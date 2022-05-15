@@ -13,6 +13,35 @@
         W3C Verifiable Credentials Processor and API
     </description>
 
+    <url>https://github.com/filip26/iron-verifiable-credentials</url>
+    
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>    
+   
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/filip26/iron-verifiable-credentials/issues</url>
+    </issueManagement>
+    
+    <scm>
+        <connection>scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
+        <developerConnection>scm:git:git://github.com/filip26/iron-verifiable-credentials.git</developerConnection>
+        <url>https://github.com/filip26/iron-verifiable-credentials/tree/main</url>
+    </scm>
+
+    <developers>
+        <developer>
+          <id>filip26</id>
+          <name>Filip Kolarik</name>
+          <email>filip26@gmail.com</email>
+          <roles><role>author</role></roles>
+        </developer>
+    </developers>
+
     <inceptionYear>2022</inceptionYear>
 
     <properties>
