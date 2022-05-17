@@ -14,19 +14,19 @@
     </description>
 
     <url>https://github.com/filip26/iron-verifiable-credentials</url>
-    
+
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
             <url>http://apache.org/licenses/LICENSE-2.0</url>
         </license>
-    </licenses>    
-   
+    </licenses>
+
     <issueManagement>
         <system>github</system>
         <url>https://github.com/filip26/iron-verifiable-credentials/issues</url>
     </issueManagement>
-    
+
     <scm>
         <connection>scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
         <developerConnection>scm:git:git://github.com/filip26/iron-verifiable-credentials.git</developerConnection>
@@ -35,10 +35,12 @@
 
     <developers>
         <developer>
-          <id>filip26</id>
-          <name>Filip Kolarik</name>
-          <email>filip26@gmail.com</email>
-          <roles><role>author</role></roles>
+            <id>filip26</id>
+            <name>Filip Kolarik</name>
+            <email>filip26@gmail.com</email>
+            <roles>
+                <role>author</role>
+            </roles>
         </developer>
     </developers>
 
@@ -62,9 +64,9 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.parsson</groupId>
+            <groupId>org.glassfish</groupId>
             <artifactId>jakarta.json</artifactId>
-            <version>1.1.0</version>
+            <version>2.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
@@ -161,8 +163,8 @@
             </plugin>
         </plugins>
     </build>
-    <profiles> 
-        <!--  Android (Java 8) Build -->        
+    <profiles>
+        <!--  Android (Java 8) Build -->
         <profile>
             <id>android</id>
             <activation>
