@@ -12,14 +12,8 @@ public interface Verifiable extends StructuredData {
     static VerifiableCredentials from(Credentials credentials, Proof proof) {
         return null;
     }
-    
-    static VerifiablePresentation from(Presentation presentation, Proof proof) {
-        
-        if (presentation instanceof MutableVerifiablePresentation) {
-            ((MutableVerifiablePresentation)presentation).setProof(proof);
-            return ((MutableVerifiablePresentation)presentation); 
-        }
-        
-        return new MutableVerifiablePresentation(presentation, proof);
+
+    static VerifiablePresentation from(Presentation presentation, Proof proof) {        
+        return new ImmutableVerifiablePresentation(presentation, proof);
     }
 }
