@@ -47,10 +47,10 @@
     <inceptionYear>2022</inceptionYear>
 
     <properties>
-        <maven.compiler.target>15</maven.compiler.target>
-        <maven.compiler.source>15</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
 
-        <envSources>src/main/java15</envSources>
+        <envSources>src/main/java17</envSources>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
