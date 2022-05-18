@@ -28,7 +28,10 @@ class VcTest {
 
         try (final InputStream is = VcTest.class.getResourceAsStream("manifest.jsonld")) {
 
-            final JsonObject manifest = JsonLd.expand(JsonDocument.of(is)).get().getJsonObject(0);
+            final JsonObject manifest = JsonLd.expand(JsonDocument.of(is))
+                        .base("https://github.com/filip26/iron-verifiable-credentials/")
+                        .get()
+                        .getJsonObject(0);
 
             return manifest
                 .asJsonObject().getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#entries")
