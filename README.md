@@ -2,7 +2,7 @@
 
 An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) in Java.
 
-**under active development, use it at your own risk, everything is subject to change**
+**under active development, use at your own risk, everything is a subject to change**
 
 # Contributing
 
