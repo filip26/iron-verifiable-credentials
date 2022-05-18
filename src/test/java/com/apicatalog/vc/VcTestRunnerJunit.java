@@ -1,6 +1,7 @@
 package com.apicatalog.vc;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.HttpLoader;
@@ -24,16 +25,17 @@ public class VcTestRunnerJunit {
         this.testCase = testCase;
     }
 
-    public boolean execute() {
+    public void execute() {
 
         assertNotNull(testCase.input);
 
         try {
-            return Vc.verify(testCase.input, LOADER);
+             VerificationResult result = Vc.verify(testCase.input, LOADER);
+             //TODO assertNotNull(result);
+             
         } catch (VerificationError e) {
-            e.printStackTrace();
+            fail(e);
         }
-        return false;
     }
 
 }

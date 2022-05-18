@@ -1,7 +1,5 @@
 package com.apicatalog.vc;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Stream;
@@ -21,7 +19,7 @@ class VcTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "manifest" })
     void test(VcTestCase testCase) {
-        assertTrue(new VcTestRunnerJunit(testCase).execute());
+        new VcTestRunnerJunit(testCase).execute();
     }
 
     static final Stream<VcTestCase> manifest() throws JsonLdError, IOException {
