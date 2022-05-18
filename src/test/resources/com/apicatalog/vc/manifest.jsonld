@@ -1,0 +1,27 @@
+{
+	"@context": {
+		"mf": "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#",
+		"name": "mf:name",
+		"sequence": {
+			"@id": "mf:entries",
+			"@type": "@id"
+		},
+		"input": {
+			"@id": "mf:action",
+			"@type": "@id"
+		}
+	},
+	"@type": "mf:Manifest",
+	"name": "Verifiable Credentials Test Suite",
+	"sequence": [
+		{
+			"@id": "#t0001",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "simple verifiable credential",
+			"input": "0001-in.jsonld",
+			"expect": ""
+		}
+	]
+}
