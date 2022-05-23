@@ -1,5 +1,7 @@
 package com.apicatalog.vc;
 
+import com.apicatalog.jsonld.lang.Keywords;
+
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.JsonValue.ValueType;
@@ -50,7 +52,7 @@ public class EmbeddedProof implements Proof {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
         }
 
-        final JsonValue proofValue = json.get(Keywords.PROOF);
+        final JsonValue proofValue = json.get(Properties.PROOF);
 
         if (proofValue == null) {
             throw new DataIntegrityError();
@@ -60,18 +62,28 @@ public class EmbeddedProof implements Proof {
             throw new DataIntegrityError();
         }
         
-        for (final JsonValue proofItem : proofValue.asJsonArray()) {
+        for (JsonValue proofItem : proofValue.asJsonArray()) {
             if (!ValueType.OBJECT.equals(proofItem.getValueType())) {
                 throw new DataIntegrityError();
+            }
+
+            if (proofItem.asJsonObject().containsKey(Keywords.GRAPH)) { //TODO hack
+                proofItem = proofItem.asJsonObject().get(Keywords.GRAPH);
+                if (ValueType.ARRAY.equals(proofItem.getValueType())) {
+                    proofItem = proofItem.asJsonArray().get(0); //FIXME !?!
+                }
+                if (!ValueType.OBJECT.equals(proofItem.getValueType())) {
+                    throw new DataIntegrityError();
+                }                
             }
             
             final JsonObject proofObject = proofItem.asJsonObject();
             
             if (!proofObject.containsKey(Keywords.TYPE)
-                    || !proofObject.containsKey(Keywords.PROOF_PURPOSE)
-                    || !proofObject.containsKey(Keywords.PROOF_VERIFICATION_METHOD)
-                    || !proofObject.containsKey(Keywords.PROOF_CREATED)
-                    || !proofObject.containsKey(Keywords.PROOF_VALUE)
+                    || !proofObject.containsKey(Properties.PROOF_PURPOSE)
+                    || !proofObject.containsKey(Properties.PROOF_VERIFICATION_METHOD)
+                    || !proofObject.containsKey(Properties.CREATED)
+                    || !proofObject.containsKey(Properties.PROOF_VALUE)
                     ) {
                 throw new DataIntegrityError();
             }

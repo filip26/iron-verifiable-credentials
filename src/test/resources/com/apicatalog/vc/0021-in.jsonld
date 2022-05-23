@@ -4,12 +4,15 @@
 		"https://www.w3.org/2018/credentials/examples/v1",
 		"https://w3id.org/security/suites/ed25519-2020/v1"
 	],
-	"id": "http://example.gov/credentials/3732",
+	"id": "http://example.edu/credentials/3732",
 	"type": [
 		"VerifiableCredential",
 		"UniversityDegreeCredential"
 	],
-	"issuer": "https://example.edu",
+	"issuer": {
+		"id": "did:example:76e12ec712ebc6f1c221ebfeb1f",
+		"name": "Example University"
+	},
 	"issuanceDate": "2010-01-01T19:23:24Z",
 	"credentialSubject": {
 		"id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
@@ -20,9 +23,8 @@
 	},
 	"proof": {
 		"type": "Ed25519Signature2020",
-		"created": "2021-11-13T18:19:39Z",
-		"verificationMethod": "https://example.edu/issuers/14#key-1",
+		"created": "2022-02-25T14:58:43Z",
 		"proofPurpose": "assertionMethod",
-		"proofValue": "z58DAdFfa9SkqZMVPxAQpic7ndSayn1PzZs6ZjWp1CktyGesjuTSwRdoWhAfGFCF5bppETSTojQCrfFPP2oumHKtz"
+		"proofValue": "z2Xdmp6YDYz5RPKeRFDcPYorAmnERyr7aRNzv176oLMxwcW7GgKxAQT45jUKwsMA1XvrmFT5Y8WCx7ZnkNTTHJnu9"
 	}
 }

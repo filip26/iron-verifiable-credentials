@@ -21,7 +21,11 @@ class VcTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "manifest" })
     void test(VcTestCase testCase) {
-        
+
+        // skip JWS credentials
+        assumeFalse("t0001".equals(testCase.id.getFragment()));
+        assumeFalse("t0002".equals(testCase.id.getFragment()));
+
         // skip unsigned credentials
         assumeFalse("t0006".equals(testCase.id.getFragment()));
         assumeFalse("t0015".equals(testCase.id.getFragment()));

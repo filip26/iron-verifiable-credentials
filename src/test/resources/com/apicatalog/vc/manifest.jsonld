@@ -157,6 +157,60 @@
             "name": "termsOfUse property by an issuer",
             "input": "0016-in.jsonld",
             "expect": ""
+        },
+        {
+            "@id": "#t0017",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: missing @type property",
+            "input": "0017-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0018",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: invalid @type property",
+            "input": "0018-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0019",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: missing created property",
+            "input": "0019-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0020",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: invalid created property",
+            "input": "0020-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0021",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: missing verificationMethod property",
+            "input": "0021-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0022",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: invalid verificationMethod property",
+            "input": "0022-in.jsonld",
+            "expect": ""
         }
 
 	]
