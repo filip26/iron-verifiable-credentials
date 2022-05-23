@@ -1,6 +1,9 @@
 package com.apicatalog.vc;
 
+import com.apicatalog.jsonld.JsonLd;
+import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.loader.DocumentLoader;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -32,6 +35,22 @@ public interface VcDocument {
         return (Presentation)this;
     }
 
+    static VcDocument load(String location, DocumentLoader loader) throws DataIntegrityError {
+        try {
+            // VC/VP in expanded form
+            final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
+
+            if (expanded == null || expanded.isEmpty()) {
+                throw new DataIntegrityError();                  //TODO
+            }
+
+            return VcDocument.from(expanded);
+
+        } catch (JsonLdError e) {
+            throw new DataIntegrityError(e);
+        }
+    }
+    
     static VcDocument from(JsonArray expanded) throws DataIntegrityError {
         
         for (final JsonValue item : expanded) {

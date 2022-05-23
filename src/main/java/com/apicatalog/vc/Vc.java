@@ -1,10 +1,6 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.jsonld.JsonLd;
-import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-
-import jakarta.json.JsonArray;
 
 /**
  * High level API to process Verified Credentials and Verified Presentations.
@@ -20,26 +16,14 @@ public final class Vc {
      * @throws DataIntegrityError
      * @throws VerificationError
      */
-    public static void verify(String location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
+    public static /*FIXME use VerificationApi*/ void verify(String location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
-        try {
-            // VC/VP in expanded form
-            final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
+        final VcDocument data  = VcDocument.load(location, loader);
 
-            if (expanded == null || expanded.isEmpty()) {
-                throw new VerificationError();                  //TODO
-            }
-
-            VcDocument data  = VcDocument.from(expanded);
-            
-            if (data == null || !data.isVerifiable()) {
-                throw new VerificationError();                  //TODO
-            }
-
-            data.asVerifiable().verify();
-
-        } catch (JsonLdError e) {
-            throw new VerificationError(e);
+        if (data == null || !data.isVerifiable()) {
+            throw new VerificationError();                  //TODO
         }
-    }    
+
+        data.asVerifiable().verify();
+    }
 }
