@@ -19,8 +19,107 @@
 			"@type": [
 				"PositiveEvaluationTest"
 			],
-			"name": "simple verifiable credential",
+			"name": "a simple verifiable credential",
 			"input": "0001-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0002",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "a simple verifiable presentation",
+			"input": "0002-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0003",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "id property",
+			"input": "0003-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0004",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "type property",
+			"input": "0004-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0005",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "credentialSubject property",
+			"input": "0005-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0006",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "multiple subjects in a credential",
+			"input": "0006-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0007",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "issuer property",
+			"input": "0007-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0008",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "issuer expanded property",
+			"input": "0008-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0009",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "issuanceDate property",
+			"input": "0009-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0010",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "proof property",
+			"input": "0010-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0011",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "expirationDate property",
+			"input": "0011-in.jsonld",
+			"expect": ""
+		},
+		{
+			"@id": "#t0012",
+			"@type": [
+				"PositiveEvaluationTest"
+			],
+			"name": "status property",
+			"input": "0012-in.jsonld",
 			"expect": ""
 		}
 	]
