@@ -2,12 +2,13 @@ package com.apicatalog.vc;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.multibase.Multibase;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
-import jakarta.json.JsonValue.ValueType;
 
 /**
  * High level API to process Verified Credentials and Verified Presentations
@@ -28,7 +29,7 @@ public final class Vc {
 
             for (final JsonValue item : expanded) {
 
-                if (!ValueType.OBJECT.equals(item.getValueType())) {
+                if (JsonUtils.isNotObject(item)) {
                     //TODO warning
                     continue;
                 }
@@ -42,6 +43,30 @@ public final class Vc {
                 // verify embedded proof
                 final Proof proof = EmbeddedProof.verify(verifiable, null);     //FIXME pass verification result
 
+                // verify supported crypto suite
+                if (!proof.isTypeOf("https://w3id.org/security#Ed25519Signature2020")) {
+                    //TODO UNKNOWN_CRYPTOSUITE_TYPE code
+                    throw new VerificationError();      // an unknown crypto suite
+                }
+
+                // verify supported proof value encoding
+                if (!proof.getValue().isTypeOf("https://w3id.org/security#multibase")) {
+                    //TODO NVALID_PROOF_VALUE code
+                    throw new VerificationError();
+                }
+
+                // decode proof value
+                if (!Multibase.isAlgorithmSupported(proof.getValue().getValue())) {
+                    //TODO NVALID_PROOF_VALUE code
+                    throw new VerificationError();
+                }
+                
+                byte[] proofValue = Multibase.decode(proof.getValue().getValue());
+                if (proofValue.length != 64) {
+                    //TODO INVALID_PROOF_LENGTH code
+                    throw new VerificationError();
+                }
+                                
                 //TODO
             }
 

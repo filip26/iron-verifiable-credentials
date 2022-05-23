@@ -17,12 +17,5 @@
 			"type": "BachelorDegree",
 			"name": "Bachelor of Science and Arts"
 		}
-	},
-	"proof": {
-		"type": "Ed25519Signature2020",
-		"created": "2022-02-25T14:58:43Z",
-		"verificationMethod": "https://example.edu/issuers/14#key-1",
-		"proofPurpose": "assertionMethod",
-        "proofValue": true
 	}
 }

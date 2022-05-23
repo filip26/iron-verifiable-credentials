@@ -48,5 +48,15 @@ public interface Proof {
      * @return
      */
     ProofValue getValue();
+
+    /**
+     * Checks is the proof is of the given type.
+     * 
+     * @param type
+     * @return <code>true</code> if the given type matches the proof type
+     */
+    default boolean isTypeOf(final String type) {
+        return getType() != null && getType().contains(type);
+    }
     
 }
