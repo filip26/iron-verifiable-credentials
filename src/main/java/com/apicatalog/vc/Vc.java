@@ -19,27 +19,33 @@ public final class Vc {
 
         try {
             // VC/VP in expanded form
-            final JsonArray expanded = JsonLd.expand(location).loader(loader).get();            
+            final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
 
             if (expanded == null || expanded.isEmpty()) {
                 //TODO error
                 return null;
             }
-            
+
             for (final JsonValue item : expanded) {
-                
+
                 if (!ValueType.OBJECT.equals(item.getValueType())) {
                     //TODO warning
                     continue;
                 }
-                
+
                 final JsonObject verifiable = item.asJsonObject();
-                
-                // TODO VC or VP ?
-                
+
+                //TODO VC or VP ?
+
+                //TODO data integrity check
+
+                // verify embedded proof
+                final Proof proof = EmbeddedProof.verify(verifiable, null);     //FIXME pass verification result
+
+                //TODO
             }
 
-            
+
             // TODO Auto-generated method stub
             return null;
 
@@ -48,5 +54,5 @@ public final class Vc {
             throw new VerificationError();
         }
     }
-  
+
 }

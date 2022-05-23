@@ -10,8 +10,8 @@ import com.apicatalog.jsonld.loader.SchemeRouter;
 public class VcTestRunnerJunit {
 
     private final VcTestCase testCase;
-    
-    private final static DocumentLoader LOADER = 
+
+    private final static DocumentLoader LOADER =
             new UriBaseRewriter(
                     "https://github.com/filip26/iron-verifiable-credentials/",
                     "classpath:",
@@ -32,8 +32,9 @@ public class VcTestRunnerJunit {
         try {
              VerificationResult result = Vc.verify(testCase.input, LOADER);
              //TODO assertNotNull(result);
-             
+
         } catch (VerificationError e) {
+            e.printStackTrace();
             fail(e);
         }
     }

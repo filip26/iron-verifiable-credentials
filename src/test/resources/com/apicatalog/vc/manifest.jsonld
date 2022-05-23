@@ -121,6 +121,43 @@
 			"name": "status property",
 			"input": "0012-in.jsonld",
 			"expect": ""
-		}
+		},
+        {
+            "@id": "#t0013",
+            "@type": [
+                "PositiveEvaluationTest"
+            ],
+            "name": "ED25519 2020 signed credentials",
+            "input": "0013-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0014",
+            "@type": [
+                "PositiveEvaluationTest"
+            ],
+            "name": "credentialSchema property to perform JSON schema validation",
+            "input": "0014-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0015",
+            "@type": [
+                "PositiveEvaluationTest"
+            ],
+            "name": "refreshService property by an issuer",
+            "input": "0015-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0016",
+            "@type": [
+                "PositiveEvaluationTest"
+            ],
+            "name": "termsOfUse property by an issuer",
+            "input": "0016-in.jsonld",
+            "expect": ""
+        }
+
 	]
 }

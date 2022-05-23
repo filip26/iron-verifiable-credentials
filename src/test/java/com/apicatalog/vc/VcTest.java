@@ -1,5 +1,7 @@
 package com.apicatalog.vc;
 
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Stream;
@@ -19,6 +21,11 @@ class VcTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "manifest" })
     void test(VcTestCase testCase) {
+        
+        // skip unsigned credentials
+        assumeFalse("t0006".equals(testCase.id.getFragment()));
+        assumeFalse("t0015".equals(testCase.id.getFragment()));
+        
         new VcTestRunnerJunit(testCase).execute();
     }
 
