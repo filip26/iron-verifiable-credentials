@@ -247,6 +247,24 @@
             "name": "embedded proof: invalid proofValue property",
             "input": "0024-in.jsonld",
             "expect": ""
-        }
+        },
+        {
+            "@id": "#t0027",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof is missing",
+            "input": "0027-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0026",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof is invalid",
+            "input": "0028-in.jsonld",
+            "expect": ""
+        }        
 	]
 }

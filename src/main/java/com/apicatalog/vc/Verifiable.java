@@ -1,6 +1,8 @@
 package com.apicatalog.vc;
 
-public interface Verifiable extends StructuredData {
+import com.apicatalog.vc.proof.Proof;
+
+public interface Verifiable extends VcDocument {
 
     Proof getProof();
 
@@ -16,4 +18,6 @@ public interface Verifiable extends StructuredData {
     static VerifiablePresentation from(Presentation presentation, Proof proof) {
         return new ImmutableVerifiablePresentation(presentation, proof);
     }
+    
+    void verify() throws VerificationError;
 }

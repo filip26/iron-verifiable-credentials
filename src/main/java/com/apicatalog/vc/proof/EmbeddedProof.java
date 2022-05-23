@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.proof;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -10,6 +10,11 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.NodeObject;
 import com.apicatalog.jsonld.lang.ValueObject;
+import com.apicatalog.multibase.Multibase;
+import com.apicatalog.vc.Constants;
+import com.apicatalog.vc.DataIntegrityError;
+import com.apicatalog.vc.VerificationError;
+import com.apicatalog.vc.VerificationError.Type;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -39,30 +44,14 @@ public class EmbeddedProof implements Proof {
      * @param result
      * @return
      * @throws VerificationError
-     * @throws DataIntegrityError 
      */
-    static EmbeddedProof verify(final JsonObject json, final VerificationResult result) throws VerificationError, DataIntegrityError {
-
-        final EmbeddedProof proof = from(json);
-
-        //TODO
-        return proof;
-    }
-    
-    /**
-     * 
-     * @param json expanded verifiable credentials or presentation
-     * @param result
-     * @return
-     * @throws VerificationError
-     */
-    static EmbeddedProof from(final JsonObject json) throws DataIntegrityError {
+    public static EmbeddedProof from(final JsonObject json) throws DataIntegrityError {
 
         if (json == null) {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
         }
 
-        final JsonValue proofValue = json.get(DataIntegrity.PROOF);
+        final JsonValue proofValue = json.get(Constants.PROOF);
 
         if (proofValue == null) {
             throw new DataIntegrityError();
@@ -120,11 +109,11 @@ public class EmbeddedProof implements Proof {
             }
 
             // proofPurpose property
-            if (!proofObject.containsKey(DataIntegrity.PROOF_PURPOSE)) {
+            if (!proofObject.containsKey(Constants.PROOF_PURPOSE)) {
                 throw new DataIntegrityError();
             }
 
-            final JsonValue proofPurposeValue = proofObject.get(DataIntegrity.PROOF_PURPOSE);
+            final JsonValue proofPurposeValue = proofObject.get(Constants.PROOF_PURPOSE);
             
             if (JsonUtils.isArray(proofPurposeValue)) {
                  
@@ -141,11 +130,11 @@ public class EmbeddedProof implements Proof {
             }
 
             // verificationMethod property
-            if (!proofObject.containsKey(DataIntegrity.PROOF_VERIFICATION_METHOD)) {
+            if (!proofObject.containsKey(Constants.PROOF_VERIFICATION_METHOD)) {
                 throw new DataIntegrityError();
             }
 
-            final JsonValue verificationMethodValue = proofObject.get(DataIntegrity.PROOF_VERIFICATION_METHOD);
+            final JsonValue verificationMethodValue = proofObject.get(Constants.PROOF_VERIFICATION_METHOD);
             
             if (JsonUtils.isArray(verificationMethodValue)) {
                  
@@ -162,11 +151,11 @@ public class EmbeddedProof implements Proof {
             }
 
             // proofValue property
-            if (!proofObject.containsKey(DataIntegrity.PROOF_VALUE)) {
+            if (!proofObject.containsKey(Constants.PROOF_VALUE)) {
                 throw new DataIntegrityError();
             }
 
-            final JsonValue embeddedProofValue = proofObject.get(DataIntegrity.PROOF_VALUE);
+            final JsonValue embeddedProofValue = proofObject.get(Constants.PROOF_VALUE);
             
             if (JsonUtils.isArray(embeddedProofValue)) {
                  
@@ -189,11 +178,11 @@ public class EmbeddedProof implements Proof {
             }
             
             // created property
-            if (!proofObject.containsKey(DataIntegrity.CREATED)) {
+            if (!proofObject.containsKey(Constants.CREATED)) {
                 throw new DataIntegrityError();
             }
 
-            final JsonValue createdValue = proofObject.get(DataIntegrity.CREATED);
+            final JsonValue createdValue = proofObject.get(Constants.CREATED);
             
             if (JsonUtils.isArray(createdValue)) {
 
@@ -228,7 +217,8 @@ public class EmbeddedProof implements Proof {
             
             //TODO domain property
             
-            
+
+
             return embeddedProof;       //FIXME process other proofs
         }
 
@@ -268,5 +258,33 @@ public class EmbeddedProof implements Proof {
     public ProofValue getValue() {
         return value;
     }
- 
+
+    @Override
+    public void verify() throws VerificationError {
+
+        // verify supported crypto suite
+        if (!isTypeOf("https://w3id.org/security#Ed25519Signature2020")) {
+            throw new VerificationError(Type.UnknownCryptoSuiteType);
+        }
+
+        // verify supported proof value encoding
+        if (value == null && !value.isTypeOf("https://w3id.org/security#multibase")) {
+            throw new VerificationError(Type.InvalidProofValue);
+        }
+
+        // verify proof value
+        if (value.getValue() == null || !Multibase.isAlgorithmSupported(value.getValue())) {
+            throw new VerificationError(Type.InvalidProofValue);
+        }
+      
+        // decode proof value
+        byte[] proofValue = Multibase.decode(value.getValue());
+      
+        // verify proof value length
+        if (proofValue.length != 64) {
+            throw new VerificationError(Type.InvalidProofLenght);
+        }
+
+        // TODO Auto-generated method stub        
+    }
 }

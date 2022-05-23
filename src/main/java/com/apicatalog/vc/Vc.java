@@ -1,58 +1,29 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.jsonld.JsonLd;
-import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 
-import jakarta.json.JsonArray;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
-import jakarta.json.JsonValue.ValueType;
-
 /**
- * High level API to process Verified Credentials and Verified Presentations
+ * High level API to process Verified Credentials and Verified Presentations.
  *
  */
 public final class Vc {
 
-    public static VerificationResult verify(String location, DocumentLoader loader) throws VerificationError, DataIntegrityError {
+    /**
+     * Verifies VC/VP document data integrity and signature.
+     * 
+     * @param location
+     * @param loader
+     * @throws DataIntegrityError
+     * @throws VerificationError
+     */
+    public static /*FIXME use VerificationApi*/ void verify(String location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
-        try {
-            // VC/VP in expanded form
-            final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
+        final VcDocument data  = VcDocument.load(location, loader);
 
-            if (expanded == null || expanded.isEmpty()) {
-                //TODO error
-                return null;
-            }
-
-            for (final JsonValue item : expanded) {
-
-                if (!ValueType.OBJECT.equals(item.getValueType())) {
-                    //TODO warning
-                    continue;
-                }
-
-                final JsonObject verifiable = item.asJsonObject();
-
-                //TODO VC or VP ?
-
-                //TODO data integrity check
-
-                // verify embedded proof
-                final Proof proof = EmbeddedProof.verify(verifiable, null);     //FIXME pass verification result
-
-                //TODO
-            }
-
-
-            // TODO Auto-generated method stub
-            return null;
-
-        } catch (JsonLdError e) {
-            e.printStackTrace();
-            throw new VerificationError();
+        if (data == null || !data.isVerifiable()) {
+            throw new VerificationError();                  //TODO
         }
-    }
 
+        data.asVerifiable().verify();
+    }
 }

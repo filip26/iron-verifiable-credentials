@@ -1,7 +1,9 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.proof;
 
 import java.time.Instant;
 import java.util.Set;
+
+import com.apicatalog.vc.VerificationError;
 
 public interface Proof {
 
@@ -48,5 +50,16 @@ public interface Proof {
      * @return
      */
     ProofValue getValue();
-    
+
+    /**
+     * Checks is the proof is of the given type.
+     * 
+     * @param type
+     * @return <code>true</code> if the given type matches the proof type
+     */
+    default boolean isTypeOf(final String type) {
+        return getType() != null && getType().contains(type);
+    }
+
+    void verify() throws VerificationError;    
 }
