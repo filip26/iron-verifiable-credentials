@@ -211,7 +211,42 @@
             "name": "embedded proof: invalid verificationMethod property",
             "input": "0022-in.jsonld",
             "expect": ""
+        },
+        {
+            "@id": "#t0023",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: missing proofPurpose property",
+            "input": "0023-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0022",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: invalid proofPurpose property",
+            "input": "0022-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0023",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: missing proofValue property",
+            "input": "0023-in.jsonld",
+            "expect": ""
+        },
+        {
+            "@id": "#t0024",
+            "@type": [
+                "NegativeEvaluationTest"
+            ],
+            "name": "embedded proof: invalid proofValue property",
+            "input": "0024-in.jsonld",
+            "expect": ""
         }
-
 	]
 }

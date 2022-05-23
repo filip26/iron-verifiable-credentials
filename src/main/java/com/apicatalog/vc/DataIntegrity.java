@@ -1,6 +1,6 @@
 package com.apicatalog.vc;
 
-public class Properties {
+public class DataIntegrity {
 
     public static final String TYPE = "@type";
     public static final String CREATED = "http://purl.org/dc/terms/created";
