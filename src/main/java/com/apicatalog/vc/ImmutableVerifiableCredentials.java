@@ -15,8 +15,10 @@ class ImmutableVerifiableCredentials implements VerifiableCredentials {
 
     @Override
     public void verify() throws VerificationError {
-        // TODO Auto-generated method stub
-        
+        if (proof == null) {
+            throw new VerificationError();
+        }
+        proof.verify();
     }
 
 }

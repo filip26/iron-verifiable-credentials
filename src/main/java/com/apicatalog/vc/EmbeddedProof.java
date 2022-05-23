@@ -10,6 +10,8 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.NodeObject;
 import com.apicatalog.jsonld.lang.ValueObject;
+import com.apicatalog.multibase.Multibase;
+import com.apicatalog.vc.VerificationError.Type;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -214,29 +216,6 @@ public class EmbeddedProof implements Proof {
             
 
 
-//            // verify supported crypto suite
-//            if (!proof.isTypeOf("https://w3id.org/security#Ed25519Signature2020")) {
-//                throw new VerificationError(Type.UnknownCryptoSuiteType);
-//            }
-//
-//            // verify supported proof value encoding
-//            if (!proof.getValue().isTypeOf("https://w3id.org/security#multibase")) {
-//                throw new VerificationError(Type.InvalidProofValue);
-//            }
-//
-//            // verify proof value
-//            if (!Multibase.isAlgorithmSupported(proof.getValue().getValue())) {
-//                throw new VerificationError(Type.InvalidProofValue);
-//            }
-//            
-//            // decode proof value
-//            byte[] proofValue = Multibase.decode(proof.getValue().getValue());
-//            
-//            // verify proof value length
-//            if (proofValue.length != 64) {
-//                throw new VerificationError(Type.InvalidProofLenght);
-//            }
-
             return embeddedProof;       //FIXME process other proofs
         }
 
@@ -279,7 +258,30 @@ public class EmbeddedProof implements Proof {
 
     @Override
     public void verify() throws VerificationError {
-        // TODO Auto-generated method stub
-        
+
+        // verify supported crypto suite
+        if (!isTypeOf("https://w3id.org/security#Ed25519Signature2020")) {
+            throw new VerificationError(Type.UnknownCryptoSuiteType);
+        }
+
+        // verify supported proof value encoding
+        if (value == null && !value.isTypeOf("https://w3id.org/security#multibase")) {
+            throw new VerificationError(Type.InvalidProofValue);
+        }
+
+        // verify proof value
+        if (value.getValue() == null || !Multibase.isAlgorithmSupported(value.getValue())) {
+            throw new VerificationError(Type.InvalidProofValue);
+        }
+      
+        // decode proof value
+        byte[] proofValue = Multibase.decode(value.getValue());
+      
+        // verify proof value length
+        if (proofValue.length != 64) {
+            throw new VerificationError(Type.InvalidProofLenght);
+        }
+
+        // TODO Auto-generated method stub        
     }
 }

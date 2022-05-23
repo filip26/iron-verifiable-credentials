@@ -21,15 +21,15 @@ public interface VcDocument {
     }
 
     default Verifiable asVerifiable() {
-        return isVerifiable() ? (Verifiable)this : null;
+        return (Verifiable)this;
     }
 
     default Credentials asCredentials() {
-        return isCredentials() ? (Credentials)this : null;
+        return (Credentials)this;
     }
 
     default Presentation asPresentation() {
-        return isPresentation() ? (Presentation)this : null;
+        return (Presentation)this;
     }
 
     static VcDocument from(JsonArray expanded) throws DataIntegrityError {
