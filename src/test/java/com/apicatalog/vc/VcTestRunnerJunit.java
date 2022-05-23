@@ -33,7 +33,7 @@ public class VcTestRunnerJunit {
              VerificationResult result = Vc.verify(testCase.input, LOADER);
              //TODO assertNotNull(result);
 
-        } catch (VerificationError e) {
+        } catch (VerificationError | DataIntegrityError e) {
             e.printStackTrace();
             fail(e);
         }

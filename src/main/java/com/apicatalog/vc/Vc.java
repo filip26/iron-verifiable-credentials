@@ -15,7 +15,7 @@ import jakarta.json.JsonValue.ValueType;
  */
 public final class Vc {
 
-    public static VerificationResult verify(String location, DocumentLoader loader) throws VerificationError {
+    public static VerificationResult verify(String location, DocumentLoader loader) throws VerificationError, DataIntegrityError {
 
         try {
             // VC/VP in expanded form

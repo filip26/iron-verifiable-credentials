@@ -9,6 +9,34 @@ import jakarta.json.JsonValue.ValueType;
  */
 public class EmbeddedProof implements Proof {
 
+    private String type;
+
+    private String purpose;
+
+    private String verificationMethod;
+    
+    private String created;
+    
+    private String domain;
+    
+    private String value;    
+
+    /**
+     * 
+     * @param json expanded verifiable credentials or presentation
+     * @param result
+     * @return
+     * @throws VerificationError
+     * @throws DataIntegrityError 
+     */
+    static EmbeddedProof verify(final JsonObject json, final VerificationResult result) throws VerificationError, DataIntegrityError {
+
+        final EmbeddedProof proof = from(json);
+
+        //TODO
+        return proof;
+    }
+    
     /**
      * 
      * @param json expanded verifiable credentials or presentation
@@ -16,7 +44,7 @@ public class EmbeddedProof implements Proof {
      * @return
      * @throws VerificationError
      */
-    static EmbeddedProof verify(final JsonObject json, final VerificationResult result) throws VerificationError {
+    static EmbeddedProof from(final JsonObject json) throws DataIntegrityError {
 
         if (json == null) {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
@@ -25,25 +53,70 @@ public class EmbeddedProof implements Proof {
         final JsonValue proofValue = json.get(Keywords.PROOF);
 
         if (proofValue == null) {
-            throw new VerificationError();
+            throw new DataIntegrityError();
         }
 
         if (!ValueType.ARRAY.equals(proofValue.getValueType())) {
-            throw new VerificationError();
+            throw new DataIntegrityError();
         }
         
         for (final JsonValue proofItem : proofValue.asJsonArray()) {
             if (!ValueType.OBJECT.equals(proofItem.getValueType())) {
-                throw new VerificationError();
+                throw new DataIntegrityError();
             }
             
-            //TODO parse embedded proof
+            final JsonObject proofObject = proofItem.asJsonObject();
             
+            if (!proofObject.containsKey(Keywords.TYPE)
+                    || !proofObject.containsKey(Keywords.PROOF_PURPOSE)
+                    || !proofObject.containsKey(Keywords.PROOF_VERIFICATION_METHOD)
+                    || !proofObject.containsKey(Keywords.PROOF_CREATED)
+                    || !proofObject.containsKey(Keywords.PROOF_VALUE)
+                    ) {
+                throw new DataIntegrityError();
+            }
+
+            EmbeddedProof embeddedProof = new EmbeddedProof();
+            
+            
+            
+            return embeddedProof;       //FIXME process other proofs
         }
 
 
         //TODO
         return null;
+    }    
+    
+
+    @Override
+    public String getType() {
+        return type;
     }
 
+
+    @Override
+    public String getPurpose() {
+        return purpose;
+    }
+
+    @Override
+    public String getVerificationMethod() {
+        return verificationMethod;
+    }
+
+    @Override
+    public String getCreated() {
+        return created;
+    }
+
+    @Override
+    public String getDomain() {
+        return domain;
+    }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
 }
