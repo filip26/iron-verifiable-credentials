@@ -23,7 +23,7 @@ public class ClasspathLoader implements DocumentLoader {
             if (is == null) {
                 throw new JsonLdError(JsonLdErrorCode.LOADING_DOCUMENT_FAILED);
             }
-            
+
             final Document document = toDocument(url, is);
             document.setDocumentUrl(url);
 

@@ -1,6 +1,7 @@
 package com.apicatalog.vc;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.HttpLoader;
@@ -9,8 +10,8 @@ import com.apicatalog.jsonld.loader.SchemeRouter;
 public class VcTestRunnerJunit {
 
     private final VcTestCase testCase;
-    
-    private final static DocumentLoader LOADER = 
+
+    private final static DocumentLoader LOADER =
             new UriBaseRewriter(
                     "https://github.com/filip26/iron-verifiable-credentials/",
                     "classpath:",
@@ -24,16 +25,28 @@ public class VcTestRunnerJunit {
         this.testCase = testCase;
     }
 
-    public boolean execute() {
+    public void execute() {
 
         assertNotNull(testCase.input);
 
         try {
-            return Vc.verify(testCase.input, LOADER);
-        } catch (VerificationError e) {
-            e.printStackTrace();
+
+             VerificationResult result = Vc.verify(testCase.input, LOADER);
+             
+             if (testCase.type.stream().noneMatch(o -> o.endsWith("PositiveEvaluationTest"))) {
+                 fail();
+                 return;
+             }
+
+             //TODO assertNotNull(result);
+
+             
+        } catch (VerificationError | DataIntegrityError e) {
+            if (testCase.type.stream().noneMatch(o -> o.endsWith("NegativeEvaluationTest"))) {
+                e.printStackTrace();
+                fail(e);                
+            }
         }
-        return false;
     }
 
 }
