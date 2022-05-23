@@ -6,7 +6,7 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public interface StructuredData {
+public interface VcDocument {
 
     default boolean isVerifiable() {
         return false;
@@ -32,7 +32,7 @@ public interface StructuredData {
         return isPresentation() ? (Presentation)this : null;
     }
 
-    static StructuredData from(JsonArray expanded) throws DataIntegrityError {
+    static VcDocument from(JsonArray expanded) throws DataIntegrityError {
         
         for (final JsonValue item : expanded) {
 

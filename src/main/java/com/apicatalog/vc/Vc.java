@@ -7,13 +7,19 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import jakarta.json.JsonArray;
 
 /**
- * High level API to process Verified Credentials and Verified Presentations
+ * High level API to process Verified Credentials and Verified Presentations.
  *
  */
 public final class Vc {
 
-
-    
+    /**
+     * Verifies VC/VP document data integrity and signature.
+     * 
+     * @param location
+     * @param loader
+     * @throws DataIntegrityError
+     * @throws VerificationError
+     */
     public static void verify(String location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
         try {
@@ -24,7 +30,7 @@ public final class Vc {
                 throw new VerificationError();                  //TODO
             }
 
-            StructuredData data  = StructuredData.from(expanded);
+            VcDocument data  = VcDocument.from(expanded);
             
             if (data == null || !data.isVerifiable()) {
                 throw new VerificationError();                  //TODO
@@ -35,5 +41,5 @@ public final class Vc {
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }
-    }
+    }    
 }

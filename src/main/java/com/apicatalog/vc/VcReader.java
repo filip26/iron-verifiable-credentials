@@ -4,7 +4,7 @@ import java.io.Closeable;
 
 public interface VcReader extends Closeable {
 
-    StructuredData read();
+    VcDocument read();
 
     Credentials readCredentials();
 

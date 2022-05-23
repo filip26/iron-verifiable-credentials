@@ -15,7 +15,7 @@ import jakarta.json.JsonStructure;
 /**
  * A credential is a set of one or more claims made by the same entity.
  */
-public interface Credentials extends StructuredData {
+public interface Credentials extends VcDocument {
 
     static Credentials from(JsonStructure json) {
 

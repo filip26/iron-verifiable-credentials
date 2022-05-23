@@ -1,6 +1,6 @@
 package com.apicatalog.vc;
 
-public interface Verifiable extends StructuredData {
+public interface Verifiable extends VcDocument {
 
     Proof getProof();
 
