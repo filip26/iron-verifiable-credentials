@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.proof;
 
 import java.util.Set;
 

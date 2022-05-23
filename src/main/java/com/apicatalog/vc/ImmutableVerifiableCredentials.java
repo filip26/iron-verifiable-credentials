@@ -1,5 +1,7 @@
 package com.apicatalog.vc;
 
+import com.apicatalog.vc.proof.Proof;
+
 class ImmutableVerifiableCredentials implements VerifiableCredentials {
 
     final Proof proof;

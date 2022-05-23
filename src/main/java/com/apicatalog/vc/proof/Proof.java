@@ -1,7 +1,9 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.proof;
 
 import java.time.Instant;
 import java.util.Set;
+
+import com.apicatalog.vc.VerificationError;
 
 public interface Proof {
 

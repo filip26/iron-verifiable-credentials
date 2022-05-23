@@ -1,5 +1,7 @@
 package com.apicatalog.vc;
 
+import com.apicatalog.vc.proof.Proof;
+
 public interface Verifiable extends VcDocument {
 
     Proof getProof();

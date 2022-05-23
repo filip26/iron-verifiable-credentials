@@ -1,6 +1,7 @@
 package com.apicatalog.vc;
 
-public class DataIntegrity {
+/*FIXME remove the class */
+public class Constants {
 
     public static final String TYPE = "@type";
     public static final String CREATED = "http://purl.org/dc/terms/created";
