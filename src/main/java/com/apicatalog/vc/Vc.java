@@ -1,5 +1,7 @@
 package com.apicatalog.vc;
 
+import java.net.URI;
+
 import com.apicatalog.jsonld.loader.DocumentLoader;
 
 /**
@@ -16,7 +18,7 @@ public final class Vc {
      * @throws DataIntegrityError
      * @throws VerificationError
      */
-    public static /*FIXME use VerificationApi*/ void verify(String location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
+    public static /*FIXME use VerificationApi*/ void verify(URI location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
         final VcDocument data  = VcDocument.load(location, loader);
 
