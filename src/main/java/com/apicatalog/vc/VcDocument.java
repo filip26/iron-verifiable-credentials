@@ -40,7 +40,7 @@ public interface VcDocument {
     static VcDocument load(String location, DocumentLoader loader) throws DataIntegrityError {
         try {
             // VC/VP in expanded form
-            final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
+            final JsonArray expanded = JsonLd.expand(location).loader(new StaticContextLoader(loader)).get();   //TODO make use of static loader optional
 
             if (expanded == null || expanded.isEmpty()) {
                 throw new DataIntegrityError();                  //TODO
