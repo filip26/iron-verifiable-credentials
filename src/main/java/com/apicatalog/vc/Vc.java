@@ -5,6 +5,7 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.vc.VerificationError.Type;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -38,35 +39,33 @@ public final class Vc {
 
                 //TODO VC or VP ?
 
-                //TODO data integrity check
-
                 // verify embedded proof
                 final Proof proof = EmbeddedProof.verify(verifiable, null);     //FIXME pass verification result
 
                 // verify supported crypto suite
                 if (!proof.isTypeOf("https://w3id.org/security#Ed25519Signature2020")) {
-                    //TODO UNKNOWN_CRYPTOSUITE_TYPE code
-                    throw new VerificationError();      // an unknown crypto suite
+                    throw new VerificationError(Type.UnknownCryptoSuiteType);
                 }
 
                 // verify supported proof value encoding
                 if (!proof.getValue().isTypeOf("https://w3id.org/security#multibase")) {
-                    //TODO NVALID_PROOF_VALUE code
-                    throw new VerificationError();
+                    throw new VerificationError(Type.InvalidProofValue);
                 }
 
-                // decode proof value
+                // verify proof value
                 if (!Multibase.isAlgorithmSupported(proof.getValue().getValue())) {
-                    //TODO NVALID_PROOF_VALUE code
-                    throw new VerificationError();
+                    throw new VerificationError(Type.InvalidProofValue);
                 }
                 
+                // decode proof value
                 byte[] proofValue = Multibase.decode(proof.getValue().getValue());
+                
+                // verify proof value length
                 if (proofValue.length != 64) {
-                    //TODO INVALID_PROOF_LENGTH code
-                    throw new VerificationError();
+                    throw new VerificationError(Type.InvalidProofLenght);
                 }
-                                
+
+                
                 //TODO
             }
 
@@ -75,8 +74,7 @@ public final class Vc {
             return null;
 
         } catch (JsonLdError e) {
-            e.printStackTrace();
-            throw new VerificationError();
+            throw new VerificationError(e);
         }
     }
 

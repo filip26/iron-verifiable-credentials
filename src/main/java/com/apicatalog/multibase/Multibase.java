@@ -4,7 +4,6 @@ public class Multibase {
 
     public enum Algorithm {
         Base58Btc,
-        
     }
     
     private Algorithm algorithm;
