@@ -1,6 +1,10 @@
 package com.apicatalog.vc;
 
+import com.apicatalog.jsonld.json.JsonUtils;
+
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
 public interface StructuredData {
 
@@ -28,8 +32,27 @@ public interface StructuredData {
         return isPresentation() ? (Presentation)this : null;
     }
 
-    static StructuredData from(JsonObject json) {
+    static StructuredData from(JsonArray expanded) throws DataIntegrityError {
+        
+        for (final JsonValue item : expanded) {
 
-        return null;
+            if (JsonUtils.isNotObject(item)) {
+                //TODO warning
+                continue;
+            }
+
+            final JsonObject verifiable = item.asJsonObject();
+
+            //TODO VC or VP ?
+
+            // verify embedded proof
+            final Proof proof = EmbeddedProof.from(verifiable);
+            
+            //TODO
+         
+            return new ImmutableVerifiableCredentials(null, proof);
+        }
+        
+        throw new IllegalStateException();
     }
 }

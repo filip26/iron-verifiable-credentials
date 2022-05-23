@@ -58,5 +58,6 @@ public interface Proof {
     default boolean isTypeOf(final String type) {
         return getType() != null && getType().contains(type);
     }
-    
+
+    void verify() throws VerificationError;    
 }

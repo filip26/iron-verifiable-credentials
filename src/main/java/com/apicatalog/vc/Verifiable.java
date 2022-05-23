@@ -16,4 +16,6 @@ public interface Verifiable extends StructuredData {
     static VerifiablePresentation from(Presentation presentation, Proof proof) {
         return new ImmutableVerifiablePresentation(presentation, proof);
     }
+    
+    void verify() throws VerificationError;
 }

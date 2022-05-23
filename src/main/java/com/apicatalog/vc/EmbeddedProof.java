@@ -39,22 +39,6 @@ public class EmbeddedProof implements Proof {
      * @param result
      * @return
      * @throws VerificationError
-     * @throws DataIntegrityError 
-     */
-    static EmbeddedProof verify(final JsonObject json, final VerificationResult result) throws VerificationError, DataIntegrityError {
-
-        final EmbeddedProof proof = from(json);
-
-        //TODO
-        return proof;
-    }
-    
-    /**
-     * 
-     * @param json expanded verifiable credentials or presentation
-     * @param result
-     * @return
-     * @throws VerificationError
      */
     static EmbeddedProof from(final JsonObject json) throws DataIntegrityError {
 
@@ -228,7 +212,31 @@ public class EmbeddedProof implements Proof {
             
             //TODO domain property
             
-            
+
+
+//            // verify supported crypto suite
+//            if (!proof.isTypeOf("https://w3id.org/security#Ed25519Signature2020")) {
+//                throw new VerificationError(Type.UnknownCryptoSuiteType);
+//            }
+//
+//            // verify supported proof value encoding
+//            if (!proof.getValue().isTypeOf("https://w3id.org/security#multibase")) {
+//                throw new VerificationError(Type.InvalidProofValue);
+//            }
+//
+//            // verify proof value
+//            if (!Multibase.isAlgorithmSupported(proof.getValue().getValue())) {
+//                throw new VerificationError(Type.InvalidProofValue);
+//            }
+//            
+//            // decode proof value
+//            byte[] proofValue = Multibase.decode(proof.getValue().getValue());
+//            
+//            // verify proof value length
+//            if (proofValue.length != 64) {
+//                throw new VerificationError(Type.InvalidProofLenght);
+//            }
+
             return embeddedProof;       //FIXME process other proofs
         }
 
@@ -268,5 +276,10 @@ public class EmbeddedProof implements Proof {
     public ProofValue getValue() {
         return value;
     }
- 
+
+    @Override
+    public void verify() throws VerificationError {
+        // TODO Auto-generated method stub
+        
+    }
 }

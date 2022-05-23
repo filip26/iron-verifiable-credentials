@@ -31,15 +31,12 @@ public class VcTestRunnerJunit {
 
         try {
 
-             VerificationResult result = Vc.verify(testCase.input, LOADER);
+             Vc.verify(testCase.input, LOADER);
              
              if (testCase.type.stream().noneMatch(o -> o.endsWith("PositiveEvaluationTest"))) {
                  fail();
                  return;
              }
-
-             //TODO assertNotNull(result);
-
              
         } catch (VerificationError | DataIntegrityError e) {
             if (testCase.type.stream().noneMatch(o -> o.endsWith("NegativeEvaluationTest"))) {

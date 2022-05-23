@@ -12,4 +12,10 @@ class ImmutableVerifiablePresentation implements VerifiablePresentation {
     public Proof getProof() {
         return proof;
     }
+
+    @Override
+    public void verify() throws VerificationError {
+        // TODO Auto-generated method stub
+        
+    }
 }
