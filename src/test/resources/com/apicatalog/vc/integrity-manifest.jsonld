@@ -12,7 +12,8 @@
 		{
 			"@id": "#t0001",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+				"DataIntegrityTest"
 			],
 			"name": "a simple verifiable credential",
 			"input": "0001-in.jsonld",
@@ -21,7 +22,8 @@
 		{
 			"@id": "#t0002",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "a simple verifiable presentation",
 			"input": "0002-in.jsonld",
@@ -30,7 +32,8 @@
 		{
 			"@id": "#t0003",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "id property",
 			"input": "integrity/0003-in.jsonld",
@@ -39,7 +42,8 @@
 		{
 			"@id": "#t0004",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "type property",
 			"input": "integrity/0004-in.jsonld",
@@ -48,7 +52,8 @@
 		{
 			"@id": "#t0005",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "credentialSubject property",
 			"input": "integrity/0005-in.jsonld",
@@ -57,7 +62,8 @@
 		{
 			"@id": "#t0006",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "multiple subjects in a credential",
 			"input": "integrity/0006-in.jsonld",
@@ -66,7 +72,8 @@
 		{
 			"@id": "#t0007",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "issuer property",
 			"input": "integrity/0007-in.jsonld",
@@ -75,7 +82,8 @@
 		{
 			"@id": "#t0008",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "issuer expanded property",
 			"input": "integrity/0008-in.jsonld",
@@ -84,7 +92,8 @@
 		{
 			"@id": "#t0009",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "issuanceDate property",
 			"input": "integrity/0009-in.jsonld",
@@ -93,7 +102,8 @@
 		{
 			"@id": "#t0010",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "proof property",
 			"input": "integrity/0010-in.jsonld",
@@ -102,7 +112,8 @@
 		{
 			"@id": "#t0011",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "expirationDate property",
 			"input": "integrity/0011-in.jsonld",
@@ -111,7 +122,8 @@
 		{
 			"@id": "#t0012",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "status property",
 			"input": "integrity/0012-in.jsonld",
@@ -120,7 +132,8 @@
 		{
 			"@id": "#t0013",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "ED25519 2020 signed credentials",
 			"input": "integrity/0013-in.jsonld",
@@ -129,7 +142,8 @@
 		{
 			"@id": "#t0014",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "credentialSchema property to perform JSON schema validation",
 			"input": "integrity/0014-in.jsonld",
@@ -138,7 +152,8 @@
 		{
 			"@id": "#t0015",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "refreshService property by an issuer",
 			"input": "integrity/0015-in.jsonld",
@@ -147,7 +162,8 @@
 		{
 			"@id": "#t0016",
 			"@type": [
-				"PositiveEvaluationTest"
+				"PositiveEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "termsOfUse property by an issuer",
 			"input": "integrity/0016-in.jsonld",
@@ -156,7 +172,8 @@
 		{
 			"@id": "#t0017",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: missing @type property",
 			"input": "integrity/0017-in.jsonld",
@@ -165,7 +182,8 @@
 		{
 			"@id": "#t0018",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: invalid @type property",
 			"input": "integrity/0018-in.jsonld",
@@ -174,7 +192,8 @@
 		{
 			"@id": "#t0019",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: missing created property",
 			"input": "integrity/0019-in.jsonld",
@@ -183,7 +202,8 @@
 		{
 			"@id": "#t0020",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: invalid created property",
 			"input": "integrity/0020-in.jsonld",
@@ -192,7 +212,8 @@
 		{
 			"@id": "#t0021",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: missing verificationMethod property",
 			"input": "integrity/0021-in.jsonld",
@@ -201,7 +222,8 @@
 		{
 			"@id": "#t0022",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: invalid verificationMethod property",
 			"input": "integrity/0022-in.jsonld",
@@ -210,7 +232,8 @@
 		{
 			"@id": "#t0023",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: missing proofPurpose property",
 			"input": "integrity/0023-in.jsonld",
@@ -219,7 +242,8 @@
 		{
 			"@id": "#t0024",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: invalid proofPurpose property",
 			"input": "integrity/0024-in.jsonld",
@@ -228,7 +252,8 @@
 		{
 			"@id": "#t0025",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: missing proofValue property",
 			"input": "integrity/0025-in.jsonld",
@@ -237,7 +262,8 @@
 		{
 			"@id": "#t0026",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof: invalid proofValue property",
 			"input": "integrity/0026-in.jsonld",
@@ -246,7 +272,8 @@
 		{
 			"@id": "#t0027",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof is missing",
 			"input": "integrity/0027-in.jsonld",
@@ -255,7 +282,8 @@
 		{
 			"@id": "#t0028",
 			"@type": [
-				"NegativeEvaluationTest"
+				"NegativeEvaluationTest",
+                "DataIntegrityTest"
 			],
 			"name": "embedded proof is invalid",
 			"input": "integrity/0028-in.jsonld",

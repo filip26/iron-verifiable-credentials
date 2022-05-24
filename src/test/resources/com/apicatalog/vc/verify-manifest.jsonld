@@ -1,0 +1,23 @@
+{
+	"@context": [
+		"context.jsonld",
+		{
+			"@base": "verify-manifest"
+		}
+	],
+	"@id": "",
+	"@type": "mf:Manifest",
+	"name": "Verifiable Credentials Verify Tests",
+	"sequence": [
+		{
+			"@id": "#t0001",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VerifyTest"
+			],
+			"name": "unknown proof type",
+			"input": "verify/0001-in.jsonld",
+			"expect": ""
+		}
+	]
+}
