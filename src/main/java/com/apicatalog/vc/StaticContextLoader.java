@@ -49,6 +49,7 @@ public class StaticContextLoader implements DocumentLoader {
                 return document;
             }
         }
+
         return defaultLoader.loadDocument(url, options);
     }
 

@@ -13,9 +13,11 @@ public class VcTestCase {
 
     public String name;
 
-    public String input;
+    public URI input;
     
     public Set<String> type;
+    
+    public String errorCode;
 
     public static VcTestCase of(JsonObject test, JsonObject manifest) {
 
@@ -29,10 +31,12 @@ public class VcTestCase {
                             .getJsonObject(0)
                             .getString("@value");
 
-        testCase.input = test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action")
+        testCase.input = URI.create(test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action")
                             .getJsonObject(0)
-                            .getString("@id");
+                            .getString("@id"));
                 
+        testCase.errorCode = test.getString("expectErrorCode", null);
+        
         return testCase;
     }
 

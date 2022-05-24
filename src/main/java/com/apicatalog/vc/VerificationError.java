@@ -2,7 +2,7 @@ package com.apicatalog.vc;
 
 public class VerificationError extends Throwable {
 
-    public enum Type {
+    public enum Code {
         Unknown,
         UnknownCryptoSuiteType,
         InvalidProofValue,
@@ -11,27 +11,27 @@ public class VerificationError extends Throwable {
     
     private static final long serialVersionUID = -3280731333804856855L;
 
-    private Type type;
+    private Code code;
 
     public VerificationError() {
-        this(Type.Unknown);
+        this(Code.Unknown);
     }
 
-    public VerificationError(Type type) {
+    public VerificationError(Code type) {
         super();
-        this.type = type;
+        this.code = type;
     }
 
     public VerificationError(Throwable e) {
-        this(Type.Unknown, e);
+        this(Code.Unknown, e);
     }
 
-    public VerificationError(Type type, Throwable e) {
+    public VerificationError(Code code, Throwable e) {
         super(e);
-        this.type = type;
+        this.code = code;
     }
     
-    public Type getType() {
-        return type;
+    public Code getCode() {
+        return code;
     }
 }

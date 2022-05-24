@@ -1,5 +1,6 @@
 package com.apicatalog.vc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -11,7 +12,7 @@ public class VcTestRunnerJunit {
 
     private final VcTestCase testCase;
 
-    private final static DocumentLoader LOADER =
+    public final static DocumentLoader LOADER =
             new UriBaseRewriter(
                     "https://github.com/filip26/iron-verifiable-credentials/",
                     "classpath:",
@@ -28,22 +29,43 @@ public class VcTestRunnerJunit {
     public void execute() {
 
         assertNotNull(testCase.input);
+        assertNotNull(testCase.type);
 
         try {
-
-             Vc.verify(testCase.input, LOADER);
-             
+            if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/VerifyTest")) {
+                Vc.verify(testCase.input, LOADER);
+                
+            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/DataIntegrityTest")) {
+                final VcDocument vcDocument = VcDocument.load(testCase.input, LOADER);        //TODO use Vc API
+                assertNotNull(vcDocument);
+                
+                
+            } else {
+                fail("Unknown test execution method");
+                return;
+            }
+ 
              if (testCase.type.stream().noneMatch(o -> o.endsWith("PositiveEvaluationTest"))) {
                  fail();
                  return;
              }
              
-        } catch (VerificationError | DataIntegrityError e) {
-            if (testCase.type.stream().noneMatch(o -> o.endsWith("NegativeEvaluationTest"))) {
-                e.printStackTrace();
-                fail(e);                
-            }
+        } catch (VerificationError e) {
+            assertException(e.getCode() != null ? e.getCode().name() : null, e);
+            
+        } catch (DataIntegrityError e) {
+            assertException(null, e);
         }
     }
-
+    
+    final void assertException(final String code, Throwable e) {
+        if (testCase.type.stream().noneMatch(o -> o.endsWith("NegativeEvaluationTest"))) {
+            e.printStackTrace();
+            fail(e);
+            return;
+        }
+        // compare expected exception
+        assertEquals(testCase.errorCode, code);
+    }
+    
 }
