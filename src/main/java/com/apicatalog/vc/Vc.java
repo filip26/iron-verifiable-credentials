@@ -18,7 +18,7 @@ public final class Vc {
      * @throws DataIntegrityError
      * @throws VerificationError
      */
-    public static /*FIXME use VerificationApi*/ void verify(URI location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
+    public static /*FIXME use VerificationApi, make loader optional - use default*/ void verify(URI location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
         final VcDocument data  = VcDocument.load(location, loader);
 

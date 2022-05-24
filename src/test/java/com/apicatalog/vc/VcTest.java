@@ -35,10 +35,11 @@ class VcTest {
 
     static final Stream<VcTestCase> manifest() throws JsonLdError, IOException {
 
-        try (final InputStream is = VcTest.class.getResourceAsStream("manifest.jsonld")) {
+        try (final InputStream is = VcTest.class.getResourceAsStream("integrity-manifest.jsonld")) {    //FIXME use main manifest
 
             final JsonObject manifest = JsonLd.expand(JsonDocument.of(is))
                         .base("https://github.com/filip26/iron-verifiable-credentials/")
+                        .loader(VcTestRunnerJunit.LOADER)
                         .get()
                         .getJsonObject(0);
 

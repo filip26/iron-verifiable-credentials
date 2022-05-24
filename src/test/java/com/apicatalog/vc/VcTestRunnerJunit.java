@@ -11,7 +11,7 @@ public class VcTestRunnerJunit {
 
     private final VcTestCase testCase;
 
-    private final static DocumentLoader LOADER =
+    public final static DocumentLoader LOADER =
             new UriBaseRewriter(
                     "https://github.com/filip26/iron-verifiable-credentials/",
                     "classpath:",
