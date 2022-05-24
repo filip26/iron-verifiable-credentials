@@ -14,7 +14,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Constants;
 import com.apicatalog.vc.DataIntegrityError;
 import com.apicatalog.vc.VerificationError;
-import com.apicatalog.vc.VerificationError.Type;
+import com.apicatalog.vc.VerificationError.Code;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -268,17 +268,17 @@ public class EmbeddedProof implements Proof {
 
         // verify supported crypto suite
         if (!isTypeOf("https://w3id.org/security#Ed25519Signature2020")) {
-            throw new VerificationError(Type.UnknownCryptoSuiteType);
+            throw new VerificationError(Code.UnknownCryptoSuiteType);
         }
 
         // verify supported proof value encoding
         if (value == null && !value.isTypeOf("https://w3id.org/security#multibase")) {
-            throw new VerificationError(Type.InvalidProofValue);
+            throw new VerificationError(Code.InvalidProofValue);
         }
 
         // verify proof value
         if (value.getValue() == null || !Multibase.isAlgorithmSupported(value.getValue())) {
-            throw new VerificationError(Type.InvalidProofValue);
+            throw new VerificationError(Code.InvalidProofValue);
         }
       
         // decode proof value
@@ -286,7 +286,7 @@ public class EmbeddedProof implements Proof {
       
         // verify proof value length
         if (proofValue.length != 64) {
-            throw new VerificationError(Type.InvalidProofLenght);
+            throw new VerificationError(Code.InvalidProofLenght);
         }
 
         // TODO Auto-generated method stub        

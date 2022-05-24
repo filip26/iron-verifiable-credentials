@@ -16,6 +16,8 @@ public class VcTestCase {
     public URI input;
     
     public Set<String> type;
+    
+    public String errorCode;
 
     public static VcTestCase of(JsonObject test, JsonObject manifest) {
 
@@ -33,6 +35,8 @@ public class VcTestCase {
                             .getJsonObject(0)
                             .getString("@id"));
                 
+        testCase.errorCode = test.getString("expectErrorCode", null);
+        
         return testCase;
     }
 

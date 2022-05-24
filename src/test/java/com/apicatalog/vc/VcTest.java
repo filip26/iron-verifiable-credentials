@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -18,11 +21,13 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
 @DisplayName("Verifiable Credentials Test Suite")
+@TestMethodOrder(OrderAnnotation.class)
 class VcTest {
 
     @DisplayName("Data Integrity")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "integrityManifest" })
+    @Order(1)
     void integrity(VcTestCase testCase) {
 
         // skip JWS credentials
@@ -39,6 +44,7 @@ class VcTest {
     @DisplayName("Verification")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "verifyManifest" })
+    @Order(2)
     void verify(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
