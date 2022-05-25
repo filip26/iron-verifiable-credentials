@@ -33,9 +33,11 @@ public class VcTestRunnerJunit {
 
         try {
             if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/VerifyTest")) {
+
                 Vc.verify(testCase.input, LOADER);
                 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/DataIntegrityTest")) {
+
                 final VcDocument vcDocument = VcDocument.load(testCase.input, LOADER);        //TODO use Vc API
                 assertNotNull(vcDocument);
                 
@@ -54,18 +56,21 @@ public class VcTestRunnerJunit {
             assertException(e.getCode() != null ? e.getCode().name() : null, e);
             
         } catch (DataIntegrityError e) {
+            e.printStackTrace();
             assertException(null, e);
         }
     }
     
     final void assertException(final String code, Throwable e) {
+
         if (testCase.type.stream().noneMatch(o -> o.endsWith("NegativeEvaluationTest"))) {
             e.printStackTrace();
             fail(e);
             return;
         }
+
         // compare expected exception
-        assertEquals(testCase.errorCode, code);
+        assertEquals(testCase.result, code);
     }
     
 }

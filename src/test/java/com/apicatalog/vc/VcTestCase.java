@@ -17,7 +17,7 @@ public class VcTestCase {
     
     public Set<String> type;
     
-    public String errorCode;
+    public String result;
 
     public static VcTestCase of(JsonObject test, JsonObject manifest) {
 
@@ -34,9 +34,12 @@ public class VcTestCase {
         testCase.input = URI.create(test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action")
                             .getJsonObject(0)
                             .getString("@id"));
-                
-        testCase.errorCode = test.getString("expectErrorCode", null);
-        
+
+        if (test.containsKey("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result")) {
+            testCase.result = test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result")
+                    .getJsonObject(0)
+                    .getString("@value", null);
+        }
         return testCase;
     }
 

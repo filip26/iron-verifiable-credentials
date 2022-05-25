@@ -272,7 +272,7 @@ public class EmbeddedProof implements Proof {
         }
 
         // verify supported proof value encoding
-        if (value == null && !value.isTypeOf("https://w3id.org/security#multibase")) {
+        if (value == null || !value.isTypeOf("https://w3id.org/security#multibase")) {
             throw new VerificationError(Code.InvalidProofValue);
         }
 

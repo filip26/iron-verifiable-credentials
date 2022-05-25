@@ -18,6 +18,17 @@
 			"name": "unknown proof type",
 			"input": "verify/0001-in.jsonld",
 			"expectErrorCode": "UnknownCryptoSuiteType"
-		}
+		},
+        {
+            "@id": "#t0002",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VerifyTest"
+            ],
+            "name": "unknown proof value encoding",
+            "input": "verify/0002-in.jsonld",
+            "expectErrorCode": "InvalidProofValue"
+        }
+
 	]
 }
