@@ -8,6 +8,8 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 
+import jakarta.json.JsonObject;
+
 public class VcTestRunnerJunit {
 
     private final VcTestCase testCase;
@@ -41,6 +43,12 @@ public class VcTestRunnerJunit {
                 final VcDocument vcDocument = VcDocument.load(testCase.input, LOADER);        //TODO use Vc API
                 assertNotNull(vcDocument);
                 
+            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/IssueTest")) {
+                
+                final JsonObject issued = Vc.issue(testCase.input, null, LOADER); //TODO suite
+                assertNotNull(issued);
+                
+                //TODO compare issued with expected
                 
             } else {
                 fail("Unknown test execution method");

@@ -42,6 +42,7 @@ public final class Vc {
     public static JsonObject issue(URI location, SignatureSuite suite, DocumentLoader loader) {
 
         //TODO
-        return null;
+        
+        return JsonObject.EMPTY_JSON_OBJECT;
     }
 }
