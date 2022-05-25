@@ -42,12 +42,12 @@
             ],
             "https://w3id.org/security#proofValue": [
               {
-                "@type": "https://w3id.org/security#multibase",
+                "@type": "some-weird-encoding",
                 "@value": "z3FXQjecWufY46yg5abdVZsXqLhxhueuSoZgNSARiKBk9czhSePTFehP8c3PGfb6a22gkfUKods5D2UAUL5n2Brbx"
               }
             ],
             "@type": [
-              "unknown-crypto-suite"
+              "https://w3id.org/security#Ed25519Signature2020"
             ],
             "https://w3id.org/security#verificationMethod": [
               {

@@ -49,12 +49,24 @@ class VcTest {
         new VcTestRunnerJunit(testCase).execute();
     }
 
+    @DisplayName("Issuing")
+    @ParameterizedTest(name = "{0}")
+    @MethodSource({ "issueManifest" })
+    @Order(3)
+    void issue(VcTestCase testCase) {
+        new VcTestRunnerJunit(testCase).execute();
+    }
+
     static final Stream<VcTestCase> integrityManifest() throws JsonLdError, IOException {
         return manifest("integrity-manifest.jsonld");
     }
 
     static final Stream<VcTestCase> verifyManifest() throws JsonLdError, IOException {
         return manifest("verify-manifest.jsonld");
+    }
+
+    static final Stream<VcTestCase> issueManifest() throws JsonLdError, IOException {
+        return manifest("issue-manifest.jsonld");
     }
 
     static final Stream<VcTestCase> manifest(String name) throws JsonLdError, IOException {

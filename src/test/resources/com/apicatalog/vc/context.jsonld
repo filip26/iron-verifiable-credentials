@@ -9,6 +9,13 @@
 		"input": {
 			"@id": "mf:action",
 			"@type": "@id"
+		},
+		"expect": {
+			"@id": "mf:result",
+			"@type": "@id"
+		},
+		"expectErrorCode": {
+			"@id": "mf:result"
 		}
 	}
 }

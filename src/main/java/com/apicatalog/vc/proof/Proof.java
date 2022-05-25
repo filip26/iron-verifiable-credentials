@@ -30,7 +30,7 @@ public interface Proof {
      * 
      * @return
      */
-    String getVerificationMethod();
+    VerificationMethod getVerificationMethod();
     
     /**
      * The string value of an ISO8601.

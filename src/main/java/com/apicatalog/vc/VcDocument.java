@@ -64,7 +64,7 @@ public interface VcDocument {
             // VC/VP in expanded form
             final JsonArray expanded = api.loader(new StaticContextLoader(loader)).get();   //TODO make use of static loader optional
 
-            return VcDocument.from(expanded);
+            return VcDocument.from(expanded, loader);
 
         } catch (JsonLdError e) {
             throw new DataIntegrityError(e);
@@ -72,7 +72,7 @@ public interface VcDocument {
     }
 
     
-    static VcDocument from(JsonArray expanded) throws DataIntegrityError {
+    static VcDocument from(JsonArray expanded, DocumentLoader loader) throws DataIntegrityError {
 
         if (expanded == null || expanded.isEmpty()) {
             throw new DataIntegrityError();                  //TODO
@@ -90,7 +90,7 @@ public interface VcDocument {
             //TODO VC or VP ?
 
             // verify embedded proof
-            final Proof proof = EmbeddedProof.from(verifiable);
+            final Proof proof = EmbeddedProof.from(verifiable, loader);
             
             //TODO
          
