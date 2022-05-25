@@ -1,5 +1,6 @@
 package com.apicatalog.vc.proof;
 
+import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
@@ -10,6 +11,7 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.NodeObject;
 import com.apicatalog.jsonld.lang.ValueObject;
+import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Constants;
 import com.apicatalog.vc.DataIntegrityError;
@@ -30,7 +32,7 @@ public class EmbeddedProof implements Proof {
 
     private String purpose;
 
-    private String verificationMethod;
+    private VerificationMethod verificationMethod;
     
     private Instant created;
     
@@ -45,7 +47,7 @@ public class EmbeddedProof implements Proof {
      * @return
      * @throws VerificationError
      */
-    public static EmbeddedProof from(final JsonObject json) throws DataIntegrityError {
+    public static EmbeddedProof from(final JsonObject json, final DocumentLoader loader) throws DataIntegrityError {
 
         if (json == null) {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
@@ -136,16 +138,25 @@ public class EmbeddedProof implements Proof {
 
             final JsonValue verificationMethodValue = proofObject.get(Constants.PROOF_VERIFICATION_METHOD);
             
-            if (JsonUtils.isArray(verificationMethodValue)) {
-                 
-                if (!verificationMethodValue.asJsonArray().stream().allMatch(NodeObject::isNodeReference)) {
+            if (JsonUtils.isArray(verificationMethodValue) && verificationMethodValue.asJsonArray().size() > 0) {
+
+                final JsonValue verificationMethodItem = verificationMethodValue.asJsonArray().get(0);
+                                
+                if (NodeObject.isNodeReference(verificationMethodItem)) { 
+
+                    final JsonObject verificationMethodObject = verificationMethodItem.asJsonObject();
+
+                    final String id = verificationMethodObject.getString(Keywords.ID);
+
+                    embeddedProof.verificationMethod = new VerificationKeyReference(URI.create(id), loader);
+                    
+                //TODO embedded key
+                    
+                } else {
                     throw new DataIntegrityError();
                 }
                 
-                embeddedProof.verificationMethod = verificationMethodValue.asJsonArray().stream()
-                                        .map(JsonValue::asJsonObject)
-                                        .map(o -> o.getString(Keywords.ID))
-                                        .limit(1).toArray(String[]::new)[0];
+                
             } else {
                 throw new DataIntegrityError();
             }
@@ -244,7 +255,7 @@ public class EmbeddedProof implements Proof {
     }
 
     @Override
-    public String getVerificationMethod() {
+    public VerificationMethod getVerificationMethod() {
         return verificationMethod;
     }
 
@@ -289,7 +300,23 @@ public class EmbeddedProof implements Proof {
             throw new VerificationError(Code.InvalidProofLength);
         }
         
+        // get verification key
+        final VerificationKey verificationKey = verificationMethod.get();
         
+        if (verificationKey == null || verificationKey.getPublicKeyMultibase() == null) {
+            throw new VerificationError();
+        }
+        
+        // decode verification key
+        byte[] verificationKeyValue = Multibase.decode(verificationKey.getPublicKeyMultibase());
+
+        // verify verification key length - TODO needs to be clarified
+        if (verificationKeyValue.length == 32 || verificationKeyValue.length == 57 || verificationKeyValue.length == 114) {
+            throw new VerificationError(Code.InvalidProofLength);
+        }
+
+        
+        //TODO validate public key length 
         
 
         // TODO Auto-generated method stub        

@@ -19,35 +19,43 @@
 			"input": "verify/0001-in.jsonld",
 			"expectErrorCode": "UnknownCryptoSuiteType"
 		},
-        {
-            "@id": "#t0002",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VerifyTest"
-            ],
-            "name": "unknown proof value encoding",
-            "input": "verify/0002-in.jsonld",
-            "expectErrorCode": "InvalidProofValue"
-        },
-        {
-            "@id": "#t0003",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VerifyTest"
-            ],
-            "name": "missing proof",
-            "input": "verify/0003-in.jsonld"
-        },        
-        {
-            "@id": "#t0004",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VerifyTest"
-            ],
-            "name": "invalid proof value length",
-            "input": "verify/0004-in.jsonld",
-            "expectErrorCode": "InvalidProofLength"
-        }        
-
+		{
+			"@id": "#t0002",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VerifyTest"
+			],
+			"name": "unknown proof value encoding",
+			"input": "verify/0002-in.jsonld",
+			"expectErrorCode": "InvalidProofValue"
+		},
+		{
+			"@id": "#t0003",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VerifyTest"
+			],
+			"name": "missing proof",
+			"input": "verify/0003-in.jsonld"
+		},
+		{
+			"@id": "#t0004",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VerifyTest"
+			],
+			"name": "invalid proof value length",
+			"input": "verify/0004-in.jsonld",
+			"expectErrorCode": "InvalidProofLength"
+		},
+		{
+			"@id": "#t0005",
+			"@type": [
+				"PositiveEvaluationTest",
+				"VerifyTest"
+			],
+			"name": "simple valid signed VC",
+			"input": "verify/0005-in.jsonld"
+		}
 	]
 }
