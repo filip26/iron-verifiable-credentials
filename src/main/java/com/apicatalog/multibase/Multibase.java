@@ -15,4 +15,8 @@ public class Multibase {
     public static byte[] decode(String encoded) {
         return io.ipfs.multibase.Multibase.decode(encoded);
     }
+    
+    public static String encode(byte[] data) {  //TODO base/algorithm
+        return io.ipfs.multibase.Multibase.encode(io.ipfs.multibase.Multibase.Base.Base58BTC, data);
+    }
 }

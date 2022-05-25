@@ -280,14 +280,17 @@ public class EmbeddedProof implements Proof {
         if (value.getValue() == null || !Multibase.isAlgorithmSupported(value.getValue())) {
             throw new VerificationError(Code.InvalidProofValue);
         }
-      
+
         // decode proof value
         byte[] proofValue = Multibase.decode(value.getValue());
       
         // verify proof value length
         if (proofValue.length != 64) {
-            throw new VerificationError(Code.InvalidProofLenght);
+            throw new VerificationError(Code.InvalidProofLength);
         }
+        
+        
+        
 
         // TODO Auto-generated method stub        
     }

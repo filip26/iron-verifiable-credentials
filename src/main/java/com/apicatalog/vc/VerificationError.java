@@ -6,7 +6,7 @@ public class VerificationError extends Throwable {
         Unknown,
         UnknownCryptoSuiteType,
         InvalidProofValue,
-        InvalidProofLenght, 
+        InvalidProofLength, 
     }
     
     private static final long serialVersionUID = -3280731333804856855L;

@@ -37,6 +37,16 @@
             ],
             "name": "missing proof",
             "input": "verify/0003-in.jsonld"
+        },        
+        {
+            "@id": "#t0004",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VerifyTest"
+            ],
+            "name": "invalid proof value length",
+            "input": "verify/0004-in.jsonld",
+            "expectErrorCode": "InvalidProofLength"
         }        
 
 	]
