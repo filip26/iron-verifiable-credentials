@@ -28,7 +28,16 @@
             "name": "unknown proof value encoding",
             "input": "verify/0002-in.jsonld",
             "expectErrorCode": "InvalidProofValue"
-        }
+        },
+        {
+            "@id": "#t0003",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VerifyTest"
+            ],
+            "name": "missing proof",
+            "input": "verify/0003-in.jsonld"
+        }        
 
 	]
 }

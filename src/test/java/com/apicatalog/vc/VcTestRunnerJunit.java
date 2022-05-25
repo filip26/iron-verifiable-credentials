@@ -56,7 +56,6 @@ public class VcTestRunnerJunit {
             assertException(e.getCode() != null ? e.getCode().name() : null, e);
             
         } catch (DataIntegrityError e) {
-            e.printStackTrace();
             assertException(null, e);
         }
     }
