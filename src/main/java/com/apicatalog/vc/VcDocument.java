@@ -94,7 +94,7 @@ public interface VcDocument {
             
             //TODO
          
-            return new ImmutableVerifiableCredentials(null, proof);
+            return new ImmutableVerifiableCredentials(null, proof, expanded);
         }
         
         throw new IllegalStateException();

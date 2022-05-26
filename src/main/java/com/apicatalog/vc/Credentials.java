@@ -27,7 +27,9 @@ public interface Credentials extends VcDocument {
 
         try {
             final JsonArray expanded = JsonLd.expand(document).get();
+            final Credentials credentials = new ImmutableVerifiableCredentials(null, null, expanded);
 
+            return credentials;
         } catch (JsonLdError e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -35,9 +37,7 @@ public interface Credentials extends VcDocument {
 
 //        final boolean verifiable = expanded.containsKey(Keywords.PROOF);
 
-        final Credentials credentials = new ImmutableVerifiableCredentials(null, null);
-
-        return credentials;
+        return null;
     }
 
     static Credentials from(Reader reader) {

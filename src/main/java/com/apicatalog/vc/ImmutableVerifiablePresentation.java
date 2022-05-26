@@ -2,6 +2,8 @@ package com.apicatalog.vc;
 
 import com.apicatalog.vc.proof.Proof;
 
+import jakarta.json.JsonArray;
+
 class ImmutableVerifiablePresentation implements VerifiablePresentation {
 
     final Proof proof;
@@ -20,4 +22,11 @@ class ImmutableVerifiablePresentation implements VerifiablePresentation {
         // TODO Auto-generated method stub
         
     }
+
+    @Override
+    public JsonArray getExpandedDocument() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
 }

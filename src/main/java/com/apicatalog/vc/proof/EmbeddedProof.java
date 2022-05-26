@@ -18,6 +18,7 @@ import com.apicatalog.vc.DataIntegrityError;
 import com.apicatalog.vc.VerificationError;
 import com.apicatalog.vc.VerificationError.Code;
 
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
@@ -275,7 +276,7 @@ public class EmbeddedProof implements Proof {
     }
 
     @Override
-    public void verify() throws VerificationError {
+    public void verify(JsonArray document) throws VerificationError {
 
         // verify supported crypto suite
         if (!isTypeOf("https://w3id.org/security#Ed25519Signature2020")) {
@@ -298,27 +299,6 @@ public class EmbeddedProof implements Proof {
         // verify proof value length
         if (proofValue.length != 64) {
             throw new VerificationError(Code.InvalidProofLength);
-        }
-        
-        // get verification key
-        final VerificationKey verificationKey = verificationMethod.get();
-        
-        if (verificationKey == null || verificationKey.getPublicKeyMultibase() == null) {
-            throw new VerificationError();
-        }
-        
-        // decode verification key
-        byte[] verificationKeyValue = Multibase.decode(verificationKey.getPublicKeyMultibase());
-
-        // verify verification key length - TODO needs to be clarified
-        if (verificationKeyValue.length == 32 || verificationKeyValue.length == 57 || verificationKeyValue.length == 114) {
-            throw new VerificationError(Code.InvalidProofLength);
-        }
-
-        
-        //TODO validate public key length 
-        
-
-        // TODO Auto-generated method stub        
+        }        
     }
 }

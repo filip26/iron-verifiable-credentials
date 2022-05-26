@@ -1,10 +1,6 @@
 package com.apicatalog.vc.proof;
 
-import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.lang.ValueObject;
-
 import jakarta.json.JsonObject;
-import jakarta.json.JsonString;
 
 public class VerificationKey {
 

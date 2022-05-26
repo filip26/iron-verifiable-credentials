@@ -5,6 +5,9 @@ import java.util.Set;
 
 import com.apicatalog.vc.VerificationError;
 
+import jakarta.json.JsonArray;
+
+
 public interface Proof {
 
     /**
@@ -61,5 +64,5 @@ public interface Proof {
         return getType() != null && getType().contains(type);
     }
 
-    void verify() throws VerificationError;    
+    void verify(JsonArray document) throws VerificationError;    
 }
