@@ -3,6 +3,7 @@ package com.apicatalog.vc;
 import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.lds.SignatureSuite;
 
 import jakarta.json.JsonObject;
 

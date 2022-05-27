@@ -1,6 +1,7 @@
 package com.apicatalog.vc;
 
 import com.apicatalog.ed25519.Ed25519Signature2020;
+import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonArray;
@@ -26,9 +27,9 @@ class ImmutableVerifiableCredentials implements VerifiableCredentials {
             throw new VerificationError();
         }
         proof.verify(document);
-        
-      Ed25519Signature2020 suite = new Ed25519Signature2020();  //TODO
-      suite.verify(this);
+
+        LinkedDataSignature ldSignature = new LinkedDataSignature(new Ed25519Signature2020());  //TODO
+        ldSignature.verify(this);
     }
 
     @Override
