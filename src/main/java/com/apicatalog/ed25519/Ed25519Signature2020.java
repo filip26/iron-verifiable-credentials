@@ -22,12 +22,15 @@ import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.http.media.MediaType;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.rdf.Rdf;
 import com.apicatalog.rdf.RdfDataset;
 import com.apicatalog.rdf.io.RdfWriter;
 import com.apicatalog.rdf.io.error.RdfWriterException;
 import com.apicatalog.rdf.io.error.UnsupportedContentException;
+import com.apicatalog.vc.Constants;
+import com.apicatalog.vc.VcDocument;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.VerificationError;
 import com.apicatalog.vc.VerificationError.Code;
@@ -35,7 +38,6 @@ import com.apicatalog.vc.proof.VerificationKey;
 
 import io.setl.rdf.normalization.RdfNormalize;
 import jakarta.json.Json;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
 public class Ed25519Signature2020 {
@@ -69,47 +71,26 @@ public class Ed25519Signature2020 {
             throw new VerificationError(Code.InvalidProofLength);
         }
 
-        // remove proof
-        JsonObject document = Json.createObjectBuilder(verifiable.getExpandedDocument().getJsonObject(0)).remove("https://w3id.org/security#proof").build();
+        // proof as JSON
+        JsonObject proof = verifiable.getExpandedDocument().getJsonObject(0).getJsonArray(Constants.PROOF).getJsonObject(0);  //FIXME consider multiple proofs
         
-        // canonicalization
-        try {
-            RdfDataset dataset = JsonLd.toRdf(JsonDocument.of(document)).get();
-            
-            RdfDataset canonical = RdfNormalize.normalize(dataset);
-            
-            StringWriter writer = new StringWriter();
-            
-            RdfWriter rdfWriter = Rdf.createWriter(MediaType.N_QUADS, writer);
-            
-            rdfWriter.write(canonical);
-        
-            System.out.println(writer);
-            
-            //  
-            byte[] documentHashCode = hashCode(writer.toString());
-            System.out.println(Arrays.toString(documentHashCode));
-            
-            // decode proof value
-            byte[] rawProofValue = Multibase.decode(verifiable.getProof().getValue().getValue());
-
-            verify(rawVerificationKey, rawProofValue, documentHashCode);
-            
-        } catch (JsonLdError e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnsupportedContentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (RdfWriterException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        // FIXME use JsonLd helpers
+        if (proof.containsKey(Keywords.GRAPH)) {
+            proof = proof.getJsonArray(Keywords.GRAPH).getJsonObject(0);
         }
         
-        return false;
+        // remove proof
+        JsonObject document = Json.createObjectBuilder(verifiable.getExpandedDocument().getJsonObject(0)).remove("https://w3id.org/security#proof").build();
+        System.out.println(document);
+        // canonicalization            
+        byte[] canonical = canonicalize(document);
+                    
+        byte[] documentHashCode = hashCode(canonical, proof);
+        
+        // decode proof value
+        byte[] rawProofValue = Multibase.decode(verifiable.getProof().getValue().getValue());
+
+        return verify(rawVerificationKey, rawProofValue, documentHashCode);            
     }
     
     static byte[] reverse(byte[] data) {
@@ -120,6 +101,13 @@ public class Ed25519Signature2020 {
         
         
         return reversed;
+    }
+    
+    public Verifiable issue(VcDocument document) throws VerificationError {      //TODO use dedicated exception
+
+        
+        //TODO
+        return null;
     }
     
 
@@ -133,14 +121,28 @@ public class Ed25519Signature2020 {
      * @throws VerificationError
      */
     
-    static byte[] hashCode(String dataset) throws VerificationError {
+    static byte[] hashCode(byte[] document, JsonObject proof) throws VerificationError {
         
+        proof = Json.createObjectBuilder(proof).remove(Constants.PROOF_VALUE).build();
+        
+        //FIXME remove
+        proof = Json.createObjectBuilder(proof).add(Constants.PROOF_VERIFICATION_METHOD, "https://example.com/issuer/123#key-0").build();
+        
+        System.out.println(proof);
 
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(dataset.getBytes(StandardCharsets.UTF_8));
-            //TODO
-            return hash;
+            
+            byte[] proofHash = digest.digest(canonicalize(proof));
+            
+            byte[] documentHash = digest.digest(document);
+
+            byte[] result = new byte[proofHash.length + documentHash.length];
+            
+            System.arraycopy(proofHash, 0, result, 0, proofHash.length);
+            System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
+                        
+            return result;
 
         } catch (NoSuchAlgorithmException e) {
             // TODO Auto-generated catch block
@@ -148,7 +150,7 @@ public class Ed25519Signature2020 {
         }
     }
     
-    static void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
+    static boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
         
         try {            
             Signature suite = Signature.getInstance("Ed25519");
@@ -156,7 +158,9 @@ public class Ed25519Signature2020 {
             suite.initVerify(getPublicKey(publicKey));
             suite.update(data);
 
-            System.out.println(suite.verify(signature));
+            boolean r = suite.verify(signature);
+            System.out.println("V: " + r);
+            return r;
  
         } catch (NoSuchAlgorithmException e) {
             // TODO Auto-generated catch block
@@ -174,6 +178,7 @@ public class Ed25519Signature2020 {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }        
+        return false;
 
     }
 
@@ -198,7 +203,7 @@ public class Ed25519Signature2020 {
         
         byte[] pk = Arrays.copyOfRange(publicKey, 2, publicKey.length -2);
 
-        //TODO validate the kay starts with 0xed01
+        //TODO validate the key starts with 0xed01
         //System.out.println(Integer.toHexString((publicKey[0] << 8)  + publicKey[1] ) );
         
         // key is already converted from hex string to a byte array.
@@ -221,5 +226,40 @@ public class Ed25519Signature2020 {
         EdECPublicKeySpec pubSpec = new EdECPublicKeySpec(paramSpec, ep);
         PublicKey pub = kf.generatePublic(pubSpec);
         return pub;
+    }
+    
+    static final byte[] canonicalize(JsonObject document) throws VerificationError {
+        
+        // canonicalization
+        try {
+            RdfDataset dataset = JsonLd.toRdf(JsonDocument.of(document)).get();
+            
+            RdfDataset canonical = RdfNormalize.normalize(dataset);
+            
+            StringWriter writer = new StringWriter();
+            
+            RdfWriter rdfWriter = Rdf.createWriter(MediaType.N_QUADS, writer);
+            
+            rdfWriter.write(canonical);
+
+System.out.println(">>> " + writer.toString().substring(0, writer.toString().length() -1) + "'");
+            return writer.toString()
+                    .substring(0, writer.toString().length() -1)
+                    .getBytes(StandardCharsets.UTF_8);
+
+            
+        } catch (JsonLdError e) {
+            throw new VerificationError(e);     //FIXME ...
+            
+        } catch (UnsupportedContentException e) {
+            throw new VerificationError(e);
+            
+        } catch (IOException e) {
+            throw new VerificationError(e);
+            
+        } catch (RdfWriterException e) {
+            throw new VerificationError(e);
+            
+        }
     }
 }
