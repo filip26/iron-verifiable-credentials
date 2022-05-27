@@ -3,11 +3,9 @@ package com.apicatalog.lds;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Constants;
-import com.apicatalog.vc.VcDocument;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.VerificationError;
 import com.apicatalog.vc.VerificationError.Code;
-import com.apicatalog.vc.proof.VerificationKey;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -43,7 +41,7 @@ public class LinkedDataSignature {
     public boolean verify(Verifiable verifiable) throws VerificationError {
         
         // get verification key
-        final VerificationKey verificationKey = verifiable.getProof().getVerificationMethod().get();
+        final KeyPair verificationKey = verifiable.getProof().getVerificationMethod().get();
         
         if (verificationKey == null || verificationKey.getPublicKeyMultibase() == null) {
             throw new VerificationError();
@@ -78,6 +76,57 @@ public class LinkedDataSignature {
 
         return signer.verify(rawVerificationKey, rawProofValue, documentHashCode);            
     }
+
+    /**
+     * Issues the given VC/VP document and returns signed version.
+     * 
+     * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm}
+     * 
+     * @param document
+     * @return
+     * @throws VerificationError
+     */
+    public Verifiable issue(Verifiable verifiable) throws VerificationError {      //TODO use dedicated exception
+
+        // proof as JSON
+        JsonObject proof = verifiable.getExpandedDocument().getJsonObject(0).getJsonArray(Constants.PROOF).getJsonObject(0);  //FIXME consider multiple proofs
+        
+        // FIXME use JsonLd helpers
+        if (proof.containsKey(Keywords.GRAPH)) {
+            proof = proof.getJsonArray(Keywords.GRAPH).getJsonObject(0);
+        }
+        
+        // remove proof
+        JsonObject document = Json.createObjectBuilder(verifiable.getExpandedDocument().getJsonObject(0)).remove("https://w3id.org/security#proof").build();
+        System.out.println(document);
+
+        
+        byte[] canonical = canonicalization.canonicalize(document);    //FIXME more objects ...
+        
+        byte[] documentHashCode = hashCode(canonical, proof);
+
+        // get private key
+        final KeyPair privateKey = verifiable.getProof().getVerificationMethod().get();
+        
+        if (privateKey == null || privateKey.getPrivateKeyMultibase() == null) {
+            throw new VerificationError();
+        }
+        
+        // decode private key
+        byte[] rawPrivateKey = Multibase.decode(privateKey.getPublicKeyMultibase());  //TODO consider other encoding
+        
+        byte[] rawProofValue = signer.sign(rawPrivateKey,  documentHashCode);
+        
+        String proofValue = Multibase.encode(rawProofValue);
+        
+        //TODO add proofValue, created, domain to proof
+        System.out.println(proofValue);
+        
+        //TODO
+        return verifiable;
+    }
+    
+
     
     static byte[] reverse(byte[] data) {
         final byte[] reversed = new byte[data.length];
@@ -88,16 +137,7 @@ public class LinkedDataSignature {
         
         return reversed;
     }
-    
-    public Verifiable issue(VcDocument document) throws VerificationError {      //TODO use dedicated exception
-
-        
-        //TODO
-        return null;
-    }
-    
-
-       
+           
     /**
      * 
      * see {@link https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}

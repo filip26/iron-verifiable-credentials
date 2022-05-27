@@ -1,22 +1,24 @@
-package com.apicatalog.vc.proof;
+package com.apicatalog.lds;
 
 import jakarta.json.JsonObject;
 
-public class VerificationKey {
+public class KeyPair {
 
     private String id;
     private String type;
     private String controller;
     private String publicKeyMultibase;
+    private String privateKeyMultibase;
    
-    public static final VerificationKey from(JsonObject json) {
+    public static final KeyPair from(JsonObject json) {
 
-        final VerificationKey key = new VerificationKey();
+        final KeyPair key = new KeyPair();
         //FIXME better
         key.id = json.getString("id");
         key.type = json.getString("type");
         key.controller = json.getString("controller");
         key.publicKeyMultibase = json.getString("publicKeyMultibase");        
+        key.privateKeyMultibase = json.getString("publicKeyMultibase");
         return key;
     }
     
@@ -34,6 +36,10 @@ public class VerificationKey {
     
     public String getPublicKeyMultibase() {
         return publicKeyMultibase;
+    }
+
+    public String getPrivateKeyMultibase() {
+        return privateKeyMultibase;
     }
    
 }

@@ -1,4 +1,4 @@
-package com.apicatalog.ed25519;
+package com.apicatalog.lds.ed25519;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -8,10 +8,12 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.EdECPoint;
+import java.security.spec.EdECPrivateKeySpec;
 import java.security.spec.EdECPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
@@ -28,13 +30,8 @@ import com.apicatalog.rdf.RdfDataset;
 import com.apicatalog.rdf.io.RdfWriter;
 import com.apicatalog.rdf.io.error.RdfWriterException;
 import com.apicatalog.rdf.io.error.UnsupportedContentException;
-import com.apicatalog.vc.Constants;
-import com.apicatalog.vc.VcDocument;
-import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.VerificationError;
 
 import io.setl.rdf.normalization.RdfNormalize;
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
 public class Ed25519Signature2020 implements SignatureSuite {
@@ -119,18 +116,37 @@ System.out.println(">>> " + writer.toString().substring(0, writer.toString().len
             e.printStackTrace();
         }        
         return false;
-
     }
     
-    static byte[] reverse(byte[] data) {
-        final byte[] reversed = new byte[data.length];
-        for (int i=0; i<data.length; i++) {
-            reversed[data.length - i - 1] = data[i];
-        }
-        
-        
-        return reversed;
-    }
+    @Override
+    public byte[] sign(byte[] privateKey, byte[] data) {
+
+        try {            
+            Signature suite = Signature.getInstance("Ed25519");
+
+            suite.initSign(getPrivateKey(privateKey));
+            suite.update(data);
+
+            return suite.sign();
+ 
+        } catch (NoSuchAlgorithmException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvalidParameterSpecException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }        
+        return null;
+    }    
 
     static PublicKey getPublicKey(byte[] publicKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
@@ -176,5 +192,46 @@ System.out.println(">>> " + writer.toString().substring(0, writer.toString().len
         EdECPublicKeySpec pubSpec = new EdECPublicKeySpec(paramSpec, ep);
         PublicKey pub = kf.generatePublic(pubSpec);
         return pub;
-    }    
+    }
+
+    static PrivateKey getPrivateKey(byte[] privateKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
+        
+        byte[] pk = Arrays.copyOfRange(privateKey, 2, privateKey.length -2);
+
+        //TODO validate the key starts with 0xed01
+        //System.out.println(Integer.toHexString((publicKey[0] << 8)  + publicKey[1] ) );
+        
+        // key is already converted from hex string to a byte array.
+        KeyFactory kf = KeyFactory.getInstance("Ed25519");
+        
+        // determine if x was odd.
+        boolean xisodd = false;
+        int lastbyteInt = pk[pk.length - 1];
+        if ((lastbyteInt & 255) >> 7 == 1) {
+            xisodd = true;
+        }
+        // make sure most significant bit will be 0 - after reversing.
+        pk[pk.length - 1] &= 127;
+              
+        pk = reverse(pk);
+        BigInteger y = new BigInteger(1, pk);
+
+        NamedParameterSpec paramSpec = new NamedParameterSpec("Ed25519");
+        EdECPrivateKeySpec spec = new EdECPrivateKeySpec(paramSpec, privateKey);
+        return kf.generatePrivate(spec);
+    }
+
+    
+    static byte[] reverse(byte[] data) {
+        final byte[] reversed = new byte[data.length];
+        for (int i=0; i<data.length; i++) {
+            reversed[data.length - i - 1] = data[i];
+        }
+        
+        
+        return reversed;
+    }
+
+
 }

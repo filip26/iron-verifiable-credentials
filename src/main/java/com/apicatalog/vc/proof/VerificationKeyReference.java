@@ -6,6 +6,7 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
+import com.apicatalog.lds.KeyPair;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -25,7 +26,7 @@ public class VerificationKeyReference implements VerificationMethod {
     }
     
     @Override
-    public VerificationKey get() {
+    public KeyPair get() {
         
         try {
             Document document = loader.loadDocument(id, new DocumentLoaderOptions());
@@ -34,7 +35,7 @@ public class VerificationKeyReference implements VerificationMethod {
             //TODO document.getJsonContent().orElseThrow()
             JsonStructure json = document.getJsonContent().orElse(JsonObject.EMPTY_JSON_OBJECT);
 
-            return VerificationKey.from(json.asJsonObject());   //TODO check json type
+            return KeyPair.from(json.asJsonObject());   //TODO check json type
             
         } catch (JsonLdError e) {
             // TODO Auto-generated catch block

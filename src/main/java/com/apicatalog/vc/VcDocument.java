@@ -19,6 +19,8 @@ import jakarta.json.JsonValue;
 
 public interface VcDocument {
 
+    JsonArray getExpandedDocument();
+    
     default boolean isVerifiable() {
         return false;
     }
