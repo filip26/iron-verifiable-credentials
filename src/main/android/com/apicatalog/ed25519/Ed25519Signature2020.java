@@ -37,7 +37,6 @@ public class Ed25519Signature2020Android {
             CleartextKeysetHandle.write(pp,
                 JsonKeysetWriter.withOutputStream(publicKeyStream));
             
-            System.out.println(publicKeyStream.toString());
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

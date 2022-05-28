@@ -91,7 +91,7 @@ public class Ed25519KeyPair2020 implements KeyPair {
 
         // decode private key
         final byte[] encodedKey = Multibase.decode(privateKeyMultibase);
-
+        
         final Codec codec = Multicodec.codec(Type.Key, encodedKey).orElseThrow(DataIntegrityError::new);
 
         if (expected != codec) {

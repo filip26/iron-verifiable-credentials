@@ -4,33 +4,19 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Constants;
 import com.apicatalog.vc.Vc2Rdf;
-import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.VerificationError;
-import com.apicatalog.vc.VerificationError.Code;
 
 import jakarta.json.Json;
-import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
 public class LinkedDataSignature {
 
-    private final CanonicalizationAlgorithm canonicalization;
-    private final DigestAlgorithm digester;
-    private final SignatureAlgorithm signer;
+    private final SignatureSuite suite;
 
     public LinkedDataSignature(SignatureSuite suite) {
-        this(suite, suite, suite);
-    }
-
-    public LinkedDataSignature(
-                CanonicalizationAlgorithm canonicalization,
-                DigestAlgorithm digester,
-                SignatureAlgorithm signer
-            ) {
-        this.canonicalization = canonicalization;
-        this.digester = digester;
-        this.signer = signer;
+        this.suite = suite;
     }
 
     /**
@@ -87,42 +73,52 @@ public class LinkedDataSignature {
      * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm}
      * 
      * @param document
-     * @return
+     * @return 
      * @throws VerificationError
      */
-    public JsonArray sign(JsonArray document, ProofOptions options, byte[] privateKey) throws VerificationError {      //TODO use dedicated exception
+    public JsonObject sign(JsonObject document, ProofOptions options, byte[] privateKey) throws VerificationError {      //TODO use dedicated exception
 
-        System.out.println(document);
-        
-        byte[] canonical = canonicalization.canonicalize(document);
+        byte[] canonical = suite.canonicalize(document);
         
         byte[] documentHashCode = hashCode(canonical, options);
-
-//        
-//        // decode private key
-//        byte[] rawPrivateKey = Multibase.decode(privateKey.getPublicKeyMultibase());  //TODO consider other encoding
         
-        byte[] rawProofValue = signer.sign(privateKey,  documentHashCode);
+        byte[] rawProofValue = suite.sign(privateKey,  documentHashCode);
         
         String proofValue = Multibase.encode(rawProofValue);
         
         //TODO add proofValue, created, domain to proof
-        System.out.println(proofValue);
-        
-        //TODO
-        return null;
-    }
-    
 
-    
-    static byte[] reverse(byte[] data) {
-        final byte[] reversed = new byte[data.length];
-        for (int i=0; i<data.length; i++) {
-            reversed[data.length - i - 1] = data[i];
-        }
-        
-        
-        return reversed;
+        return Json.createObjectBuilder(document)
+                .add(Constants.PROOF, 
+                    Json.createArrayBuilder().add(
+                        Json.createObjectBuilder()
+                        
+                        .add(Keywords.TYPE,
+                                Json.createArrayBuilder().add(
+                                        suite.getType()
+                                        ))
+                        
+                        .add(Constants.PROOF_VALUE, 
+                                Json.createArrayBuilder().add(
+                                        Json.createObjectBuilder()
+                                        .add(Keywords.VALUE, proofValue)
+                                        .add(Keywords.TYPE, "https://w3id.org/security#multibase")
+                                ))
+                        .add(Constants.PROOF_VERIFICATION_METHOD, 
+                                Json.createArrayBuilder().add(
+                                        Json.createObjectBuilder()
+                                        .add(Keywords.ID, options.getVerificationMethod().getId().toString()))
+                                )
+                        .add(Constants.CREATED, 
+                                Json.createArrayBuilder().add(
+                                        Json.createObjectBuilder()
+                                        .add(Keywords.TYPE, "http://www.w3.org/2001/XMLSchema#dateTime")
+                                        .add(Keywords.VALUE, options.getCreated().toString())
+                                        
+                                ))
+                        ))
+                    
+                .build();                
     }
            
     /**
@@ -141,9 +137,9 @@ public class LinkedDataSignature {
 //        System.out.println(proof);
 
         
-        byte[] proofHash = digester.digest(canonicalization.canonicalize(Vc2Rdf.toRdf(options)));
+        byte[] proofHash = suite.digest(suite.canonicalize(Vc2Rdf.toRdf(options)));
         
-        byte[] documentHash = digester.digest(document);
+        byte[] documentHash = suite.digest(document);
 
         byte[] result = new byte[proofHash.length + documentHash.length];
         
@@ -161,12 +157,10 @@ public class LinkedDataSignature {
               .remove(Keywords.TYPE)
               .build();
               
-      System.out.println(proof);
-
       
-      byte[] proofHash = digester.digest(canonicalization.canonicalize(proof));
+      byte[] proofHash = suite.digest(suite.canonicalize(proof));
       
-      byte[] documentHash = digester.digest(document);
+      byte[] documentHash = suite.digest(document);
 
       byte[] result = new byte[proofHash.length + documentHash.length];
       

@@ -29,4 +29,8 @@ public class Ed25519ProofOptions2020 implements ProofOptions {
     public String getdomain() {
         return domain;
     }
+
+    public void setVerificationMethod(VerificationMethod verificationMethod) {
+        this.verificationMethod = verificationMethod;
+    }
 }

@@ -34,7 +34,6 @@ public class Urdna2015 implements CanonicalizationAlgorithm {
             
             rdfWriter.write(canonical);
 
-System.out.println(">>> " + writer.toString().substring(0, writer.toString().length() -1) + "'");
             return writer.toString()
                     .substring(0, writer.toString().length() -1)
                     .getBytes(StandardCharsets.UTF_8);
@@ -69,7 +68,6 @@ System.out.println(">>> " + writer.toString().substring(0, writer.toString().len
             
             rdfWriter.write(canonical);
 
-System.out.println(">>> " + writer.toString().substring(0, writer.toString().length() -1) + "'");
             return writer.toString()
                     .substring(0, writer.toString().length() -1)
                     .getBytes(StandardCharsets.UTF_8);

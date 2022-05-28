@@ -83,7 +83,7 @@ class VcTest {
                 .asJsonObject().getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#entries")
                 .stream()
                 .map(JsonValue::asJsonObject)
-                .map(test -> VcTestCase.of(test, manifest));
+                .map(test -> VcTestCase.of(test, manifest, VcTestRunnerJunit.LOADER));
         }
     }
 }

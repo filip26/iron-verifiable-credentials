@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
+import com.apicatalog.code.Multicodec;
+import com.apicatalog.code.Multicodec.Codec;
+import com.apicatalog.multibase.Multibase;
 import com.google.crypto.tink.CleartextKeysetHandle;
 import com.google.crypto.tink.JsonKeysetWriter;
 import com.google.crypto.tink.KeyTemplates;
@@ -32,7 +35,7 @@ public class TinkSignature implements SignatureAlgorithm {
             try {
                 CleartextKeysetHandle.write(pp, JsonKeysetWriter.withOutputStream(publicKeyStream));
 
-                System.out.println(publicKeyStream.toString());
+
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -68,15 +71,9 @@ public class TinkSignature implements SignatureAlgorithm {
             // Register all signature key types with the Tink runtime.
             SignatureConfig.register();
 
-            byte[] pk = Arrays.copyOfRange(privateKey, 4, privateKey.length);
-
-            System.out.println("pk " + pk.length);
-            System.out.println(Arrays.toString(pk));
-
-            Ed25519Sign signer = new Ed25519Sign(pk);
+            Ed25519Sign signer = new Ed25519Sign(privateKey);
 
             byte[] signature = signer.sign(data);
-            System.out.println(Arrays.toString(signature));
 
             return signature;
 
@@ -86,4 +83,17 @@ public class TinkSignature implements SignatureAlgorithm {
 
         return null;
     }
+    
+
+    /*TODO keygen
+     *      
+                    Ed25519Sign.KeyPair keyPair = Ed25519Sign.KeyPair.newKeyPair();
+            privateKey = keyPair.getPrivateKey();
+    System.out.println("private= " + Multibase.encode(Multicodec.encode(Codec.Ed25519PrivateKey, privateKey))); 
+    byte[] publicKey = keyPair.getPublicKey();
+System.out.println("public= " + Multibase.encode(Multicodec.encode(Codec.Ed25519PublicKey, publicKey)));            
+
+
+
+     */
 }

@@ -4,21 +4,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collections;
 
+import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
+import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.lds.ProofOptions;
-import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519ProofOptions2020;
-import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
+import jakarta.json.JsonValue;
+import jakarta.json.JsonWriter;
+import jakarta.json.JsonWriterFactory;
+import jakarta.json.stream.JsonGenerator;
 
 public class VcTestRunnerJunit {
 
@@ -59,14 +68,26 @@ public class VcTestRunnerJunit {
                  
                 //FIXME
                 Ed25519ProofOptions2020 options = new Ed25519ProofOptions2020();
-                options.setCreated(Instant.now());
+                options.setCreated(testCase.created);
+                options.setVerificationMethod(testCase.verificationMethod);
                 
-                final JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options, LOADER);
+                JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options, LOADER);
                 assertNotNull(signed);
+                
+//TODO  getCompacted(context)                signed = JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(new StringReader("{\"@context\":[\"https://github.com/filip26/iron-verifiable-credentials/issue/0001-context.jsonld\"]}"))).loader(LOADER).get();
                 
                 final Document expected = LOADER.loadDocument(URI.create(testCase.result), new DocumentLoaderOptions());
                 
-                assertEquals(expected.getJsonContent().orElse(null), signed);
+                boolean match = signed.equals(expected.getJsonContent().orElse(null));
+                
+                if (!match) {
+                    
+                    write(testCase, signed, expected.getJsonContent().orElse(null));
+                    
+                    
+                    fail("Expected result does not match");
+                }
+                
                 
             } else {
                 fail("Unknown test execution method");
@@ -100,6 +121,44 @@ public class VcTestRunnerJunit {
 
         // compare expected exception
         assertEquals(testCase.result, code);
+    }
+    
+    public static void write(final VcTestCase testCase, final JsonStructure result, final JsonStructure expected) {
+        final StringWriter stringWriter = new StringWriter();
+
+        try (final PrintWriter writer = new PrintWriter(stringWriter)) {
+            writer.println("Test " + testCase.id + ": " + testCase.name);
+
+            
+            
+            final JsonWriterFactory writerFactory = Json.createWriterFactory(Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
+
+            if (expected != null) {
+                write(writer, writerFactory, "Expected", expected);
+                writer.println();
+            }
+
+            if (result != null) {
+                write(writer, writerFactory, "Actual", result);
+                writer.println();
+            }
+        }
+
+        System.out.println(stringWriter.toString());
+    }
+    
+    public static final void write(final PrintWriter writer, final JsonWriterFactory writerFactory, final String name, final JsonValue result) {
+
+        writer.println(name + ":");
+
+        final StringWriter out = new StringWriter();
+
+        try (final JsonWriter jsonWriter = writerFactory.createWriter(out)) {
+            jsonWriter.write(result);
+        }
+
+        writer.write(out.toString());
+        writer.println();
     }
     
 }

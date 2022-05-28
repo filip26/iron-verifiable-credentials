@@ -1,10 +1,14 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.lang.Keywords;
+import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.vc.proof.VerificationKeyReference;
+import com.apicatalog.vc.proof.VerificationMethod;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -22,11 +26,15 @@ public class VcTestCase {
     public String result;
     
     public URI keyPair;
+    
+    public VerificationMethod verificationMethod;
+    
+    public Instant created;
 
-    public static VcTestCase of(JsonObject test, JsonObject manifest) {
+    public static VcTestCase of(JsonObject test, JsonObject manifest, DocumentLoader loader) {
 
         final VcTestCase testCase = new VcTestCase();
-System.out.println(test);
+
         testCase.id =  URI.create(test.getString(Keywords.ID));
 
         testCase.type = test.getJsonArray(Keywords.TYPE).stream().map(JsonString.class::cast).map(JsonString::getString).collect(Collectors.toSet());
@@ -55,11 +63,21 @@ System.out.println(test);
                                 .getJsonObject(0)
                                 .getString(Keywords.ID));
             
+            URI verificationMethod = URI.create(
+                    options.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#verificationMethod")
+                    .getJsonObject(0)
+                    .getString(Keywords.ID));
+
+            testCase.verificationMethod = new VerificationKeyReference(verificationMethod, loader);
+            
+            if (options.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#created")) {
+                testCase.created = Instant.parse(options.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#created")
+                        .getJsonObject(0)
+                       .getString(Keywords.VALUE));
+            }
             
         }
-        
-        
-        
+
         return testCase;
     }
 

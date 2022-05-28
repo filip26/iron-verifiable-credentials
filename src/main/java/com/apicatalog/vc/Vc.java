@@ -62,19 +62,12 @@ public final class Vc {
 
             byte[] vk = keyPair.getPublicKey();
             byte[] pk = keyPair.getPrivateKey();
-            
-            System.out.println(vk.length + " - " + Arrays.toString(vk));
-            System.out.println(pk.length + " - " +Arrays.toString(pk));
-            
-            System.out.println(": " + Arrays.equals(vk,  0, 1, pk, 0, 1));
-            System.out.println(": " + Arrays.equals(vk,  0, 1, pk, 33, 34));
-            System.out.println(": " + Arrays.equals(vk,  0, 34, pk, 0, 32));
-            System.out.println(": " + Arrays.equals(vk,  0, 34, pk, 34, 66));
-            
+                        
             LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());    //FIXME check keypair type
 
-            signature.sign(document.getExpandedDocument(), options, keyPair.getPrivateKey());
-            //TODO
+            JsonObject signed = signature.sign(document.getExpandedDocument().getJsonObject(0), options, keyPair.getPrivateKey());
+
+            return signed;
 
         } catch (JsonLdError e) {
             // TODO Auto-generated catch block
