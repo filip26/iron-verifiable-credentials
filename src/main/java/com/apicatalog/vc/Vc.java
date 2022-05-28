@@ -1,8 +1,8 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
-import java.util.Arrays;
 
+import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.loader.DocumentLoader;
@@ -12,6 +12,7 @@ import com.apicatalog.lds.ProofOptions;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
 /**
@@ -30,13 +31,13 @@ public final class Vc {
      */
     public static /*FIXME use VerificationApi, make loader optional - use default*/ void verify(URI location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
-        final VcDocument data  = VcDocument.load(location, loader);
+      //  final VcDocument data  = VcDocument.load(location, loader);
 
-        if (data == null || !data.isVerifiable()) {
-            throw new VerificationError();                  //TODO
-        }
-
-        data.asVerifiable().verify();
+//        if (data == null || !data.isVerifiable()) {
+//            throw new VerificationError();                  //TODO
+//        }
+//
+//        data.asVerifiable().verify();
     }
 
     /**
@@ -51,9 +52,11 @@ public final class Vc {
      */
     public static JsonObject sign(URI documentLocation, URI keyPairLocation, ProofOptions options, DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
+        //TODO keyPair type must match options.type
+        
         try {
             // load the document
-            final VcDocument document  = VcDocument.load(documentLocation, loader);
+            final JsonArray  document  = JsonLd.expand(documentLocation).loader(loader).get();
 
             // load key pair
             Document keys = loader.loadDocument(keyPairLocation, new DocumentLoaderOptions());
@@ -65,7 +68,7 @@ public final class Vc {
                         
             LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());    //FIXME check keypair type
 
-            JsonObject signed = signature.sign(document.getExpandedDocument().getJsonObject(0), options, keyPair.getPrivateKey());
+            JsonObject signed = signature.sign(document.getJsonObject(0), options, keyPair.getPrivateKey());
 
             return signed;
 

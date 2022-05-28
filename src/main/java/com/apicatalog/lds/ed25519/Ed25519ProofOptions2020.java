@@ -33,4 +33,9 @@ public class Ed25519ProofOptions2020 implements ProofOptions {
     public void setVerificationMethod(VerificationMethod verificationMethod) {
         this.verificationMethod = verificationMethod;
     }
+    
+    @Override
+    public String getType() {
+        return "https://w3id.org/security#Ed25519Signature2020";
+    }
 }

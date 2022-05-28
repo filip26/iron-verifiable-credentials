@@ -3,11 +3,9 @@ package com.apicatalog.lds;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Constants;
-import com.apicatalog.vc.Vc2Rdf;
 import com.apicatalog.vc.VerificationError;
 
 import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
@@ -22,13 +20,14 @@ public class LinkedDataSignature {
     /**
      * Verifies the given signed VC/VP document.
      * 
-     * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm}
+     * see
+     * {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm}
      * 
      * @param document signed VC/VP document
-     * @return <code>true</code> if the document has been successfully verified 
+     * @return <code>true</code> if the document has been successfully verified
      */
     public boolean verify(JsonStructure document, byte[] publicKey) throws VerificationError {
-        
+
 //        // get verification key
 //        final KeyPair verificationKey = verifiable.getProof().getVerificationMethod().get();
 //        
@@ -73,100 +72,78 @@ public class LinkedDataSignature {
      * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm}
      * 
      * @param document
-     * @return 
+     * @return
      * @throws VerificationError
      */
-    public JsonObject sign(JsonObject document, ProofOptions options, byte[] privateKey) throws VerificationError {      //TODO use dedicated exception
+    public JsonObject sign(JsonObject document, ProofOptions options, byte[] privateKey) throws VerificationError { // TODO
+                                                                                                                    // use
+        JsonObject proof = createProof(options);
 
         byte[] canonical = suite.canonicalize(document);
-        
-        byte[] documentHashCode = hashCode(canonical, options);
-        
-        byte[] rawProofValue = suite.sign(privateKey,  documentHashCode);
-        
+
+        byte[] documentHashCode = hashCode(canonical, proof);
+
+        byte[] rawProofValue = suite.sign(privateKey, documentHashCode);
+
         String proofValue = Multibase.encode(rawProofValue);
-        
-        //TODO add proofValue, created, domain to proof
 
         return Json.createObjectBuilder(document)
-                .add(Constants.PROOF, 
-                    Json.createArrayBuilder().add(
-                        Json.createObjectBuilder()
-                        
-                        .add(Keywords.TYPE,
-                                Json.createArrayBuilder().add(
-                                        suite.getType()
-                                        ))
-                        
-                        .add(Constants.PROOF_VALUE, 
-                                Json.createArrayBuilder().add(
-                                        Json.createObjectBuilder()
+                .add(Constants.PROOF,
+                        Json.createArrayBuilder().add(
+                        Json.createObjectBuilder(proof).add(Constants.PROOF_VALUE,
+                                Json.createArrayBuilder().add(Json.createObjectBuilder()
                                         .add(Keywords.VALUE, proofValue)
-                                        .add(Keywords.TYPE, "https://w3id.org/security#multibase")
-                                ))
-                        .add(Constants.PROOF_VERIFICATION_METHOD, 
-                                Json.createArrayBuilder().add(
-                                        Json.createObjectBuilder()
-                                        .add(Keywords.ID, options.getVerificationMethod().getId().toString()))
-                                )
-                        .add(Constants.CREATED, 
-                                Json.createArrayBuilder().add(
-                                        Json.createObjectBuilder()
-                                        .add(Keywords.TYPE, "http://www.w3.org/2001/XMLSchema#dateTime")
-                                        .add(Keywords.VALUE, options.getCreated().toString())
-                                        
-                                ))
-                        ))
-                    
-                .build();                
+                                        .add(Keywords.TYPE, "https://w3id.org/security#multibase"))))
+                ).build();
     }
-           
+
     /**
      * 
-     * see {@link https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}
+     * see
+     * {@link https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}
      * 
      * @param dataset
      * @return
      * @throws VerificationError
      */
-    
-    public byte[] hashCode(byte[] document, ProofOptions options) throws VerificationError {
-        
-//        proof = Json.createObjectBuilder(proof).remove(Constants.PROOF_VALUE).build();
-//                
-//        System.out.println(proof);
+    public byte[] hashCode(byte[] document, JsonObject proof) throws VerificationError {
 
-        
-        byte[] proofHash = suite.digest(suite.canonicalize(Vc2Rdf.toRdf(options)));
-        
+        proof = Json.createObjectBuilder(proof).remove(Constants.PROOF_VALUE)
+//              .remove(Constants.PROOF_PURPOSE)
+                .remove(Keywords.TYPE).build();
+
+        byte[] proofHash = suite.digest(suite.canonicalize(proof));
+
         byte[] documentHash = suite.digest(document);
 
         byte[] result = new byte[proofHash.length + documentHash.length];
-        
+
         System.arraycopy(proofHash, 0, result, 0, proofHash.length);
         System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
-                    
+
         return result;
     }
-    
-    public byte[] hashCode(byte[] document, JsonObject proof) throws VerificationError {
-        
-      proof = Json.createObjectBuilder(proof)
-              .remove(Constants.PROOF_VALUE)
-//              .remove(Constants.PROOF_PURPOSE)
-              .remove(Keywords.TYPE)
-              .build();
-              
-      
-      byte[] proofHash = suite.digest(suite.canonicalize(proof));
-      
-      byte[] documentHash = suite.digest(document);
 
-      byte[] result = new byte[proofHash.length + documentHash.length];
-      
-      System.arraycopy(proofHash, 0, result, 0, proofHash.length);
-      System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
-                  
-      return result;
-  }
+    static JsonObject createProof(ProofOptions options) {
+        return Json.createObjectBuilder().add(Keywords.TYPE, Json.createArrayBuilder().add(options.getType()))
+
+                .add(Constants.PROOF_VERIFICATION_METHOD,
+                        Json.createArrayBuilder()
+                                .add(Json.createObjectBuilder().add(Keywords.ID,
+                                        options.getVerificationMethod().getId().toString())))
+                .add(Constants.CREATED,
+                        Json.createArrayBuilder()
+                                .add(Json.createObjectBuilder()
+                                        .add(Keywords.TYPE, "http://www.w3.org/2001/XMLSchema#dateTime")
+                                        .add(Keywords.VALUE, options.getCreated().toString())
+
+                                ))
+                .add(Constants.PROOF_PURPOSE,
+                        Json.createArrayBuilder()
+                                .add(Json.createObjectBuilder().add(Keywords.ID,
+                                        "https://w3id.org/security#assertionMethod")))
+                // TODO domain to proof
+
+                .build();
+    }
 }

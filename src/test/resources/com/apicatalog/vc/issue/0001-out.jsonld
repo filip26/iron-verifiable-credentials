@@ -19,7 +19,7 @@
 			"https://w3id.org/security#proofValue": [
 				{
 					"@type": "https://w3id.org/security#multibase",
-					"@value": "z5ZBKdXq5amm3uBem6YhAonZrGSvzraGX769fn4ZkxDJ4RSq8iCSRnCBTCAmjhL3KAE45AzzjUNJ3w5GB1o6ijVs8"
+					"@value": "z4bgGyD5PG3uxyrX8tWknJAggGKuD3nqqo6VpsSBg7vNd881W5n2aLJD9QicG3vMLyPk2YY5QQM4g5rgjzTEhAtu9"
 				}
 			],
 			"@type": [
@@ -27,7 +27,12 @@
 			],
 			"https://w3id.org/security#verificationMethod": [
 				{
-					"@id": "https://github.com/filip26/iron-verifiable-credentials/issue/0001-verification-key.json"
+					"@id": "https://github.com/filip26/iron-verifiable-credentials/verify/0005-verification-key.json"
+				}
+			],
+			"https://w3id.org/security#proofPurpose": [
+				{
+					"@id": "https://w3id.org/security#assertionMethod"
 				}
 			]
 		}

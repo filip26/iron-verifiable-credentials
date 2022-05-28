@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
-import java.time.Instant;
 import java.util.Collections;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -53,14 +52,15 @@ public class VcTestRunnerJunit {
         assertNotNull(testCase.input);
 
         try {
-            if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/VerifyTest")) {
+            if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VerifyTest")) {
 
                 Vc.verify(testCase.input, LOADER);
                 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#DataIntegrityTest")) {
 
-                final VcDocument vcDocument = VcDocument.load(testCase.input, LOADER);        //TODO use Vc API
-                assertNotNull(vcDocument);
+                //final VcDocument vcDocument = VcDocument.load(testCase.input, LOADER);        //TODO use Vc API
+                //assertNotNull(vcDocument);
+                fail("TODO");
                 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssueTest")) {
 
@@ -74,7 +74,8 @@ public class VcTestRunnerJunit {
                 JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options, LOADER);
                 assertNotNull(signed);
                 
-//TODO  getCompacted(context)                signed = JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(new StringReader("{\"@context\":[\"https://github.com/filip26/iron-verifiable-credentials/issue/0001-context.jsonld\"]}"))).loader(LOADER).get();
+//TODO  getCompacted(context) 
+//signed = JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(new StringReader("{\"@context\":[\"https://github.com/filip26/iron-verifiable-credentials/issue/0001-context.jsonld\"]}"))).loader(LOADER).get();
                 
                 final Document expected = LOADER.loadDocument(URI.create(testCase.result), new DocumentLoaderOptions());
                 

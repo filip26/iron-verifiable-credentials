@@ -23,7 +23,6 @@ class ImmutableVerifiablePresentation implements VerifiablePresentation {
         
     }
 
-    @Override
     public JsonArray getExpandedDocument() {
         // TODO Auto-generated method stub
         return null;

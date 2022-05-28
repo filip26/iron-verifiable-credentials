@@ -32,7 +32,7 @@ class ImmutableVerifiableCredentials implements VerifiableCredentials {
         //ldSignature.verify(this);
     }
 
-    @Override
+
     public JsonArray getExpandedDocument() {
         return document;
     }

@@ -2,11 +2,10 @@ package com.apicatalog.vc;
 
 import com.apicatalog.vc.proof.Proof;
 
-public interface Verifiable extends VcDocument {
+public interface Verifiable {
 
     Proof getProof();
 
-    @Override
     default boolean isVerifiable() {
         return true;
     }

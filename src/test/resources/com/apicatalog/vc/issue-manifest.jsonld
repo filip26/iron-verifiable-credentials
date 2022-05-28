@@ -20,7 +20,7 @@
 			"expect": "issue/0001-out.jsonld",
 			"options": {
 				"keyPair": "issue/0001-keys.json",
-				"verificationMethod": "issue/0001-verification-key.json",
+				"verificationMethod": "verify/0005-verification-key.json",
 				"created": "2022-05-28T17:02:05Z"
 			}
 		}
