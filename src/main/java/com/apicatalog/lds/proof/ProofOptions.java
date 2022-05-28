@@ -1,8 +1,6 @@
-package com.apicatalog.lds;
+package com.apicatalog.lds.proof;
 
 import java.time.Instant;
-
-import com.apicatalog.vc.proof.VerificationMethod;
 
 
 public interface ProofOptions {

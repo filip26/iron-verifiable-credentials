@@ -8,9 +8,11 @@ import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.lds.LinkedDataSignature;
-import com.apicatalog.lds.ProofOptions;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
+import com.apicatalog.lds.proof.EmbeddedProof;
+import com.apicatalog.lds.proof.ProofOptions;
+import com.apicatalog.lds.proof.VerificationMethod;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -29,8 +31,33 @@ public final class Vc {
      * @throws DataIntegrityError
      * @throws VerificationError
      */
-    public static /*FIXME use VerificationApi, make loader optional - use default*/ void verify(URI location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
+    public static  void verify(URI location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
+        /*FIXME use VerificationApi, make loader optional - use default*/
+        try {
+            // load the document
+            final JsonObject document  = JsonLd.expand(location).loader(loader).get().getJsonObject(0);  //FIXME
 
+            // data integrity check
+            EmbeddedProof proof = EmbeddedProof.from(document, loader);
+
+            if (proof == null) {
+                throw new VerificationError();
+            }
+
+            VerificationMethod verificationMethod = proof.getVerificationMethod();
+            
+            LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());    //FIXME check keypair type
+            
+            signature.verify(document, verificationMethod.get(), proof.getValue());   //FIXME
+            
+            
+        } catch (JsonLdError e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+        
       //  final VcDocument data  = VcDocument.load(location, loader);
 
 //        if (data == null || !data.isVerifiable()) {
@@ -68,7 +95,7 @@ public final class Vc {
                         
             LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());    //FIXME check keypair type
 
-            JsonObject signed = signature.sign(document.getJsonObject(0), options, keyPair.getPrivateKey());
+            JsonObject signed = signature.sign(document.getJsonObject(0), options, keyPair);
 
             return signed;
 

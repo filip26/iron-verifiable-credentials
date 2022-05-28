@@ -1,6 +1,6 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.lds.proof.Proof;
 
 public interface Verifiable {
 
@@ -17,6 +17,4 @@ public interface Verifiable {
     static VerifiablePresentation from(Presentation presentation, Proof proof) {
         return new ImmutableVerifiablePresentation(presentation, proof);
     }
-    
-    void verify() throws VerificationError;
 }

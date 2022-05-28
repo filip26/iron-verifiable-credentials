@@ -1,4 +1,4 @@
-package com.apicatalog.vc.proof;
+package com.apicatalog.lds.proof;
 
 import java.net.URI;
 

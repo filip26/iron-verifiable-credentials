@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.vc.proof.VerificationKeyReference;
-import com.apicatalog.vc.proof.VerificationMethod;
+import com.apicatalog.lds.proof.VerificationKeyReference;
+import com.apicatalog.lds.proof.VerificationMethod;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;

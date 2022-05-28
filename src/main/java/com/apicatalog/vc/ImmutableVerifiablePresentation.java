@@ -1,6 +1,6 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.lds.proof.Proof;
 
 import jakarta.json.JsonArray;
 
@@ -15,17 +15,6 @@ class ImmutableVerifiablePresentation implements VerifiablePresentation {
     @Override
     public Proof getProof() {
         return proof;
-    }
-
-    @Override
-    public void verify() throws VerificationError {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public JsonArray getExpandedDocument() {
-        // TODO Auto-generated method stub
-        return null;
     }
     
 }

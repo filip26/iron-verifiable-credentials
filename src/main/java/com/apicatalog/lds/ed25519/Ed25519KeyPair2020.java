@@ -36,6 +36,12 @@ public class Ed25519KeyPair2020 implements KeyPair {
         key.type = json.getString(TYPE);
         key.controller = json.getString(CONTROLLER);
         key.publicKey = getKey(json, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
+        
+        // verify verification key length - TODO needs to be clarified
+        if (key.publicKey.length == 32 || key.publicKey.length == 57 || key.publicKey.length == 114) {
+            //FIXME throw new VerificationError(Code.InvalidProofLength);
+        }
+        
         key.privateKey = getKey(json, PRIVATE_KEY_MULTIBASE, Codec.Ed25519PrivateKey);
 
         return key;

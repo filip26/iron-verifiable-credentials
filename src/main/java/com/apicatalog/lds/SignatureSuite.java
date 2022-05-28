@@ -2,7 +2,6 @@ package com.apicatalog.lds;
 
 import com.apicatalog.rdf.RdfDataset;
 
-import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
 /**
@@ -12,18 +11,18 @@ import jakarta.json.JsonStructure;
  */
 public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
-    private final String type;
+    private final String id;
     private final CanonicalizationAlgorithm canonicalization;
     private final DigestAlgorithm digester;
     private final SignatureAlgorithm signer;
     
     public SignatureSuite(
-            String type,
+            String id,
             CanonicalizationAlgorithm canonicalization,
             DigestAlgorithm digester,
             SignatureAlgorithm signer
             ) {
-        this.type = type;
+        this.id = id;
         this.canonicalization = canonicalization;
         this.digester = digester;
         this.signer = signer;
@@ -49,8 +48,8 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
         return canonicalization.canonicalize(document);
     }
 
-    public String getType() {
-        return type;
+    public String getId() {
+        return id;
     }
 
     @Override
