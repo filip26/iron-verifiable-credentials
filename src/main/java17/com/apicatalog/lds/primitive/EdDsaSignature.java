@@ -88,7 +88,7 @@ public class EdDsaSignature implements SignatureAlgorithm {
         return null;
     }    
 
-    static PublicKey getPublicKey(byte[] publicKey)
+    PublicKey getPublicKey(byte[] publicKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
 
 //      val lastIndex = publicKey.lastIndex
@@ -107,13 +107,13 @@ public class EdDsaSignature implements SignatureAlgorithm {
 //      var key = keyFactory.generatePublic(keySpec);
 
         
-        byte[] pk = Arrays.copyOfRange(publicKey, 2, publicKey.length -2);
+        byte[] pk = Arrays.copyOfRange(publicKey, 2, publicKey.length);
 
         //TODO validate the key starts with 0xed01
         //System.out.println(Integer.toHexString((publicKey[0] << 8)  + publicKey[1] ) );
         
         // key is already converted from hex string to a byte array.
-        KeyFactory kf = KeyFactory.getInstance("Ed25519");
+        KeyFactory kf = KeyFactory.getInstance(type);
         
         // determine if x was odd.
         boolean xisodd = false;
@@ -134,30 +134,11 @@ public class EdDsaSignature implements SignatureAlgorithm {
         return pub;
     }
 
-    static PrivateKey getPrivateKey(byte[] privateKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
-        
-        byte[] pk = Arrays.copyOfRange(privateKey, 2, privateKey.length -2);
+    PrivateKey getPrivateKey(byte[] privateKey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
 
-        //TODO validate the key starts with 0xed01
-        //System.out.println(Integer.toHexString((publicKey[0] << 8)  + publicKey[1] ) );
-        
-        // key is already converted from hex string to a byte array.
         KeyFactory kf = KeyFactory.getInstance("Ed25519");
         
-        // determine if x was odd.
-        boolean xisodd = false;
-        int lastbyteInt = pk[pk.length - 1];
-        if ((lastbyteInt & 255) >> 7 == 1) {
-            xisodd = true;
-        }
-        // make sure most significant bit will be 0 - after reversing.
-        pk[pk.length - 1] &= 127;
-              
-        pk = reverse(pk);
-        BigInteger y = new BigInteger(1, pk);
-
-        NamedParameterSpec paramSpec = new NamedParameterSpec("Ed25519");
+        NamedParameterSpec paramSpec = new NamedParameterSpec(type);
         EdECPrivateKeySpec spec = new EdECPrivateKeySpec(paramSpec, privateKey);
         return kf.generatePrivate(spec);
     }

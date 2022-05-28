@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.apicatalog.jsonld.lang.Keywords;
+
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 
@@ -18,28 +20,46 @@ public class VcTestCase {
     public Set<String> type;
     
     public String result;
+    
+    public URI keyPair;
 
     public static VcTestCase of(JsonObject test, JsonObject manifest) {
 
         final VcTestCase testCase = new VcTestCase();
+System.out.println(test);
+        testCase.id =  URI.create(test.getString(Keywords.ID));
 
-        testCase.id =  URI.create(test.getString("@id"));
-
-        testCase.type = test.getJsonArray("@type").stream().map(JsonString.class::cast).map(JsonString::getString).collect(Collectors.toSet());
+        testCase.type = test.getJsonArray(Keywords.TYPE).stream().map(JsonString.class::cast).map(JsonString::getString).collect(Collectors.toSet());
 
         testCase.name = test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#name")
                             .getJsonObject(0)
-                            .getString("@value");
+                            .getString(Keywords.VALUE);
 
         testCase.input = URI.create(test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action")
                             .getJsonObject(0)
-                            .getString("@id"));
+                            .getString(Keywords.ID));
 
         if (test.containsKey("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result")) {
-            testCase.result = test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result")
-                    .getJsonObject(0)
-                    .getString("@value", null);
+            final JsonObject result = test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result").getJsonObject(0);
+            testCase.result = result.getString(Keywords.ID, result.getString(Keywords.VALUE, null));
         }
+
+        
+        if (test.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#options")) {
+            JsonObject options = test.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#options").getJsonObject(0);
+            
+
+            testCase.keyPair =
+                    URI.create(
+                    options.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#keyPair")
+                                .getJsonObject(0)
+                                .getString(Keywords.ID));
+            
+            
+        }
+        
+        
+        
         return testCase;
     }
 

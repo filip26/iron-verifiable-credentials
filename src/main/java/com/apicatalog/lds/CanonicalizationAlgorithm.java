@@ -1,6 +1,8 @@
 package com.apicatalog.lds;
 
-import jakarta.json.JsonObject;
+import com.apicatalog.rdf.RdfDataset;
+
+import jakarta.json.JsonStructure;
 
 /**
  * An algorithm that takes an input document that has more than one possible representation
@@ -9,6 +11,8 @@ import jakarta.json.JsonObject;
  */
 public interface CanonicalizationAlgorithm {
 
-    byte[] canonicalize(JsonObject proof);
+    byte[] canonicalize(JsonStructure json);
+    
+    byte[] canonicalize(RdfDataset dataset);
 
 }

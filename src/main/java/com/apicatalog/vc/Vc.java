@@ -1,9 +1,16 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
+import java.util.Arrays;
 
+import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.lds.SignatureSuite;
+import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
+import com.apicatalog.lds.LinkedDataSignature;
+import com.apicatalog.lds.ProofOptions;
+import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 
 import jakarta.json.JsonObject;
 
@@ -35,14 +42,45 @@ public final class Vc {
     /**
      * Signs VC/VP document with using the provided signature suite. 
 
-     * @param location
+     * @param documentLocation
      * @param suite
      * @param loader
      * @return signed VC/VP with proof property at the root level
+     * @throws DataIntegrityError 
+     * @throws VerificationError 
      */
-    public static JsonObject issue(URI location, SignatureSuite suite, DocumentLoader loader) {
+    public static JsonObject sign(URI documentLocation, URI keyPairLocation, ProofOptions options, DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
-        //TODO
+        try {
+            // load the document
+            final VcDocument document  = VcDocument.load(documentLocation, loader);
+
+            // load key pair
+            Document keys = loader.loadDocument(keyPairLocation, new DocumentLoaderOptions());
+
+            Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(keys.getJsonContent().orElseThrow().asJsonObject()); //FIXME
+
+            byte[] vk = keyPair.getPublicKey();
+            byte[] pk = keyPair.getPrivateKey();
+            
+            System.out.println(vk.length + " - " + Arrays.toString(vk));
+            System.out.println(pk.length + " - " +Arrays.toString(pk));
+            
+            System.out.println(": " + Arrays.equals(vk,  0, 1, pk, 0, 1));
+            System.out.println(": " + Arrays.equals(vk,  0, 1, pk, 33, 34));
+            System.out.println(": " + Arrays.equals(vk,  0, 34, pk, 0, 32));
+            System.out.println(": " + Arrays.equals(vk,  0, 34, pk, 34, 66));
+            
+            LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());    //FIXME check keypair type
+
+            signature.sign(document.getExpandedDocument(), options, keyPair.getPrivateKey());
+            //TODO
+
+        } catch (JsonLdError e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
         
         return JsonObject.EMPTY_JSON_OBJECT;
     }

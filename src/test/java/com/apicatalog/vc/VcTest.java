@@ -53,7 +53,7 @@ class VcTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "issueManifest" })
     @Order(3)
-    void issue(VcTestCase testCase) {
+    void sign(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
 

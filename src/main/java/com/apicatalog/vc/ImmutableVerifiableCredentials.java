@@ -29,7 +29,7 @@ class ImmutableVerifiableCredentials implements VerifiableCredentials {
         proof.verify(document);
 
         LinkedDataSignature ldSignature = new LinkedDataSignature(new Ed25519Signature2020());  //TODO
-        ldSignature.verify(this);
+        //ldSignature.verify(this);
     }
 
     @Override

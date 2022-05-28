@@ -8,11 +8,11 @@ import java.util.Optional;
 
 public class Multicodec {
 
-    enum Type {
+    public enum Type {
         Key,
     }
 
-    enum Codec {
+    public enum Codec {
     
         Ed25519PublicKey(Type.Key,  new byte[]{0xe, 0xd}),
         Ed25519PrivateKey(Type.Key, new byte[]{0x1, 0x3, 0x0, 0x0});

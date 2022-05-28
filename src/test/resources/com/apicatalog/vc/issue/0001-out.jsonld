@@ -1,0 +1,14 @@
+{
+	"@context": [
+		"https://www.w3.org/2018/credentials/v1"
+	],
+	"id": "https://apicatalog/com/vc/test-credentials#0001",
+	"type": "VerifiableCredential",
+	"credentialSubject": {
+		"id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+	},
+	"proof": {
+		"verificationMethod": "issue/0001-verification-key.json",
+		"created": "2022-05-28T17:02:05Z"
+	}
+}

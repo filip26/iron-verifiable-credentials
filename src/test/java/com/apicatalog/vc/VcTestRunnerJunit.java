@@ -4,9 +4,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.net.URI;
+import java.time.Instant;
+
+import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
+import com.apicatalog.lds.ProofOptions;
+import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.lds.ed25519.Ed25519ProofOptions2020;
+import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 
 import jakarta.json.JsonObject;
 
@@ -30,25 +40,33 @@ public class VcTestRunnerJunit {
 
     public void execute() {
 
-        assertNotNull(testCase.input);
         assertNotNull(testCase.type);
+        assertNotNull(testCase.input);
 
         try {
-            if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/VerifyTest")) {
+            if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/VerifyTest")) {
 
                 Vc.verify(testCase.input, LOADER);
                 
-            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/DataIntegrityTest")) {
+            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#DataIntegrityTest")) {
 
                 final VcDocument vcDocument = VcDocument.load(testCase.input, LOADER);        //TODO use Vc API
                 assertNotNull(vcDocument);
                 
-            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/IssueTest")) {
+            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssueTest")) {
+
+                assertNotNull(testCase.result);
+                 
+                //FIXME
+                Ed25519ProofOptions2020 options = new Ed25519ProofOptions2020();
+                options.setCreated(Instant.now());
                 
-                final JsonObject issued = Vc.issue(testCase.input, null, LOADER); //TODO suite
-                assertNotNull(issued);
+                final JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options, LOADER);
+                assertNotNull(signed);
                 
-                //TODO compare issued with expected
+                final Document expected = LOADER.loadDocument(URI.create(testCase.result), new DocumentLoaderOptions());
+                
+                assertEquals(expected.getJsonContent().orElse(null), signed);
                 
             } else {
                 fail("Unknown test execution method");
@@ -65,6 +83,10 @@ public class VcTestRunnerJunit {
             
         } catch (DataIntegrityError e) {
             assertException(null, e);
+            
+        } catch (JsonLdError e) {
+            e.printStackTrace();
+            fail(e);
         }
     }
     

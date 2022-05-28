@@ -17,12 +17,12 @@ import com.apicatalog.rdf.io.error.UnsupportedContentException;
 
 import io.setl.rdf.normalization.RdfNormalize;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 
 public class Urdna2015 implements CanonicalizationAlgorithm {
 
     @Override
-    public byte[] canonicalize(JsonObject document) {
-        // canonicalization
+    public byte[] canonicalize(JsonStructure document) {
         try {
             RdfDataset dataset = JsonLd.toRdf(JsonDocument.of(document)).get();
             
@@ -55,5 +55,37 @@ System.out.println(">>> " + writer.toString().substring(0, writer.toString().len
             
         }
         throw new IllegalStateException();
+    }
+
+    @Override
+    public byte[] canonicalize(RdfDataset dataset) {
+        try {
+            
+            RdfDataset canonical = RdfNormalize.normalize(dataset);
+            
+            StringWriter writer = new StringWriter();
+            
+            RdfWriter rdfWriter = Rdf.createWriter(MediaType.N_QUADS, writer);
+            
+            rdfWriter.write(canonical);
+
+System.out.println(">>> " + writer.toString().substring(0, writer.toString().length() -1) + "'");
+            return writer.toString()
+                    .substring(0, writer.toString().length() -1)
+                    .getBytes(StandardCharsets.UTF_8);
+
+            
+        } catch (UnsupportedContentException e) {
+            e.printStackTrace();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            
+        } catch (RdfWriterException e) {
+            e.printStackTrace();
+            
+        }
+        throw new IllegalStateException();
+
     }
 }

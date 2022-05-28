@@ -1,6 +1,9 @@
 package com.apicatalog.lds;
 
+import com.apicatalog.rdf.RdfDataset;
+
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization algorithm,
@@ -42,11 +45,16 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     }
 
     @Override
-    public byte[] canonicalize(JsonObject document) {   //TODO consider VcDocument
+    public byte[] canonicalize(JsonStructure document) {
         return canonicalization.canonicalize(document);
     }
 
     public String getType() {
         return type;
+    }
+
+    @Override
+    public byte[] canonicalize(RdfDataset dataset) {
+        return canonicalization.canonicalize(dataset);
     }
 }

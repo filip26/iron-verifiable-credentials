@@ -56,9 +56,8 @@ public class EmbeddedProof implements Proof {
 
         final JsonValue proofValue = json.get(Constants.PROOF);
 
-        if (proofValue == null) {
-            throw new DataIntegrityError();
-        }
+        if (proofValue != null) {
+
 
         if (!ValueType.ARRAY.equals(proofValue.getValueType())) {
             throw new DataIntegrityError();
@@ -237,6 +236,8 @@ public class EmbeddedProof implements Proof {
 
             return embeddedProof;       //FIXME process other proofs
         }
+        }
+
 
 
         //TODO
