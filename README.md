@@ -11,6 +11,20 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 All PR's welcome!
 
+# Usage
+
+```java
+
+boolean valid = Vc.verify(credentials).verify();
+
+JsonObject signedCredentials = Vc.sign(credentials, keys, proofOptions).getExpanded();
+
+JsonObject signedCredentials = Vc.sign(credentials, keys, proofOptions).getCompacted(context);
+
+KeyPair keys = Vc.generateKeys("https://w3id.org/security#Ed25519KeyPair2020", 32);
+
+```
+
 # Building
 
 Fork and clone the project repository.

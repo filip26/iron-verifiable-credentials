@@ -52,7 +52,7 @@ public class EmbeddedProof implements Proof {
         proof.type = options.getType();
         proof.verificationMethod = options.getVerificationMethod();
         proof.created = options.getCreated();
-        proof.domain = options.getdomain();
+        proof.domain = options.getDomain();
         
         return proof;
     }

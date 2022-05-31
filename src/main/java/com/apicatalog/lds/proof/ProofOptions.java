@@ -9,7 +9,7 @@ public interface ProofOptions {
     
     Instant getCreated();
     
-    String getdomain();
+    String getDomain();
     
     String getType();    
 }

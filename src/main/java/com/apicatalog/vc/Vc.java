@@ -48,7 +48,7 @@ public final class Vc {
     }
 
     /**
-     * Signs VC/VP document.
+     * Signs VC/VP document. Returns the provided VC/VP with added proof property.
      * 
      * @param documentLocation
      * @param keyPairLocation
@@ -58,6 +58,7 @@ public final class Vc {
      * @throws DataIntegrityError
      * @throws VerificationError
      */
+    //TODO use SignApi - provide getCompacted() method getExpanded() -> default now
     public static JsonObject sign(URI documentLocation, URI keyPairLocation, ProofOptions options,
             DocumentLoader loader) throws DataIntegrityError, SigningError {
         try {
