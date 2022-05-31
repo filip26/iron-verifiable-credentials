@@ -51,6 +51,9 @@ public class VerificationApi {
             loader = SchemeRouter.defaultInstance();
         }
         
+        //TODO make it configurable
+        loader = new StaticContextLoader(loader);
+        
         if (document != null) {
             return verify(document, loader);
         }
