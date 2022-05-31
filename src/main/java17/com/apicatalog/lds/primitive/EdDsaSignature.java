@@ -14,6 +14,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.NamedParameterSpec;
 
+import com.apicatalog.lds.SigningError;
+import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
 
 public class EdDsaSignature implements SignatureAlgorithm {
@@ -24,9 +26,8 @@ public class EdDsaSignature implements SignatureAlgorithm {
         this.type = type;
     }
 
-
     @Override
-    public boolean verify(byte[] publicKey, byte[] signature, byte[] data) {
+    public boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
         
         try {            
             java.security.Signature suite = java.security.Signature.getInstance(type);
@@ -35,28 +36,16 @@ public class EdDsaSignature implements SignatureAlgorithm {
             suite.update(data);
 
             return suite.verify(signature);
- 
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidParameterSpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }        
-        return false;
+
+        } catch (InvalidParameterSpecException | InvalidKeySpecException 
+                | InvalidKeyException | NoSuchAlgorithmException 
+                | SignatureException e) {
+            throw new VerificationError(e);            
+        }
     }
     
     @Override
-    public byte[] sign(byte[] privateKey, byte[] data) {
+    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
 
         try {            
             java.security.Signature suite = java.security.Signature.getInstance(type);
@@ -66,23 +55,11 @@ public class EdDsaSignature implements SignatureAlgorithm {
 
             return suite.sign();
  
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidParameterSpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }        
-        return null;
+        } catch (InvalidParameterSpecException | InvalidKeySpecException  
+                | InvalidKeyException | NoSuchAlgorithmException 
+                | SignatureException e) {
+            throw new SigningError(e);
+        }
     }    
 
     private PublicKey getPublicKey(byte[] publicKey)

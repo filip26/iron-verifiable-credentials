@@ -21,13 +21,13 @@ public class TinkSignature implements SignatureAlgorithm {
             return true;
 
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();
+            /* ignore */
         }
         return false;
     }
 
     @Override
-    public byte[] sign(byte[] privateKey, byte[] data) {
+    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
 
         try {
             // Register all signature key types with the Tink runtime.
@@ -40,10 +40,8 @@ public class TinkSignature implements SignatureAlgorithm {
             return signature;
 
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();        //TODO
+            throw new SigningError(e);
         }
-
-        return null;
     }
     
 

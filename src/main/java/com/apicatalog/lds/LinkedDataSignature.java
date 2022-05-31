@@ -8,8 +8,6 @@ import com.apicatalog.lds.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.vc.Constants;
-import com.apicatalog.vc.SigningError;
-import com.apicatalog.vc.VerificationError;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;

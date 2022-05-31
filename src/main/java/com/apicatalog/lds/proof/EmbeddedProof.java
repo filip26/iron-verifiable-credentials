@@ -11,11 +11,11 @@ import com.apicatalog.jsonld.lang.NodeObject;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.lds.DataIntegrityError;
+import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.DataIntegrityError.Code;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Constants;
-import com.apicatalog.vc.VerificationError;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
