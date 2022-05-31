@@ -1,12 +1,11 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.lds.proof.Proof;
 
-public interface Verifiable extends VcDocument {
+public interface Verifiable {
 
     Proof getProof();
 
-    @Override
     default boolean isVerifiable() {
         return true;
     }
@@ -18,6 +17,4 @@ public interface Verifiable extends VcDocument {
     static VerifiablePresentation from(Presentation presentation, Proof proof) {
         return new ImmutableVerifiablePresentation(presentation, proof);
     }
-    
-    void verify() throws VerificationError;
 }

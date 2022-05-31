@@ -1,23 +1,24 @@
-package com.apicatalog.vc.proof;
+package com.apicatalog.lds.proof;
 
 import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.NodeObject;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Constants;
 import com.apicatalog.vc.DataIntegrityError;
 import com.apicatalog.vc.VerificationError;
 import com.apicatalog.vc.VerificationError.Code;
 
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
@@ -28,7 +29,7 @@ import jakarta.json.JsonValue.ValueType;
  */
 public class EmbeddedProof implements Proof {
 
-    private Set<String> type;
+    private String type;
 
     private String purpose;
 
@@ -38,8 +39,19 @@ public class EmbeddedProof implements Proof {
     
     private String domain;
     
-    private ProofValue value;    
+    private byte[] value;    
 
+    public static EmbeddedProof from(ProofOptions options) {
+        final EmbeddedProof proof = new EmbeddedProof();
+
+        proof.type = options.getType();
+        proof.verificationMethod = options.getVerificationMethod();
+        proof.created = options.getCreated();
+        proof.domain = options.getdomain();
+        
+        return proof;
+    }
+    
     /**
      * 
      * @param json expanded verifiable credentials or presentation
@@ -47,7 +59,7 @@ public class EmbeddedProof implements Proof {
      * @return
      * @throws VerificationError
      */
-    public static EmbeddedProof from(final JsonObject json, final DocumentLoader loader) throws DataIntegrityError {
+    public static EmbeddedProof from(final JsonObject json, final DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
         if (json == null) {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
@@ -55,9 +67,12 @@ public class EmbeddedProof implements Proof {
 
         final JsonValue proofValue = json.get(Constants.PROOF);
 
+
         if (proofValue == null) {
             throw new DataIntegrityError();
         }
+        
+
 
         if (!ValueType.ARRAY.equals(proofValue.getValueType())) {
             throw new DataIntegrityError();
@@ -101,10 +116,10 @@ public class EmbeddedProof implements Proof {
                 embeddedProof.type = typeValue.asJsonArray().stream()
                                         .map(JsonString.class::cast)
                                         .map(JsonString::getString)
-                                        .collect(Collectors.toSet());
+                                        .findAny().orElse(null);
                 
             } else if (JsonUtils.isString(typeValue)) {
-                embeddedProof.type = Set.of(((JsonString)typeValue).getString());
+                embeddedProof.type = ((JsonString)typeValue).getString();
                 
             } else {
                 throw new DataIntegrityError();
@@ -147,8 +162,9 @@ public class EmbeddedProof implements Proof {
                     final JsonObject verificationMethodObject = verificationMethodItem.asJsonObject();
 
                     final String id = verificationMethodObject.getString(Keywords.ID);
-
-                    embeddedProof.verificationMethod = new VerificationKeyReference(URI.create(id), loader);
+                    //TODO check verification method type
+                    
+                    embeddedProof.verificationMethod = Ed25519KeyPair2020.reference(URI.create(id));
                     
                 //TODO embedded key
                     
@@ -179,15 +195,31 @@ public class EmbeddedProof implements Proof {
                     throw new DataIntegrityError();
                 }
                 
-                embeddedProof.value = embeddedProofValue.asJsonArray().stream()
-                                        .map(JsonValue::asJsonObject)
-                                        .map(o -> new ProofValue(o.getString(Keywords.VALUE),
-                                                JsonUtils.toStream(o.get(Keywords.TYPE))
-                                                .map(JsonString.class::cast)
-                                                .map(JsonString::getString)
-                                                .collect(Collectors.toSet())
-                                                   ))
-                                        .limit(1).toArray(ProofValue[]::new)[0];
+
+                String proofValueType = embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.TYPE);
+                                
+                String encodedProofValue =  embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
+                
+                // verify supported proof value encoding
+                if (!"https://w3id.org/security#multibase".equals(proofValueType)) {
+                    throw new VerificationError(Code.InvalidProofValue);        //FIXME
+                }
+
+                // verify proof value
+                if (encodedProofValue == null || !Multibase.isAlgorithmSupported(encodedProofValue)) {
+                    throw new VerificationError(Code.InvalidProofValue);
+                }
+
+                // decode proof value
+                byte[] rawProofValue = Multibase.decode(encodedProofValue);
+              
+                // verify proof value length
+                if (rawProofValue.length != 64) {
+                    throw new VerificationError(Code.InvalidProofLength);
+                }
+                
+                embeddedProof.value = rawProofValue;
+                
             } else {
                 throw new DataIntegrityError();
             }
@@ -236,15 +268,16 @@ public class EmbeddedProof implements Proof {
 
             return embeddedProof;       //FIXME process other proofs
         }
+        
+
 
 
         //TODO
         return null;
     }    
     
-
     @Override
-    public Set<String> getType() {
+    public String getType() {
         return type;
     }
 
@@ -270,55 +303,50 @@ public class EmbeddedProof implements Proof {
     }
 
     @Override
-    public ProofValue getValue() {
+    public byte[] getValue() {
         return value;
     }
 
-    @Override
-    public void verify() throws VerificationError {
+    public void verify(JsonArray document) throws VerificationError {
 
         // verify supported crypto suite
-        if (!isTypeOf("https://w3id.org/security#Ed25519Signature2020")) {
+        if (!"https://w3id.org/security#Ed25519Signature2020".equals(type)) {
             throw new VerificationError(Code.UnknownCryptoSuiteType);
-        }
+        }        
+    }
+    
+    @Override
+    public JsonObject toJson() {
+        return Json.createObjectBuilder().add(Keywords.TYPE, Json.createArrayBuilder().add(type))
 
-        // verify supported proof value encoding
-        if (value == null || !value.isTypeOf("https://w3id.org/security#multibase")) {
-            throw new VerificationError(Code.InvalidProofValue);
-        }
+                .add(Constants.PROOF_VERIFICATION_METHOD,
+                        Json.createArrayBuilder()
+                                .add(Json.createObjectBuilder().add(Keywords.ID,
+                                        verificationMethod.getId().toString())))
+                .add(Constants.CREATED,
+                        Json.createArrayBuilder()
+                                .add(Json.createObjectBuilder()
+                                        .add(Keywords.TYPE, "http://www.w3.org/2001/XMLSchema#dateTime")
+                                        .add(Keywords.VALUE, created.toString())
 
-        // verify proof value
-        if (value.getValue() == null || !Multibase.isAlgorithmSupported(value.getValue())) {
-            throw new VerificationError(Code.InvalidProofValue);
-        }
+                                ))
+                .add(Constants.PROOF_PURPOSE,
+                        Json.createArrayBuilder()
+                                .add(Json.createObjectBuilder().add(Keywords.ID,
+                                        "https://w3id.org/security#assertionMethod")))  //FIXME configurable
+                // TODO domain to proof
 
-        // decode proof value
-        byte[] proofValue = Multibase.decode(value.getValue());
-      
-        // verify proof value length
-        if (proofValue.length != 64) {
-            throw new VerificationError(Code.InvalidProofLength);
-        }
-        
-        // get verification key
-        final VerificationKey verificationKey = verificationMethod.get();
-        
-        if (verificationKey == null || verificationKey.getPublicKeyMultibase() == null) {
-            throw new VerificationError();
-        }
-        
-        // decode verification key
-        byte[] verificationKeyValue = Multibase.decode(verificationKey.getPublicKeyMultibase());
-
-        // verify verification key length - TODO needs to be clarified
-        if (verificationKeyValue.length == 32 || verificationKeyValue.length == 57 || verificationKeyValue.length == 114) {
-            throw new VerificationError(Code.InvalidProofLength);
-        }
-
-        
-        //TODO validate public key length 
-        
-
-        // TODO Auto-generated method stub        
+                .build();
+    }
+    
+    public static JsonObject setProof(JsonObject document, JsonObject proof, String proofValue) {
+        return Json.createObjectBuilder(document)
+                .add(Constants.PROOF,
+                        Json.createArrayBuilder().add(
+                        Json.createObjectBuilder(proof).add(Constants.PROOF_VALUE,
+                                Json.createArrayBuilder().add(Json.createObjectBuilder()
+                                        .add(Keywords.VALUE, proofValue)
+                                        .add(Keywords.TYPE, "https://w3id.org/security#multibase"))))
+                ).build();
     }
 }

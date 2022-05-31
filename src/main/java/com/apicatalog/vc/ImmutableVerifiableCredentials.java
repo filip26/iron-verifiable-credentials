@@ -1,13 +1,19 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.lds.LinkedDataSignature;
+import com.apicatalog.lds.ed25519.Ed25519Signature2020;
+import com.apicatalog.lds.proof.Proof;
+
+import jakarta.json.JsonArray;
 
 class ImmutableVerifiableCredentials implements VerifiableCredentials {
 
     final Proof proof;
+    final JsonArray document;
 
-    public ImmutableVerifiableCredentials(Credentials credentials, Proof proof) {
+    public ImmutableVerifiableCredentials(Credentials credentials, Proof proof, JsonArray document) {
         this.proof = proof;
+        this.document = document;
     }
 
     @Override
@@ -15,12 +21,8 @@ class ImmutableVerifiableCredentials implements VerifiableCredentials {
         return proof;
     }
 
-    @Override
-    public void verify() throws VerificationError {
-        if (proof == null) {
-            throw new VerificationError();
-        }
-        proof.verify();
+    public JsonArray getExpandedDocument() {
+        return document;
     }
 
 }

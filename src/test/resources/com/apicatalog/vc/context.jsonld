@@ -1,5 +1,6 @@
 {
 	"@context": {
+	   "@vocab":   "https://github.com/filip26/iron-verifiable-credentials/tests/vocab#",
 		"mf": "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#",
 		"name": "mf:name",
 		"sequence": {
@@ -16,6 +17,13 @@
 		},
 		"expectErrorCode": {
 			"@id": "mf:result"
-		}
+		},
+        "keyPair": {
+          "@type": "@id"
+        },
+        "verificationMethod": {
+          "@type": "@id"
+        }       
+        		
 	}
 }

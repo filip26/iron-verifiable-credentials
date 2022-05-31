@@ -3,7 +3,6 @@ package com.apicatalog.vc;
 /*FIXME remove the class */
 public class Constants {
 
-    public static final String TYPE = "@type";
     public static final String CREATED = "http://purl.org/dc/terms/created";
 
     public static final String PROOF = "https://w3id.org/security#proof";

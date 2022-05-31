@@ -16,7 +16,13 @@
 				"IssueTest"
 			],
 			"name": "a simple credentials to sign",
-			"input": "issue/0001-in.jsonld"
+			"input": "issue/0001-in.jsonld",
+			"expect": "issue/0001-out.jsonld",
+			"options": {
+				"keyPair": "issue/0001-keys.json",
+				"verificationMethod": "verify/0005-verification-key.json",
+				"created": "2022-05-28T17:02:05Z"
+			}
 		}
 	]
 }

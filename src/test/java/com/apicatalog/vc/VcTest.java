@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -28,6 +29,7 @@ class VcTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "integrityManifest" })
     @Order(1)
+    @Disabled
     void integrity(VcTestCase testCase) {
 
         // skip JWS credentials
@@ -53,7 +55,7 @@ class VcTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "issueManifest" })
     @Order(3)
-    void issue(VcTestCase testCase) {
+    void sign(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
 
@@ -83,7 +85,7 @@ class VcTest {
                 .asJsonObject().getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#entries")
                 .stream()
                 .map(JsonValue::asJsonObject)
-                .map(test -> VcTestCase.of(test, manifest));
+                .map(test -> VcTestCase.of(test, manifest, VcTestRunnerJunit.LOADER));
         }
     }
 }
