@@ -2,7 +2,7 @@ package com.apicatalog.lds.primitive;
 
 import java.security.NoSuchAlgorithmException;
 
-import com.apicatalog.lds.DigestAlgorithm;
+import com.apicatalog.lds.algorithm.DigestAlgorithm;
 
 public class MessageDigest implements DigestAlgorithm {
 

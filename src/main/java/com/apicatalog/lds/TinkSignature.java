@@ -5,9 +5,10 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
-import com.apicatalog.code.Multicodec;
-import com.apicatalog.code.Multicodec.Codec;
+import com.apicatalog.lds.algorithm.SignatureAlgorithm;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.Multicodec.Codec;
 import com.google.crypto.tink.CleartextKeysetHandle;
 import com.google.crypto.tink.JsonKeysetWriter;
 import com.google.crypto.tink.KeyTemplates;

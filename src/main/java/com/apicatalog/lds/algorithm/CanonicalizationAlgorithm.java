@@ -1,6 +1,4 @@
-package com.apicatalog.lds;
-
-import com.apicatalog.rdf.RdfDataset;
+package com.apicatalog.lds.algorithm;
 
 import jakarta.json.JsonStructure;
 
@@ -12,7 +10,5 @@ import jakarta.json.JsonStructure;
 public interface CanonicalizationAlgorithm {
 
     byte[] canonicalize(JsonStructure json);
-    
-    byte[] canonicalize(RdfDataset dataset);
 
 }

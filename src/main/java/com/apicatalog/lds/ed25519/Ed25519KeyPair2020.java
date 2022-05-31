@@ -1,10 +1,17 @@
 package com.apicatalog.lds.ed25519;
 
-import com.apicatalog.code.Multicodec;
-import com.apicatalog.code.Multicodec.Codec;
-import com.apicatalog.code.Multicodec.Type;
-import com.apicatalog.lds.KeyPair;
+import java.net.URI;
+
+import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.document.Document;
+import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
+import com.apicatalog.lds.key.KeyPair;
+import com.apicatalog.lds.proof.VerificationMethod;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.Multicodec.Codec;
+import com.apicatalog.multicodec.Multicodec.Type;
 import com.apicatalog.vc.DataIntegrityError;
 
 import jakarta.json.Json;
@@ -19,9 +26,9 @@ public class Ed25519KeyPair2020 implements KeyPair {
     private static final String PUBLIC_KEY_MULTIBASE = "publicKeyMultibase";
     private static final String PRIVATE_KEY_MULTIBASE = "privateKeyMultibase";
 
-    private String id;
+    private URI id;
     private String type;
-    private String controller;
+    private URI controller;
 
     private byte[] publicKey;
     private byte[] privateKey;
@@ -32,9 +39,9 @@ public class Ed25519KeyPair2020 implements KeyPair {
 
         // TODO check json object type!
 
-        key.id = json.getString(ID);
+        key.id = URI.create(json.getString(ID));
         key.type = json.getString(TYPE);
-        key.controller = json.getString(CONTROLLER);
+        key.controller = URI.create(json.getString(CONTROLLER));
         key.publicKey = getKey(json, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
         
         // verify verification key length - TODO needs to be clarified
@@ -46,16 +53,30 @@ public class Ed25519KeyPair2020 implements KeyPair {
 
         return key;
     }
+    
+    public static VerificationMethod fetch(URI id, DocumentLoader loader) {
+        
+        try {
+            final Document document = loader.loadDocument(id, new DocumentLoaderOptions());
+
+            return from(document.getJsonContent().orElseThrow().asJsonObject());    //TODO check types
+        } catch (DataIntegrityError | JsonLdError e) {
+            //TODO
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     @Override
     public JsonObject toJson() {
         final JsonObjectBuilder builder = Json.createObjectBuilder();
 
-        builder.add(ID, id);
+        builder.add(ID, id.toString());
         builder.add(TYPE, type);
 
         if (controller != null) {
-            builder.add(CONTROLLER, controller);
+            builder.add(CONTROLLER, controller.toString());
         }
 
         setKey(builder, publicKey, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
@@ -64,7 +85,7 @@ public class Ed25519KeyPair2020 implements KeyPair {
         return builder.build();
     }
 
-    public String getId() {
+    public URI getId() {
         return id;
     }
 
@@ -73,7 +94,7 @@ public class Ed25519KeyPair2020 implements KeyPair {
         return type;
     }
 
-    public String getController() {
+    public URI getController() {
         return controller;
     }
 

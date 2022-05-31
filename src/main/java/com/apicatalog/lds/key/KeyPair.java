@@ -1,4 +1,4 @@
-package com.apicatalog.lds;
+package com.apicatalog.lds.key;
 
 public interface KeyPair extends VerificationKey {
 

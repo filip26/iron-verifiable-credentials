@@ -1,4 +1,4 @@
-package com.apicatalog.lds;
+package com.apicatalog.lds.algorithm;
 
 /**
  * An algorithm that takes an input message and produces an output value

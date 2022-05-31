@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.lds.proof.VerificationKeyReference;
+import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.proof.VerificationMethod;
 
 import jakarta.json.JsonObject;
@@ -68,7 +68,10 @@ public class VcTestCase {
                     .getJsonObject(0)
                     .getString(Keywords.ID));
 
-            testCase.verificationMethod = new VerificationKeyReference(verificationMethod, loader);
+            if (verificationMethod != null) {
+                testCase.verificationMethod = Ed25519KeyPair2020.fetch(verificationMethod, loader);
+            }
+            
             
             if (options.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#created")) {
                 testCase.created = Instant.parse(options.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#created")

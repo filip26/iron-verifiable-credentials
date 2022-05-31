@@ -1,13 +1,15 @@
 package com.apicatalog.lds;
 
-import com.apicatalog.rdf.RdfDataset;
+import com.apicatalog.lds.algorithm.CanonicalizationAlgorithm;
+import com.apicatalog.lds.algorithm.DigestAlgorithm;
+import com.apicatalog.lds.algorithm.SignatureAlgorithm;
 
 import jakarta.json.JsonStructure;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization algorithm,
- * a message digest algorithm, and a signature algorithm that are bundled together 
- * for the purposes of safety and convenience.
+ * a message digest algorithm, and a signature algorithm.
+ * 
  */
 public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
@@ -50,10 +52,5 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
 
     public String getId() {
         return id;
-    }
-
-    @Override
-    public byte[] canonicalize(RdfDataset dataset) {
-        return canonicalization.canonicalize(dataset);
     }
 }

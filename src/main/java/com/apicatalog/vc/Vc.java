@@ -10,6 +10,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
+import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.lds.proof.ProofOptions;
 import com.apicatalog.lds.proof.VerificationMethod;
@@ -40,15 +41,11 @@ public final class Vc {
             // data integrity check
             EmbeddedProof proof = EmbeddedProof.from(document, loader);
 
-            if (proof == null) {
-                throw new VerificationError();
-            }
-
             VerificationMethod verificationMethod = proof.getVerificationMethod();
             
             LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());    //FIXME check keypair type
             
-            signature.verify(document, verificationMethod.get(), proof.getValue());   //FIXME
+            signature.verify(document, (VerificationKey) verificationMethod, proof.getValue()); //TODO check  verification method type
             
             
         } catch (JsonLdError e) {
@@ -90,9 +87,6 @@ public final class Vc {
 
             Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(keys.getJsonContent().orElseThrow().asJsonObject()); //FIXME
 
-            byte[] vk = keyPair.getPublicKey();
-            byte[] pk = keyPair.getPrivateKey();
-                        
             LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());    //FIXME check keypair type
 
             JsonObject signed = signature.sign(document.getJsonObject(0), options, keyPair);

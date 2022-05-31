@@ -15,7 +15,7 @@ import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.NamedParameterSpec;
 import java.util.Arrays;
 
-import com.apicatalog.lds.SignatureAlgorithm;
+import com.apicatalog.lds.algorithm.SignatureAlgorithm;
 
 public class EdDsaSignature implements SignatureAlgorithm {
 

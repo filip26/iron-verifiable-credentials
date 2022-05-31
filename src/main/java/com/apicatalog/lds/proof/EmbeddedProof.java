@@ -11,6 +11,7 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.NodeObject;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Constants;
 import com.apicatalog.vc.DataIntegrityError;
@@ -67,7 +68,11 @@ public class EmbeddedProof implements Proof {
 
         final JsonValue proofValue = json.get(Constants.PROOF);
 
-        if (proofValue != null) {
+
+        if (proofValue == null) {
+            throw new DataIntegrityError();
+        }
+        
 
 
         if (!ValueType.ARRAY.equals(proofValue.getValueType())) {
@@ -159,7 +164,7 @@ public class EmbeddedProof implements Proof {
 
                     final String id = verificationMethodObject.getString(Keywords.ID);
 
-                    embeddedProof.verificationMethod = new VerificationKeyReference(URI.create(id), loader);
+                    embeddedProof.verificationMethod = Ed25519KeyPair2020.fetch(URI.create(id), loader);        //TODO check verification method type
                     
                 //TODO embedded key
                     
@@ -263,7 +268,7 @@ public class EmbeddedProof implements Proof {
 
             return embeddedProof;       //FIXME process other proofs
         }
-        }
+        
 
 
 

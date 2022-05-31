@@ -1,14 +1,15 @@
 package com.apicatalog.lds.proof;
 
 import java.time.Instant;
-import java.util.Set;
 
-import com.apicatalog.vc.VerificationError;
-
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
-
+/**
+ * 
+ * 
+ * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proofs}
+ *
+ */
 public interface Proof {
 
     /**
@@ -54,16 +55,6 @@ public interface Proof {
      * @return
      */
     byte[] getValue();
-
-//    /**
-//     * Checks is the proof is of the given type.
-//     * 
-//     * @param type
-//     * @return <code>true</code> if the given type matches the proof type
-//     */
-//    default boolean isTypeOf(final String type) {
-//        return getType() != null && getType().contains(type);
-//    }
     
     JsonObject toJson();
 }

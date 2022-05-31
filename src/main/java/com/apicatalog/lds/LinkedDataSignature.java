@@ -1,6 +1,8 @@
 package com.apicatalog.lds;
 
 import com.apicatalog.jsonld.lang.Keywords;
+import com.apicatalog.lds.key.KeyPair;
+import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.lds.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase;
