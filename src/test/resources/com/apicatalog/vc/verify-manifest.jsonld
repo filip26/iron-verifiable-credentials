@@ -36,7 +36,8 @@
 				"VerifyTest"
 			],
 			"name": "missing proof",
-			"input": "verify/0003-in.jsonld"
+			"input": "verify/0003-in.jsonld",
+		    "expectErrorCode": "MissingProof"
 		},
 		{
 			"@id": "#t0004",

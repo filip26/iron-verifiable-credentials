@@ -6,7 +6,9 @@ import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.lds.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.vc.Constants;
+import com.apicatalog.vc.SigningError;
 import com.apicatalog.vc.VerificationError;
 
 import jakarta.json.Json;
@@ -55,7 +57,6 @@ public class LinkedDataSignature {
       byte[] computeSignature = hashCode(canonical, proof);      //FIXME
 
       return suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
-
     }
 
     /**
@@ -67,8 +68,8 @@ public class LinkedDataSignature {
      * @return
      * @throws VerificationError
      */
-    public JsonObject sign(JsonObject document, ProofOptions options, KeyPair keyPair) throws VerificationError { // TODO
-                                                                                                                    // use
+    public JsonObject sign(JsonObject document, ProofOptions options, KeyPair keyPair) throws SigningError {
+
         final JsonObject proof = EmbeddedProof.from(options).toJson();
 
         final byte[] canonical = suite.canonicalize(document);
@@ -77,7 +78,7 @@ public class LinkedDataSignature {
 
         final byte[] rawProofValue = suite.sign(keyPair.getPrivateKey(), documentHashCode);
 
-        final String proofValue = Multibase.encode(rawProofValue);
+        final String proofValue = Multibase.encode(Algorithm.Base58Btc, rawProofValue);
 
         return EmbeddedProof.setProof(document, proof, proofValue);
     }
@@ -91,7 +92,7 @@ public class LinkedDataSignature {
      * @return
      * @throws VerificationError
      */
-    public byte[] hashCode(byte[] document, JsonObject proof) throws VerificationError {
+    public byte[] hashCode(byte[] document, JsonObject proof) {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 

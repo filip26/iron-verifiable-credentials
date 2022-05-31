@@ -6,13 +6,15 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
+import com.apicatalog.lds.DataIntegrityError;
+import com.apicatalog.lds.DataIntegrityError.Code;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.proof.VerificationMethod;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.multicodec.Multicodec.Type;
-import com.apicatalog.vc.DataIntegrityError;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -49,10 +51,10 @@ public class Ed25519KeyPair2020 implements KeyPair {
         key.type = json.getString(TYPE);
         key.controller = URI.create(json.getString(CONTROLLER));
         key.publicKey = getKey(json, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
-        
+
         // verify verification key length - TODO needs to be clarified
-        if (key.publicKey.length == 32 || key.publicKey.length == 57 || key.publicKey.length == 114) {
-            //FIXME throw new VerificationError(Code.InvalidProofLength);
+        if (key.publicKey.length != 32 && key.publicKey.length != 57 && key.publicKey.length != 114) {
+            throw new DataIntegrityError(Code.InvalidProofLength);
         }
         
         key.privateKey = getKey(json, PRIVATE_KEY_MULTIBASE, Codec.Ed25519PrivateKey);
@@ -142,7 +144,7 @@ public class Ed25519KeyPair2020 implements KeyPair {
 
         final byte[] encoded = Multicodec.encode(codec, key);
 
-        final String multibase = Multibase.encode(encoded);
+        final String multibase = Multibase.encode(Algorithm.Base58Btc, encoded);
 
         builder.add(property, multibase);
     }

@@ -1,6 +1,6 @@
 package com.apicatalog.vc;
 
-public class VerificationError extends Throwable {
+public class SigningError extends Throwable {
 
     public enum Code {
         Unknown,
@@ -10,20 +10,20 @@ public class VerificationError extends Throwable {
 
     private Code code;
 
-    public VerificationError() {
+    public SigningError() {
         this(Code.Unknown);
     }
 
-    public VerificationError(Code type) {
+    public SigningError(Code type) {
         super();
         this.code = type;
     }
 
-    public VerificationError(Throwable e) {
+    public SigningError(Throwable e) {
         this(Code.Unknown, e);
     }
 
-    public VerificationError(Code code, Throwable e) {
+    public SigningError(Code code, Throwable e) {
         super(e);
         this.code = code;
     }
