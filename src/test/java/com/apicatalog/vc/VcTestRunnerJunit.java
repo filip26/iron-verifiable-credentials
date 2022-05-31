@@ -5,15 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collections;
 
-import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
-import com.apicatalog.jsonld.document.JsonDocument;
+import com.apicatalog.jsonld.json.JsonLdComparison;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
@@ -79,7 +77,7 @@ public class VcTestRunnerJunit {
                 
                 final Document expected = LOADER.loadDocument(URI.create(testCase.result), new DocumentLoaderOptions());
                 
-                boolean match = signed.equals(expected.getJsonContent().orElse(null));
+                boolean match = JsonLdComparison.equals(signed, expected.getJsonContent().orElse(null));
                 
                 if (!match) {
                     

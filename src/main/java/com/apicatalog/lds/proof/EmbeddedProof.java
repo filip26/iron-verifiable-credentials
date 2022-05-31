@@ -4,7 +4,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -163,8 +162,9 @@ public class EmbeddedProof implements Proof {
                     final JsonObject verificationMethodObject = verificationMethodItem.asJsonObject();
 
                     final String id = verificationMethodObject.getString(Keywords.ID);
-
-                    embeddedProof.verificationMethod = Ed25519KeyPair2020.fetch(URI.create(id), loader);        //TODO check verification method type
+                    //TODO check verification method type
+                    
+                    embeddedProof.verificationMethod = Ed25519KeyPair2020.reference(URI.create(id));
                     
                 //TODO embedded key
                     

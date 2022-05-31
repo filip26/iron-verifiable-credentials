@@ -69,7 +69,7 @@ public class VcTestCase {
                     .getString(Keywords.ID));
 
             if (verificationMethod != null) {
-                testCase.verificationMethod = Ed25519KeyPair2020.fetch(verificationMethod, loader);
+                testCase.verificationMethod = Ed25519KeyPair2020.reference(verificationMethod);
             }
             
             

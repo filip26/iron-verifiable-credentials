@@ -26,20 +26,26 @@ public class Ed25519KeyPair2020 implements KeyPair {
     private static final String PUBLIC_KEY_MULTIBASE = "publicKeyMultibase";
     private static final String PRIVATE_KEY_MULTIBASE = "privateKeyMultibase";
 
-    private URI id;
+    private final URI id;
     private String type;
     private URI controller;
 
     private byte[] publicKey;
     private byte[] privateKey;
 
+    public Ed25519KeyPair2020(final URI id) {
+        this.id = id;
+    }
+    
+    public static final Ed25519KeyPair2020 reference(URI id) {
+        return new Ed25519KeyPair2020(id);
+    }
+    
     public static final Ed25519KeyPair2020 from(JsonObject json) throws DataIntegrityError {
 
-        final Ed25519KeyPair2020 key = new Ed25519KeyPair2020();
-
         // TODO check json object type!
+        final Ed25519KeyPair2020 key = new Ed25519KeyPair2020(URI.create(json.getString(ID)));
 
-        key.id = URI.create(json.getString(ID));
         key.type = json.getString(TYPE);
         key.controller = URI.create(json.getString(CONTROLLER));
         key.publicKey = getKey(json, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
@@ -55,7 +61,7 @@ public class Ed25519KeyPair2020 implements KeyPair {
     }
     
     public static VerificationMethod fetch(URI id, DocumentLoader loader) {
-        
+
         try {
             final Document document = loader.loadDocument(id, new DocumentLoaderOptions());
 
