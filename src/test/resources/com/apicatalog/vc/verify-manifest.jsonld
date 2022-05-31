@@ -57,6 +57,16 @@
 			],
 			"name": "simple valid signed VC",
 			"input": "verify/0005-in.jsonld"
-		}
+		},
+        {
+            "@id": "#t0006",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VerifyTest"
+            ],
+            "name": "forged credentials subject",
+            "input": "verify/0006-in.jsonld",
+            "expect": false
+        }
 	]
 }

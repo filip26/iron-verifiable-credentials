@@ -2,7 +2,6 @@ package com.apicatalog.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.PrintWriter;
@@ -18,6 +17,8 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.lds.DataIntegrityError;
+import com.apicatalog.lds.SigningError;
+import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519ProofOptions2020;
 
 import jakarta.json.Json;
@@ -54,7 +55,7 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VerifyTest")) {
 
-                assertTrue(Vc.verify(testCase.input, LOADER));
+                assertEquals(testCase.result != null ? testCase.result : true, Vc.verify(testCase.input).loader(LOADER).verify());
                 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#DataIntegrityTest")) {
 
@@ -77,7 +78,7 @@ public class VcTestRunnerJunit {
 //TODO  getCompacted(context) 
 //signed = JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(new StringReader("{\"@context\":[\"https://github.com/filip26/iron-verifiable-credentials/issue/0001-context.jsonld\"]}"))).loader(LOADER).get();
                 
-                final Document expected = LOADER.loadDocument(URI.create(testCase.result), new DocumentLoaderOptions());
+                final Document expected = LOADER.loadDocument(URI.create((String)testCase.result), new DocumentLoaderOptions());
                 
                 boolean match = JsonLdComparison.equals(signed, expected.getJsonContent().orElse(null));
                 
