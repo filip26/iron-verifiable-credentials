@@ -59,7 +59,7 @@ public class EmbeddedProof implements Proof {
      * @return
      * @throws VerificationError
      */
-    public static EmbeddedProof from(final JsonObject json, final DocumentLoader loader) throws DataIntegrityError {
+    public static EmbeddedProof from(final JsonObject json, final DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
         if (json == null) {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
@@ -202,23 +202,23 @@ public class EmbeddedProof implements Proof {
                 
                 // verify supported proof value encoding
                 if (!"https://w3id.org/security#multibase".equals(proofValueType)) {
-//FIXME                    throw new VerificationError(Code.InvalidProofValue);
+                    throw new VerificationError(Code.InvalidProofValue);        //FIXME
                 }
 
                 // verify proof value
-//                if (value.getValue() == null || !Multibase.isAlgorithmSupported(value.getValue())) {
-//                    throw new VerificationError(Code.InvalidProofValue);
-//                }
-//
-//                // decode proof value
-//                byte[] proofValue = Multibase.decode(value.getValue());
-//              
-//                // verify proof value length
-//                if (proofValue.length != 64) {
-//                    throw new VerificationError(Code.InvalidProofLength);
-//                }
+                if (encodedProofValue == null || !Multibase.isAlgorithmSupported(encodedProofValue)) {
+                    throw new VerificationError(Code.InvalidProofValue);
+                }
+
+                // decode proof value
+                byte[] rawProofValue = Multibase.decode(encodedProofValue);
+              
+                // verify proof value length
+                if (rawProofValue.length != 64) {
+                    throw new VerificationError(Code.InvalidProofLength);
+                }
                 
-                embeddedProof.value = Multibase.decode(encodedProofValue);
+                embeddedProof.value = rawProofValue;
                 
             } else {
                 throw new DataIntegrityError();

@@ -7,9 +7,11 @@ import com.apicatalog.lds.primitive.Urdna2015;
 
 public class Ed25519Signature2020 extends SignatureSuite {
 
+    public static final String TYPE = "https://w3id.org/security#Ed25519Signature2020"; 
+    
     public Ed25519Signature2020() {
         super(
-            "https://w3id.org/security#Ed25519Signature2020",
+            TYPE,
             new Urdna2015(),
             new MessageDigest("SHA-256"),
             new EdDsaSignature("Ed25519")

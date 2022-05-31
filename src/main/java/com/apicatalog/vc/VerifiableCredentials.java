@@ -18,11 +18,10 @@ import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
 /**
- * A verifiable credential is a set of tamper-evident claims
- * and metadata that cryptographically prove who issued it.
+ * A verifiable credential is a set of tamper-evident claims and metadata that
+ * cryptographically prove who issued it.
  */
 public interface VerifiableCredentials extends Verifiable, Credentials {
-
 
     static VerifiableCredentials load(URI location, DocumentLoader loader) throws DataIntegrityError {
         return load(JsonLd.expand(location), loader);
@@ -43,42 +42,45 @@ public interface VerifiableCredentials extends Verifiable, Credentials {
     static VerifiableCredentials load(ExpansionApi api, DocumentLoader loader) throws DataIntegrityError {
         try {
             // VC/VP in expanded form
-            final JsonArray expanded = api.loader(new StaticContextLoader(loader)).get();   //TODO make use of static loader optional
+            final JsonArray expanded = api.loader(new StaticContextLoader(loader)).get(); // TODO make use of static
+                                                                                          // loader optional
 
             return from(expanded, loader);
 
         } catch (JsonLdError e) {
             throw new DataIntegrityError(e);
-        }        
+        }
     }
 
-    
     static VerifiableCredentials from(JsonArray expanded, DocumentLoader loader) throws DataIntegrityError {
 
         if (expanded == null || expanded.isEmpty()) {
-            throw new DataIntegrityError();                  //TODO
+            throw new DataIntegrityError(); // TODO
         }
 
         for (final JsonValue item : expanded) {
 
             if (JsonUtils.isNotObject(item)) {
-                //TODO warning
+                // TODO warning
                 continue;
             }
 
             final JsonObject verifiable = item.asJsonObject();
 
-            //TODO VC or VP ?
+            // TODO VC or VP ?
 
-            // verify embedded proof
-            final Proof proof = EmbeddedProof.from(verifiable, loader);
-            
-            //TODO
-         
-            return new ImmutableVerifiableCredentials(null, proof, expanded);
+            try {
+                // verify embedded proof
+                final Proof proof = EmbeddedProof.from(verifiable, loader);
+
+                // TODO
+
+                return new ImmutableVerifiableCredentials(null, proof, expanded);
+            } catch (VerificationError e) {
+                throw new DataIntegrityError(e); // TODO fixme
+            }
         }
-        
         throw new IllegalStateException();
     }
-    
+
 }

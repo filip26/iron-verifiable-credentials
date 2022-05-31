@@ -13,6 +13,7 @@ import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.lds.proof.ProofOptions;
+import com.apicatalog.vc.VerificationError.Code;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -39,6 +40,11 @@ public final class Vc {
 
             // data integrity check
             EmbeddedProof proof = EmbeddedProof.from(document, loader);
+            
+            // check proof type
+            if (!Ed25519Signature2020.TYPE.equals(proof.getType())) {
+                throw new VerificationError(Code.UnknownCryptoSuiteType);
+            }
 
             VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), loader);
             

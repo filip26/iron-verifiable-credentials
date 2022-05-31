@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -28,6 +29,7 @@ class VcTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "integrityManifest" })
     @Order(1)
+    @Disabled
     void integrity(VcTestCase testCase) {
 
         // skip JWS credentials
