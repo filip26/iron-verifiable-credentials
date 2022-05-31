@@ -10,15 +10,14 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.NodeObject;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.lds.DataIntegrityError;
+import com.apicatalog.lds.DataIntegrityError.Code;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Constants;
-import com.apicatalog.vc.DataIntegrityError;
 import com.apicatalog.vc.VerificationError;
-import com.apicatalog.vc.VerificationError.Code;
 
 import jakarta.json.Json;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
@@ -59,7 +58,7 @@ public class EmbeddedProof implements Proof {
      * @return
      * @throws VerificationError
      */
-    public static EmbeddedProof from(final JsonObject json, final DocumentLoader loader) throws DataIntegrityError, VerificationError {
+    public static EmbeddedProof from(final JsonObject json, final DocumentLoader loader) throws DataIntegrityError {
 
         if (json == null) {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
@@ -202,12 +201,12 @@ public class EmbeddedProof implements Proof {
                 
                 // verify supported proof value encoding
                 if (!"https://w3id.org/security#multibase".equals(proofValueType)) {
-                    throw new VerificationError(Code.InvalidProofValue);        //FIXME
+                    throw new DataIntegrityError(Code.InvalidProofValue);        //FIXME belongs to ED25...
                 }
 
                 // verify proof value
                 if (encodedProofValue == null || !Multibase.isAlgorithmSupported(encodedProofValue)) {
-                    throw new VerificationError(Code.InvalidProofValue);
+                    throw new DataIntegrityError(Code.InvalidProofValue);
                 }
 
                 // decode proof value
@@ -215,7 +214,7 @@ public class EmbeddedProof implements Proof {
               
                 // verify proof value length
                 if (rawProofValue.length != 64) {
-                    throw new VerificationError(Code.InvalidProofLength);
+                    throw new DataIntegrityError(Code.InvalidProofLength);
                 }
                 
                 embeddedProof.value = rawProofValue;
@@ -305,14 +304,6 @@ public class EmbeddedProof implements Proof {
     @Override
     public byte[] getValue() {
         return value;
-    }
-
-    public void verify(JsonArray document) throws VerificationError {
-
-        // verify supported crypto suite
-        if (!"https://w3id.org/security#Ed25519Signature2020".equals(type)) {
-            throw new VerificationError(Code.UnknownCryptoSuiteType);
-        }        
     }
     
     @Override

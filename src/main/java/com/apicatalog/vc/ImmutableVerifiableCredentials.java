@@ -1,7 +1,5 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.lds.LinkedDataSignature;
-import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.proof.Proof;
 
 import jakarta.json.JsonArray;

@@ -5,9 +5,7 @@ public class Multibase {
     public enum Algorithm {
         Base58Btc,
     }
-    
-    private Algorithm algorithm;
-
+   
     public static boolean isAlgorithmSupported(String encoded) {
         return encoded != null && !encoded.isEmpty() && 'z' == encoded.toCharArray()[0];
     }
@@ -16,7 +14,8 @@ public class Multibase {
         return io.ipfs.multibase.Multibase.decode(encoded);
     }
     
-    public static String encode(byte[] data) {  //TODO base/algorithm
+    public static String encode(Algorithm algorithm, byte[] data) {
+        //TODO check aloorithm
         return io.ipfs.multibase.Multibase.encode(io.ipfs.multibase.Multibase.Base.Base58BTC, data);
     }
 }

@@ -9,6 +9,7 @@ import com.apicatalog.jsonld.api.ExpansionApi;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.lds.DataIntegrityError;
 import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.lds.proof.Proof;
 
@@ -69,16 +70,13 @@ public interface VerifiableCredentials extends Verifiable, Credentials {
 
             // TODO VC or VP ?
 
-            try {
-                // verify embedded proof
-                final Proof proof = EmbeddedProof.from(verifiable, loader);
+            // verify embedded proof
+            final Proof proof = EmbeddedProof.from(verifiable, loader);
 
-                // TODO
+            // TODO
 
-                return new ImmutableVerifiableCredentials(null, proof, expanded);
-            } catch (VerificationError e) {
-                throw new DataIntegrityError(e); // TODO fixme
-            }
+            return new ImmutableVerifiableCredentials(null, proof, expanded);
+
         }
         throw new IllegalStateException();
     }

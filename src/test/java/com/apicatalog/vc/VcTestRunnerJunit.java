@@ -17,6 +17,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
+import com.apicatalog.lds.DataIntegrityError;
 import com.apicatalog.lds.ed25519.Ed25519ProofOptions2020;
 
 import jakarta.json.Json;
@@ -101,9 +102,12 @@ public class VcTestRunnerJunit {
              
         } catch (VerificationError e) {
             assertException(e.getCode() != null ? e.getCode().name() : null, e);
-            
+
+        } catch (SigningError e) {
+            assertException(e.getCode() != null ? e.getCode().name() : null, e);
+
         } catch (DataIntegrityError e) {
-            assertException(null, e);
+            assertException(e.getCode() != null ? e.getCode().name() : null, e);
             
         } catch (JsonLdError e) {
             e.printStackTrace();
