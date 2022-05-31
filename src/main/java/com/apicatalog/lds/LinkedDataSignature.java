@@ -37,23 +37,22 @@ public class LinkedDataSignature {
         
        // proof as JSON
        JsonObject proof = document.getJsonArray(Constants.PROOF).getJsonObject(0);  //FIXME consider multiple proofs
-        
+
        // FIXME use JsonLd helpers
        if (proof.containsKey(Keywords.GRAPH)) {
             proof = proof.getJsonArray(Keywords.GRAPH).getJsonObject(0);
        }
-        
+
+       proof = Json.createObjectBuilder(proof).remove(Constants.PROOF_VALUE).build();
+       
+       
       // remove proof
       JsonObject data = Json.createObjectBuilder(document).remove("https://w3id.org/security#proof").build();
-      System.out.println(data);
       
       // canonicalization            
-      byte[] canonical = suite.canonicalize(document);
+      byte[] canonical = suite.canonicalize(data);
                     
       byte[] computeSignature = hashCode(canonical, proof);      //FIXME
-        
-//      // decode proof value
-//      byte[] rawProofValue = Multibase.decode(verifiable.getProof().getValue().getValue());
 
       return suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
 
@@ -93,8 +92,6 @@ public class LinkedDataSignature {
      * @throws VerificationError
      */
     public byte[] hashCode(byte[] document, JsonObject proof) throws VerificationError {
-
-        proof = Json.createObjectBuilder(proof).remove(Constants.PROOF_VALUE).build();
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 

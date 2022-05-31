@@ -12,7 +12,7 @@ public class Ed25519Signature2020 extends SignatureSuite {
             "https://w3id.org/security#Ed25519Signature2020",
             new Urdna2015(),
             new MessageDigest("SHA-256"),
-           new EdDsaSignature("Ed25519")
+            new EdDsaSignature("Ed25519")
             //new TinkSignature()
             );
     }

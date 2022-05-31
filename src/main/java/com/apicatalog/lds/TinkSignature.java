@@ -1,22 +1,11 @@
 package com.apicatalog.lds;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
 
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
-import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Codec;
-import com.google.crypto.tink.CleartextKeysetHandle;
-import com.google.crypto.tink.JsonKeysetWriter;
-import com.google.crypto.tink.KeyTemplates;
-import com.google.crypto.tink.KeysetHandle;
-import com.google.crypto.tink.PublicKeyVerify;
-import com.google.crypto.tink.config.TinkConfig;
 import com.google.crypto.tink.signature.SignatureConfig;
 import com.google.crypto.tink.subtle.Ed25519Sign;
+import com.google.crypto.tink.subtle.Ed25519Verify;
 
 public class TinkSignature implements SignatureAlgorithm {
 
@@ -24,44 +13,16 @@ public class TinkSignature implements SignatureAlgorithm {
     public boolean verify(byte[] publicKey, byte[] signature, byte[] data) {
 
         try {
-            TinkConfig.register(); // TODO find proper place!
+            SignatureConfig.register();
 
-            // 1. Generate the private key material.
-            KeysetHandle privateKeysetHandle = KeysetHandle.generateNew(KeyTemplates.get("ED25519"));
+            Ed25519Verify verifier = new Ed25519Verify(publicKey);
 
-            KeysetHandle pp = privateKeysetHandle.getPublicKeysetHandle();
-
-            ByteArrayOutputStream publicKeyStream = new ByteArrayOutputStream();
-
-            try {
-                CleartextKeysetHandle.write(pp, JsonKeysetWriter.withOutputStream(publicKeyStream));
-
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            KeysetHandle publicKeysetHandle = KeysetHandle.readNoSecret(publicKey);
-
-//        // 2. Get the primitive.
-//        PublicKeySign signer = privateKeysetHandle.getPrimitive(PublicKeySign.class);
-//
-//        // 3. Use the primitive to sign.
-//        byte[] signature = signer.sign(data);
-
-            // VERIFYING
-
-            // 2. Get the primitive.
-            PublicKeyVerify verifier = publicKeysetHandle.getPrimitive(PublicKeyVerify.class);
-
-            // 4. Use the primitive to verify.
             verifier.verify(signature, data);
+            return true;
 
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
-        // TODO
         return false;
     }
 
@@ -79,7 +40,7 @@ public class TinkSignature implements SignatureAlgorithm {
             return signature;
 
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();
+            e.printStackTrace();        //TODO
         }
 
         return null;
@@ -93,8 +54,6 @@ public class TinkSignature implements SignatureAlgorithm {
     System.out.println("private= " + Multibase.encode(Multicodec.encode(Codec.Ed25519PrivateKey, privateKey))); 
     byte[] publicKey = keyPair.getPublicKey();
 System.out.println("public= " + Multibase.encode(Multicodec.encode(Codec.Ed25519PublicKey, publicKey)));            
-
-
 
      */
 }

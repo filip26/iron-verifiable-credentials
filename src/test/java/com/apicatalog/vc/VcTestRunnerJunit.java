@@ -2,6 +2,7 @@ package com.apicatalog.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.PrintWriter;
@@ -52,7 +53,7 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VerifyTest")) {
 
-                Vc.verify(testCase.input, LOADER);
+                assertTrue(Vc.verify(testCase.input, LOADER));
                 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#DataIntegrityTest")) {
 

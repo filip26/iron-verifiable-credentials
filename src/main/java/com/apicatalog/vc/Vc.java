@@ -13,7 +13,6 @@ import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.lds.proof.ProofOptions;
-import com.apicatalog.lds.proof.VerificationMethod;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -32,7 +31,7 @@ public final class Vc {
      * @throws DataIntegrityError
      * @throws VerificationError
      */
-    public static  void verify(URI location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
+    public static boolean verify(URI location, DocumentLoader loader) throws DataIntegrityError, VerificationError {
         /*FIXME use VerificationApi, make loader optional - use default*/
         try {
             // load the document
@@ -41,27 +40,18 @@ public final class Vc {
             // data integrity check
             EmbeddedProof proof = EmbeddedProof.from(document, loader);
 
-            VerificationMethod verificationMethod = proof.getVerificationMethod();
+            VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), loader);
             
             LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());    //FIXME check keypair type
             
-            signature.verify(document, (VerificationKey) verificationMethod, proof.getValue()); //TODO check  verification method type
-            
-            
+            return signature.verify(document, verificationMethod, proof.getValue()); 
+                        
         } catch (JsonLdError e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-
         
-      //  final VcDocument data  = VcDocument.load(location, loader);
-
-//        if (data == null || !data.isVerifiable()) {
-//            throw new VerificationError();                  //TODO
-//        }
-//
-//        data.asVerifiable().verify();
+        return false;
     }
 
     /**
@@ -100,5 +90,24 @@ public final class Vc {
         
         
         return JsonObject.EMPTY_JSON_OBJECT;
+    }
+
+    // refresh/fetch verification method
+    static final VerificationKey get(URI id, DocumentLoader loader) {
+
+        try {
+            final Document document = loader.loadDocument(id, new DocumentLoaderOptions());
+
+            JsonObject method = document.getJsonContent().orElseThrow().asJsonObject();
+
+            //TODO check  verification method type
+            return Ed25519KeyPair2020.from(method);
+        
+        } catch (JsonLdError | DataIntegrityError e) {
+            e.printStackTrace();
+            //TODO
+        }
+
+        return null;
     }
 }
