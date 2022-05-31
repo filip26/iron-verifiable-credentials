@@ -26,7 +26,7 @@ import jakarta.json.JsonValue.ValueType;
 /**
  * An embedded proof is included in the data, such as a Linked Data Signature.
  */
-public class EmbeddedProof implements Proof {
+public class EmbeddedProof2 implements Proof {
 
     private String type;
 
@@ -40,8 +40,8 @@ public class EmbeddedProof implements Proof {
     
     private byte[] value;    
 
-    public static EmbeddedProof from(ProofOptions options) {
-        final EmbeddedProof proof = new EmbeddedProof();
+    public static EmbeddedProof2 from(ProofOptions options) {
+        final EmbeddedProof2 proof = new EmbeddedProof2();
 
         proof.type = options.getType();
         proof.verificationMethod = options.getVerificationMethod();
@@ -58,16 +58,17 @@ public class EmbeddedProof implements Proof {
      * @return
      * @throws VerificationError
      */
-    public static EmbeddedProof from(final JsonObject json, final DocumentLoader loader) throws DataIntegrityError {
+    public static EmbeddedProof2 from(final JsonObject json, final DocumentLoader loader) throws DataIntegrityError {
 
         if (json == null) {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
         }
 
-        final JsonValue proofValue = json.get(Constants.PROOF); //TODO move out
+        final JsonValue proofValue = json.get(Constants.PROOF);
+
 
         if (proofValue == null) {
-            throw new DataIntegrityError(Code.MissingProof);
+            throw new DataIntegrityError();
         }
 
         if (!ValueType.ARRAY.equals(proofValue.getValueType())) {
@@ -93,7 +94,7 @@ public class EmbeddedProof implements Proof {
 
             final JsonObject proofObject = proofItem.asJsonObject();
             
-            final EmbeddedProof embeddedProof = new EmbeddedProof();
+            final EmbeddedProof2 embeddedProof = new EmbeddedProof2();
 
             // @type property
             if (!proofObject.containsKey(Keywords.TYPE)) {
@@ -158,6 +159,7 @@ public class EmbeddedProof implements Proof {
                     final JsonObject verificationMethodObject = verificationMethodItem.asJsonObject();
 
                     final String id = verificationMethodObject.getString(Keywords.ID);
+                    //TODO check verification method type
                     
                     embeddedProof.verificationMethod = Ed25519KeyPair2020.reference(URI.create(id));
                     
