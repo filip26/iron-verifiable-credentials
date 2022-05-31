@@ -7,10 +7,10 @@ import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.lds.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.vc.Constants;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 
 public class LinkedDataSignature {
 
@@ -27,6 +27,8 @@ public class LinkedDataSignature {
      * {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm}
      * 
      * @param document unsigned VC/VP document
+     * @param verificationKey
+     * @param signature
      * @return <code>true</code> if the document has been successfully verified
      */
     public boolean verify(final JsonObject document, final VerificationKey verificationKey, final byte[] signature) throws VerificationError {
@@ -36,25 +38,21 @@ public class LinkedDataSignature {
         }
         
        // proof as JSON
-       JsonObject proof = document.getJsonArray(Constants.PROOF).getJsonObject(0);  //FIXME consider multiple proofs
+       JsonObject proof = document.getJsonArray(EmbeddedProof.PROOF).getJsonObject(0);  //FIXME consider multiple proofs
 
        // FIXME use JsonLd helpers
        if (proof.containsKey(Keywords.GRAPH)) {
             proof = proof.getJsonArray(Keywords.GRAPH).getJsonObject(0);
        }
 
-       proof = Json.createObjectBuilder(proof).remove(Constants.PROOF_VALUE).build();
-       
-       
-      // remove proof
-      JsonObject data = Json.createObjectBuilder(document).remove("https://w3id.org/security#proof").build();
+       proof = Json.createObjectBuilder(proof).remove(EmbeddedProof.PROOF_VALUE).build();
+              
+       // remove proof
+       JsonObject data = Json.createObjectBuilder(document).remove("https://w3id.org/security#proof").build();
       
-      // canonicalization            
-      byte[] canonical = suite.canonicalize(data);
-                    
-      byte[] computeSignature = hashCode(canonical, proof);      //FIXME
+       byte[] computeSignature = hashCode(data, proof);
 
-      return suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
+       return suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
     }
 
     /**
@@ -63,6 +61,8 @@ public class LinkedDataSignature {
      * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm}
      * 
      * @param document
+     * @param options
+     * @param keyPair
      * @return
      * @throws VerificationError
      */
@@ -70,9 +70,7 @@ public class LinkedDataSignature {
 
         final JsonObject proof = EmbeddedProof.from(options).toJson();
 
-        final byte[] canonical = suite.canonicalize(document);
-
-        final byte[] documentHashCode = hashCode(canonical, proof);
+        final byte[] documentHashCode = hashCode(document, proof);
 
         final byte[] rawProofValue = suite.sign(keyPair.getPrivateKey(), documentHashCode);
 
@@ -86,16 +84,18 @@ public class LinkedDataSignature {
      * see
      * {@link https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}
      * 
-     * @param dataset
+     * @param document
+     * @param proof
      * @return
      * @throws VerificationError
      */
-    public byte[] hashCode(byte[] document, JsonObject proof) {
+    public byte[] hashCode(JsonStructure document, JsonObject proof) {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 
-        byte[] documentHash = suite.digest(document);
+        byte[] documentHash = suite.digest(suite.canonicalize(document));
 
+        // proof hash + document hash
         byte[] result = new byte[proofHash.length + documentHash.length];
 
         System.arraycopy(proofHash, 0, result, 0, proofHash.length);

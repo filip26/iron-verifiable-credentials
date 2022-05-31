@@ -3,6 +3,7 @@ package com.apicatalog.lds.primitive;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -17,6 +18,7 @@ import java.security.spec.NamedParameterSpec;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
+import com.apicatalog.lds.key.KeyPair;
 
 public class EdDsaSignature implements SignatureAlgorithm {
 
@@ -61,6 +63,24 @@ public class EdDsaSignature implements SignatureAlgorithm {
             throw new SigningError(e);
         }
     }    
+    
+    @Override
+    public KeyPair keygen(int length) {
+        try {
+            final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(type);
+            keyGen.initialize(length);
+            
+            java.security.KeyPair kp =  keyGen.generateKeyPair();
+
+            //TODO
+            
+        } catch (NoSuchAlgorithmException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+
+    }
 
     private PublicKey getPublicKey(byte[] publicKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {

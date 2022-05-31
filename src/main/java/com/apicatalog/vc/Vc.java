@@ -13,6 +13,7 @@ import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
+import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.proof.ProofOptions;
 
 import jakarta.json.JsonArray;
@@ -39,7 +40,6 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      * 
      * @param location
-     * @param loader
      * @throws DataIntegrityError
      * @throws VerificationError
      */
@@ -48,10 +48,11 @@ public final class Vc {
     }
 
     /**
-     * Signs VC/VP document with using the provided signature suite.
+     * Signs VC/VP document.
      * 
      * @param documentLocation
-     * @param suite
+     * @param keyPairLocation
+     * @param options
      * @param loader
      * @return signed VC/VP with proof property at the root level
      * @throws DataIntegrityError
@@ -79,4 +80,19 @@ public final class Vc {
             throw new SigningError(e);
         }
     }
+
+    /**
+     * Generates public/private key pair. 
+     * 
+     * @param type requested key pair type, e.g. <code>https://w3id.org/security#Ed25519KeyPair2020</code>
+     * @param length
+     * @return
+     */
+    public static KeyPair generateKeys(String type, int length) {
+        
+        //TODO reject unknown keypair type 
+
+        return new Ed25519Signature2020().keygen(length);
+    }
+    
 }

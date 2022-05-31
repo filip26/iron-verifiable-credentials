@@ -2,6 +2,7 @@ package com.apicatalog.lds.algorithm;
 
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.VerificationError;
+import com.apicatalog.lds.key.KeyPair;
 
 /**
  * An algorithm that takes an input message and produces an output value
@@ -13,4 +14,6 @@ public interface SignatureAlgorithm {
     boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError;
 
     byte[] sign(byte[] privateKey, byte[] data) throws SigningError;
+    
+    KeyPair keygen( int length);    
 }

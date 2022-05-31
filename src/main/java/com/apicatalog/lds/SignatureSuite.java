@@ -3,6 +3,7 @@ package com.apicatalog.lds;
 import com.apicatalog.lds.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.lds.algorithm.DigestAlgorithm;
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
+import com.apicatalog.lds.key.KeyPair;
 
 import jakarta.json.JsonStructure;
 
@@ -48,6 +49,11 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     @Override
     public byte[] canonicalize(JsonStructure document) {
         return canonicalization.canonicalize(document);
+    }
+
+    @Override
+    public KeyPair keygen(int length) {
+        return signer.keygen(length);
     }
 
     public String getId() {
