@@ -24,7 +24,7 @@ signedCredentials = Vc.sign(credentials, keys, proofOptions)
 signedCredentials = Vc.sign(credentials, keys, proofOptions)
                       .getCompacted(context); // returns signed document in compacted form
 
-KeyPair keys = Vc.newKeys("https://w3id.org/security#Ed25519KeyPair2020", 32)
+KeyPair keys = Vc.newKeys("https://w3id.org/security#Ed25519KeyPair2020")
                  .generate()
 
 ```

@@ -19,11 +19,11 @@ class VcKeyGenTest {
     @Order(1)
     @Test
     void generate32L() {
-        KeyPair kp = Vc.generateKeys("https://w3id.org/security#Ed25519KeyPair2020", 32);
+        KeyPair kp = Vc.generateKeys("https://w3id.org/security#Ed25519KeyPair2020");
         assertNotNull(kp);
         assertEquals("https://w3id.org/security#Ed25519KeyPair2020", kp.getType());
-        assertNotNull(kp.getPrivateKey());
         assertNotNull(kp.getPublicKey());
+        assertNotNull(kp.getPrivateKey());
         assertEquals(32, kp.getPublicKey().length);
         assertEquals(32, kp.getPrivateKey().length);
     }

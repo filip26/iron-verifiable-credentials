@@ -4,7 +4,6 @@ import java.security.GeneralSecurityException;
 
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
-import com.apicatalog.lds.key.KeyPair;
 import com.google.crypto.tink.signature.SignatureConfig;
 import com.google.crypto.tink.subtle.Ed25519Sign;
 import com.google.crypto.tink.subtle.Ed25519Verify;
@@ -55,10 +54,7 @@ public class TinkSignature implements SignatureAlgorithm {
             byte[] privateKey = kp.getPrivateKey();
             byte[] publicKey = kp.getPublicKey();
 
-            Ed25519KeyPair2020 keyPair = new Ed25519KeyPair2020(null); //FIXME
-            keyPair.setPublicKey(publicKey);
-            keyPair.setPrivateKey(privateKey);
-            return keyPair;
+            return new KeyPair(publicKey, privateKey);
             
         } catch (GeneralSecurityException e) {
             // TODO Auto-generated catch block

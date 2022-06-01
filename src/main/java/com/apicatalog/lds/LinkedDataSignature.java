@@ -1,6 +1,7 @@
 package com.apicatalog.lds;
 
 import com.apicatalog.jsonld.lang.Keywords;
+import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
@@ -105,5 +106,15 @@ public class LinkedDataSignature {
         System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
 
         return result;
+    }
+
+    public KeyPair keygen(int length) {
+
+        com.apicatalog.lds.algorithm.SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
+        
+        Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(null); //FIXME
+        kp.setPublicKey(keyPair.getPublicKey());
+        kp.setPrivateKey(keyPair.getPrivateKey());
+        return kp;
     }
 }

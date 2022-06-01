@@ -3,6 +3,7 @@ package com.apicatalog.vc;
 import java.net.URI;
 
 import com.apicatalog.lds.DataIntegrityError;
+import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
@@ -60,11 +61,13 @@ public final class Vc {
      * @param length
      * @return
      */
-    public static KeyPair generateKeys(String type, int length) {
+    //FIXMe use processor api allowing to set length
+    public static KeyPair generateKeys(String type) {
         
         //TODO reject unknown keypair type 
-
-        return new Ed25519Signature2020().keygen(length);
+        final LinkedDataSignature lds = new LinkedDataSignature(new Ed25519Signature2020());
+        
+        return lds.keygen(256); //FIXME
     }
     
 }
