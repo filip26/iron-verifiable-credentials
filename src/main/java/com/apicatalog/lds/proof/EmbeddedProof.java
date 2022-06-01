@@ -72,6 +72,11 @@ public class EmbeddedProof implements Proof {
 
         final JsonValue proofValue = json.get(PROOF); //TODO move out
 
+        //TODO return set or chain of proofs
+        // proof sets - https://w3c-ccg.github.io/data-integrity-spec/#proof-sets
+        // proof chains - https://w3c-ccg.github.io/data-integrity-spec/#proof-chains
+
+        
         if (proofValue == null) {
             throw new DataIntegrityError(Code.MissingProof);
         }
@@ -79,7 +84,7 @@ public class EmbeddedProof implements Proof {
         if (!ValueType.ARRAY.equals(proofValue.getValueType())) {
             throw new DataIntegrityError();
         }
-        
+                
         for (JsonValue proofItem : proofValue.asJsonArray()) {
             
             // data integrity checks
@@ -167,9 +172,12 @@ public class EmbeddedProof implements Proof {
                     
                     embeddedProof.verificationMethod = Ed25519KeyPair2020.reference(URI.create(id));
                     
-                //TODO embedded key
+
+                } else if (JsonUtils.isObject(verificationMethodItem)) {
+                    embeddedProof.verificationMethod = Ed25519KeyPair2020.from(verificationMethodItem.asJsonObject());
                     
                 } else {
+                    System.out.println(verificationMethodItem);
                     throw new DataIntegrityError(Code.InvalidVerificationMethod);
                 }
                 

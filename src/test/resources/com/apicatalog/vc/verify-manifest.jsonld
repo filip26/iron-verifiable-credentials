@@ -80,6 +80,15 @@
 
         },
         {
+            "@id": "#t0008",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VerifyTest"
+            ],
+            "name": "embedded verification method",
+            "input": "verify/0008-in.jsonld"
+        },        
+        {
             "@id": "#t0009",
             "@type": [
                 "NegativeEvaluationTest",

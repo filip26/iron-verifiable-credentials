@@ -4,6 +4,7 @@ public class DataIntegrityError extends Throwable {
 
     private static final long serialVersionUID = -7146533158378348477L;
     
+    //FIXME rethinks codes, status: [Missing|Invalid] property: [name] attribute: [length|encoding|..]
     public enum Code {
         Unknown,
         
@@ -26,7 +27,15 @@ public class DataIntegrityError extends Throwable {
         InvalidVerificationMethod,
         
         MissingCreated,
-        InvalidCreated,
+        InvalidCreated, 
+        
+        MissingIssuer, 
+        InvalidIssuer,
+        
+        MissingIssuanceDater,
+        InvalidIssuanceDater, 
+        
+        MissingSubject,
     }
     
     private Code code;

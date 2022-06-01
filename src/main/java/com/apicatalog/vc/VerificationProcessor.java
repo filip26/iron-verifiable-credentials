@@ -95,7 +95,7 @@ public class VerificationProcessor {
     }
     
     private static boolean verifyExpanded(JsonArray expanded, DocumentLoader loader) throws DataIntegrityError, VerificationError {
-        //TODO validate each objects ?!
+
         for (final JsonValue item : expanded) {
             if (JsonUtils.isNotObject(item)) {
                 return false;
@@ -109,10 +109,13 @@ public class VerificationProcessor {
     }
 
     private static boolean verifyExpanded(JsonObject expanded, DocumentLoader loader) throws DataIntegrityError, VerificationError {
+
+        // data integrity checks
+        final Credential credential = Credential.from(expanded);
         
+        final EmbeddedProof proof = EmbeddedProof.from(expanded, loader);
+
         try {
-            // data integrity check
-            EmbeddedProof proof = EmbeddedProof.from(expanded, loader);
 
             // check proof type
             if (!Ed25519Signature2020.TYPE.equals(proof.getType())) {
