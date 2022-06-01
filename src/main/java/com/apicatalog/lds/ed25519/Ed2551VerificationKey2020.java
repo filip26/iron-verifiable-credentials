@@ -24,13 +24,13 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     protected static final String PUBLIC_KEY_MULTIBASE = "publicKeyMultibase";
 
     protected final URI id;
-    protected String type;
+    protected final String type;
     protected URI controller;
 
     protected byte[] publicKey;
 
-    protected Ed2551VerificationKey2020(final URI id) {
-        this(id, null);
+    public Ed2551VerificationKey2020(final URI id) {
+        this(id, "https://w3id.org/security#Ed25519VerificationKey2020");
     }
 
     protected Ed2551VerificationKey2020(final URI id, final String type) {
@@ -51,7 +51,9 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     }
 
     protected static final  <T extends Ed2551VerificationKey2020> T from(T key, JsonObject json) throws DataIntegrityError {
-        key.type = json.getString(TYPE);
+
+        //TODO check type        key.type = json.getString(TYPE);
+
         key.controller = URI.create(json.getString(CONTROLLER));
         key.publicKey = getKey(json, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
 
@@ -70,7 +72,9 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     }
     
     protected void toJson(JsonObjectBuilder builder) {
-        builder.add(ID, id.toString());
+        if (id != null) {
+            builder.add(ID, id.toString());
+        }
         builder.add(TYPE, type);
 
         if (controller != null) {
@@ -83,7 +87,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     public URI getId() {
         return id;
     }
-
+    
     @Override
     public String getType() {
         return type;
@@ -92,10 +96,18 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     public URI getController() {
         return controller;
     }
+    
+    public void setController(URI controller) {
+        this.controller = controller;
+    }
 
     @Override
     public byte[] getPublicKey() {
         return publicKey;
+    }
+    
+    public void setPublicKey(byte[] publicKey) {
+        this.publicKey = publicKey;
     }
 
     static byte[] getKey(JsonObject json, String property, Codec expected) throws DataIntegrityError {

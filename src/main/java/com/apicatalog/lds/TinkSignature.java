@@ -3,11 +3,8 @@ package com.apicatalog.lds;
 import java.security.GeneralSecurityException;
 
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
+import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.key.KeyPair;
-import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Codec;
 import com.google.crypto.tink.signature.SignatureConfig;
 import com.google.crypto.tink.subtle.Ed25519Sign;
 import com.google.crypto.tink.subtle.Ed25519Verify;
@@ -51,18 +48,18 @@ public class TinkSignature implements SignatureAlgorithm {
     
     @Override
     public KeyPair keygen(int length) {
-        
-        
-        Ed25519Sign.KeyPair keyPair;
-        try {
-            keyPair = Ed25519Sign.KeyPair.newKeyPair();
-            
-            byte[] privateKey = keyPair.getPrivateKey();
-            System.out.println("private= " + Multibase.encode(Algorithm.Base58Btc, Multicodec.encode(Codec.Ed25519PrivateKey, privateKey))); 
-            byte[] publicKey = keyPair.getPublicKey();
-            System.out.println("public= " + Multibase.encode(Algorithm.Base58Btc, Multicodec.encode(Codec.Ed25519PublicKey, publicKey)));
-            
 
+        try {
+            Ed25519Sign.KeyPair kp = Ed25519Sign.KeyPair.newKeyPair();
+            
+            byte[] privateKey = kp.getPrivateKey();
+            byte[] publicKey = kp.getPublicKey();
+
+            Ed25519KeyPair2020 keyPair = new Ed25519KeyPair2020(null); //FIXME
+            keyPair.setPublicKey(publicKey);
+            keyPair.setPrivateKey(privateKey);
+            return keyPair;
+            
         } catch (GeneralSecurityException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

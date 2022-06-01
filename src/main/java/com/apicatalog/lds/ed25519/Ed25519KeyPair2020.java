@@ -16,7 +16,7 @@ public class Ed25519KeyPair2020 extends Ed2551VerificationKey2020 implements Key
     
     protected byte[] privateKey;
 
-    protected Ed25519KeyPair2020(final URI id) {
+    public Ed25519KeyPair2020(final URI id) {
         super(id, "https://w3id.org/security#Ed25519KeyPair2020");
     }
 
@@ -48,5 +48,8 @@ public class Ed25519KeyPair2020 extends Ed2551VerificationKey2020 implements Key
     public byte[] getPrivateKey() {
         return privateKey;
     }
-
+    
+    public void setPrivateKey(byte[] privateKey) {
+        this.privateKey = privateKey;
+    }
 }
