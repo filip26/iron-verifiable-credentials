@@ -22,7 +22,9 @@ public class StaticContextLoader implements DocumentLoader {
         staticCache.put("https://www.w3.org/2018/credentials/v1", get("2018-credentials-v1.jsonld"));
         staticCache.put("https://w3id.org/security/suites/ed25519-2020/v1", get("security-suites-ed25519-2020-v1.jsonld"));
         staticCache.put("https://www.w3.org/ns/odrl.jsonld", get("odrl.jsonld"));
+        staticCache.put("https://www.w3.org/ns/did/v1", get("did-v1.jsonld"));
     }
+    
 
     static JsonDocument get(String name) {
         try (final InputStream is = StaticContextLoader.class.getResourceAsStream(name)) {
