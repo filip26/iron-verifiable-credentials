@@ -11,7 +11,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import com.apicatalog.lds.key.KeyPair;
 
-@DisplayName("Key Generation Test")
+@DisplayName("Keys Generation")
 @TestMethodOrder(OrderAnnotation.class)
 class VcKeyGenTest {
 
