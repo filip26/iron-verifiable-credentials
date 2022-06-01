@@ -23,28 +23,33 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class VerificationApi {
+public class VerificationProcessor {
 
     private final URI location;
     private final JsonObject document;
     private DocumentLoader loader = null;
     
-    protected VerificationApi(URI location) {
+    protected VerificationProcessor(URI location) {
         this.location = location;
         this.document = null;
     }
     
-    protected VerificationApi(JsonObject document) {
+    protected VerificationProcessor(JsonObject document) {
         this.document = document;
         this.location = null;
     }
     
-    public VerificationApi loader(DocumentLoader loader) {
+    public VerificationProcessor loader(DocumentLoader loader) {
         this.loader = loader;
         return this;
     }
-        
-    public boolean verify() throws VerificationError, DataIntegrityError {
+    
+    public VerificationProcessor useBundledContexts(boolean buildedContexts) {
+        //TOOD
+        return this;
+    }
+
+    public boolean isValid() throws VerificationError, DataIntegrityError {
         
         if (loader == null) {
             // default loader

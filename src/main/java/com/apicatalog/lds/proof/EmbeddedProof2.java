@@ -2,8 +2,6 @@ package com.apicatalog.lds.proof;
 
 import java.time.Instant;
 
-import jakarta.json.JsonObject;
-
 /**
  * An embedded proof is included in the data, such as a Linked Data Signature.
  */
@@ -64,12 +62,6 @@ public class EmbeddedProof2 implements Proof {
 
     @Override
     public byte[] getValue() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public JsonObject toJson() {
         // TODO Auto-generated method stub
         return null;
     }

@@ -55,7 +55,7 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VerifyTest")) {
 
-                assertEquals(testCase.result != null ? testCase.result : true, Vc.verify(testCase.input).loader(LOADER).verify());
+                assertEquals(testCase.result != null ? testCase.result : true, Vc.verify(testCase.input).loader(LOADER).isValid());
                 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#DataIntegrityTest")) {
 
@@ -72,7 +72,7 @@ public class VcTestRunnerJunit {
                 options.setCreated(testCase.created);
                 options.setVerificationMethod(testCase.verificationMethod);
                 
-                JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options, LOADER);
+                JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options).loader(LOADER).get();
                 assertNotNull(signed);
                 
 //TODO  getCompacted(context) 

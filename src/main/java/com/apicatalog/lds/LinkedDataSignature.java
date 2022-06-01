@@ -56,7 +56,7 @@ public class LinkedDataSignature {
     }
 
     /**
-     * Issues the given VC/VP document and returns signed version.
+     * Issues the given VC/VP document and returns the document signature.
      * 
      * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm}
      * 
@@ -66,6 +66,8 @@ public class LinkedDataSignature {
      * @return
      * @throws VerificationError
      */
+    //FIXME must return the signature as byte[]
+    //FIXME change order, kayPar, options - align with Vc api
     public JsonObject sign(JsonObject document, ProofOptions options, KeyPair keyPair) throws SigningError {
 
         final JsonObject proof = EmbeddedProof.from(options).toJson();
@@ -74,6 +76,7 @@ public class LinkedDataSignature {
 
         final byte[] rawProofValue = suite.sign(keyPair.getPrivateKey(), documentHashCode);
 
+        //FIXME encoding depends on proof @type - move to Vc api
         final String proofValue = Multibase.encode(Algorithm.Base58Btc, rawProofValue);
 
         return EmbeddedProof.setProof(document, proof, proofValue);

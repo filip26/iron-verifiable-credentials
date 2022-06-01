@@ -15,13 +15,17 @@ All PR's welcome!
 
 ```java
 
-boolean valid = Vc.verify(credentials).verify();
+boolean valid = Vc.verify(credentials).isValid();
 
-JsonObject signedCredentials = Vc.sign(credentials, keys, proofOptions).getExpanded();
+signedCredentials = Vc.sign(credentials, keys, proofOptions)
+                      .loader(documentLoader) // custom loader
+                      .get();   // returns signed document in expanded form
 
-JsonObject signedCredentials = Vc.sign(credentials, keys, proofOptions).getCompacted(context);
+signedCredentials = Vc.sign(credentials, keys, proofOptions)
+                      .getCompacted(context); // returns signed document in compacted form
 
-KeyPair keys = Vc.generateKeys("https://w3id.org/security#Ed25519KeyPair2020", 32);
+KeyPair keys = Vc.newKeys("https://w3id.org/security#Ed25519KeyPair2020", 32)
+                 .generate()
 
 ```
 

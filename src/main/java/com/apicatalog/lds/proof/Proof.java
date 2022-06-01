@@ -2,8 +2,6 @@ package com.apicatalog.lds.proof;
 
 import java.time.Instant;
 
-import jakarta.json.JsonObject;
-
 /**
  * 
  * 
@@ -55,6 +53,4 @@ public interface Proof {
      * @return
      */
     byte[] getValue();
-    
-    JsonObject toJson();
 }

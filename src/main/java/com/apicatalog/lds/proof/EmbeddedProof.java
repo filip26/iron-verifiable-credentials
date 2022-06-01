@@ -307,8 +307,7 @@ public class EmbeddedProof implements Proof {
     public byte[] getValue() {
         return value;
     }
-    
-    @Override
+
     public JsonObject toJson() {
         return Json.createObjectBuilder().add(Keywords.TYPE, Json.createArrayBuilder().add(type))
 
