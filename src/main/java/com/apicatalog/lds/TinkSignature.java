@@ -3,7 +3,6 @@ package com.apicatalog.lds;
 import java.security.GeneralSecurityException;
 
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
-import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.google.crypto.tink.signature.SignatureConfig;
 import com.google.crypto.tink.subtle.Ed25519Sign;
 import com.google.crypto.tink.subtle.Ed25519Verify;

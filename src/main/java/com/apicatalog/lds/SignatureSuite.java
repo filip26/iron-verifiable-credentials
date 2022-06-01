@@ -3,7 +3,6 @@ package com.apicatalog.lds;
 import com.apicatalog.lds.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.lds.algorithm.DigestAlgorithm;
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
-import com.apicatalog.lds.key.KeyPair;
 
 import jakarta.json.JsonStructure;
 

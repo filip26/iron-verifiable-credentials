@@ -59,7 +59,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
 
         // verify verification key length - TODO needs to be clarified
         if (key.publicKey.length != 32 && key.publicKey.length != 57 && key.publicKey.length != 114) {
-            throw new DataIntegrityError(Code.InvalidProofLength);
+            throw new DataIntegrityError(Code.InvalidProofValueLength);
         }
         return key;
     }

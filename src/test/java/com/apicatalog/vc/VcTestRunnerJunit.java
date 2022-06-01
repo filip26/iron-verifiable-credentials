@@ -57,12 +57,6 @@ public class VcTestRunnerJunit {
 
                 assertEquals(testCase.result != null ? testCase.result : true, Vc.verify(testCase.input).loader(LOADER).isValid());
                 
-            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#DataIntegrityTest")) {
-
-                //final VcDocument vcDocument = VcDocument.load(testCase.input, LOADER);        //TODO use Vc API
-                //assertNotNull(vcDocument);
-                fail("TODO");
-                
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssueTest")) {
 
                 assertNotNull(testCase.result);
@@ -133,8 +127,6 @@ public class VcTestRunnerJunit {
 
         try (final PrintWriter writer = new PrintWriter(stringWriter)) {
             writer.println("Test " + testCase.id + ": " + testCase.name);
-
-            
             
             final JsonWriterFactory writerFactory = Json.createWriterFactory(Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
 

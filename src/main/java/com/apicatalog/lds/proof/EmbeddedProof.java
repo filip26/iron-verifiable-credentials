@@ -84,7 +84,7 @@ public class EmbeddedProof implements Proof {
             
             // data integrity checks
             if (JsonUtils.isNotObject(proofItem)) {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidProof);
             }
 
             if (proofItem.asJsonObject().containsKey(Keywords.GRAPH)) { //TODO hack
@@ -93,7 +93,7 @@ public class EmbeddedProof implements Proof {
                     proofItem = proofItem.asJsonArray().get(0); //FIXME !?!
                 }
                 if (JsonUtils.isNotObject(proofItem)) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidProof);
                 }                
             }
 
@@ -103,7 +103,7 @@ public class EmbeddedProof implements Proof {
 
             // @type property
             if (!proofObject.containsKey(Keywords.TYPE)) {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.MissingProofType);
             }
 
             final JsonValue typeValue = proofObject.get(Keywords.TYPE);
@@ -112,7 +112,7 @@ public class EmbeddedProof implements Proof {
                 
                 // all @type values must be string
                 if (!typeValue.asJsonArray().stream().allMatch(JsonUtils::isString)) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidProofType);
                 }
                 
                 embeddedProof.type = typeValue.asJsonArray().stream()
@@ -124,12 +124,12 @@ public class EmbeddedProof implements Proof {
                 embeddedProof.type = ((JsonString)typeValue).getString();
                 
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidProofType);
             }
 
             // proofPurpose property
             if (!proofObject.containsKey(PROOF_PURPOSE)) {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.MissingProofPurpose);
             }
 
             final JsonValue proofPurposeValue = proofObject.get(PROOF_PURPOSE);
@@ -137,7 +137,7 @@ public class EmbeddedProof implements Proof {
             if (JsonUtils.isArray(proofPurposeValue)) {
                  
                 if (!proofPurposeValue.asJsonArray().stream().allMatch(NodeObject::isNodeReference)) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidProofPurpose);
                 }
                 
                 embeddedProof.purpose = proofPurposeValue.asJsonArray().stream()
@@ -145,12 +145,12 @@ public class EmbeddedProof implements Proof {
                                         .map(o -> o.getString(Keywords.ID))
                                         .limit(1).toArray(String[]::new)[0];
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidProofPurpose);
             }
 
             // verificationMethod property
             if (!proofObject.containsKey(PROOF_VERIFICATION_METHOD)) {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.MissingVerificationMethod);
             }
 
             final JsonValue verificationMethodValue = proofObject.get(PROOF_VERIFICATION_METHOD);
@@ -170,17 +170,17 @@ public class EmbeddedProof implements Proof {
                 //TODO embedded key
                     
                 } else {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidVerificationMethod);
                 }
                 
                 
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidVerificationMethod);
             }
 
             // proofValue property
             if (!proofObject.containsKey(PROOF_VALUE)) {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.MissingProofValue);
             }
 
             final JsonValue embeddedProofValue = proofObject.get(PROOF_VALUE);
@@ -193,7 +193,7 @@ public class EmbeddedProof implements Proof {
                                 .map(o -> o.get(Keywords.VALUE))
                                 .allMatch(JsonUtils::isString)
                         ) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidProofValue);
                 }
                 
 
@@ -216,18 +216,18 @@ public class EmbeddedProof implements Proof {
               
                 // verify proof value length
                 if (rawProofValue.length != 64) {
-                    throw new DataIntegrityError(Code.InvalidProofLength);
+                    throw new DataIntegrityError(Code.InvalidProofValueLength);
                 }
                 
                 embeddedProof.value = rawProofValue;
                 
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidProofValue);
             }
             
             // created property
             if (!proofObject.containsKey(CREATED)) {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.MissingCreated);
             }
 
             final JsonValue createdValue = proofObject.get(CREATED);
@@ -239,7 +239,7 @@ public class EmbeddedProof implements Proof {
                 
                 // expect value object and date in ISO 8601 format
                 if (!ValueObject.isValueObject(createdItem)) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidCreated);
                 }
 
                 //TODO check @type
@@ -254,12 +254,12 @@ public class EmbeddedProof implements Proof {
                     embeddedProof.created = created.toInstant(); 
                 
                 } catch (DateTimeParseException e) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidCreated);
                 }
                 
 
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidCreated);
             }
 
             
