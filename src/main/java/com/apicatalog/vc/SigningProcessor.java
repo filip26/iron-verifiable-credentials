@@ -14,6 +14,7 @@ import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
+import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.proof.ProofOptions;
 
 import jakarta.json.JsonArray;
@@ -23,23 +24,32 @@ public class SigningProcessor {
 
     private final URI location;
     private final JsonObject document;
+    
     private final URI keyPairLocation;
+    private final KeyPair keyPair;
+    
     private final ProofOptions options;
+    
     private DocumentLoader loader = null;
     
     protected SigningProcessor(URI location, URI keyPairLocation, ProofOptions options) {
         this.location = location;
         this.document = null;
+        
         this.keyPairLocation = keyPairLocation;
+        this.keyPair = null;
+        
         this.options = options;
     }
     
-    protected SigningProcessor(JsonObject document) {
+    protected SigningProcessor(JsonObject document, KeyPair keyPair, ProofOptions options) {
         this.document = document;
         this.location = null;
-        //TOOD
+
+        this.keyPair = keyPair;
         this.keyPairLocation = null;
-        this.options = null;
+        
+        this.options = options;
     }
     
     public SigningProcessor loader(DocumentLoader loader) {
@@ -63,8 +73,12 @@ public class SigningProcessor {
         
         //TODO make it configurable
         loader = new StaticContextLoader(loader);
-
-        if (location != null) {
+        
+        if (document != null && keyPair != null)  {
+            return sign(document, keyPair, options);
+        }
+        
+        if (location != null && keyPairLocation != null)  {
             return sign(location, keyPairLocation, options);
         }
         
@@ -104,6 +118,25 @@ public class SigningProcessor {
             LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
 
             JsonObject signed = signature.sign(document.getJsonObject(0), options, keyPair);
+
+            return signed;
+
+        } catch (JsonLdError e) {
+            throw new SigningError(e);
+        }
+    }
+
+    private final JsonObject sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataIntegrityError, SigningError {
+        try {
+            // load the document
+            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
+
+            // load key pair
+            Document keys = loader.loadDocument(keyPairLocation, new DocumentLoaderOptions());
+
+            LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
+
+            JsonObject signed = signature.sign(expanded.getJsonObject(0), options, keyPair);
 
             return signed;
 

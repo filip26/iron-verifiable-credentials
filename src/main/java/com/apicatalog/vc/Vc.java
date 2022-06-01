@@ -55,6 +55,20 @@ public final class Vc {
     }
 
     /**
+     * Signs VC/VP document. Returns the provided VC/VP with added proof property.
+     * 
+     * @param document
+     * @param keyPair
+     * @param options
+     * @return signed VC/VP with proof property at the root level
+     * @throws DataIntegrityError
+     * @throws VerificationError
+     */
+    public static SigningProcessor sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataIntegrityError, SigningError {
+        return new SigningProcessor(document, keyPair, options);
+    }
+
+    /**
      * Generates public/private key pair. 
      * 
      * @param type requested key pair type, e.g. <code>https://w3id.org/security#Ed25519KeyPair2020</code>
