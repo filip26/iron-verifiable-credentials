@@ -31,12 +31,12 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     }
     
     @Override
-    public boolean verify(byte[] publicKey, byte[] signature, byte[] data) {
+    public boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
         return signer.verify(publicKey, signature, data);
     }
 
     @Override
-    public byte[] sign(byte[] privateKey, byte[] data) {
+    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
         return signer.sign(privateKey, data);
     }
 
@@ -48,6 +48,11 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     @Override
     public byte[] canonicalize(JsonStructure document) {
         return canonicalization.canonicalize(document);
+    }
+
+    @Override
+    public KeyPair keygen(int length) {
+        return signer.keygen(length);
     }
 
     public String getId() {

@@ -11,6 +11,24 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 All PR's welcome!
 
+# Usage
+
+```java
+
+boolean valid = Vc.verify(credentials).isValid();
+
+signedCredentials = Vc.sign(credentials, keys, proofOptions)
+                      .loader(documentLoader) // custom loader
+                      .get();   // returns signed document in expanded form
+
+signedCredentials = Vc.sign(credentials, keys, proofOptions)
+                      .getCompacted(context); // returns signed document in compacted form
+
+KeyPair keys = Vc.newKeys("https://w3id.org/security#Ed25519KeyPair2020")
+                 .generate()
+
+```
+
 # Building
 
 Fork and clone the project repository.

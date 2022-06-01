@@ -12,6 +12,7 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 
+//RENAME to BuindledContextloader
 public class StaticContextLoader implements DocumentLoader {
 
     static Map<String, Document> staticCache = new HashMap<>();

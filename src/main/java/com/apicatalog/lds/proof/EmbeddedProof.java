@@ -12,10 +12,9 @@ import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.lds.DataIntegrityError;
 import com.apicatalog.lds.DataIntegrityError.Code;
+import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.Constants;
-import com.apicatalog.vc.VerificationError;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -28,6 +27,13 @@ import jakarta.json.JsonValue.ValueType;
  */
 public class EmbeddedProof implements Proof {
 
+    public static final String CREATED = "http://purl.org/dc/terms/created";
+    public static final String PROOF = "https://w3id.org/security#proof";
+    public static final String PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
+    public static final String PROOF_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
+    public static final String PROOF_DOMAIN = "https://w3id.org/security#domain";
+    public static final String PROOF_VALUE = "https://w3id.org/security#proofValue";
+    
     private String type;
 
     private String purpose;
@@ -46,7 +52,7 @@ public class EmbeddedProof implements Proof {
         proof.type = options.getType();
         proof.verificationMethod = options.getVerificationMethod();
         proof.created = options.getCreated();
-        proof.domain = options.getdomain();
+        proof.domain = options.getDomain();
         
         return proof;
     }
@@ -64,7 +70,7 @@ public class EmbeddedProof implements Proof {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
         }
 
-        final JsonValue proofValue = json.get(Constants.PROOF); //TODO move out
+        final JsonValue proofValue = json.get(PROOF); //TODO move out
 
         if (proofValue == null) {
             throw new DataIntegrityError(Code.MissingProof);
@@ -78,7 +84,7 @@ public class EmbeddedProof implements Proof {
             
             // data integrity checks
             if (JsonUtils.isNotObject(proofItem)) {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidProof);
             }
 
             if (proofItem.asJsonObject().containsKey(Keywords.GRAPH)) { //TODO hack
@@ -87,7 +93,7 @@ public class EmbeddedProof implements Proof {
                     proofItem = proofItem.asJsonArray().get(0); //FIXME !?!
                 }
                 if (JsonUtils.isNotObject(proofItem)) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidProof);
                 }                
             }
 
@@ -97,7 +103,7 @@ public class EmbeddedProof implements Proof {
 
             // @type property
             if (!proofObject.containsKey(Keywords.TYPE)) {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.MissingProofType);
             }
 
             final JsonValue typeValue = proofObject.get(Keywords.TYPE);
@@ -106,7 +112,7 @@ public class EmbeddedProof implements Proof {
                 
                 // all @type values must be string
                 if (!typeValue.asJsonArray().stream().allMatch(JsonUtils::isString)) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidProofType);
                 }
                 
                 embeddedProof.type = typeValue.asJsonArray().stream()
@@ -118,20 +124,20 @@ public class EmbeddedProof implements Proof {
                 embeddedProof.type = ((JsonString)typeValue).getString();
                 
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidProofType);
             }
 
             // proofPurpose property
-            if (!proofObject.containsKey(Constants.PROOF_PURPOSE)) {
-                throw new DataIntegrityError();
+            if (!proofObject.containsKey(PROOF_PURPOSE)) {
+                throw new DataIntegrityError(Code.MissingProofPurpose);
             }
 
-            final JsonValue proofPurposeValue = proofObject.get(Constants.PROOF_PURPOSE);
+            final JsonValue proofPurposeValue = proofObject.get(PROOF_PURPOSE);
             
             if (JsonUtils.isArray(proofPurposeValue)) {
                  
                 if (!proofPurposeValue.asJsonArray().stream().allMatch(NodeObject::isNodeReference)) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidProofPurpose);
                 }
                 
                 embeddedProof.purpose = proofPurposeValue.asJsonArray().stream()
@@ -139,15 +145,15 @@ public class EmbeddedProof implements Proof {
                                         .map(o -> o.getString(Keywords.ID))
                                         .limit(1).toArray(String[]::new)[0];
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidProofPurpose);
             }
 
             // verificationMethod property
-            if (!proofObject.containsKey(Constants.PROOF_VERIFICATION_METHOD)) {
-                throw new DataIntegrityError();
+            if (!proofObject.containsKey(PROOF_VERIFICATION_METHOD)) {
+                throw new DataIntegrityError(Code.MissingVerificationMethod);
             }
 
-            final JsonValue verificationMethodValue = proofObject.get(Constants.PROOF_VERIFICATION_METHOD);
+            final JsonValue verificationMethodValue = proofObject.get(PROOF_VERIFICATION_METHOD);
             
             if (JsonUtils.isArray(verificationMethodValue) && verificationMethodValue.asJsonArray().size() > 0) {
 
@@ -164,20 +170,20 @@ public class EmbeddedProof implements Proof {
                 //TODO embedded key
                     
                 } else {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidVerificationMethod);
                 }
                 
                 
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidVerificationMethod);
             }
 
             // proofValue property
-            if (!proofObject.containsKey(Constants.PROOF_VALUE)) {
-                throw new DataIntegrityError();
+            if (!proofObject.containsKey(PROOF_VALUE)) {
+                throw new DataIntegrityError(Code.MissingProofValue);
             }
 
-            final JsonValue embeddedProofValue = proofObject.get(Constants.PROOF_VALUE);
+            final JsonValue embeddedProofValue = proofObject.get(PROOF_VALUE);
             
             if (JsonUtils.isArray(embeddedProofValue)) {
                  
@@ -187,7 +193,7 @@ public class EmbeddedProof implements Proof {
                                 .map(o -> o.get(Keywords.VALUE))
                                 .allMatch(JsonUtils::isString)
                         ) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidProofValue);
                 }
                 
 
@@ -210,21 +216,21 @@ public class EmbeddedProof implements Proof {
               
                 // verify proof value length
                 if (rawProofValue.length != 64) {
-                    throw new DataIntegrityError(Code.InvalidProofLength);
+                    throw new DataIntegrityError(Code.InvalidProofValueLength);
                 }
                 
                 embeddedProof.value = rawProofValue;
                 
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidProofValue);
             }
             
             // created property
-            if (!proofObject.containsKey(Constants.CREATED)) {
-                throw new DataIntegrityError();
+            if (!proofObject.containsKey(CREATED)) {
+                throw new DataIntegrityError(Code.MissingCreated);
             }
 
-            final JsonValue createdValue = proofObject.get(Constants.CREATED);
+            final JsonValue createdValue = proofObject.get(CREATED);
             
             if (JsonUtils.isArray(createdValue)) {
 
@@ -233,7 +239,7 @@ public class EmbeddedProof implements Proof {
                 
                 // expect value object and date in ISO 8601 format
                 if (!ValueObject.isValueObject(createdItem)) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidCreated);
                 }
 
                 //TODO check @type
@@ -248,12 +254,12 @@ public class EmbeddedProof implements Proof {
                     embeddedProof.created = created.toInstant(); 
                 
                 } catch (DateTimeParseException e) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.InvalidCreated);
                 }
                 
 
             } else {
-                throw new DataIntegrityError();
+                throw new DataIntegrityError(Code.InvalidCreated);
             }
 
             
@@ -301,23 +307,22 @@ public class EmbeddedProof implements Proof {
     public byte[] getValue() {
         return value;
     }
-    
-    @Override
+
     public JsonObject toJson() {
         return Json.createObjectBuilder().add(Keywords.TYPE, Json.createArrayBuilder().add(type))
 
-                .add(Constants.PROOF_VERIFICATION_METHOD,
+                .add(PROOF_VERIFICATION_METHOD,
                         Json.createArrayBuilder()
                                 .add(Json.createObjectBuilder().add(Keywords.ID,
                                         verificationMethod.getId().toString())))
-                .add(Constants.CREATED,
+                .add(CREATED,
                         Json.createArrayBuilder()
                                 .add(Json.createObjectBuilder()
                                         .add(Keywords.TYPE, "http://www.w3.org/2001/XMLSchema#dateTime")
                                         .add(Keywords.VALUE, created.toString())
 
                                 ))
-                .add(Constants.PROOF_PURPOSE,
+                .add(PROOF_PURPOSE,
                         Json.createArrayBuilder()
                                 .add(Json.createObjectBuilder().add(Keywords.ID,
                                         "https://w3id.org/security#assertionMethod")))  //FIXME configurable
@@ -328,9 +333,9 @@ public class EmbeddedProof implements Proof {
 
     public static JsonObject setProof(JsonObject document, JsonObject proof, String proofValue) {
         return Json.createObjectBuilder(document)
-                .add(Constants.PROOF,
+                .add(PROOF,
                         Json.createArrayBuilder().add(
-                        Json.createObjectBuilder(proof).add(Constants.PROOF_VALUE,
+                        Json.createObjectBuilder(proof).add(PROOF_VALUE,
                                 Json.createArrayBuilder().add(Json.createObjectBuilder()
                                         .add(Keywords.VALUE, proofValue)
                                         .add(Keywords.TYPE, "https://w3id.org/security#multibase"))))

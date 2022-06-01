@@ -14,115 +14,96 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.NamedParameterSpec;
 
+import com.apicatalog.lds.SigningError;
+import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
 
-public class EdDsaSignature implements SignatureAlgorithm {
+public class SunSignatureProvider implements SignatureAlgorithm {
 
     private final String type;
-    
-    public EdDsaSignature(String type) {
+
+    public SunSignatureProvider(String type) {
         this.type = type;
     }
 
-
     @Override
-    public boolean verify(byte[] publicKey, byte[] signature, byte[] data) {
-        
-        try {            
+    public boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
+
+        try {
             java.security.Signature suite = java.security.Signature.getInstance(type);
 
             suite.initVerify(getPublicKey(publicKey));
             suite.update(data);
 
             return suite.verify(signature);
- 
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidParameterSpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }        
-        return false;
-    }
-    
-    @Override
-    public byte[] sign(byte[] privateKey, byte[] data) {
 
-        try {            
+        } catch (InvalidParameterSpecException | InvalidKeySpecException | InvalidKeyException
+                | NoSuchAlgorithmException | SignatureException e) {
+            throw new VerificationError(e);
+        }
+    }
+
+    @Override
+    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
+
+        try {
             java.security.Signature suite = java.security.Signature.getInstance(type);
 
             suite.initSign(getPrivateKey(privateKey));
             suite.update(data);
 
             return suite.sign();
- 
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvalidParameterSpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }        
-        return null;
-    }    
+
+        } catch (InvalidParameterSpecException | InvalidKeySpecException | InvalidKeyException
+                | NoSuchAlgorithmException | SignatureException e) {
+            throw new SigningError(e);
+        }
+    }
+
+    @Override
+    public KeyPair keygen(int length) {
+        throw new UnsupportedOperationException();
+    }
 
     private PublicKey getPublicKey(byte[] publicKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
 
         KeyFactory kf = KeyFactory.getInstance(type);
-        
+
         // determine if x was odd.
         boolean xisodd = false;
         int lastbyteInt = publicKey[publicKey.length - 1];
         if ((lastbyteInt & 255) >> 7 == 1) {
             xisodd = true;
         }
-        
+
         // make sure most significant bit will be 0 - after reversing.
         publicKey[publicKey.length - 1] &= 127;
-              
+
         publicKey = reverse(publicKey);
         BigInteger y = new BigInteger(1, publicKey);
 
-        NamedParameterSpec paramSpec = new NamedParameterSpec("Ed25519");
+        NamedParameterSpec paramSpec = new NamedParameterSpec(type);
         EdECPoint ep = new EdECPoint(xisodd, y);
         EdECPublicKeySpec pubSpec = new EdECPublicKeySpec(paramSpec, ep);
         PublicKey pub = kf.generatePublic(pubSpec);
         return pub;
     }
 
-    private PrivateKey getPrivateKey(byte[] privateKey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
-        KeyFactory kf = KeyFactory.getInstance("Ed25519");
-        
+    private PrivateKey getPrivateKey(byte[] privateKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
+        KeyFactory kf = KeyFactory.getInstance(type);
+
         NamedParameterSpec paramSpec = new NamedParameterSpec(type);
         EdECPrivateKeySpec spec = new EdECPrivateKeySpec(paramSpec, privateKey);
         return kf.generatePrivate(spec);
     }
-    
+
     private final static byte[] reverse(byte[] data) {
         final byte[] reversed = new byte[data.length];
-        for (int i=0; i<data.length; i++) {
+        for (int i = 0; i < data.length; i++) {
             reversed[data.length - i - 1] = data[i];
-        }   
+        }
         return reversed;
-    }
+    }    
 }

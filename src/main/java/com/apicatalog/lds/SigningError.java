@@ -1,13 +1,13 @@
-package com.apicatalog.vc;
+package com.apicatalog.lds;
 
 public class SigningError extends Throwable {
+
+    private static final long serialVersionUID = 8441020241391845866L;
 
     public enum Code {
         Unknown,
     }
     
-    private static final long serialVersionUID = -3280731333804856855L;
-
     private Code code;
 
     public SigningError() {

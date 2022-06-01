@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.lds;
 
 public class VerificationError extends Throwable {
 

@@ -21,13 +21,13 @@ public class TinkSignature implements SignatureAlgorithm {
             return true;
 
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();
+            /* ignore */
         }
         return false;
     }
 
     @Override
-    public byte[] sign(byte[] privateKey, byte[] data) {
+    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
 
         try {
             // Register all signature key types with the Tink runtime.
@@ -40,20 +40,28 @@ public class TinkSignature implements SignatureAlgorithm {
             return signature;
 
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();        //TODO
+            throw new SigningError(e);
         }
-
-        return null;
     }
     
+    @Override
+    public KeyPair keygen(int length) {
 
-    /*TODO keygen
-     *      
-                    Ed25519Sign.KeyPair keyPair = Ed25519Sign.KeyPair.newKeyPair();
-            privateKey = keyPair.getPrivateKey();
-    System.out.println("private= " + Multibase.encode(Multicodec.encode(Codec.Ed25519PrivateKey, privateKey))); 
-    byte[] publicKey = keyPair.getPublicKey();
-System.out.println("public= " + Multibase.encode(Multicodec.encode(Codec.Ed25519PublicKey, publicKey)));            
+        try {
+            Ed25519Sign.KeyPair kp = Ed25519Sign.KeyPair.newKeyPair();
+            
+            byte[] privateKey = kp.getPrivateKey();
+            byte[] publicKey = kp.getPublicKey();
 
-     */
+            return new KeyPair(publicKey, privateKey);
+            
+        } catch (GeneralSecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        //TODO
+        return null;
+        
+    }
 }

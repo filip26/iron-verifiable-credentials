@@ -1,12 +1,9 @@
 package com.apicatalog.vc;
 
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -25,24 +22,6 @@ import jakarta.json.JsonValue;
 @TestMethodOrder(OrderAnnotation.class)
 class VcTest {
 
-    @DisplayName("Data Integrity")
-    @ParameterizedTest(name = "{0}")
-    @MethodSource({ "integrityManifest" })
-    @Order(1)
-    @Disabled
-    void integrity(VcTestCase testCase) {
-
-        // skip JWS credentials
-        assumeFalse("t0001".equals(testCase.id.getFragment()));
-        assumeFalse("t0002".equals(testCase.id.getFragment()));
-
-        // skip unsigned credentials
-        assumeFalse("t0006".equals(testCase.id.getFragment()));
-        assumeFalse("t0015".equals(testCase.id.getFragment()));
-        
-        new VcTestRunnerJunit(testCase).execute();
-    }
-
     @DisplayName("Verification")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "verifyManifest" })
@@ -51,24 +30,20 @@ class VcTest {
         new VcTestRunnerJunit(testCase).execute();
     }
 
-    @DisplayName("Issuing")
+    @DisplayName("Signing")
     @ParameterizedTest(name = "{0}")
-    @MethodSource({ "issueManifest" })
+    @MethodSource({ "signManifest" })
     @Order(3)
     void sign(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
-    }
-
-    static final Stream<VcTestCase> integrityManifest() throws JsonLdError, IOException {
-        return manifest("integrity-manifest.jsonld");
     }
 
     static final Stream<VcTestCase> verifyManifest() throws JsonLdError, IOException {
         return manifest("verify-manifest.jsonld");
     }
 
-    static final Stream<VcTestCase> issueManifest() throws JsonLdError, IOException {
-        return manifest("issue-manifest.jsonld");
+    static final Stream<VcTestCase> signManifest() throws JsonLdError, IOException {
+        return manifest("sign-manifest.jsonld");
     }
 
     static final Stream<VcTestCase> manifest(String name) throws JsonLdError, IOException {

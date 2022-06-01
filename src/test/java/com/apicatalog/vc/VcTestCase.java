@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
@@ -12,6 +13,7 @@ import com.apicatalog.lds.proof.VerificationMethod;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 
 public class VcTestCase {
 
@@ -23,7 +25,7 @@ public class VcTestCase {
     
     public Set<String> type;
     
-    public String result;
+    public Object result;
     
     public URI keyPair;
     
@@ -49,7 +51,15 @@ public class VcTestCase {
 
         if (test.containsKey("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result")) {
             final JsonObject result = test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result").getJsonObject(0);
-            testCase.result = result.getString(Keywords.ID, result.getString(Keywords.VALUE, null));
+            
+            JsonValue resultValue  = result.getOrDefault(Keywords.ID, result.getOrDefault(Keywords.VALUE, null));
+
+            if (JsonUtils.isString(resultValue)) {
+                testCase.result = ((JsonString)resultValue).getString();
+                
+            } else {
+                testCase.result = !JsonValue.ValueType.FALSE.equals(resultValue.getValueType()); 
+            }
         }
 
         

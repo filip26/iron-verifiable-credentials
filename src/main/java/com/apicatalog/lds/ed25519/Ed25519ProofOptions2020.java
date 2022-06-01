@@ -26,7 +26,7 @@ public class Ed25519ProofOptions2020 implements ProofOptions {
     }
 
     @Override
-    public String getdomain() {
+    public String getDomain() {
         return domain;
     }
 

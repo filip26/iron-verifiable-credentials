@@ -2,7 +2,6 @@ package com.apicatalog.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.PrintWriter;
@@ -18,6 +17,8 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.lds.DataIntegrityError;
+import com.apicatalog.lds.SigningError;
+import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519ProofOptions2020;
 
 import jakarta.json.Json;
@@ -54,13 +55,7 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VerifyTest")) {
 
-                assertTrue(Vc.verify(testCase.input, LOADER));
-                
-            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#DataIntegrityTest")) {
-
-                //final VcDocument vcDocument = VcDocument.load(testCase.input, LOADER);        //TODO use Vc API
-                //assertNotNull(vcDocument);
-                fail("TODO");
+                assertEquals(testCase.result != null ? testCase.result : true, Vc.verify(testCase.input).loader(LOADER).isValid());
                 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssueTest")) {
 
@@ -71,13 +66,13 @@ public class VcTestRunnerJunit {
                 options.setCreated(testCase.created);
                 options.setVerificationMethod(testCase.verificationMethod);
                 
-                JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options, LOADER);
+                JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options).loader(LOADER).get();
                 assertNotNull(signed);
                 
 //TODO  getCompacted(context) 
 //signed = JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(new StringReader("{\"@context\":[\"https://github.com/filip26/iron-verifiable-credentials/issue/0001-context.jsonld\"]}"))).loader(LOADER).get();
                 
-                final Document expected = LOADER.loadDocument(URI.create(testCase.result), new DocumentLoaderOptions());
+                final Document expected = LOADER.loadDocument(URI.create((String)testCase.result), new DocumentLoaderOptions());
                 
                 boolean match = JsonLdComparison.equals(signed, expected.getJsonContent().orElse(null));
                 
@@ -132,8 +127,6 @@ public class VcTestRunnerJunit {
 
         try (final PrintWriter writer = new PrintWriter(stringWriter)) {
             writer.println("Test " + testCase.id + ": " + testCase.name);
-
-            
             
             final JsonWriterFactory writerFactory = Json.createWriterFactory(Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
 

@@ -6,10 +6,27 @@ public class DataIntegrityError extends Throwable {
     
     public enum Code {
         Unknown,
+        
         UnknownCryptoSuiteType,
+        
         MissingProof,
+        InvalidProof,
+        
+        MissingProofType,
+        InvalidProofType,
+
+        MissingProofValue,
         InvalidProofValue,
-        InvalidProofLength, 
+        InvalidProofValueLength,
+        
+        MissingProofPurpose,
+        InvalidProofPurpose,
+        
+        MissingVerificationMethod,
+        InvalidVerificationMethod,
+        
+        MissingCreated,
+        InvalidCreated,
     }
     
     private Code code;
