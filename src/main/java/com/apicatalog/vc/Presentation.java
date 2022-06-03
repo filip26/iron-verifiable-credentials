@@ -41,7 +41,7 @@ public class Presentation {
         }
 
         if (!json.containsKey(ISSUANCE_DATE)) {
-            throw new DataIntegrityError(Code.MissingIssuanceDater);
+            throw new DataIntegrityError(Code.MissingIssuanceDate);
         }
 
         //TODO

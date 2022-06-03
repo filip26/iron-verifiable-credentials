@@ -3,6 +3,17 @@
 	"@type": [
 		"https://www.w3.org/2018/credentials#VerifiableCredential"
 	],
+	"https://www.w3.org/2018/credentials#issuer": [
+		{
+			"@id": "https://github.com/filip26/iron-verifiable-credentials/issuer/1"
+		}
+	],
+	"https://www.w3.org/2018/credentials#issuanceDate": [
+		{
+			"@value": "2022-06-03T21:18:40Z",
+			"@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+		}
+	],
 	"https://www.w3.org/2018/credentials#credentialSubject": [
 		{
 			"@id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
@@ -10,18 +21,6 @@
 	],
 	"https://w3id.org/security#proof": [
 		{
-			"http://purl.org/dc/terms/created": [
-				{
-					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-					"@value": "2022-05-28T17:02:05Z"
-				}
-			],
-			"https://w3id.org/security#proofValue": [
-				{
-					"@type": "https://w3id.org/security#multibase",
-					"@value": "z4Xcnawq7gzT4J1HWABCnoWSAn1TwjcrUMjz9hZeRasMQ586tu6Q3NRSQVSTUH4JpiAhMxYSU7rxtJrvePGSzhPD7"
-				}
-			],
 			"@type": [
 				"https://w3id.org/security#Ed25519Signature2020"
 			],
@@ -30,9 +29,21 @@
 					"@id": "https://github.com/filip26/iron-verifiable-credentials/verify/0005-verification-key.json"
 				}
 			],
+			"http://purl.org/dc/terms/created": [
+				{
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+					"@value": "2022-05-28T17:02:05Z"
+				}
+			],
 			"https://w3id.org/security#proofPurpose": [
 				{
 					"@id": "https://w3id.org/security#assertionMethod"
+				}
+			],
+			"https://w3id.org/security#proofValue": [
+				{
+					"@value": "z2BKHtarpb5oPmgQpmbbgBr7iZQP8TbMgiTNbWyW3mxyvuFXZGyLTF6xAd2AgL7PFV4kzpUNgeJvhzJ4ji8kzE7Lh",
+					"@type": "https://w3id.org/security#multibase"
 				}
 			]
 		}

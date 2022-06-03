@@ -32,8 +32,8 @@ public class DataIntegrityError extends Throwable {
         MissingIssuer,
         InvalidIssuer,
 
-        MissingIssuanceDater,
-        InvalidIssuanceDater,
+        MissingIssuanceDate,
+        InvalidIssuanceDate,
 
         MissingSubject,
     }

@@ -177,7 +177,6 @@ public class EmbeddedProof implements Proof {
                     embeddedProof.verificationMethod = Ed25519KeyPair2020.from(verificationMethodItem.asJsonObject());
 
                 } else {
-                    System.out.println(verificationMethodItem);
                     throw new DataIntegrityError(Code.InvalidVerificationMethod);
                 }
 

@@ -7,6 +7,7 @@ import com.apicatalog.lds.DataIntegrityError;
 import com.apicatalog.lds.DataIntegrityError.Code;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
 public class Credential {
 
@@ -17,7 +18,12 @@ public class Credential {
     public static final String ISSUANCE_DATE = "https://www.w3.org/2018/credentials#issuanceDate";
     public static final String EXPIRATION_DATE = "https://www.w3.org/2018/credentials#expirationDate";
 
+    private Instant issuance;
     private Instant expiration;
+    
+    protected Credential() {
+        
+    }
 
     public static boolean isCredential(JsonObject object) {
         if (object == null) {
@@ -27,28 +33,40 @@ public class Credential {
         return JsonLdUtils.isTypeOf(TYPE_VALUE, object);
     }
 
-    public static Credential from(JsonObject json) throws DataIntegrityError {
+    public static Credential from(JsonObject object) throws DataIntegrityError {
 
-        if (JsonLdUtils.hasTypeDeclaration(json)) {
+        if (object == null) {
+            throw new IllegalArgumentException("The 'object' parameter must not be null.");
+        }
+
+        final Credential credential = new Credential(); 
+        
+        if (!JsonLdUtils.hasTypeDeclaration(object)) {
+            throw new DataIntegrityError();
+        }
+        
+        if (!JsonLdUtils.isTypeOf(TYPE_VALUE, object)) {
+            throw new DataIntegrityError();
+        }
+
+        if (!object.containsKey(SUBJECT)) {
             throw new DataIntegrityError(Code.MissingSubject);
         }
 
-        if (!json.containsKey(SUBJECT)) {
-            throw new DataIntegrityError(Code.MissingSubject);
-        }
-
-        if (!json.containsKey(ISSUER)) {
+        if (!object.containsKey(ISSUER)) {
             throw new DataIntegrityError(Code.MissingIssuer);
         }
 
-        if (!json.containsKey(ISSUANCE_DATE)) {
-            throw new DataIntegrityError(Code.MissingIssuanceDater);
-        }
-
+        credential.issuance = JsonLdUtils
+                                    .getDateTime(object.get(ISSUANCE_DATE))
+                                    .orElseThrow(() -> new DataIntegrityError(Code.MissingIssuanceDate));
+        
+        credential.expiration = JsonLdUtils.getDateTime(object.get(EXPIRATION_DATE)).orElse(null);
+        
         //TODO
-        return null;
+        return credential;
     }
-
+        
     /**
      *
      * see {@link https://www.w3.org/TR/vc-data-model/#issuer}
@@ -65,8 +83,7 @@ public class Credential {
      * @return
      */
     public Instant getIssuanceDate() {
-        //TODO
-        return null;
+        return issuance;
     }
 
     /**

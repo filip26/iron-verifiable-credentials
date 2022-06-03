@@ -21,7 +21,7 @@ public class Ed25519KeyPair2020 extends Ed2551VerificationKey2020 implements Key
     }
 
     public static Ed25519KeyPair2020 from(JsonObject json) throws DataIntegrityError {
-System.out.println(json);
+
         // TODO check json object type!
         final Ed25519KeyPair2020 key = new Ed25519KeyPair2020(URI.create(json.getString(ID)));
 
