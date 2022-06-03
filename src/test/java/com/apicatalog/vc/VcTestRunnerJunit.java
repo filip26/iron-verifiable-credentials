@@ -69,7 +69,7 @@ public class VcTestRunnerJunit {
 
                 JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options).loader(LOADER).get();
                 
-                assertFalse(isNegative());
+                assertFalse(isNegative(), "Expected error " + testCase.result);
                 
                 assertNotNull(signed);
                 

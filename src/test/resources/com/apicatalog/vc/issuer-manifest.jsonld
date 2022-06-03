@@ -30,7 +30,7 @@
                 "NegativeEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "@type is not VerifiableCredentials",
+            "name": "@type must be VerifiableCredentials",
             "input": "issuer/0002-in.jsonld",
             "options": {
                 "keyPair": "issuer/0001-keys.json",
@@ -60,7 +60,7 @@
                 "NegativeEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "issuer is not IRI",
+            "name": "issuer muset be IRI",
             "input": "issuer/0004-in.jsonld",
             "options": {
                 "keyPair": "issuer/0001-keys.json",
@@ -90,7 +90,7 @@
                 "NegativeEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "issuanceDate @type is not XmlDateTime",
+            "name": "issuanceDate @type must be XmlDateTime",
             "input": "issuer/0006-in.jsonld",
             "options": {
                 "keyPair": "issuer/0001-keys.json",
@@ -115,7 +115,67 @@
             "expectErrorCode": "InvalidIssuanceDate"
         },
         {
+            "@id": "#t0008",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "invalid expirationDate @type",
+            "input": "issuer/0008-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "InvalidIssuanceDate"
+        },
+        {
+            "@id": "#t0009",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "miasing credentialStatus @id",
+            "input": "issuer/0009-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "InvalidIssuanceDate"
+        },
+        {
             "@id": "#t0010",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "miasing credentialStatus @type",
+            "input": "issuer/0009-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "InvalidIssuanceDate"
+        },
+        {
+            "@id": "#t0011",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "credentialStatus @id must be IRI",
+            "input": "issuer/0011-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "InvalidIssuanceDate"
+        },
+        {
+            "@id": "#t0020",
             "@type": [
                 "PositiveEvaluationTest",
                 "IssuerTest"

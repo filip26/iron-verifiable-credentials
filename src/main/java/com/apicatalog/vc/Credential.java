@@ -7,7 +7,6 @@ import com.apicatalog.lds.DataIntegrityError;
 import com.apicatalog.lds.DataIntegrityError.Code;
 
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 public class Credential {
 
@@ -17,8 +16,10 @@ public class Credential {
     public static final String ISSUER = "https://www.w3.org/2018/credentials#issuer";
     public static final String ISSUANCE_DATE = "https://www.w3.org/2018/credentials#issuanceDate";
     public static final String EXPIRATION_DATE = "https://www.w3.org/2018/credentials#expirationDate";
+    public static final String CREDENTIAL_STATUS = "https://www.w3.org/2018/credentials#credentialStatus";
 
     private Instant issuance;
+    
     private Instant expiration;
     
     protected Credential() {
