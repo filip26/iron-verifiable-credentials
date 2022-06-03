@@ -105,5 +105,5 @@ public class SunSignatureProvider implements SignatureAlgorithm {
             reversed[data.length - i - 1] = data[i];
         }
         return reversed;
-    }    
+    }
 }

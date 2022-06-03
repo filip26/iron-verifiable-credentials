@@ -20,7 +20,7 @@ public final class Vc {
 
     /**
      * Verifies VC/VP document data integrity and signature.
-     * 
+     *
      * @param location
      * @throws DataIntegrityError
      * @throws VerificationError
@@ -31,7 +31,7 @@ public final class Vc {
 
     /**
      * Verifies VC/VP document data integrity and signature.
-     * 
+     *
      * @param location
      * @throws DataIntegrityError
      * @throws VerificationError
@@ -42,7 +42,7 @@ public final class Vc {
 
     /**
      * Signs VC/VP document. Returns the provided VC/VP with added proof property.
-     * 
+     *
      * @param documentLocation
      * @param keyPairLocation
      * @param options
@@ -56,7 +56,7 @@ public final class Vc {
 
     /**
      * Signs VC/VP document. Returns the provided VC/VP with added proof property.
-     * 
+     *
      * @param document
      * @param keyPair
      * @param options
@@ -69,19 +69,19 @@ public final class Vc {
     }
 
     /**
-     * Generates public/private key pair. 
-     * 
+     * Generates public/private key pair.
+     *
      * @param type requested key pair type, e.g. <code>https://w3id.org/security#Ed25519KeyPair2020</code>
      * @param length
      * @return
      */
     //FIXMe use processor api allowing to set length
     public static KeyPair generateKeys(String type) {
-        
-        //TODO reject unknown keypair type 
+
+        //TODO reject unknown keypair type
         final LinkedDataSignature lds = new LinkedDataSignature(new Ed25519Signature2020());
-        
+
         return lds.keygen(256); //FIXME
     }
-    
+
 }

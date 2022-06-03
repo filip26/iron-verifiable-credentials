@@ -33,18 +33,18 @@ public class EmbeddedProof implements Proof {
     public static final String PROOF_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
     public static final String PROOF_DOMAIN = "https://w3id.org/security#domain";
     public static final String PROOF_VALUE = "https://w3id.org/security#proofValue";
-    
+
     private String type;
 
     private String purpose;
 
     private VerificationMethod verificationMethod;
-    
+
     private Instant created;
-    
+
     private String domain;
-    
-    private byte[] value;    
+
+    private byte[] value;
 
     public static EmbeddedProof from(ProofOptions options) {
         final EmbeddedProof proof = new EmbeddedProof();
@@ -53,12 +53,12 @@ public class EmbeddedProof implements Proof {
         proof.verificationMethod = options.getVerificationMethod();
         proof.created = options.getCreated();
         proof.domain = options.getDomain();
-        
+
         return proof;
     }
-    
+
     /**
-     * 
+     *
      * @param json expanded verifiable credentials or presentation
      * @param result
      * @return
@@ -76,7 +76,7 @@ public class EmbeddedProof implements Proof {
         // proof sets - https://w3c-ccg.github.io/data-integrity-spec/#proof-sets
         // proof chains - https://w3c-ccg.github.io/data-integrity-spec/#proof-chains
 
-        
+
         if (proofValue == null) {
             throw new DataIntegrityError(Code.MissingProof);
         }
@@ -84,9 +84,9 @@ public class EmbeddedProof implements Proof {
         if (!ValueType.ARRAY.equals(proofValue.getValueType())) {
             throw new DataIntegrityError();
         }
-                
+
         for (JsonValue proofItem : proofValue.asJsonArray()) {
-            
+
             // data integrity checks
             if (JsonUtils.isNotObject(proofItem)) {
                 throw new DataIntegrityError(Code.InvalidProof);
@@ -99,11 +99,11 @@ public class EmbeddedProof implements Proof {
                 }
                 if (JsonUtils.isNotObject(proofItem)) {
                     throw new DataIntegrityError(Code.InvalidProof);
-                }                
+                }
             }
 
             final JsonObject proofObject = proofItem.asJsonObject();
-            
+
             final EmbeddedProof embeddedProof = new EmbeddedProof();
 
             // @type property
@@ -112,22 +112,22 @@ public class EmbeddedProof implements Proof {
             }
 
             final JsonValue typeValue = proofObject.get(Keywords.TYPE);
-            
+
             if (JsonUtils.isArray(typeValue)) {
-                
+
                 // all @type values must be string
                 if (!typeValue.asJsonArray().stream().allMatch(JsonUtils::isString)) {
                     throw new DataIntegrityError(Code.InvalidProofType);
                 }
-                
+
                 embeddedProof.type = typeValue.asJsonArray().stream()
                                         .map(JsonString.class::cast)
                                         .map(JsonString::getString)
                                         .findAny().orElse(null);
-                
+
             } else if (JsonUtils.isString(typeValue)) {
                 embeddedProof.type = ((JsonString)typeValue).getString();
-                
+
             } else {
                 throw new DataIntegrityError(Code.InvalidProofType);
             }
@@ -138,13 +138,13 @@ public class EmbeddedProof implements Proof {
             }
 
             final JsonValue proofPurposeValue = proofObject.get(PROOF_PURPOSE);
-            
+
             if (JsonUtils.isArray(proofPurposeValue)) {
-                 
+
                 if (!proofPurposeValue.asJsonArray().stream().allMatch(NodeObject::isNodeReference)) {
                     throw new DataIntegrityError(Code.InvalidProofPurpose);
                 }
-                
+
                 embeddedProof.purpose = proofPurposeValue.asJsonArray().stream()
                                         .map(JsonValue::asJsonObject)
                                         .map(o -> o.getString(Keywords.ID))
@@ -159,29 +159,29 @@ public class EmbeddedProof implements Proof {
             }
 
             final JsonValue verificationMethodValue = proofObject.get(PROOF_VERIFICATION_METHOD);
-            
+
             if (JsonUtils.isArray(verificationMethodValue) && verificationMethodValue.asJsonArray().size() > 0) {
 
                 final JsonValue verificationMethodItem = verificationMethodValue.asJsonArray().get(0);
-                                
-                if (NodeObject.isNodeReference(verificationMethodItem)) { 
+
+                if (NodeObject.isNodeReference(verificationMethodItem)) {
 
                     final JsonObject verificationMethodObject = verificationMethodItem.asJsonObject();
 
                     final String id = verificationMethodObject.getString(Keywords.ID);
-                    
+
                     embeddedProof.verificationMethod = Ed25519KeyPair2020.reference(URI.create(id));
-                    
+
 
                 } else if (JsonUtils.isObject(verificationMethodItem)) {
                     embeddedProof.verificationMethod = Ed25519KeyPair2020.from(verificationMethodItem.asJsonObject());
-                    
+
                 } else {
                     System.out.println(verificationMethodItem);
                     throw new DataIntegrityError(Code.InvalidVerificationMethod);
                 }
-                
-                
+
+
             } else {
                 throw new DataIntegrityError(Code.InvalidVerificationMethod);
             }
@@ -192,9 +192,9 @@ public class EmbeddedProof implements Proof {
             }
 
             final JsonValue embeddedProofValue = proofObject.get(PROOF_VALUE);
-            
+
             if (JsonUtils.isArray(embeddedProofValue)) {
-                 
+
                 if (!embeddedProofValue.asJsonArray().stream().allMatch(ValueObject::isValueObject)
                         || !embeddedProofValue.asJsonArray().stream()
                                 .map(JsonValue::asJsonObject)
@@ -203,12 +203,12 @@ public class EmbeddedProof implements Proof {
                         ) {
                     throw new DataIntegrityError(Code.InvalidProofValue);
                 }
-                
+
 
                 String proofValueType = embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.TYPE);
-                                
+
                 String encodedProofValue =  embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
-                
+
                 // verify supported proof value encoding
                 if (!"https://w3id.org/security#multibase".equals(proofValueType)) {
                     throw new DataIntegrityError(Code.InvalidProofValue);        //FIXME belongs to ED25...
@@ -221,70 +221,70 @@ public class EmbeddedProof implements Proof {
 
                 // decode proof value
                 byte[] rawProofValue = Multibase.decode(encodedProofValue);
-              
+
                 // verify proof value length
                 if (rawProofValue.length != 64) {
                     throw new DataIntegrityError(Code.InvalidProofValueLength);
                 }
-                
+
                 embeddedProof.value = rawProofValue;
-                
+
             } else {
                 throw new DataIntegrityError(Code.InvalidProofValue);
             }
-            
+
             // created property
             if (!proofObject.containsKey(CREATED)) {
                 throw new DataIntegrityError(Code.MissingCreated);
             }
 
             final JsonValue createdValue = proofObject.get(CREATED);
-            
+
             if (JsonUtils.isArray(createdValue)) {
 
                 // take first created property
                 final JsonValue createdItem = createdValue.asJsonArray().get(0);
-                
+
                 // expect value object and date in ISO 8601 format
                 if (!ValueObject.isValueObject(createdItem)) {
                     throw new DataIntegrityError(Code.InvalidCreated);
                 }
 
                 //TODO check @type
-                
+
                 String createdString = ValueObject.getValue(createdItem).filter(JsonUtils::isString)
                 .map(JsonString.class::cast)
                 .map(JsonString::getString).orElseThrow(DataIntegrityError::new);
 
                 try {
                     OffsetDateTime created = OffsetDateTime.parse(createdString);
-                    
-                    embeddedProof.created = created.toInstant(); 
-                
+
+                    embeddedProof.created = created.toInstant();
+
                 } catch (DateTimeParseException e) {
                     throw new DataIntegrityError(Code.InvalidCreated);
                 }
-                
+
 
             } else {
                 throw new DataIntegrityError(Code.InvalidCreated);
             }
 
-            
+
             //TODO domain property
-            
+
 
 
             return embeddedProof;       //FIXME process other proofs
         }
-        
+
 
 
 
         //TODO
         return null;
-    }    
-    
+    }
+
     @Override
     public String getType() {
         return type;

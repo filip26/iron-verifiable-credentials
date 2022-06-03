@@ -9,7 +9,7 @@ import jakarta.json.JsonStructure;
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization algorithm,
  * a message digest algorithm, and a signature algorithm.
- * 
+ *
  */
 public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
@@ -17,7 +17,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     private final CanonicalizationAlgorithm canonicalization;
     private final DigestAlgorithm digester;
     private final SignatureAlgorithm signer;
-    
+
     public SignatureSuite(
             String id,
             CanonicalizationAlgorithm canonicalization,
@@ -29,7 +29,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
         this.digester = digester;
         this.signer = signer;
     }
-    
+
     @Override
     public boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
         return signer.verify(publicKey, signature, data);

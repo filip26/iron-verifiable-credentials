@@ -27,79 +27,79 @@ public class SigningProcessor {
 
     private final URI location;
     private final JsonObject document;
-    
+
     private final URI keyPairLocation;
     private final KeyPair keyPair;
-    
+
     private final ProofOptions options;
-    
+
     private DocumentLoader loader = null;
-    
+
     protected SigningProcessor(URI location, URI keyPairLocation, ProofOptions options) {
         this.location = location;
         this.document = null;
-        
+
         this.keyPairLocation = keyPairLocation;
         this.keyPair = null;
-        
+
         this.options = options;
     }
-    
+
     protected SigningProcessor(JsonObject document, KeyPair keyPair, ProofOptions options) {
         this.document = document;
         this.location = null;
 
         this.keyPair = keyPair;
         this.keyPairLocation = null;
-        
+
         this.options = options;
     }
-    
+
     public SigningProcessor loader(DocumentLoader loader) {
         this.loader = loader;
         return this;
     }
-        
+
     /**
      * Get signed document in expanded form.
-     * 
+     *
      * @return
      * @throws SigningError
      * @throws DataIntegrityError
      */
     public JsonObject get() throws SigningError, DataIntegrityError {
-        
+
         if (loader == null) {
             // default loader
             loader = SchemeRouter.defaultInstance();
         }
-        
+
         //TODO make it configurable
         loader = new StaticContextLoader(loader);
-        
+
         if (document != null && keyPair != null)  {
             return sign(document, keyPair, options);
         }
-        
+
         if (location != null && keyPairLocation != null)  {
             return sign(location, keyPairLocation, options);
         }
-        
+
         throw new IllegalStateException();
     }
 
     /**
      * Get signed document in compacted form.
-     * 
+     *
      * @param context
      * @return
      * @throws SigningError
      * @throws DataIntegrityError
      */
     public JsonObject getCompacted(URI context)  throws SigningError, DataIntegrityError {
-        
+
         final JsonObject signed = get();
-        
+
         try {
             return JsonLd.compact(JsonDocument.of(signed), context).get();
         } catch (JsonLdError e) {
@@ -117,9 +117,9 @@ public class SigningProcessor {
 
             // TODO keyPair type must match options.type
             final Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(keys.getJsonContent().orElseThrow().asJsonObject()); // FIXME
-  
+
             return sign(expanded, keyPair, options);
-            
+
         } catch (JsonLdError e) {
             throw new SigningError(e);
         }
@@ -143,40 +143,40 @@ public class SigningProcessor {
 
         for (final JsonValue item : expanded) {
             if (JsonUtils.isObject(item)) {
-                
+
                 final JsonObject object = item.asJsonObject();
-                
+
                 // is not expanded JSON-LD object
                 if (!JsonLdUtils.hasTypeDeclaration(object)) {
                     throw new DataIntegrityError();
                 }
-                
+
                 // is a credential?
                 if (Credential.isCredential(object)) {
-                    
+
                     // validate the credential object
                     final Credential credential = Credential.from(object);
-                    
-                    // is expired? 
+
+                    // is expired?
                     if (credential.isExpired()) {
-                        //TODO 
+                        //TODO
                         throw new SigningError();
                     }
-                    
+
                 // is a presentation?
                 } else if (Presentation.isPresentation(object)) {
                     // validate the presentation object
                     //TODO
-                    
+
                 // unknown type
                 } else {
                     throw new DataIntegrityError();
                 }
-                
+
                 final JsonObject signed = signature.sign(object, options, keyPair);
 
-                // take only the first object - TODO
-                return signed;        
+                // take only the first object - FIXME
+                return signed;
 
             }
         }

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * 
+ *
  * see {@link https://github.com/multiformats/multicodec/blob/master/table.csv}
  *
  */
@@ -18,33 +18,33 @@ public class Multicodec {
     }
 
     public enum Codec {
-    
+
         Ed25519PublicKey(Type.Key,  new byte[]{(byte)0xed, (byte)0x01}),
         Ed25519PrivateKey(Type.Key, new byte[]{(byte)0x13, (byte)0x00}),
-        
+
 //        UnknownPrivateKey(Type.Key, new byte[]{(byte)0x80, (byte)0x26, (byte)0x9b, (byte)0x93}) //FIXME ?!?!?!?
         ;
 
         private final byte[] code;
         private final Type type;
-        
+
         Codec(Type type, byte[] code) {
             this.type = type;
             this.code = code;
         }
-        
+
         int length() {
             return code.length;
         }
-        
+
         int asInteger() {
             return new BigInteger(code).intValue();
         }
-        
+
         byte[] code() {
             return code;
         }
-        
+
         Type type() {
             return type;
         }
@@ -62,14 +62,14 @@ public class Multicodec {
         switch (type) {
         case Key:
 
-            Integer byte4 = new BigInteger(Arrays.copyOf(encoded, 4)).intValue();            
+            Integer byte4 = new BigInteger(Arrays.copyOf(encoded, 4)).intValue();
             if (Multicodec.KEY_REGISTRY.containsKey(byte4)) {
                 return Optional.of(KEY_REGISTRY.get(byte4));
             }
 
-            
+
             Integer byte2 = new BigInteger(Arrays.copyOf(encoded, 2)).intValue();
-            
+
             if (Multicodec.KEY_REGISTRY.containsKey(byte2)) {
                 return Optional.of(KEY_REGISTRY.get(byte2));
             }
@@ -90,7 +90,7 @@ public class Multicodec {
     }
 
     public static byte[] encode(Codec codec, byte[] value) {
-        
+
         final byte[] encoded = new byte[codec.length() + value.length];
 
         System.arraycopy(codec.code, 0, encoded, 0, codec.length());

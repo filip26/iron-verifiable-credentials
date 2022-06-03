@@ -3,41 +3,41 @@ package com.apicatalog.lds;
 public class DataIntegrityError extends Throwable {
 
     private static final long serialVersionUID = -7146533158378348477L;
-    
+
     //FIXME rethinks codes, status: [Missing|Invalid] property: [name] attribute: [length|encoding|..]
     public enum Code {
         Unknown,
-        
+
         UnknownCryptoSuiteType,
-        
+
         MissingProof,
         InvalidProof,
-        
+
         MissingProofType,
         InvalidProofType,
 
         MissingProofValue,
         InvalidProofValue,
         InvalidProofValueLength,
-        
+
         MissingProofPurpose,
         InvalidProofPurpose,
-        
+
         MissingVerificationMethod,
         InvalidVerificationMethod,
-        
+
         MissingCreated,
-        InvalidCreated, 
-        
-        MissingIssuer, 
+        InvalidCreated,
+
+        MissingIssuer,
         InvalidIssuer,
-        
+
         MissingIssuanceDater,
-        InvalidIssuanceDater, 
-        
+        InvalidIssuanceDater,
+
         MissingSubject,
     }
-    
+
     private Code code;
 
     public DataIntegrityError() {
@@ -57,7 +57,7 @@ public class DataIntegrityError extends Throwable {
         super(e);
         this.code = code;
     }
-    
+
     public Code getCode() {
         return code;
     }

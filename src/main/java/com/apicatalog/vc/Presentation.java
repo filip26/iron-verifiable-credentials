@@ -12,7 +12,7 @@ import jakarta.json.JsonObject;
 public class Presentation {
 
     public static final String TYPE_VALUE = "https://www.w3.org/2018/credentials#VerifiablePresentation";
-    
+
     public static final String SUBJECT = "https://www.w3.org/2018/credentials#credentialSubject";
     public static final String ISSUER = "https://www.w3.org/2018/credentials#issuer";
     public static final String ISSUANCE_DATE = "https://www.w3.org/2018/credentials#issuanceDate";
@@ -22,10 +22,10 @@ public class Presentation {
         if (object == null) {
             throw new IllegalArgumentException("The 'object' parameter must not be null.");
         }
-        
-        return JsonLdUtils.isTypeOf(TYPE_VALUE, object);        
+
+        return JsonLdUtils.isTypeOf(TYPE_VALUE, object);
     }
-    
+
     public static Presentation from(JsonObject json) throws DataIntegrityError {
 
         if (!json.containsKey(Keywords.TYPE)) {
@@ -49,7 +49,7 @@ public class Presentation {
     }
 
     /**
-     * 
+     *
      * see {@link https://www.w3.org/TR/vc-data-model/#issuer}
      * @return
      */
@@ -59,7 +59,7 @@ public class Presentation {
     }
 
     /**
-     * 
+     *
      * see {@link https://www.w3.org/TR/vc-data-model/#issuance-date}
      * @return
      */
@@ -67,7 +67,7 @@ public class Presentation {
         //TODO
         return null;
     }
-    
+
     /**
      * see {@link https://www.w3.org/TR/vc-data-model/#credential-subject}
      */

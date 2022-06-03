@@ -24,33 +24,33 @@ public class Urdna2015 implements CanonicalizationAlgorithm {
     public byte[] canonicalize(JsonStructure document) {
         try {
             RdfDataset dataset = JsonLd.toRdf(JsonDocument.of(document)).get();
-            
+
             RdfDataset canonical = RdfNormalize.normalize(dataset);
-            
+
             StringWriter writer = new StringWriter();
-            
+
             RdfWriter rdfWriter = Rdf.createWriter(MediaType.N_QUADS, writer);
-            
+
             rdfWriter.write(canonical);
 
             return writer.toString()
                     .substring(0, writer.toString().length() -1)
                     .getBytes(StandardCharsets.UTF_8);
 
-            
+
         } catch (JsonLdError e) {
             //FIXME ...
             e.printStackTrace();
-            
+
         } catch (UnsupportedContentException e) {
             e.printStackTrace();
-            
+
         } catch (IOException e) {
             e.printStackTrace();
-            
+
         } catch (RdfWriterException e) {
             e.printStackTrace();
-            
+
         }
         throw new IllegalStateException();
     }

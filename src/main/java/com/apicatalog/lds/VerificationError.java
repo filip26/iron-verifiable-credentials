@@ -5,7 +5,7 @@ public class VerificationError extends Throwable {
     public enum Code {
         Unknown,
     }
-    
+
     private static final long serialVersionUID = -3280731333804856855L;
 
     private Code code;
@@ -27,7 +27,7 @@ public class VerificationError extends Throwable {
         super(e);
         this.code = code;
     }
-    
+
     public Code getCode() {
         return code;
     }

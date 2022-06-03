@@ -7,15 +7,15 @@ import com.apicatalog.lds.algorithm.DigestAlgorithm;
 public class MessageDigest implements DigestAlgorithm {
 
     private final String type;
-    
+
     public MessageDigest(String type) {
         this.type = type;
     }
-    
+
 
     @Override
     public byte[] digest(byte[] data) {
-        
+
         try {
             java.security.MessageDigest digest = java.security.MessageDigest.getInstance(type);
             return digest.digest(data);

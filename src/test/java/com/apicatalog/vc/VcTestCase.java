@@ -22,15 +22,15 @@ public class VcTestCase {
     public String name;
 
     public URI input;
-    
+
     public Set<String> type;
-    
+
     public Object result;
-    
+
     public URI keyPair;
-    
+
     public VerificationMethod verificationMethod;
-    
+
     public Instant created;
 
     public static VcTestCase of(JsonObject test, JsonObject manifest, DocumentLoader loader) {
@@ -51,28 +51,28 @@ public class VcTestCase {
 
         if (test.containsKey("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result")) {
             final JsonObject result = test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result").getJsonObject(0);
-            
+
             JsonValue resultValue  = result.getOrDefault(Keywords.ID, result.getOrDefault(Keywords.VALUE, null));
 
             if (JsonUtils.isString(resultValue)) {
                 testCase.result = ((JsonString)resultValue).getString();
-                
+
             } else {
-                testCase.result = !JsonValue.ValueType.FALSE.equals(resultValue.getValueType()); 
+                testCase.result = !JsonValue.ValueType.FALSE.equals(resultValue.getValueType());
             }
         }
 
-        
+
         if (test.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#options")) {
             JsonObject options = test.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#options").getJsonObject(0);
-            
+
 
             testCase.keyPair =
                     URI.create(
                     options.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#keyPair")
                                 .getJsonObject(0)
                                 .getString(Keywords.ID));
-            
+
             URI verificationMethod = URI.create(
                     options.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#verificationMethod")
                     .getJsonObject(0)
@@ -81,14 +81,14 @@ public class VcTestCase {
             if (verificationMethod != null) {
                 testCase.verificationMethod = Ed25519KeyPair2020.reference(verificationMethod);
             }
-            
-            
+
+
             if (options.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#created")) {
                 testCase.created = Instant.parse(options.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#created")
                         .getJsonObject(0)
                        .getString(Keywords.VALUE));
             }
-            
+
         }
 
         return testCase;

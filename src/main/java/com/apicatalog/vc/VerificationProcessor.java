@@ -28,45 +28,45 @@ public class VerificationProcessor {
     private final URI location;
     private final JsonObject document;
     private DocumentLoader loader = null;
-    
+
     protected VerificationProcessor(URI location) {
         this.location = location;
         this.document = null;
     }
-    
+
     protected VerificationProcessor(JsonObject document) {
         this.document = document;
         this.location = null;
     }
-    
+
     public VerificationProcessor loader(DocumentLoader loader) {
         this.loader = loader;
         return this;
     }
-    
+
     public VerificationProcessor useBundledContexts(boolean buildedContexts) {
         //TOOD
         return this;
     }
 
     public boolean isValid() throws VerificationError, DataIntegrityError {
-        
+
         if (loader == null) {
             // default loader
             loader = SchemeRouter.defaultInstance();
         }
-        
+
         //TODO make it configurable
         loader = new StaticContextLoader(loader);
-        
+
         if (document != null) {
             return verify(document, loader);
         }
-        
+
         if (location != null) {
             return verify(location, loader);
         }
-        
+
         throw new IllegalStateException();
     }
 
@@ -76,24 +76,24 @@ public class VerificationProcessor {
             final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
 
             return verifyExpanded(expanded, loader);
-            
+
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }
     }
-    
+
     private static boolean verify(JsonObject document, DocumentLoader loader) throws VerificationError, DataIntegrityError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
-            
+
             return verifyExpanded(expanded, loader);
 
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }
     }
-    
+
     private static boolean verifyExpanded(JsonArray expanded, DocumentLoader loader) throws DataIntegrityError, VerificationError {
 
         for (final JsonValue item : expanded) {
@@ -104,7 +104,7 @@ public class VerificationProcessor {
             if (!result) {
                 return false;
             }
-        }        
+        }
         return true;
     }
 
@@ -112,7 +112,7 @@ public class VerificationProcessor {
 
         // data integrity checks
         final Credential credential = Credential.from(expanded);
-        
+
         final EmbeddedProof proof = EmbeddedProof.from(expanded, loader);
 
         try {
@@ -132,7 +132,7 @@ public class VerificationProcessor {
             throw new VerificationError(e);
         }
     }
-    
+
     // refresh/fetch verification method
     static final VerificationKey get(URI id, DocumentLoader loader) throws DataIntegrityError, JsonLdError {
 

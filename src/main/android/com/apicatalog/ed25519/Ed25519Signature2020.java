@@ -16,34 +16,34 @@ public class Ed25519Signature2020Android {
 
     static {
     }
-    
 
-    public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {        
-        
+
+    public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
+
         try {
             TinkConfig.register();      //TODO find proper place!
 
-            
-            
+
+
         // 1. Generate the private key material.
         KeysetHandle privateKeysetHandle = KeysetHandle.generateNew(
             KeyTemplates.get("ECDSA_P256"));
-        
+
         KeysetHandle pp = privateKeysetHandle.getPublicKeysetHandle();
-        
+
         ByteArrayOutputStream publicKeyStream = new ByteArrayOutputStream();
 
         try {
             CleartextKeysetHandle.write(pp,
                 JsonKeysetWriter.withOutputStream(publicKeyStream));
-            
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         KeysetHandle publicKeysetHandle = KeysetHandle.readNoSecret(publicKey);
-        
+
 
 //        // 2. Get the primitive.
 //        PublicKeySign signer = privateKeysetHandle.getPrimitive(PublicKeySign.class);
@@ -59,13 +59,13 @@ public class Ed25519Signature2020Android {
 
         // 4. Use the primitive to verify.
         verifier.verify(signature, data);
-        
+
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
         //TODO
     }
-    
+
     /* Google Tink Public Key Format
      * {
    "primaryKeyId":1162504282,
@@ -83,5 +83,5 @@ public class Ed25519Signature2020Android {
    ]
 }
      */
-    
+
 }

@@ -37,11 +37,11 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
         this.id = id;
         this.type = type;
     }
-    
+
     public static final Ed2551VerificationKey2020 reference(URI id) {
         return new Ed2551VerificationKey2020(id);
     }
-    
+
     public static Ed2551VerificationKey2020 from(JsonObject json) throws DataIntegrityError {
 
         // TODO check json object type!
@@ -67,10 +67,10 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     @Override
     public JsonObject toJson() {
         final JsonObjectBuilder builder = Json.createObjectBuilder();
-        toJson(builder);        
+        toJson(builder);
         return builder.build();
     }
-    
+
     protected void toJson(JsonObjectBuilder builder) {
         if (id != null) {
             builder.add(ID, id.toString());
@@ -87,7 +87,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     public URI getId() {
         return id;
     }
-    
+
     @Override
     public String getType() {
         return type;
@@ -96,7 +96,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     public URI getController() {
         return controller;
     }
-    
+
     public void setController(URI controller) {
         this.controller = controller;
     }
@@ -105,7 +105,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     public byte[] getPublicKey() {
         return publicKey;
     }
-    
+
     public void setPublicKey(byte[] publicKey) {
         this.publicKey = publicKey;
     }
@@ -120,7 +120,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
 
         // decode private key
         final byte[] encodedKey = Multibase.decode(privateKeyMultibase);
-        
+
         final Codec codec = Multicodec.codec(Type.Key, encodedKey).orElseThrow(DataIntegrityError::new);
 
         if (expected != codec) {

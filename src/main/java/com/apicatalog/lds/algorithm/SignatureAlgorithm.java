@@ -13,22 +13,22 @@ public interface SignatureAlgorithm {
     boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError;
 
     byte[] sign(byte[] privateKey, byte[] data) throws SigningError;
-    
-    KeyPair keygen( int length);   
-    
+
+    KeyPair keygen( int length);
+
     public class KeyPair {
         byte[] publicKey;
         byte[] privateKey;
-        
+
         public KeyPair(byte[] publicKey, byte[] privateKey) {
             this.publicKey = publicKey;
             this.privateKey = privateKey;
         }
-        
+
         public byte[] getPublicKey() {
             return publicKey;
         }
-        
+
         public byte[] getPrivateKey() {
             return privateKey;
         }
