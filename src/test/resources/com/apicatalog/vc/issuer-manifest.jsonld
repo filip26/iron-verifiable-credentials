@@ -37,7 +37,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "MissingType"
+            "expectErrorCode": "UnknownType"
         },        
         {
             "@id": "#t0003",

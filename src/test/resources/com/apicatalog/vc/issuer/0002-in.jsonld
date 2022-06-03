@@ -16,6 +16,9 @@
       {
         "@id": "https://github.com/filip26/iron-verifiable-credentials/issuer/1"
       }
+    ],
+    "@type": [
+      "https://www.w3.org/2018/credentials#UnVerifiableCredential"
     ]
   }
 ]

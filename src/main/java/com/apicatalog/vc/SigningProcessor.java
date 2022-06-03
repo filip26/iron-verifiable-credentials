@@ -12,6 +12,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.lds.DataIntegrityError;
+import com.apicatalog.lds.DataIntegrityError.Code;
 import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
@@ -148,7 +149,7 @@ public class SigningProcessor {
 
                 // is not expanded JSON-LD object
                 if (!JsonLdUtils.hasTypeDeclaration(object)) {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.MissingType);
                 }
 
                 // is a credential?
@@ -170,7 +171,7 @@ public class SigningProcessor {
 
                 // unknown type
                 } else {
-                    throw new DataIntegrityError();
+                    throw new DataIntegrityError(Code.UnknownType);
                 }
 
                 final JsonObject signed = signature.sign(object, options, keyPair);

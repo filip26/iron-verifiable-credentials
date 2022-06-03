@@ -54,7 +54,7 @@ public class VcTestRunnerJunit {
         assertNotNull(testCase.input);
 
         try {
-            if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VerifyTest")) {
+            if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VeriferTest")) {
 
                 assertEquals(testCase.result != null ? testCase.result : true, Vc.verify(testCase.input).loader(LOADER).isValid());
 
@@ -90,7 +90,7 @@ public class VcTestRunnerJunit {
 
 
             } else {
-                fail("Unknown test execution method");
+                fail("Unknown test execution method: " + testCase.type);
                 return;
             }
 
@@ -116,18 +116,17 @@ public class VcTestRunnerJunit {
 
     final void assertException(final String code, Throwable e) {
 
-        if (isNegative()) {
+        if (!isNegative()) {
             e.printStackTrace();
             fail(e);
             return;
         }
-
         // compare expected exception
         assertEquals(testCase.result, code);
     }
 
     final boolean isNegative() {
-        return testCase.type.stream().noneMatch(o -> o.endsWith("NegativeEvaluationTest"));
+        return testCase.type.stream().anyMatch(o -> o.endsWith("NegativeEvaluationTest"));
     }
 
     public static void write(final VcTestCase testCase, final JsonStructure result, final JsonStructure expected) {
