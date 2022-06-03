@@ -1,6 +1,7 @@
 package com.apicatalog.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -57,7 +58,7 @@ public class VcTestRunnerJunit {
 
                 assertEquals(testCase.result != null ? testCase.result : true, Vc.verify(testCase.input).loader(LOADER).isValid());
 
-            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssueTest")) {
+            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssuerTest")) {
 
                 assertNotNull(testCase.result);
 
@@ -67,8 +68,11 @@ public class VcTestRunnerJunit {
                 options.setVerificationMethod(testCase.verificationMethod);
 
                 JsonObject signed = Vc.sign(testCase.input, testCase.keyPair, options).loader(LOADER).get();
+                
+                assertFalse(isNegative());
+                
                 assertNotNull(signed);
-
+                
 //TODO  getCompacted(context)
 //signed = JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(new StringReader("{\"@context\":[\"https://github.com/filip26/iron-verifiable-credentials/issue/0001-context.jsonld\"]}"))).loader(LOADER).get();
 
@@ -112,7 +116,7 @@ public class VcTestRunnerJunit {
 
     final void assertException(final String code, Throwable e) {
 
-        if (testCase.type.stream().noneMatch(o -> o.endsWith("NegativeEvaluationTest"))) {
+        if (isNegative()) {
             e.printStackTrace();
             fail(e);
             return;
@@ -120,6 +124,10 @@ public class VcTestRunnerJunit {
 
         // compare expected exception
         assertEquals(testCase.result, code);
+    }
+
+    final boolean isNegative() {
+        return testCase.type.stream().noneMatch(o -> o.endsWith("NegativeEvaluationTest"));
     }
 
     public static void write(final VcTestCase testCase, final JsonStructure result, final JsonStructure expected) {

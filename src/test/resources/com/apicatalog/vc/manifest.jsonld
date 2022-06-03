@@ -9,7 +9,7 @@
 	"@type": "mf:Manifest",
 	"name": "Verifiable Credentials Test Suite",
 	"sequence": [
-		"verify-manifest.jsonld",
-		"sign-manifest.jsonld"
+		"verifier-manifest.jsonld",
+		"issuer-manifest.jsonld"
 	]
 }

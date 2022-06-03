@@ -1,0 +1,133 @@
+{
+	"@context": [
+		"context.jsonld",
+		{
+			"@base": "issuer-manifest"
+		}
+	],
+	"@id": "",
+	"@type": "mf:Manifest",
+	"name": "Verifiable Credentials Issuer Test Suite",
+	"sequence": [
+        {
+            "@id": "#t0001",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "missing @type property",
+            "input": "issuer/0001-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "MissingType"
+        },
+        {
+            "@id": "#t0002",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "@type is not VerifiableCredentials",
+            "input": "issuer/0002-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "MissingType"
+        },        
+        {
+            "@id": "#t0003",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "missing issuer property",
+            "input": "issuer/0003-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "MissingIssuer"
+        },
+        {
+            "@id": "#t0004",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "issuer is not IRI",
+            "input": "issuer/0004-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "MissingIssuer"
+        },        
+        {
+            "@id": "#t0005",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "missing issuanceDate property",
+            "input": "issuer/0004-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0005-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "MissingIssuanceDate"
+        },
+        {
+            "@id": "#t0006",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "issuanceDate @type is not XmlDateTime",
+            "input": "issuer/0006-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "InvalidIssuanceDate"
+        },
+        {
+            "@id": "#t0007",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "invalid issuanceDate @value",
+            "input": "issuer/0007-in.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            },
+            "expectErrorCode": "InvalidIssuanceDate"
+        },
+        {
+            "@id": "#t0010",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "a simple credentials to sign",
+            "input": "issuer/0010-in.jsonld",
+            "expect": "issuer/0010-out.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verify/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            }
+        }
+	]
+}

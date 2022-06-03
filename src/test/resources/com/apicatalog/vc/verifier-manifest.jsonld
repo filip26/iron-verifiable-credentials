@@ -2,80 +2,80 @@
 	"@context": [
 		"context.jsonld",
 		{
-			"@base": "verify-manifest"
+			"@base": "verifier-manifest"
 		}
 	],
 	"@id": "",
 	"@type": "mf:Manifest",
-	"name": "Verifiable Credentials Verify Tests",
+	"name": "Verifiable Credentials Verifier Test Suite",
 	"sequence": [
 		{
 			"@id": "#t0001",
 			"@type": [
 				"NegativeEvaluationTest",
-				"VerifyTest"
+				"VeriferTest"
 			],
 			"name": "unknown proof type",
-			"input": "verify/0001-in.jsonld",
+			"input": "verifier/0001-in.jsonld",
 			"expectErrorCode": "UnknownCryptoSuiteType"
 		},
 		{
 			"@id": "#t0002",
 			"@type": [
 				"NegativeEvaluationTest",
-				"VerifyTest"
+				"VeriferTest"
 			],
 			"name": "unknown proof value encoding",
-			"input": "verify/0002-in.jsonld",
+			"input": "verifier/0002-in.jsonld",
 			"expectErrorCode": "InvalidProofValue"
 		},
 		{
 			"@id": "#t0003",
 			"@type": [
 				"NegativeEvaluationTest",
-				"VerifyTest"
+				"VeriferTest"
 			],
 			"name": "missing proof",
-			"input": "verify/0003-in.jsonld",
+			"input": "verifier/0003-in.jsonld",
 		    "expectErrorCode": "MissingProof"
 		},
 		{
 			"@id": "#t0004",
 			"@type": [
 				"NegativeEvaluationTest",
-				"VerifyTest"
+				"VeriferTest"
 			],
 			"name": "invalid proof value length",
-			"input": "verify/0004-in.jsonld",
+			"input": "verifier/0004-in.jsonld",
 			"expectErrorCode": "InvalidProofValueLength"
 		},
 		{
 			"@id": "#t0005",
 			"@type": [
 				"PositiveEvaluationTest",
-				"VerifyTest"
+				"VeriferTest"
 			],
 			"name": "simple valid signed VC",
-			"input": "verify/0005-in.jsonld"
+			"input": "verifier/0005-in.jsonld"
 		},
         {
             "@id": "#t0006",
             "@type": [
                 "PositiveEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "forged credentials subject",
-            "input": "verify/0006-in.jsonld",
+            "input": "verifier/0006-in.jsonld",
             "expect": false
         },
         {
             "@id": "#t0007",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "missing @type property",
-            "input": "verify/0007-in.jsonld",
+            "input": "verifier/0007-in.jsonld",
             "expectErrorCode": "MissingProofType"
 
         },
@@ -83,99 +83,99 @@
             "@id": "#t0008",
             "@type": [
                 "PositiveEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "embedded verification method",
-            "input": "verify/0008-in.jsonld"
+            "input": "verifier/0008-in.jsonld"
         },        
         {
             "@id": "#t0009",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "missing created property",
-            "input": "verify/0009-in.jsonld",
+            "input": "verifier/0009-in.jsonld",
             "expectErrorCode": "MissingCreated"
         },
         {
             "@id": "#t0010",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "invalid created property",
-            "input": "verify/0010-in.jsonld",
+            "input": "verifier/0010-in.jsonld",
             "expectErrorCode": "InvalidCreated"
         },
         {
             "@id": "#t0011",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"                
+                "VeriferTest"                
             ],
             "name": "missing verificationMethod property",
-            "input": "verify/0011-in.jsonld",
+            "input": "verifier/0011-in.jsonld",
             "expectErrorCode": "MissingVerificationMethod"
         },
         {
             "@id": "#t0012",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "invalid verificationMethod property",
-            "input": "verify/0012-in.jsonld",
+            "input": "verifier/0012-in.jsonld",
             "expectErrorCode": "InvalidVerificationMethod"
         },
         {
             "@id": "#t0013",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "missing proofPurpose property",
-            "input": "verify/0013-in.jsonld",
+            "input": "verifier/0013-in.jsonld",
             "expectErrorCode": "MissingProofPurpose"
         },
         {
             "@id": "#t0014",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "invalid proofPurpose property",
-            "input": "verify/0014-in.jsonld",
+            "input": "verifier/0014-in.jsonld",
             "expectErrorCode": "InvalidProofPurpose"
         },
         {
             "@id": "#t0015",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "missing proofValue property",
-            "input": "verify/0015-in.jsonld",
+            "input": "verifier/0015-in.jsonld",
             "expectErrorCode": "MissingProofValue"
         },
         {
             "@id": "#t0016",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "invalid proofValue property",
-            "input": "verify/0016-in.jsonld",
+            "input": "verifier/0016-in.jsonld",
             "expectErrorCode": "InvalidProofValue"
         },
         {
             "@id": "#t0017",
             "@type": [
                 "NegativeEvaluationTest",
-                "VerifyTest"
+                "VeriferTest"
             ],
             "name": "embedded proof is missing",
-            "input": "verify/0017-in.jsonld",
+            "input": "verifier/0017-in.jsonld",
             "expectErrorCode": "MissingProof"
         }     
 	]
