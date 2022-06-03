@@ -4,8 +4,10 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
@@ -19,6 +21,7 @@ import com.apicatalog.lds.proof.ProofOptions;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
 public class SigningProcessor {
 
@@ -107,20 +110,16 @@ public class SigningProcessor {
     private final JsonObject sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataIntegrityError, SigningError {
         try {
             // load the document
-            final JsonArray document = JsonLd.expand(documentLocation).loader(loader).get();
+            final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).get();
 
             // load key pair
-            Document keys = loader.loadDocument(keyPairLocation, new DocumentLoaderOptions());
+            final Document keys = loader.loadDocument(keyPairLocation, new DocumentLoaderOptions());
 
             // TODO keyPair type must match options.type
-            Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(keys.getJsonContent().orElseThrow().asJsonObject()); // FIXME
-
-            LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
-
-            JsonObject signed = signature.sign(document.getJsonObject(0), options, keyPair);
-
-            return signed;
-
+            final Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(keys.getJsonContent().orElseThrow().asJsonObject()); // FIXME
+  
+            return sign(expanded, keyPair, options);
+            
         } catch (JsonLdError e) {
             throw new SigningError(e);
         }
@@ -131,18 +130,56 @@ public class SigningProcessor {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
 
-            // load key pair
-            Document keys = loader.loadDocument(keyPairLocation, new DocumentLoaderOptions());
-
-            LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
-
-            JsonObject signed = signature.sign(expanded.getJsonObject(0), options, keyPair);
-
-            return signed;
+            return sign(expanded, keyPair, options);
 
         } catch (JsonLdError e) {
             throw new SigningError(e);
         }
     }
 
+    private static final JsonObject sign(JsonArray expanded, KeyPair keyPair, ProofOptions options) throws SigningError, DataIntegrityError {
+
+        final LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
+
+        for (final JsonValue item : expanded) {
+            if (JsonUtils.isObject(item)) {
+                
+                final JsonObject object = item.asJsonObject();
+                
+                // is not expanded JSON-LD object
+                if (!JsonLdUtils.hasTypeDeclaration(object)) {
+                    throw new DataIntegrityError();
+                }
+                
+                // is a credential?
+                if (Credential.isCredential(object)) {
+                    
+                    // validate the credential object
+                    final Credential credential = Credential.from(object);
+                    
+                    // is expired? 
+                    if (credential.isExpired()) {
+                        //TODO 
+                        throw new SigningError();
+                    }
+                    
+                // is a presentation?
+                } else if (Presentation.isPresentation(object)) {
+                    // validate the presentation object
+                    //TODO
+                    
+                // unknown type
+                } else {
+                    throw new DataIntegrityError();
+                }
+                
+                final JsonObject signed = signature.sign(object, options, keyPair);
+
+                // take only the first object - TODO
+                return signed;        
+
+            }
+        }
+        throw new DataIntegrityError();     // malformed input, not single object to sign has been found
+    }
 }
