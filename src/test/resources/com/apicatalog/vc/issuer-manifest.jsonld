@@ -60,7 +60,7 @@
                 "NegativeEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "issuer muset be IRI",
+            "name": "issuer must be IRI",
             "input": "issuer/0004-in.jsonld",
             "options": {
                 "keyPair": "issuer/0001-keys.json",
@@ -76,9 +76,9 @@
                 "IssuerTest"
             ],
             "name": "missing issuanceDate property",
-            "input": "issuer/0004-in.jsonld",
+            "input": "issuer/0005-in.jsonld",
             "options": {
-                "keyPair": "issuer/0005-keys.json",
+                "keyPair": "issuer/0001-keys.json",
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
@@ -181,8 +181,8 @@
                 "IssuerTest"
             ],
             "name": "a simple credentials to sign",
-            "input": "issuer/0010-in.jsonld",
-            "expect": "issuer/0010-out.jsonld",
+            "input": "issuer/0020-in.jsonld",
+            "expect": "issuer/0020-out.jsonld",
             "options": {
                 "keyPair": "issuer/0001-keys.json",
                 "verificationMethod": "verify/0005-verification-key.json",

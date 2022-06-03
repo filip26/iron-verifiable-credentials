@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Objects;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
@@ -121,6 +122,11 @@ public class VcTestRunnerJunit {
             fail(e);
             return;
         }
+        
+        if (!Objects.equals(testCase.result, code)) {
+            e.printStackTrace();
+        }
+
         // compare expected exception
         assertEquals(testCase.result, code);
     }
