@@ -1,5 +1,6 @@
 package com.apicatalog.vc;
 
+import java.net.URI;
 import java.time.Instant;
 
 import com.apicatalog.jsonld.JsonLdUtils;
@@ -18,6 +19,8 @@ public class Credential {
     public static final String EXPIRATION_DATE = "https://www.w3.org/2018/credentials#expirationDate";
     public static final String CREDENTIAL_STATUS = "https://www.w3.org/2018/credentials#credentialStatus";
 
+    private URI issuer;
+    
     private Instant issuance;
     
     private Instant expiration;
@@ -57,12 +60,20 @@ public class Credential {
         if (!object.containsKey(ISSUER)) {
             throw new DataIntegrityError(Code.MissingIssuer);
         }
+        
+        credential.issuer = JsonLdUtils
+                                .getId(object.get(ISSUER))
+                                .orElseThrow(() -> new DataIntegrityError(Code.InvalidIssuer));
+
+        if (!object.containsKey(ISSUANCE_DATE)) {
+            throw new DataIntegrityError(Code.MissingIssuanceDate);
+        }
 
         credential.issuance = JsonLdUtils
-                                    .getDateTime(object.get(ISSUANCE_DATE))
-                                    .orElseThrow(() -> new DataIntegrityError(Code.MissingIssuanceDate));
+                                    .getXsdDateTime(object.get(ISSUANCE_DATE))
+                                    .orElseThrow(() -> new DataIntegrityError(Code.InvalidIssuanceDate));
         
-        credential.expiration = JsonLdUtils.getDateTime(object.get(EXPIRATION_DATE)).orElse(null);
+        credential.expiration = JsonLdUtils.getXsdDateTime(object.get(EXPIRATION_DATE)).orElse(null);
         
         //TODO
         return credential;
@@ -73,9 +84,8 @@ public class Credential {
      * see {@link https://www.w3.org/TR/vc-data-model/#issuer}
      * @return
      */
-    public String getIssuer() {
-        //TODO
-        return null;
+    public URI getIssuer() {
+        return issuer;
     }
 
     /**

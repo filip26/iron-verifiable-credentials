@@ -67,7 +67,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "MissingIssuer"
+            "expectErrorCode": "InvalidIssuer"
         },        
         {
             "@id": "#t0005",
