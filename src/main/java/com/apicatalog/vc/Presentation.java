@@ -4,7 +4,7 @@ import com.apicatalog.jsonld.json.JsonUtils;
 
 import jakarta.json.JsonValue;
 
-public class Presentation {
+public class Presentation implements Verifiable {
 
     public static final String TYPE_VALUE = "https://www.w3.org/2018/credentials#VerifiablePresentation";
 
@@ -16,4 +16,13 @@ public class Presentation {
         return JsonUtils.isObject(value) && JsonLdUtils.isTypeOf(TYPE_VALUE, value.asJsonObject());
     }
 
+    @Override
+    public boolean isPresentation() {
+        return true;
+    }
+    
+    @Override
+    public Presentation asPresentation() {
+        return this;
+    }
 }

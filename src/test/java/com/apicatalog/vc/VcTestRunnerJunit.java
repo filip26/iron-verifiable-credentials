@@ -23,6 +23,8 @@ import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519ProofOptions2020;
+import com.apicatalog.vc.api.IssuerApi;
+import com.apicatalog.vc.api.Vc;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -76,7 +78,7 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create("https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json");
                 }
 
-                SigningProcessor issuer = Vc.sign(testCase.input, keyPairLocation, options).loader(LOADER);
+                IssuerApi issuer = Vc.sign(testCase.input, keyPairLocation, options).loader(LOADER);
 
                 JsonObject signed = null;
 

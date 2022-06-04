@@ -1,14 +1,20 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.api;
 
 import java.net.URI;
 
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.lds.DataError;
+import com.apicatalog.lds.DataError.ErrorType;
 import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.proof.ProofOptions;
+import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.JsonLdUtils;
+import com.apicatalog.vc.Presentation;
+import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonObject;
 
@@ -25,8 +31,8 @@ public final class Vc {
      * @throws DataError
      * @throws VerificationError
      */
-    public static VerificationProcessor verify(URI location) throws DataError, VerificationError {
-        return new VerificationProcessor(location);
+    public static VerifierApi verify(URI location) throws DataError, VerificationError {
+        return new VerifierApi(location);
     }
 
     /**
@@ -36,8 +42,8 @@ public final class Vc {
      * @throws DataError
      * @throws VerificationError
      */
-    public static VerificationProcessor verify(JsonObject document) throws DataError, VerificationError {
-        return new VerificationProcessor(document);
+    public static VerifierApi verify(JsonObject document) throws DataError, VerificationError {
+        return new VerifierApi(document);
     }
 
     /**
@@ -50,8 +56,8 @@ public final class Vc {
      * @throws DataError
      * @throws VerificationError
      */
-    public static SigningProcessor sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataError, SigningError {
-        return new SigningProcessor(documentLocation, keyPairLocation, options);
+    public static IssuerApi sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataError, SigningError {
+        return new IssuerApi(documentLocation, keyPairLocation, options);
     }
 
     /**
@@ -64,8 +70,8 @@ public final class Vc {
      * @throws DataError
      * @throws VerificationError
      */
-    public static SigningProcessor sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
-        return new SigningProcessor(document, keyPair, options);
+    public static IssuerApi sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
+        return new IssuerApi(document, keyPair, options);
     }
 
     /**
@@ -82,6 +88,32 @@ public final class Vc {
         final LinkedDataSignature lds = new LinkedDataSignature(new Ed25519Signature2020());
 
         return lds.keygen(256); //FIXME
+    }
+    
+    protected static Verifiable get(JsonObject expanded) throws DataError {
+
+        // is a credential?
+        if (Credential.isCredential(expanded)) {
+
+            final JsonObject object = expanded.asJsonObject();
+
+            // validate the credential object
+            final Credential credential = Credential.from(object);
+
+            return credential;
+        }
+
+        // is a presentation?
+        if (Presentation.isPresentation(expanded)) {
+            // validate the presentation object
+            //TODO
+        }
+
+        // is not expanded JSON-LD object
+        if (!JsonLdUtils.hasType(expanded)) {
+            throw new DataError(ErrorType.Missing, Keywords.TYPE);
+        }
+        throw new DataError(ErrorType.Unknown, Keywords.TYPE);
     }
 
 }

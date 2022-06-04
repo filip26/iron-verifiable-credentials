@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.api;
 
 import java.net.URI;
 
@@ -17,33 +17,35 @@ import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
+import com.apicatalog.vc.StaticContextLoader;
+import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class VerificationProcessor {
+public final class VerifierApi {
 
     private final URI location;
     private final JsonObject document;
     private DocumentLoader loader = null;
 
-    protected VerificationProcessor(URI location) {
+    protected VerifierApi(URI location) {
         this.location = location;
         this.document = null;
     }
 
-    protected VerificationProcessor(JsonObject document) {
+    protected VerifierApi(JsonObject document) {
         this.document = document;
         this.location = null;
     }
 
-    public VerificationProcessor loader(DocumentLoader loader) {
+    public VerifierApi loader(DocumentLoader loader) {
         this.loader = loader;
         return this;
     }
 
-    public VerificationProcessor useBundledContexts(boolean buildedContexts) {
+    public VerifierApi useBundledContexts(boolean buildedContexts) {
         //TOOD
         return this;
     }
@@ -110,9 +112,10 @@ public class VerificationProcessor {
     private static boolean verifyExpanded(JsonObject expanded, DocumentLoader loader) throws DataError, VerificationError {
 
         // data integrity checks
-        final Credential credential = Credential.from(expanded);
+        final Verifiable verifiable = Vc.get(expanded);
 
-        if (credential.isExpired()) {
+        // is expired?
+        if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
             throw new VerificationError(Code.Expired);
         }
 

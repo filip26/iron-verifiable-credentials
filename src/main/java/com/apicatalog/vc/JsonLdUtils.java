@@ -141,4 +141,18 @@ public class JsonLdUtils {
 
         return Optional.ofNullable(value);
     }
+    
+    public static Optional<JsonObject> findFirstObject(JsonValue expanded) {
+        if (JsonUtils.isArray(expanded)) {
+            for (JsonValue item : expanded.asJsonArray()) {
+                if (JsonUtils.isObject(item)) {
+                    return Optional.of(item.asJsonObject());
+                }
+            }
+        } else if (JsonUtils.isObject(expanded)) {
+            return Optional.of(expanded.asJsonObject());
+        }
+
+        return Optional.empty();
+    }
 }
