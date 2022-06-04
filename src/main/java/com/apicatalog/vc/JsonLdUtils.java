@@ -118,13 +118,14 @@ public class JsonLdUtils {
                     .orElse(false);
     }
 
-    public static boolean hasProperty(JsonObject object, String schema, String property) {
-        return object.containsKey(schema + property) || object.containsKey(property);
+    public static boolean hasProperty(JsonObject object, String base, String property) {
+        return object.containsKey(base + property) || object.containsKey(property);
     }
 
-    public static Optional<JsonValue> getProperty(JsonObject object, String schema, String property) {
+    public static Optional<JsonValue> getProperty(JsonObject object, String base, String property) {
         
-        JsonValue value = object.get(schema + property);
+        final JsonValue value = object.get(base + property);
+        
         if (value == null) {
             object.get(property);
         }

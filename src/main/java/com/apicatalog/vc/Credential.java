@@ -17,7 +17,7 @@ import jakarta.json.JsonValue;
  */
 public class Credential {
 
-    public static final String SCHEMA = "https://www.w3.org/2018/credentials#";
+    public static final String BASE = "https://www.w3.org/2018/credentials#";
     
     public static final String TYPE = "VerifiableCredential";
 
@@ -40,7 +40,7 @@ public class Credential {
         if (value == null) {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
-        return JsonUtils.isObject(value) && JsonLdUtils.isTypeOf(TYPE, value.asJsonObject());
+        return JsonUtils.isObject(value) && JsonLdUtils.isTypeOf(BASE + TYPE, value.asJsonObject());
     }
 
     public static Credential from(JsonObject object) throws DataIntegrityError {
@@ -50,12 +50,13 @@ public class Credential {
         }
 
         final Credential credential = new Credential(); 
-        
-        if (!JsonLdUtils.hasType(object)) {
-            throw new DataIntegrityError(ErrorType.Missing, Keywords.TYPE);
-        }
-        
-        if (!JsonLdUtils.isTypeOf(TYPE, object)) {
+
+        if (!JsonLdUtils.isTypeOf(BASE + TYPE, object)) {
+
+            if (!JsonLdUtils.hasType(object)) {
+                throw new DataIntegrityError(ErrorType.Missing, Keywords.TYPE);
+            }
+
             throw new DataIntegrityError(ErrorType.Unknown, Keywords.TYPE);
         }
 
@@ -93,11 +94,11 @@ public class Credential {
     }
     
     protected static boolean hasProperty(JsonObject object, String property) {
-        return JsonLdUtils.hasProperty(object, SCHEMA, property);
+        return JsonLdUtils.hasProperty(object, BASE, property);
     }
     
     protected static JsonValue getProperty(JsonObject object, String property) {
-        return JsonLdUtils.getProperty(object, SCHEMA, property).orElse(null);  //TODO throw something
+        return JsonLdUtils.getProperty(object, BASE, property).orElse(null);  //TODO throw something
     }
         
     /**
