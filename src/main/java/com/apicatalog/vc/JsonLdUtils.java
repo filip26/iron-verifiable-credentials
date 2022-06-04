@@ -18,7 +18,7 @@ import jakarta.json.JsonValue;
 public class JsonLdUtils {
 
     static final String XSD_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
-    
+
     protected JsonLdUtils() {}
 
     /**
@@ -57,59 +57,59 @@ public class JsonLdUtils {
         if (value == null) {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
-        
+
         for (final JsonValue item : JsonUtils.toJsonArray(value)) {
-            
+
             if (!ValueObject.isValueObject(item) || !isTypeOf(XSD_DATE_TIME, item.asJsonObject())) {
                 continue;
             }
-            
-            
+
+
             final Optional<JsonValue> datetimeValue = ValueObject.getValue(item);
-            
+
             if (datetimeValue.isPresent()) {
 
                 if (JsonUtils.isNotString(datetimeValue.get()) /*TODO validate format ...Z */) {
                     //TODO exception
                 }
-                
+
                 try {
                     final Instant datetitme = Instant.parse(((JsonString)datetimeValue.get()).getString());
-    
+
                     // consider only the first item
                     return Optional.of(datetitme);
-                    
+
                 } catch (DateTimeParseException e) {
                     // invalid date time format
                 }
             }
-    
+
         }
-                
+
         return Optional.empty();
     }
-    
+
     public static final Optional<URI> getId(JsonValue value) {
 
         if (JsonUtils.isArray(value)) {
             // consider only the first item
-            value = value.asJsonArray().get(0); 
+            value = value.asJsonArray().get(0);
         }
 
         if (JsonUtils.isObject(value)) {
             value = value.asJsonObject().get(Keywords.ID);
         }
-        
+
         if (JsonUtils.isString(value)) {
-            
+
             final String id = ((JsonString)value).getString();
-            
+
             if (UriUtils.isURI(id)) {
                 return Optional.of(URI.create(id));
             }
 
         }
-        
+
         return Optional.empty();
     }
 
@@ -122,7 +122,7 @@ public class JsonLdUtils {
                     .findAny()
                     .orElse(false);
     }
-    
+
     public static boolean hasProperty(JsonObject object, String property) {
         return object.containsKey(property);
     }
@@ -132,13 +132,13 @@ public class JsonLdUtils {
     }
 
     public static Optional<JsonValue> getProperty(JsonObject object, String base, String property) {
-        
+
         JsonValue value = object.get(base + property);
-        
+
         if (value == null) {
             value = object.get(property);
         }
 
-        return Optional.ofNullable(value); 
+        return Optional.ofNullable(value);
     }
 }

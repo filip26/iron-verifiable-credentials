@@ -111,7 +111,7 @@ public class VerificationProcessor {
 
         // data integrity checks
         final Credential credential = Credential.from(expanded);
-        
+
         if (credential.isExpired()) {
             throw new VerificationError(Code.Expired);
         }

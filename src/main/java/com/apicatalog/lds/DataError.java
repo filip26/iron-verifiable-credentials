@@ -13,21 +13,21 @@ public class DataError extends Throwable {
     private final ErrorType type;
     private final String subject;
     private final String[] attibutes;
-    
+
     @Deprecated
     public DataError() {
         this.type = null;
         this.subject = null;
-        this.attibutes = null;        
+        this.attibutes = null;
     }
 
-    
+
     @Deprecated
     public DataError(Throwable e) {
         super(e);
         this.type = null;
         this.subject = null;
-        this.attibutes = null;        
+        this.attibutes = null;
     }
 
     public DataError(ErrorType type, String subject) {
@@ -36,7 +36,7 @@ public class DataError extends Throwable {
         this.subject = subject;
         this.attibutes = null;
     }
-    
+
     public DataError(ErrorType type, String subject, String... attributes) {
         super();
         this.type = type;
@@ -47,11 +47,11 @@ public class DataError extends Throwable {
     public ErrorType getType() {
         return type;
     }
-    
+
     public String getSubject() {
         return subject;
     }
-    
+
     public String[] getAttibutes() {
         return attibutes;
     }

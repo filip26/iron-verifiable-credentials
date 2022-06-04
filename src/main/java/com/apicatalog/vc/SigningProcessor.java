@@ -148,7 +148,7 @@ public class SigningProcessor {
             if (Credential.isCredential(item)) {
 
                 final JsonObject object = item.asJsonObject();
-                
+
                 // validate the credential object
                 final Credential credential = Credential.from(object);
 
@@ -162,13 +162,13 @@ public class SigningProcessor {
                 // take only the first object
                 return signed;
             }
-            
+
             // is a presentation?
             if (Presentation.isPresentation(item)) {
                 // validate the presentation object
                 //TODO
             }
-            
+
             // unknown or non-existent type
 
             // is not expanded JSON-LD object

@@ -10,7 +10,7 @@ import jakarta.json.JsonObject;
 public class VerificationMethodReference implements VerificationMethod {
 
     private final URI id;
-    
+
     public VerificationMethodReference(URI id) {
         this.id = id;
     }

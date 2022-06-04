@@ -48,9 +48,9 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     public static Ed2551VerificationKey2020 from(JsonObject json) throws DataError {
 
         // TODO check json object type!
-        
+
         URI id =  JsonLdUtils.getId(json).orElse(null);
-        
+
         final Ed2551VerificationKey2020 key = new Ed2551VerificationKey2020(id);
 
         return from(key, json);
@@ -59,28 +59,28 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     protected static final <T extends Ed2551VerificationKey2020> T from(T key, JsonObject json) throws DataError {
 
         // TODO check type key.type = json.getString(TYPE);
-        
+
         // controller
         JsonLdUtils.getProperty(json, BASE, CONTROLLER)
             .ifPresent(controller -> {
-                
+
                 if (JsonUtils.isArray(controller)) {
                     controller = controller.asJsonArray().get(0);
                 }
-                
+
                 JsonLdUtils.getId(controller)
                     .ifPresent(id -> {
                         key.controller = id;
                     });
             });
-                
+
         // public key
         if (JsonLdUtils.hasProperty(json, BASE, PUBLIC_KEY_MULTIBASE)) {
             key.publicKey = getKey(json, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
-    
+
             // verify verification key length - TODO needs to be clarified
-            if (key.publicKey != null 
-                    && key.publicKey.length != 32 
+            if (key.publicKey != null
+                    && key.publicKey.length != 32
                     && key.publicKey.length != 57
                     && key.publicKey.length != 114
                     ) {
@@ -93,7 +93,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     @Override
     public JsonObject toJson() {
         final JsonObjectBuilder builder = Json.createObjectBuilder();
-        
+
         toJson(builder);
         return builder.build();
     }
@@ -105,8 +105,8 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
         builder.add(Keywords.TYPE, type);
 
         if (controller != null) {
-            builder.add(BASE + CONTROLLER, 
-                    Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, 
+            builder.add(BASE + CONTROLLER,
+                    Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID,
                     controller.toString())));
         }
 
@@ -141,7 +141,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
 
     static byte[] getKey(JsonObject json, String property, Codec expected) throws DataError {
         JsonValue key = JsonLdUtils.getProperty(json, BASE, property).orElseThrow(DataError::new);    //FIXME
-        
+
         if (JsonUtils.isArray(key)) {
             key = key.asJsonArray().get(0);
         }
@@ -149,11 +149,11 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
         if (!ValueObject.isValueObject(key)) {
             throw new DataError();
         }
-        
+
         if (!JsonLdUtils.isTypeOf(PUBLIC_KEY_TYPE, key.asJsonObject())) {
             throw new DataError();
         }
-        
+
         final String privateKeyMultibase = ValueObject.getValue(key)
                 .filter(JsonUtils::isString)
                 .map(JsonString.class::cast)
@@ -182,7 +182,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
 
         final String multibase = Multibase.encode(Algorithm.Base58Btc, encoded);
 
-        builder.add(property, 
+        builder.add(property,
                 Json.createArrayBuilder().add(
                         Json.createObjectBuilder()
                             .add(Keywords.TYPE, "https://w3id.org/security#multibase")

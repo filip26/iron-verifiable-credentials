@@ -311,7 +311,7 @@ public class EmbeddedProof implements Proof {
     }
 
     public JsonObject toJson() {
-        
+
         final JsonObjectBuilder root = Json.createObjectBuilder().add(Keywords.TYPE, Json.createArrayBuilder().add(type));
 
         if (verificationMethod != null) {
@@ -319,7 +319,7 @@ public class EmbeddedProof implements Proof {
                     Json.createArrayBuilder()
                             .add(verificationMethod.toJson()));
         }
-        
+
         if (created != null) {
             root.add(CREATED,
                     Json.createArrayBuilder()
@@ -334,8 +334,8 @@ public class EmbeddedProof implements Proof {
                                 "https://w3id.org/security#assertionMethod")));  //FIXME configurable
         // TODO domain to proof
 
-        
-        return root.build(); 
+
+        return root.build();
     }
 
     public static JsonObject setProof(JsonObject document, JsonObject proof, String proofValue) {

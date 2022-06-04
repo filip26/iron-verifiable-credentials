@@ -92,7 +92,7 @@ public class VcTestCase {
             if (JsonLdUtils.isTypeOf("https://w3id.org/security#Ed25519VerificationKey2020", method)) {
                 try {
                     testCase.verificationMethod = Ed2551VerificationKey2020.from(method);
-                    
+
                 } catch (DataError e) {
                     fail(e);
                 }

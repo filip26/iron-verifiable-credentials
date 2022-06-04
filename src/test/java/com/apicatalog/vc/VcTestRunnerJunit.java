@@ -70,28 +70,28 @@ public class VcTestRunnerJunit {
                 options.setVerificationMethod(testCase.verificationMethod);
 
                 URI keyPairLocation = testCase.keyPair;
-                
+
                 if (keyPairLocation == null) {
                     // set dummy key pair
                     keyPairLocation = URI.create("https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json");
                 }
-                
+
                 SigningProcessor issuer = Vc.sign(testCase.input, keyPairLocation, options).loader(LOADER);
-                
+
                 JsonObject signed = null;
-                
+
                 if (testCase.context != null) {
-                    
+
                     signed = issuer.getCompacted(testCase.context);
-                    
+
                 } else {
-                    signed = issuer.get();    
+                    signed = issuer.get();
                 }
-                
+
                 assertFalse(isNegative(), "Expected error " + testCase.result);
-                
+
                 assertNotNull(signed);
-                
+
 //TODO  getCompacted(context)
 //signed = JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(new StringReader("{\"@context\":[\"https://github.com/filip26/iron-verifiable-credentials/issue/0001-context.jsonld\"]}"))).loader(LOADER).get();
 
@@ -132,27 +132,27 @@ public class VcTestRunnerJunit {
             fail(e);
         }
     }
-    
+
     final static String toCode(DataError e) {
         final StringBuilder sb = new StringBuilder();
         if (e.getType() != null) {
             sb.append(e.getType().name());
         }
         if (e.getSubject() != null) {
-            
+
             int index = (e.getSubject().startsWith("@")) ? 1 : 0;
-            
+
             sb.append(Character.toUpperCase(e.getSubject().charAt(index)));
             sb.append(e.getSubject().substring(index + 1));
         }
         if (e.getAttibutes() != null) {
-            
+
             Arrays.stream(e.getAttibutes())
                 .forEach(attribute -> {
                     int index = (attribute.startsWith("@")) ? 1 : 0;
-                    
+
                     sb.append(Character.toUpperCase(attribute.charAt(index)));
-                    sb.append(attribute.substring(index + 1));    
+                    sb.append(attribute.substring(index + 1));
                 });
         }
         return sb.toString();
@@ -165,7 +165,7 @@ public class VcTestRunnerJunit {
             fail(e);
             return;
         }
-        
+
         if (!Objects.equals(testCase.result, code)) {
             e.printStackTrace();
         }
