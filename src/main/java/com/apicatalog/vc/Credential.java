@@ -72,14 +72,12 @@ public class Credential {
                                 .getId(getProperty(object, ISSUER))
                                 .orElseThrow(() -> new DataIntegrityError(ErrorType.Invalid, ISSUER, Keywords.ID));
 
-        if (!hasProperty(object, ISSUANCE_DATE)) {
-            throw new DataIntegrityError(ErrorType.Missing, ISSUANCE_DATE);
-        }
-        
         if (!JsonLdUtils.isXsdDateTime(getProperty(object, ISSUANCE_DATE))) {
             
+            if (!hasProperty(object, ISSUANCE_DATE)) {
+                throw new DataIntegrityError(ErrorType.Missing, ISSUANCE_DATE);
+            }
             
-            System.out.println(">>>> " + object);
             throw new DataIntegrityError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.TYPE);
         }
 
@@ -89,7 +87,12 @@ public class Credential {
         
         if (hasProperty(object, EXPIRATION_DATE)) {
             credential.expiration = JsonLdUtils.getXsdDateTime(getProperty(object, EXPIRATION_DATE))
-                    .orElseThrow(() -> new DataIntegrityError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.VALUE));
+                    .orElseThrow(() -> {
+                        if (!JsonLdUtils.isXsdDateTime(getProperty(object, EXPIRATION_DATE))) {
+                            return new DataIntegrityError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.TYPE);
+                        }
+                        return new DataIntegrityError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.VALUE);
+                    });
         }
         
         //TODO
@@ -138,7 +141,7 @@ public class Credential {
     }
 
     public boolean isExpired() {
-        return expiration != null && expiration.isAfter(Instant.now());
+        return expiration != null && expiration.isBefore(Instant.now());
     }
 
 }

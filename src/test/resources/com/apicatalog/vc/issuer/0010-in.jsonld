@@ -14,8 +14,8 @@
     ],
     "https://www.w3.org/2018/credentials#expirationDate": [
       {
-        "@type": "http://www.w3.org/2001/XMLSchema#date",
-        "@value": "2022-06-04"
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+        "@value": "2022-06-01T00:00:00Z"
       }
     ],
     "https://www.w3.org/2018/credentials#issuer": [

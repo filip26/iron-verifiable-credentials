@@ -12,6 +12,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.lds.DataIntegrityError;
 import com.apicatalog.lds.DataIntegrityError.ErrorType;
+import com.apicatalog.lds.SigningError.Code;
 import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
@@ -153,8 +154,7 @@ public class SigningProcessor {
 
                 // is expired?
                 if (credential.isExpired()) {
-                    //TODO
-                    throw new SigningError();
+                    throw new SigningError(Code.Expired);
                 }
 
                 final JsonObject signed = signature.sign(object, options, keyPair);
