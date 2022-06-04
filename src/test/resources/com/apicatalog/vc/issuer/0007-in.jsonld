@@ -8,7 +8,7 @@
     "@id": "https://apicatalog/com/vc/test-credentials#0001",
     "https://www.w3.org/2018/credentials#issuanceDate": [
       {
-        "@type": "http://www.w3.org/2001/XMLSchema#datetime",
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
         "@value": "2022-06-03"
       }
     ],

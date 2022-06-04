@@ -2,6 +2,7 @@ package com.apicatalog.vc;
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 import com.apicatalog.jsonld.StringUtils;
@@ -73,10 +74,15 @@ public class JsonLdUtils {
                     //TODO exception
                 }
                 
-                final Instant datetitme = Instant.parse(((JsonString)datetimeValue.get()).getString());
-
-                // consider only the first item
-                return Optional.of(datetitme);
+                try {
+                    final Instant datetitme = Instant.parse(((JsonString)datetimeValue.get()).getString());
+    
+                    // consider only the first item
+                    return Optional.of(datetitme);
+                    
+                } catch (DateTimeParseException e) {
+                    // invalid date time format
+                }
             }
     
         }
@@ -84,7 +90,7 @@ public class JsonLdUtils {
         return Optional.empty();
     }
     
-    public static final Optional<URI> getId(JsonValue value) throws DataIntegrityError {
+    public static final Optional<URI> getId(JsonValue value) {
 
         if (JsonUtils.isArray(value)) {
             // consider only the first item
@@ -102,7 +108,7 @@ public class JsonLdUtils {
             if (UriUtils.isURI(id)) {
                 return Optional.of(URI.create(id));
             }
-            throw new DataIntegrityError();
+
         }
         
         return Optional.empty();

@@ -77,6 +77,9 @@ public class Credential {
         }
         
         if (!JsonLdUtils.isXsdDateTime(getProperty(object, ISSUANCE_DATE))) {
+            
+            
+            System.out.println(">>>> " + object);
             throw new DataIntegrityError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.TYPE);
         }
 
