@@ -34,6 +34,8 @@ public class Credential {
     
     private Instant expiration;
     
+    private CredentialStatus status;
+    
     protected Credential() {}
 
     public static boolean isCredential(JsonValue value) {
@@ -64,6 +66,7 @@ public class Credential {
             throw new DataIntegrityError(ErrorType.Missing, SUBJECT);
         }
 
+        // issuer
         if (!hasProperty(object, ISSUER)) {
             throw new DataIntegrityError(ErrorType.Missing, ISSUER);
         }
@@ -72,6 +75,7 @@ public class Credential {
                                 .getId(getProperty(object, ISSUER))
                                 .orElseThrow(() -> new DataIntegrityError(ErrorType.Invalid, ISSUER, Keywords.ID));
 
+        // issuance date
         if (!JsonLdUtils.isXsdDateTime(getProperty(object, ISSUANCE_DATE))) {
             
             if (!hasProperty(object, ISSUANCE_DATE)) {
@@ -85,6 +89,7 @@ public class Credential {
                                     .getXsdDateTime(getProperty(object, ISSUANCE_DATE))
                                     .orElseThrow(() -> new DataIntegrityError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.VALUE));
         
+        // expiration date
         if (hasProperty(object, EXPIRATION_DATE)) {
             credential.expiration = JsonLdUtils.getXsdDateTime(getProperty(object, EXPIRATION_DATE))
                     .orElseThrow(() -> {
@@ -93,6 +98,14 @@ public class Credential {
                         }
                         return new DataIntegrityError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.VALUE);
                     });
+        }
+        
+        // status
+        if (hasProperty(object, CREDENTIAL_STATUS)) {
+            for (final JsonValue status : JsonUtils.toJsonArray(getProperty(object, CREDENTIAL_STATUS))) {
+                credential.status = CredentialStatus.from(status);
+                break;
+            }
         }
         
         //TODO
@@ -140,8 +153,20 @@ public class Credential {
         return expiration;
     }
 
+    /**
+     * Checks if the credential is expired.
+     * 
+     * @return <code>true</code> if the credential is expired
+     */
     public boolean isExpired() {
         return expiration != null && expiration.isBefore(Instant.now());
     }
 
+    /**
+     * see {@link https://www.w3.org/TR/vc-data-model/#status}
+     * @return
+     */
+    public CredentialStatus getCredentialStatus() {
+        return status;
+    }
 }

@@ -161,7 +161,6 @@ public class SigningProcessor {
 
                 // take only the first object
                 return signed;
-
             }
             
             // is a presentation?

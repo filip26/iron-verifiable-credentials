@@ -115,7 +115,7 @@
                 "NegativeEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "miasing credentialStatus @id",
+            "name": "missing credentialStatus @id",
             "input": "issuer/0011-in.jsonld",
             "expectErrorCode": "MissingStatusId"
         },
@@ -125,19 +125,9 @@
                 "NegativeEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "miasing credentialStatus @type",
+            "name": "missing credentialStatus @type",
             "input": "issuer/0012-in.jsonld",
-            "expectErrorCode": "InvalidStatusType"
-        },
-        {
-            "@id": "#t0013",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "credentialStatus @id must be IRI",
-            "input": "issuer/0013-in.jsonld",
-            "expectErrorCode": "InvalidStatusId"
+            "expectErrorCode": "MissingStatusType"
         },
         {
             "@id": "#t0020",

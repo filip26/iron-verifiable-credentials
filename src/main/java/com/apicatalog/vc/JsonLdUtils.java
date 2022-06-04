@@ -10,7 +10,6 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.uri.UriUtils;
-import com.apicatalog.lds.DataIntegrityError;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -122,6 +121,10 @@ public class JsonLdUtils {
                     .map(o -> isTypeOf(XSD_DATE_TIME, o))
                     .findAny()
                     .orElse(false);
+    }
+    
+    public static boolean hasProperty(JsonObject object, String property) {
+        return object.containsKey(property);
     }
 
     public static boolean hasProperty(JsonObject object, String base, String property) {
