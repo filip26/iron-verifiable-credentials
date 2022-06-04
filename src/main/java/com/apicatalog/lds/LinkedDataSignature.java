@@ -23,21 +23,21 @@ public class LinkedDataSignature {
 
     /**
      * Verifies the given signed VC/VP document.
-     * 
+     *
      * see
      * {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm}
-     * 
+     *
      * @param document unsigned VC/VP document
      * @param verificationKey
      * @param signature
      * @return <code>true</code> if the document has been successfully verified
      */
     public boolean verify(final JsonObject document, final VerificationKey verificationKey, final byte[] signature) throws VerificationError {
-        
+
         if (verificationKey == null || verificationKey.getPublicKey() == null) {
             throw new VerificationError();
         }
-        
+
        // proof as JSON
        JsonObject proof = document.getJsonArray(EmbeddedProof.PROOF).getJsonObject(0);  //FIXME consider multiple proofs
 
@@ -47,10 +47,10 @@ public class LinkedDataSignature {
        }
 
        proof = Json.createObjectBuilder(proof).remove(EmbeddedProof.PROOF_VALUE).build();
-              
+
        // remove proof
        JsonObject data = Json.createObjectBuilder(document).remove("https://w3id.org/security#proof").build();
-      
+
        byte[] computeSignature = hashCode(data, proof);
 
        return suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
@@ -58,9 +58,9 @@ public class LinkedDataSignature {
 
     /**
      * Issues the given VC/VP document and returns the document signature.
-     * 
+     *
      * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm}
-     * 
+     *
      * @param document
      * @param options
      * @param keyPair
@@ -84,10 +84,10 @@ public class LinkedDataSignature {
     }
 
     /**
-     * 
+     *
      * see
      * {@link https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}
-     * 
+     *
      * @param document
      * @param proof
      * @return
@@ -111,7 +111,7 @@ public class LinkedDataSignature {
     public KeyPair keygen(int length) {
 
         com.apicatalog.lds.algorithm.SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
-        
+
         Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(null); //FIXME
         kp.setPublicKey(keyPair.getPublicKey());
         kp.setPrivateKey(keyPair.getPrivateKey());

@@ -7,8 +7,8 @@ import com.apicatalog.lds.primitive.Urdna2015;
 
 public class Ed25519Signature2020 extends SignatureSuite {
 
-    public static final String TYPE = "https://w3id.org/security#Ed25519Signature2020"; 
-    
+    public static final String TYPE = "https://w3id.org/security#Ed25519Signature2020";
+
     public Ed25519Signature2020() {
         super(
             TYPE,

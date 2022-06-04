@@ -43,25 +43,25 @@ public class TinkSignature implements SignatureAlgorithm {
             throw new SigningError(e);
         }
     }
-    
+
     @Override
     public KeyPair keygen(int length) {
 
         try {
             Ed25519Sign.KeyPair kp = Ed25519Sign.KeyPair.newKeyPair();
-            
+
             byte[] privateKey = kp.getPrivateKey();
             byte[] publicKey = kp.getPublicKey();
 
             return new KeyPair(publicKey, privateKey);
-            
+
         } catch (GeneralSecurityException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         //TODO
         return null;
-        
+
     }
 }

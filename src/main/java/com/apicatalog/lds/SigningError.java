@@ -6,8 +6,9 @@ public class SigningError extends Throwable {
 
     public enum Code {
         Unknown,
+        Expired,
     }
-    
+
     private Code code;
 
     public SigningError() {
@@ -27,7 +28,7 @@ public class SigningError extends Throwable {
         super(e);
         this.code = code;
     }
-    
+
     public Code getCode() {
         return code;
     }

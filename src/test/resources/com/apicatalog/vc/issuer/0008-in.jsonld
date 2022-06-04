@@ -1,0 +1,30 @@
+[
+  {
+    "https://www.w3.org/2018/credentials#credentialSubject": [
+      {
+        "@id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+      }
+    ],
+    "@id": "https://apicatalog/com/vc/test-credentials#0001",
+    "https://www.w3.org/2018/credentials#issuanceDate": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+        "@value": "2022-06-04T18:47:14Z"
+      }
+    ],
+    "https://www.w3.org/2018/credentials#expirationDate": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#date",
+        "@value": "2022-06-04"
+      }
+    ],
+    "https://www.w3.org/2018/credentials#issuer": [
+      {
+        "@id": "https://github.com/filip26/iron-verifiable-credentials/issuer/1"
+      }
+    ],
+    "@type": [
+      "https://www.w3.org/2018/credentials#VerifiableCredential"
+    ]
+  }
+]

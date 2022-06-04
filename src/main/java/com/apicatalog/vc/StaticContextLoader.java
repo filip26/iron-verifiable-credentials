@@ -16,31 +16,33 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 public class StaticContextLoader implements DocumentLoader {
 
     static Map<String, Document> staticCache = new HashMap<>();
-    
+
     static {
         staticCache.put("https://www.w3.org/2018/credentials/examples/v1", get("2018-credentials-examples-v1.jsonld"));
         staticCache.put("https://www.w3.org/2018/credentials/v1", get("2018-credentials-v1.jsonld"));
         staticCache.put("https://w3id.org/security/suites/ed25519-2020/v1", get("security-suites-ed25519-2020-v1.jsonld"));
         staticCache.put("https://www.w3.org/ns/odrl.jsonld", get("odrl.jsonld"));
+        staticCache.put("https://www.w3.org/ns/did/v1", get("did-v1.jsonld"));
     }
+
 
     static JsonDocument get(String name) {
         try (final InputStream is = StaticContextLoader.class.getResourceAsStream(name)) {
-            
+
             return JsonDocument.of(is);
-                        
+
         } catch (IOException | JsonLdError e) {
             e.printStackTrace();
         }
         return  null;
     }
-    
+
     DocumentLoader defaultLoader;
-    
+
     public StaticContextLoader(DocumentLoader defaultLoader) {
         this.defaultLoader = defaultLoader;
     }
-    
+
     @Override
     public Document loadDocument(URI url, DocumentLoaderOptions options) throws JsonLdError {
 

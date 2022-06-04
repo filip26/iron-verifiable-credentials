@@ -22,28 +22,28 @@ import jakarta.json.JsonValue;
 @TestMethodOrder(OrderAnnotation.class)
 class VcTest {
 
-    @DisplayName("Verification")
+    @DisplayName("Verifier")
     @ParameterizedTest(name = "{0}")
-    @MethodSource({ "verifyManifest" })
+    @MethodSource({ "verifierManifest" })
     @Order(2)
     void verify(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
 
-    @DisplayName("Signing")
+    @DisplayName("Issuer")
     @ParameterizedTest(name = "{0}")
-    @MethodSource({ "signManifest" })
+    @MethodSource({ "issuerManifest" })
     @Order(3)
     void sign(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
 
-    static final Stream<VcTestCase> verifyManifest() throws JsonLdError, IOException {
-        return manifest("verify-manifest.jsonld");
+    static final Stream<VcTestCase> verifierManifest() throws JsonLdError, IOException {
+        return manifest("verifier-manifest.jsonld");
     }
 
-    static final Stream<VcTestCase> signManifest() throws JsonLdError, IOException {
-        return manifest("sign-manifest.jsonld");
+    static final Stream<VcTestCase> issuerManifest() throws JsonLdError, IOException {
+        return manifest("issuer-manifest.jsonld");
     }
 
     static final Stream<VcTestCase> manifest(String name) throws JsonLdError, IOException {
