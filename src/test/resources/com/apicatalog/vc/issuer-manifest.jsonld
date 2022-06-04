@@ -90,7 +90,7 @@
                 "NegativeEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "issuanceDate @type must be XmlDateTime",
+            "name": "issuanceDate @type must be xsd:DateTime",
             "input": "issuer/0006-in.jsonld",
             "options": {
                 "keyPair": "issuer/0001-keys.json",
@@ -120,7 +120,7 @@
                 "NegativeEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "expirationDate @type must be XmlDateTime",
+            "name": "expirationDate @type must be xsd:DateTime",
             "input": "issuer/0008-in.jsonld",
             "options": {
                 "keyPair": "issuer/0001-keys.json",
