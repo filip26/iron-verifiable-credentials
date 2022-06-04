@@ -17,11 +17,6 @@
             ],
             "name": "missing @type property",
             "input": "issuer/0001-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "MissingType"
         },
         {
@@ -32,11 +27,6 @@
             ],
             "name": "@type must be VerifiableCredentials",
             "input": "issuer/0002-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "UnknownType"
         },        
         {
@@ -47,11 +37,6 @@
             ],
             "name": "missing issuer property",
             "input": "issuer/0003-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "MissingIssuer"
         },
         {
@@ -60,13 +45,8 @@
                 "NegativeEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "issuer must be IRI",
+            "name": "issuer @id must be IRI",
             "input": "issuer/0004-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "InvalidIssuerId"
         },        
         {
@@ -77,11 +57,6 @@
             ],
             "name": "missing issuanceDate property",
             "input": "issuer/0005-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "MissingIssuanceDate"
         },
         {
@@ -92,11 +67,6 @@
             ],
             "name": "issuanceDate @type must be xsd:DateTime",
             "input": "issuer/0006-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "InvalidIssuanceDateType"
         },
         {
@@ -107,11 +77,6 @@
             ],
             "name": "invalid issuanceDate @value",
             "input": "issuer/0007-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "InvalidIssuanceDateValue"
         },
         {
@@ -122,11 +87,6 @@
             ],
             "name": "expirationDate @type must be xsd:DateTime",
             "input": "issuer/0008-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "InvalidExpirationDateType"
         },
         {
@@ -137,11 +97,6 @@
             ],
             "name": "invalid expirationDate @value",
             "input": "issuer/0009-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "InvalidExpirationDateValue"
         },
         {
@@ -152,11 +107,6 @@
             ],
             "name": "expired credentials",
             "input": "issuer/0010-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "Expired"
         },
         {
@@ -167,11 +117,6 @@
             ],
             "name": "miasing credentialStatus @id",
             "input": "issuer/0011-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "MissingStatusId"
         },
         {
@@ -182,11 +127,6 @@
             ],
             "name": "miasing credentialStatus @type",
             "input": "issuer/0012-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "InvalidStatusType"
         },
         {
@@ -197,11 +137,6 @@
             ],
             "name": "credentialStatus @id must be IRI",
             "input": "issuer/0013-in.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verify/0005-verification-key.json",
-                "created": "2022-05-28T17:02:05Z"
-            },
             "expectErrorCode": "InvalidStatusId"
         },
         {
