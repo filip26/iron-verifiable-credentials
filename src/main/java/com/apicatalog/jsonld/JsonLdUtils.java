@@ -1,11 +1,10 @@
-package com.apicatalog.vc;
+package com.apicatalog.jsonld;
 
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
-import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
@@ -52,38 +51,31 @@ public class JsonLdUtils {
         return JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.TYPE);
     }
 
-    public static Optional<Instant> getXsdDateTime(JsonValue value)  {
+    public static Optional<Instant> findFirstXsdDateTime(JsonValue value)  {
 
         if (value == null) {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
-
+        
         for (final JsonValue item : JsonUtils.toJsonArray(value)) {
 
             if (!ValueObject.isValueObject(item) || !isTypeOf(XSD_DATE_TIME, item.asJsonObject())) {
                 continue;
             }
 
-
-            final Optional<JsonValue> datetimeValue = ValueObject.getValue(item);
-
-            if (datetimeValue.isPresent()) {
-
-                if (JsonUtils.isNotString(datetimeValue.get()) /*TODO validate format ...Z */) {
-                    //TODO exception
-                }
-
-                try {
-                    final Instant datetitme = Instant.parse(((JsonString)datetimeValue.get()).getString());
-
-                    // consider only the first item
-                    return Optional.of(datetitme);
-
-                } catch (DateTimeParseException e) {
-                    // invalid date time format
-                }
-            }
-
+            return ValueObject.getValue(item)
+                    .filter(JsonUtils::isString)
+                    .map(JsonString.class::cast)
+                    .map(JsonString::getString)
+                    .map(datetimeValue -> {
+                        try {
+                            return Instant.parse(datetimeValue);
+        
+                        } catch (DateTimeParseException e) {
+                            // invalid date time format
+                        }
+                        return null;
+                    });
         }
 
         return Optional.empty();

@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;

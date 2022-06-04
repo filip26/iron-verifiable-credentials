@@ -3,6 +3,7 @@ package com.apicatalog.vc;
 import java.net.URI;
 import java.time.Instant;
 
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.lds.DataError;
@@ -86,12 +87,12 @@ public class Credential implements Verifiable {
         }
 
         credential.issuance = JsonLdUtils
-                                    .getXsdDateTime(getProperty(expanded, ISSUANCE_DATE))
+                                    .findFirstXsdDateTime(getProperty(expanded, ISSUANCE_DATE))
                                     .orElseThrow(() -> new DataError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.VALUE));
 
         // expiration date
         if (hasProperty(expanded, EXPIRATION_DATE)) {
-            credential.expiration = JsonLdUtils.getXsdDateTime(getProperty(expanded, EXPIRATION_DATE))
+            credential.expiration = JsonLdUtils.findFirstXsdDateTime(getProperty(expanded, EXPIRATION_DATE))
                     .orElseThrow(() -> {
                         if (!JsonLdUtils.isXsdDateTime(getProperty(expanded, EXPIRATION_DATE))) {
                             return new DataError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.TYPE);

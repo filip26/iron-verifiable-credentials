@@ -2,6 +2,7 @@ package com.apicatalog.vc.api;
 
 import java.net.URI;
 
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.DataError.ErrorType;
@@ -12,7 +13,6 @@ import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.proof.ProofOptions;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.JsonLdUtils;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 

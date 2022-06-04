@@ -1,5 +1,6 @@
 package com.apicatalog.vc;
 
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 
 import jakarta.json.JsonValue;

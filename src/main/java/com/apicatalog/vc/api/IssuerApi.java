@@ -4,6 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
@@ -15,7 +16,6 @@ import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.proof.ProofOptions;
-import com.apicatalog.vc.JsonLdUtils;
 import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.Verifiable;
 
