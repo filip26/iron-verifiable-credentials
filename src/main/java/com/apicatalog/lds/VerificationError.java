@@ -4,6 +4,7 @@ public class VerificationError extends Throwable {
 
     public enum Code {
         Unknown,
+        Expired,
     }
 
     private static final long serialVersionUID = -3280731333804856855L;

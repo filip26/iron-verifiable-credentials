@@ -10,8 +10,8 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.lds.DataIntegrityError;
-import com.apicatalog.lds.DataIntegrityError.ErrorType;
+import com.apicatalog.lds.DataError;
+import com.apicatalog.lds.DataError.ErrorType;
 import com.apicatalog.lds.SigningError.Code;
 import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
@@ -66,9 +66,9 @@ public class SigningProcessor {
      *
      * @return
      * @throws SigningError
-     * @throws DataIntegrityError
+     * @throws DataError
      */
-    public JsonObject get() throws SigningError, DataIntegrityError {
+    public JsonObject get() throws SigningError, DataError {
 
         if (loader == null) {
             // default loader
@@ -95,29 +95,29 @@ public class SigningProcessor {
      * @param context
      * @return
      * @throws SigningError
-     * @throws DataIntegrityError
+     * @throws DataError
      */
-    public JsonObject getCompacted(URI context)  throws SigningError, DataIntegrityError {
+    public JsonObject getCompacted(URI context)  throws SigningError, DataError {
 
         final JsonObject signed = get();
 
         try {
-            return JsonLd.compact(JsonDocument.of(signed), context).get();
+            return JsonLd.compact(JsonDocument.of(signed), context).loader(loader).get();
         } catch (JsonLdError e) {
             throw new SigningError(e);
         }
     }
 
-    private final JsonObject sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataIntegrityError, SigningError {
+    private final JsonObject sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataError, SigningError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).get();
 
             // load key pair
-            final Document keys = loader.loadDocument(keyPairLocation, new DocumentLoaderOptions());
+            final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
 
             // TODO keyPair type must match options.type
-            final Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(keys.getJsonContent().orElseThrow().asJsonObject()); // FIXME
+            final Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(keys.getJsonObject(0)); // FIXME
 
             return sign(expanded, keyPair, options);
 
@@ -126,7 +126,7 @@ public class SigningProcessor {
         }
     }
 
-    private final JsonObject sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataIntegrityError, SigningError {
+    private final JsonObject sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
@@ -138,7 +138,7 @@ public class SigningProcessor {
         }
     }
 
-    private static final JsonObject sign(JsonArray expanded, KeyPair keyPair, ProofOptions options) throws SigningError, DataIntegrityError {
+    private static final JsonObject sign(JsonArray expanded, KeyPair keyPair, ProofOptions options) throws SigningError, DataError {
 
         final LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
 
@@ -173,10 +173,10 @@ public class SigningProcessor {
 
             // is not expanded JSON-LD object
             if (!JsonLdUtils.hasType(item)) {
-                throw new DataIntegrityError(ErrorType.Missing, Keywords.TYPE);
+                throw new DataError(ErrorType.Missing, Keywords.TYPE);
             }
 
-            throw new DataIntegrityError(ErrorType.Unknown, Keywords.TYPE);
+            throw new DataError(ErrorType.Unknown, Keywords.TYPE);
         }
 
         throw new SigningError();     // malformed input, not single object to sign has been found

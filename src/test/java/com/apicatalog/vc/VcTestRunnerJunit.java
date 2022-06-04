@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -18,7 +19,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.lds.DataIntegrityError;
+import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519ProofOptions2020;
@@ -75,7 +76,17 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create("https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json");
                 }
                 
-                JsonObject signed = Vc.sign(testCase.input, keyPairLocation, options).loader(LOADER).get();
+                SigningProcessor issuer = Vc.sign(testCase.input, keyPairLocation, options).loader(LOADER);
+                
+                JsonObject signed = null;
+                
+                if (testCase.context != null) {
+                    
+                    signed = issuer.getCompacted(testCase.context);
+                    
+                } else {
+                    signed = issuer.get();    
+                }
                 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
                 
@@ -113,7 +124,7 @@ public class VcTestRunnerJunit {
         } catch (SigningError e) {
             assertException(e.getCode() != null ? e.getCode().name() : null, e);
 
-        } catch (DataIntegrityError e) {
+        } catch (DataError e) {
             assertException(toCode(e), e);
 
         } catch (JsonLdError e) {
@@ -122,7 +133,7 @@ public class VcTestRunnerJunit {
         }
     }
     
-    final static String toCode(DataIntegrityError e) {
+    final static String toCode(DataError e) {
         final StringBuilder sb = new StringBuilder();
         if (e.getType() != null) {
             sb.append(e.getType().name());
@@ -134,12 +145,15 @@ public class VcTestRunnerJunit {
             sb.append(Character.toUpperCase(e.getSubject().charAt(index)));
             sb.append(e.getSubject().substring(index + 1));
         }
-        if (e.getProperty() != null) {
+        if (e.getAttibutes() != null) {
             
-            int index = (e.getProperty().startsWith("@")) ? 1 : 0;
-            
-            sb.append(Character.toUpperCase(e.getProperty().charAt(index)));
-            sb.append(e.getProperty().substring(index + 1));
+            Arrays.stream(e.getAttibutes())
+                .forEach(attribute -> {
+                    int index = (attribute.startsWith("@")) ? 1 : 0;
+                    
+                    sb.append(Character.toUpperCase(attribute.charAt(index)));
+                    sb.append(attribute.substring(index + 1));    
+                });
         }
         return sb.toString();
     }

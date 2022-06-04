@@ -5,8 +5,8 @@ import java.time.Instant;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.lds.DataIntegrityError;
-import com.apicatalog.lds.DataIntegrityError.ErrorType;
+import com.apicatalog.lds.DataError;
+import com.apicatalog.lds.DataError.ErrorType;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -45,7 +45,7 @@ public class Credential {
         return JsonUtils.isObject(value) && JsonLdUtils.isTypeOf(BASE + TYPE, value.asJsonObject());
     }
 
-    public static Credential from(JsonObject object) throws DataIntegrityError {
+    public static Credential from(JsonObject object) throws DataError {
 
         if (object == null) {
             throw new IllegalArgumentException("The 'object' parameter must not be null.");
@@ -56,47 +56,47 @@ public class Credential {
         if (!JsonLdUtils.isTypeOf(BASE + TYPE, object)) {
 
             if (!JsonLdUtils.hasType(object)) {
-                throw new DataIntegrityError(ErrorType.Missing, Keywords.TYPE);
+                throw new DataError(ErrorType.Missing, Keywords.TYPE);
             }
 
-            throw new DataIntegrityError(ErrorType.Unknown, Keywords.TYPE);
+            throw new DataError(ErrorType.Unknown, Keywords.TYPE);
         }
 
         if (!hasProperty(object, SUBJECT)) {
-            throw new DataIntegrityError(ErrorType.Missing, SUBJECT);
+            throw new DataError(ErrorType.Missing, SUBJECT);
         }
 
         // issuer
         if (!hasProperty(object, ISSUER)) {
-            throw new DataIntegrityError(ErrorType.Missing, ISSUER);
+            throw new DataError(ErrorType.Missing, ISSUER);
         }
         
         credential.issuer = JsonLdUtils
                                 .getId(getProperty(object, ISSUER))
-                                .orElseThrow(() -> new DataIntegrityError(ErrorType.Invalid, ISSUER, Keywords.ID));
+                                .orElseThrow(() -> new DataError(ErrorType.Invalid, ISSUER, Keywords.ID));
 
         // issuance date
         if (!JsonLdUtils.isXsdDateTime(getProperty(object, ISSUANCE_DATE))) {
             
             if (!hasProperty(object, ISSUANCE_DATE)) {
-                throw new DataIntegrityError(ErrorType.Missing, ISSUANCE_DATE);
+                throw new DataError(ErrorType.Missing, ISSUANCE_DATE);
             }
             
-            throw new DataIntegrityError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.TYPE);
+            throw new DataError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.TYPE);
         }
 
         credential.issuance = JsonLdUtils
                                     .getXsdDateTime(getProperty(object, ISSUANCE_DATE))
-                                    .orElseThrow(() -> new DataIntegrityError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.VALUE));
+                                    .orElseThrow(() -> new DataError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.VALUE));
         
         // expiration date
         if (hasProperty(object, EXPIRATION_DATE)) {
             credential.expiration = JsonLdUtils.getXsdDateTime(getProperty(object, EXPIRATION_DATE))
                     .orElseThrow(() -> {
                         if (!JsonLdUtils.isXsdDateTime(getProperty(object, EXPIRATION_DATE))) {
-                            return new DataIntegrityError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.TYPE);
+                            return new DataError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.TYPE);
                         }
-                        return new DataIntegrityError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.VALUE);
+                        return new DataError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.VALUE);
                     });
         }
         

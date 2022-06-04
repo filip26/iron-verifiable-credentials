@@ -133,13 +133,12 @@ public class JsonLdUtils {
 
     public static Optional<JsonValue> getProperty(JsonObject object, String base, String property) {
         
-        final JsonValue value = object.get(base + property);
+        JsonValue value = object.get(base + property);
         
         if (value == null) {
-            object.get(property);
+            value = object.get(property);
         }
 
         return Optional.ofNullable(value); 
     }
-
 }

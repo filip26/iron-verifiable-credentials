@@ -4,16 +4,15 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.lds.DataIntegrityError;
-import com.apicatalog.lds.DataIntegrityError.Code;
+import com.apicatalog.lds.DataError;
+import com.apicatalog.lds.DataError.ErrorType;
 import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.VerificationError;
+import com.apicatalog.lds.VerificationError.Code;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.VerificationKey;
@@ -49,7 +48,7 @@ public class VerificationProcessor {
         return this;
     }
 
-    public boolean isValid() throws VerificationError, DataIntegrityError {
+    public boolean isValid() throws VerificationError, DataError {
 
         if (loader == null) {
             // default loader
@@ -70,7 +69,7 @@ public class VerificationProcessor {
         throw new IllegalStateException();
     }
 
-    private static boolean verify(URI location, DocumentLoader loader) throws VerificationError, DataIntegrityError {
+    private static boolean verify(URI location, DocumentLoader loader) throws VerificationError, DataError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
@@ -82,7 +81,7 @@ public class VerificationProcessor {
         }
     }
 
-    private static boolean verify(JsonObject document, DocumentLoader loader) throws VerificationError, DataIntegrityError {
+    private static boolean verify(JsonObject document, DocumentLoader loader) throws VerificationError, DataError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
@@ -94,7 +93,7 @@ public class VerificationProcessor {
         }
     }
 
-    private static boolean verifyExpanded(JsonArray expanded, DocumentLoader loader) throws DataIntegrityError, VerificationError {
+    private static boolean verifyExpanded(JsonArray expanded, DocumentLoader loader) throws DataError, VerificationError {
 
         for (final JsonValue item : expanded) {
             if (JsonUtils.isNotObject(item)) {
@@ -108,10 +107,14 @@ public class VerificationProcessor {
         return true;
     }
 
-    private static boolean verifyExpanded(JsonObject expanded, DocumentLoader loader) throws DataIntegrityError, VerificationError {
+    private static boolean verifyExpanded(JsonObject expanded, DocumentLoader loader) throws DataError, VerificationError {
 
         // data integrity checks
         final Credential credential = Credential.from(expanded);
+        
+        if (credential.isExpired()) {
+            throw new VerificationError(Code.Expired);
+        }
 
         final EmbeddedProof proof = EmbeddedProof.from(expanded, loader);
 
@@ -119,7 +122,7 @@ public class VerificationProcessor {
 
             // check proof type
             if (!Ed25519Signature2020.TYPE.equals(proof.getType())) {
-                throw new DataIntegrityError(Code.UnknownCryptoSuiteType);
+                throw new DataError(ErrorType.Unknown, "cryptoSuiteType");
             }
 
             VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), loader);
@@ -134,11 +137,11 @@ public class VerificationProcessor {
     }
 
     // refresh/fetch verification method
-    static final VerificationKey get(URI id, DocumentLoader loader) throws DataIntegrityError, JsonLdError {
+    static final VerificationKey get(URI id, DocumentLoader loader) throws DataError, JsonLdError {
 
-        final Document document = loader.loadDocument(id, new DocumentLoaderOptions());
+        final JsonArray document = JsonLd.expand(id).loader(loader).get();
 
-        JsonObject method = document.getJsonContent().orElseThrow().asJsonObject();
+        JsonObject method = document.getJsonObject(0);  //FIXME
 
         // TODO check verification method type
         return Ed25519KeyPair2020.from(method);

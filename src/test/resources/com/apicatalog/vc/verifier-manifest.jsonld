@@ -167,16 +167,6 @@
             "name": "invalid proofValue property",
             "input": "verifier/0016-in.jsonld",
             "expectErrorCode": "InvalidProofValue"
-        },
-        {
-            "@id": "#t0017",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "embedded proof is missing",
-            "input": "verifier/0017-in.jsonld",
-            "expectErrorCode": "MissingProof"
-        }     
+        }
 	]
 }

@@ -26,7 +26,7 @@
 			],
 			"https://w3id.org/security#verificationMethod": [
 				{
-					"@id": "https://github.com/filip26/iron-verifiable-credentials/verify/0005-verification-key.json"
+					"@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json"
 				}
 			],
 			"http://purl.org/dc/terms/created": [
@@ -42,7 +42,7 @@
 			],
 			"https://w3id.org/security#proofValue": [
 				{
-					"@value": "z2BKHtarpb5oPmgQpmbbgBr7iZQP8TbMgiTNbWyW3mxyvuFXZGyLTF6xAd2AgL7PFV4kzpUNgeJvhzJ4ji8kzE7Lh",
+					"@value": "z2ra7SweRfoZJ2MQK1E3ueK3pdkNQNuJ5Gs1k6sd3C1hG9oR5vUitdun8HXRNZg418qN6MtQ89JqVXasnw6uymc9d",
 					"@type": "https://w3id.org/security#multibase"
 				}
 			]

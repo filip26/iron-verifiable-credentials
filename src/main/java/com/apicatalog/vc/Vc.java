@@ -2,7 +2,7 @@ package com.apicatalog.vc;
 
 import java.net.URI;
 
-import com.apicatalog.lds.DataIntegrityError;
+import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.VerificationError;
@@ -22,10 +22,10 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param location
-     * @throws DataIntegrityError
+     * @throws DataError
      * @throws VerificationError
      */
-    public static VerificationProcessor verify(URI location) throws DataIntegrityError, VerificationError {
+    public static VerificationProcessor verify(URI location) throws DataError, VerificationError {
         return new VerificationProcessor(location);
     }
 
@@ -33,10 +33,10 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param location
-     * @throws DataIntegrityError
+     * @throws DataError
      * @throws VerificationError
      */
-    public static VerificationProcessor verify(JsonObject document) throws DataIntegrityError, VerificationError {
+    public static VerificationProcessor verify(JsonObject document) throws DataError, VerificationError {
         return new VerificationProcessor(document);
     }
 
@@ -47,10 +47,10 @@ public final class Vc {
      * @param keyPairLocation
      * @param options
      * @return signed VC/VP with proof property at the root level
-     * @throws DataIntegrityError
+     * @throws DataError
      * @throws VerificationError
      */
-    public static SigningProcessor sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataIntegrityError, SigningError {
+    public static SigningProcessor sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataError, SigningError {
         return new SigningProcessor(documentLocation, keyPairLocation, options);
     }
 
@@ -61,10 +61,10 @@ public final class Vc {
      * @param keyPair
      * @param options
      * @return signed VC/VP with proof property at the root level
-     * @throws DataIntegrityError
+     * @throws DataError
      * @throws VerificationError
      */
-    public static SigningProcessor sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataIntegrityError, SigningError {
+    public static SigningProcessor sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
         return new SigningProcessor(document, keyPair, options);
     }
 
