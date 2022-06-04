@@ -4,7 +4,14 @@ public class DataIntegrityError extends Throwable {
 
     private static final long serialVersionUID = -7146533158378348477L;
 
+    public enum ErrorType {
+        Missing,
+        Unknown,
+        Invalid
+    }
+    
     //FIXME rethinks codes, status: [Missing|Invalid] property: [name] attribute: [length|encoding|..]
+    @Deprecated
     public enum Code {
         Unknown,
 
@@ -28,33 +35,39 @@ public class DataIntegrityError extends Throwable {
 
         MissingCreated,
         InvalidCreated,
-
-        MissingIssuer,
-        InvalidIssuer,
-
-        MissingIssuanceDate,
-        InvalidIssuanceDate,
-
-        MissingSubject, 
-        
-        MissingType, 
-        
-        UnknownType,
     }
 
+    @Deprecated
     private Code code;
 
+    private ErrorType type;
+    private String subject;
+    private String property;
+    
+    @Deprecated
     public DataIntegrityError() {
-        this(Code.Unknown);
+
     }
 
+    @Deprecated
     public DataIntegrityError(Code type) {
         super();
         this.code = type;
     }
+    
+    public DataIntegrityError(ErrorType type, String subject) {
+        this(type, subject, null);
+    }
+    
+    public DataIntegrityError(ErrorType type, String subject, String property) {
+        super();
+        this.type = type;
+        this.subject = subject;
+        this.property = property;
+    }
 
     public DataIntegrityError(Throwable e) {
-        this(Code.Unknown, e);
+        super(e);
     }
 
     public DataIntegrityError(Code code, Throwable e) {
@@ -62,7 +75,15 @@ public class DataIntegrityError extends Throwable {
         this.code = code;
     }
 
-    public Code getCode() {
-        return code;
+    public ErrorType getType() {
+        return type;
+    }
+    
+    public String getSubject() {
+        return subject;
+    }
+    
+    public String getProperty() {
+        return property;
     }
 }

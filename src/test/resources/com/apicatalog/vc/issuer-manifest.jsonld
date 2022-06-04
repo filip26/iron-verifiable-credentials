@@ -67,7 +67,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "InvalidIssuer"
+            "expectErrorCode": "InvalidIssuerId"
         },        
         {
             "@id": "#t0005",
@@ -97,7 +97,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "InvalidIssuanceDate"
+            "expectErrorCode": "InvalidIssuanceDateType"
         },
         {
             "@id": "#t0007",
@@ -112,7 +112,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "InvalidIssuanceDate"
+            "expectErrorCode": "InvalidIssuanceDateValue"
         },
         {
             "@id": "#t0008",
@@ -127,7 +127,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "InvalidExpirationDate"
+            "expectErrorCode": "InvalidExpirationDateType"
         },
         {
             "@id": "#t0009",
@@ -142,7 +142,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "InvalidExpirationDate"
+            "expectErrorCode": "InvalidExpirationDateValue"
         },
         {
             "@id": "#t0010",
@@ -172,7 +172,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "InvalidIssuanceDate"
+            "expectErrorCode": "MissingStatusId"
         },
         {
             "@id": "#t0012",
@@ -187,7 +187,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "InvalidIssuanceDate"
+            "expectErrorCode": "InvalidStatusType"
         },
         {
             "@id": "#t0013",
@@ -202,7 +202,7 @@
                 "verificationMethod": "verify/0005-verification-key.json",
                 "created": "2022-05-28T17:02:05Z"
             },
-            "expectErrorCode": "InvalidIssuanceDate"
+            "expectErrorCode": "InvalidStatusId"
         },
         {
             "@id": "#t0020",

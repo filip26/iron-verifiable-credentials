@@ -4,15 +4,14 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.lds.DataIntegrityError;
-import com.apicatalog.lds.DataIntegrityError.Code;
+import com.apicatalog.lds.DataIntegrityError.ErrorType;
 import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
@@ -143,44 +142,44 @@ public class SigningProcessor {
         final LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
 
         for (final JsonValue item : expanded) {
-            if (JsonUtils.isObject(item)) {
+
+            // is a credential?
+            if (Credential.isCredential(item)) {
 
                 final JsonObject object = item.asJsonObject();
+                
+                // validate the credential object
+                final Credential credential = Credential.from(object);
 
-                // is not expanded JSON-LD object
-                if (!JsonLdUtils.hasTypeDeclaration(object)) {
-                    throw new DataIntegrityError(Code.MissingType);
-                }
-
-                // is a credential?
-                if (Credential.isCredential(object)) {
-
-                    // validate the credential object
-                    final Credential credential = Credential.from(object);
-
-                    // is expired?
-                    if (credential.isExpired()) {
-                        //TODO
-                        throw new SigningError();
-                    }
-
-                // is a presentation?
-                } else if (Presentation.isPresentation(object)) {
-                    // validate the presentation object
+                // is expired?
+                if (credential.isExpired()) {
                     //TODO
-
-                // unknown type
-                } else {
-                    throw new DataIntegrityError(Code.UnknownType);
+                    throw new SigningError();
                 }
 
                 final JsonObject signed = signature.sign(object, options, keyPair);
 
-                // take only the first object - FIXME
+                // take only the first object
                 return signed;
 
             }
+            
+            // is a presentation?
+            if (Presentation.isPresentation(item)) {
+                // validate the presentation object
+                //TODO
+            }
+            
+            // unknown or non-existent type
+
+            // is not expanded JSON-LD object
+            if (!JsonLdUtils.hasType(item)) {
+                throw new DataIntegrityError(ErrorType.Missing, Keywords.TYPE);
+            }
+
+            throw new DataIntegrityError(ErrorType.Unknown, Keywords.TYPE);
         }
-        throw new DataIntegrityError();     // malformed input, not single object to sign has been found
+
+        throw new SigningError();     // malformed input, not single object to sign has been found
     }
 }

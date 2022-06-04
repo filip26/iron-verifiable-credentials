@@ -1,10 +1,10 @@
-package com.apicatalog.jsonld;
+package com.apicatalog.vc;
 
 import java.net.URI;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
+import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
@@ -48,27 +48,24 @@ public class JsonLdUtils {
                     .anyMatch(type::equals);
     }
 
-    public static boolean hasTypeDeclaration(final JsonObject object) {
-        if (object == null) {
-            throw new IllegalArgumentException("The 'object' parameter must not be null.");
-        }
-        return object.containsKey(Keywords.TYPE);
+    public static boolean hasType(final JsonValue value) {
+        return JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.TYPE);
     }
-        
-    public static Optional<Instant> getXsdDateTime(JsonValue value) throws DateTimeParseException {
 
-        if (JsonUtils.isArray(value)) {
-            // consider only the first item
-            value = value.asJsonArray().get(0); 
+    public static Optional<Instant> getXsdDateTime(JsonValue value)  {
+
+        if (value == null) {
+            throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
         
-        if (!ValueObject.isValueObject(value)) {
-            return Optional.empty();
-        }
-        
-        if (isTypeOf(XSD_DATE_TIME, value.asJsonObject())) {
+        for (final JsonValue item : JsonUtils.toJsonArray(value)) {
             
-            final Optional<JsonValue> datetimeValue = ValueObject.getValue(value);
+            if (!ValueObject.isValueObject(item) || !isTypeOf(XSD_DATE_TIME, item.asJsonObject())) {
+                continue;
+            }
+            
+            
+            final Optional<JsonValue> datetimeValue = ValueObject.getValue(item);
             
             if (datetimeValue.isPresent()) {
 
@@ -77,11 +74,13 @@ public class JsonLdUtils {
                 }
                 
                 final Instant datetitme = Instant.parse(((JsonString)datetimeValue.get()).getString());
-                
+
+                // consider only the first item
                 return Optional.of(datetitme);
             }
+    
         }
-        
+                
         return Optional.empty();
     }
     
@@ -107,6 +106,30 @@ public class JsonLdUtils {
         }
         
         return Optional.empty();
+    }
+
+    public static boolean isXsdDateTime(JsonValue value) {
+        return JsonUtils
+                    .toStream(value)
+                    .filter(JsonUtils::isObject)
+                    .map(JsonValue::asJsonObject)
+                    .map(o -> isTypeOf(XSD_DATE_TIME, o))
+                    .findAny()
+                    .orElse(false);
+    }
+
+    public static boolean hasProperty(JsonObject object, String schema, String property) {
+        return object.containsKey(schema + property) || object.containsKey(property);
+    }
+
+    public static Optional<JsonValue> getProperty(JsonObject object, String schema, String property) {
+        
+        JsonValue value = object.get(schema + property);
+        if (value == null) {
+            object.get(property);
+        }
+
+        return Optional.ofNullable(value); 
     }
 
 }

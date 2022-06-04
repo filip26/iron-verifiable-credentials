@@ -107,12 +107,34 @@ public class VcTestRunnerJunit {
             assertException(e.getCode() != null ? e.getCode().name() : null, e);
 
         } catch (DataIntegrityError e) {
-            assertException(e.getCode() != null ? e.getCode().name() : null, e);
+            assertException(toCode(e), e);
 
         } catch (JsonLdError e) {
             e.printStackTrace();
             fail(e);
         }
+    }
+    
+    final static String toCode(DataIntegrityError e) {
+        final StringBuilder sb = new StringBuilder();
+        if (e.getType() != null) {
+            sb.append(e.getType().name());
+        }
+        if (e.getSubject() != null) {
+            
+            int index = (e.getSubject().startsWith("@")) ? 1 : 0;
+            
+            sb.append(Character.toUpperCase(e.getSubject().charAt(index)));
+            sb.append(e.getSubject().substring(index + 1));
+        }
+        if (e.getProperty() != null) {
+            
+            int index = (e.getProperty().startsWith("@")) ? 1 : 0;
+            
+            sb.append(Character.toUpperCase(e.getProperty().charAt(index)));
+            sb.append(e.getProperty().substring(index + 1));
+        }
+        return sb.toString();
     }
 
     final void assertException(final String code, Throwable e) {
