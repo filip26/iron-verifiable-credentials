@@ -89,7 +89,7 @@ public final class Vc {
 
         return lds.keygen(256); //FIXME
     }
-    
+
     protected static Verifiable get(JsonObject expanded) throws DataError {
 
         // is a credential?

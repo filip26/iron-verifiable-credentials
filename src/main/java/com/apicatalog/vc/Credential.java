@@ -175,7 +175,7 @@ public class Credential implements Verifiable {
     public boolean isCredential() {
         return true;
     }
-    
+
     @Override
     public Credential asCredential() {
         return this;

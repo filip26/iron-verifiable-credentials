@@ -140,8 +140,8 @@ public final class IssuerApi {
 
         final LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
 
-        final JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() -> 
-                    new SigningError() // malformed input, not single object to sign has been found     
+        final JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
+                    new SigningError() // malformed input, not single object to sign has been found
                 );
 
         final Verifiable verifiable = Vc.get(object);
@@ -150,7 +150,7 @@ public final class IssuerApi {
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
             throw new SigningError(Code.Expired);
         }
-        
+
         return signature.sign(object, options, keyPair);
     }
 }

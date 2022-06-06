@@ -48,6 +48,11 @@ public class JsonLdUtils {
     }
 
     public static boolean hasType(final JsonValue value) {
+
+        if (value == null) {
+            throw new IllegalArgumentException("The 'value' parameter must not be null.");
+        }
+
         return JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.TYPE);
     }
 
@@ -56,56 +61,48 @@ public class JsonLdUtils {
         if (value == null) {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
-        
-        for (final JsonValue item : JsonUtils.toJsonArray(value)) {
 
-            if (!ValueObject.isValueObject(item) || !isTypeOf(XSD_DATE_TIME, item.asJsonObject())) {
-                continue;
-            }
+        return JsonUtils.toStream(value)
+                .filter(ValueObject::isValueObject)
+                .filter(item -> isTypeOf(XSD_DATE_TIME, item.asJsonObject()))
+                .map(ValueObject::getValue)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(JsonUtils::isString)
+                .findFirst()
+                .map(JsonString.class::cast)
+                .map(JsonString::getString)
+                .map(datetimeValue -> {
+                    try {
+                        return Instant.parse(datetimeValue);
 
-            return ValueObject.getValue(item)
-                    .filter(JsonUtils::isString)
-                    .map(JsonString.class::cast)
-                    .map(JsonString::getString)
-                    .map(datetimeValue -> {
-                        try {
-                            return Instant.parse(datetimeValue);
-        
-                        } catch (DateTimeParseException e) {
-                            // invalid date time format
-                        }
-                        return null;
-                    });
-        }
-
-        return Optional.empty();
+                    } catch (DateTimeParseException e) {
+                        // invalid date time format
+                    }
+                    return null;
+                });
     }
 
-    public static final Optional<URI> getId(JsonValue value) {
-
-        if (JsonUtils.isArray(value)) {
-            // consider only the first item
-            value = value.asJsonArray().get(0);
-        }
-
-        if (JsonUtils.isObject(value)) {
-            value = value.asJsonObject().get(Keywords.ID);
-        }
-
-        if (JsonUtils.isString(value)) {
-
-            final String id = ((JsonString)value).getString();
-
-            if (UriUtils.isURI(id)) {
-                return Optional.of(URI.create(id));
-            }
-
-        }
-
-        return Optional.empty();
+    public static final Optional<URI> getId(JsonValue expanded) {
+        return findFirstObject(expanded)
+                .map(o -> o.get(Keywords.ID))
+                .filter(JsonUtils::isString)
+                .map(JsonString.class::cast)
+                .map(JsonString::getString)
+                .map(id -> {
+                    if (UriUtils.isURI(id)) {
+                        return URI.create(id);
+                    }
+                    return null;
+                });
     }
 
     public static boolean isXsdDateTime(JsonValue value) {
+
+        if (value == null) {
+            throw new IllegalArgumentException("The 'value' parameter must not be null.");
+        }
+
         return JsonUtils
                     .toStream(value)
                     .filter(JsonUtils::isObject)
@@ -123,8 +120,11 @@ public class JsonLdUtils {
         return object.containsKey(base + property) || object.containsKey(property);
     }
 
-    public static Optional<JsonValue> getProperty(JsonObject object, String base, String property) {
+    public static Optional<JsonValue> getProperty(JsonObject object,String property) {
+        return Optional.ofNullable(object.get(property));
+    }
 
+    public static Optional<JsonValue> getProperty(JsonObject object, String base, String property) {
         JsonValue value = object.get(base + property);
 
         if (value == null) {
@@ -133,7 +133,7 @@ public class JsonLdUtils {
 
         return Optional.ofNullable(value);
     }
-    
+
     public static Optional<JsonObject> findFirstObject(JsonValue expanded) {
         if (JsonUtils.isArray(expanded)) {
             for (JsonValue item : expanded.asJsonArray()) {

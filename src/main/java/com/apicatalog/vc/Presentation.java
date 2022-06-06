@@ -21,7 +21,7 @@ public class Presentation implements Verifiable {
     public boolean isPresentation() {
         return true;
     }
-    
+
     @Override
     public Presentation asPresentation() {
         return this;
