@@ -1,6 +1,7 @@
 package com.apicatalog.vc.api;
 
 import java.net.URI;
+import java.util.Collection;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -119,29 +120,51 @@ public final class VerifierApi {
             throw new VerificationError(Code.Expired);
         }
 
-        final EmbeddedProof proof = EmbeddedProof.from(expanded, loader);
-
-        try {
-
-            // check proof type
-            if (!Ed25519Signature2020.TYPE.equals(proof.getType())) {
-                throw new DataError(ErrorType.Unknown, "cryptoSuiteType");
+        // proof set
+        if (EmbeddedProof.hasProof(expanded)) {
+            
+            final JsonObject data = EmbeddedProof.removeProof(expanded);
+            
+            final Collection<JsonValue> proofs = EmbeddedProof.getProof(expanded);
+            
+            if (proofs == null || proofs.size() == 0) {
+                throw new DataError(ErrorType.Missing, "proof");
             }
 
-            VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), loader);
+            for (final JsonValue proofValue : proofs) { 
+    
+                final EmbeddedProof proof = EmbeddedProof.from(proofValue, loader);
+                
+                final JsonObject proofObject = proofValue.asJsonObject();
 
-            LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
-
-            return signature.verify(expanded, verificationMethod, proof.getValue());
-
-        } catch (JsonLdError e) {
-            throw new VerificationError(e);
+        
+                try {
+        
+                    // check proof type
+                    if (!Ed25519Signature2020.TYPE.equals(proof.getType())) {
+                        throw new DataError(ErrorType.Unknown, "cryptoSuiteType");
+                    }
+        
+                    VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), loader);
+        
+                    LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
+        
+                    if (!signature.verify(data, proofObject, verificationMethod, proof.getValue())) {
+                        return false;
+                    }
+        
+                } catch (JsonLdError e) {
+                    throw new VerificationError(e);
+                }
+            }
+            return true;
         }
+        throw new DataError(ErrorType.Missing, "proof");
     }
 
     // refresh/fetch verification method
     static final VerificationKey get(URI id, DocumentLoader loader) throws DataError, JsonLdError {
-
+        
         final JsonArray document = JsonLd.expand(id).loader(loader).get();
 
         JsonObject method = document.getJsonObject(0);  //FIXME

@@ -3,6 +3,8 @@ package com.apicatalog.lds.proof;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Collection;
+import java.util.Collections;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -57,111 +59,124 @@ public class EmbeddedProof implements Proof {
         return proof;
     }
 
+    public static boolean hasProof(JsonObject credential) {
+        return credential.containsKey(EmbeddedProof.PROOF);
+    }
+    
+    public static Collection<JsonValue> getProof(JsonObject credential) {
+        
+        JsonValue proofs = credential.get(EmbeddedProof.PROOF);
+ 
+        if (JsonUtils.isNull(proofs)) {
+            return Collections.emptyList();
+        }
+        
+        if (JsonUtils.isArray(proofs)) {
+            if (proofs.asJsonArray().size() == 0) {
+                return Collections.emptyList();
+            }
+        }
+
+        return JsonUtils.toCollection(proofs);
+    }
+    
+    public static JsonObject removeProof(final JsonObject credential) {
+       return Json.createObjectBuilder(credential).remove(PROOF).build();
+    }
+    
     /**
      *
-     * @param json expanded verifiable credentials or presentation
+     * @param json expanded proof
      * @param result
      * @return
      * @throws VerificationError
      */
-    public static EmbeddedProof from(final JsonObject json, final DocumentLoader loader) throws DataError {
+    public static EmbeddedProof from(final JsonValue json, final DocumentLoader loader) throws DataError {
 
         if (json == null) {
             throw new IllegalArgumentException("Parameter 'json' must not be null.");
         }
 
-        final JsonValue proofValue = json.get(PROOF); //TODO move out
-
-        //TODO return set or chain of proofs
-        // proof sets - https://w3c-ccg.github.io/data-integrity-spec/#proof-sets
-        // proof chains - https://w3c-ccg.github.io/data-integrity-spec/#proof-chains
-
-
-        if (proofValue == null) {
-            throw new DataError(ErrorType.Missing, "proof");
+        // data integrity checks
+        if (JsonUtils.isNotObject(json)) {
+            throw new DataError(ErrorType.Invalid, "proof");
         }
 
-        for (JsonValue proofItem : JsonUtils.toJsonArray(proofValue)) {
-
-            // data integrity checks
-            if (JsonUtils.isNotObject(proofItem)) {
+        JsonObject proofObject = json.asJsonObject();
+        
+        if (proofObject.containsKey(Keywords.GRAPH)) { //TODO hack
+            
+            JsonValue proofValue = proofObject.getJsonArray(Keywords.GRAPH).get(0);     //FIXME
+            
+            if (JsonUtils.isNotObject(proofValue)) {
                 throw new DataError(ErrorType.Invalid, "proof");
             }
+            proofObject = proofValue.asJsonObject();
+        }
 
-            if (proofItem.asJsonObject().containsKey(Keywords.GRAPH)) { //TODO hack
-                proofItem = proofItem.asJsonObject().get(Keywords.GRAPH);
-                if (JsonUtils.isArray(proofItem)) {
-                    proofItem = proofItem.asJsonArray().get(0); //FIXME !?!
-                }
-                if (JsonUtils.isNotObject(proofItem)) {
-                    throw new DataError(ErrorType.Invalid, "proof");
-                }
-            }
 
-            final JsonObject proofObject = proofItem.asJsonObject();
+        final EmbeddedProof embeddedProof = new EmbeddedProof();
 
-            final EmbeddedProof embeddedProof = new EmbeddedProof();
+        // @type property
+        if (!proofObject.containsKey(Keywords.TYPE)) {
+            throw new DataError(ErrorType.Missing, "proof", Keywords.TYPE);
+        }
 
-            // @type property
-            if (!proofObject.containsKey(Keywords.TYPE)) {
-                throw new DataError(ErrorType.Missing, "proof", Keywords.TYPE);
-            }
+        final JsonValue typeValue = proofObject.get(Keywords.TYPE);
 
-            final JsonValue typeValue = proofObject.get(Keywords.TYPE);
+        if (JsonUtils.isArray(typeValue)) {
 
-            if (JsonUtils.isArray(typeValue)) {
-
-                // all @type values must be string
-                if (!typeValue.asJsonArray().stream().allMatch(JsonUtils::isString)) {
-                    throw new DataError(ErrorType.Invalid, "proof", Keywords.TYPE);
-                }
-
-                embeddedProof.type = typeValue.asJsonArray().stream()
-                                        .map(JsonString.class::cast)
-                                        .map(JsonString::getString)
-                                        .findAny().orElse(null);
-
-            } else if (JsonUtils.isString(typeValue)) {
-                embeddedProof.type = ((JsonString)typeValue).getString();
-
-            } else {
+            // all @type values must be string
+            if (!typeValue.asJsonArray().stream().allMatch(JsonUtils::isString)) {
                 throw new DataError(ErrorType.Invalid, "proof", Keywords.TYPE);
             }
 
-            // proofPurpose property
-            if (!proofObject.containsKey(PROOF_PURPOSE)) {
-                throw new DataError(ErrorType.Missing, "proofPurpose");
-            }
+            embeddedProof.type = typeValue.asJsonArray().stream()
+                                    .map(JsonString.class::cast)
+                                    .map(JsonString::getString)
+                                    .findAny().orElse(null);
 
-            final JsonValue proofPurposeValue = proofObject.get(PROOF_PURPOSE);
+        } else if (JsonUtils.isString(typeValue)) {
+            embeddedProof.type = ((JsonString)typeValue).getString();
 
-            if (JsonUtils.isArray(proofPurposeValue)) {
+        } else {
+            throw new DataError(ErrorType.Invalid, "proof", Keywords.TYPE);
+        }
 
-                if (!proofPurposeValue.asJsonArray().stream().allMatch(NodeObject::isNodeReference)) {
-                    throw new DataError(ErrorType.Invalid, "proofPurpose");
-                }
+        // proofPurpose property
+        if (!proofObject.containsKey(PROOF_PURPOSE)) {
+            throw new DataError(ErrorType.Missing, "proofPurpose");
+        }
 
-                embeddedProof.purpose = proofPurposeValue.asJsonArray().stream()
-                                        .map(JsonValue::asJsonObject)
-                                        .map(o -> o.getString(Keywords.ID))
-                                        .limit(1).toArray(String[]::new)[0];
-            } else {
+        final JsonValue proofPurposeValue = proofObject.get(PROOF_PURPOSE);
+
+        if (JsonUtils.isArray(proofPurposeValue)) {
+
+            if (!proofPurposeValue.asJsonArray().stream().allMatch(NodeObject::isNodeReference)) {
                 throw new DataError(ErrorType.Invalid, "proofPurpose");
             }
 
-            // verificationMethod property
-            if (!proofObject.containsKey(PROOF_VERIFICATION_METHOD)) {
-                throw new DataError(ErrorType.Missing, "verificationMethod");
-            }
+            embeddedProof.purpose = proofPurposeValue.asJsonArray().stream()
+                                    .map(JsonValue::asJsonObject)
+                                    .map(o -> o.getString(Keywords.ID))
+                                    .limit(1).toArray(String[]::new)[0];
+        } else {
+            throw new DataError(ErrorType.Invalid, "proofPurpose");
+        }
 
-            final JsonValue verificationMethodValue = proofObject.get(PROOF_VERIFICATION_METHOD);
+        // verificationMethod property
+        if (!proofObject.containsKey(PROOF_VERIFICATION_METHOD)) {
+            throw new DataError(ErrorType.Missing, "verificationMethod");
+        }
 
-            if (JsonUtils.isArray(verificationMethodValue) && verificationMethodValue.asJsonArray().size() > 0) {
+        final JsonValue verificationMethodValue = proofObject.get(PROOF_VERIFICATION_METHOD);
 
-                final JsonValue verificationMethodItem = verificationMethodValue.asJsonArray().get(0);
+        if (JsonUtils.isArray(verificationMethodValue) && verificationMethodValue.asJsonArray().size() > 0) {
 
-                if (JsonUtils.isNonEmptyObject(verificationMethodItem)) {
-                    embeddedProof.verificationMethod = Ed25519KeyPair2020.from(verificationMethodItem.asJsonObject());
+            final JsonValue verificationMethodItem = verificationMethodValue.asJsonArray().get(0);
+
+            if (JsonUtils.isNonEmptyObject(verificationMethodItem)) {
+                embeddedProof.verificationMethod = Ed25519KeyPair2020.from(verificationMethodItem.asJsonObject());
 
 //                } else if (NodeObject.isNodeReference(verificationMethodItem)) {
 //
@@ -171,113 +186,106 @@ public class EmbeddedProof implements Proof {
 //
 //                    embeddedProof.verificationMethod = Ed25519KeyPair2020.reference(URI.create(id));
 
-                } else {
-                    throw new DataError(ErrorType.Invalid, "verificationMethod");
-                }
-
-
             } else {
                 throw new DataError(ErrorType.Invalid, "verificationMethod");
             }
 
-            // proofValue property
-            if (!proofObject.containsKey(PROOF_VALUE)) {
-                throw new DataError(ErrorType.Missing, "proof", Keywords.VALUE);
-            }
 
-            final JsonValue embeddedProofValue = proofObject.get(PROOF_VALUE);
+        } else {
+            throw new DataError(ErrorType.Invalid, "verificationMethod");
+        }
 
-            if (JsonUtils.isArray(embeddedProofValue)) {
+        // proofValue property
+        if (!proofObject.containsKey(PROOF_VALUE)) {
+            throw new DataError(ErrorType.Missing, "proof", Keywords.VALUE);
+        }
 
-                if (!embeddedProofValue.asJsonArray().stream().allMatch(ValueObject::isValueObject)
-                        || !embeddedProofValue.asJsonArray().stream()
-                                .map(JsonValue::asJsonObject)
-                                .map(o -> o.get(Keywords.VALUE))
-                                .allMatch(JsonUtils::isString)
-                        ) {
-                    throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE);
-                }
+        final JsonValue embeddedProofValue = proofObject.get(PROOF_VALUE);
 
+        if (JsonUtils.isArray(embeddedProofValue)) {
 
-                String proofValueType = embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.TYPE);
-
-                String encodedProofValue =  embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
-
-                // verify supported proof value encoding
-                if (!"https://w3id.org/security#multibase".equals(proofValueType)) {
-                    throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE);
-                    //FIXME belongs to ED25...
-                }
-
-                // verify proof value
-                if (encodedProofValue == null || !Multibase.isAlgorithmSupported(encodedProofValue)) {
-                    throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE);
-                }
-
-                // decode proof value
-                byte[] rawProofValue = Multibase.decode(encodedProofValue);
-
-                // verify proof value length
-                if (rawProofValue.length != 64) {
-                    throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE, "length");
-                }
-
-                embeddedProof.value = rawProofValue;
-
-            } else {
+            if (!embeddedProofValue.asJsonArray().stream().allMatch(ValueObject::isValueObject)
+                    || !embeddedProofValue.asJsonArray().stream()
+                            .map(JsonValue::asJsonObject)
+                            .map(o -> o.get(Keywords.VALUE))
+                            .allMatch(JsonUtils::isString)
+                    ) {
                 throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE);
             }
 
-            // created property
-            if (!proofObject.containsKey(CREATED)) {
-                throw new DataError(ErrorType.Missing, "created");
+
+            String proofValueType = embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.TYPE);
+
+            String encodedProofValue =  embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
+
+            // verify supported proof value encoding
+            if (!"https://w3id.org/security#multibase".equals(proofValueType)) {
+                throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE);
+                //FIXME belongs to ED25...
             }
 
-            final JsonValue createdValue = proofObject.get(CREATED);
+            // verify proof value
+            if (encodedProofValue == null || !Multibase.isAlgorithmSupported(encodedProofValue)) {
+                throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE);
+            }
 
-            if (JsonUtils.isArray(createdValue)) {
+            // decode proof value
+            byte[] rawProofValue = Multibase.decode(encodedProofValue);
 
-                // take first created property
-                final JsonValue createdItem = createdValue.asJsonArray().get(0);
+            // verify proof value length
+            if (rawProofValue.length != 64) {
+                throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE, "length");
+            }
 
-                // expect value object and date in ISO 8601 format
-                if (!ValueObject.isValueObject(createdItem)) {
-                    throw new DataError(ErrorType.Invalid, "created");
-                }
+            embeddedProof.value = rawProofValue;
 
-                //TODO check @type
+        } else {
+            throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE);
+        }
 
-                String createdString = ValueObject.getValue(createdItem).filter(JsonUtils::isString)
-                .map(JsonString.class::cast)
-                .map(JsonString::getString).orElseThrow(DataError::new);
+        // created property
+        if (!proofObject.containsKey(CREATED)) {
+            throw new DataError(ErrorType.Missing, "created");
+        }
 
-                try {
-                    OffsetDateTime created = OffsetDateTime.parse(createdString);
+        final JsonValue createdValue = proofObject.get(CREATED);
 
-                    embeddedProof.created = created.toInstant();
+        if (JsonUtils.isArray(createdValue)) {
 
-                } catch (DateTimeParseException e) {
-                    throw new DataError(ErrorType.Invalid, "created");
-                }
+            // take first created property
+            final JsonValue createdItem = createdValue.asJsonArray().get(0);
 
+            // expect value object and date in ISO 8601 format
+            if (!ValueObject.isValueObject(createdItem)) {
+                throw new DataError(ErrorType.Invalid, "created");
+            }
 
-            } else {
+            //TODO check @type
+
+            String createdString = ValueObject.getValue(createdItem).filter(JsonUtils::isString)
+            .map(JsonString.class::cast)
+            .map(JsonString::getString).orElseThrow(DataError::new);
+
+            try {
+                OffsetDateTime created = OffsetDateTime.parse(createdString);
+
+                embeddedProof.created = created.toInstant();
+
+            } catch (DateTimeParseException e) {
                 throw new DataError(ErrorType.Invalid, "created");
             }
 
 
-            //TODO domain property
-
-
-
-            return embeddedProof;       //FIXME process other proofs
+        } else {
+            throw new DataError(ErrorType.Invalid, "created");
         }
 
 
+        //TODO domain property
 
 
-        //TODO
-        return null;
+
+        return embeddedProof;       //FIXME process other proofs
     }
 
     @Override

@@ -17,12 +17,13 @@
             "verificationMethod": {
                 "id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
                 "type": "Ed25519VerificationKey2020",
-                "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2"
+                "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1"
             },
             "created": "2022-06-07T21:06:15Z",
             "proofPurpose": "assertionMethod",
             "proofValue": "z3NdyGyM2RK1SUY23V1mbemVAnQTqcWpLUFkdmbXF4sC2RhhqL5JpeKyzjeLDeDo5Jr4vaaA7eDiebogM4MYczqnb"
         }
+        
     ],
     "@context": [
         "https://www.w3.org/2018/credentials/v1",

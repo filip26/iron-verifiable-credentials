@@ -1,6 +1,5 @@
 package com.apicatalog.lds;
 
-import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.key.VerificationKey;
@@ -32,26 +31,15 @@ public class LinkedDataSignature {
      * @param signature
      * @return <code>true</code> if the document has been successfully verified
      */
-    public boolean verify(final JsonObject document, final VerificationKey verificationKey, final byte[] signature) throws VerificationError {
+    public boolean verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError {
 
         if (verificationKey == null || verificationKey.getPublicKey() == null) {
             throw new VerificationError();
         }
 
-       // proof as JSON
-       JsonObject proof = document.getJsonArray(EmbeddedProof.PROOF).getJsonObject(0);  //FIXME consider multiple proofs
+       final JsonObject proofObject = Json.createObjectBuilder(proof).remove(EmbeddedProof.PROOF_VALUE).build();
 
-       // FIXME use JsonLd helpers
-       if (proof.containsKey(Keywords.GRAPH)) {
-            proof = proof.getJsonArray(Keywords.GRAPH).getJsonObject(0);
-       }
-
-       proof = Json.createObjectBuilder(proof).remove(EmbeddedProof.PROOF_VALUE).build();
-
-       // remove proof
-       JsonObject data = Json.createObjectBuilder(document).remove("https://w3id.org/security#proof").build();
-
-       byte[] computeSignature = hashCode(data, proof);
+       final byte[] computeSignature = hashCode(document, proofObject);
 
        return suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
     }
@@ -71,9 +59,10 @@ public class LinkedDataSignature {
     //FIXME change order, kayPar, options - align with Vc api
     public JsonObject sign(JsonObject document, ProofOptions options, KeyPair keyPair) throws SigningError {
 
+        final JsonObject data = EmbeddedProof.removeProof(document);
         final JsonObject proof = EmbeddedProof.from(options).toJson();
 
-        final byte[] documentHashCode = hashCode(document, proof);
+        final byte[] documentHashCode = hashCode(data, proof);
 
         final byte[] rawProofValue = suite.sign(keyPair.getPrivateKey(), documentHashCode);
 

@@ -7,13 +7,6 @@
     "sec:proof": [
         {
             "type": "Ed25519Signature2020",
-            "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-            "created": "2022-06-04T20:33:01Z",
-            "proofPurpose": "assertionMethod",
-            "proofValue": "z4XRCSmN1S86TcVfLfNQYiGhmAuEymVCAs9Nztm7UoXuBqyzGqaJd5giEsJHEoddprFXkpGHuhbrhvTMGwV6qVi4U"
-        },
-        {
-            "type": "Ed25519Signature2020",
             "verificationMethod": {
                 "id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
                 "type": "Ed25519VerificationKey2020",
@@ -22,6 +15,13 @@
             "created": "2022-06-07T21:06:15Z",
             "proofPurpose": "assertionMethod",
             "proofValue": "z3NdyGyM2RK1SUY23V1mbemVAnQTqcWpLUFkdmbXF4sC2RhhqL5JpeKyzjeLDeDo5Jr4vaaA7eDiebogM4MYczqnb"
+        },
+        {
+            "type": "Ed25519Signature2020",
+            "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+            "created": "2022-06-04T20:33:01Z",
+            "proofPurpose": "assertionMethod",
+            "proofValue": "z4XRCSmN1S86TcVfLfNQYiGhmAuEymVCAs9Nztm7UoXuBqyzGqaJd5giEsJHEoddprFXkpGHuhbrhvTMGwV6qVi4U"
         }
     ],
     "@context": [
