@@ -16,6 +16,7 @@ import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.multibase.Multibase;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
@@ -338,14 +339,28 @@ public class EmbeddedProof implements Proof {
         return root.build();
     }
 
-    public static JsonObject setProof(JsonObject document, JsonObject proof, String proofValue) {
-        return Json.createObjectBuilder(document)
-                .add(PROOF,
-                        Json.createArrayBuilder().add(
-                        Json.createObjectBuilder(proof).add(PROOF_VALUE,
-                                Json.createArrayBuilder().add(Json.createObjectBuilder()
-                                        .add(Keywords.VALUE, proofValue)
-                                        .add(Keywords.TYPE, "https://w3id.org/security#multibase"))))
-                ).build();
+    public static JsonObject setProof(final JsonObject document, final JsonObject proof, final String proofValue) {
+        
+        final JsonValue proofPropertyValue = document.get(PROOF);
+
+        final JsonArrayBuilder proofs;
+        
+        if (proofPropertyValue == null) {
+            proofs  = Json.createArrayBuilder();
+
+        } else {
+            proofs = Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue));
+        }
+
+        proofs.add(
+                Json.createObjectBuilder(proof).add(PROOF_VALUE,
+                        Json.createArrayBuilder().add(Json.createObjectBuilder()
+                                .add(Keywords.VALUE, proofValue)
+                                .add(Keywords.TYPE, "https://w3id.org/security#multibase")
+                                )
+                        )
+                );
+        
+        return Json.createObjectBuilder(document).add(PROOF, proofs).build();
     }
 }

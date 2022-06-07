@@ -142,6 +142,7 @@ public final class IssuerApi {
 
         final JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
+                    //TODO ErrorCode
                 );
 
         final Verifiable verifiable = Vc.get(object);
