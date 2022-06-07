@@ -18,7 +18,7 @@ class DidKeyTest {
         DidKey key = DidKey.create(URI.create("did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH"));
         assertNotNull(key);
     }
-    
+
     @Test
     void t2() {
         DidKey key = DidKey.create(URI.create("did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp"));

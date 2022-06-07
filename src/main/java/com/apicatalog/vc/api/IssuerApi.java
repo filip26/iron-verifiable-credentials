@@ -1,30 +1,28 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.api;
 
 import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.document.Document;
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.DataError.ErrorType;
-import com.apicatalog.lds.SigningError.Code;
 import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
+import com.apicatalog.lds.SigningError.Code;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.proof.ProofOptions;
+import com.apicatalog.vc.StaticContextLoader;
+import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
-public class SigningProcessor {
+public final class IssuerApi {
 
     private final URI location;
     private final JsonObject document;
@@ -36,7 +34,7 @@ public class SigningProcessor {
 
     private DocumentLoader loader = null;
 
-    protected SigningProcessor(URI location, URI keyPairLocation, ProofOptions options) {
+    protected IssuerApi(URI location, URI keyPairLocation, ProofOptions options) {
         this.location = location;
         this.document = null;
 
@@ -46,7 +44,7 @@ public class SigningProcessor {
         this.options = options;
     }
 
-    protected SigningProcessor(JsonObject document, KeyPair keyPair, ProofOptions options) {
+    protected IssuerApi(JsonObject document, KeyPair keyPair, ProofOptions options) {
         this.document = document;
         this.location = null;
 
@@ -56,7 +54,7 @@ public class SigningProcessor {
         this.options = options;
     }
 
-    public SigningProcessor loader(DocumentLoader loader) {
+    public IssuerApi loader(DocumentLoader loader) {
         this.loader = loader;
         return this;
     }
@@ -142,43 +140,18 @@ public class SigningProcessor {
 
         final LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
 
-        for (final JsonValue item : expanded) {
+        final JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
+                    new SigningError() // malformed input, not single object to sign has been found
+                    //TODO ErrorCode
+                );
 
-            // is a credential?
-            if (Credential.isCredential(item)) {
+        final Verifiable verifiable = Vc.get(object);
 
-                final JsonObject object = item.asJsonObject();
-
-                // validate the credential object
-                final Credential credential = Credential.from(object);
-
-                // is expired?
-                if (credential.isExpired()) {
-                    throw new SigningError(Code.Expired);
-                }
-
-                final JsonObject signed = signature.sign(object, options, keyPair);
-
-                // take only the first object
-                return signed;
-            }
-
-            // is a presentation?
-            if (Presentation.isPresentation(item)) {
-                // validate the presentation object
-                //TODO
-            }
-
-            // unknown or non-existent type
-
-            // is not expanded JSON-LD object
-            if (!JsonLdUtils.hasType(item)) {
-                throw new DataError(ErrorType.Missing, Keywords.TYPE);
-            }
-
-            throw new DataError(ErrorType.Unknown, Keywords.TYPE);
+        // is expired?
+        if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
+            throw new SigningError(Code.Expired);
         }
 
-        throw new SigningError();     // malformed input, not single object to sign has been found
+        return signature.sign(object, options, keyPair);
     }
 }

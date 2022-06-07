@@ -37,7 +37,7 @@
 			],
 			"name": "missing proof",
 			"input": "verifier/0003-in.jsonld",
-		    "expectErrorCode": "MissingProof"
+			"expectErrorCode": "MissingProof"
 		},
 		{
 			"@id": "#t0004",
@@ -58,115 +58,133 @@
 			"name": "simple valid signed VC",
 			"input": "verifier/0005-in.jsonld"
 		},
-        {
-            "@id": "#t0006",
-            "@type": [
+		{
+			"@id": "#t0006",
+			"@type": [
+				"PositiveEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "forged credentials subject",
+			"input": "verifier/0006-in.jsonld",
+			"expect": false
+		},
+		{
+			"@id": "#t0007",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "missing @type property",
+			"input": "verifier/0007-in.jsonld",
+			"expectErrorCode": "MissingProofType"
+		},
+		{
+			"@id": "#t0008",
+			"@type": [
+				"PositiveEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "embedded verification method",
+			"input": "verifier/0008-in.jsonld"
+		},
+		{
+			"@id": "#t0009",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "missing created property",
+			"input": "verifier/0009-in.jsonld",
+			"expectErrorCode": "MissingCreated"
+		},
+		{
+			"@id": "#t0010",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "invalid created property",
+			"input": "verifier/0010-in.jsonld",
+			"expectErrorCode": "InvalidCreated"
+		},
+		{
+			"@id": "#t0011",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "missing verificationMethod property",
+			"input": "verifier/0011-in.jsonld",
+			"expectErrorCode": "MissingVerificationMethod"
+		},
+		{
+			"@id": "#t0012",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "invalid verificationMethod property",
+			"input": "verifier/0012-in.jsonld",
+			"expectErrorCode": "InvalidVerificationMethod"
+		},
+		{
+			"@id": "#t0013",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "missing proofPurpose property",
+			"input": "verifier/0013-in.jsonld",
+			"expectErrorCode": "MissingProofPurpose"
+		},
+		{
+			"@id": "#t0014",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "invalid proofPurpose property",
+			"input": "verifier/0014-in.jsonld",
+			"expectErrorCode": "InvalidProofPurpose"
+		},
+		{
+			"@id": "#t0015",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "missing proofValue property",
+			"input": "verifier/0015-in.jsonld",
+			"expectErrorCode": "MissingProofValue"
+		},
+		{
+			"@id": "#t0016",
+			"@type": [
+				"NegativeEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "invalid proofValue property",
+			"input": "verifier/0016-in.jsonld",
+			"expectErrorCode": "InvalidProofValue"
+		},
+		{
+			"@id": "#t0020",
+			"@type": [
+				"PositiveEvaluationTest",
+				"VeriferTest"
+			],
+			"name": "proof set of two valid proofs",
+			"input": "verifier/0020-in.jsonld"
+		},
+		{
+			"@id": "#t0021",
+			"@type": [
                 "PositiveEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "forged credentials subject",
-            "input": "verifier/0006-in.jsonld",
-            "expect": false
-        },
-        {
-            "@id": "#t0007",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "missing @type property",
-            "input": "verifier/0007-in.jsonld",
-            "expectErrorCode": "MissingProofType"
-
-        },
-        {
-            "@id": "#t0008",
-            "@type": [
-                "PositiveEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "embedded verification method",
-            "input": "verifier/0008-in.jsonld"
-        },        
-        {
-            "@id": "#t0009",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "missing created property",
-            "input": "verifier/0009-in.jsonld",
-            "expectErrorCode": "MissingCreated"
-        },
-        {
-            "@id": "#t0010",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "invalid created property",
-            "input": "verifier/0010-in.jsonld",
-            "expectErrorCode": "InvalidCreated"
-        },
-        {
-            "@id": "#t0011",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"                
-            ],
-            "name": "missing verificationMethod property",
-            "input": "verifier/0011-in.jsonld",
-            "expectErrorCode": "MissingVerificationMethod"
-        },
-        {
-            "@id": "#t0012",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "invalid verificationMethod property",
-            "input": "verifier/0012-in.jsonld",
-            "expectErrorCode": "InvalidVerificationMethod"
-        },
-        {
-            "@id": "#t0013",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "missing proofPurpose property",
-            "input": "verifier/0013-in.jsonld",
-            "expectErrorCode": "MissingProofPurpose"
-        },
-        {
-            "@id": "#t0014",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "invalid proofPurpose property",
-            "input": "verifier/0014-in.jsonld",
-            "expectErrorCode": "InvalidProofPurpose"
-        },
-        {
-            "@id": "#t0015",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "missing proofValue property",
-            "input": "verifier/0015-in.jsonld",
-            "expectErrorCode": "MissingProofValue"
-        },
-        {
-            "@id": "#t0016",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "invalid proofValue property",
-            "input": "verifier/0016-in.jsonld",
-            "expectErrorCode": "InvalidProofValue"
-        }
+				"VeriferTest"
+			],
+			"name": "proof set having one forged proof",
+			"input": "verifier/0021-in.jsonld",
+			"expect": false
+		}
 	]
 }

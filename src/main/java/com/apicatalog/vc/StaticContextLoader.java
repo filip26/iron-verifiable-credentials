@@ -25,7 +25,6 @@ public class StaticContextLoader implements DocumentLoader {
         staticCache.put("https://www.w3.org/ns/did/v1", get("did-v1.jsonld"));
     }
 
-
     static JsonDocument get(String name) {
         try (final InputStream is = StaticContextLoader.class.getResourceAsStream(name)) {
 

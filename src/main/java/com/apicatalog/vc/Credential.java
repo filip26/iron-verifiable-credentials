@@ -3,6 +3,7 @@ package com.apicatalog.vc;
 import java.net.URI;
 import java.time.Instant;
 
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.lds.DataError;
@@ -15,7 +16,7 @@ import jakarta.json.JsonValue;
  *
  * see {@link https://www.w3.org/TR/vc-data-model/#credentials}
  */
-public class Credential {
+public class Credential implements Verifiable {
 
     public static final String BASE = "https://www.w3.org/2018/credentials#";
 
@@ -38,62 +39,61 @@ public class Credential {
 
     protected Credential() {}
 
-    public static boolean isCredential(JsonValue value) {
-        if (value == null) {
+    public static boolean isCredential(JsonValue expanded) {
+        if (expanded == null) {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
-        return JsonUtils.isObject(value) && JsonLdUtils.isTypeOf(BASE + TYPE, value.asJsonObject());
+        return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
     }
 
-    public static Credential from(JsonObject object) throws DataError {
+    public static Credential from(JsonObject expanded) throws DataError {
 
-        if (object == null) {
+        if (expanded == null) {
             throw new IllegalArgumentException("The 'object' parameter must not be null.");
         }
 
         final Credential credential = new Credential();
 
-        if (!JsonLdUtils.isTypeOf(BASE + TYPE, object)) {
+        if (!JsonLdUtils.isTypeOf(BASE + TYPE, expanded)) {
 
-            if (!JsonLdUtils.hasType(object)) {
+            if (!JsonLdUtils.hasType(expanded)) {
                 throw new DataError(ErrorType.Missing, Keywords.TYPE);
             }
 
             throw new DataError(ErrorType.Unknown, Keywords.TYPE);
         }
 
-        if (!hasProperty(object, SUBJECT)) {
+        if (!hasProperty(expanded, SUBJECT)) {
             throw new DataError(ErrorType.Missing, SUBJECT);
         }
 
         // issuer
-        if (!hasProperty(object, ISSUER)) {
+        if (!hasProperty(expanded, ISSUER)) {
             throw new DataError(ErrorType.Missing, ISSUER);
         }
 
         credential.issuer = JsonLdUtils
-                                .getId(getProperty(object, ISSUER))
+                                .getId(getProperty(expanded, ISSUER))
                                 .orElseThrow(() -> new DataError(ErrorType.Invalid, ISSUER, Keywords.ID));
 
         // issuance date
-        if (!JsonLdUtils.isXsdDateTime(getProperty(object, ISSUANCE_DATE))) {
+        if (!hasProperty(expanded, ISSUANCE_DATE)) {
+            throw new DataError(ErrorType.Missing, ISSUANCE_DATE);
+        }
 
-            if (!hasProperty(object, ISSUANCE_DATE)) {
-                throw new DataError(ErrorType.Missing, ISSUANCE_DATE);
-            }
-
+        if (!JsonLdUtils.isXsdDateTime(getProperty(expanded, ISSUANCE_DATE))) {
             throw new DataError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.TYPE);
         }
 
         credential.issuance = JsonLdUtils
-                                    .getXsdDateTime(getProperty(object, ISSUANCE_DATE))
+                                    .findFirstXsdDateTime(getProperty(expanded, ISSUANCE_DATE))
                                     .orElseThrow(() -> new DataError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.VALUE));
 
         // expiration date
-        if (hasProperty(object, EXPIRATION_DATE)) {
-            credential.expiration = JsonLdUtils.getXsdDateTime(getProperty(object, EXPIRATION_DATE))
+        if (hasProperty(expanded, EXPIRATION_DATE)) {
+            credential.expiration = JsonLdUtils.findFirstXsdDateTime(getProperty(expanded, EXPIRATION_DATE))
                     .orElseThrow(() -> {
-                        if (!JsonLdUtils.isXsdDateTime(getProperty(object, EXPIRATION_DATE))) {
+                        if (!JsonLdUtils.isXsdDateTime(getProperty(expanded, EXPIRATION_DATE))) {
                             return new DataError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.TYPE);
                         }
                         return new DataError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.VALUE);
@@ -101,8 +101,8 @@ public class Credential {
         }
 
         // status
-        if (hasProperty(object, CREDENTIAL_STATUS)) {
-            for (final JsonValue status : JsonUtils.toJsonArray(getProperty(object, CREDENTIAL_STATUS))) {
+        if (hasProperty(expanded, CREDENTIAL_STATUS)) {
+            for (final JsonValue status : JsonUtils.toJsonArray(getProperty(expanded, CREDENTIAL_STATUS))) {
                 credential.status = CredentialStatus.from(status);
                 break;
             }
@@ -112,12 +112,12 @@ public class Credential {
         return credential;
     }
 
-    protected static boolean hasProperty(JsonObject object, String property) {
-        return JsonLdUtils.hasProperty(object, BASE, property);
+    protected static boolean hasProperty(JsonObject expanded, String property) {
+        return JsonLdUtils.hasProperty(expanded, BASE, property);
     }
 
-    protected static JsonValue getProperty(JsonObject object, String property) {
-        return JsonLdUtils.getProperty(object, BASE, property).orElse(null);  //TODO throw something
+    protected static JsonValue getProperty(JsonObject expanded, String property) {
+        return JsonLdUtils.getProperty(expanded, BASE, property).orElse(null);  //TODO throw something
     }
 
     /**
@@ -168,5 +168,15 @@ public class Credential {
      */
     public CredentialStatus getCredentialStatus() {
         return status;
+    }
+
+    @Override
+    public boolean isCredential() {
+        return true;
+    }
+
+    @Override
+    public Credential asCredential() {
+        return this;
     }
 }

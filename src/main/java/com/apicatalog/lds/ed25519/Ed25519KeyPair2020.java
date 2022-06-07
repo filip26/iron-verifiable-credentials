@@ -2,10 +2,10 @@ package com.apicatalog.lds.ed25519;
 
 import java.net.URI;
 
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.vc.JsonLdUtils;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;

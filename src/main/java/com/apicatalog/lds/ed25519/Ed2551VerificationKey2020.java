@@ -2,6 +2,7 @@ package com.apicatalog.lds.ed25519;
 
 import java.net.URI;
 
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
@@ -13,7 +14,6 @@ import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.multicodec.Multicodec.Type;
-import com.apicatalog.vc.JsonLdUtils;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
