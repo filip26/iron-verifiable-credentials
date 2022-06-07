@@ -62,15 +62,15 @@ public class EmbeddedProof implements Proof {
     public static boolean hasProof(JsonObject credential) {
         return credential.containsKey(EmbeddedProof.PROOF);
     }
-    
+
     public static Collection<JsonValue> getProof(JsonObject credential) {
-        
+
         JsonValue proofs = credential.get(EmbeddedProof.PROOF);
- 
+
         if (JsonUtils.isNull(proofs)) {
             return Collections.emptyList();
         }
-        
+
         if (JsonUtils.isArray(proofs)) {
             if (proofs.asJsonArray().size() == 0) {
                 return Collections.emptyList();
@@ -79,11 +79,11 @@ public class EmbeddedProof implements Proof {
 
         return JsonUtils.toCollection(proofs);
     }
-    
+
     public static JsonObject removeProof(final JsonObject credential) {
        return Json.createObjectBuilder(credential).remove(PROOF).build();
     }
-    
+
     /**
      *
      * @param json expanded proof
@@ -103,11 +103,11 @@ public class EmbeddedProof implements Proof {
         }
 
         JsonObject proofObject = json.asJsonObject();
-        
+
         if (proofObject.containsKey(Keywords.GRAPH)) { //TODO hack
-            
+
             JsonValue proofValue = proofObject.getJsonArray(Keywords.GRAPH).get(0);     //FIXME
-            
+
             if (JsonUtils.isNotObject(proofValue)) {
                 throw new DataError(ErrorType.Invalid, "proof");
             }
@@ -348,11 +348,11 @@ public class EmbeddedProof implements Proof {
     }
 
     public static JsonObject setProof(final JsonObject document, final JsonObject proof, final String proofValue) {
-        
+
         final JsonValue proofPropertyValue = document.get(PROOF);
 
         final JsonArrayBuilder proofs;
-        
+
         if (proofPropertyValue == null) {
             proofs  = Json.createArrayBuilder();
 
@@ -368,7 +368,7 @@ public class EmbeddedProof implements Proof {
                                 )
                         )
                 );
-        
+
         return Json.createObjectBuilder(document).add(PROOF, proofs).build();
     }
 }

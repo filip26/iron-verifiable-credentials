@@ -122,37 +122,37 @@ public final class VerifierApi {
 
         // proof set
         if (EmbeddedProof.hasProof(expanded)) {
-            
+
             final JsonObject data = EmbeddedProof.removeProof(expanded);
-            
+
             final Collection<JsonValue> proofs = EmbeddedProof.getProof(expanded);
-            
+
             if (proofs == null || proofs.size() == 0) {
                 throw new DataError(ErrorType.Missing, "proof");
             }
 
-            for (final JsonValue proofValue : proofs) { 
-    
+            for (final JsonValue proofValue : proofs) {
+
                 final EmbeddedProof proof = EmbeddedProof.from(proofValue, loader);
-                
+
                 final JsonObject proofObject = proofValue.asJsonObject();
 
-        
+
                 try {
-        
+
                     // check proof type
                     if (!Ed25519Signature2020.TYPE.equals(proof.getType())) {
                         throw new DataError(ErrorType.Unknown, "cryptoSuiteType");
                     }
-        
+
                     VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), loader);
-        
+
                     LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
-        
+
                     if (!signature.verify(data, proofObject, verificationMethod, proof.getValue())) {
                         return false;
                     }
-        
+
                 } catch (JsonLdError e) {
                     throw new VerificationError(e);
                 }
@@ -164,7 +164,7 @@ public final class VerifierApi {
 
     // refresh/fetch verification method
     static final VerificationKey get(URI id, DocumentLoader loader) throws DataError, JsonLdError {
-        
+
         final JsonArray document = JsonLd.expand(id).loader(loader).get();
 
         JsonObject method = document.getJsonObject(0);  //FIXME
