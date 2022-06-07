@@ -77,12 +77,11 @@ public class Credential implements Verifiable {
                                 .orElseThrow(() -> new DataError(ErrorType.Invalid, ISSUER, Keywords.ID));
 
         // issuance date
+        if (!hasProperty(expanded, ISSUANCE_DATE)) {
+            throw new DataError(ErrorType.Missing, ISSUANCE_DATE);
+        }
+
         if (!JsonLdUtils.isXsdDateTime(getProperty(expanded, ISSUANCE_DATE))) {
-
-            if (!hasProperty(expanded, ISSUANCE_DATE)) {
-                throw new DataError(ErrorType.Missing, ISSUANCE_DATE);
-            }
-
             throw new DataError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.TYPE);
         }
 
