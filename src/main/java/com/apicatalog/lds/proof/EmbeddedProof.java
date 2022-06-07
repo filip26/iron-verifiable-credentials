@@ -16,6 +16,7 @@ import com.apicatalog.lds.DataError.ErrorType;
 import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multibase.Multibase.Algorithm;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
@@ -79,7 +80,7 @@ public class EmbeddedProof implements Proof {
 
         return JsonUtils.toCollection(proofs);
     }
-
+    
     public static JsonObject removeProof(final JsonObject credential) {
        return Json.createObjectBuilder(credential).remove(PROOF).build();
     }
@@ -318,6 +319,10 @@ public class EmbeddedProof implements Proof {
     public byte[] getValue() {
         return value;
     }
+    
+    public void setValue(byte[] value) {
+        this.value = value;
+    }
 
     public JsonObject toJson() {
 
@@ -341,13 +346,24 @@ public class EmbeddedProof implements Proof {
                 Json.createArrayBuilder()
                         .add(Json.createObjectBuilder().add(Keywords.ID,
                                 "https://w3id.org/security#assertionMethod")));  //FIXME configurable
+
         // TODO domain to proof
-
-
+        
+        if (value != null) {
+            
+            final String proofValue = Multibase.encode(Algorithm.Base58Btc, value);
+            
+            root.add(PROOF_VALUE,
+                    Json.createArrayBuilder().add(Json.createObjectBuilder()
+                            .add(Keywords.VALUE, proofValue)
+                            .add(Keywords.TYPE, "https://w3id.org/security#multibase")
+                            )
+                    );
+        }
         return root.build();
     }
 
-    public static JsonObject setProof(final JsonObject document, final JsonObject proof, final String proofValue) {
+    public JsonObject setProof(final JsonObject document) {
 
         final JsonValue proofPropertyValue = document.get(PROOF);
 
@@ -360,14 +376,7 @@ public class EmbeddedProof implements Proof {
             proofs = Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue));
         }
 
-        proofs.add(
-                Json.createObjectBuilder(proof).add(PROOF_VALUE,
-                        Json.createArrayBuilder().add(Json.createObjectBuilder()
-                                .add(Keywords.VALUE, proofValue)
-                                .add(Keywords.TYPE, "https://w3id.org/security#multibase")
-                                )
-                        )
-                );
+        proofs.add(toJson());
 
         return Json.createObjectBuilder(document).add(PROOF, proofs).build();
     }

@@ -4,9 +4,6 @@ import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
-import com.apicatalog.lds.proof.ProofOptions;
-import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multibase.Multibase.Algorithm;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -26,7 +23,8 @@ public class LinkedDataSignature {
      * see
      * {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm}
      *
-     * @param document unsigned VC/VP document
+     * @param document expanded unsigned VC/VP document
+     * @param proof expanded proof with no proofValue
      * @param verificationKey
      * @param signature
      * @return <code>true</code> if the document has been successfully verified
@@ -49,37 +47,28 @@ public class LinkedDataSignature {
      *
      * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm}
      *
-     * @param document
-     * @param options
+     * @param document expanded unsigned VC/VP document
+     * @param proof expanded proof options
      * @param keyPair
-     * @return
+     * @return computed signature
      * @throws VerificationError
      */
-    //FIXME must return the signature as byte[]
     //FIXME change order, kayPar, options - align with Vc api
-    public JsonObject sign(JsonObject document, ProofOptions options, KeyPair keyPair) throws SigningError {
+    public byte[] sign(JsonObject document, JsonObject options, KeyPair keyPair) throws SigningError {
 
-        final JsonObject data = EmbeddedProof.removeProof(document);
-        final JsonObject proof = EmbeddedProof.from(options).toJson();
+        final byte[] documentHashCode = hashCode(document, options);
 
-        final byte[] documentHashCode = hashCode(data, proof);
-
-        final byte[] rawProofValue = suite.sign(keyPair.getPrivateKey(), documentHashCode);
-
-        //FIXME encoding depends on proof @type - move to Vc api
-        final String proofValue = Multibase.encode(Algorithm.Base58Btc, rawProofValue);
-
-        return EmbeddedProof.setProof(document, proof, proofValue);
+        return suite.sign(keyPair.getPrivateKey(), documentHashCode);
     }
 
     /**
-     *
      * see
      * {@link https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}
      *
-     * @param document
-     * @param proof
-     * @return
+     * @param document expanded unsigned VC/VP document
+     * @param proof expanded proof with no proofValue
+     * @return computed hash code
+     * 
      * @throws VerificationError
      */
     public byte[] hashCode(JsonStructure document, JsonObject proof) {

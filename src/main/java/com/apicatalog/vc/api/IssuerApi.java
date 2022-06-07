@@ -15,6 +15,7 @@ import com.apicatalog.lds.SigningError.Code;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.KeyPair;
+import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.lds.proof.ProofOptions;
 import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.Verifiable;
@@ -138,8 +139,6 @@ public final class IssuerApi {
 
     private static final JsonObject sign(JsonArray expanded, KeyPair keyPair, ProofOptions options) throws SigningError, DataError {
 
-        final LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
-
         final JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
                     //TODO ErrorCode
@@ -152,6 +151,15 @@ public final class IssuerApi {
             throw new SigningError(Code.Expired);
         }
 
-        return signature.sign(object, options, keyPair);
+        final JsonObject data = EmbeddedProof.removeProof(object);
+        final EmbeddedProof proof = EmbeddedProof.from(options);
+
+        final LinkedDataSignature suite = new LinkedDataSignature(new Ed25519Signature2020());
+
+        byte[] signature = suite.sign(data, proof.toJson(), keyPair);
+
+        proof.setValue(signature);
+
+        return proof.setProof(object);
     }
 }
