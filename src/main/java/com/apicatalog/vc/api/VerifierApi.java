@@ -51,7 +51,7 @@ public final class VerifierApi {
         return this;
     }
 
-    public boolean isValid() throws VerificationError, DataError {
+    public void isValid() throws VerificationError, DataError {
 
         if (loader == null) {
             // default loader
@@ -62,55 +62,52 @@ public final class VerifierApi {
         loader = new StaticContextLoader(loader);
 
         if (document != null) {
-            return verify(document, loader);
+            verify(document, loader);
+            return;
         }
 
         if (location != null) {
-            return verify(location, loader);
+            verify(location, loader);
+            return;
         }
 
         throw new IllegalStateException();
     }
 
-    private static boolean verify(URI location, DocumentLoader loader) throws VerificationError, DataError {
+    private static void verify(URI location, DocumentLoader loader) throws VerificationError, DataError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
 
-            return verifyExpanded(expanded, loader);
+            verifyExpanded(expanded, loader);
 
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }
     }
 
-    private static boolean verify(JsonObject document, DocumentLoader loader) throws VerificationError, DataError {
+    private static void verify(JsonObject document, DocumentLoader loader) throws VerificationError, DataError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
 
-            return verifyExpanded(expanded, loader);
+            verifyExpanded(expanded, loader);
 
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }
     }
 
-    private static boolean verifyExpanded(JsonArray expanded, DocumentLoader loader) throws DataError, VerificationError {
-
+    private static void verifyExpanded(JsonArray expanded, DocumentLoader loader) throws DataError, VerificationError {
         for (final JsonValue item : expanded) {
             if (JsonUtils.isNotObject(item)) {
-                return false;
+                throw new VerificationError(); //TODO code
             }
-            boolean result = verifyExpanded(item.asJsonObject(), loader);
-            if (!result) {
-                return false;
-            }
+            verifyExpanded(item.asJsonObject(), loader);
         }
-        return true;
     }
 
-    private static boolean verifyExpanded(JsonObject expanded, DocumentLoader loader) throws DataError, VerificationError {
+    private static void verifyExpanded(JsonObject expanded, DocumentLoader loader) throws DataError, VerificationError {
 
         // data integrity checks
         final Verifiable verifiable = Vc.get(expanded);
@@ -149,15 +146,15 @@ public final class VerifierApi {
 
                     LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
 
-                    if (!signature.verify(data, proofObject, verificationMethod, proof.getValue())) {
-                        return false;
-                    }
+                    // verify signature
+                    signature.verify(data, proofObject, verificationMethod, proof.getValue());
 
                 } catch (JsonLdError e) {
                     throw new VerificationError(e);
                 }
             }
-            return true;
+            // all good
+            return;
         }
         throw new DataError(ErrorType.Missing, "proof");
     }

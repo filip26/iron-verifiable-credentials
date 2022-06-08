@@ -9,8 +9,6 @@
 		"VerifiableCredential",
 		"UniversityDegreeCredential"
 	],
-	"issuer": "https://example.edu/issuers/565049",
-	"issuanceDate": "2010-01-01T00:00:00Z",
 	"credentialSubject": {
 		"id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
 		"degree": {
@@ -20,9 +18,11 @@
 	},
 	"proof": {
 		"type": "Ed25519Signature2020",
-		"created": "2022-02-25T14:58:43Z",
-		"verificationMethod": {},
 		"proofPurpose": "assertionMethod",
-		"proofValue": "zeEdUoM7m9cY8ZyTpey83yBKeBcmcvbyrEQzJ19rD2UXArU2U1jPGoEtrRvGYppdiK37GU4NBeoPakxpWhAvsVSt"
-	}
+		"proofValue": "zeEdUoM7m9cY8ZyTpey83yBKeBcmcvbyrEQzJ19rD2UXArU2U1jPGoEtrRvGYppdiK37GU4NBeoPakxpWhAvsVSt",
+        "created": "2022-02-25T14:58:43Z",
+        "verificationMethod": {}
+	},
+    "issuer": "https://example.edu/issuers/565049",
+    "issuanceDate": "2010-01-01T00:00:00Z"	
 }

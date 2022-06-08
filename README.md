@@ -15,14 +15,18 @@ All PR's welcome!
 
 ```java
 
-boolean valid = Vc.verify(credentials).isValid();
+try {
+  Vc.verify(credentials).isValid();
+} catch (VerificationError | DataError e) {
+  ...
+}
 
-signedCredentials = Vc.sign(credentials, keys, proofOptions)
-                      .loader(documentLoader) // custom loader
-                      .get();   // returns signed document in expanded form
+signed = Vc.sign(credentials, keys, proofOptions)
+           .loader(documentLoader) // custom loader
+           .get();   // returns signed document in expanded form
 
-signedCredentials = Vc.sign(credentials, keys, proofOptions)
-                      .getCompacted(context); // returns signed document in compacted form
+signed = Vc.sign(credentials, keys, proofOptions)
+           .getCompacted(context); // returns signed document in compacted form
 
 KeyPair keys = Vc.newKeys("https://w3id.org/security#Ed25519KeyPair2020")
                  .generate()

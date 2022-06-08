@@ -27,9 +27,9 @@ public class LinkedDataSignature {
      * @param proof expanded proof with no proofValue
      * @param verificationKey
      * @param signature
-     * @return <code>true</code> if the document has been successfully verified
+     * @throws VerificationError
      */
-    public boolean verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError {
+    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError {
 
         if (verificationKey == null || verificationKey.getPublicKey() == null) {
             throw new VerificationError();
@@ -39,7 +39,7 @@ public class LinkedDataSignature {
 
        final byte[] computeSignature = hashCode(document, proofObject);
 
-       return suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
+       suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
     }
 
     /**

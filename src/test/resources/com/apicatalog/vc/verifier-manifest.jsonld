@@ -61,12 +61,12 @@
 		{
 			"@id": "#t0006",
 			"@type": [
-				"PositiveEvaluationTest",
+				"NegativeEvaluationTest",
 				"VeriferTest"
 			],
 			"name": "forged credentials subject",
 			"input": "verifier/0006-in.jsonld",
-			"expect": false
+			"expectErrorCode": "InvalidSignature"
 		},
 		{
 			"@id": "#t0007",
@@ -179,12 +179,12 @@
 		{
 			"@id": "#t0021",
 			"@type": [
-                "PositiveEvaluationTest",
+                "NegativeEvaluationTest",
 				"VeriferTest"
 			],
 			"name": "proof set having one forged proof",
 			"input": "verifier/0021-in.jsonld",
-			"expect": false
+            "expectErrorCode": "InvalidSignature"
 		}
 	]
 }

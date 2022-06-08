@@ -10,7 +10,7 @@ import com.apicatalog.lds.VerificationError;
  */
 public interface SignatureAlgorithm {
 
-    boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError;
+    void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError;
 
     byte[] sign(byte[] privateKey, byte[] data) throws SigningError;
 

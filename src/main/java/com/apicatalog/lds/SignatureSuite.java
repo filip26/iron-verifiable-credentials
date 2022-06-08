@@ -31,8 +31,8 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     }
 
     @Override
-    public boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
-        return signer.verify(publicKey, signature, data);
+    public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
+        signer.verify(publicKey, signature, data);
     }
 
     @Override

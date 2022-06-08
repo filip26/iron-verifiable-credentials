@@ -160,6 +160,6 @@ public final class IssuerApi {
 
         proof.setValue(signature);
 
-        return proof.setProof(object);
+        return proof.appendTo(object);
     }
 }
