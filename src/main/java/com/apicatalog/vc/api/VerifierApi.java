@@ -18,6 +18,7 @@ import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
+import com.apicatalog.vc.CredentialStatus;
 import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.StatusVerifier;
 import com.apicatalog.vc.Verifiable;
@@ -31,7 +32,8 @@ public final class VerifierApi {
     private final URI location;
     private final JsonObject document;
     private DocumentLoader loader = null;
-    private StatusVerifier statusVerifier = null;  
+    private StatusVerifier statusVerifier = null;
+    private boolean bundledContexts = true;
 
     protected VerifierApi(URI location) {
         this.location = location;
@@ -48,16 +50,35 @@ public final class VerifierApi {
         return this;
     }
 
-    public VerifierApi useBundledContexts(boolean buildedContexts) {
-        //TOOD
+    /**
+     * Use well-known contexts that are bundled with the library instead of fetching it online. 
+     * <code>true</code> by default. Disabling might cause slower processing.
+     *  
+     * @param enable
+     * @return
+     */
+    public VerifierApi useBundledContexts(boolean enable) {
+        this.bundledContexts = enable;
         return this;
     }
     
+    /**
+     * Sets {@link CredentialStatus} verifier. 
+     * If not set then <code>credentialStatus</code> is not verified.
+     * 
+     * @param statusVerifier
+     * @return
+     */
     public VerifierApi statusVerifier(StatusVerifier statusVerifier) {
         this.statusVerifier = statusVerifier;
         return this;
     }
 
+    /**
+     * Verifies VC/VP document. Throws VerificationError if the document is not valid or cannot be verified.
+     * @throws VerificationError
+     * @throws DataError
+     */
     public void isValid() throws VerificationError, DataError {
 
         if (loader == null) {
@@ -65,8 +86,9 @@ public final class VerifierApi {
             loader = SchemeRouter.defaultInstance();
         }
 
-        //TODO make it configurable
-        loader = new StaticContextLoader(loader);
+        if (bundledContexts) {
+            loader = new StaticContextLoader(loader);
+        }
 
         if (document != null) {
             verify(document, loader, statusVerifier);
