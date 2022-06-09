@@ -29,6 +29,8 @@ public class Credential implements Verifiable {
     public static final String EXPIRATION_DATE = "expirationDate";
     public static final String CREDENTIAL_STATUS = "credentialStatus";
 
+    private URI id;     //TODO
+    
     private URI issuer;
 
     private Instant issuance;
@@ -41,7 +43,7 @@ public class Credential implements Verifiable {
 
     public static boolean isCredential(JsonValue expanded) {
         if (expanded == null) {
-            throw new IllegalArgumentException("The 'value' parameter must not be null.");
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
         return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
     }
@@ -49,11 +51,12 @@ public class Credential implements Verifiable {
     public static Credential from(JsonObject expanded) throws DataError {
 
         if (expanded == null) {
-            throw new IllegalArgumentException("The 'object' parameter must not be null.");
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
 
         final Credential credential = new Credential();
 
+        // type
         if (!JsonLdUtils.isTypeOf(BASE + TYPE, expanded)) {
 
             if (!JsonLdUtils.hasType(expanded)) {
@@ -62,7 +65,14 @@ public class Credential implements Verifiable {
 
             throw new DataError(ErrorType.Unknown, Keywords.TYPE);
         }
+        
+        // id
+        if (JsonLdUtils.hasProperty(expanded, Keywords.ID)) {            
+            credential.id = JsonLdUtils.getId(expanded)
+                    .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
+        }
 
+        // subject
         if (!hasProperty(expanded, SUBJECT)) {
             throw new DataError(ErrorType.Missing, SUBJECT);
         }
@@ -118,6 +128,11 @@ public class Credential implements Verifiable {
 
     protected static JsonValue getProperty(JsonObject expanded, String property) {
         return JsonLdUtils.getProperty(expanded, BASE, property).orElse(null);  //TODO throw something
+    }
+
+    @Override
+    public URI getId() {
+        return id;
     }
 
     /**
