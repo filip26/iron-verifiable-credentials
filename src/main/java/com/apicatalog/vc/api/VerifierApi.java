@@ -19,6 +19,7 @@ import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.vc.StaticContextLoader;
+import com.apicatalog.vc.StatusVerifier;
 import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonArray;
@@ -30,6 +31,7 @@ public final class VerifierApi {
     private final URI location;
     private final JsonObject document;
     private DocumentLoader loader = null;
+    private StatusVerifier statusVerifier = null;  
 
     protected VerifierApi(URI location) {
         this.location = location;
@@ -50,6 +52,11 @@ public final class VerifierApi {
         //TOOD
         return this;
     }
+    
+    public VerifierApi statusVerifier(StatusVerifier statusVerifier) {
+        this.statusVerifier = statusVerifier;
+        return this;
+    }
 
     public void isValid() throws VerificationError, DataError {
 
@@ -62,52 +69,52 @@ public final class VerifierApi {
         loader = new StaticContextLoader(loader);
 
         if (document != null) {
-            verify(document, loader);
+            verify(document, loader, statusVerifier);
             return;
         }
 
         if (location != null) {
-            verify(location, loader);
+            verify(location, loader, statusVerifier);
             return;
         }
 
         throw new IllegalStateException();
     }
 
-    private static void verify(URI location, DocumentLoader loader) throws VerificationError, DataError {
+    private static void verify(URI location, DocumentLoader loader, StatusVerifier statusVerifier) throws VerificationError, DataError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
 
-            verifyExpanded(expanded, loader);
+            verifyExpanded(expanded, loader, statusVerifier);
 
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }
     }
 
-    private static void verify(JsonObject document, DocumentLoader loader) throws VerificationError, DataError {
+    private static void verify(JsonObject document, DocumentLoader loader, StatusVerifier statusVerifier) throws VerificationError, DataError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
 
-            verifyExpanded(expanded, loader);
+            verifyExpanded(expanded, loader, statusVerifier);
 
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }
     }
 
-    private static void verifyExpanded(JsonArray expanded, DocumentLoader loader) throws DataError, VerificationError {
+    private static void verifyExpanded(JsonArray expanded, DocumentLoader loader, StatusVerifier statusVerifier) throws DataError, VerificationError {
         for (final JsonValue item : expanded) {
             if (JsonUtils.isNotObject(item)) {
                 throw new VerificationError(); //TODO code
             }
-            verifyExpanded(item.asJsonObject(), loader);
+            verifyExpanded(item.asJsonObject(), loader, statusVerifier);
         }
     }
 
-    private static void verifyExpanded(JsonObject expanded, DocumentLoader loader) throws DataError, VerificationError {
+    private static void verifyExpanded(JsonObject expanded, DocumentLoader loader, StatusVerifier statusVerifier) throws DataError, VerificationError {
 
         // data integrity checks
         final Verifiable verifiable = Vc.get(expanded);
@@ -134,9 +141,7 @@ public final class VerifierApi {
 
                 final JsonObject proofObject = proofValue.asJsonObject();
 
-
                 try {
-
                     // check proof type
                     if (!Ed25519Signature2020.TYPE.equals(proof.getType())) {
                         throw new DataError(ErrorType.Unknown, "cryptoSuiteType");
@@ -149,6 +154,11 @@ public final class VerifierApi {
                     // verify signature
                     signature.verify(data, proofObject, verificationMethod, proof.getValue());
 
+                    // verify status
+                    if (statusVerifier != null && verifiable.isCredential()) {
+                        statusVerifier.verify(verifiable.asCredential().getCredentialStatus());
+                    }
+                    
                 } catch (JsonLdError e) {
                     throw new VerificationError(e);
                 }
