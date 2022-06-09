@@ -7,7 +7,6 @@ import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.DataError.ErrorType;
@@ -27,13 +26,11 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public final class VerifierApi {
+public final class VerifierApi extends CommonApi {
 
     private final URI location;
     private final JsonObject document;
-    private DocumentLoader loader = null;
     private StatusVerifier statusVerifier = null;
-    private boolean bundledContexts = true;
 
     protected VerifierApi(URI location) {
         this.location = location;
@@ -43,23 +40,6 @@ public final class VerifierApi {
     protected VerifierApi(JsonObject document) {
         this.document = document;
         this.location = null;
-    }
-
-    public VerifierApi loader(DocumentLoader loader) {
-        this.loader = loader;
-        return this;
-    }
-
-    /**
-     * Use well-known contexts that are bundled with the library instead of fetching it online. 
-     * <code>true</code> by default. Disabling might cause slower processing.
-     *  
-     * @param enable
-     * @return
-     */
-    public VerifierApi useBundledContexts(boolean enable) {
-        this.bundledContexts = enable;
-        return this;
     }
     
     /**
@@ -91,52 +71,52 @@ public final class VerifierApi {
         }
 
         if (document != null) {
-            verify(document, loader, statusVerifier);
+            verify(document);
             return;
         }
 
         if (location != null) {
-            verify(location, loader, statusVerifier);
+            verify(location);
             return;
         }
 
         throw new IllegalStateException();
     }
 
-    private static void verify(URI location, DocumentLoader loader, StatusVerifier statusVerifier) throws VerificationError, DataError {
+    private void verify(URI location) throws VerificationError, DataError {
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(location).loader(loader).get();
+            final JsonArray expanded = JsonLd.expand(location).loader(loader).base(base).get();
 
-            verifyExpanded(expanded, loader, statusVerifier);
+            verifyExpanded(expanded);
 
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }
     }
 
-    private static void verify(JsonObject document, DocumentLoader loader, StatusVerifier statusVerifier) throws VerificationError, DataError {
+    private void verify(JsonObject document) throws VerificationError, DataError {
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
+            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).base(base).get();
 
-            verifyExpanded(expanded, loader, statusVerifier);
+            verifyExpanded(expanded);
 
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }
     }
 
-    private static void verifyExpanded(JsonArray expanded, DocumentLoader loader, StatusVerifier statusVerifier) throws DataError, VerificationError {
+    private void verifyExpanded(JsonArray expanded) throws VerificationError, DataError {
         for (final JsonValue item : expanded) {
             if (JsonUtils.isNotObject(item)) {
                 throw new VerificationError(); //TODO code
             }
-            verifyExpanded(item.asJsonObject(), loader, statusVerifier);
+            verifyExpanded(item.asJsonObject());
         }
     }
 
-    private static void verifyExpanded(JsonObject expanded, DocumentLoader loader, StatusVerifier statusVerifier) throws DataError, VerificationError {
+    private void verifyExpanded(JsonObject expanded) throws VerificationError, DataError {
 
         // data integrity checks
         final Verifiable verifiable = Vc.get(expanded);
@@ -169,7 +149,7 @@ public final class VerifierApi {
                         throw new DataError(ErrorType.Unknown, "cryptoSuiteType");
                     }
 
-                    VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), loader);
+                    VerificationKey verificationMethod = get(proof.getVerificationMethod().getId());
 
                     LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
 
@@ -192,7 +172,7 @@ public final class VerifierApi {
     }
 
     // refresh/fetch verification method
-    static final VerificationKey get(URI id, DocumentLoader loader) throws DataError, JsonLdError {
+    final VerificationKey get(URI id) throws JsonLdError, DataError {
 
         final JsonArray document = JsonLd.expand(id).loader(loader).get();
 

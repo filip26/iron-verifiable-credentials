@@ -6,7 +6,6 @@ import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.LinkedDataSignature;
@@ -23,7 +22,7 @@ import com.apicatalog.vc.Verifiable;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
-public final class IssuerApi {
+public final class IssuerApi extends CommonApi {
 
     private final URI location;
     private final JsonObject document;
@@ -32,8 +31,6 @@ public final class IssuerApi {
     private final KeyPair keyPair;
 
     private final ProofOptions options;
-
-    private DocumentLoader loader = null;
 
     protected IssuerApi(URI location, URI keyPairLocation, ProofOptions options) {
         this.location = location;
@@ -55,11 +52,6 @@ public final class IssuerApi {
         this.options = options;
     }
 
-    public IssuerApi loader(DocumentLoader loader) {
-        this.loader = loader;
-        return this;
-    }
-
     /**
      * Get signed document in expanded form.
      *
@@ -74,8 +66,9 @@ public final class IssuerApi {
             loader = SchemeRouter.defaultInstance();
         }
 
-        //TODO make it configurable
-        loader = new StaticContextLoader(loader);
+        if (bundledContexts) {
+            loader = new StaticContextLoader(loader);
+        }
 
         if (document != null && keyPair != null)  {
             return sign(document, keyPair, options);
@@ -110,7 +103,7 @@ public final class IssuerApi {
     private final JsonObject sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataError, SigningError {
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).get();
+            final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).base(base).get();
 
             // load key pair
             final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
@@ -128,7 +121,7 @@ public final class IssuerApi {
     private final JsonObject sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
+            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).base(base).get();
 
             return sign(expanded, keyPair, options);
 
