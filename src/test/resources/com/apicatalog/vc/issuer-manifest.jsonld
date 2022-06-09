@@ -169,7 +169,7 @@
 			"name": "signed embedded verificationMethod",
 			"input": "issuer/0022-in.jsonld",
 			"expect": "issuer/0022-out.jsonld",
-            "context": "issuer/0001-context.jsonld",
+			"context": "issuer/0001-context.jsonld",
 			"options": {
 				"keyPair": "issuer/0001-keys.json",
 				"verificationMethod": {
@@ -181,25 +181,41 @@
 				"created": "2022-06-04T20:33:01Z"
 			}
 		},
-        {
-            "@id": "#t0030",
-            "@type": [
-                "PositiveEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "proof set, co-sign",
-            "input": "issuer/0030-in.jsonld",
-            "expect": "issuer/0030-out.jsonld",
-            "context": "issuer/0001-context.jsonld",
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": {
-                    "@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-                    "@type": "Ed25519VerificationKey2020",
-                    "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2"
-                },
-                "created": "2022-06-07T21:06:15Z"
-            }
-        }		
+		{
+			"@id": "#t0030",
+			"@type": [
+				"PositiveEvaluationTest",
+				"IssuerTest"
+			],
+			"name": "proof set, co-sign",
+			"input": "issuer/0030-in.jsonld",
+			"expect": "issuer/0030-out.jsonld",
+			"context": "issuer/0001-context.jsonld",
+			"options": {
+				"keyPair": "issuer/0001-keys.json",
+				"verificationMethod": {
+					"@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+					"@type": "Ed25519VerificationKey2020",
+					"controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2"
+				},
+				"created": "2022-06-07T21:06:15Z"
+			}
+		},
+		{
+			"@id": "#t0050",
+			"@type": [
+				"PositiveEvaluationTest",
+				"IssuerTest"
+			],
+			"name": "compacted signed presentation",
+			"input": "issuer/0050-in.jsonld",
+			"expect": "issuer/0050-out.jsonld",
+			"context": "issuer/0001-context.jsonld",
+			"options": {
+				"keyPair": "issuer/0001-keys.json",
+				"verificationMethod": "verifier/0005-verification-key.json",
+				"created": "2022-06-09T21:49:41Z"
+			}
+		}
 	]
 }

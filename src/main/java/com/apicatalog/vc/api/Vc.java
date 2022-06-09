@@ -91,7 +91,6 @@ public final class Vc {
     }
 
     protected static Verifiable get(JsonObject expanded) throws DataError {
-
         // is a credential?
         if (Credential.isCredential(expanded)) {
 
@@ -105,8 +104,13 @@ public final class Vc {
 
         // is a presentation?
         if (Presentation.isPresentation(expanded)) {
+            
+            final JsonObject object =expanded.asJsonObject();
+
             // validate the presentation object
-            //TODO
+            final Presentation presentation = Presentation.from(object);
+            
+            return presentation;
         }
 
         // is not expanded JSON-LD object
@@ -115,5 +119,4 @@ public final class Vc {
         }
         throw new DataError(ErrorType.Unknown, Keywords.TYPE);
     }
-
 }

@@ -16,6 +16,7 @@ import java.security.spec.NamedParameterSpec;
 
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.VerificationError;
+import com.apicatalog.lds.VerificationError.Code;
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
 
 public class SunSignatureProvider implements SignatureAlgorithm {
@@ -27,7 +28,7 @@ public class SunSignatureProvider implements SignatureAlgorithm {
     }
 
     @Override
-    public boolean verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
+    public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
 
         try {
             java.security.Signature suite = java.security.Signature.getInstance(type);
@@ -35,7 +36,9 @@ public class SunSignatureProvider implements SignatureAlgorithm {
             suite.initVerify(getPublicKey(publicKey));
             suite.update(data);
 
-            return suite.verify(signature);
+            if (!suite.verify(signature)) {
+                throw new VerificationError(Code.InvalidSignature);     //TODO more details
+            }
 
         } catch (InvalidParameterSpecException | InvalidKeySpecException | InvalidKeyException
                 | NoSuchAlgorithmException | SignatureException e) {

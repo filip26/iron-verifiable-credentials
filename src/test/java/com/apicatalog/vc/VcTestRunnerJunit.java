@@ -60,7 +60,8 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VeriferTest")) {
 
-                assertEquals(testCase.result != null ? testCase.result : true, Vc.verify(testCase.input).loader(LOADER).isValid());
+                Vc.verify(testCase.input).loader(LOADER).isValid();
+                assertFalse(isNegative(), "Expected error " + testCase.result);
 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssuerTest")) {
 

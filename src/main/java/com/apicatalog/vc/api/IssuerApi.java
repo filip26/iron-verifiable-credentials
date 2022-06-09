@@ -6,7 +6,6 @@ import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.LinkedDataSignature;
@@ -15,6 +14,7 @@ import com.apicatalog.lds.SigningError.Code;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.KeyPair;
+import com.apicatalog.lds.proof.EmbeddedProof;
 import com.apicatalog.lds.proof.ProofOptions;
 import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.Verifiable;
@@ -22,7 +22,7 @@ import com.apicatalog.vc.Verifiable;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
-public final class IssuerApi {
+public final class IssuerApi extends CommonApi<IssuerApi> {
 
     private final URI location;
     private final JsonObject document;
@@ -31,8 +31,6 @@ public final class IssuerApi {
     private final KeyPair keyPair;
 
     private final ProofOptions options;
-
-    private DocumentLoader loader = null;
 
     protected IssuerApi(URI location, URI keyPairLocation, ProofOptions options) {
         this.location = location;
@@ -54,11 +52,6 @@ public final class IssuerApi {
         this.options = options;
     }
 
-    public IssuerApi loader(DocumentLoader loader) {
-        this.loader = loader;
-        return this;
-    }
-
     /**
      * Get signed document in expanded form.
      *
@@ -73,8 +66,9 @@ public final class IssuerApi {
             loader = SchemeRouter.defaultInstance();
         }
 
-        //TODO make it configurable
-        loader = new StaticContextLoader(loader);
+        if (bundledContexts) {
+            loader = new StaticContextLoader(loader);
+        }
 
         if (document != null && keyPair != null)  {
             return sign(document, keyPair, options);
@@ -109,7 +103,7 @@ public final class IssuerApi {
     private final JsonObject sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataError, SigningError {
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).get();
+            final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).base(base).get();
 
             // load key pair
             final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
@@ -127,7 +121,7 @@ public final class IssuerApi {
     private final JsonObject sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).get();
+            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).base(base).get();
 
             return sign(expanded, keyPair, options);
 
@@ -137,8 +131,6 @@ public final class IssuerApi {
     }
 
     private static final JsonObject sign(JsonArray expanded, KeyPair keyPair, ProofOptions options) throws SigningError, DataError {
-
-        final LinkedDataSignature signature = new LinkedDataSignature(new Ed25519Signature2020());
 
         final JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
@@ -152,6 +144,15 @@ public final class IssuerApi {
             throw new SigningError(Code.Expired);
         }
 
-        return signature.sign(object, options, keyPair);
+        final JsonObject data = EmbeddedProof.removeProof(object);
+        final EmbeddedProof proof = EmbeddedProof.from(options);
+
+        final LinkedDataSignature suite = new LinkedDataSignature(new Ed25519Signature2020());
+
+        byte[] signature = suite.sign(data, proof.toJson(), keyPair);
+
+        proof.setValue(signature);
+
+        return proof.appendTo(object);
     }
 }

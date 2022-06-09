@@ -2,6 +2,7 @@ package com.apicatalog.lds;
 
 import java.security.GeneralSecurityException;
 
+import com.apicatalog.lds.VerificationError.Code;
 import com.apicatalog.lds.algorithm.SignatureAlgorithm;
 import com.google.crypto.tink.signature.SignatureConfig;
 import com.google.crypto.tink.subtle.Ed25519Sign;
@@ -10,20 +11,17 @@ import com.google.crypto.tink.subtle.Ed25519Verify;
 public class TinkSignature implements SignatureAlgorithm {
 
     @Override
-    public boolean verify(byte[] publicKey, byte[] signature, byte[] data) {
-
+    public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
         try {
             SignatureConfig.register();
 
             Ed25519Verify verifier = new Ed25519Verify(publicKey);
 
             verifier.verify(signature, data);
-            return true;
 
         } catch (GeneralSecurityException e) {
-            /* ignore */
-        }
-        return false;
+            throw new VerificationError(Code.InvalidSignature, e);     //TODO more details
+        }        
     }
 
     @Override
