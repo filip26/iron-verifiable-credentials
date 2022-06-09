@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 
-public abstract class CommonApi {
+public abstract class CommonApi<T extends CommonApi<T>> {
 
     protected DocumentLoader loader;
     protected boolean bundledContexts;
@@ -17,7 +17,7 @@ public abstract class CommonApi {
         this.base = null;
     }
 
-    public <T extends CommonApi> T loader(DocumentLoader loader) {
+    public T loader(DocumentLoader loader) {
         this.loader = loader;
         return (T)this;
     }

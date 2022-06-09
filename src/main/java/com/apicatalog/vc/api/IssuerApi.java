@@ -22,7 +22,7 @@ import com.apicatalog.vc.Verifiable;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
-public final class IssuerApi extends CommonApi {
+public final class IssuerApi extends CommonApi<IssuerApi> {
 
     private final URI location;
     private final JsonObject document;
