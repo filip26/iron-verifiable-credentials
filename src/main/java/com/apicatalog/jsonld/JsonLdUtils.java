@@ -9,6 +9,8 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.uri.UriUtils;
+import com.apicatalog.lds.DataError;
+import com.apicatalog.lds.DataError.ErrorType;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -24,22 +26,22 @@ public class JsonLdUtils {
      * Checks if the given {@link JsonObject} has the given type listed as one of its @type declarations.
      *
      * @param type
-     * @param object
+     * @param expanded
      * @return
      */
-    public static boolean isTypeOf(final String type, final JsonObject object) {
+    public static boolean isTypeOf(final String type, final JsonObject expanded) {
 
         if (StringUtils.isBlank(type)) {
             throw new IllegalArgumentException("The 'type' parameter must not be null nor blank.");
         }
 
-        if (object == null) {
-            throw new IllegalArgumentException("The 'object' parameter must not be null.");
+        if (expanded == null) {
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
 
-        return object.containsKey(Keywords.TYPE)
+        return expanded.containsKey(Keywords.TYPE)
                 && JsonUtils
-                    .toStream(object.get(Keywords.TYPE))
+                    .toStream(expanded.get(Keywords.TYPE))
                     .filter(JsonUtils::isString)
                     .map(JsonString.class::cast)
                     .map(JsonString::getString)
@@ -47,22 +49,22 @@ public class JsonLdUtils {
                     .anyMatch(type::equals);
     }
 
-    public static boolean hasType(final JsonValue value) {
+    public static boolean hasType(final JsonValue expanded) {
 
-        if (value == null) {
-            throw new IllegalArgumentException("The 'value' parameter must not be null.");
+        if (expanded == null) {
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
 
-        return JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.TYPE);
+        return JsonUtils.isObject(expanded) && expanded.asJsonObject().containsKey(Keywords.TYPE);
     }
 
-    public static Optional<Instant> findFirstXsdDateTime(JsonValue value)  {
+    public static Optional<Instant> findFirstXsdDateTime(JsonValue expanded)  {
 
-        if (value == null) {
-            throw new IllegalArgumentException("The 'value' parameter must not be null.");
+        if (expanded == null) {
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
 
-        return JsonUtils.toStream(value)
+        return JsonUtils.toStream(expanded)
                 .filter(ValueObject::isValueObject)
                 .filter(item -> isTypeOf(XSD_DATE_TIME, item.asJsonObject()))
                 .map(ValueObject::getValue)
@@ -84,6 +86,11 @@ public class JsonLdUtils {
     }
 
     public static final Optional<URI> getId(JsonValue expanded) {
+        
+        if (expanded == null) {
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
+        }
+
         return findFirstObject(expanded)
                 .map(o -> o.get(Keywords.ID))
                 .filter(JsonUtils::isString)
@@ -97,14 +104,14 @@ public class JsonLdUtils {
                 });
     }
 
-    public static boolean isXsdDateTime(JsonValue value) {
+    public static boolean isXsdDateTime(JsonValue expanded) {
 
-        if (value == null) {
-            throw new IllegalArgumentException("The 'value' parameter must not be null.");
+        if (expanded == null) {
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
 
         return JsonUtils
-                    .toStream(value)
+                    .toStream(expanded)
                     .filter(JsonUtils::isObject)
                     .map(JsonValue::asJsonObject)
                     .map(o -> isTypeOf(XSD_DATE_TIME, o))
@@ -112,26 +119,12 @@ public class JsonLdUtils {
                     .orElse(false);
     }
 
-    public static boolean hasProperty(JsonObject object, String property) {
-        return object.containsKey(property);
+    public static boolean hasProperty(JsonObject object, String property) {        
+        return JsonUtils.isNotNull(object.get(property));
     }
 
-    public static boolean hasProperty(JsonObject object, String base, String property) {
-        return object.containsKey(base + property) || object.containsKey(property);
-    }
-
-    public static Optional<JsonValue> getProperty(JsonObject object,String property) {
+    public static Optional<JsonValue> getValue(JsonObject object, String property) {
         return Optional.ofNullable(object.get(property));
-    }
-
-    public static Optional<JsonValue> getProperty(JsonObject object, String base, String property) {
-        JsonValue value = object.get(base + property);
-
-        if (value == null) {
-            value = object.get(property);
-        }
-
-        return Optional.ofNullable(value);
     }
 
     public static Optional<JsonObject> findFirstObject(JsonValue expanded) {
@@ -147,4 +140,35 @@ public class JsonLdUtils {
 
         return Optional.empty();
     }
+
+    public static URI assertId(JsonValue expanded, String base, String property) throws DataError {
+
+        if (JsonUtils.isNotObject(expanded) || !hasProperty(expanded.asJsonObject(), base + property)) {
+            throw new DataError(ErrorType.Missing, property);    
+        }
+      
+        final JsonValue value =  JsonLdUtils.getValue(expanded.asJsonObject(), base + property)
+                                    .orElseThrow(() -> new DataError(ErrorType.Missing, property));
+
+        return JsonLdUtils.getId(value)
+                    .orElseThrow(() ->  new DataError(ErrorType.Invalid, property, Keywords.ID));
+    }
+
+    public static Instant assertXsdDateTimeType(JsonValue expanded, String base, String property) throws DataError {
+
+        if (JsonUtils.isNotObject(expanded) || !hasProperty(expanded.asJsonObject(), base + property)) {
+            throw new DataError(ErrorType.Missing, property);    
+        }
+      
+        final JsonValue value =  JsonLdUtils
+                                .getValue(expanded.asJsonObject(), base + property)
+                                .orElseThrow(() -> new DataError(ErrorType.Missing, property, Keywords.VALUE));
+        
+        if (isXsdDateTime(value)) {
+            return JsonLdUtils.findFirstXsdDateTime(value)
+                    .orElseThrow(() ->  new DataError(ErrorType.Invalid, property, Keywords.VALUE));
+        }
+        
+        throw new DataError(ErrorType.Invalid, property, Keywords.TYPE);
+    }    
 }

@@ -1,7 +1,6 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
-import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -22,19 +21,18 @@ public class Presentation implements Verifiable {
     
     public static final String VERIFIABLE_CREDENTIALS = "verifiableCredential";
 
-    private URI id;
+    protected URI id;
     
-    private URI holder;
+    protected URI holder;
 
-    
     protected Presentation() {}
     
-    public static boolean isPresentation(JsonValue value) {
-        if (value == null) {
-            throw new IllegalArgumentException("The 'value' parameter must not be null.");
+    public static boolean isPresentation(JsonValue expanded) {
+        if (expanded == null) {
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
 
-        return JsonUtils.isObject(value) && JsonLdUtils.isTypeOf(BASE + TYPE, value.asJsonObject());
+        return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
     }
     
     public static Presentation from(JsonObject expanded) throws DataError {
@@ -45,6 +43,7 @@ public class Presentation implements Verifiable {
         
         final Presentation presentation = new Presentation();
         
+        // @type
         if (!JsonLdUtils.isTypeOf(BASE + TYPE, expanded)) {
 
             if (!JsonLdUtils.hasType(expanded)) {
@@ -54,21 +53,17 @@ public class Presentation implements Verifiable {
             throw new DataError(ErrorType.Unknown, Keywords.TYPE);
         }
 
-        // id
+        // @id - optional
         if (JsonLdUtils.hasProperty(expanded, Keywords.ID)) {            
             presentation.id = JsonLdUtils.getId(expanded)
                     .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
         }
 
-        // holder
+        // holder - optional
         if (JsonLdUtils.hasProperty(expanded, BASE + HOLDER)) {
-            presentation.holder = JsonLdUtils.getProperty(expanded, BASE + HOLDER)
-                    .map(JsonLdUtils::getId)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .orElseThrow(() -> new DataError(ErrorType.Invalid, HOLDER, Keywords.ID));
+            presentation.holder = JsonLdUtils.assertId(expanded, BASE, HOLDER);
         }
-        
+
         return presentation;
     }
 

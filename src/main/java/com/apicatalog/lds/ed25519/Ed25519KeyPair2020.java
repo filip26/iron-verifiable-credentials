@@ -11,7 +11,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 
-public class Ed25519KeyPair2020 extends Ed2551VerificationKey2020 implements KeyPair {
+public class Ed25519KeyPair2020 extends Ed25519VerificationKey2020 implements KeyPair {
 
     protected static final String PRIVATE_KEY_MULTIBASE = "privateKeyMultibase";
 
@@ -28,9 +28,9 @@ public class Ed25519KeyPair2020 extends Ed2551VerificationKey2020 implements Key
         // TODO check json object type!
         final Ed25519KeyPair2020 key = new Ed25519KeyPair2020(id);
 
-        Ed2551VerificationKey2020.from(key, json);
+        Ed25519VerificationKey2020.from(key, json);
 
-        if (JsonLdUtils.hasProperty(json, BASE, PRIVATE_KEY_MULTIBASE)) {
+        if (JsonLdUtils.hasProperty(json, BASE + PRIVATE_KEY_MULTIBASE)) {
             key.privateKey = getKey(json, PRIVATE_KEY_MULTIBASE, Codec.Ed25519PrivateKey);
         }
 

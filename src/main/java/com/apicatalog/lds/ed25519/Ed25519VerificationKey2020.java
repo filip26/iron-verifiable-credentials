@@ -22,7 +22,7 @@ import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
 //TODO javadoc
-public class Ed2551VerificationKey2020 implements VerificationKey {
+public class Ed25519VerificationKey2020 implements VerificationKey {
 
     public static final String BASE = "https://w3id.org/security#";
 
@@ -36,32 +36,32 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
 
     protected byte[] publicKey;
 
-    public Ed2551VerificationKey2020(final URI id) {
+    public Ed25519VerificationKey2020(final URI id) {
         this(id, "https://w3id.org/security#Ed25519VerificationKey2020");
     }
 
-    protected Ed2551VerificationKey2020(final URI id, final String type) {
+    protected Ed25519VerificationKey2020(final URI id, final String type) {
         this.id = id;
         this.type = type;
     }
 
-    public static Ed2551VerificationKey2020 from(JsonObject json) throws DataError {
+    public static Ed25519VerificationKey2020 from(JsonObject json) throws DataError {
 
         // TODO check json object type!
 
         URI id =  JsonLdUtils.getId(json).orElse(null);
 
-        final Ed2551VerificationKey2020 key = new Ed2551VerificationKey2020(id);
+        final Ed25519VerificationKey2020 key = new Ed25519VerificationKey2020(id);
 
         return from(key, json);
     }
 
-    protected static final <T extends Ed2551VerificationKey2020> T from(T key, JsonObject json) throws DataError {
+    protected static final <T extends Ed25519VerificationKey2020> T from(T key, JsonObject json) throws DataError {
 
         // TODO check type key.type = json.getString(TYPE);
 
         // controller
-        JsonLdUtils.getProperty(json, BASE, CONTROLLER)
+        JsonLdUtils.getValue(json, BASE + CONTROLLER)
             .ifPresent(controller -> {
 
                 if (JsonUtils.isArray(controller)) {
@@ -75,7 +75,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
             });
 
         // public key
-        if (JsonLdUtils.hasProperty(json, BASE, PUBLIC_KEY_MULTIBASE)) {
+        if (JsonLdUtils.hasProperty(json, BASE + PUBLIC_KEY_MULTIBASE)) {
             key.publicKey = getKey(json, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
 
             // verify verification key length - TODO needs to be clarified
@@ -140,7 +140,7 @@ public class Ed2551VerificationKey2020 implements VerificationKey {
     }
 
     static byte[] getKey(JsonObject json, String property, Codec expected) throws DataError {
-        JsonValue key = JsonLdUtils.getProperty(json, BASE, property).orElseThrow(DataError::new);    //FIXME
+        JsonValue key = JsonLdUtils.getValue(json, BASE + property).orElseThrow(DataError::new);    //FIXME
 
         if (JsonUtils.isArray(key)) {
             key = key.asJsonArray().get(0);
