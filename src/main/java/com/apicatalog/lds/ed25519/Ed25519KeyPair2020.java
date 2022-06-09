@@ -30,7 +30,7 @@ public class Ed25519KeyPair2020 extends Ed25519VerificationKey2020 implements Ke
 
         Ed25519VerificationKey2020.from(key, json);
 
-        if (JsonLdUtils.hasProperty(json, BASE + PRIVATE_KEY_MULTIBASE)) {
+        if (JsonLdUtils.hasPredicate(json, BASE + PRIVATE_KEY_MULTIBASE)) {
             key.privateKey = getKey(json, PRIVATE_KEY_MULTIBASE, Codec.Ed25519PrivateKey);
         }
 

@@ -23,13 +23,17 @@ public class Credential implements Verifiable {
 
     public static final String TYPE = "VerifiableCredential";
 
-    // properties
+    // known properties
     public static final String SUBJECT = "credentialSubject";
     public static final String ISSUER = "issuer";
     public static final String ISSUANCE_DATE = "issuanceDate";
     public static final String EXPIRATION_DATE = "expirationDate";
     public static final String CREDENTIAL_STATUS = "credentialStatus";
-
+    public static final String CREDENTIAL_SCHEMA = "credentialSchema";
+    public static final String REFRESH_SERVICE = "refreshService";
+    public static final String TERMS_OF_USE = "termsOfUse";
+    public static final String EVIDENCE = "evidence";
+    
     protected URI id;
     
     protected URI issuer;
@@ -68,13 +72,13 @@ public class Credential implements Verifiable {
         }
         
         // @id - optional
-        if (JsonLdUtils.hasProperty(expanded, Keywords.ID)) {            
+        if (JsonLdUtils.hasPredicate(expanded, Keywords.ID)) {            
             credential.id = JsonLdUtils.getId(expanded)
                     .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
         }
 
         // subject - mandatory
-        if (!JsonLdUtils.hasProperty(expanded, BASE + SUBJECT)) {
+        if (!JsonLdUtils.hasPredicate(expanded, BASE + SUBJECT)) {
             throw new DataError(ErrorType.Missing, SUBJECT);
         }
 
@@ -82,19 +86,18 @@ public class Credential implements Verifiable {
         credential.issuer = JsonLdUtils.assertId(expanded, BASE, ISSUER);
        
         // issuance date - mandatory
-        credential.issuance = JsonLdUtils.assertXsdDateTimeType(expanded, BASE, ISSUANCE_DATE);
+        credential.issuance = JsonLdUtils.assertXsdDateTime(expanded, BASE, ISSUANCE_DATE);
         
         // expiration date - optional            
-        if (JsonLdUtils.hasProperty(expanded, BASE + EXPIRATION_DATE)) {
-            credential.expiration = JsonLdUtils.assertXsdDateTimeType(expanded, BASE, EXPIRATION_DATE);
+        if (JsonLdUtils.hasPredicate(expanded, BASE + EXPIRATION_DATE)) {
+            credential.expiration = JsonLdUtils.assertXsdDateTime(expanded, BASE, EXPIRATION_DATE);
         }
 
         // status
         final Optional<JsonValue> status = JsonLdUtils
-                                            .getValue(expanded, BASE + CREDENTIAL_STATUS)
-                                            .stream()
-                                            .flatMap(x -> JsonUtils.toStream(x))
-                                            .findFirst();
+                                                .getObject(expanded, BASE + CREDENTIAL_STATUS)
+                                                .findFirst();
+
         if (status.isPresent()) {
             credential.status = CredentialStatus.from(status.get());
         }

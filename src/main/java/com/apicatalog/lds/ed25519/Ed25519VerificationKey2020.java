@@ -61,7 +61,8 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
         // TODO check type key.type = json.getString(TYPE);
 
         // controller
-        JsonLdUtils.getValue(json, BASE + CONTROLLER)
+        JsonLdUtils.getObject(json, BASE + CONTROLLER)
+            .findFirst()
             .ifPresent(controller -> {
 
                 if (JsonUtils.isArray(controller)) {
@@ -75,7 +76,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
             });
 
         // public key
-        if (JsonLdUtils.hasProperty(json, BASE + PUBLIC_KEY_MULTIBASE)) {
+        if (JsonLdUtils.hasPredicate(json, BASE + PUBLIC_KEY_MULTIBASE)) {
             key.publicKey = getKey(json, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
 
             // verify verification key length - TODO needs to be clarified
@@ -140,7 +141,11 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
     }
 
     static byte[] getKey(JsonObject json, String property, Codec expected) throws DataError {
-        JsonValue key = JsonLdUtils.getValue(json, BASE + property).orElseThrow(DataError::new);    //FIXME
+        
+        JsonValue key = JsonLdUtils
+                            .getObject(json, BASE + property)
+                            .findFirst()
+                            .orElseThrow(DataError::new);    //FIXME
 
         if (JsonUtils.isArray(key)) {
             key = key.asJsonArray().get(0);

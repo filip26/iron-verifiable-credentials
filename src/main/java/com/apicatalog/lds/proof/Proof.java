@@ -1,5 +1,6 @@
 package com.apicatalog.lds.proof;
 
+import java.net.URI;
 import java.time.Instant;
 
 /**
@@ -25,7 +26,7 @@ public interface Proof {
      *
      * @return
      */
-    String getPurpose();
+    URI getPurpose();
 
     /**
      * A set of parameters required to independently verify the proof,

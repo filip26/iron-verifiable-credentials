@@ -1,5 +1,6 @@
 package com.apicatalog.lds.proof;
 
+import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
@@ -10,7 +11,6 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.JsonLdValueObject;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.lang.NodeObject;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.lds.DataError;
@@ -33,14 +33,16 @@ import jakarta.json.JsonValue;
  */
 public abstract class EmbeddedProof implements Proof {
 
+    public static final String BASE = "https://w3id.org/security#";
+    
     public static final String CREATED = "http://purl.org/dc/terms/created";
     public static final String PROOF = "https://w3id.org/security#proof";
-    public static final String PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
+    public static final String PROOF_PURPOSE = "proofPurpose";
     public static final String PROOF_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
     public static final String PROOF_DOMAIN = "https://w3id.org/security#domain";
     public static final String PROOF_VALUE = "https://w3id.org/security#proofValue";
 
-    protected String purpose;
+    protected URI purpose;
 
     protected VerificationMethod verificationMethod;
 
@@ -133,26 +135,8 @@ public abstract class EmbeddedProof implements Proof {
         EmbeddedProof embeddedProof = new Ed25519Proof2020();
 
         // proofPurpose property
-        if (!proofObject.containsKey(PROOF_PURPOSE)) {
-            throw new DataError(ErrorType.Missing, "proofPurpose");
-        }
-
-        final JsonValue proofPurposeValue = proofObject.get(PROOF_PURPOSE);
-
-        if (JsonUtils.isArray(proofPurposeValue)) {
-
-            if (!proofPurposeValue.asJsonArray().stream().allMatch(NodeObject::isNodeReference)) {
-                throw new DataError(ErrorType.Invalid, "proofPurpose");
-            }
-
-            embeddedProof.purpose = proofPurposeValue.asJsonArray().stream()
-                                    .map(JsonValue::asJsonObject)
-                                    .map(o -> o.getString(Keywords.ID))
-                                    .limit(1).toArray(String[]::new)[0];
-        } else {
-            throw new DataError(ErrorType.Invalid, "proofPurpose");
-        }
-
+        embeddedProof.purpose = JsonLdUtils.assertId(proofObject, BASE, PROOF_PURPOSE);
+        
         // verificationMethod property
         if (!proofObject.containsKey(PROOF_VERIFICATION_METHOD)) {
             throw new DataError(ErrorType.Missing, "verificationMethod");
@@ -259,7 +243,7 @@ public abstract class EmbeddedProof implements Proof {
     }
 
     @Override
-    public String getPurpose() {
+    public URI getPurpose() {
         return purpose;
     }
 
@@ -307,7 +291,7 @@ public abstract class EmbeddedProof implements Proof {
                         );
         }
 
-        root.add(PROOF_PURPOSE,
+        root.add(BASE + PROOF_PURPOSE,
                 Json.createArrayBuilder()
                         .add(Json.createObjectBuilder().add(Keywords.ID,
                                 "https://w3id.org/security#assertionMethod")));  //FIXME configurable

@@ -54,13 +54,13 @@ public class Presentation implements Verifiable {
         }
 
         // @id - optional
-        if (JsonLdUtils.hasProperty(expanded, Keywords.ID)) {            
+        if (JsonLdUtils.hasPredicate(expanded, Keywords.ID)) {            
             presentation.id = JsonLdUtils.getId(expanded)
                     .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
         }
 
         // holder - optional
-        if (JsonLdUtils.hasProperty(expanded, BASE + HOLDER)) {
+        if (JsonLdUtils.hasPredicate(expanded, BASE + HOLDER)) {
             presentation.holder = JsonLdUtils.assertId(expanded, BASE, HOLDER);
         }
 

@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 
-public abstract class CommonApi<T extends CommonApi<T>> {
+public abstract class CommonApi<T extends CommonApi<?>> {
 
     protected DocumentLoader loader;
     protected boolean bundledContexts;
@@ -29,7 +29,7 @@ public abstract class CommonApi<T extends CommonApi<T>> {
      * @param enable
      * @return
      */
-    public <T extends CommonApi> T useBundledContexts(boolean enable) {
+    public T useBundledContexts(boolean enable) {
         this.bundledContexts = enable;
         return (T)this;
     }
@@ -40,8 +40,8 @@ public abstract class CommonApi<T extends CommonApi<T>> {
      * @param base
      * @return
      */
-    public CommonApi base(URI base) {
+    public T base(URI base) {
        this.base = base;
-       return this;
+       return (T)this;
     }
 }
