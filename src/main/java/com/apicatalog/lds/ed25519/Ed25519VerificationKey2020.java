@@ -61,7 +61,8 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
         // TODO check type key.type = json.getString(TYPE);
 
         // controller
-        JsonLdUtils.getObject(json, BASE + CONTROLLER)
+        JsonLdUtils.getObjects(json, BASE + CONTROLLER)
+            .stream()
             .findFirst()
             .ifPresent(controller -> {
 
@@ -143,7 +144,8 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
     static byte[] getKey(JsonObject json, String property, Codec expected) throws DataError {
         
         JsonValue key = JsonLdUtils
-                            .getObject(json, BASE + property)
+                            .getObjects(json, BASE + property)
+                            .stream()
                             .findFirst()
                             .orElseThrow(DataError::new);    //FIXME
 

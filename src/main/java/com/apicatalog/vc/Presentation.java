@@ -1,6 +1,8 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -24,6 +26,8 @@ public class Presentation implements Verifiable {
     protected URI id;
     
     protected URI holder;
+    
+    protected Collection<Credential> credentials;
 
     protected Presentation() {}
     
@@ -35,18 +39,18 @@ public class Presentation implements Verifiable {
         return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
     }
     
-    public static Presentation from(JsonObject expanded) throws DataError {
+    public static Presentation from(JsonObject subject) throws DataError {
 
-        if (expanded == null) {
+        if (subject == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
         
         final Presentation presentation = new Presentation();
         
         // @type
-        if (!JsonLdUtils.isTypeOf(BASE + TYPE, expanded)) {
+        if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
 
-            if (!JsonLdUtils.hasType(expanded)) {
+            if (!JsonLdUtils.hasType(subject)) {
                 throw new DataError(ErrorType.Missing, Keywords.TYPE);
             }
 
@@ -54,16 +58,25 @@ public class Presentation implements Verifiable {
         }
 
         // @id - optional
-        if (JsonLdUtils.hasPredicate(expanded, Keywords.ID)) {            
-            presentation.id = JsonLdUtils.getId(expanded)
+        if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {            
+            presentation.id = JsonLdUtils.getId(subject)
                     .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
         }
 
         // holder - optional
-        if (JsonLdUtils.hasPredicate(expanded, BASE + HOLDER)) {
-            presentation.holder = JsonLdUtils.assertId(expanded, BASE, HOLDER);
+        if (JsonLdUtils.hasPredicate(subject, BASE + HOLDER)) {
+            presentation.holder = JsonLdUtils.assertId(subject, BASE, HOLDER);
         }
 
+        // verifiableCredentials
+        for (JsonValue credential : JsonLdUtils.getObjects(subject, BASE + VERIFIABLE_CREDENTIALS)) {
+            
+            presentation.credentials = new ArrayList<>();  
+            
+            presentation.credentials.add(Credential.from(subject));
+            //TODO proof somehow, do I need to parse it here?
+        }
+                             
         return presentation;
     }
 

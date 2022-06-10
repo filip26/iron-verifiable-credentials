@@ -3,8 +3,9 @@ package com.apicatalog.jsonld;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -12,7 +13,6 @@ import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.DataError.ErrorType;
-import com.google.crypto.tink.KeysetWriter;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -79,14 +79,14 @@ public class JsonLdUtils {
         return JsonUtils.isNotNull(subject.get(predicate));
     }
 
-    public static Stream<JsonValue> getObject(JsonObject subject, String predicate) {
+    public static Collection<JsonValue> getObjects(JsonObject subject, String predicate) {
         final JsonValue value = subject.get(predicate);
         
         if (JsonUtils.isNull(value)) {
-            return Stream.empty();
+            return Collections.emptyList();
         }
         
-        return JsonUtils.toStream(value);
+        return JsonUtils.toCollection(value);
     }
 
     //FIXME JsonUtils
@@ -111,7 +111,8 @@ public class JsonLdUtils {
         }
       
         JsonValue value = JsonLdUtils
-                                    .getObject(subject.asJsonObject(), base + property)
+                                    .getObjects(subject.asJsonObject(), base + property)
+                                    .stream()
                                     .findFirst()
                                     .orElseThrow(() -> new DataError(ErrorType.Missing, property));
         
@@ -142,7 +143,8 @@ public class JsonLdUtils {
         }
 
         final JsonValue value = JsonLdUtils
-                                    .getObject(subject.asJsonObject(), base + property)
+                                    .getObjects(subject.asJsonObject(), base + property)
+                                    .stream()
                                     .findFirst()
                                     .orElseThrow(() -> new DataError(ErrorType.Missing, property, Keywords.VALUE));
         
