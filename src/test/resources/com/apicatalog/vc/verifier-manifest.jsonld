@@ -55,7 +55,7 @@
 				"PositiveEvaluationTest",
 				"VeriferTest"
 			],
-			"name": "simple valid signed VC",
+			"name": "valid signed VC",
 			"input": "verifier/0005-in.jsonld"
 		},
 		{
@@ -185,6 +185,15 @@
 			"name": "proof set having one forged proof",
 			"input": "verifier/0021-in.jsonld",
             "expectErrorCode": "InvalidSignature"
-		}
+		},
+        {
+            "@id": "#t0050",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "valid signed VP",
+            "input": "verifier/0050-in.jsonld"
+        }
 	]
 }

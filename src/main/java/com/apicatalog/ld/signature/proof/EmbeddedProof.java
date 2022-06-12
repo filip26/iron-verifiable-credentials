@@ -204,6 +204,7 @@ public abstract class EmbeddedProof implements Proof {
     }
     
     public abstract void setValue(String encoding, String value) throws DataError;
+
     public abstract String getValue(String encoding) throws DataError;;
     
     public JsonObject toJson() throws DataError {
