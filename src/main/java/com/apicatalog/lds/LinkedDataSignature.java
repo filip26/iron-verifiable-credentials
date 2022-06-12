@@ -5,7 +5,6 @@ import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.key.VerificationKey;
 import com.apicatalog.lds.proof.EmbeddedProof;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
@@ -35,7 +34,7 @@ public class LinkedDataSignature {
             throw new VerificationError();
         }
 
-       final JsonObject proofObject = Json.createObjectBuilder(proof).remove(EmbeddedProof.PROOF_VALUE).build();
+       final JsonObject proofObject = EmbeddedProof.removeProofValue(proof);
 
        final byte[] computeSignature = hashCode(document, proofObject);
 

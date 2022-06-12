@@ -68,12 +68,16 @@ public class Presentation implements Verifiable {
             presentation.holder = JsonLdUtils.assertId(subject, BASE, HOLDER);
         }
 
+        presentation.credentials = new ArrayList<>();
+        
         // verifiableCredentials
         for (JsonValue credential : JsonLdUtils.getObjects(subject, BASE + VERIFIABLE_CREDENTIALS)) {
             
-            presentation.credentials = new ArrayList<>();  
-            
-            presentation.credentials.add(Credential.from(subject));
+            if (JsonUtils.isNotObject(credential)) {
+                throw new DataError();
+            }
+                        
+            presentation.credentials.add(Credential.from(credential.asJsonObject()));
             //TODO proof somehow, do I need to parse it here?
         }
                              

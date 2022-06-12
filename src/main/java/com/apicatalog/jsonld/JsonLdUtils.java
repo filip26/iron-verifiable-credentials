@@ -25,25 +25,26 @@ public class JsonLdUtils {
     protected JsonLdUtils() {}
 
     /**
-     * Checks if the given {@link JsonObject} has the given type listed as one of its <code>@type</code> declarations.
+     * Checks if the given {@link JsonValue} is {@link JsonObject} has the given type listed as one of its <code>@type</code> declarations.
      *
      * @param type
-     * @param object
+     * @param value
      * @return
      */
-    public static boolean isTypeOf(final String type, final JsonObject object) {
+    public static boolean isTypeOf(final String type, final JsonValue value) {
 
         if (StringUtils.isBlank(type)) {
             throw new IllegalArgumentException("The 'type' parameter must not be null nor blank.");
         }
 
-        if (object == null) {
+        if (value == null) {
             throw new IllegalArgumentException("The 'object' parameter must not be null.");
         }
 
-        return object.containsKey(Keywords.TYPE)
+        return JsonUtils.isObject(value) 
+                && value.asJsonObject().containsKey(Keywords.TYPE)
                 && JsonUtils
-                    .toStream(object.get(Keywords.TYPE))
+                    .toStream(value.asJsonObject().get(Keywords.TYPE))
                     .filter(JsonUtils::isString)
                     .map(JsonString.class::cast)
                     .map(JsonString::getString)
@@ -80,10 +81,23 @@ public class JsonLdUtils {
     }
 
     public static Collection<JsonValue> getObjects(JsonObject subject, String predicate) {
-        final JsonValue value = subject.get(predicate);
+        
+        JsonValue value = subject.get(predicate);
         
         if (JsonUtils.isNull(value)) {
             return Collections.emptyList();
+        }
+        
+        if (JsonUtils.isArray(value)) {
+            if (value.asJsonArray().size() == 1) {
+                value = value.asJsonArray().get(0);
+            }
+        }
+        
+        if (JsonUtils.isObject(value)) {
+            if (value.asJsonObject().containsKey(Keywords.GRAPH) &&  value.asJsonObject().size() == 1) {
+                value = value.asJsonObject().get(Keywords.GRAPH);
+            }
         }
         
         return JsonUtils.toCollection(value);

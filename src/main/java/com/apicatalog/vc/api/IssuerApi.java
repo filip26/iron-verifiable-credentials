@@ -12,6 +12,7 @@ import com.apicatalog.lds.LinkedDataSignature;
 import com.apicatalog.lds.SigningError;
 import com.apicatalog.lds.SigningError.Code;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.lds.ed25519.Ed25519Proof2020;
 import com.apicatalog.lds.ed25519.Ed25519Signature2020;
 import com.apicatalog.lds.key.KeyPair;
 import com.apicatalog.lds.proof.EmbeddedProof;
@@ -145,7 +146,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         }
 
         final JsonObject data = EmbeddedProof.removeProof(object);
-        final EmbeddedProof proof = EmbeddedProof.from(options);
+        final EmbeddedProof proof = Ed25519Proof2020.from(options);
 
         final LinkedDataSignature suite = new LinkedDataSignature(new Ed25519Signature2020());
 

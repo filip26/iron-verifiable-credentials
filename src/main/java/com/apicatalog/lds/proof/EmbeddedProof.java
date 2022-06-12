@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collection;
-import java.util.Collections;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.JsonLdValueObject;
@@ -15,11 +14,7 @@ import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.lds.DataError;
 import com.apicatalog.lds.DataError.ErrorType;
-import com.apicatalog.lds.VerificationError;
 import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
-import com.apicatalog.lds.ed25519.Ed25519Proof2020;
-import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multibase.Multibase.Algorithm;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
@@ -33,14 +28,14 @@ import jakarta.json.JsonValue;
  */
 public abstract class EmbeddedProof implements Proof {
 
-    public static final String BASE = "https://w3id.org/security#";
+    protected static final String BASE = "https://w3id.org/security#";
     
-    public static final String CREATED = "http://purl.org/dc/terms/created";
-    public static final String PROOF = "https://w3id.org/security#proof";
-    public static final String PROOF_PURPOSE = "proofPurpose";
-    public static final String PROOF_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
-    public static final String PROOF_DOMAIN = "https://w3id.org/security#domain";
-    public static final String PROOF_VALUE = "https://w3id.org/security#proofValue";
+    protected static final String CREATED = "http://purl.org/dc/terms/created";
+    protected static final String PROOF = "proof";
+    protected static final String PROOF_PURPOSE = "proofPurpose";
+    protected static final String PROOF_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
+    protected static final String PROOF_DOMAIN = "https://w3id.org/security#domain";
+    protected static final String PROOF_VALUE = "proofValue";
 
     protected URI purpose;
 
@@ -52,87 +47,23 @@ public abstract class EmbeddedProof implements Proof {
 
     protected byte[] value;
 
-    public static EmbeddedProof from(ProofOptions options) {
-        
-        if (Ed25519Proof2020.TYPE.equals(options.getType())) {
-            final EmbeddedProof proof = new Ed25519Proof2020();
-
-            proof.verificationMethod = options.getVerificationMethod();
-            proof.created = options.getCreated();
-            proof.domain = options.getDomain();
-
-            return proof;
-        }
-        
-        //TODO
-        throw new IllegalStateException();        
-    }
-
     public static boolean hasProof(JsonObject credential) {
-        return credential.containsKey(EmbeddedProof.PROOF);
+        return credential.containsKey(BASE + PROOF);
     }
 
     public static Collection<JsonValue> getProof(JsonObject credential) {
-
-        JsonValue proofs = credential.get(EmbeddedProof.PROOF);
-
-        if (JsonUtils.isNull(proofs)) {
-            return Collections.emptyList();
-        }
-
-        if (JsonUtils.isArray(proofs)) {
-            if (proofs.asJsonArray().size() == 0) {
-                return Collections.emptyList();
-            }
-        }
-
-        return JsonUtils.toCollection(proofs);
+        return JsonLdUtils.getObjects(credential, BASE + PROOF);
     }
     
     public static JsonObject removeProof(final JsonObject credential) {
-       return Json.createObjectBuilder(credential).remove(PROOF).build();
+       return Json.createObjectBuilder(credential).remove(BASE + PROOF).build();
     }
 
-    /**
-     *
-     * @param json expanded proof
-     * @param result
-     * @return
-     * @throws VerificationError
-     */
-    public static EmbeddedProof from(final JsonValue json, final DocumentLoader loader) throws DataError {
+    public static JsonObject removeProofValue(final JsonObject credential) {
+        return Json.createObjectBuilder(credential).remove(BASE + PROOF_VALUE).build();
+     }
 
-        if (json == null) {
-            throw new IllegalArgumentException("Parameter 'json' must not be null.");
-        }
-
-        // data integrity checks
-        if (JsonUtils.isNotObject(json)) {
-            throw new DataError(ErrorType.Invalid, "proof");
-        }
-
-        JsonObject proofObject = json.asJsonObject();
-
-        if (proofObject.containsKey(Keywords.GRAPH)) { //TODO hack
-
-            JsonValue proofValue = proofObject.getJsonArray(Keywords.GRAPH).get(0);     //FIXME
-
-            if (JsonUtils.isNotObject(proofValue)) {
-                throw new DataError(ErrorType.Invalid, "proof");
-            }
-            proofObject = proofValue.asJsonObject();
-        }
-
-        if (!JsonLdUtils.isTypeOf(Ed25519Proof2020.TYPE, proofObject)) {
-
-            // @type property
-            if (!JsonLdUtils.hasType(proofObject)) {
-                throw new DataError(ErrorType.Missing, "proof", Keywords.TYPE);
-            }
-            throw new DataError(ErrorType.Unknown, "cryptoSuite", Keywords.TYPE);
-        }
-
-        EmbeddedProof embeddedProof = new Ed25519Proof2020();
+    protected static EmbeddedProof from(EmbeddedProof embeddedProof, final JsonObject proofObject, final DocumentLoader loader) throws DataError {
 
         // proofPurpose property
         embeddedProof.purpose = JsonLdUtils.assertId(proofObject, BASE, PROOF_PURPOSE);
@@ -169,11 +100,11 @@ public abstract class EmbeddedProof implements Proof {
         }
 
         // proofValue property
-        if (!proofObject.containsKey(PROOF_VALUE)) {
-            throw new DataError(ErrorType.Missing, "proof", Keywords.VALUE);
+        if (!proofObject.containsKey(BASE + PROOF_VALUE)) {
+            throw new DataError(ErrorType.Missing, PROOF, Keywords.VALUE);
         }
 
-        final JsonValue embeddedProofValue = proofObject.get(PROOF_VALUE);
+        final JsonValue embeddedProofValue = proofObject.get(BASE + PROOF_VALUE);
 
         if (JsonUtils.isArray(embeddedProofValue)) {
 
@@ -183,7 +114,7 @@ public abstract class EmbeddedProof implements Proof {
                             .map(o -> o.get(Keywords.VALUE))
                             .allMatch(JsonUtils::isString)
                     ) {
-                throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE);
+                throw new DataError(ErrorType.Invalid, PROOF, Keywords.VALUE);
             }
 
 
@@ -191,10 +122,10 @@ public abstract class EmbeddedProof implements Proof {
 
             String encodedProofValue =  embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
 
-            embeddedProof.updateValue(proofValueType, encodedProofValue);
+            embeddedProof.setValue(proofValueType, encodedProofValue);
 
         } else {
-            throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE);
+            throw new DataError(ErrorType.Invalid, PROOF, Keywords.VALUE);
         }
 
         // created property
@@ -271,10 +202,10 @@ public abstract class EmbeddedProof implements Proof {
         this.value = value;
     }
     
-    public abstract void updateValue(String encoding, String value) throws DataError;
+    public abstract void setValue(String encoding, String value) throws DataError;
+    public abstract String getValue(String encoding) throws DataError;;
     
-    public JsonObject toJson() {
-
+    public JsonObject toJson() throws DataError {
         final JsonObjectBuilder root = Json.createObjectBuilder().add(Keywords.TYPE, Json.createArrayBuilder().add(getType()));
 
         if (verificationMethod != null) {
@@ -300,13 +231,13 @@ public abstract class EmbeddedProof implements Proof {
         if (domain != null) {
             //TODO add domain
         }
-        
+
         if (value != null) {
 
             //TODO move to ed
-            final String proofValue = Multibase.encode(Algorithm.Base58Btc, value);
+            final String proofValue = getValue("https://w3id.org/security#multibase");
             
-            root.add(PROOF_VALUE,
+            root.add(BASE + PROOF_VALUE,
                     Json
                         .createArrayBuilder()
                         .add(JsonLdValueObject.create("https://w3id.org/security#multibase", proofValue))
@@ -316,15 +247,16 @@ public abstract class EmbeddedProof implements Proof {
     }
 
     /**
-     * Append the proof to the given VC/VP document. 
+     * Appends the proof to the given VC/VP document. 
      * If the document has been signed already then the proof is added into a proof set.
      * 
      * @param document VC/VP document
      * @return the given VC/VP with the proof attached
+     * @throws DataError 
      */
-    public JsonObject appendTo(final JsonObject document) {
+    public JsonObject appendTo(final JsonObject document) throws DataError {
 
-        final JsonValue proofPropertyValue = document.get(PROOF);
+        final JsonValue proofPropertyValue = document.get(BASE + PROOF);
 
         final JsonArrayBuilder proofs;
 
@@ -337,6 +269,6 @@ public abstract class EmbeddedProof implements Proof {
 
         proofs.add(toJson());
 
-        return Json.createObjectBuilder(document).add(PROOF, proofs).build();
+        return Json.createObjectBuilder(document).add(BASE + PROOF, proofs).build();
     }
 }
