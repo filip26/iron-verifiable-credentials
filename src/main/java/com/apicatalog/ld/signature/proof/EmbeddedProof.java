@@ -1,4 +1,4 @@
-package com.apicatalog.lds.proof;
+package com.apicatalog.ld.signature.proof;
 
 import java.net.URI;
 import java.time.Instant;
@@ -12,9 +12,9 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.DataError.ErrorType;
-import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
@@ -46,6 +46,8 @@ public abstract class EmbeddedProof implements Proof {
     protected String domain;
 
     protected byte[] value;
+    
+    protected EmbeddedProof() {}
 
     public static boolean hasProof(JsonObject credential) {
         return credential.containsKey(BASE + PROOF);

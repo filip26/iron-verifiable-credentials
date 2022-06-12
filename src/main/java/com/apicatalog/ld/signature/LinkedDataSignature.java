@@ -1,9 +1,9 @@
-package com.apicatalog.lds;
+package com.apicatalog.ld.signature;
 
-import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
-import com.apicatalog.lds.key.KeyPair;
-import com.apicatalog.lds.key.VerificationKey;
-import com.apicatalog.lds.proof.EmbeddedProof;
+import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.ld.signature.proof.EmbeddedProof;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -87,7 +87,7 @@ public class LinkedDataSignature {
 
     public KeyPair keygen(int length) {
 
-        com.apicatalog.lds.algorithm.SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
+        com.apicatalog.ld.signature.algorithm.SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
 
         Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(null); //FIXME
         kp.setPublicKey(keyPair.getPublicKey());

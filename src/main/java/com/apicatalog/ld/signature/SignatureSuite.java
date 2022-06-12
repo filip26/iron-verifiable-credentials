@@ -1,8 +1,8 @@
-package com.apicatalog.lds;
+package com.apicatalog.ld.signature;
 
-import com.apicatalog.lds.algorithm.CanonicalizationAlgorithm;
-import com.apicatalog.lds.algorithm.DigestAlgorithm;
-import com.apicatalog.lds.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
+import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
+import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 
 import jakarta.json.JsonStructure;
 

@@ -1,4 +1,4 @@
-package com.apicatalog.lds.ed25519;
+package com.apicatalog.ld.signature.ed25519;
 
 import java.net.URI;
 
@@ -6,9 +6,9 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.DataError.ErrorType;
-import com.apicatalog.lds.key.VerificationKey;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;

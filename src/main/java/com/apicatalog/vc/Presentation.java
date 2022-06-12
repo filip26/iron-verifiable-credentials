@@ -7,8 +7,8 @@ import java.util.Collection;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.DataError.ErrorType;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;

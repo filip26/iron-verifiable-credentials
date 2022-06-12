@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.apicatalog.lds.key.KeyPair;
+import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.api.Vc;
 
 @DisplayName("Keys Generation")

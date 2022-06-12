@@ -11,10 +11,10 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.ed25519.Ed25519VerificationKey2020;
-import com.apicatalog.lds.proof.VerificationMethod;
-import com.apicatalog.lds.proof.VerificationMethodReference;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
+import com.apicatalog.ld.signature.proof.VerificationMethod;
+import com.apicatalog.ld.signature.proof.VerificationMethodReference;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;

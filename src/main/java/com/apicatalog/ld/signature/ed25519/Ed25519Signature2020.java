@@ -1,9 +1,9 @@
-package com.apicatalog.lds.ed25519;
+package com.apicatalog.ld.signature.ed25519;
 
-import com.apicatalog.lds.SignatureSuite;
-import com.apicatalog.lds.TinkSignature;
-import com.apicatalog.lds.primitive.MessageDigest;
-import com.apicatalog.lds.primitive.Urdna2015;
+import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.ld.signature.TinkSignature;
+import com.apicatalog.ld.signature.primitive.MessageDigest;
+import com.apicatalog.ld.signature.primitive.Urdna2015;
 
 public class Ed25519Signature2020 extends SignatureSuite {
 

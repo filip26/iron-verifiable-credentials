@@ -14,10 +14,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.NamedParameterSpec;
 
-import com.apicatalog.lds.SigningError;
-import com.apicatalog.lds.VerificationError;
-import com.apicatalog.lds.VerificationError.Code;
-import com.apicatalog.lds.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.SigningError;
+import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 
 public class SunSignatureProvider implements SignatureAlgorithm {
 

@@ -1,6 +1,6 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.lds.DataError;
+import com.apicatalog.ld.signature.DataError;
 
 public interface StatusVerifier {
 

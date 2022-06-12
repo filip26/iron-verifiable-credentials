@@ -1,14 +1,14 @@
-package com.apicatalog.lds.ed25519;
+package com.apicatalog.ld.signature.ed25519;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.DataError.ErrorType;
-import com.apicatalog.lds.proof.EmbeddedProof;
-import com.apicatalog.lds.proof.Proof;
-import com.apicatalog.lds.proof.ProofOptions;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.signature.proof.EmbeddedProof;
+import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 

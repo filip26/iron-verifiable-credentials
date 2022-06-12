@@ -11,8 +11,8 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.uri.UriUtils;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.DataError.ErrorType;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
