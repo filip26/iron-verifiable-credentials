@@ -30,11 +30,14 @@ public abstract class EmbeddedProof implements Proof {
     protected static final String BASE = "https://w3id.org/security#";
     
     protected static final String CREATED = "http://purl.org/dc/terms/created";
+    
     protected static final String PROOF = "proof";
     protected static final String PROOF_PURPOSE = "proofPurpose";
-    protected static final String PROOF_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
+    protected static final String PROOF_VERIFICATION_METHOD = "verificationMethod";
     protected static final String PROOF_DOMAIN = "https://w3id.org/security#domain";
     protected static final String PROOF_VALUE = "proofValue";
+    
+    protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
     protected URI purpose;
 
@@ -70,11 +73,11 @@ public abstract class EmbeddedProof implements Proof {
         embeddedProof.purpose = JsonLdUtils.assertId(proofObject, BASE, PROOF_PURPOSE);
         
         // verificationMethod property
-        if (!proofObject.containsKey(PROOF_VERIFICATION_METHOD)) {
-            throw new DataError(ErrorType.Missing, "verificationMethod");
+        if (!proofObject.containsKey(BASE + PROOF_VERIFICATION_METHOD)) {
+            throw new DataError(ErrorType.Missing, PROOF_VERIFICATION_METHOD);
         }
 
-        final JsonValue verificationMethodValue = proofObject.get(PROOF_VERIFICATION_METHOD);
+        final JsonValue verificationMethodValue = proofObject.get(BASE + PROOF_VERIFICATION_METHOD);
 
         if (JsonUtils.isArray(verificationMethodValue) && verificationMethodValue.asJsonArray().size() > 0) {
 
@@ -83,21 +86,12 @@ public abstract class EmbeddedProof implements Proof {
             if (JsonUtils.isNonEmptyObject(verificationMethodItem)) {
                 embeddedProof.verificationMethod = Ed25519KeyPair2020.from(verificationMethodItem.asJsonObject());
 
-//                } else if (NodeObject.isNodeReference(verificationMethodItem)) {
-//
-//                    final JsonObject verificationMethodObject = verificationMethodItem.asJsonObject();
-//
-//                    final String id = verificationMethodObject.getString(Keywords.ID);
-//
-//                    embeddedProof.verificationMethod = Ed25519KeyPair2020.reference(URI.create(id));
-
             } else {
-                throw new DataError(ErrorType.Invalid, "verificationMethod");
+                throw new DataError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD);
             }
 
-
         } else {
-            throw new DataError(ErrorType.Invalid, "verificationMethod");
+            throw new DataError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD);
         }
 
         // proofValue property
@@ -183,7 +177,7 @@ public abstract class EmbeddedProof implements Proof {
                         .add(Keywords.TYPE, Json.createArrayBuilder().add(getType()));
 
         if (verificationMethod != null) {
-            root.add(PROOF_VERIFICATION_METHOD,
+            root.add(BASE + PROOF_VERIFICATION_METHOD,
                     Json.createArrayBuilder()
                             .add(verificationMethod.toJson()));
         }
@@ -201,9 +195,9 @@ public abstract class EmbeddedProof implements Proof {
         }
         
         if (value != null) {
-            final String proofValue = getValue("https://w3id.org/security#multibase");
+            final String proofValue = getValue(MULTIBASE_TYPE);
             
-            JsonLdUtils.setValue(root, BASE + PROOF_VALUE, "https://w3id.org/security#multibase", proofValue);
+            JsonLdUtils.setValue(root, BASE + PROOF_VALUE, MULTIBASE_TYPE, proofValue);
         }
         return root.build();
     }

@@ -34,6 +34,7 @@ public class Ed25519Proof2020 extends EmbeddedProof implements Proof {
             proof.verificationMethod = options.getVerificationMethod();
             proof.created = options.getCreated();
             proof.domain = options.getDomain();
+            proof.purpose = options.getPurpose();
 
             return proof;
         }

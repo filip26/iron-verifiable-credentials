@@ -1,5 +1,6 @@
 package com.apicatalog.ld.signature.ed25519;
 
+import java.net.URI;
 import java.time.Instant;
 
 import com.apicatalog.ld.signature.proof.ProofOptions;
@@ -10,6 +11,7 @@ public class Ed25519ProofOptions2020 implements ProofOptions {
     VerificationMethod verificationMethod;
     Instant created;
     String domain;
+    URI purpose;
 
     @Override
     public Instant getCreated() {
@@ -32,6 +34,15 @@ public class Ed25519ProofOptions2020 implements ProofOptions {
 
     public void setVerificationMethod(VerificationMethod verificationMethod) {
         this.verificationMethod = verificationMethod;
+    }
+    
+    @Override
+    public URI getPurpose() {
+        return purpose;
+    }
+    
+    public void setPurpose(URI purpose) {
+        this.purpose = purpose;
     }
 
     @Override

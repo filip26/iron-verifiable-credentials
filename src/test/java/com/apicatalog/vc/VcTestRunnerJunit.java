@@ -71,6 +71,7 @@ public class VcTestRunnerJunit {
                 Ed25519ProofOptions2020 options = new Ed25519ProofOptions2020();
                 options.setCreated(testCase.created);
                 options.setVerificationMethod(testCase.verificationMethod);
+                options.setPurpose(URI.create("https://w3id.org/security#assertionMethod"));//TODO make it configurable
 
                 URI keyPairLocation = testCase.keyPair;
 
