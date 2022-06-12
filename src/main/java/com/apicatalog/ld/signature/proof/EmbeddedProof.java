@@ -177,7 +177,10 @@ public abstract class EmbeddedProof implements Proof {
     public abstract String getValue(String encoding) throws DataError;;
     
     public JsonObject toJson() throws DataError {
-        final JsonObjectBuilder root = Json.createObjectBuilder().add(Keywords.TYPE, Json.createArrayBuilder().add(getType()));
+        
+        final JsonObjectBuilder root = 
+                    Json.createObjectBuilder()
+                        .add(Keywords.TYPE, Json.createArrayBuilder().add(getType()));
 
         if (verificationMethod != null) {
             root.add(PROOF_VERIFICATION_METHOD,
@@ -186,15 +189,17 @@ public abstract class EmbeddedProof implements Proof {
         }
 
         if (created != null) {
-            JsonLdUtils.setValue(root, CREATED, "http://www.w3.org/2001/XMLSchema#dateTime", created.toString());
+            JsonLdUtils.setValue(root, CREATED, created);
         }
 
-        JsonLdUtils.setId(root, BASE + PROOF_PURPOSE, "https://w3id.org/security#assertionMethod"); //FIXME configurable
+        if (purpose != null) {
+            JsonLdUtils.setId(root, BASE + PROOF_PURPOSE, purpose);
+        }
 
         if (domain != null) {
             //TODO
         }
-
+        
         if (value != null) {
             final String proofValue = getValue("https://w3id.org/security#multibase");
             

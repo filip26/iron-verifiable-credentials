@@ -227,4 +227,9 @@ public class JsonLdUtils {
         
         return objectBuilder;
     }
+    
+    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property, Instant instant) {
+        return setValue(objectBuilder, property, XSD_DATE_TIME, instant.toString());
+    }
+
 }
