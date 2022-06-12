@@ -7,15 +7,16 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.LinkedDataSignature;
-import com.apicatalog.lds.SigningError;
-import com.apicatalog.lds.SigningError.Code;
-import com.apicatalog.lds.ed25519.Ed25519KeyPair2020;
-import com.apicatalog.lds.ed25519.Ed25519Signature2020;
-import com.apicatalog.lds.key.KeyPair;
-import com.apicatalog.lds.proof.EmbeddedProof;
-import com.apicatalog.lds.proof.ProofOptions;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.LinkedDataSignature;
+import com.apicatalog.ld.signature.SigningError;
+import com.apicatalog.ld.signature.SigningError.Code;
+import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519Proof2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.proof.EmbeddedProof;
+import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.Verifiable;
 
@@ -145,7 +146,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         }
 
         final JsonObject data = EmbeddedProof.removeProof(object);
-        final EmbeddedProof proof = EmbeddedProof.from(options);
+        final EmbeddedProof proof = Ed25519Proof2020.from(options);
 
         final LinkedDataSignature suite = new LinkedDataSignature(new Ed25519Signature2020());
 

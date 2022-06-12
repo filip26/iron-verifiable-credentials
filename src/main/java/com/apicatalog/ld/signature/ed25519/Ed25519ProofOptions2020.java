@@ -1,9 +1,9 @@
-package com.apicatalog.lds.ed25519;
+package com.apicatalog.ld.signature.ed25519;
 
 import java.time.Instant;
 
-import com.apicatalog.lds.proof.ProofOptions;
-import com.apicatalog.lds.proof.VerificationMethod;
+import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 public class Ed25519ProofOptions2020 implements ProofOptions {
 

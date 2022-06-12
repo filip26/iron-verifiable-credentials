@@ -1,9 +1,9 @@
-package com.apicatalog.lds;
+package com.apicatalog.ld.signature;
 
 import java.security.GeneralSecurityException;
 
-import com.apicatalog.lds.VerificationError.Code;
-import com.apicatalog.lds.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.google.crypto.tink.signature.SignatureConfig;
 import com.google.crypto.tink.subtle.Ed25519Sign;
 import com.google.crypto.tink.subtle.Ed25519Verify;

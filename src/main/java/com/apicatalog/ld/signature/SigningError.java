@@ -1,4 +1,4 @@
-package com.apicatalog.lds;
+package com.apicatalog.ld.signature;
 
 public class SigningError extends Throwable {
 

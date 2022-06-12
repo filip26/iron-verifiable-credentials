@@ -19,10 +19,10 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.SigningError;
-import com.apicatalog.lds.VerificationError;
-import com.apicatalog.lds.ed25519.Ed25519ProofOptions2020;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.SigningError;
+import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.ed25519.Ed25519ProofOptions2020;
 import com.apicatalog.vc.api.IssuerApi;
 import com.apicatalog.vc.api.Vc;
 

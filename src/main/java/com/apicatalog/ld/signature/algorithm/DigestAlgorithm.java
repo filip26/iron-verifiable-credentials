@@ -1,4 +1,4 @@
-package com.apicatalog.lds.algorithm;
+package com.apicatalog.ld.signature.algorithm;
 
 public interface DigestAlgorithm {
 

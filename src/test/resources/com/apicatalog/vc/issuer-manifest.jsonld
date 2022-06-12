@@ -47,7 +47,7 @@
 			],
 			"name": "issuer @id must be IRI",
 			"input": "issuer/0004-in.jsonld",
-			"expectErrorCode": "InvalidIssuerId"
+			"expectErrorCode": "InvalidIssuer"
 		},
 		{
 			"@id": "#t0005",

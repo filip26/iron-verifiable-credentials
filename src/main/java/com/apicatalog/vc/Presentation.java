@@ -1,13 +1,14 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.DataError.ErrorType;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -22,53 +23,64 @@ public class Presentation implements Verifiable {
     
     public static final String VERIFIABLE_CREDENTIALS = "verifiableCredential";
 
-    private URI id;
+    protected URI id;
     
-    private URI holder;
+    protected URI holder;
+    
+    protected Collection<Credential> credentials;
 
-    
     protected Presentation() {}
     
-    public static boolean isPresentation(JsonValue value) {
-        if (value == null) {
-            throw new IllegalArgumentException("The 'value' parameter must not be null.");
+    public static boolean isPresentation(JsonValue expanded) {
+        if (expanded == null) {
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
 
-        return JsonUtils.isObject(value) && JsonLdUtils.isTypeOf(BASE + TYPE, value.asJsonObject());
+        return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
     }
     
-    public static Presentation from(JsonObject expanded) throws DataError {
+    public static Presentation from(JsonObject subject) throws DataError {
 
-        if (expanded == null) {
+        if (subject == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
         
         final Presentation presentation = new Presentation();
         
-        if (!JsonLdUtils.isTypeOf(BASE + TYPE, expanded)) {
+        // @type
+        if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
 
-            if (!JsonLdUtils.hasType(expanded)) {
+            if (!JsonLdUtils.hasType(subject)) {
                 throw new DataError(ErrorType.Missing, Keywords.TYPE);
             }
 
             throw new DataError(ErrorType.Unknown, Keywords.TYPE);
         }
 
-        // id
-        if (JsonLdUtils.hasProperty(expanded, Keywords.ID)) {            
-            presentation.id = JsonLdUtils.getId(expanded)
+        // @id - optional
+        if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {            
+            presentation.id = JsonLdUtils.getId(subject)
                     .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
         }
 
-        // holder
-        if (JsonLdUtils.hasProperty(expanded, BASE + HOLDER)) {
-            presentation.holder = JsonLdUtils.getProperty(expanded, BASE + HOLDER)
-                    .map(JsonLdUtils::getId)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .orElseThrow(() -> new DataError(ErrorType.Invalid, HOLDER, Keywords.ID));
+        // holder - optional
+        if (JsonLdUtils.hasPredicate(subject, BASE + HOLDER)) {
+            presentation.holder = JsonLdUtils.assertId(subject, BASE, HOLDER);
         }
+
+        presentation.credentials = new ArrayList<>();
         
+        // verifiableCredentials
+        for (JsonValue credential : JsonLdUtils.getObjects(subject, BASE + VERIFIABLE_CREDENTIALS)) {
+            
+            if (JsonUtils.isNotObject(credential)) {
+                throw new DataError();
+            }
+                        
+            presentation.credentials.add(Credential.from(credential.asJsonObject()));
+            //TODO proof somehow, do I need to parse it here?
+        }
+                             
         return presentation;
     }
 

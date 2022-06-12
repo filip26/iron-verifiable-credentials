@@ -1,4 +1,4 @@
-package com.apicatalog.lds.primitive;
+package com.apicatalog.ld.signature.primitive;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -8,7 +8,7 @@ import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.http.media.MediaType;
-import com.apicatalog.lds.algorithm.CanonicalizationAlgorithm;
+import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.rdf.Rdf;
 import com.apicatalog.rdf.RdfDataset;
 import com.apicatalog.rdf.io.RdfWriter;

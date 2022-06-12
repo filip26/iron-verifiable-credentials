@@ -1,7 +1,7 @@
-package com.apicatalog.lds.algorithm;
+package com.apicatalog.ld.signature.algorithm;
 
-import com.apicatalog.lds.SigningError;
-import com.apicatalog.lds.VerificationError;
+import com.apicatalog.ld.signature.SigningError;
+import com.apicatalog.ld.signature.VerificationError;
 
 /**
  * An algorithm that takes an input message and produces an output value

@@ -2,12 +2,15 @@ package com.apicatalog.vc;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.lds.DataError;
-import com.apicatalog.lds.DataError.ErrorType;
+import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -22,112 +25,92 @@ public class Credential implements Verifiable {
 
     public static final String TYPE = "VerifiableCredential";
 
-    // properties
+    // known properties
     public static final String SUBJECT = "credentialSubject";
     public static final String ISSUER = "issuer";
     public static final String ISSUANCE_DATE = "issuanceDate";
     public static final String EXPIRATION_DATE = "expirationDate";
     public static final String CREDENTIAL_STATUS = "credentialStatus";
-
-    private URI id;     //TODO
+    public static final String CREDENTIAL_SCHEMA = "credentialSchema";
+    public static final String REFRESH_SERVICE = "refreshService";
+    public static final String TERMS_OF_USE = "termsOfUse";
+    public static final String EVIDENCE = "evidence";
     
-    private URI issuer;
+    protected URI id;
+    
+    protected URI issuer;
 
-    private Instant issuance;
+    protected Instant issuance;
 
-    private Instant expiration;
+    protected Instant expiration;
 
-    private CredentialStatus status;
+    protected CredentialStatus status;
 
+    protected Collection<JsonValue> subjects;
+    
+    protected Map<String, JsonValue> extensions;
+    
     protected Credential() {}
 
-    public static boolean isCredential(JsonValue expanded) {
-        if (expanded == null) {
+    public static boolean isCredential(JsonValue subject) {
+        if (subject == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
-        return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
+        return JsonUtils.isObject(subject) && JsonLdUtils.isTypeOf(BASE + TYPE, subject.asJsonObject());
     }
 
-    public static Credential from(JsonObject expanded) throws DataError {
+    public static Credential from(JsonObject subject) throws DataError {
 
-        if (expanded == null) {
-            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
+        if (subject == null) {
+            throw new IllegalArgumentException("The 'subject' parameter must not be null.");
         }
 
         final Credential credential = new Credential();
 
-        // type
-        if (!JsonLdUtils.isTypeOf(BASE + TYPE, expanded)) {
+        // @type
+        if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
 
-            if (!JsonLdUtils.hasType(expanded)) {
+            if (!JsonLdUtils.hasType(subject)) {
                 throw new DataError(ErrorType.Missing, Keywords.TYPE);
             }
 
             throw new DataError(ErrorType.Unknown, Keywords.TYPE);
         }
         
-        // id
-        if (JsonLdUtils.hasProperty(expanded, Keywords.ID)) {            
-            credential.id = JsonLdUtils.getId(expanded)
+        // @id - optional
+        if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {            
+            credential.id = JsonLdUtils.getId(subject)
                     .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
         }
 
-        // subject
-        if (!hasProperty(expanded, SUBJECT)) {
+        // subject - mandatory
+        if (!JsonLdUtils.hasPredicate(subject, BASE + SUBJECT)) {
             throw new DataError(ErrorType.Missing, SUBJECT);
         }
 
-        // issuer
-        if (!hasProperty(expanded, ISSUER)) {
-            throw new DataError(ErrorType.Missing, ISSUER);
-        }
-
-        credential.issuer = JsonLdUtils
-                                .getId(getProperty(expanded, ISSUER))
-                                .orElseThrow(() -> new DataError(ErrorType.Invalid, ISSUER, Keywords.ID));
-
-        // issuance date
-        if (!hasProperty(expanded, ISSUANCE_DATE)) {
-            throw new DataError(ErrorType.Missing, ISSUANCE_DATE);
-        }
-
-        if (!JsonLdUtils.isXsdDateTime(getProperty(expanded, ISSUANCE_DATE))) {
-            throw new DataError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.TYPE);
-        }
-
-        credential.issuance = JsonLdUtils
-                                    .findFirstXsdDateTime(getProperty(expanded, ISSUANCE_DATE))
-                                    .orElseThrow(() -> new DataError(ErrorType.Invalid, ISSUANCE_DATE, Keywords.VALUE));
-
-        // expiration date
-        if (hasProperty(expanded, EXPIRATION_DATE)) {
-            credential.expiration = JsonLdUtils.findFirstXsdDateTime(getProperty(expanded, EXPIRATION_DATE))
-                    .orElseThrow(() -> {
-                        if (!JsonLdUtils.isXsdDateTime(getProperty(expanded, EXPIRATION_DATE))) {
-                            return new DataError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.TYPE);
-                        }
-                        return new DataError(ErrorType.Invalid, EXPIRATION_DATE, Keywords.VALUE);
-                    });
+        // issuer - mandatory
+        credential.issuer = JsonLdUtils.assertId(subject, BASE, ISSUER);
+       
+        // issuance date - mandatory
+        credential.issuance = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
+        
+        // expiration date - optional            
+        if (JsonLdUtils.hasPredicate(subject, BASE + EXPIRATION_DATE)) {
+            credential.expiration = JsonLdUtils.assertXsdDateTime(subject, BASE, EXPIRATION_DATE);
         }
 
         // status
-        if (hasProperty(expanded, CREDENTIAL_STATUS)) {
-            for (final JsonValue status : JsonUtils.toJsonArray(getProperty(expanded, CREDENTIAL_STATUS))) {
-                credential.status = CredentialStatus.from(status);
-                break;
-            }
+        final Optional<JsonValue> status = JsonLdUtils
+                                                .getObjects(subject, BASE + CREDENTIAL_STATUS)
+                                                .stream()
+                                                .findFirst();
+
+        if (status.isPresent()) {
+            credential.status = CredentialStatus.from(status.get());
         }
 
         //TODO
         return credential;
-    }
-
-    protected static boolean hasProperty(JsonObject expanded, String property) {
-        return JsonLdUtils.hasProperty(expanded, BASE, property);
-    }
-
-    protected static JsonValue getProperty(JsonObject expanded, String property) {
-        return JsonLdUtils.getProperty(expanded, BASE, property).orElse(null);  //TODO throw something
     }
 
     @Override
@@ -193,5 +176,14 @@ public class Credential implements Verifiable {
     @Override
     public Credential asCredential() {
         return this;
+    }
+
+    /**
+     * Returns a map of predicates and objects that are not recognized by this implementation.
+     * 
+     * @return an immutable map of extensions
+     */
+    public Map<String, JsonValue> getExtensions() {
+        return extensions;
     }
 }

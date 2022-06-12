@@ -1,8 +1,8 @@
-package com.apicatalog.lds.primitive;
+package com.apicatalog.ld.signature.primitive;
 
 import java.security.NoSuchAlgorithmException;
 
-import com.apicatalog.lds.algorithm.DigestAlgorithm;
+import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 
 public class MessageDigest implements DigestAlgorithm {
 
