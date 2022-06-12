@@ -4,6 +4,7 @@ import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
+import com.google.crypto.tink.subtle.Base64;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -81,7 +82,12 @@ public class LinkedDataSignature {
 
         System.arraycopy(proofHash, 0, result, 0, proofHash.length);
         System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
+/*
 
+P# KeHj02o+GaIWES7eSJ7H6NK1Gcm3i06viskQ2swzJBI=
+D# kLSQSa27iPMn++CWOx2ymqk2tiRlxOeQ/CCGtFIBhGw=
+
+ */
         return result;
     }
 

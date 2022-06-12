@@ -169,40 +169,9 @@ public abstract class EmbeddedProof implements Proof {
 
         //TODO domain property
 
-
-
         return embeddedProof;
     }
 
-    @Override
-    public URI getPurpose() {
-        return purpose;
-    }
-
-    @Override
-    public VerificationMethod getVerificationMethod() {
-        return verificationMethod;
-    }
-
-    @Override
-    public Instant getCreated() {
-        return created;
-    }
-
-    @Override
-    public String getDomain() {
-        return domain;
-    }
-
-    @Override
-    public byte[] getValue() {
-        return value;
-    }
-    
-    public void setValue(byte[] value) {
-        this.value = value;
-    }
-    
     public abstract void setValue(String encoding, String value) throws DataError;
 
     public abstract String getValue(String encoding) throws DataError;;
@@ -242,7 +211,7 @@ public abstract class EmbeddedProof implements Proof {
      * @return the given VC/VP with the proof attached
      * @throws DataError 
      */
-    public JsonObject appendTo(final JsonObject document) throws DataError {
+    public JsonObject addProofTo(final JsonObject document) throws DataError {
 
         final JsonValue proofPropertyValue = document.get(BASE + PROOF);
 
@@ -258,5 +227,35 @@ public abstract class EmbeddedProof implements Proof {
         proofs.add(toJson());
 
         return Json.createObjectBuilder(document).add(BASE + PROOF, proofs).build();
+    }
+    
+
+    @Override
+    public URI getPurpose() {
+        return purpose;
+    }
+
+    @Override
+    public VerificationMethod getVerificationMethod() {
+        return verificationMethod;
+    }
+
+    @Override
+    public Instant getCreated() {
+        return created;
+    }
+
+    @Override
+    public String getDomain() {
+        return domain;
+    }
+
+    @Override
+    public byte[] getValue() {
+        return value;
+    }
+    
+    public void setValue(byte[] value) {
+        this.value = value;
     }
 }

@@ -11,7 +11,7 @@
 		"issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
 		"issuanceDate": "2022-06-03T21:18:40Z",
 		"credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-		"proof": {
+		"sec:proof": {
 			"type": "Ed25519Signature2020",
 			"verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
 			"created": "2022-06-04T20:33:01Z",
@@ -19,7 +19,7 @@
 			"proofValue": "z4XRCSmN1S86TcVfLfNQYiGhmAuEymVCAs9Nztm7UoXuBqyzGqaJd5giEsJHEoddprFXkpGHuhbrhvTMGwV6qVi4U"
 		}
 	},
-	"proof": {
+	"sec:proof": {
 		"type": "Ed25519Signature2020",
 		"verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
 		"created": "2022-06-09T21:49:41Z",

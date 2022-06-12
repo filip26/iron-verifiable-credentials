@@ -140,6 +140,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
                 throw new DataError(ErrorType.Missing, "proof");
             }
 
+            // verify attached proofs' signatures
             for (final JsonValue proofValue : proofs) {
 
                 // check proof type
