@@ -117,6 +117,7 @@ public final class Vc {
         if (!JsonLdUtils.hasType(expanded)) {
             throw new DataError(ErrorType.Missing, Keywords.TYPE);
         }
+
         throw new DataError(ErrorType.Unknown, Keywords.TYPE);
     }
 }

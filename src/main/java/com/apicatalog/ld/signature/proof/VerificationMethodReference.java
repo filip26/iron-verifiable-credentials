@@ -32,7 +32,6 @@ public class VerificationMethodReference implements VerificationMethod {
 
     @Override
     public JsonObject toJson() {
-
         return Json.createObjectBuilder().add(Keywords.ID, id.toString()).build();
     }
 

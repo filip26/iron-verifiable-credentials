@@ -154,6 +154,6 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
 
         proof.setValue(signature);
 
-        return proof.appendTo(object);
+        return proof.addProofTo(object);
     }
 }
