@@ -1,4 +1,4 @@
-package com.apicatalog.lds.primitive;
+package com.apicatalog.ld.signature.ed25519;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
