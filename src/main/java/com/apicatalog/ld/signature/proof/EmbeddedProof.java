@@ -7,7 +7,6 @@ import java.time.format.DateTimeParseException;
 import java.util.Collection;
 
 import com.apicatalog.jsonld.JsonLdUtils;
-import com.apicatalog.jsonld.JsonLdValueObject;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
@@ -217,33 +216,19 @@ public abstract class EmbeddedProof implements Proof {
         }
 
         if (created != null) {
-            root.add(CREATED,
-                    Json
-                        .createArrayBuilder()
-                        .add(JsonLdValueObject.create("http://www.w3.org/2001/XMLSchema#dateTime", created.toString()))
-                        );
+            JsonLdUtils.setValue(root, CREATED, "http://www.w3.org/2001/XMLSchema#dateTime", created.toString());
         }
 
-        root.add(BASE + PROOF_PURPOSE,
-                Json.createArrayBuilder()
-                        .add(Json.createObjectBuilder().add(Keywords.ID,
-                                "https://w3id.org/security#assertionMethod")));  //FIXME configurable
-
+        JsonLdUtils.setId(root, BASE + PROOF_PURPOSE, "https://w3id.org/security#assertionMethod"); //FIXME configurable
 
         if (domain != null) {
-            //TODO add domain
+            //TODO
         }
 
         if (value != null) {
-
-            //TODO move to ed
             final String proofValue = getValue("https://w3id.org/security#multibase");
             
-            root.add(BASE + PROOF_VALUE,
-                    Json
-                        .createArrayBuilder()
-                        .add(JsonLdValueObject.create("https://w3id.org/security#multibase", proofValue))
-                    );
+            JsonLdUtils.setValue(root, BASE + PROOF_VALUE, "https://w3id.org/security#multibase", proofValue);
         }
         return root.build();
     }

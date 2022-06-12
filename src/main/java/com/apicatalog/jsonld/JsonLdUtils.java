@@ -14,7 +14,9 @@ import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
@@ -207,5 +209,22 @@ public class JsonLdUtils {
                 });
     }
 
+    public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property, URI id) {
+        return setId(objectBuilder, property, id.toString());
+    }
 
+    public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property, String id) {
+        objectBuilder.add(property, 
+                Json.createArrayBuilder()
+                        .add(Json.createObjectBuilder().add(Keywords.ID, id.toString())));
+
+        return objectBuilder;
+    }
+
+    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property, String type, String value) {
+
+        objectBuilder.add(property, JsonLdValueObject.toJson(type, value));
+        
+        return objectBuilder;
+    }
 }

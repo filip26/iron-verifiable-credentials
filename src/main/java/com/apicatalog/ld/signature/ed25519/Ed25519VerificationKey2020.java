@@ -24,11 +24,11 @@ import jakarta.json.JsonValue;
 //TODO javadoc
 public class Ed25519VerificationKey2020 implements VerificationKey {
 
-    public static final String BASE = "https://w3id.org/security#";
+    protected static final String BASE = "https://w3id.org/security#";
 
-    public static final String CONTROLLER = "controller";
-    public static final String PUBLIC_KEY_MULTIBASE = "publicKeyMultibase";
-    public static final String PUBLIC_KEY_TYPE = "https://w3id.org/security#multibase";
+    protected static final String CONTROLLER = "controller";
+    protected static final String PUBLIC_KEY_MULTIBASE = "publicKeyMultibase";
+    protected static final String PUBLIC_KEY_TYPE = "https://w3id.org/security#multibase";
 
     protected final URI id;
     protected final String type;
@@ -94,25 +94,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
 
     @Override
     public JsonObject toJson() {
-        final JsonObjectBuilder builder = Json.createObjectBuilder();
-
-        toJson(builder);
-        return builder.build();
-    }
-
-    protected void toJson(JsonObjectBuilder builder) {
-        if (id != null) {
-            builder.add(Keywords.ID, id.toString());
-        }
-        builder.add(Keywords.TYPE, type);
-
-        if (controller != null) {
-            builder.add(BASE + CONTROLLER,
-                    Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID,
-                    controller.toString())));
-        }
-
-        setKey(builder, publicKey, BASE + PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
+        return toJson(Json.createObjectBuilder()).build();
     }
 
     public URI getId() {
@@ -179,22 +161,30 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
         return Multicodec.decode(codec, encodedKey);
     }
 
-    static void setKey(JsonObjectBuilder builder, byte[] key, String property, Codec codec) {
+    protected JsonObjectBuilder toJson(JsonObjectBuilder builder) {
+        if (id != null) {
+            builder.add(Keywords.ID, id.toString());
+        }
+        
+        builder.add(Keywords.TYPE, type);
+
+        if (controller != null) {
+            JsonLdUtils.setId(builder, BASE + CONTROLLER, controller);
+        }
+
+        return setKey(builder, publicKey, BASE + PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
+    }
+
+    static JsonObjectBuilder setKey(JsonObjectBuilder builder, byte[] key, String property, Codec codec) {
 
         if (key == null || key.length == 0) {
-            return;
+            return builder;
         }
 
         final byte[] encoded = Multicodec.encode(codec, key);
 
         final String multibase = Multibase.encode(Algorithm.Base58Btc, encoded);
 
-        builder.add(property,
-                Json.createArrayBuilder().add(
-                        Json.createObjectBuilder()
-                            .add(Keywords.TYPE, "https://w3id.org/security#multibase")
-                            .add(Keywords.VALUE, multibase)
-                        )
-                    );
+        return JsonLdUtils.setValue(builder, property, "https://w3id.org/security#multibase", multibase);
     }
 }
