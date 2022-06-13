@@ -17,15 +17,14 @@ import com.apicatalog.multicodec.Multicodec.Type;
  */
 public class DidKey extends Did {
 
-    public static final String METHOD = "key";
+    protected static final String METHOD_KEY = "key";
     
     private final Codec codec;
     
     private final byte[] rawKey;
 
-    //TODO improve params name and order
-    protected DidKey(String version, Codec codec, byte[] rawValue, String encoded) {
-        super(METHOD, version, encoded);
+    protected DidKey(Did did, Codec codec, byte[] rawValue) {
+        super(did.getMethod(), did.getVersion(), did.getMethodSpecificId());
         this.codec = codec;
         this.rawKey = rawValue;
     }
@@ -42,45 +41,36 @@ public class DidKey extends Did {
      * @throws IllegalArgumentException
      *         If the given {@code uri} is not valid DID key
      */    
-    public static final DidKey create(final URI uri) {
+    public static final DidKey from(final URI uri) {
 
-        if (!isDidKey(uri)) {
-            throw new IllegalArgumentException("The given uri is not valid DID key, does not start with did:key prefix but [" + uri + "]");
-        }
-
-        // default DID key version
-        String version = "1";
-
-        String encoded = uri.getSchemeSpecificPart().substring(METHOD.length() + 1);
-        int versionIndex = encoded.indexOf(":");
+        final Did did = Did.from(uri);
         
-        if (versionIndex != -1) {
-            version = encoded.substring(0, versionIndex);
-            encoded = encoded.substring(versionIndex + 1);            
+        if (!METHOD_KEY.equalsIgnoreCase(did.getMethod())) {
+            throw new IllegalArgumentException("The given URI [" + uri + "] is not valid DID key, does not start with 'did:key'.");
         }
         
-        if (!Multibase.isAlgorithmSupported(encoded)) {
+        if (!Multibase.isAlgorithmSupported(did.getMethodSpecificId())) {
             throw new IllegalArgumentException();
         }
 
-        final byte[] decoded = Multibase.decode(encoded);
+        final byte[] decoded = Multibase.decode(did.getMethodSpecificId());
 
         final Codec codec = Multicodec.codec(Type.Key, decoded).orElseThrow(IllegalArgumentException::new);
 
         final byte[] rawKey = Multicodec.decode(codec, decoded);
 
-        return new DidKey(version, codec, rawKey, encoded);
+        return new DidKey(did, codec, rawKey);
     }
     
     public static boolean isDidKey(final URI uri) {
         return Did.SCHEME.equals(uri.getScheme())
                 && uri.getSchemeSpecificPart() != null
-                && uri.getSchemeSpecificPart().startsWith(METHOD)
+                && uri.getSchemeSpecificPart().startsWith(METHOD_KEY + ":")
                 ;
     }
 
-    public static boolean isDid(final String uri) {
-        return uri != null && uri.toLowerCase().startsWith(SCHEME + ":" + METHOD + ":");
+    public static boolean isDidKey(final String uri) {
+        return uri != null && uri.toLowerCase().startsWith(SCHEME + ":" + METHOD_KEY + ":");
     }
     
     public Codec getCodec() {

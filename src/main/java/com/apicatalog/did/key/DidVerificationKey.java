@@ -2,6 +2,7 @@ package com.apicatalog.did.key;
 
 import java.net.URI;
 
+import com.apicatalog.did.Did;
 import com.apicatalog.did.DidUrl;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
@@ -14,11 +15,11 @@ public class DidVerificationKey implements VerificationKey {
     private static final String ED25519_VERIFICATION_KEY_2020_TYPE =  "https://w3id.org/security#Ed25519VerificationKey2020";
     private static final String X25519_KEYAGREEMENT_KEY_2020_TYPE =  "https://w3id.org/security#X25519KeyAgreementKey2020";
     
-    private URI id;
+    private DidUrl id;
     
     private String type;
     
-    private URI controller;
+    private Did controller;
     
     private byte[] publicKey;
     
@@ -42,7 +43,7 @@ public class DidVerificationKey implements VerificationKey {
         verificationMethod.publicKey = didKey.getRawKey();
         
         // 4.
-        verificationMethod.id = DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri();
+        verificationMethod.id = DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId());
         
         // 5.
         String encodingType = MULTIKEY_TYPE;
@@ -80,7 +81,7 @@ public class DidVerificationKey implements VerificationKey {
         //TODO
         
         // 4.
-        verificationMethod.id = DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri();
+        verificationMethod.id = DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId());
 
         // 5.
         String encodingType = MULTIKEY_TYPE;
@@ -113,7 +114,7 @@ public class DidVerificationKey implements VerificationKey {
     
     @Override
     public URI getId() {
-        return id;
+        return id.toUri();
     }
 
     @Override
@@ -123,7 +124,7 @@ public class DidVerificationKey implements VerificationKey {
 
     @Override
     public URI getController() {
-        return controller;
+        return controller.toUri();
     }
 
     @Override

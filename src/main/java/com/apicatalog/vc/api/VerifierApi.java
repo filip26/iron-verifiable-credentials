@@ -188,7 +188,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     final VerificationKey get(URI id) throws JsonLdError, DataError {
 
         if (DidKey.isDidKey(id)) {             
-            final DidKey didKey = DidKey.create(id);
+            final DidKey didKey = DidKey.from(id);
             
             return DidVerificationKey.createSignatureMethod(didKey);    //TODO simplify, skip DidKey.create
         }

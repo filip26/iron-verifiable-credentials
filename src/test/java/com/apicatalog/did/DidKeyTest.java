@@ -29,7 +29,7 @@ class DidKeyTest {
 
         try {
         
-            final DidKey didKey = DidKey.create(testCase.uri);
+            final DidKey didKey = DidKey.from(testCase.uri);
             
             if (testCase.negative) {
                 fail("Expected failure but got " + didKey);
