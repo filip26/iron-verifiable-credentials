@@ -21,8 +21,7 @@ public class Multicodec {
 
         Ed25519PublicKey(Type.Key,  new byte[]{(byte)0xed, (byte)0x01}),
         Ed25519PrivateKey(Type.Key, new byte[]{(byte)0x13, (byte)0x00}),
-
-//        UnknownPrivateKey(Type.Key, new byte[]{(byte)0x80, (byte)0x26, (byte)0x9b, (byte)0x93}) //FIXME ?!?!?!?
+        X25519PublicKey(Type.Key, new byte[]{(byte)0xec}),
         ;
 
         private final byte[] code;
@@ -50,13 +49,18 @@ public class Multicodec {
         }
     }
 
-    static Map<Integer, Codec> KEY_REGISTRY = new HashMap<>();
+    private static Map<Integer, Codec> KEY_REGISTRY = new HashMap<>();
 
     static {
-        KEY_REGISTRY.put(Codec.Ed25519PublicKey.asInteger(), Codec.Ed25519PublicKey);
-        KEY_REGISTRY.put(Codec.Ed25519PrivateKey.asInteger(), Codec.Ed25519PrivateKey);
+        add(Codec.Ed25519PublicKey);
+        add(Codec.Ed25519PrivateKey);
+        add(Codec.X25519PublicKey);
     }
 
+    public static void add(final Codec codec) {
+        KEY_REGISTRY.put(codec.asInteger(), codec);
+    }
+    
     public static Optional<Codec> codec(Type type, final byte[] encoded) {
 
         switch (type) {

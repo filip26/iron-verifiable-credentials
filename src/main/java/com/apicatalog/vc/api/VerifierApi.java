@@ -3,6 +3,8 @@ package com.apicatalog.vc.api;
 import java.net.URI;
 import java.util.Collection;
 
+import com.apicatalog.did.DidKey;
+import com.apicatalog.did.DidVerificationKey;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdUtils;
@@ -185,6 +187,12 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     // refresh/fetch verification method
     final VerificationKey get(URI id) throws JsonLdError, DataError {
 
+        if (DidKey.isDidKey(id)) {             
+            final DidKey didKey = DidKey.create(id);
+            
+            return DidVerificationKey.createSignatureMethod(didKey);    //TODO simplify, skip DidKey.create
+        }
+        
         final JsonArray document = JsonLd.expand(id).loader(loader).get();
 
         JsonObject method = document.getJsonObject(0);  //FIXME
