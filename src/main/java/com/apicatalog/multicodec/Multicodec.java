@@ -18,7 +18,6 @@ public class Multicodec {
     }
 
     public enum Codec {
-
         Ed25519PublicKey(Type.Key,  new byte[]{(byte)0xed, (byte)0x01}),
         Ed25519PrivateKey(Type.Key, new byte[]{(byte)0x13, (byte)0x00}),
         X25519PublicKey(Type.Key, new byte[]{(byte)0xec}),

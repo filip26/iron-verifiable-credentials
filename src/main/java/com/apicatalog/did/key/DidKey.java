@@ -1,7 +1,8 @@
-package com.apicatalog.did;
+package com.apicatalog.did.key;
 
 import java.net.URI;
 
+import com.apicatalog.did.Did;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Codec;
@@ -14,24 +15,19 @@ import com.apicatalog.multicodec.Multicodec.Type;
  * did-key-format := did:key:MULTIBASE(base58-btc, MULTICODEC(public-key-type, raw-public-key-bytes))
  *
  */
-public class DidKey {
+public class DidKey extends Did {
 
-    public static final String SCHEME = "did";
-    public static final String KEY = "key";
-
-    private final String version;
+    public static final String METHOD = "key";
     
     private final Codec codec;
     
     private final byte[] rawKey;
-    
-    private final String encoded;
 
+    //TODO improve params name and order
     protected DidKey(String version, Codec codec, byte[] rawValue, String encoded) {
-        this.version = version;
+        super(METHOD, version, encoded);
         this.codec = codec;
         this.rawKey = rawValue;
-        this.encoded = encoded;
     }
 
     /**
@@ -55,7 +51,7 @@ public class DidKey {
         // default DID key version
         String version = "1";
 
-        String encoded = uri.getSchemeSpecificPart().substring(KEY.length() + 1);
+        String encoded = uri.getSchemeSpecificPart().substring(METHOD.length() + 1);
         int versionIndex = encoded.indexOf(":");
         
         if (versionIndex != -1) {
@@ -77,15 +73,14 @@ public class DidKey {
     }
     
     public static boolean isDidKey(final URI uri) {
-        return SCHEME.equals(uri.getScheme())
+        return Did.SCHEME.equals(uri.getScheme())
                 && uri.getSchemeSpecificPart() != null
-                && uri.getSchemeSpecificPart().startsWith(KEY)
+                && uri.getSchemeSpecificPart().startsWith(METHOD)
                 ;
     }
 
-
-    public String getVersion() {
-        return version;
+    public static boolean isDid(final String uri) {
+        return uri != null && uri.toLowerCase().startsWith(SCHEME + ":" + METHOD + ":");
     }
     
     public Codec getCodec() {
@@ -94,18 +89,5 @@ public class DidKey {
 
     public byte[] getRawKey() {
         return rawKey;
-    }
-    
-    public String getPublicKeyEncoded() {
-        return encoded;
-    }
-
-    @Override
-    public String toString() {
-        return SCHEME + ":" + KEY + (!"1".equals(version) ? ":" + version : "") + ":" + encoded; 
-    }
-    
-    public URI toURI() {
-        return URI.create(toString()); 
-    }
+    }    
 }

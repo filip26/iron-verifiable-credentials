@@ -1,7 +1,8 @@
-package com.apicatalog.did;
+package com.apicatalog.did.key;
 
 import java.net.URI;
 
+import com.apicatalog.did.DidUrl;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 
@@ -41,7 +42,7 @@ public class DidVerificationKey implements VerificationKey {
         verificationMethod.publicKey = didKey.getRawKey();
         
         // 4.
-        verificationMethod.id = URI.create(didKey.toString() + "#" + didKey.getPublicKeyEncoded());
+        verificationMethod.id = DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri();
         
         // 5.
         String encodingType = MULTIKEY_TYPE;
@@ -59,7 +60,7 @@ public class DidVerificationKey implements VerificationKey {
         // 9.
         if (MULTIKEY_TYPE.equals(encodingType) 
                 || ED25519_VERIFICATION_KEY_2020_TYPE.equals(encodingType)) {
-            verificationMethod.publicKeyMultibase = didKey.getPublicKeyEncoded();
+            verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
         }
         
         // 10.
@@ -79,7 +80,7 @@ public class DidVerificationKey implements VerificationKey {
         //TODO
         
         // 4.
-        verificationMethod.id = URI.create(didKey.toString() + "#" + didKey.getPublicKeyEncoded());
+        verificationMethod.id = DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri();
 
         // 5.
         String encodingType = MULTIKEY_TYPE;
@@ -100,7 +101,7 @@ public class DidVerificationKey implements VerificationKey {
         // 9.
         if (MULTIKEY_TYPE.equals(encodingType) 
                 || X25519_KEYAGREEMENT_KEY_2020_TYPE.equals(encodingType)) {
-            verificationMethod.publicKeyMultibase = didKey.getPublicKeyEncoded();
+            verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
         }
         
         //TODO
