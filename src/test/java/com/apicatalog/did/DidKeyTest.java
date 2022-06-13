@@ -14,6 +14,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.apicatalog.did.key.DidKey;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.multicodec.Multicodec.Codec;
 
@@ -28,7 +29,7 @@ class DidKeyTest {
 
         try {
         
-            final DidKey didKey = DidKey.create(testCase.uri);
+            final DidKey didKey = DidKey.from(testCase.uri);
             
             if (testCase.negative) {
                 fail("Expected failure but got " + didKey);
