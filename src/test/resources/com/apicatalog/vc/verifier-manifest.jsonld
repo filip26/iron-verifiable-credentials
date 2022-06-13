@@ -186,6 +186,15 @@
 			"input": "verifier/0021-in.jsonld",
 			"expectErrorCode": "InvalidSignature"
 		},
+        {
+            "@id": "#t0022",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "DID key as a verification method",
+            "input": "verifier/0022-in.jsonld"
+        },		
 		{
 			"@id": "#t0050",
 			"@type": [

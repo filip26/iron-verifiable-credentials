@@ -48,10 +48,7 @@ public class DidKey {
      */    
     public static final DidKey create(final URI uri) {
 
-        if (!SCHEME.equals(uri.getScheme())
-                || uri.getSchemeSpecificPart() == null
-                || !uri.getSchemeSpecificPart().startsWith(KEY)
-                ) {
+        if (!isDidKey(uri)) {
             throw new IllegalArgumentException("The given uri is not valid DID key, does not start with did:key prefix but [" + uri + "]");
         }
 
@@ -78,6 +75,14 @@ public class DidKey {
 
         return new DidKey(version, codec, rawKey, encoded);
     }
+    
+    public static boolean isDidKey(final URI uri) {
+        return SCHEME.equals(uri.getScheme())
+                && uri.getSchemeSpecificPart() != null
+                && uri.getSchemeSpecificPart().startsWith(KEY)
+                ;
+    }
+
 
     public String getVersion() {
         return version;
@@ -103,5 +108,4 @@ public class DidKey {
     public URI toURI() {
         return URI.create(toString()); 
     }
-
 }
