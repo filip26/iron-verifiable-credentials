@@ -29,10 +29,10 @@ public class DidDocument {
         final DidDocument document = new DidDocument();
 
         // 4.
-        document.signatureMethod = DidVerificationKey.expand(didKey);
+        document.signatureMethod = DidVerificationKey.createSignatureMethod(didKey);
         
         // 5.
-        //TODO document.encryptiongMethod = 
+        document.encryptiongMethod = DidVerificationKey.createEncryptionMethod(didKey); 
         
         // 6.
         document.id = didKey.toURI();
@@ -51,4 +51,5 @@ public class DidDocument {
         
         return document;   
     }
+    
 }

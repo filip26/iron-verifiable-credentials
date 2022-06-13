@@ -3,6 +3,7 @@ package com.apicatalog.did;
 import java.net.URI;
 
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 import jakarta.json.JsonObject;
 
@@ -10,6 +11,7 @@ public class DidVerificationKey implements VerificationKey {
 
     private static final String MULTIKEY_TYPE = "Multikey";     //FIXME an absolute URI
     private static final String ED25519_VERIFICATION_KEY_2020_TYPE =  "https://w3id.org/security#Ed25519VerificationKey2020";
+    private static final String X25519_KEYAGREEMENT_KEY_2020_TYPE =  "https://w3id.org/security#X25519KeyAgreementKey2020";
     
     private URI id;
     
@@ -32,12 +34,14 @@ public class DidVerificationKey implements VerificationKey {
      * 
      * @return The new verification key
      */
-    public static DidVerificationKey expand(DidKey didKey) {
-        
-        final DidVerificationKey verificationKey = new DidVerificationKey();
+    public static DidVerificationKey createSignatureMethod(DidKey didKey) {
+
+        // 1.
+        final DidVerificationKey verificationMethod = new DidVerificationKey();
+        verificationMethod.publicKey = didKey.getRawKey();
         
         // 4.
-        verificationKey.id = URI.create(didKey.toString() + "#" + didKey.getPublicKeyEncoded());
+        verificationMethod.id = URI.create(didKey.toString() + "#" + didKey.getPublicKeyEncoded());
         
         // 5.
         String encodingType = MULTIKEY_TYPE;
@@ -47,24 +51,62 @@ public class DidVerificationKey implements VerificationKey {
         //TODO
         
         // 7.
-        verificationKey.type = encodingType;
+        verificationMethod.type = encodingType;
         
         // 8.
-        verificationKey.controller = verificationKey.id;
-        
-        verificationKey.publicKey = didKey.getRawKey();
+        verificationMethod.controller = verificationMethod.id;
         
         // 9.
         if (MULTIKEY_TYPE.equals(encodingType) 
                 || ED25519_VERIFICATION_KEY_2020_TYPE.equals(encodingType)) {
-            verificationKey.publicKeyMultibase = didKey.getPublicKeyEncoded();
+            verificationMethod.publicKeyMultibase = didKey.getPublicKeyEncoded();
         }
         
         // 10.
         //TODO jwk
         
-        return verificationKey;
+        return verificationMethod;
         
+    }
+    
+    public static VerificationMethod createEncryptionMethod(final DidKey didKey) {
+
+        // 1.
+        final DidVerificationKey verificationMethod = new DidVerificationKey();
+        verificationMethod.publicKey = didKey.getRawKey();
+        
+        // 3.
+        //TODO
+        
+        // 4.
+        verificationMethod.id = URI.create(didKey.toString() + "#" + didKey.getPublicKeyEncoded());
+
+        // 5.
+        String encodingType = MULTIKEY_TYPE;
+        //TODO use options
+        
+        // 6.
+        //TODO
+        
+        // 7.
+        //TODO
+
+        // 8.
+        verificationMethod.type = encodingType;
+        
+        // 9.
+        verificationMethod.controller = verificationMethod.id;
+        
+        // 9.
+        if (MULTIKEY_TYPE.equals(encodingType) 
+                || X25519_KEYAGREEMENT_KEY_2020_TYPE.equals(encodingType)) {
+            verificationMethod.publicKeyMultibase = didKey.getPublicKeyEncoded();
+        }
+        
+        //TODO
+        
+        // 12
+        return verificationMethod;
     }
 
     
