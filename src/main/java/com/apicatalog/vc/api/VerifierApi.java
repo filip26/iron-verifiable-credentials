@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.did.key.DidKey;
+import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.did.key.DidVerificationKey;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -190,7 +191,8 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
         if (DidKey.isDidKey(id)) {             
             final DidKey didKey = DidKey.from(id);
             
-            return DidVerificationKey.createSignatureMethod(didKey);    //TODO simplify, skip DidKey.create
+            //TODO use set of configurable DidResolvers
+            return DidKeyResolver.createSignatureMethod(didKey);    //TODO simplify, skip DidKey.create
         }
         
         final JsonArray document = JsonLd.expand(id).loader(loader).get();

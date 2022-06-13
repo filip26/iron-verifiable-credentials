@@ -61,15 +61,21 @@ public class DidKey extends Did {
 
         return new DidKey(did, codec, rawKey);
     }
+
+    public static boolean isDidKey(final Did did) {
+        return METHOD_KEY.equalsIgnoreCase(did.getMethod());         //FIXME path .. #fragment must be blank
+    }
     
     public static boolean isDidKey(final URI uri) {
         return Did.SCHEME.equals(uri.getScheme())
                 && uri.getSchemeSpecificPart() != null
-                && uri.getSchemeSpecificPart().startsWith(METHOD_KEY + ":")
+                && uri.getSchemeSpecificPart().toLowerCase().startsWith(METHOD_KEY + ":")
+                //FIXME path .. #fragment must be blank
                 ;
     }
 
     public static boolean isDidKey(final String uri) {
+        //FIXME path .. #fragment must be blank
         return uri != null && uri.toLowerCase().startsWith(SCHEME + ":" + METHOD_KEY + ":");
     }
     

@@ -13,13 +13,5 @@ public interface DidResolver {
      * @param did To resolve
      * @return The new {@link DidDocument}
      */
-    DidDocument resolve(Did did);
-
-    /**
-     * 
-     * @param didUrl
-     * @return
-     */
-    DidDocument dereference(DidUrl didUrl);
-    
+    DidDocument resolve(Did did);    
 }

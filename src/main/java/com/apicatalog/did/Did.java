@@ -19,11 +19,11 @@ public class Did  {
     }
     
     public static boolean isDid(final URI uri) {
-        return Did.SCHEME.equals(uri.getScheme());
+        return Did.SCHEME.equals(uri.getScheme());      //FIXME path .. #fragment must be blank
     }
 
     public static boolean isDid(final String uri) {
-        return uri != null && uri.toLowerCase().startsWith(SCHEME + ":");
+        return uri != null && uri.toLowerCase().startsWith(SCHEME + ":");      //FIXME path .. #fragment must be blank
     }
     
     /**
@@ -78,6 +78,14 @@ public class Did  {
     
     public URI toUri() {
         return URI.create(toString());
+    }
+    
+    public boolean isDidUrl() {
+        return false;
+    }
+    
+    public DidUrl asDidUrl() {
+        throw new ClassCastException();
     }
     
     @Override
