@@ -4,8 +4,13 @@ import java.net.URI;
 import java.util.Set;
 
 import com.apicatalog.did.key.DidKey;
+import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.did.key.DidVerificationKey;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
+
+import jakarta.json.Json;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 
 public class DidDocument {
 
@@ -39,15 +44,16 @@ public class DidDocument {
      * 
      * @return The new DID document
      */
-    public DidDocument expand(final DidKey didKey) {
+    public DidDocument from(final DidKey didKey) {
         
         final DidDocument document = new DidDocument();
 
+        //TODO use configurable DidResolvers, steps 4-5
         // 4.
-        document.signatureMethod = DidVerificationKey.createSignatureMethod(didKey);
+        document.signatureMethod = DidKeyResolver.createSignatureMethod(didKey);
         
         // 5.
-        document.encryptiongMethod = DidVerificationKey.createEncryptionMethod(didKey); 
+        document.encryptiongMethod = DidKeyResolver.createEncryptionMethod(didKey); 
         
         // 6.
         document.id = didKey.toUri();
@@ -67,4 +73,13 @@ public class DidDocument {
         return document;   
     }
     
+    public JsonValue toJson() {
+        return toJson(Json.createObjectBuilder()).build();
+    }
+    
+    protected JsonObjectBuilder toJson(final JsonObjectBuilder builder) {
+        //TODO
+        return builder;
+    }
+
 }
