@@ -181,6 +181,22 @@
 				"created": "2022-06-04T20:33:01Z"
 			}
 		},
+        {
+            "@id": "#t0023",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "a credential with DID key as a verification method",
+            "input": "issuer/0023-in.jsonld",
+            "expect": "issuer/0023-out.jsonld",
+            "context": "issuer/0001-context.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y",
+                "created": "2022-05-28T17:02:05Z"
+            }
+        },		
 		{
 			"@id": "#t0030",
 			"@type": [
