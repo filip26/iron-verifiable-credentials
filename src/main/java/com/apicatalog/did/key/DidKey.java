@@ -17,6 +17,8 @@ import com.apicatalog.multicodec.Multicodec.Type;
  */
 public class DidKey extends Did {
 
+    private static final long serialVersionUID = 5467606126809729049L;
+
     protected static final String METHOD_KEY = "key";
     
     private final Codec codec;

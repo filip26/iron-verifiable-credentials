@@ -4,8 +4,13 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Objects;
+
+import com.apicatalog.jsonld.StringUtils;
 
 public class DidUrl extends Did {
+
+    private static final long serialVersionUID = -3952644987975446496L;
 
     protected final String path;
     protected final String query;
@@ -22,23 +27,26 @@ public class DidUrl extends Did {
         return new DidUrl(did, path, query, fragment);
     }
 
-    public static DidUrl from(URI uri) {
-        //TODO return new DidUrl(Did.from(uri), path, query, fragment);
-        return null;
-    }
-    
     public static boolean isDidUrl(final URI uri) {
         return Did.SCHEME.equals(uri.getScheme());
     }
 
     public static boolean isDidUrl(final String uri) {
-        return uri != null && uri.toLowerCase().startsWith(SCHEME + ":");
+        if (StringUtils.isBlank(uri)) {
+            return false;
+        }
+
+        final String[] parts = uri.split(":");
+
+        return (parts.length == 3 || parts.length == 4) 
+                && Did.SCHEME.equalsIgnoreCase(parts[0])
+                ;
     }
-    
+
     @Override
     public URI toUri() {
         try {
-            return new URI(SCHEME, method + ":" + methodSpecificId, null);      //FIXME
+            return new URI(SCHEME, method + ":" + methodSpecificId, path, query, fragment);
         } catch (URISyntaxException e) {
             throw new IllegalStateException(e);
         }
@@ -63,9 +71,54 @@ public class DidUrl extends Did {
     }
 
     @Override
-    public String toString() {        
-        return toUri().toString();
+    public String toString() {
+        final StringBuilder builder = new StringBuilder(super.toString());
+
+        if (StringUtils.isNotBlank(path)) {
+            if (path.charAt(0) != '/') {
+                builder.append('/');
+            }
+            builder.append(path);
+        }
+        
+        if (StringUtils.isNotBlank(query)) {
+            if (path.charAt(0) != '?') {
+                builder.append('?');
+            }
+            builder.append(query);
+        }
+        
+        if (StringUtils.isNotBlank(fragment)) {
+            if (path.charAt(0) != '#') {
+                builder.append('#');
+            }
+            builder.append(fragment);            
+        }
+
+        return builder.toString();
     }
 
-    //TODO add equals and hashCode
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(fragment, path, query);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        DidUrl other = (DidUrl) obj;
+        return Objects.equals(fragment, other.fragment) && Objects.equals(path, other.path)
+                && Objects.equals(query, other.query);
+    }
 }

@@ -1,12 +1,15 @@
 package com.apicatalog.did;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.StringUtils;
 
-public class Did  {
+public class Did implements Serializable {
+
+    private static final long serialVersionUID = -2179410886513458650L;
 
     public static final String SCHEME = "did";
 
@@ -43,10 +46,15 @@ public class Did  {
         if (StringUtils.isBlank(uri)) {
             return false;
         }
-        
+
         final String[] parts = uri.split(":");
-        
-        return (parts.length == 3 || parts.length == 4) && Did.SCHEME.equalsIgnoreCase(parts[0]); 
+
+        return (parts.length == 3 || parts.length == 4) 
+                && Did.SCHEME.equalsIgnoreCase(parts[0])
+                && !parts[parts.length - 1].contains("/")       // path
+                && !parts[parts.length - 1].contains("?")       // query
+                && !parts[parts.length - 1].contains("#")       // fragment
+                ;
     }
     
     /**
@@ -146,14 +154,14 @@ public class Did  {
     public String toString() {
         final StringBuilder builder = new StringBuilder()
                     .append(SCHEME)
-                    .append(":")
+                    .append(':')
                     .append(method)
-                    .append(":");
+                    .append(':');
         
         if (!"1".equals(version)) {
             builder
                 .append(version)
-                .append(":");
+                .append(':');
         }        
         return builder.append(methodSpecificId).toString();
     }
