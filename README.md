@@ -16,15 +16,16 @@ All PR's welcome!
 ```java
 
 try {
-  Vc.verify(credentials).isValid();
+  Vc.verify(credentials)
+    .statusVerifier(...)    // optional
+    .didResolver(...)       // optional  
+    .isValid();
 } catch (VerificationError | DataError e) {
   ...
 }
 
 signed = Vc.sign(credentials, keys, proofOptions)
            .loader(documentLoader) // optional custom loader
-           .statusVerifier(...)    // optional
-           .didResolver(...)       // optional
            .get();   // returns signed document in expanded form
 
 signed = Vc.sign(credentials, keys, proofOptions)
