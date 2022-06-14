@@ -2,6 +2,7 @@ package com.apicatalog.did;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 public class DidUrl extends Did {
@@ -34,6 +35,15 @@ public class DidUrl extends Did {
         return uri != null && uri.toLowerCase().startsWith(SCHEME + ":");
     }
     
+    @Override
+    public URI toUri() {
+        try {
+            return new URI(SCHEME, method + ":" + methodSpecificId, null);      //FIXME
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+    
     public URL toUrl() {
         try {
             return toUri().toURL();
@@ -51,6 +61,11 @@ public class DidUrl extends Did {
     public DidUrl asDidUrl() {
         return this;
     }
-    
-    //TODO add toString, equals and hashCode
+
+    @Override
+    public String toString() {        
+        return toUri().toString();
+    }
+
+    //TODO add equals and hashCode
 }

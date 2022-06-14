@@ -1,6 +1,7 @@
 package com.apicatalog.did;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.StringUtils;
@@ -13,18 +14,39 @@ public class Did  {
     protected final String version;
     protected final String methodSpecificId;
     
-    protected Did(String method, String version, String methodSpecificId) {
+    protected Did(final String method, final String version, final String methodSpecificId) {
         this.method = method;
         this.version = version;
         this.methodSpecificId = methodSpecificId;
     }
     
     public static boolean isDid(final URI uri) {
-        return Did.SCHEME.equals(uri.getScheme());      //FIXME path .. #fragment must be blank
+        if (!Did.SCHEME.equalsIgnoreCase(uri.getScheme())
+                || StringUtils.isBlank(uri.getSchemeSpecificPart())
+                || StringUtils.isNotBlank(uri.getAuthority())
+                || StringUtils.isNotBlank(uri.getUserInfo())
+                || StringUtils.isNotBlank(uri.getHost())
+                || StringUtils.isNotBlank(uri.getPath())
+                || StringUtils.isNotBlank(uri.getQuery())
+                || StringUtils.isNotBlank(uri.getFragment())
+                ) {
+                  return false;  
+                }
+        
+        final String[] parts = uri.getSchemeSpecificPart().split(":");
+        
+        return parts.length == 2 || parts.length == 3;
     }
 
     public static boolean isDid(final String uri) {
-        return uri != null && uri.toLowerCase().startsWith(SCHEME + ":");      //FIXME path .. #fragment must be blank
+
+        if (StringUtils.isBlank(uri)) {
+            return false;
+        }
+        
+        final String[] parts = uri.split(":");
+        
+        return (parts.length == 3 || parts.length == 4) && Did.SCHEME.equalsIgnoreCase(parts[0]); 
     }
     
     /**
@@ -47,7 +69,19 @@ public class Did  {
 
         return from(uri, uri.getSchemeSpecificPart().split(":"), 3);
     }
-    
+
+    /**
+     * Creates a new DID instance from the given URI.
+     *
+     * @param uri The source URI to be transformed into DID
+     * @return The new DID
+     * 
+     * @throws NullPointerException
+     *         If {@code uri} is {@code null}
+     *         
+     * @throws IllegalArgumentException
+     *         If the given {@code uri} is not valid DID
+     */
     public static Did from(final String uri) {
 
         if (!isDid(uri)) {
@@ -93,7 +127,11 @@ public class Did  {
     }
     
     public URI toUri() {
-        return URI.create(toString());
+        try {
+            return new URI(SCHEME, method + ":" + methodSpecificId, null);
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
     }
     
     public boolean isDidUrl() {
@@ -106,7 +144,18 @@ public class Did  {
     
     @Override
     public String toString() {
-        return Did.SCHEME + ":" + method + (!"1".equals(version) ? ":" + version : "") + ":" + methodSpecificId; 
+        final StringBuilder builder = new StringBuilder()
+                    .append(SCHEME)
+                    .append(":")
+                    .append(method)
+                    .append(":");
+        
+        if (!"1".equals(version)) {
+            builder
+                .append(version)
+                .append(":");
+        }        
+        return builder.append(methodSpecificId).toString();
     }
 
     @Override
@@ -115,7 +164,7 @@ public class Did  {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
