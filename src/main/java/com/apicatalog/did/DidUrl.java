@@ -51,4 +51,6 @@ public class DidUrl extends Did {
     public DidUrl asDidUrl() {
         return this;
     }
+    
+    //TODO add equals and hashCode
 }

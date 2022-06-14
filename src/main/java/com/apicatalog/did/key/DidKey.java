@@ -44,9 +44,18 @@ public class DidKey extends Did {
     public static final DidKey from(final URI uri) {
 
         final Did did = Did.from(uri);
-        
+
         if (!METHOD_KEY.equalsIgnoreCase(did.getMethod())) {
             throw new IllegalArgumentException("The given URI [" + uri + "] is not valid DID key, does not start with 'did:key'.");
+        }
+
+        return from(did);
+    }
+
+    public static final DidKey from(final Did did) {
+        
+        if (!METHOD_KEY.equalsIgnoreCase(did.getMethod())) {
+            throw new IllegalArgumentException("The given DID method [" + did.getMethod() + "] is not 'key'. DID [" + did.toString() + "].");
         }
         
         if (!Multibase.isAlgorithmSupported(did.getMethodSpecificId())) {
@@ -63,7 +72,7 @@ public class DidKey extends Did {
     }
 
     public static boolean isDidKey(final Did did) {
-        return METHOD_KEY.equalsIgnoreCase(did.getMethod());         //FIXME path .. #fragment must be blank
+        return !did.isDidUrl() && METHOD_KEY.equalsIgnoreCase(did.getMethod());
     }
     
     public static boolean isDidKey(final URI uri) {

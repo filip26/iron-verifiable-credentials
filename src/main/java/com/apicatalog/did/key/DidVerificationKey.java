@@ -10,18 +10,19 @@ import jakarta.json.JsonObject;
 
 public class DidVerificationKey implements VerificationKey {
     
-    protected DidUrl id;
+    protected final DidUrl id;
     
-    protected String type;
+    protected final String type;
     
-    protected Did controller;
+    protected final Did controller;
     
-    protected byte[] publicKey;
+    protected final byte[] publicKey;
     
-    protected String publicKeyMultibase;
-    
-    protected DidVerificationKey() {
-        
+    protected DidVerificationKey(DidUrl id, String type, Did controller, byte[] publicKey) {
+        this.id = id;
+        this.type = type;
+        this.controller = controller;
+        this.publicKey = publicKey;
     }
     
     @Override
@@ -49,9 +50,4 @@ public class DidVerificationKey implements VerificationKey {
     public byte[] getPublicKey() {
         return publicKey;
     }
-    
-    public String getPublicKeyMultibase() {
-        return publicKeyMultibase;
-    }
-
 }

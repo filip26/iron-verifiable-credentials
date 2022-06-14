@@ -92,4 +92,6 @@ public class Did  {
     public String toString() {
         return Did.SCHEME + ":" + method + (!"1".equals(version) ? ":" + version : "") + ":" + methodSpecificId; 
     }    
+    
+    //TODO add equals and hashCode
 }
