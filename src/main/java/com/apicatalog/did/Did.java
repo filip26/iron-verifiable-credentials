@@ -1,6 +1,7 @@
 package com.apicatalog.did;
 
 import java.net.URI;
+import java.util.Objects;
 
 import com.apicatalog.jsonld.StringUtils;
 
@@ -44,26 +45,41 @@ public class Did  {
             throw new IllegalArgumentException("The URI [" + uri + "] is not valid DID key, does not start with 'did:'.");
         }
 
-        final String[] parts = uri.getSchemeSpecificPart().split(":");
-        
-        if (parts.length < 2 || parts.length > 3 || StringUtils.isBlank(parts[0]) || StringUtils.isBlank(parts[1])) {
-            throw new IllegalArgumentException("The URI [" + uri + "] is not valid DID, must be in form 'did:method:method-specific-id'.");
-        }
-               
-        String methodSpecificId = parts[1];
-        String version = "1";   // default DID version
-
-        if (parts.length == 3) {
-            if (StringUtils.isBlank(parts[2])) {
-                throw new IllegalArgumentException("The URI [" + uri + "] is not valid DID, must be in form 'did:method:method-specific-id'.");
-            }
-            version = parts[1]; 
-            methodSpecificId = parts[2];
-        }
-
-        return new Did(parts[0], version, methodSpecificId);
+        return from(uri, uri.getSchemeSpecificPart().split(":"), 3);
     }
     
+    public static Did from(final String uri) {
+
+        if (!isDid(uri)) {
+            throw new IllegalArgumentException("The URI [" + uri + "] is not valid DID key, does not start with 'did:'.");
+        }
+
+        return from(uri, uri.split(":"), 4);
+    }
+
+    protected static Did from(final Object uri, final String[] parts, int max) {
+        
+        if (parts.length < max - 1
+                || parts.length > max
+                || StringUtils.isBlank(parts[max - 3])
+                || StringUtils.isBlank(parts[max - 2])
+                ) {
+            throw new IllegalArgumentException("The URI [" + uri + "] is not valid DID, must be in form 'did:method:method-specific-id'.");
+        }
+
+        String methodSpecificId = parts[max - 2];
+        String version = "1";   // default DID version
+
+        if (parts.length == max) {
+            if (StringUtils.isBlank(parts[max - 1])) {
+                throw new IllegalArgumentException("The URI [" + uri + "] is not valid DID, must be in form 'did:method:method-specific-id'.");
+            }
+            version = parts[max - 2]; 
+            methodSpecificId = parts[max - 1];
+        }
+
+        return new Did(parts[max - 3], version, methodSpecificId);
+    }
     public String getMethod() {
         return method;
     }
@@ -91,7 +107,26 @@ public class Did  {
     @Override
     public String toString() {
         return Did.SCHEME + ":" + method + (!"1".equals(version) ? ":" + version : "") + ":" + methodSpecificId; 
-    }    
-    
-    //TODO add equals and hashCode
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(method, methodSpecificId, version);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Did other = (Did) obj;
+        return Objects.equals(method, other.method) && Objects.equals(methodSpecificId, other.methodSpecificId)
+                && Objects.equals(version, other.version);
+    }
 }

@@ -6,8 +6,8 @@ import java.util.Set;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonValue;
 
 class DidDocumentImpl implements DidDocument {
 
@@ -30,7 +30,8 @@ class DidDocumentImpl implements DidDocument {
 
     //TODO  service
     
-    public JsonValue toJson() {
+    @Override
+    public JsonObject toJson() {
         return toJson(Json.createObjectBuilder()).build();
     }
     
@@ -39,4 +40,19 @@ class DidDocumentImpl implements DidDocument {
         return builder;
     }
 
+    @Override
+    public Did getId() {
+        return id;
+    }
+
+    @Override
+    public Set<Did> getController() {
+        return controller;
+    }
+    
+    @Override
+    public Set<VerificationMethod> getVerificationMethod() {
+        return verificationMethod;
+    }
+    
 }

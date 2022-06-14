@@ -22,7 +22,7 @@ public class DidUrl extends Did {
     }
 
     public static DidUrl from(URI uri) {
-        //TODO
+        //TODO return new DidUrl(Did.from(uri), path, query, fragment);
         return null;
     }
     
@@ -52,5 +52,5 @@ public class DidUrl extends Did {
         return this;
     }
     
-    //TODO add equals and hashCode
+    //TODO add toString, equals and hashCode
 }

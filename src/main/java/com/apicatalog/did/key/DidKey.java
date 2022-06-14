@@ -76,16 +76,15 @@ public class DidKey extends Did {
     }
     
     public static boolean isDidKey(final URI uri) {
-        return Did.SCHEME.equals(uri.getScheme())
-                && uri.getSchemeSpecificPart() != null
+        return Did.isDid(uri)
                 && uri.getSchemeSpecificPart().toLowerCase().startsWith(METHOD_KEY + ":")
-                //FIXME path .. #fragment must be blank
                 ;
     }
 
     public static boolean isDidKey(final String uri) {
-        //FIXME path .. #fragment must be blank
-        return uri != null && uri.toLowerCase().startsWith(SCHEME + ":" + METHOD_KEY + ":");
+        return Did.isDid(uri) 
+                && uri.toLowerCase().startsWith(SCHEME + ":" + METHOD_KEY + ":")
+                ;
     }
     
     public Codec getCodec() {
@@ -95,4 +94,7 @@ public class DidKey extends Did {
     public byte[] getRawKey() {
         return rawKey;
     }    
+    
+    //TODO toString(), equals, hashCode
+    
 }
