@@ -25,7 +25,7 @@ import jakarta.json.JsonValue;
 public class Ed25519VerificationKey2020 implements VerificationKey {
 
     public static final String TYPE = "https://w3id.org/security#Ed25519VerificationKey2020";
-    
+
     protected static final String BASE = "https://w3id.org/security#";
 
     protected static final String CONTROLLER = "controller";
@@ -126,7 +126,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
     }
 
     static byte[] getKey(JsonObject json, String property, Codec expected) throws DataError {
-        
+
         JsonValue key = JsonLdUtils
                             .getObjects(json, BASE + property)
                             .stream()
@@ -167,7 +167,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
         if (id != null) {
             builder.add(Keywords.ID, id.toString());
         }
-        
+
         builder.add(Keywords.TYPE, type);
 
         if (controller != null) {

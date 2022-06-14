@@ -16,13 +16,13 @@ public class Did implements Serializable {
     protected final String method;
     protected final String version;
     protected final String methodSpecificId;
-    
+
     protected Did(final String method, final String version, final String methodSpecificId) {
         this.method = method;
         this.version = version;
         this.methodSpecificId = methodSpecificId;
     }
-    
+
     public static boolean isDid(final URI uri) {
         if (!Did.SCHEME.equalsIgnoreCase(uri.getScheme())
                 || StringUtils.isBlank(uri.getSchemeSpecificPart())
@@ -33,11 +33,11 @@ public class Did implements Serializable {
                 || StringUtils.isNotBlank(uri.getQuery())
                 || StringUtils.isNotBlank(uri.getFragment())
                 ) {
-                  return false;  
+                  return false;
                 }
-        
+
         final String[] parts = uri.getSchemeSpecificPart().split(":");
-        
+
         return parts.length == 2 || parts.length == 3;
     }
 
@@ -49,26 +49,26 @@ public class Did implements Serializable {
 
         final String[] parts = uri.split(":");
 
-        return (parts.length == 3 || parts.length == 4) 
+        return (parts.length == 3 || parts.length == 4)
                 && Did.SCHEME.equalsIgnoreCase(parts[0])
                 && !parts[parts.length - 1].contains("/")       // path
                 && !parts[parts.length - 1].contains("?")       // query
                 && !parts[parts.length - 1].contains("#")       // fragment
                 ;
     }
-    
+
     /**
      * Creates a new DID instance from the given {@link URI}.
      *
      * @param uri The source URI to be transformed into DID
      * @return The new DID
-     * 
+     *
      * @throws NullPointerException
      *         If {@code uri} is {@code null}
-     *         
+     *
      * @throws IllegalArgumentException
      *         If the given {@code uri} is not valid DID
-     */    
+     */
     public static Did from(final URI uri) {
 
         if (!isDid(uri)) {
@@ -83,10 +83,10 @@ public class Did implements Serializable {
      *
      * @param uri The source URI to be transformed into DID
      * @return The new DID
-     * 
+     *
      * @throws NullPointerException
      *         If {@code uri} is {@code null}
-     *         
+     *
      * @throws IllegalArgumentException
      *         If the given {@code uri} is not valid DID
      */
@@ -100,7 +100,7 @@ public class Did implements Serializable {
     }
 
     protected static Did from(final Object uri, final String[] parts, int max) {
-        
+
         if (parts.length < max - 1
                 || parts.length > max
                 || StringUtils.isBlank(parts[max - 3])
@@ -116,7 +116,7 @@ public class Did implements Serializable {
             if (StringUtils.isBlank(parts[max - 1])) {
                 throw new IllegalArgumentException("The URI [" + uri + "] is not valid DID, must be in form 'did:method:method-specific-id'.");
             }
-            version = parts[max - 2]; 
+            version = parts[max - 2];
             methodSpecificId = parts[max - 1];
         }
 
@@ -125,15 +125,15 @@ public class Did implements Serializable {
     public String getMethod() {
         return method;
     }
-    
+
     public String getVersion() {
         return version;
     }
-    
+
     public String getMethodSpecificId() {
         return methodSpecificId;
     }
-    
+
     public URI toUri() {
         try {
             return new URI(SCHEME, method + ":" + methodSpecificId, null);
@@ -141,15 +141,15 @@ public class Did implements Serializable {
             throw new IllegalStateException(e);
         }
     }
-    
+
     public boolean isDidUrl() {
         return false;
     }
-    
+
     public DidUrl asDidUrl() {
         throw new ClassCastException();
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder()
@@ -157,12 +157,12 @@ public class Did implements Serializable {
                     .append(':')
                     .append(method)
                     .append(':');
-        
+
         if (!"1".equals(version)) {
             builder
                 .append(version)
                 .append(':');
-        }        
+        }
         return builder.append(methodSpecificId).toString();
     }
 

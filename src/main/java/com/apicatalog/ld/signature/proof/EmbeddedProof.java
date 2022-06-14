@@ -28,15 +28,15 @@ import jakarta.json.JsonValue;
 public abstract class EmbeddedProof implements Proof {
 
     protected static final String BASE = "https://w3id.org/security#";
-    
+
     protected static final String CREATED = "http://purl.org/dc/terms/created";
-    
+
     protected static final String PROOF = "proof";
     protected static final String PROOF_PURPOSE = "proofPurpose";
     protected static final String PROOF_VERIFICATION_METHOD = "verificationMethod";
     protected static final String PROOF_DOMAIN = "https://w3id.org/security#domain";
     protected static final String PROOF_VALUE = "proofValue";
-    
+
     protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
     protected URI purpose;
@@ -48,7 +48,7 @@ public abstract class EmbeddedProof implements Proof {
     protected String domain;
 
     protected byte[] value;
-    
+
     protected EmbeddedProof() {}
 
     public static boolean hasProof(JsonObject credential) {
@@ -58,7 +58,7 @@ public abstract class EmbeddedProof implements Proof {
     public static Collection<JsonValue> getProof(JsonObject credential) {
         return JsonLdUtils.getObjects(credential, BASE + PROOF);
     }
-    
+
     public static JsonObject removeProof(final JsonObject credential) {
        return Json.createObjectBuilder(credential).remove(BASE + PROOF).build();
     }
@@ -71,7 +71,7 @@ public abstract class EmbeddedProof implements Proof {
 
         // proofPurpose property
         embeddedProof.purpose = JsonLdUtils.assertId(proofObject, BASE, PROOF_PURPOSE);
-        
+
         // verificationMethod property
         if (!proofObject.containsKey(BASE + PROOF_VERIFICATION_METHOD)) {
             throw new DataError(ErrorType.Missing, PROOF_VERIFICATION_METHOD);
@@ -169,10 +169,10 @@ public abstract class EmbeddedProof implements Proof {
     public abstract void setValue(String encoding, String value) throws DataError;
 
     public abstract String getValue(String encoding) throws DataError;;
-    
+
     public JsonObject toJson() throws DataError {
-        
-        final JsonObjectBuilder root = 
+
+        final JsonObjectBuilder root =
                     Json.createObjectBuilder()
                         .add(Keywords.TYPE, Json.createArrayBuilder().add(getType()));
 
@@ -193,22 +193,22 @@ public abstract class EmbeddedProof implements Proof {
         if (domain != null) {
             //TODO
         }
-        
+
         if (value != null) {
             final String proofValue = getValue(MULTIBASE_TYPE);
-            
+
             JsonLdUtils.setValue(root, BASE + PROOF_VALUE, MULTIBASE_TYPE, proofValue);
         }
         return root.build();
     }
 
     /**
-     * Appends the proof to the given VC/VP document. 
+     * Appends the proof to the given VC/VP document.
      * If the document has been signed already then the proof is added into a proof set.
-     * 
+     *
      * @param document VC/VP document
      * @return the given VC/VP with the proof attached
-     * @throws DataError 
+     * @throws DataError
      */
     public JsonObject addProofTo(final JsonObject document) throws DataError {
 
@@ -227,7 +227,7 @@ public abstract class EmbeddedProof implements Proof {
 
         return Json.createObjectBuilder(document).add(BASE + PROOF, proofs).build();
     }
-    
+
 
     @Override
     public URI getPurpose() {
@@ -253,7 +253,7 @@ public abstract class EmbeddedProof implements Proof {
     public byte[] getValue() {
         return value;
     }
-    
+
     public void setValue(byte[] value) {
         this.value = value;
     }

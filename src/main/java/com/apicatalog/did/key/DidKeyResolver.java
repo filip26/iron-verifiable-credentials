@@ -30,35 +30,35 @@ public class DidKeyResolver implements DidResolver {
 
         //TODO use configurable DidResolvers, steps 4-5
         // 4.
-        DidVerificationKey signatureMethod = DidKeyResolver.createSignatureMethod(didKey); 
+        DidVerificationKey signatureMethod = DidKeyResolver.createSignatureMethod(didKey);
         builder.add(signatureMethod);
-        
+
         // 5.
-        builder.add(DidKeyResolver.createEncryptionMethod(didKey)); 
-        
+        builder.add(DidKeyResolver.createEncryptionMethod(didKey));
+
         // 6.
         builder.id(did);
-        
+
         // 7.
         //TODO toJson();
-        
+
         // 8.
         builder.addAuthentication(signatureMethod.id);
         builder.addAssertionMethod(signatureMethod.getId());
         builder.addCapabilityInvocation(signatureMethod.getId());
         builder.addCapabilityDelegation(signatureMethod.getId());
-        
-        // 9.        
+
+        // 9.
         //TODO
-        
-        return builder.build();   
+
+        return builder.build();
     }
-    
+
     /**
      * Creates a new verification key by expading the given DID key.
-     * 
+     *
      * see {@link https://pr-preview.s3.amazonaws.com/w3c-ccg/did-method-key/pull/51.html#signature-method-creation-algorithm}
-     * 
+     *
      * @return The new verification key
      */
     public static DidVerificationKey createSignatureMethod(DidKey didKey) {
@@ -66,20 +66,20 @@ public class DidKeyResolver implements DidResolver {
         if (!Multicodec.Codec.Ed25519PublicKey.equals(didKey.getCodec())) {
             throw new IllegalArgumentException();       //TODO
         }
-        
+
         // 5.
         String encodingType = ED25519_VERIFICATION_KEY_2020_TYPE;
         //TODO use options
-        
+
         // 6.
         //TODO
-        
+
         // 9.
-        if (MULTIKEY_TYPE.equals(encodingType) 
+        if (MULTIKEY_TYPE.equals(encodingType)
                 || ED25519_VERIFICATION_KEY_2020_TYPE.equals(encodingType)) {
             //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
         }
-        
+
         // 10.
         //TODO jwk
 
@@ -88,38 +88,38 @@ public class DidKeyResolver implements DidResolver {
                 encodingType,
                 DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
                 didKey.getRawKey()
-                );        
-        
+                );
+
     }
-    
+
     public static VerificationMethod createEncryptionMethod(final DidKey didKey) {
-        
+
         // 3.
         //TODO
-        
+
         // 5.
         String encodingType = MULTIKEY_TYPE;
         //TODO use options
-        
+
         // 6.
         //TODO
-        
+
         // 7.
         //TODO
-        
+
         // 9.
-        if (MULTIKEY_TYPE.equals(encodingType) 
+        if (MULTIKEY_TYPE.equals(encodingType)
                 || X25519_KEYAGREEMENT_KEY_2020_TYPE.equals(encodingType)) {
             //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
         }
-        
+
         //TODO
-        
+
         return new DidVerificationKey(
                 DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
                 encodingType,
                 DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
                 didKey.getRawKey()
-                );        
+                );
     }
 }

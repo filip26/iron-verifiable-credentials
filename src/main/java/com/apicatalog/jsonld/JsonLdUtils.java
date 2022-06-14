@@ -43,7 +43,7 @@ public class JsonLdUtils {
             throw new IllegalArgumentException("The 'object' parameter must not be null.");
         }
 
-        return JsonUtils.isObject(value) 
+        return JsonUtils.isObject(value)
                 && value.asJsonObject().containsKey(Keywords.TYPE)
                 && JsonUtils
                     .toStream(value.asJsonObject().get(Keywords.TYPE))
@@ -78,30 +78,30 @@ public class JsonLdUtils {
                     .orElse(false);
     }
 
-    public static boolean hasPredicate(JsonObject subject, String predicate) {        
+    public static boolean hasPredicate(JsonObject subject, String predicate) {
         return JsonUtils.isNotNull(subject.get(predicate));
     }
 
     public static Collection<JsonValue> getObjects(JsonObject subject, String predicate) {
-        
+
         JsonValue value = subject.get(predicate);
-        
+
         if (JsonUtils.isNull(value)) {
             return Collections.emptyList();
         }
-        
+
         if (JsonUtils.isArray(value)) {
             if (value.asJsonArray().size() == 1) {
                 value = value.asJsonArray().get(0);
             }
         }
-        
+
         if (JsonUtils.isObject(value)) {
             if (value.asJsonObject().containsKey(Keywords.GRAPH) &&  value.asJsonObject().size() == 1) {
                 value = value.asJsonObject().get(Keywords.GRAPH);
             }
         }
-        
+
         return JsonUtils.toCollection(value);
     }
 
@@ -123,26 +123,26 @@ public class JsonLdUtils {
     public static URI assertId(JsonValue subject, String base, String property) throws DataError {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), base + property)) {
-            throw new DataError(ErrorType.Missing, property);    
+            throw new DataError(ErrorType.Missing, property);
         }
-      
+
         JsonValue value = JsonLdUtils
                                     .getObjects(subject.asJsonObject(), base + property)
                                     .stream()
                                     .findFirst()
                                     .orElseThrow(() -> new DataError(ErrorType.Missing, property));
-        
+
         if (JsonUtils.isObject(value)) {
             value  = value.asJsonObject().get(Keywords.ID);
-        } 
+        }
 
         final String id;
-        
+
         if (JsonUtils.isString(value)) {
             id = ((JsonString)value).getString();
-            
+
         } else {
-            throw new DataError(ErrorType.Invalid, property);            
+            throw new DataError(ErrorType.Invalid, property);
         }
 
         if (UriUtils.isURI(id)) {
@@ -155,7 +155,7 @@ public class JsonLdUtils {
     public static Instant assertXsdDateTime(JsonValue subject, String base, String property) throws DataError {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), base + property)) {
-            throw new DataError(ErrorType.Missing, property);    
+            throw new DataError(ErrorType.Missing, property);
         }
 
         final JsonValue value = JsonLdUtils
@@ -163,7 +163,7 @@ public class JsonLdUtils {
                                     .stream()
                                     .findFirst()
                                     .orElseThrow(() -> new DataError(ErrorType.Missing, property, Keywords.VALUE));
-        
+
         if (isXsdDateTime(value)) {
             return JsonUtils.toStream(value)
                     .filter(ValueObject::isValueObject)
@@ -191,7 +191,7 @@ public class JsonLdUtils {
 
     @Deprecated
     public static final Optional<URI> getId(JsonValue value) {
-        
+
         if (value == null) {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
@@ -214,7 +214,7 @@ public class JsonLdUtils {
     }
 
     public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property, String id) {
-        objectBuilder.add(property, 
+        objectBuilder.add(property,
                 Json.createArrayBuilder()
                         .add(Json.createObjectBuilder().add(Keywords.ID, id.toString())));
 
@@ -224,10 +224,10 @@ public class JsonLdUtils {
     public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property, String type, String value) {
 
         objectBuilder.add(property, JsonLdValueObject.toJson(type, value));
-        
+
         return objectBuilder;
     }
-    
+
     public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property, Instant instant) {
         return setValue(objectBuilder, property, XSD_DATE_TIME, instant.toString());
     }

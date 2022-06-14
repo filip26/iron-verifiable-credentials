@@ -7,15 +7,15 @@ import com.apicatalog.ld.signature.proof.VerificationMethod;
 public class DidDocumentBuilder {
 
     private final DidDocumentImpl document;
-    
+
     protected DidDocumentBuilder() {
         this.document = new DidDocumentImpl();
     }
-    
+
     public static DidDocumentBuilder create() {
         return new DidDocumentBuilder();
     }
-    
+
     public DidDocumentBuilder id(Did did) {
         this.document.id = did;
         return this;
@@ -27,7 +27,7 @@ public class DidDocumentBuilder {
     }
 
     public DidDocumentBuilder addAuthentication(DidUrl didUrl) {
-        //TODO        
+        //TODO
         return this;
     }
 
@@ -47,7 +47,7 @@ public class DidDocumentBuilder {
 
     public DidDocumentBuilder addCapabilityDelegation(URI id) {
         // TODO Auto-generated method stub
-        return this;        
+        return this;
     }
-    
+
 }

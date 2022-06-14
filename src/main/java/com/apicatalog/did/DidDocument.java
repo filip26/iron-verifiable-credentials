@@ -12,15 +12,15 @@ import jakarta.json.JsonObject;
 
 public interface DidDocument {
 
-    
+
     Did getId();
-    
+
     Set<Did> getController();
-    
+
     Set<VerificationMethod> getVerificationMethod();
-    
+
     //TODO getters
-    
+
     JsonObject toJson();
 
 }

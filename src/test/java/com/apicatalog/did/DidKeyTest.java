@@ -21,16 +21,16 @@ import com.apicatalog.multicodec.Multicodec.Codec;
 @DisplayName("DID Key")
 @TestMethodOrder(OrderAnnotation.class)
 class DidKeyTest {
-    
+
     @DisplayName("Create DID key from string")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "testVectors" })
     void createFromString(DidKeyTestCase testCase) {
 
         try {
-        
+
             final DidKey didKey = DidKey.from(testCase.uri);
-            
+
             if (testCase.negative) {
                 fail("Expected failure but got " + didKey);
                 return;
@@ -52,8 +52,8 @@ class DidKeyTest {
 
     static final Stream<DidKeyTestCase> testVectors() throws JsonLdError, IOException {
         return Arrays.stream(testCases);
-    }    
-    
+    }
+
     static final DidKeyTestCase testCases[] = new DidKeyTestCase[] {
             DidKeyTestCase.create(
                     "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH",
@@ -80,7 +80,7 @@ class DidKeyTest {
                     Codec.Ed25519PublicKey,
                     32
                     ),
-            
+
             // invalid keys
             DidKeyTestCase.create("http:key:z6MkicdicToW5HbxPP7zZV1H7RHvXgRMhoujWAF2n5WQkdd2"),
             DidKeyTestCase.create("did:example:z6MkicdicToW5HbxPP7zZV1H7RHvXgRMhoujWAF2n5WQkdd2"),
@@ -100,5 +100,5 @@ class DidKeyTest {
                     "0.7"
                     ),
     };
-    
+
 }

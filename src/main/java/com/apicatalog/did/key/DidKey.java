@@ -20,9 +20,9 @@ public class DidKey extends Did {
     private static final long serialVersionUID = 5467606126809729049L;
 
     protected static final String METHOD_KEY = "key";
-    
+
     private final Codec codec;
-    
+
     private final byte[] rawKey;
 
     protected DidKey(Did did, Codec codec, byte[] rawValue) {
@@ -36,13 +36,13 @@ public class DidKey extends Did {
      *
      * @param uri The source URI to be transformed into DID key
      * @return The new DID key
-     * 
+     *
      * @throws NullPointerException
      *         If {@code uri} is {@code null}
-     *         
+     *
      * @throws IllegalArgumentException
      *         If the given {@code uri} is not valid DID key
-     */    
+     */
     public static final DidKey from(final URI uri) {
 
         final Did did = Did.from(uri);
@@ -55,11 +55,11 @@ public class DidKey extends Did {
     }
 
     public static final DidKey from(final Did did) {
-        
+
         if (!METHOD_KEY.equalsIgnoreCase(did.getMethod())) {
             throw new IllegalArgumentException("The given DID method [" + did.getMethod() + "] is not 'key'. DID [" + did.toString() + "].");
         }
-        
+
         if (!Multibase.isAlgorithmSupported(did.getMethodSpecificId())) {
             throw new IllegalArgumentException();
         }
@@ -76,7 +76,7 @@ public class DidKey extends Did {
     public static boolean isDidKey(final Did did) {
         return METHOD_KEY.equalsIgnoreCase(did.getMethod());
     }
-    
+
     public static boolean isDidKey(final URI uri) {
         return Did.isDid(uri)
                 && uri.getSchemeSpecificPart().toLowerCase().startsWith(METHOD_KEY + ":")
@@ -88,15 +88,15 @@ public class DidKey extends Did {
                 && uri.toLowerCase().startsWith(SCHEME + ":" + METHOD_KEY + ":")
                 ;
     }
-    
+
     public Codec getCodec() {
         return codec;
     }
 
     public byte[] getRawKey() {
         return rawKey;
-    }    
-    
+    }
+
     //TODO toString(), equals, hashCode
-    
+
 }

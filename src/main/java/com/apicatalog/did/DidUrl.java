@@ -15,7 +15,7 @@ public class DidUrl extends Did {
     protected final String path;
     protected final String query;
     protected final String fragment;
-    
+
     protected DidUrl(Did did, String path, String query, String fragment) {
         super(did.method, did.version, did.methodSpecificId);
         this.path = path;
@@ -38,7 +38,7 @@ public class DidUrl extends Did {
 
         final String[] parts = uri.split(":");
 
-        return (parts.length == 3 || parts.length == 4) 
+        return (parts.length == 3 || parts.length == 4)
                 && Did.SCHEME.equalsIgnoreCase(parts[0])
                 ;
     }
@@ -51,7 +51,7 @@ public class DidUrl extends Did {
             throw new IllegalStateException(e);
         }
     }
-    
+
     public URL toUrl() {
         try {
             return toUri().toURL();
@@ -59,7 +59,7 @@ public class DidUrl extends Did {
             throw new IllegalStateException(e);
         }
     }
-    
+
     @Override
     public boolean isDidUrl() {
         return true;
@@ -80,19 +80,19 @@ public class DidUrl extends Did {
             }
             builder.append(path);
         }
-        
+
         if (StringUtils.isNotBlank(query)) {
             if (path.charAt(0) != '?') {
                 builder.append('?');
             }
             builder.append(query);
         }
-        
+
         if (StringUtils.isNotBlank(fragment)) {
             if (path.charAt(0) != '#') {
                 builder.append('#');
             }
-            builder.append(fragment);            
+            builder.append(fragment);
         }
 
         return builder.toString();

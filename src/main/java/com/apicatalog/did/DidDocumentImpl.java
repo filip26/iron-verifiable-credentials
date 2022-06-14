@@ -18,11 +18,11 @@ class DidDocumentImpl implements DidDocument {
     protected Did id;
 
     protected Set<URI> alsoKnownAs;
-    
+
     protected Set<Did> controller = new HashSet<>();
 
     protected Set<VerificationMethod> verificationMethod = new HashSet<>();
-    
+
     protected Set<DidUrl> assertionMethod;
     protected Set<DidUrl> authentication;
     protected Set<DidUrl> capabilityInvocation;
@@ -35,7 +35,7 @@ class DidDocumentImpl implements DidDocument {
     public JsonObject toJson() {
         return toJson(Json.createObjectBuilder()).build();
     }
-    
+
     protected JsonObjectBuilder toJson(final JsonObjectBuilder builder) {
         //TODO
         return builder;
@@ -50,10 +50,10 @@ class DidDocumentImpl implements DidDocument {
     public Set<Did> getController() {
         return controller;
     }
-    
+
     @Override
     public Set<VerificationMethod> getVerificationMethod() {
         return verificationMethod;
     }
-    
+
 }

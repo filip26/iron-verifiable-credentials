@@ -25,9 +25,9 @@ public class Ed25519Proof2020 extends EmbeddedProof implements Proof {
     public static boolean isIstanceOf(final JsonValue object) {
         return JsonLdUtils.isTypeOf(BASE + TYPE,  object);
     }
-    
+
     public static Ed25519Proof2020 from(ProofOptions options) {
-        
+
         if ((BASE + TYPE).equals(options.getType())) {
             final Ed25519Proof2020 proof = new Ed25519Proof2020();
 
@@ -40,9 +40,9 @@ public class Ed25519Proof2020 extends EmbeddedProof implements Proof {
         }
 
         //TODO
-        throw new IllegalStateException();        
+        throw new IllegalStateException();
     }
-    
+
     public static EmbeddedProof from(final JsonValue json, final DocumentLoader loader) throws DataError {
 
         if (json == null) {
@@ -67,11 +67,11 @@ public class Ed25519Proof2020 extends EmbeddedProof implements Proof {
         }
 
         EmbeddedProof embeddedProof = new Ed25519Proof2020();
-        
+
         return EmbeddedProof.from(embeddedProof, proofObject, loader);
     }
 
-    
+
     @Override
     public String getType() {
         return BASE + TYPE;
@@ -79,7 +79,7 @@ public class Ed25519Proof2020 extends EmbeddedProof implements Proof {
 
     @Override
     public void setValue(String encoding, String value) throws DataError {
-            
+
         // verify supported proof value encoding
         if (!"https://w3id.org/security#multibase".equals(encoding)) {
             throw new DataError(ErrorType.Invalid, PROOF, Keywords.VALUE);
