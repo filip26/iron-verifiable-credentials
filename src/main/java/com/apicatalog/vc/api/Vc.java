@@ -19,8 +19,7 @@ import com.apicatalog.vc.Verifiable;
 import jakarta.json.JsonObject;
 
 /**
- * High level API to process Verified Credentials and Verified Presentations.
- *
+ * High level API to process Verifiable Credentials (VC) and Presentations (VP).
  */
 public final class Vc {
 
