@@ -9,21 +9,22 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import jakarta.json.JsonObject;
 
 public class DidVerificationKey implements VerificationKey {
-    
-    protected DidUrl id;
-    
-    protected String type;
-    
-    protected Did controller;
-    
-    protected byte[] publicKey;
-    
-    protected String publicKeyMultibase;
-    
-    protected DidVerificationKey() {
-        
+
+    protected final DidUrl id;
+
+    protected final String type;
+
+    protected final Did controller;
+
+    protected final byte[] publicKey;
+
+    protected DidVerificationKey(DidUrl id, String type, Did controller, byte[] publicKey) {
+        this.id = id;
+        this.type = type;
+        this.controller = controller;
+        this.publicKey = publicKey;
     }
-    
+
     @Override
     public URI getId() {
         return id.toUri();
@@ -49,9 +50,4 @@ public class DidVerificationKey implements VerificationKey {
     public byte[] getPublicKey() {
         return publicKey;
     }
-    
-    public String getPublicKeyMultibase() {
-        return publicKeyMultibase;
-    }
-
 }

@@ -104,12 +104,12 @@ public final class Vc {
 
         // is a presentation?
         if (Presentation.isPresentation(expanded)) {
-            
+
             final JsonObject object =expanded.asJsonObject();
 
             // validate the presentation object
             final Presentation presentation = Presentation.from(object);
-            
+
             return presentation;
         }
 

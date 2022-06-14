@@ -13,6 +13,6 @@ public interface ProofOptions {
     String getDomain();
 
     String getType();
-    
+
     URI getPurpose();
 }

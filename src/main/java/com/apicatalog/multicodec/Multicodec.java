@@ -59,7 +59,7 @@ public class Multicodec {
     public static void add(final Codec codec) {
         KEY_REGISTRY.put(codec.asInteger(), codec);
     }
-    
+
     public static Optional<Codec> codec(Type type, final byte[] encoded) {
 
         switch (type) {

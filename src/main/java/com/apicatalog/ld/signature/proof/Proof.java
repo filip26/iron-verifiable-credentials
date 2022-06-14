@@ -22,9 +22,9 @@ public interface Proof {
     String getType();
 
     /**
-     * The intent for the proof, the reason why an entity created it. 
+     * The intent for the proof, the reason why an entity created it.
      * e.g. assertion or authentication
-     * 
+     *
      * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-purposes}
      *
      * @return

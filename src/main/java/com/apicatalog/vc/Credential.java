@@ -35,9 +35,9 @@ public class Credential implements Verifiable {
     public static final String REFRESH_SERVICE = "refreshService";
     public static final String TERMS_OF_USE = "termsOfUse";
     public static final String EVIDENCE = "evidence";
-    
+
     protected URI id;
-    
+
     protected URI issuer;
 
     protected Instant issuance;
@@ -47,9 +47,9 @@ public class Credential implements Verifiable {
     protected CredentialStatus status;
 
     protected Collection<JsonValue> subjects;
-    
+
     protected Map<String, JsonValue> extensions;
-    
+
     protected Credential() {}
 
     public static boolean isCredential(JsonValue subject) {
@@ -76,9 +76,9 @@ public class Credential implements Verifiable {
 
             throw new DataError(ErrorType.Unknown, Keywords.TYPE);
         }
-        
+
         // @id - optional
-        if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {            
+        if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
             credential.id = JsonLdUtils.getId(subject)
                     .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
         }
@@ -90,11 +90,11 @@ public class Credential implements Verifiable {
 
         // issuer - mandatory
         credential.issuer = JsonLdUtils.assertId(subject, BASE, ISSUER);
-       
+
         // issuance date - mandatory
         credential.issuance = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
-        
-        // expiration date - optional            
+
+        // expiration date - optional
         if (JsonLdUtils.hasPredicate(subject, BASE + EXPIRATION_DATE)) {
             credential.expiration = JsonLdUtils.assertXsdDateTime(subject, BASE, EXPIRATION_DATE);
         }
@@ -180,7 +180,7 @@ public class Credential implements Verifiable {
 
     /**
      * Returns a map of predicates and objects that are not recognized by this implementation.
-     * 
+     *
      * @return an immutable map of extensions
      */
     public Map<String, JsonValue> getExtensions() {

@@ -18,19 +18,19 @@ public class Presentation implements Verifiable {
     public static final String BASE = "https://www.w3.org/2018/credentials#";
 
     public static final String TYPE = "VerifiablePresentation";
-    
+
     public static final String HOLDER = "holder";
-    
+
     public static final String VERIFIABLE_CREDENTIALS = "verifiableCredential";
 
     protected URI id;
-    
+
     protected URI holder;
-    
+
     protected Collection<Credential> credentials;
 
     protected Presentation() {}
-    
+
     public static boolean isPresentation(JsonValue expanded) {
         if (expanded == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
@@ -38,15 +38,15 @@ public class Presentation implements Verifiable {
 
         return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
     }
-    
+
     public static Presentation from(JsonObject subject) throws DataError {
 
         if (subject == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
-        
+
         final Presentation presentation = new Presentation();
-        
+
         // @type
         if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
 
@@ -58,7 +58,7 @@ public class Presentation implements Verifiable {
         }
 
         // @id - optional
-        if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {            
+        if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
             presentation.id = JsonLdUtils.getId(subject)
                     .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
         }
@@ -69,18 +69,18 @@ public class Presentation implements Verifiable {
         }
 
         presentation.credentials = new ArrayList<>();
-        
+
         // verifiableCredentials
         for (JsonValue credential : JsonLdUtils.getObjects(subject, BASE + VERIFIABLE_CREDENTIALS)) {
-            
+
             if (JsonUtils.isNotObject(credential)) {
                 throw new DataError();
             }
-                        
+
             presentation.credentials.add(Credential.from(credential.asJsonObject()));
             //TODO proof somehow, do I need to parse it here?
         }
-                             
+
         return presentation;
     }
 
@@ -93,7 +93,7 @@ public class Presentation implements Verifiable {
     public Presentation asPresentation() {
         return this;
     }
-    
+
     @Override
     public URI getId() {
         return id;
