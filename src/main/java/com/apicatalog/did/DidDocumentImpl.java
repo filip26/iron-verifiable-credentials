@@ -1,6 +1,7 @@
 package com.apicatalog.did;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.apicatalog.ld.signature.proof.VerificationMethod;
@@ -18,9 +19,9 @@ class DidDocumentImpl implements DidDocument {
 
     protected Set<URI> alsoKnownAs;
     
-    protected Set<Did> controller;
+    protected Set<Did> controller = new HashSet<>();
 
-    protected Set<VerificationMethod> verificationMethod;
+    protected Set<VerificationMethod> verificationMethod = new HashSet<>();
     
     protected Set<DidUrl> assertionMethod;
     protected Set<DidUrl> authentication;
@@ -29,7 +30,7 @@ class DidDocumentImpl implements DidDocument {
     protected Set<DidUrl> keyAgreement;
 
     //TODO  service
-    
+
     @Override
     public JsonObject toJson() {
         return toJson(Json.createObjectBuilder()).build();

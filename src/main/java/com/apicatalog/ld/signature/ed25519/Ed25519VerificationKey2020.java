@@ -24,6 +24,8 @@ import jakarta.json.JsonValue;
 //TODO javadoc
 public class Ed25519VerificationKey2020 implements VerificationKey {
 
+    public static final String TYPE = "https://w3id.org/security#Ed25519VerificationKey2020";
+    
     protected static final String BASE = "https://w3id.org/security#";
 
     protected static final String CONTROLLER = "controller";
@@ -37,7 +39,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
     protected byte[] publicKey;
 
     public Ed25519VerificationKey2020(final URI id) {
-        this(id, "https://w3id.org/security#Ed25519VerificationKey2020");
+        this(id, TYPE);
     }
 
     protected Ed25519VerificationKey2020(final URI id, final String type) {

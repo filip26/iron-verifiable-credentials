@@ -20,9 +20,9 @@ public class DidDocumentBuilder {
         this.document.id = did;
         return this;
     }
-    
+
     public DidDocumentBuilder add(VerificationMethod verificationMethod) {
-        //TODO        
+        this.document.verificationMethod.add(verificationMethod);
         return this;
     }
 

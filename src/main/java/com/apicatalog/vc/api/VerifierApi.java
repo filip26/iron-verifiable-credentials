@@ -3,9 +3,11 @@ package com.apicatalog.vc.api;
 import java.net.URI;
 import java.util.Collection;
 
+import com.apicatalog.did.Did;
+import com.apicatalog.did.DidDocument;
+import com.apicatalog.did.DidResolver;
 import com.apicatalog.did.key.DidKey;
 import com.apicatalog.did.key.DidKeyResolver;
-import com.apicatalog.did.key.DidVerificationKey;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdUtils;
@@ -14,13 +16,14 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519Proof2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.vc.CredentialStatus;
@@ -36,7 +39,9 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
 
     private final URI location;
     private final JsonObject document;
+    
     private StatusVerifier statusVerifier = null;
+    private DidResolver didResolver = null;
 
     protected VerifierApi(URI location) {
         this.location = location;
@@ -57,6 +62,11 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
      */
     public VerifierApi statusVerifier(StatusVerifier statusVerifier) {
         this.statusVerifier = statusVerifier;
+        return this;
+    }
+
+    public VerifierApi didResolver(final DidResolver didResolver) {
+        this.didResolver = didResolver;
         return this;
     }
 
@@ -188,11 +198,23 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     // refresh/fetch verification method
     final VerificationKey get(URI id) throws JsonLdError, DataError {
 
-        if (DidKey.isDidKey(id)) {             
-            final DidKey didKey = DidKey.from(id);
+        if (DidKey.isDidKey(id)) {
             
-            //TODO use set of configurable DidResolvers
-            return DidKeyResolver.createSignatureMethod(didKey);    //TODO simplify, skip DidKey.create
+            DidResolver resolver = didResolver;
+            
+            if (resolver == null) {
+                resolver = new DidKeyResolver();
+            }
+            
+            DidDocument didDocument = resolver.resolve(Did.from(id));
+
+            return didDocument
+                        .getVerificationMethod()
+                        .stream()
+                        .filter(vm -> Ed25519VerificationKey2020.TYPE.equals(vm.getType()))
+                        .map(VerificationKey.class::cast)
+                        .findAny()
+                        .orElseThrow(); //TODO
         }
         
         final JsonArray document = JsonLd.expand(id).loader(loader).get();

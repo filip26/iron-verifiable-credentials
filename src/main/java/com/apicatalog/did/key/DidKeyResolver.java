@@ -6,6 +6,7 @@ import com.apicatalog.did.DidDocumentBuilder;
 import com.apicatalog.did.DidResolver;
 import com.apicatalog.did.DidUrl;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
+import com.apicatalog.multicodec.Multicodec;
 
 public class DidKeyResolver implements DidResolver {
 
@@ -13,7 +14,7 @@ public class DidKeyResolver implements DidResolver {
     private static final String ED25519_VERIFICATION_KEY_2020_TYPE =  "https://w3id.org/security#Ed25519VerificationKey2020";
     private static final String X25519_KEYAGREEMENT_KEY_2020_TYPE =  "https://w3id.org/security#X25519KeyAgreementKey2020";
 
-    protected DidKeyResolver() {
+    public DidKeyResolver() {
     }
 
     @Override
@@ -62,8 +63,12 @@ public class DidKeyResolver implements DidResolver {
      */
     public static DidVerificationKey createSignatureMethod(DidKey didKey) {
 
+        if (!Multicodec.Codec.Ed25519PublicKey.equals(didKey.getCodec())) {
+            throw new IllegalArgumentException();       //TODO
+        }
+        
         // 5.
-        String encodingType = MULTIKEY_TYPE;
+        String encodingType = ED25519_VERIFICATION_KEY_2020_TYPE;
         //TODO use options
         
         // 6.

@@ -74,7 +74,7 @@ public class DidKey extends Did {
     }
 
     public static boolean isDidKey(final Did did) {
-        return !did.isDidUrl() && METHOD_KEY.equalsIgnoreCase(did.getMethod());
+        return METHOD_KEY.equalsIgnoreCase(did.getMethod());
     }
     
     public static boolean isDidKey(final URI uri) {
@@ -84,7 +84,7 @@ public class DidKey extends Did {
     }
 
     public static boolean isDidKey(final String uri) {
-        return Did.isDid(uri) 
+        return Did.isDid(uri)
                 && uri.toLowerCase().startsWith(SCHEME + ":" + METHOD_KEY + ":")
                 ;
     }
