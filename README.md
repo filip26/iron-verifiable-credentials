@@ -4,8 +4,17 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 **under active development, use at your own risk, everything is a subject to change**
 
-[![Java 17 Build](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml)
-[![Android (JDK8) Build](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/android-build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/android-build.yml)
+[![Java 17 CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml)
+[![Android (Java 8) CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java8-build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java8-build.yml)
+
+
+## Features
+
+* Verifying VC/VP
+* Issuing VC/VP
+* Signature
+  * Ed25519 Signature 2020
+  
 
 # Contributing
 
@@ -30,9 +39,6 @@ signed = Vc.sign(credentials, keys, proofOptions)
 
 signed = Vc.sign(credentials, keys, proofOptions)
            .getCompacted(context); // returns signed document in compacted form
-
-KeyPair keys = Vc.newKeys("https://w3id.org/security#Ed25519KeyPair2020")
-                 .generate()
 
 ```
 

@@ -214,7 +214,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
                         .filter(vm -> Ed25519VerificationKey2020.TYPE.equals(vm.getType()))
                         .map(VerificationKey.class::cast)
                         .findAny()
-                        .orElseThrow(); //TODO
+                        .orElseThrow(IllegalStateException::new); //TODO
         }
 
         final JsonArray document = JsonLd.expand(id).loader(loader).get();
