@@ -4,7 +4,6 @@ import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
-import com.google.crypto.tink.subtle.Base64;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;

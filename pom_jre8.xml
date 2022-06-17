@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
- <modelVersion>4.0.0</modelVersion>
- 
- <parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>pom_parent.xml</relativePath>
   </parent>
 
-  <artifactId>iron-vc</artifactId>
+  <artifactId>iron-vc-jre8</artifactId>
   <packaging>jar</packaging>
 
-  <name>Iron Verifiable Credentials (JRE17)</name>
-
+  <name>Iron Verifiable Credentials (JRE8)</name>
+    
   <url>https://github.com/filip26/iron-verifiable-credentials</url>
 
   <scm>
@@ -23,34 +23,6 @@
     <url>https://github.com/filip26/iron-verifiable-credentials/tree/main</url>
   </scm>
 
-  <properties>
-    <maven.compiler.target>17</maven.compiler.target>
-    <maven.compiler.source>17</maven.compiler.source>
-    <envSources>src/main/java17</envSources>
-    <rdf-urdna.version>1.1</rdf-urdna.version>
-  </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>com.apicatalog</groupId>
-      <artifactId>titanium-json-ld</artifactId>
-      <version>${titanium.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.setl</groupId>
-      <artifactId>rdf-urdna</artifactId>
-      <version>${rdf-urdna.version}</version>
-    </dependency>
-  </dependencies>
-  
-  <profiles>
-   <!--  Android Dev Build -->
-        <profile>
-            <id>jre8</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <jdk>1.8</jdk>
-            </activation>
   <properties>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -76,8 +48,4 @@
       <version>${tink.version}</version>
     </dependency>         
   </dependencies>
-
-        </profile>    
-    
-  </profiles>
 </project>
