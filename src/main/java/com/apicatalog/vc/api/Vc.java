@@ -19,8 +19,7 @@ import com.apicatalog.vc.Verifiable;
 import jakarta.json.JsonObject;
 
 /**
- * High level API to process Verified Credentials and Verified Presentations.
- *
+ * High level API to process Verifiable Credentials (VC) and Presentations (VP).
  */
 public final class Vc {
 
@@ -104,12 +103,12 @@ public final class Vc {
 
         // is a presentation?
         if (Presentation.isPresentation(expanded)) {
-            
+
             final JsonObject object =expanded.asJsonObject();
 
             // validate the presentation object
             final Presentation presentation = Presentation.from(object);
-            
+
             return presentation;
         }
 

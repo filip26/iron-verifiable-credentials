@@ -5,7 +5,7 @@ import java.net.URI;
 public interface Verifiable {
 
     URI getId();
-    
+
     default boolean isCredential() {
         return false;
     }

@@ -21,11 +21,11 @@ public abstract class CommonApi<T extends CommonApi<?>> {
         this.loader = loader;
         return (T)this;
     }
-    
+
     /**
-     * Use well-known contexts that are bundled with the library instead of fetching it online. 
+     * Use well-known contexts that are bundled with the library instead of fetching it online.
      * <code>true</code> by default. Disabling might cause slower processing.
-     *  
+     *
      * @param enable
      * @return
      */
@@ -33,10 +33,10 @@ public abstract class CommonApi<T extends CommonApi<?>> {
         this.bundledContexts = enable;
         return (T)this;
     }
-    
+
     /**
      * If set, this overrides the input document's IRI.
-     * 
+     *
      * @param base
      * @return
      */

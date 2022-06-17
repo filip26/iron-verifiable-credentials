@@ -44,7 +44,7 @@
   </dependencies>
   
   <profiles>
-   <!--  Android Dev Build -->
+   <!--  Android Dev Build to support Eclipse IDE -->
         <profile>
             <id>jre8</id>
             <activation>
@@ -58,6 +58,7 @@
     <okhttp.version>4.10.0</okhttp.version>
     <tink.version>1.6.1</tink.version>
   </properties>
+
 
   <dependencies>
     <dependency>
@@ -77,7 +78,8 @@
     </dependency>         
   </dependencies>
 
-        </profile>    
-    
+   
+    </profile>
   </profiles>
 </project>
+

@@ -67,7 +67,7 @@ public class LinkedDataSignature {
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
      * @return computed hash code
-     * 
+     *
      * @throws VerificationError
      */
     public byte[] hashCode(JsonStructure document, JsonObject proof) {
