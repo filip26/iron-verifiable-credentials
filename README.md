@@ -22,36 +22,64 @@ All PR's welcome!
 
 # Usage
 
+## Verifying 
+
 ```java
 
 try {
-
-  Vc.verify(credentials)
-    .domain("...")
+  Vc.verify(credentials|presentation)
+  
+    // optional options
+    .domain(...)
+    .base(...)
+    .loader(documentLoader) 
     .statusVerifier(...)
-    .didResolver(...)   
+    .didResolver(...)  
+    .useBundledContexts(true|false)
+
+    // assert valid document
     .isValid();
     
 } catch (VerificationError | DataError e) {
   ...
 }
+```
+
+## Issuing
+
+```java
+signed = Vc.sign(credentials, keys, proofOptions)
+
+           // optional options
+           .base(...)
+           .loader(documentLoader) 
+           .useBundledContexts(true|false)
+           
+           // returns signed document in expanded form
+           .getExpanded(); 
 
 signed = Vc.sign(credentials, keys, proofOptions)
-           .loader(documentLoader) // optional custom loader
-           .getExpanded(); // returns signed document in expanded form
 
-signed = Vc.sign(credentials, keys, proofOptions)
-           .getCompacted(context); // returns signed document in compacted form
+           // returns signed document in compacted form
+           .getCompacted(context);
 
 ```
+
 
 # Building
 
 Fork and clone the project repository.
 
+## Java 17
 ```bash
 > cd iron-verfiable-credentials
 > mvn clean package
+```
+
+## Java 8
+```bash
+> cd iron-verfiable-credentials
+> mvn -f pom_jre8.xml clean package
 ```
 
 # Resources
