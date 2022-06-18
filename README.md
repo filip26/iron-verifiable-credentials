@@ -17,10 +17,6 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
   * Ed25519 Signature 2020
   
 
-# Contributing
-
-All PR's welcome!
-
 # Usage
 
 ## Verifying 
@@ -66,18 +62,21 @@ signed = Vc.sign(credential|presentation, keys, proofOptions)
 
 ```
 
+# Contributing
 
-# Building
+All PR's welcome!
+
+## Building
 
 Fork and clone the project repository.
 
-## Java 17
+### Java 17
 ```bash
 > cd iron-verfiable-credentials
 > mvn clean package
 ```
 
-## Java 8
+### Java 8
 ```bash
 > cd iron-verfiable-credentials
 > mvn -f pom_jre8.xml clean package
