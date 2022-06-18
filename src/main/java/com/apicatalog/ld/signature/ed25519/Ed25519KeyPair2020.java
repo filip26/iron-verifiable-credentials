@@ -10,8 +10,11 @@ import com.apicatalog.multicodec.Multicodec.Codec;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 
 public class Ed25519KeyPair2020 extends Ed25519VerificationKey2020 implements KeyPair {
+
+    public static final String TYPE = "https://w3id.org/security#Ed25519KeyPair2020";
 
     protected static final String PRIVATE_KEY_MULTIBASE = "privateKeyMultibase";
 
@@ -19,6 +22,10 @@ public class Ed25519KeyPair2020 extends Ed25519VerificationKey2020 implements Ke
 
     public Ed25519KeyPair2020(final URI id) {
         super(id, "https://w3id.org/security#Ed25519KeyPair2020");
+    }
+
+    public static boolean isIstanceOf(final JsonValue object) {
+        return JsonLdUtils.isTypeOf(TYPE,  object);
     }
 
     public static Ed25519KeyPair2020 from(JsonObject json) throws DataError {

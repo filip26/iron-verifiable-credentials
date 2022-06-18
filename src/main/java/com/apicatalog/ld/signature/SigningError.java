@@ -7,7 +7,8 @@ public class SigningError extends Throwable {
     public enum Code {
         Unknown,
         Expired, 
-        UnknownVerificatioonKey,
+        UnknownVerificatioonKey, 
+        UnknownCryptoSuite,
     }
 
     private Code code;
@@ -16,9 +17,9 @@ public class SigningError extends Throwable {
         this(Code.Unknown);
     }
 
-    public SigningError(Code type) {
-        super();
-        this.code = type;
+    public SigningError(Code code) {
+        super(code.name());
+        this.code = code;
     }
 
     public SigningError(Throwable e) {
