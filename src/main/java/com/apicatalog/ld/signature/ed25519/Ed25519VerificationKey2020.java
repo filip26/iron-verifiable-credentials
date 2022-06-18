@@ -1,6 +1,7 @@
 package com.apicatalog.ld.signature.ed25519;
 
 import java.net.URI;
+import java.util.Objects;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -26,13 +27,13 @@ import jakarta.json.JsonValue;
  */
 public class Ed25519VerificationKey2020 implements VerificationKey {
 
-    public static final String TYPE = "https://w3id.org/security#Ed25519VerificationKey2020";
+    private static final String TYPE = "Ed25519VerificationKey2020";
 
     protected static final String BASE = "https://w3id.org/security#";
 
     protected static final String CONTROLLER = "controller";
     protected static final String PUBLIC_KEY_MULTIBASE = "publicKeyMultibase";
-    protected static final String PUBLIC_KEY_TYPE = "https://w3id.org/security#multibase";
+    protected static final String PUBLIC_KEY_TYPE_VALUE = "https://w3id.org/security#multibase";
 
     protected final URI id;
     protected final String type;
@@ -41,7 +42,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
     protected byte[] publicKey;
 
     public Ed25519VerificationKey2020(final URI id) {
-        this(id, TYPE);
+        this(id, BASE + TYPE);
     }
 
     protected Ed25519VerificationKey2020(final URI id, final String type) {
@@ -49,10 +50,14 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
         this.type = type;
     }
 
-    public static boolean isIstanceOf(final JsonValue object) {
-        return JsonLdUtils.isTypeOf(TYPE,  object);
+    public static boolean isTypeOf(final String type) {
+        return Objects.equals(BASE + TYPE, type);
     }
-    
+
+    public static boolean isIstanceOf(final JsonValue object) {
+        return JsonLdUtils.isTypeOf(BASE + TYPE,  object);
+    }
+
     public static Ed25519VerificationKey2020 from(JsonObject json) throws DataError {
 
         // TODO check json object type!
@@ -147,7 +152,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
             throw new DataError();
         }
 
-        if (!JsonLdUtils.isTypeOf(PUBLIC_KEY_TYPE, key.asJsonObject())) {
+        if (!JsonLdUtils.isTypeOf(PUBLIC_KEY_TYPE_VALUE, key.asJsonObject())) {
             throw new DataError();
         }
 
@@ -193,6 +198,6 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
 
         final String multibase = Multibase.encode(Algorithm.Base58Btc, encoded);
 
-        return JsonLdUtils.setValue(builder, property, "https://w3id.org/security#multibase", multibase);
+        return JsonLdUtils.setValue(builder, property, PUBLIC_KEY_TYPE_VALUE, multibase);
     }
 }

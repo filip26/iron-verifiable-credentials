@@ -1,12 +1,12 @@
-package com.apicatalog.ld.signature.proof;
+package com.apicatalog.ld.signature;
 
 import java.util.Optional;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.ld.signature.proof.EmbeddedProof;
+import com.apicatalog.ld.signature.proof.ProofOptions;
 
 import jakarta.json.JsonValue;
 
@@ -21,4 +21,6 @@ public interface SignatureAdapter {
     Optional<EmbeddedProof> materialize(ProofOptions options) throws DataError;
 
     Optional<EmbeddedProof> materializeProof(JsonValue value, DocumentLoader loader) throws DataError;
+
+    boolean isSupportedType(String type);
 }

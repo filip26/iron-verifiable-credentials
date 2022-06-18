@@ -16,8 +16,8 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.vc.DefaultSignatureAdapters;
 import com.apicatalog.vc.StaticContextLoader;
-import com.apicatalog.vc.SignatureAdapters;
 import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonArray;
@@ -71,9 +71,9 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         if (bundledContexts) {
             loader = new StaticContextLoader(loader);
         }
-        
+
         if (signatureAdapter == null) {
-            signatureAdapter = new SignatureAdapters();
+            signatureAdapter = new DefaultSignatureAdapters();
         }
 
         if (document != null && keyPair != null)  {
@@ -117,8 +117,8 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
             for (final JsonValue key : keys) {
 
                 // take the first key that match
-                final Optional<KeyPair> keyPair = signatureAdapter.materializeKeyPair(key); 
-                
+                final Optional<KeyPair> keyPair = signatureAdapter.materializeKeyPair(key);
+
                 if (keyPair.isPresent()) {
                     return sign(expanded, keyPair.get(), options);
                 }
@@ -156,13 +156,13 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
             throw new SigningError(Code.Expired);
         }
-        
-        final EmbeddedProof proof = 
+
+        final EmbeddedProof proof =
                                 signatureAdapter
                                     .materialize(options)
                                     .orElseThrow(() -> new SigningError(Code.UnknownCryptoSuite));
 
-        final SignatureSuite signatureSuite = 
+        final SignatureSuite signatureSuite =
                                     signatureAdapter
                                         .getSuiteByType(proof.getType())
                                         .orElseThrow(() -> new SigningError(Code.UnknownCryptoSuite));

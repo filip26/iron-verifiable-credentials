@@ -23,7 +23,7 @@ public class TinkSignature implements SignatureAlgorithm {
 
         } catch (GeneralSecurityException e) {
             throw new VerificationError(Code.InvalidSignature, e);     //TODO more details
-        }        
+        }
     }
 
     @Override

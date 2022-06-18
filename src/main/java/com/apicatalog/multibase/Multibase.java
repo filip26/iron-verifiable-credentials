@@ -15,7 +15,7 @@ public class Multibase {
     }
 
     public static String encode(Algorithm algorithm, byte[] data) {
-        
+
         if (algorithm == null) {
             throw new IllegalArgumentException("The 'algorithm' parameter must not be null.");
         }
@@ -25,7 +25,7 @@ public class Multibase {
 
         switch (algorithm) {
         case Base58Btc:
-            return io.ipfs.multibase.Multibase.encode(io.ipfs.multibase.Multibase.Base.Base58BTC, data);            
+            return io.ipfs.multibase.Multibase.encode(io.ipfs.multibase.Multibase.Base.Base58BTC, data);
         }
 
         throw new IllegalArgumentException("Unsupported algorithm [" + algorithm + "].");

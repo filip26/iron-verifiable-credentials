@@ -18,7 +18,7 @@ public class JsonLdValueObject {
     public static final JsonValue toJson(String type, String value) {
         return Json.createArrayBuilder().add(create(type, value)).build();
     }
-    
+
     public static final JsonValue toJson(String value) {
         return Json.createObjectBuilder()
                 .add(Keywords.VALUE, value)

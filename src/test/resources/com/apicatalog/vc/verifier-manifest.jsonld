@@ -17,7 +17,7 @@
 			],
 			"name": "unknown proof type",
 			"input": "verifier/0001-in.jsonld",
-			"expectErrorCode": "UnknownCryptoSuiteType"
+			"expectErrorCode": "UnknownCryptoSuite"
 		},
 		{
 			"@id": "#t0002",

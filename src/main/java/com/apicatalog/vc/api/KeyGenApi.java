@@ -8,7 +8,7 @@ import com.apicatalog.ld.signature.key.KeyPair;
 
 public final class KeyGenApi extends CommonApi<KeyGenApi> {
 
-    private final LinkedDataSignature lds; 
+    private final LinkedDataSignature lds;
 
     protected KeyGenApi(final LinkedDataSignature lds) {
         this.lds = lds;

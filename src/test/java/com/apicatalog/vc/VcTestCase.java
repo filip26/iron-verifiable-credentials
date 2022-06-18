@@ -39,7 +39,7 @@ public class VcTestCase {
     public Instant created;
 
     public String domain;
-    
+
     public URI context;
 
     public static VcTestCase of(JsonObject test, JsonObject manifest, DocumentLoader loader) {
@@ -83,7 +83,7 @@ public class VcTestCase {
                     .getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#options")
                     .getJsonObject(0);
 
-            
+
             if (options.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#keyPair")) {
                 testCase.keyPair = URI.create(
                         options.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#keyPair")
@@ -96,15 +96,15 @@ public class VcTestCase {
                         .getJsonArray(
                                 "https://github.com/filip26/iron-verifiable-credentials/tests/vocab#verificationMethod")
                         .getJsonObject(0);
-    
+
                 if (JsonLdUtils.isTypeOf("https://w3id.org/security#Ed25519VerificationKey2020", method)) {
                     try {
                         testCase.verificationMethod = Ed25519VerificationKey2020.from(method);
-    
+
                     } catch (DataError e) {
                         fail(e);
                     }
-    
+
                 } else {
                     JsonLdUtils.getId(method)
                             .ifPresent(id -> testCase.verificationMethod = new VerificationMethodReference(id));

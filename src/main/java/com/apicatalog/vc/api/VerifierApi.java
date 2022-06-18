@@ -20,16 +20,16 @@ import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.LinkedDataSignature;
+import com.apicatalog.ld.signature.SignatureAdapter;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
-import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.vc.CredentialStatus;
+import com.apicatalog.vc.DefaultSignatureAdapters;
 import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.StatusVerifier;
-import com.apicatalog.vc.SignatureAdapters;
 import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonArray;
@@ -44,7 +44,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     private String domain = null;
     private StatusVerifier statusVerifier = null;
     private DidResolver didResolver = null;
-    
+
     protected VerifierApi(URI location) {
         this.location = location;
         this.document = null;
@@ -71,7 +71,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
         this.didResolver = didResolver;
         return this;
     }
-    
+
     public VerifierApi domain(final String domain) {
         this.domain = domain;
         return this;
@@ -92,9 +92,9 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
         if (bundledContexts) {
             loader = new StaticContextLoader(loader);
         }
-        
+
         if (signatureAdapter == null) {
-            signatureAdapter = new SignatureAdapters();
+            signatureAdapter = new DefaultSignatureAdapters();
         }
 
         if (document != null) {
@@ -177,11 +177,11 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
                         throw new DataError(ErrorType.Missing, "proof", Keywords.TYPE);
                     }
 
-                    throw new DataError(ErrorType.Unknown, "cryptoSuiteType");
+                    throw new VerificationError(Code.UnknownCryptoSuite);
                 }
 
                 final EmbeddedProof proof = embeddedProof.get();
-                
+
                 // check domain
                 if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
                     throw new VerificationError(Code.InvalidProofDomain);
@@ -191,14 +191,14 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
 
                 try {
 
-                    VerificationKey verificationMethod = get(proof.getVerificationMethod().getId());
-                    
-                    final SignatureSuite suite = 
-                                            signatureAdapter
-                                                .getSuiteByType(proof.getType())
-                                                .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
+                    final SignatureSuite suite =
+                            signatureAdapter
+                                .getSuiteByType(proof.getType())
+                                .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
 
-                    LinkedDataSignature signature = new LinkedDataSignature(suite);
+                    final VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), suite.getAdapter());
+
+                    final LinkedDataSignature signature = new LinkedDataSignature(suite);
 
                     // verify signature
                     signature.verify(data, proofObject, verificationMethod, proof.getValue());
@@ -220,7 +220,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     }
 
     // refresh/fetch verification method
-    final VerificationKey get(URI id) throws JsonLdError, DataError {
+    final VerificationKey get(final URI id, final SignatureAdapter adapter) throws JsonLdError, DataError {
 
         if (DidKey.isDidKey(id)) {
 
@@ -235,24 +235,24 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
             return didDocument
                         .getVerificationMethod()
                         .stream()
-                        .filter(vm -> Ed25519VerificationKey2020.TYPE.equals(vm.getType()))
+                        .filter(vm -> adapter.isSupportedType(vm.getType()))
                         .map(VerificationKey.class::cast)
                         .findAny()
-                        .orElseThrow(IllegalStateException::new); 
+                        .orElseThrow(IllegalStateException::new);
         }
 
         final JsonArray document = JsonLd.expand(id).loader(loader).get();
 
-        for (final JsonValue method : document) {   
+        for (final JsonValue method : document) {
 
-            final Optional<VerificationKey> key = signatureAdapter.materializeKey(method); 
+            final Optional<VerificationKey> key = adapter.materializeKey(method);
 
             // take the first key that match
             if (key.isPresent()) {
                 return key.get();
             }
         }
-        
+
         throw new IllegalStateException();
     }
 }

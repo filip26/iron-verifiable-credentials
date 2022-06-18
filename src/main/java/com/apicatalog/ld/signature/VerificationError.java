@@ -5,8 +5,8 @@ public class VerificationError extends Throwable {
     public enum Code {
         Unknown,
         Expired,
-        InvalidSignature, 
-        InvalidProofDomain, 
+        InvalidSignature,
+        InvalidProofDomain,
         UnknownCryptoSuite,
     }
 
@@ -34,5 +34,5 @@ public class VerificationError extends Throwable {
 
     public Code getCode() {
         return code;
-    }    
+    }
 }

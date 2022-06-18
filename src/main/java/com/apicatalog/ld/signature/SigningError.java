@@ -6,8 +6,8 @@ public class SigningError extends Throwable {
 
     public enum Code {
         Unknown,
-        Expired, 
-        UnknownVerificatioonKey, 
+        Expired,
+        UnknownVerificatioonKey,
         UnknownCryptoSuite,
     }
 

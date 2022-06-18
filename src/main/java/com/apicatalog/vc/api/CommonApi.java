@@ -3,7 +3,7 @@ package com.apicatalog.vc.api;
 import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.signature.proof.SignatureAdapter;
+import com.apicatalog.ld.signature.SignatureAdapter;
 
 public abstract class CommonApi<T extends CommonApi<?>> {
 
@@ -12,7 +12,7 @@ public abstract class CommonApi<T extends CommonApi<?>> {
     protected URI base;
 
     protected SignatureAdapter signatureAdapter;
-    
+
     protected CommonApi() {
         // default values
         this.loader = null;
