@@ -10,10 +10,10 @@
     <relativePath>pom_parent.xml</relativePath>
   </parent>
 
-  <artifactId>iron-vc</artifactId>
+  <artifactId>iron-verifiable-credentials</artifactId>
   <packaging>jar</packaging>
 
-  <name>Iron Verifiable Credentials (JRE17)</name>
+  <name>Iron Verifiable Credentials</name>
 
   <url>https://github.com/filip26/iron-verifiable-credentials</url>
 
