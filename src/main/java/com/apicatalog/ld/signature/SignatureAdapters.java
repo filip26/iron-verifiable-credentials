@@ -43,6 +43,12 @@ public class SignatureAdapters implements SignatureAdapter {
     public Optional<EmbeddedProof> materializeProof(JsonValue value, final DocumentLoader loader) throws DataError {
         return materialize(value, (a, v) -> a.materializeProof(v, loader));
     }
+
+    @Override
+    public boolean isSupportedType(final String type) {
+        return adapters.stream().anyMatch(a -> a.isSupportedType(type));
+    }
+
     
     protected <V, R> Optional<R> materialize(final V value, MaterializeFunction<V, R> method) throws DataError {
         
@@ -60,5 +66,4 @@ public class SignatureAdapters implements SignatureAdapter {
     protected interface MaterializeFunction<V, R> {
         Optional<R> apply(SignatureAdapter adapter, V value) throws DataError;
     }
-
 }

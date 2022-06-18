@@ -14,7 +14,7 @@ import jakarta.json.JsonValue;
 
 public class Ed25519KeyPair2020 extends Ed25519VerificationKey2020 implements KeyPair {
 
-    public static final String TYPE = "https://w3id.org/security#Ed25519KeyPair2020";
+    private static final String TYPE = "Ed25519KeyPair2020";
 
     protected static final String PRIVATE_KEY_MULTIBASE = "privateKeyMultibase";
 
@@ -25,7 +25,7 @@ public class Ed25519KeyPair2020 extends Ed25519VerificationKey2020 implements Ke
     }
 
     public static boolean isIstanceOf(final JsonValue object) {
-        return JsonLdUtils.isTypeOf(TYPE,  object);
+        return JsonLdUtils.isTypeOf(BASE + TYPE,  object);
     }
 
     public static Ed25519KeyPair2020 from(JsonObject json) throws DataError {

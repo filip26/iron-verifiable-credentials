@@ -236,7 +236,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
             return didDocument
                         .getVerificationMethod()
                         .stream()
-                        .filter(vm -> Ed25519VerificationKey2020.TYPE.equals(vm.getType()) || Ed25519KeyPair2020.TYPE.equals(vm.getType()))
+                        .filter(vm -> signatureAdapter.isSupportedType(vm.getType()))
                         .map(VerificationKey.class::cast)
                         .findAny()
                         .orElseThrow(IllegalStateException::new); 

@@ -48,7 +48,7 @@ public class Ed25519SignatureAdapter implements SignatureAdapter {
     @Override
     public Optional<SignatureSuite> getSuiteByType(String type) {
         
-        if (Ed25519Signature2020.TYPE.equals(type)) {
+        if (Ed25519Signature2020.isTypeOf(type)) {
             return Optional.of(new Ed25519Signature2020());            
         }
         
@@ -63,5 +63,15 @@ public class Ed25519SignatureAdapter implements SignatureAdapter {
         }
         
         return Optional.empty();
+    }
+
+    @Override
+    public boolean isSupportedType(String type) {
+        return 
+            Ed25519VerificationKey2020.isTypeOf(type)
+            || Ed25519KeyPair2020.isTypeOf(type)
+            || Ed25519Proof2020.isTypeOf(type)
+            || Ed25519Signature2020.isTypeOf(type)
+            ;
     }
 }

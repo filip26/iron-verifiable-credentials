@@ -21,4 +21,6 @@ public interface SignatureAdapter {
     Optional<EmbeddedProof> materialize(ProofOptions options) throws DataError;
 
     Optional<EmbeddedProof> materializeProof(JsonValue value, DocumentLoader loader) throws DataError;
+
+    boolean isSupportedType(String type);
 }

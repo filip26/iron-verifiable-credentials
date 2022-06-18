@@ -83,7 +83,7 @@ public final class Vc {
      */
     public static KeyGenApi generateKeys(String type) throws KeyGenError {
         
-        if (Ed25519Signature2020.TYPE.equals(type)) {
+        if (Ed25519Signature2020.isTypeOf(type)) {
             final LinkedDataSignature lds = new LinkedDataSignature(new Ed25519Signature2020());
 
             return new KeyGenApi(lds);

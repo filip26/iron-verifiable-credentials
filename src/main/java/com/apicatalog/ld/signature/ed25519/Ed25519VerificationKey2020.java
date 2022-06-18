@@ -1,6 +1,7 @@
 package com.apicatalog.ld.signature.ed25519;
 
 import java.net.URI;
+import java.util.Objects;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -26,7 +27,7 @@ import jakarta.json.JsonValue;
  */
 public class Ed25519VerificationKey2020 implements VerificationKey {
 
-    public static final String TYPE = "https://w3id.org/security#Ed25519VerificationKey2020";
+    private static final String TYPE = "Ed25519VerificationKey2020";
 
     protected static final String BASE = "https://w3id.org/security#";
 
@@ -41,7 +42,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
     protected byte[] publicKey;
 
     public Ed25519VerificationKey2020(final URI id) {
-        this(id, TYPE);
+        this(id, BASE + TYPE);
     }
 
     protected Ed25519VerificationKey2020(final URI id, final String type) {
@@ -49,8 +50,12 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
         this.type = type;
     }
 
+    public static boolean isTypeOf(final String type) {
+        return Objects.equals(BASE + TYPE, type);
+    }
+
     public static boolean isIstanceOf(final JsonValue object) {
-        return JsonLdUtils.isTypeOf(TYPE,  object);
+        return JsonLdUtils.isTypeOf(BASE + TYPE,  object);
     }
     
     public static Ed25519VerificationKey2020 from(JsonObject json) throws DataError {
