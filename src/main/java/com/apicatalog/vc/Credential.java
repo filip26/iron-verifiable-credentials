@@ -109,7 +109,6 @@ public class Credential implements Verifiable {
             credential.status = CredentialStatus.from(status.get());
         }
 
-        //TODO
         return credential;
     }
 
@@ -134,13 +133,6 @@ public class Credential implements Verifiable {
      */
     public Instant getIssuanceDate() {
         return issuance;
-    }
-
-    /**
-     * see {@link https://www.w3.org/TR/vc-data-model/#credential-subject}
-     */
-    public void getCredentialSubject() {
-        //TODO
     }
 
     /**

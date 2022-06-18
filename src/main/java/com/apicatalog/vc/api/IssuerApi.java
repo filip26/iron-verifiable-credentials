@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.signature.DataError;
@@ -14,6 +14,7 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519Proof2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
@@ -22,6 +23,7 @@ import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
 public final class IssuerApi extends CommonApi<IssuerApi> {
 
@@ -109,10 +111,18 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
             // load key pair
             final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
 
-            // TODO keyPair type must match options.type
-            final Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(keys.getJsonObject(0)); // FIXME
+            for (final JsonValue key : keys) {
+ 
+                // take the first key that match
+                if (!Ed25519VerificationKey2020.isIstanceOf(key)) {
 
-            return sign(expanded, keyPair, options);
+                    final Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(key.asJsonObject()); 
+                    
+                    return sign(expanded, keyPair, options);
+                }                
+            }
+
+            throw new SigningError(Code.UnknownVerificatioonKey);
 
         } catch (JsonLdError e) {
             throw new SigningError(e);
@@ -133,7 +143,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
 
     private static final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DataError {
 
-        final JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
+        final JsonObject object = JsonUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
                     //TODO ErrorCode
                 );
@@ -150,7 +160,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
 
         final LinkedDataSignature suite = new LinkedDataSignature(new Ed25519Signature2020());
 
-        byte[] signature = suite.sign(data, proof.toJson(), keyPair);
+        byte[] signature = suite.sign(data, keyPair, proof.toJson());
 
         proof.setValue(signature);
 

@@ -1,5 +1,8 @@
 package com.apicatalog.ld.signature;
 
+import java.net.URI;
+
+import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
@@ -27,8 +30,9 @@ public class LinkedDataSignature {
      * @param verificationKey
      * @param signature
      * @throws VerificationError
+     * @throws DataError 
      */
-    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError {
+    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DataError {
 
         if (verificationKey == null || verificationKey.getPublicKey() == null) {
             throw new VerificationError();
@@ -50,10 +54,10 @@ public class LinkedDataSignature {
      * @param proof expanded proof options
      * @param keyPair
      * @return computed signature
+     * @throws DataError 
      * @throws VerificationError
      */
-    //FIXME change order, kayPar, options - align with Vc api
-    public byte[] sign(JsonObject document, JsonObject options, KeyPair keyPair) throws SigningError {
+    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError, DataError {
 
         final byte[] documentHashCode = hashCode(document, options);
 
@@ -67,10 +71,11 @@ public class LinkedDataSignature {
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
      * @return computed hash code
+     * @throws DataError 
      *
      * @throws VerificationError
      */
-    public byte[] hashCode(JsonStructure document, JsonObject proof) {
+    public byte[] hashCode(JsonStructure document, JsonObject proof) throws DataError {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 
@@ -81,22 +86,19 @@ public class LinkedDataSignature {
 
         System.arraycopy(proofHash, 0, result, 0, proofHash.length);
         System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
-/*
 
-P# KeHj02o+GaIWES7eSJ7H6NK1Gcm3i06viskQ2swzJBI=
-D# kLSQSa27iPMn++CWOx2ymqk2tiRlxOeQ/CCGtFIBhGw=
-
- */
         return result;
     }
 
-    public KeyPair keygen(int length) {
-
-        com.apicatalog.ld.signature.algorithm.SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
-
-        Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(null); //FIXME
+    public KeyPair keygen(URI id, int length) {
+        
+        final SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
+        
+        final Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(id);
+        
         kp.setPublicKey(keyPair.getPublicKey());
         kp.setPrivateKey(keyPair.getPrivateKey());
+        
         return kp;
     }
 }

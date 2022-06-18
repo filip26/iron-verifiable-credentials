@@ -70,7 +70,7 @@ public class VcTestRunnerJunit {
                 Ed25519ProofOptions2020 options = new Ed25519ProofOptions2020();
                 options.setCreated(testCase.created);
                 options.setVerificationMethod(testCase.verificationMethod);
-                options.setPurpose(URI.create("https://w3id.org/security#assertionMethod"));//TODO make it configurable
+                options.setPurpose(URI.create("https://w3id.org/security#assertionMethod"));
                 options.setDomain(testCase.domain);
                 
                 URI keyPairLocation = testCase.keyPair;
@@ -98,9 +98,6 @@ public class VcTestRunnerJunit {
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 
                 assertNotNull(signed);
-
-//TODO  getCompacted(context)
-//signed = JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(new StringReader("{\"@context\":[\"https://github.com/filip26/iron-verifiable-credentials/issue/0001-context.jsonld\"]}"))).loader(LOADER).get();
 
                 final Document expected = LOADER.loadDocument(URI.create((String)testCase.result), new DocumentLoaderOptions());
 

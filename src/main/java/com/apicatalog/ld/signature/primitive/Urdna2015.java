@@ -8,6 +8,7 @@ import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.http.media.MediaType;
+import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.rdf.Rdf;
 import com.apicatalog.rdf.RdfDataset;
@@ -21,7 +22,7 @@ import jakarta.json.JsonStructure;
 public class Urdna2015 implements CanonicalizationAlgorithm {
 
     @Override
-    public byte[] canonicalize(JsonStructure document) {
+    public byte[] canonicalize(JsonStructure document) throws DataError {
         try {
             RdfDataset dataset = JsonLd.toRdf(JsonDocument.of(document)).get();
 
@@ -37,21 +38,8 @@ public class Urdna2015 implements CanonicalizationAlgorithm {
                     .substring(0, writer.toString().length() -1)
                     .getBytes(StandardCharsets.UTF_8);
 
-
-        } catch (JsonLdError e) {
-            //FIXME ...
-            e.printStackTrace();
-
-        } catch (UnsupportedContentException e) {
-            e.printStackTrace();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        } catch (RdfWriterException e) {
-            e.printStackTrace();
-
+        } catch (JsonLdError | UnsupportedContentException | IOException | RdfWriterException e) {
+            throw new DataError(e);
         }
-        throw new IllegalStateException();
     }
 }

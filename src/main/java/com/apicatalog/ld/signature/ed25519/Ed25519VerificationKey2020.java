@@ -21,7 +21,9 @@ import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
-//TODO javadoc
+/**
+ * Ed25519 Verification Key 2020 Suite.
+ */
 public class Ed25519VerificationKey2020 implements VerificationKey {
 
     public static final String TYPE = "https://w3id.org/security#Ed25519VerificationKey2020";
@@ -47,6 +49,10 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
         this.type = type;
     }
 
+    public static boolean isIstanceOf(final JsonValue object) {
+        return JsonLdUtils.isTypeOf(TYPE,  object);
+    }
+    
     public static Ed25519VerificationKey2020 from(JsonObject json) throws DataError {
 
         // TODO check json object type!
@@ -131,7 +137,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
                             .getObjects(json, BASE + property)
                             .stream()
                             .findFirst()
-                            .orElseThrow(DataError::new);    //FIXME
+                            .orElseThrow(() -> new DataError(ErrorType.Missing, BASE + property));
 
         if (JsonUtils.isArray(key)) {
             key = key.asJsonArray().get(0);
