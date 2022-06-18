@@ -38,6 +38,8 @@ public class VcTestCase {
 
     public Instant created;
 
+    public String domain;
+    
     public URI context;
 
     public static VcTestCase of(JsonObject test, JsonObject manifest, DocumentLoader loader) {
@@ -109,6 +111,11 @@ public class VcTestCase {
                         .getJsonObject(0).getString(Keywords.VALUE));
             }
 
+            if (options.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#domain")) {
+                testCase.domain= options
+                        .getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#domain")
+                        .getJsonObject(0).getString(Keywords.VALUE);
+            }
         }
 
         return testCase;

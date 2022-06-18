@@ -72,7 +72,8 @@ public class VcTestRunnerJunit {
                 options.setCreated(testCase.created);
                 options.setVerificationMethod(testCase.verificationMethod);
                 options.setPurpose(URI.create("https://w3id.org/security#assertionMethod"));//TODO make it configurable
-
+                options.setDomain(testCase.domain);
+                
                 URI keyPairLocation = testCase.keyPair;
 
                 if (keyPairLocation == null) {
@@ -80,8 +81,11 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create("https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json");
                 }
 
-                IssuerApi issuer = Vc.sign(testCase.input, keyPairLocation, options).loader(LOADER);
-
+                IssuerApi issuer = Vc
+                                    .sign(testCase.input, keyPairLocation, options)
+                                    .loader(LOADER)
+                                    ;
+                
                 JsonObject signed = null;
 
                 if (testCase.context != null) {

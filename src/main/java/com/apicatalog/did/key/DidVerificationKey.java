@@ -8,7 +8,7 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 
 import jakarta.json.JsonObject;
 
-public class DidVerificationKey implements VerificationKey {
+class DidVerificationKey implements VerificationKey {
 
     protected final DidUrl id;
 

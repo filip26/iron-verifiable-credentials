@@ -32,6 +32,10 @@ public class Ed25519ProofOptions2020 implements ProofOptions {
         return domain;
     }
 
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
     public void setVerificationMethod(VerificationMethod verificationMethod) {
         this.verificationMethod = verificationMethod;
     }
@@ -40,7 +44,7 @@ public class Ed25519ProofOptions2020 implements ProofOptions {
     public URI getPurpose() {
         return purpose;
     }
-
+    
     public void setPurpose(URI purpose) {
         this.purpose = purpose;
     }

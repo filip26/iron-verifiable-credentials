@@ -196,7 +196,24 @@
                 "verificationMethod": "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y",
                 "created": "2022-05-28T17:02:05Z"
             }
-        },		
+        },	
+        {
+            "@id": "#t0024",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "proof domain property",
+            "input": "issuer/0024-in.jsonld",
+            "expect": "issuer/0024-out.jsonld",
+            "context": "issuer/0001-context.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verifier/0005-verification-key.json",
+                "created": "2022-06-18T19:00:44Z",
+                "domain": ""
+            }
+        },        	
 		{
 			"@id": "#t0030",
 			"@type": [
