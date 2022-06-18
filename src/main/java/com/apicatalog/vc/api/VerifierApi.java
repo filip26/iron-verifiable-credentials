@@ -44,7 +44,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     private String domain = null;
     private StatusVerifier statusVerifier = null;
     private DidResolver didResolver = null;
-    
+
     protected VerifierApi(URI location) {
         this.location = location;
         this.document = null;
@@ -71,7 +71,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
         this.didResolver = didResolver;
         return this;
     }
-    
+
     public VerifierApi domain(final String domain) {
         this.domain = domain;
         return this;
@@ -92,7 +92,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
         if (bundledContexts) {
             loader = new StaticContextLoader(loader);
         }
-        
+
         if (signatureAdapter == null) {
             signatureAdapter = new DefaultSignatureAdapters();
         }
@@ -181,7 +181,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
                 }
 
                 final EmbeddedProof proof = embeddedProof.get();
-                
+
                 // check domain
                 if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
                     throw new VerificationError(Code.InvalidProofDomain);
@@ -191,13 +191,13 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
 
                 try {
 
-                    final SignatureSuite suite = 
+                    final SignatureSuite suite =
                             signatureAdapter
                                 .getSuiteByType(proof.getType())
                                 .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
 
                     final VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), suite.getAdapter());
-                    
+
                     final LinkedDataSignature signature = new LinkedDataSignature(suite);
 
                     // verify signature
@@ -238,21 +238,21 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
                         .filter(vm -> adapter.isSupportedType(vm.getType()))
                         .map(VerificationKey.class::cast)
                         .findAny()
-                        .orElseThrow(IllegalStateException::new); 
+                        .orElseThrow(IllegalStateException::new);
         }
 
         final JsonArray document = JsonLd.expand(id).loader(loader).get();
 
-        for (final JsonValue method : document) {   
+        for (final JsonValue method : document) {
 
-            final Optional<VerificationKey> key = adapter.materializeKey(method); 
+            final Optional<VerificationKey> key = adapter.materializeKey(method);
 
             // take the first key that match
             if (key.isPresent()) {
                 return key.get();
             }
         }
-        
+
         throw new IllegalStateException();
     }
 }

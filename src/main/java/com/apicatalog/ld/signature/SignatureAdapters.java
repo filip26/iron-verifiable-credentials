@@ -14,11 +14,11 @@ import jakarta.json.JsonValue;
 public class SignatureAdapters implements SignatureAdapter {
 
     protected Collection<SignatureAdapter> adapters;
-    
+
     public SignatureAdapters(Collection<SignatureAdapter> adapters) {
         this.adapters = adapters;
     }
-    
+
     @Override
     public Optional<VerificationKey> materializeKey(final JsonValue value) throws DataError {
         return materialize(value, (a, v) -> a.materializeKey(v));
@@ -49,19 +49,19 @@ public class SignatureAdapters implements SignatureAdapter {
         return adapters.stream().anyMatch(a -> a.isSupportedType(type));
     }
 
-    
+
     protected <V, R> Optional<R> materialize(final V value, MaterializeFunction<V, R> method) throws DataError {
-        
-        for (final SignatureAdapter adapter : adapters) {           
+
+        for (final SignatureAdapter adapter : adapters) {
             final Optional<R> result = method.apply(adapter, value);
-            
+
             if (result.isPresent()) {
                 return result;
             }
         }
         return Optional.empty();
     }
-    
+
     @FunctionalInterface
     protected interface MaterializeFunction<V, R> {
         Optional<R> apply(SignatureAdapter adapter, V value) throws DataError;

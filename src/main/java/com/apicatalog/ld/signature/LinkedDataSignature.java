@@ -30,7 +30,7 @@ public class LinkedDataSignature {
      * @param verificationKey
      * @param signature
      * @throws VerificationError
-     * @throws DataError 
+     * @throws DataError
      */
     public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DataError {
 
@@ -54,7 +54,7 @@ public class LinkedDataSignature {
      * @param proof expanded proof options
      * @param keyPair
      * @return computed signature
-     * @throws DataError 
+     * @throws DataError
      * @throws VerificationError
      */
     public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError, DataError {
@@ -71,7 +71,7 @@ public class LinkedDataSignature {
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
      * @return computed hash code
-     * @throws DataError 
+     * @throws DataError
      *
      * @throws VerificationError
      */
@@ -91,14 +91,14 @@ public class LinkedDataSignature {
     }
 
     public KeyPair keygen(URI id, int length) {
-        
+
         final SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
-        
+
         final Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(id);
-        
+
         kp.setPublicKey(keyPair.getPublicKey());
         kp.setPrivateKey(keyPair.getPrivateKey());
-        
+
         return kp;
     }
 }

@@ -12,7 +12,7 @@ public abstract class CommonApi<T extends CommonApi<?>> {
     protected URI base;
 
     protected SignatureAdapter signatureAdapter;
-    
+
     protected CommonApi() {
         // default values
         this.loader = null;

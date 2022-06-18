@@ -20,7 +20,7 @@ public class MessageDigest implements DigestAlgorithm {
         try {
             java.security.MessageDigest digest = java.security.MessageDigest.getInstance(type);
             return digest.digest(data);
-            
+
         } catch (NoSuchAlgorithmException e) {
             throw new DataError(e);
         }

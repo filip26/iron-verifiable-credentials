@@ -82,12 +82,12 @@ public final class Vc {
      * @return
      */
     public static KeyGenApi generateKeys(String type) throws KeyGenError {
-        
+
         if (Ed25519Signature2020.isTypeOf(type)) {
             final LinkedDataSignature lds = new LinkedDataSignature(new Ed25519Signature2020());
 
             return new KeyGenApi(lds);
-        }   
+        }
         throw new KeyGenError(Code.UnknownCryptoSuite);
     }
 

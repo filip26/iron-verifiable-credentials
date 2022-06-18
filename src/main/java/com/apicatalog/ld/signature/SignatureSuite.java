@@ -61,7 +61,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     public String getId() {
         return id;
     }
-    
+
     public SignatureAdapter getAdapter() {
         return adapter;
     }

@@ -57,7 +57,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
     public static boolean isIstanceOf(final JsonValue object) {
         return JsonLdUtils.isTypeOf(BASE + TYPE,  object);
     }
-    
+
     public static Ed25519VerificationKey2020 from(JsonObject json) throws DataError {
 
         // TODO check json object type!

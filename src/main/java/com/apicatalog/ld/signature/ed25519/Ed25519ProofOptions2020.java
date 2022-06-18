@@ -44,7 +44,7 @@ public class Ed25519ProofOptions2020 implements ProofOptions {
     public URI getPurpose() {
         return purpose;
     }
-    
+
     public void setPurpose(URI purpose) {
         this.purpose = purpose;
     }

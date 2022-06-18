@@ -19,7 +19,7 @@ public final class Ed25519Signature2020 extends SignatureSuite {
             new Ed25519SignatureAdapter()
             );
     }
-    
+
     public static boolean isTypeOf(final String type) {
         return Objects.equals(TYPE, type);
     }

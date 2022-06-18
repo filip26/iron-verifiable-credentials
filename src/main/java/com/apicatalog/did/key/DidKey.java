@@ -9,8 +9,8 @@ import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.multicodec.Multicodec.Type;
 
 /**
- * Immutable DID Key. 
- * 
+ * Immutable DID Key.
+ *
  * https://pr-preview.s3.amazonaws.com/w3c-ccg/did-method-key/pull/51.html
  *
  * did-key-format := did:key:MULTIBASE(base58-btc, MULTICODEC(public-key-type, raw-public-key-bytes))
