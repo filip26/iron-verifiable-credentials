@@ -9,6 +9,8 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.signature.KeyGenError;
+import com.apicatalog.ld.signature.KeyGenError.Code;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.ProofOptions;
@@ -77,16 +79,16 @@ public final class Vc {
      * Generates public/private key pair.
      *
      * @param type requested key pair type, e.g. <code>https://w3id.org/security#Ed25519KeyPair2020</code>
-     * @param length
      * @return
      */
-    //FIXMe use processor api allowing to set length
-    public static KeyPair generateKeys(String type) {
+    public static KeyGenApi generateKeys(String type) throws KeyGenError {
+        
+        if (Ed25519Signature2020.TYPE.equals(type)) {
+            final LinkedDataSignature lds = new LinkedDataSignature(new Ed25519Signature2020());
 
-        //TODO reject unknown keypair type
-        final LinkedDataSignature lds = new LinkedDataSignature(new Ed25519Signature2020());
-
-        return lds.keygen(256); //FIXME
+            return new KeyGenApi(lds);
+        }   
+        throw new KeyGenError(Code.UnknownCryptoSuite);
     }
 
     protected static Verifiable get(JsonObject expanded) throws DataError {

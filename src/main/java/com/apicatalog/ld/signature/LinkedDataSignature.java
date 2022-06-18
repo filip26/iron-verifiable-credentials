@@ -1,5 +1,8 @@
 package com.apicatalog.ld.signature;
 
+import java.net.URI;
+
+import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
@@ -81,22 +84,19 @@ public class LinkedDataSignature {
 
         System.arraycopy(proofHash, 0, result, 0, proofHash.length);
         System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
-/*
 
-P# KeHj02o+GaIWES7eSJ7H6NK1Gcm3i06viskQ2swzJBI=
-D# kLSQSa27iPMn++CWOx2ymqk2tiRlxOeQ/CCGtFIBhGw=
-
- */
         return result;
     }
 
-    public KeyPair keygen(int length) {
-
-        com.apicatalog.ld.signature.algorithm.SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
-
-        Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(null); //FIXME
+    public KeyPair keygen(URI id, int length) {
+        
+        final SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
+        
+        final Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(id);
+        
         kp.setPublicKey(keyPair.getPublicKey());
         kp.setPrivateKey(keyPair.getPrivateKey());
+        
         return kp;
     }
 }
