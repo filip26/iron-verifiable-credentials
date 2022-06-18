@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.signature.DataError;
@@ -143,7 +143,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
 
     private static final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DataError {
 
-        final JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
+        final JsonObject object = JsonUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
                     //TODO ErrorCode
                 );
@@ -160,7 +160,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
 
         final LinkedDataSignature suite = new LinkedDataSignature(new Ed25519Signature2020());
 
-        byte[] signature = suite.sign(data, proof.toJson(), keyPair);
+        byte[] signature = suite.sign(data, keyPair, proof.toJson());
 
         proof.setValue(signature);
 

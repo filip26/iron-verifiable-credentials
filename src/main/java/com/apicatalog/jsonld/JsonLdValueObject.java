@@ -6,7 +6,6 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-//TODO use Titanium 1.4.0
 public class JsonLdValueObject {
 
     public static final JsonObject create(String type, String value) {

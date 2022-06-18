@@ -15,7 +15,19 @@ public class Multibase {
     }
 
     public static String encode(Algorithm algorithm, byte[] data) {
-        //TODO check aloorithm
-        return io.ipfs.multibase.Multibase.encode(io.ipfs.multibase.Multibase.Base.Base58BTC, data);
+        
+        if (algorithm == null) {
+            throw new IllegalArgumentException("The 'algorithm' parameter must not be null.");
+        }
+        if (data == null || data.length == 0) {
+            throw new IllegalArgumentException("The 'data' parameter must not be an empty array nor null.");
+        }
+
+        switch (algorithm) {
+        case Base58Btc:
+            return io.ipfs.multibase.Multibase.encode(io.ipfs.multibase.Multibase.Base.Base58BTC, data);            
+        }
+
+        throw new IllegalArgumentException("Unsupported algorithm [" + algorithm + "].");
     }
 }

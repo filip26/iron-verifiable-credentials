@@ -41,12 +41,12 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     }
 
     @Override
-    public byte[] digest(byte[] data) {
+    public byte[] digest(byte[] data) throws DataError {
         return digester.digest(data);
     }
 
     @Override
-    public byte[] canonicalize(JsonStructure document) {
+    public byte[] canonicalize(JsonStructure document) throws DataError {
         return canonicalization.canonicalize(document);
     }
 

@@ -105,21 +105,6 @@ public class JsonLdUtils {
         return JsonUtils.toCollection(value);
     }
 
-    //FIXME JsonUtils
-    public static Optional<JsonObject> findFirstObject(JsonValue expanded) {
-        if (JsonUtils.isArray(expanded)) {
-            for (JsonValue item : expanded.asJsonArray()) {
-                if (JsonUtils.isObject(item)) {
-                    return Optional.of(item.asJsonObject());
-                }
-            }
-        } else if (JsonUtils.isObject(expanded)) {
-            return Optional.of(expanded.asJsonObject());
-        }
-
-        return Optional.empty();
-    }
-
     public static URI assertId(JsonValue subject, String base, String property) throws DataError {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), base + property)) {
@@ -196,7 +181,7 @@ public class JsonLdUtils {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
 
-        return findFirstObject(value)
+        return com.apicatalog.jsonld.JsonUtils.findFirstObject(value)
                 .map(o -> o.get(Keywords.ID))
                 .filter(JsonUtils::isString)
                 .map(JsonString.class::cast)

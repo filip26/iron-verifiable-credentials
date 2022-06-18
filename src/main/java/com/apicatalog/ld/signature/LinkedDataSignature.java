@@ -30,8 +30,9 @@ public class LinkedDataSignature {
      * @param verificationKey
      * @param signature
      * @throws VerificationError
+     * @throws DataError 
      */
-    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError {
+    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DataError {
 
         if (verificationKey == null || verificationKey.getPublicKey() == null) {
             throw new VerificationError();
@@ -53,10 +54,10 @@ public class LinkedDataSignature {
      * @param proof expanded proof options
      * @param keyPair
      * @return computed signature
+     * @throws DataError 
      * @throws VerificationError
      */
-    //FIXME change order, kayPar, options - align with Vc api
-    public byte[] sign(JsonObject document, JsonObject options, KeyPair keyPair) throws SigningError {
+    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError, DataError {
 
         final byte[] documentHashCode = hashCode(document, options);
 
@@ -70,10 +71,11 @@ public class LinkedDataSignature {
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
      * @return computed hash code
+     * @throws DataError 
      *
      * @throws VerificationError
      */
-    public byte[] hashCode(JsonStructure document, JsonObject proof) {
+    public byte[] hashCode(JsonStructure document, JsonObject proof) throws DataError {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 

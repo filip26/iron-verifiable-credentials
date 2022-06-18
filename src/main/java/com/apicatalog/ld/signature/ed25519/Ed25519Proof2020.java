@@ -40,7 +40,6 @@ public class Ed25519Proof2020 extends EmbeddedProof implements Proof {
             return proof;
         }
 
-        //TODO
         throw new IllegalStateException();
     }
 
