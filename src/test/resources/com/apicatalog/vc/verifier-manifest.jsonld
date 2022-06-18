@@ -194,7 +194,32 @@
             ],
             "name": "DID key as a verification method",
             "input": "verifier/0022-in.jsonld"
-        },		
+        },
+        {
+            "@id": "#t0023",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "valid proof domain property",
+            "input": "verifier/0023-in.jsonld",
+            "options": {
+                "domain": "4jt78h47fh"
+            }
+        },
+        {
+            "@id": "#t0024",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid proof domain property",
+            "input": "verifier/0024-in.jsonld",
+            "options": {
+                "domain": "4jt"
+            },
+            "expectErrorCode": "InvalidProofDomain"            
+        },
 		{
 			"@id": "#t0050",
 			"@type": [
