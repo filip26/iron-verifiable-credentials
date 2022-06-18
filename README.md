@@ -27,7 +27,7 @@ All PR's welcome!
 ```java
 
 try {
-  Vc.verify(credentials|presentation)
+  Vc.verify(credential|presentation)
   
     // optional options
     .domain(...)
@@ -48,7 +48,7 @@ try {
 ## Issuing
 
 ```java
-signed = Vc.sign(credentials, keys, proofOptions)
+signed = Vc.sign(credential|presentation, keys, proofOptions)
 
            // optional options
            .base(...)
@@ -58,7 +58,7 @@ signed = Vc.sign(credentials, keys, proofOptions)
            // returns signed document in expanded form
            .getExpanded(); 
 
-signed = Vc.sign(credentials, keys, proofOptions)
+signed = Vc.sign(credential|presentation, keys, proofOptions)
 
            // returns signed document in compacted form
            .getCompacted(context);
