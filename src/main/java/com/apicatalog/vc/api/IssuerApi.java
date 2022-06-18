@@ -1,6 +1,7 @@
 package com.apicatalog.vc.api;
 
 import java.net.URI;
+import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -9,16 +10,14 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.LinkedDataSignature;
+import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
-import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519Proof2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.StaticContextLoader;
+import com.apicatalog.vc.SignatureAdapters;
 import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonArray;
@@ -72,6 +71,10 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         if (bundledContexts) {
             loader = new StaticContextLoader(loader);
         }
+        
+        if (signatureAdapter == null) {
+            signatureAdapter = new SignatureAdapters();
+        }
 
         if (document != null && keyPair != null)  {
             return sign(document, keyPair, options);
@@ -112,14 +115,13 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
             final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
 
             for (final JsonValue key : keys) {
- 
-                // take the first key that match
-                if (!Ed25519VerificationKey2020.isIstanceOf(key)) {
 
-                    final Ed25519KeyPair2020 keyPair = Ed25519KeyPair2020.from(key.asJsonObject()); 
-                    
-                    return sign(expanded, keyPair, options);
-                }                
+                // take the first key that match
+                final Optional<KeyPair> keyPair = signatureAdapter.materializeKeyPair(key); 
+                
+                if (keyPair.isPresent()) {
+                    return sign(expanded, keyPair.get(), options);
+                }
             }
 
             throw new SigningError(Code.UnknownVerificatioonKey);
@@ -141,7 +143,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         }
     }
 
-    private static final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DataError {
+    private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DataError {
 
         final JsonObject object = JsonUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
@@ -154,11 +156,20 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
             throw new SigningError(Code.Expired);
         }
+        
+        final EmbeddedProof proof = 
+                                signatureAdapter
+                                    .materialize(options)
+                                    .orElseThrow(() -> new SigningError(Code.UnknownCryptoSuite));
+
+        final SignatureSuite signatureSuite = 
+                                    signatureAdapter
+                                        .getSuiteByType(proof.getType())
+                                        .orElseThrow(() -> new SigningError(Code.UnknownCryptoSuite));
 
         final JsonObject data = EmbeddedProof.removeProof(object);
-        final EmbeddedProof proof = Ed25519Proof2020.from(options);
 
-        final LinkedDataSignature suite = new LinkedDataSignature(new Ed25519Signature2020());
+        final LinkedDataSignature suite = new LinkedDataSignature(signatureSuite);
 
         byte[] signature = suite.sign(data, keyPair, proof.toJson());
 

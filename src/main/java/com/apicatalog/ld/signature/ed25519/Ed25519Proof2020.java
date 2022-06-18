@@ -1,5 +1,7 @@
 package com.apicatalog.ld.signature.ed25519;
 
+import java.util.Objects;
+
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -20,7 +22,11 @@ import jakarta.json.JsonValue;
  */
 public class Ed25519Proof2020 extends EmbeddedProof implements Proof {
 
-    protected static final String TYPE = "Ed25519Signature2020";
+    private static final String TYPE = "Ed25519Signature2020";
+
+    public static boolean isTypeOf(final String type) {
+        return Objects.equals(BASE + TYPE, type);
+    }
 
     public static boolean isIstanceOf(final JsonValue object) {
         return JsonLdUtils.isTypeOf(BASE + TYPE,  object);
