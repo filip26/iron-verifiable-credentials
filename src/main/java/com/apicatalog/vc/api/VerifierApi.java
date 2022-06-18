@@ -23,6 +23,7 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
@@ -177,7 +178,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
                         throw new DataError(ErrorType.Missing, "proof", Keywords.TYPE);
                     }
 
-                    throw new DataError(ErrorType.Unknown, "cryptoSuiteType");
+                    throw new VerificationError(Code.UnknownCryptoSuite);
                 }
 
                 final EmbeddedProof proof = embeddedProof.get();
@@ -235,7 +236,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
             return didDocument
                         .getVerificationMethod()
                         .stream()
-                        .filter(vm -> Ed25519VerificationKey2020.TYPE.equals(vm.getType()))
+                        .filter(vm -> Ed25519VerificationKey2020.TYPE.equals(vm.getType()) || Ed25519KeyPair2020.TYPE.equals(vm.getType()))
                         .map(VerificationKey.class::cast)
                         .findAny()
                         .orElseThrow(IllegalStateException::new); 
