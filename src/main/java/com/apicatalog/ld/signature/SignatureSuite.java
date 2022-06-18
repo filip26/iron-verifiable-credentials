@@ -17,17 +17,20 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     private final CanonicalizationAlgorithm canonicalization;
     private final DigestAlgorithm digester;
     private final SignatureAlgorithm signer;
+    private final SignatureAdapter adapter;
 
     public SignatureSuite(
             String id,
             CanonicalizationAlgorithm canonicalization,
             DigestAlgorithm digester,
-            SignatureAlgorithm signer
+            SignatureAlgorithm signer,
+            SignatureAdapter adapter
             ) {
         this.id = id;
         this.canonicalization = canonicalization;
         this.digester = digester;
         this.signer = signer;
+        this.adapter = adapter;
     }
 
     @Override
@@ -57,5 +60,9 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
 
     public String getId() {
         return id;
+    }
+    
+    public SignatureAdapter getAdapter() {
+        return adapter;
     }
 }

@@ -16,8 +16,8 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
-import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.DefaultSignatureAdapters;
+import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonArray;

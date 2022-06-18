@@ -15,7 +15,8 @@ public final class Ed25519Signature2020 extends SignatureSuite {
             TYPE,
             new Urdna2015(),
             new MessageDigest("SHA-256"),
-            new SunSignatureProvider("Ed25519")
+            new SunSignatureProvider("Ed25519"),
+            new Ed25519SignatureAdapter()
             );
     }
     
