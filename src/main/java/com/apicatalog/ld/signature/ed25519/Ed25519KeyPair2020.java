@@ -21,7 +21,7 @@ public class Ed25519KeyPair2020 extends Ed25519VerificationKey2020 implements Ke
     protected byte[] privateKey;
 
     public Ed25519KeyPair2020(final URI id) {
-        super(id, "https://w3id.org/security#Ed25519KeyPair2020");
+        super(id, BASE + TYPE);
     }
 
     public static boolean isIstanceOf(final JsonValue object) {

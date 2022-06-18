@@ -33,7 +33,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
 
     protected static final String CONTROLLER = "controller";
     protected static final String PUBLIC_KEY_MULTIBASE = "publicKeyMultibase";
-    protected static final String PUBLIC_KEY_TYPE = "https://w3id.org/security#multibase";
+    protected static final String PUBLIC_KEY_TYPE_VALUE = "https://w3id.org/security#multibase";
 
     protected final URI id;
     protected final String type;
@@ -152,7 +152,7 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
             throw new DataError();
         }
 
-        if (!JsonLdUtils.isTypeOf(PUBLIC_KEY_TYPE, key.asJsonObject())) {
+        if (!JsonLdUtils.isTypeOf(PUBLIC_KEY_TYPE_VALUE, key.asJsonObject())) {
             throw new DataError();
         }
 
@@ -198,6 +198,6 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
 
         final String multibase = Multibase.encode(Algorithm.Base58Btc, encoded);
 
-        return JsonLdUtils.setValue(builder, property, "https://w3id.org/security#multibase", multibase);
+        return JsonLdUtils.setValue(builder, property, PUBLIC_KEY_TYPE_VALUE, multibase);
     }
 }
