@@ -1,18 +1,13 @@
-package com.apicatalog.vc;
+package com.apicatalog.ld.signature;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.ld.signature.ed25519.Ed25519SignatureAdapter;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
-import com.apicatalog.ld.signature.proof.SignatureAdapter;
 
 import jakarta.json.JsonValue;
 
@@ -20,10 +15,6 @@ public class SignatureAdapters implements SignatureAdapter {
 
     protected Collection<SignatureAdapter> adapters;
     
-    public SignatureAdapters() {
-        this(Arrays.asList(new SignatureAdapter[] { new Ed25519SignatureAdapter() }));
-    }
-
     public SignatureAdapters(Collection<SignatureAdapter> adapters) {
         this.adapters = adapters;
     }

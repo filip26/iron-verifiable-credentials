@@ -29,7 +29,7 @@ import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.vc.CredentialStatus;
 import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.StatusVerifier;
-import com.apicatalog.vc.SignatureAdapters;
+import com.apicatalog.vc.DefaultSignatureAdapters;
 import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonArray;
@@ -94,7 +94,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
         }
         
         if (signatureAdapter == null) {
-            signatureAdapter = new SignatureAdapters();
+            signatureAdapter = new DefaultSignatureAdapters();
         }
 
         if (document != null) {

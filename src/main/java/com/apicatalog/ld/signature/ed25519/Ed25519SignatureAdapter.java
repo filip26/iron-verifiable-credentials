@@ -4,12 +4,12 @@ import java.util.Optional;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.SignatureAdapter;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
-import com.apicatalog.ld.signature.proof.SignatureAdapter;
 
 import jakarta.json.JsonValue;
 
