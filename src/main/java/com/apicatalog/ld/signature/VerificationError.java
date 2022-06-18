@@ -5,7 +5,8 @@ public class VerificationError extends Throwable {
     public enum Code {
         Unknown,
         Expired,
-        InvalidSignature,
+        InvalidSignature, 
+        InvalidProofDomain,
     }
 
     private static final long serialVersionUID = -3280731333804856855L;
@@ -17,7 +18,7 @@ public class VerificationError extends Throwable {
     }
 
     public VerificationError(Code type) {
-        super();
+        super(type.name());
         this.code = type;
     }
 
@@ -32,5 +33,5 @@ public class VerificationError extends Throwable {
 
     public Code getCode() {
         return code;
-    }
+    }    
 }

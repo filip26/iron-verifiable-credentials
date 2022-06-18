@@ -204,7 +204,7 @@
             "name": "valid proof domain property",
             "input": "verifier/0023-in.jsonld",
             "options": {
-                "domain": "4jt78h47fh"
+                "domain": "4jt78h47fh47"
             }
         },
         {

@@ -60,14 +60,13 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VeriferTest")) {
 
-                Vc.verify(testCase.input).loader(LOADER).isValid();
+                Vc.verify(testCase.input).loader(LOADER).domain(testCase.domain).isValid();
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssuerTest")) {
 
                 assertNotNull(testCase.result);
 
-                //FIXME
                 Ed25519ProofOptions2020 options = new Ed25519ProofOptions2020();
                 options.setCreated(testCase.created);
                 options.setVerificationMethod(testCase.verificationMethod);

@@ -25,10 +25,13 @@ All PR's welcome!
 ```java
 
 try {
+
   Vc.verify(credentials)
-    .statusVerifier(...)    // optional
-    .didResolver(...)       // optional  
+    .domain("...")
+    .statusVerifier(...)
+    .didResolver(...)   
     .isValid();
+    
 } catch (VerificationError | DataError e) {
   ...
 }
