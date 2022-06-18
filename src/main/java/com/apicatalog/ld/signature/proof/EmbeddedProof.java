@@ -34,7 +34,7 @@ public abstract class EmbeddedProof implements Proof {
     protected static final String PROOF = "proof";
     protected static final String PROOF_PURPOSE = "proofPurpose";
     protected static final String PROOF_VERIFICATION_METHOD = "verificationMethod";
-    protected static final String PROOF_DOMAIN = "https://w3id.org/security#domain";
+    protected static final String PROOF_DOMAIN = "domain";
     protected static final String PROOF_VALUE = "proofValue";
 
     protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
@@ -191,7 +191,7 @@ public abstract class EmbeddedProof implements Proof {
         }
 
         if (domain != null) {
-            //TODO
+            JsonLdUtils.setValue(root, BASE + PROOF_DOMAIN, domain);
         }
 
         if (value != null) {

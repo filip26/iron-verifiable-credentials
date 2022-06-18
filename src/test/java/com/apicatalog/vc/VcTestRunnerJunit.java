@@ -93,7 +93,7 @@ public class VcTestRunnerJunit {
                     signed = issuer.getCompacted(testCase.context);
 
                 } else {
-                    signed = issuer.get();
+                    signed = issuer.getExpanded();
                 }
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);

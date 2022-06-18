@@ -35,7 +35,7 @@ try {
 
 signed = Vc.sign(credentials, keys, proofOptions)
            .loader(documentLoader) // optional custom loader
-           .get();   // returns signed document in expanded form
+           .getExpanded(); // returns signed document in expanded form
 
 signed = Vc.sign(credentials, keys, proofOptions)
            .getCompacted(context); // returns signed document in compacted form
