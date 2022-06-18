@@ -34,7 +34,7 @@ public abstract class EmbeddedProof implements Proof {
     protected static final String PROOF = "proof";
     protected static final String PROOF_PURPOSE = "proofPurpose";
     protected static final String PROOF_VERIFICATION_METHOD = "verificationMethod";
-    protected static final String PROOF_DOMAIN = "https://w3id.org/security#domain";
+    protected static final String PROOF_DOMAIN = "domain";
     protected static final String PROOF_VALUE = "proofValue";
 
     protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
@@ -160,8 +160,13 @@ public abstract class EmbeddedProof implements Proof {
             throw new DataError(ErrorType.Invalid, "created");
         }
 
+        // domain property
+        if (proofObject.containsKey(BASE + PROOF_DOMAIN)) {
+            embeddedProof.domain = ValueObject.getValue(proofObject.get(BASE + PROOF_DOMAIN).asJsonArray().get(0)).filter(JsonUtils::isString)
+                    .map(JsonString.class::cast)
+                    .map(JsonString::getString).orElseThrow(DataError::new);
+        }
 
-        //TODO domain property
 
         return embeddedProof;
     }
@@ -191,7 +196,7 @@ public abstract class EmbeddedProof implements Proof {
         }
 
         if (domain != null) {
-            //TODO
+            JsonLdUtils.setValue(root, BASE + PROOF_DOMAIN, domain);
         }
 
         if (value != null) {

@@ -11,6 +11,7 @@ import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -40,6 +41,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     private final URI location;
     private final JsonObject document;
 
+    private String domain = null;
     private StatusVerifier statusVerifier = null;
     private DidResolver didResolver = null;
 
@@ -67,6 +69,11 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
 
     public VerifierApi didResolver(final DidResolver didResolver) {
         this.didResolver = didResolver;
+        return this;
+    }
+    
+    public VerifierApi domain(final String domain) {
+        this.domain = domain;
         return this;
     }
 
@@ -168,6 +175,11 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
                 }
 
                 final EmbeddedProof proof = Ed25519Proof2020.from(proofValue, loader);
+
+                // check domain
+                if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
+                    throw new VerificationError(Code.InvalidProofDomain);
+                }
 
                 final JsonObject proofObject = proofValue.asJsonObject();
 

@@ -6,7 +6,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-//TODO use Titanium 1.3.1
+//TODO use Titanium 1.4.0
 public class JsonLdValueObject {
 
     public static final JsonObject create(String type, String value) {
@@ -18,6 +18,12 @@ public class JsonLdValueObject {
 
     public static final JsonValue toJson(String type, String value) {
         return Json.createArrayBuilder().add(create(type, value)).build();
-
     }
+    
+    public static final JsonValue toJson(String value) {
+        return Json.createObjectBuilder()
+                .add(Keywords.VALUE, value)
+                .build();
+    }
+
 }

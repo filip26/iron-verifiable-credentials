@@ -60,19 +60,19 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VeriferTest")) {
 
-                Vc.verify(testCase.input).loader(LOADER).isValid();
+                Vc.verify(testCase.input).loader(LOADER).domain(testCase.domain).isValid();
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 
             } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssuerTest")) {
 
                 assertNotNull(testCase.result);
 
-                //FIXME
                 Ed25519ProofOptions2020 options = new Ed25519ProofOptions2020();
                 options.setCreated(testCase.created);
                 options.setVerificationMethod(testCase.verificationMethod);
                 options.setPurpose(URI.create("https://w3id.org/security#assertionMethod"));//TODO make it configurable
-
+                options.setDomain(testCase.domain);
+                
                 URI keyPairLocation = testCase.keyPair;
 
                 if (keyPairLocation == null) {
@@ -80,8 +80,11 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create("https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json");
                 }
 
-                IssuerApi issuer = Vc.sign(testCase.input, keyPairLocation, options).loader(LOADER);
-
+                IssuerApi issuer = Vc
+                                    .sign(testCase.input, keyPairLocation, options)
+                                    .loader(LOADER)
+                                    ;
+                
                 JsonObject signed = null;
 
                 if (testCase.context != null) {
@@ -89,7 +92,7 @@ public class VcTestRunnerJunit {
                     signed = issuer.getCompacted(testCase.context);
 
                 } else {
-                    signed = issuer.get();
+                    signed = issuer.getExpanded();
                 }
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);

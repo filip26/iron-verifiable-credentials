@@ -10,7 +10,7 @@
     <relativePath>pom_parent.xml</relativePath>
   </parent>
 
-  <artifactId>iron-vc-jre8</artifactId>
+  <artifactId>iron-verifiable-credentials-jre8</artifactId>
   <packaging>jar</packaging>
 
   <name>Iron Verifiable Credentials (JRE8)</name>

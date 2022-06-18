@@ -60,7 +60,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
      * @throws SigningError
      * @throws DataError
      */
-    public JsonObject get() throws SigningError, DataError {
+    public JsonObject getExpanded() throws SigningError, DataError {
 
         if (loader == null) {
             // default loader
@@ -90,9 +90,9 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
      * @throws SigningError
      * @throws DataError
      */
-    public JsonObject getCompacted(URI context)  throws SigningError, DataError {
+    public JsonObject getCompacted(final URI context)  throws SigningError, DataError {
 
-        final JsonObject signed = get();
+        final JsonObject signed = getExpanded();
 
         try {
             return JsonLd.compact(JsonDocument.of(signed), context).loader(loader).get();
@@ -101,7 +101,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         }
     }
 
-    private final JsonObject sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataError, SigningError {
+    private final JsonObject sign(final URI documentLocation, final URI keyPairLocation, final ProofOptions options) throws DataError, SigningError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).base(base).get();
@@ -131,7 +131,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         }
     }
 
-    private static final JsonObject sign(JsonArray expanded, KeyPair keyPair, ProofOptions options) throws SigningError, DataError {
+    private static final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DataError {
 
         final JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
