@@ -51,32 +51,25 @@
                 <activeByDefault>false</activeByDefault>
                 <jdk>1.8</jdk>
             </activation>
-  <properties>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <envSources>src/main/java8</envSources>
-    <okhttp.version>4.10.0</okhttp.version>
-    <tink.version>1.6.1</tink.version>
-  </properties>
-
-
-  <dependencies>
-    <dependency>
-      <groupId>com.apicatalog</groupId>
-      <artifactId>titanium-json-ld-jre8</artifactId>
-      <version>${titanium.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.squareup.okhttp3</groupId>
-      <artifactId>okhttp</artifactId>
-      <version>${okhttp.version}</version>
-    </dependency>   
-    <dependency>
-      <groupId>com.google.crypto.tink</groupId>
-      <artifactId>tink</artifactId>
-      <version>${tink.version}</version>
-    </dependency>         
-  </dependencies>
+          <properties>
+            <maven.compiler.target>1.8</maven.compiler.target>
+            <maven.compiler.source>1.8</maven.compiler.source>
+            <envSources>src/main/java8</envSources>
+            <tink.version>1.6.1</tink.version>
+          </properties>
+                
+          <dependencies>
+            <dependency>
+              <groupId>com.apicatalog</groupId>
+              <artifactId>titanium-json-ld-jre8</artifactId>
+              <version>${titanium.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>com.google.crypto.tink</groupId>
+              <artifactId>tink</artifactId>
+              <version>${tink.version}</version>
+            </dependency>         
+          </dependencies>
 
    
     </profile>
