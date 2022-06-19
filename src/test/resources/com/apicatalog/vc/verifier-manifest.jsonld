@@ -84,7 +84,7 @@
 				"PositiveEvaluationTest",
 				"VeriferTest"
 			],
-			"name": "embedded verification method",
+			"name": "valid VC with embedded verification method",
 			"input": "verifier/0008-in.jsonld"
 		},
 		{
@@ -167,6 +167,16 @@
 			"input": "verifier/0016-in.jsonld",
 			"expectErrorCode": "InvalidProofValue"
 		},
+        {
+            "@id": "#t0017",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "unsupported proofValue codec",
+            "input": "verifier/0017-in.jsonld",
+            "expectErrorCode": "InvalidProofValue"
+        },
 		{
 			"@id": "#t0020",
 			"@type": [
