@@ -15,7 +15,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 * Issuing VC/VP
 * Signature
   * Ed25519 Signature 2020
-  
+* [HTTP API & Service](https://github.com/filip26/vc-http-api)
 
 # Usage
 
