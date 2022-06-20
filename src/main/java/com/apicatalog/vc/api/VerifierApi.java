@@ -135,6 +135,11 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     }
 
     private void verifyExpanded(JsonArray expanded) throws VerificationError, DataError {
+        
+        if (expanded == null || expanded.isEmpty()) {
+            throw new DataError(ErrorType.Invalid, "document");
+        }
+        
         for (final JsonValue item : expanded) {
             if (JsonUtils.isNotObject(item)) {
                 throw new VerificationError(); //TODO code
