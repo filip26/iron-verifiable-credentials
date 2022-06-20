@@ -35,7 +35,6 @@ public class Urdna2015 implements CanonicalizationAlgorithm {
             rdfWriter.write(canonical);
 
             return writer.toString()
-                    .substring(0, writer.toString().length() -1)
                     .getBytes(StandardCharsets.UTF_8);
 
         } catch (JsonLdError | UnsupportedContentException | IOException | RdfWriterException e) {

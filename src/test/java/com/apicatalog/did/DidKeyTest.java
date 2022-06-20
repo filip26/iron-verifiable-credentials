@@ -80,7 +80,11 @@ class DidKeyTest {
                     Codec.Ed25519PublicKey,
                     32
                     ),
-
+            DidKeyTestCase.create(
+                    "did:key:z6MkiVQTYk3L2XKY6yg6MyeN2QLE5QkKcXByUeY1dkdiLx4j",
+                    Codec.Ed25519PublicKey,
+                    32
+                    ),
             // invalid keys
             DidKeyTestCase.create("http:key:z6MkicdicToW5HbxPP7zZV1H7RHvXgRMhoujWAF2n5WQkdd2"),
             DidKeyTestCase.create("did:example:z6MkicdicToW5HbxPP7zZV1H7RHvXgRMhoujWAF2n5WQkdd2"),

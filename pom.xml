@@ -42,7 +42,7 @@
       <version>${rdf-urdna.version}</version>
     </dependency>
   </dependencies>
-  
+
   <profiles>
    <!--  Android Dev Build to support Eclipse IDE -->
         <profile>
@@ -70,8 +70,6 @@
               <version>${tink.version}</version>
             </dependency>         
           </dependencies>
-
-   
     </profile>
   </profiles>
 </project>

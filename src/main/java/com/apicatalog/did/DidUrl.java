@@ -36,7 +36,7 @@ public class DidUrl extends Did {
         return from(uri, uri.getSchemeSpecificPart().split(":"), 3);
     }
 
-    
+
     public static boolean isDidUrl(final URI uri) {
         return Did.SCHEME.equals(uri.getScheme());
     }

@@ -29,7 +29,6 @@ public class SunSignatureProvider implements SignatureAlgorithm {
 
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
-
         try {
             java.security.Signature suite = java.security.Signature.getInstance(type);
 
