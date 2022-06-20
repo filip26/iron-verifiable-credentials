@@ -177,6 +177,16 @@
             "input": "verifier/0017-in.jsonld",
             "expectErrorCode": "InvalidProofValue"
         },
+        {
+            "@id": "#t0018",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid document using embededed credentials",
+            "input": "verifier/0018-in.jsonld",
+            "expectErrorCode": "InvalidDocument"
+        },
 		{
 			"@id": "#t0020",
 			"@type": [
