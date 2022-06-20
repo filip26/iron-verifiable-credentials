@@ -15,9 +15,11 @@ public class Multicodec {
 
     public enum Type {
         Key,
+        Multihash,
     }
 
     public enum Codec {
+        Identity(Type.Multihash, new byte[]{(byte)0x00}),
         Ed25519PublicKey(Type.Key,  new byte[]{(byte)0xed, (byte)0x01}),
         Ed25519PrivateKey(Type.Key, new byte[]{(byte)0x13, (byte)0x00}),
         X25519PublicKey(Type.Key, new byte[]{(byte)0xec}),
@@ -51,6 +53,7 @@ public class Multicodec {
     private static Map<Integer, Codec> KEY_REGISTRY = new HashMap<>();
 
     static {
+        add(Codec.Identity);
         add(Codec.Ed25519PublicKey);
         add(Codec.Ed25519PrivateKey);
         add(Codec.X25519PublicKey);

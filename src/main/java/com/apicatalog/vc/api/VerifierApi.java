@@ -4,10 +4,9 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 
-import com.apicatalog.did.Did;
 import com.apicatalog.did.DidDocument;
 import com.apicatalog.did.DidResolver;
-import com.apicatalog.did.key.DidKey;
+import com.apicatalog.did.DidUrl;
 import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -135,11 +134,11 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     }
 
     private void verifyExpanded(JsonArray expanded) throws VerificationError, DataError {
-        
+
         if (expanded == null || expanded.isEmpty()) {
             throw new DataError(ErrorType.Invalid, "document");
         }
-        
+
         for (final JsonValue item : expanded) {
             if (JsonUtils.isNotObject(item)) {
                 throw new VerificationError(); //TODO code
@@ -155,7 +154,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
 
         // is expired?
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
-            throw new VerificationError(Code.Expired);
+//            throw new VerificationError(Code.Expired);
         }
 
         // proof set
@@ -227,7 +226,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     // refresh/fetch verification method
     final VerificationKey get(final URI id, final SignatureAdapter adapter) throws JsonLdError, DataError {
 
-        if (DidKey.isDidKey(id)) {
+        if (DidUrl.isDidUrl(id)) {
 
             DidResolver resolver = didResolver;
 
@@ -235,7 +234,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
                 resolver = new DidKeyResolver();
             }
 
-            DidDocument didDocument = resolver.resolve(Did.from(id));
+            final DidDocument didDocument = resolver.resolve(DidUrl.from(id));
 
             return didDocument
                         .getVerificationMethod()

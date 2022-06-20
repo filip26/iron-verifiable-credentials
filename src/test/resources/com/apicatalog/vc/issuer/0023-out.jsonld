@@ -9,7 +9,7 @@
         "verificationMethod": "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y",
         "created": "2022-05-28T17:02:05Z",
         "proofPurpose": "assertionMethod",
-        "proofValue": "z6BKCUGHkj43gKvCuxfM6fF17zDnJkNV4xr2EgR9qo33qHkkeEqweKeXZpF77UkDFp6s3YP8HUXqJRhzXPeMxFjM"
+        "proofValue": "z3aTVwakBRYkJScYKeCcVh1NTogaj7UTA83B1TrEqKsBJwstWAvv9qekPXGvCZeptq7vTEk8VHBtK4EQLEWc7uYMC"
     },
     "@context": [
         "https://www.w3.org/2018/credentials/v1",

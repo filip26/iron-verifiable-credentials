@@ -27,6 +27,16 @@ public class DidUrl extends Did {
         return new DidUrl(did, path, query, fragment);
     }
 
+    public static Did from(final URI uri) {
+
+        if (!isDidUrl(uri)) {
+            throw new IllegalArgumentException("The URI [" + uri + "] is not valid DID URL, does not start with 'did:'.");
+        }
+
+        return from(uri, uri.getSchemeSpecificPart().split(":"), 3);
+    }
+
+
     public static boolean isDidUrl(final URI uri) {
         return Did.SCHEME.equals(uri.getScheme());
     }
@@ -82,14 +92,14 @@ public class DidUrl extends Did {
         }
 
         if (StringUtils.isNotBlank(query)) {
-            if (path.charAt(0) != '?') {
+            if (query.charAt(0) != '?') {
                 builder.append('?');
             }
             builder.append(query);
         }
 
         if (StringUtils.isNotBlank(fragment)) {
-            if (path.charAt(0) != '#') {
+            if (fragment.charAt(0) != '#') {
                 builder.append('#');
             }
             builder.append(fragment);

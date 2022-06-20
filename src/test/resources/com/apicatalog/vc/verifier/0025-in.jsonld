@@ -1,0 +1,23 @@
+{
+	"@context": [
+		"https://www.w3.org/2018/credentials/v1",
+		"https://w3id.org/security/suites/ed25519-2020/v1"
+	],
+	"issuanceDate": "2022-03-31T19:21:25Z",
+	"issuer": "did:key:z6MkiVQTYk3L2XKY6yg6MyeN2QLE5QkKcXByUeY1dkdiLx4j",
+	"type": [
+		"VerifiableCredential"
+	],
+	"credentialSubject": {
+		"id": "did:key:z6MkhTNL7i2etLerDK8Acz5t528giE5KA4p75T6ka1E1D74r"
+	},
+	"id": "urn:uuid:797f719c-e4ac-4e9e-8da8-bc60a9c8ba91",
+	"proof": {
+		"proofPurpose": "assertionMethod",
+		"verificationMethod": "did:key:z6MkiVQTYk3L2XKY6yg6MyeN2QLE5QkKcXByUeY1dkdiLx4j#z6MkiVQTYk3L2XKY6yg6MyeN2QLE5QkKcXByUeY1dkdiLx4j",
+		"type": "Ed25519Signature2020",
+		"created": "2022-03-31T19:21:26Z",
+		"proofValue": "z4ngCxM3oqs6Fxq4NcgzXT8XugTK92EeHxkux8CjdZwSbFqMZVDQqBJcXb3MUcfbDWzsCoDA3pYAYJDqYbCtMvXxz"
+	},
+	"expirationDate": "2022-05-31T19:21:25Z"
+}

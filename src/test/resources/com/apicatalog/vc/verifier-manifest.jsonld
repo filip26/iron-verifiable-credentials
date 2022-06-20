@@ -240,6 +240,15 @@
             },
             "expectErrorCode": "InvalidProofDomain"            
         },
+        {
+            "@id": "#t0025",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "did:key verification method",
+            "input": "verifier/0025-in.jsonld"            
+        },
 		{
 			"@id": "#t0050",
 			"@type": [
