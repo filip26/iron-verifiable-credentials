@@ -154,7 +154,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
 
         // is expired?
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
-//            throw new VerificationError(Code.Expired);
+            throw new VerificationError(Code.Expired);
         }
 
         // proof set
