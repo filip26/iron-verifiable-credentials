@@ -1,15 +1,15 @@
 {
-	"@context": [
-		"context.jsonld",
-		{
-			"@base": "manifest"
-		}
-	],
-	"@id": "",
-	"@type": "mf:Manifest",
-	"name": "Verifiable Credentials Test Suite",
-	"sequence": [
-		"verifier-manifest.jsonld",
-		"issuer-manifest.jsonld"
-	]
+    "@context": [
+        "context.jsonld",
+        {
+            "@base": "manifest"
+        }
+    ],
+    "@id": "",
+    "@type": "mf:Manifest",
+    "name": "Verifiable Credentials Test Suite",
+    "sequence": [
+        "verifier-manifest.jsonld",
+        "issuer-manifest.jsonld"
+    ]
 }

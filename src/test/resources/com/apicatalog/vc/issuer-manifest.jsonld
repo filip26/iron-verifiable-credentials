@@ -1,186 +1,186 @@
 {
-	"@context": [
-		"context.jsonld",
-		{
-			"@base": "issuer-manifest"
-		}
-	],
-	"@id": "",
-	"@type": "mf:Manifest",
-	"name": "Verifiable Credentials Issuer Test Suite",
-	"sequence": [
-		{
-			"@id": "#t0001",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "missing @type property",
-			"input": "issuer/0001-in.jsonld",
-			"expectErrorCode": "MissingType"
-		},
-		{
-			"@id": "#t0002",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "@type must be VerifiableCredentials",
-			"input": "issuer/0002-in.jsonld",
-			"expectErrorCode": "UnknownType"
-		},
-		{
-			"@id": "#t0003",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "missing issuer property",
-			"input": "issuer/0003-in.jsonld",
-			"expectErrorCode": "MissingIssuer"
-		},
-		{
-			"@id": "#t0004",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "issuer @id must be IRI",
-			"input": "issuer/0004-in.jsonld",
-			"expectErrorCode": "InvalidIssuer"
-		},
-		{
-			"@id": "#t0005",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "missing issuanceDate property",
-			"input": "issuer/0005-in.jsonld",
-			"expectErrorCode": "MissingIssuanceDate"
-		},
-		{
-			"@id": "#t0006",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "issuanceDate @type must be xsd:DateTime",
-			"input": "issuer/0006-in.jsonld",
-			"expectErrorCode": "InvalidIssuanceDateType"
-		},
-		{
-			"@id": "#t0007",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "invalid issuanceDate @value",
-			"input": "issuer/0007-in.jsonld",
-			"expectErrorCode": "InvalidIssuanceDateValue"
-		},
-		{
-			"@id": "#t0008",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "expirationDate @type must be xsd:DateTime",
-			"input": "issuer/0008-in.jsonld",
-			"expectErrorCode": "InvalidExpirationDateType"
-		},
-		{
-			"@id": "#t0009",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "invalid expirationDate @value",
-			"input": "issuer/0009-in.jsonld",
-			"expectErrorCode": "InvalidExpirationDateValue"
-		},
-		{
-			"@id": "#t0010",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "expired credentials",
-			"input": "issuer/0010-in.jsonld",
-			"expectErrorCode": "Expired"
-		},
-		{
-			"@id": "#t0011",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "missing credentialStatus @id",
-			"input": "issuer/0011-in.jsonld",
-			"expectErrorCode": "MissingStatusId"
-		},
-		{
-			"@id": "#t0012",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "missing credentialStatus @type",
-			"input": "issuer/0012-in.jsonld",
-			"expectErrorCode": "MissingStatusType"
-		},
-		{
-			"@id": "#t0020",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "a simple credential to sign",
-			"input": "issuer/0020-in.jsonld",
-			"expect": "issuer/0020-out.jsonld",
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "verifier/0005-verification-key.json",
-				"created": "2022-05-28T17:02:05Z"
-			}
-		},
-		{
-			"@id": "#t0021",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "compacted signed credential",
-			"input": "issuer/0021-in.jsonld",
-			"expect": "issuer/0021-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "verifier/0005-verification-key.json",
-				"created": "2022-06-04T20:33:01Z"
-			}
-		},
-		{
-			"@id": "#t0022",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "signed embedded verificationMethod",
-			"input": "issuer/0022-in.jsonld",
-			"expect": "issuer/0022-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": {
-					"@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-					"@type": "Ed25519VerificationKey2020",
-					"controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
-					"publicKeyMultibase": "z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"
-				},
-				"created": "2022-06-04T20:33:01Z"
-			}
-		},
+    "@context": [
+        "context.jsonld",
+        {
+            "@base": "issuer-manifest"
+        }
+    ],
+    "@id": "",
+    "@type": "mf:Manifest",
+    "name": "Verifiable Credentials Issuer Test Suite",
+    "sequence": [
+        {
+            "@id": "#t0001",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "missing @type property",
+            "input": "issuer/0001-in.jsonld",
+            "expectErrorCode": "MissingType"
+        },
+        {
+            "@id": "#t0002",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "@type must be VerifiableCredentials",
+            "input": "issuer/0002-in.jsonld",
+            "expectErrorCode": "UnknownType"
+        },
+        {
+            "@id": "#t0003",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "missing issuer property",
+            "input": "issuer/0003-in.jsonld",
+            "expectErrorCode": "MissingIssuer"
+        },
+        {
+            "@id": "#t0004",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "issuer @id must be IRI",
+            "input": "issuer/0004-in.jsonld",
+            "expectErrorCode": "InvalidIssuer"
+        },
+        {
+            "@id": "#t0005",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "missing issuanceDate property",
+            "input": "issuer/0005-in.jsonld",
+            "expectErrorCode": "MissingIssuanceDate"
+        },
+        {
+            "@id": "#t0006",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "issuanceDate @type must be xsd:DateTime",
+            "input": "issuer/0006-in.jsonld",
+            "expectErrorCode": "InvalidIssuanceDateType"
+        },
+        {
+            "@id": "#t0007",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "invalid issuanceDate @value",
+            "input": "issuer/0007-in.jsonld",
+            "expectErrorCode": "InvalidIssuanceDateValue"
+        },
+        {
+            "@id": "#t0008",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "expirationDate @type must be xsd:DateTime",
+            "input": "issuer/0008-in.jsonld",
+            "expectErrorCode": "InvalidExpirationDateType"
+        },
+        {
+            "@id": "#t0009",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "invalid expirationDate @value",
+            "input": "issuer/0009-in.jsonld",
+            "expectErrorCode": "InvalidExpirationDateValue"
+        },
+        {
+            "@id": "#t0010",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "expired credentials",
+            "input": "issuer/0010-in.jsonld",
+            "expectErrorCode": "Expired"
+        },
+        {
+            "@id": "#t0011",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "missing credentialStatus @id",
+            "input": "issuer/0011-in.jsonld",
+            "expectErrorCode": "MissingStatusId"
+        },
+        {
+            "@id": "#t0012",
+            "@type": [
+                "NegativeEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "missing credentialStatus @type",
+            "input": "issuer/0012-in.jsonld",
+            "expectErrorCode": "MissingStatusType"
+        },
+        {
+            "@id": "#t0020",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "a simple credential to sign",
+            "input": "issuer/0020-in.jsonld",
+            "expect": "issuer/0020-out.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verifier/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            }
+        },
+        {
+            "@id": "#t0021",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "compacted signed credential",
+            "input": "issuer/0021-in.jsonld",
+            "expect": "issuer/0021-out.jsonld",
+            "context": "issuer/0001-context.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verifier/0005-verification-key.json",
+                "created": "2022-06-04T20:33:01Z"
+            }
+        },
+        {
+            "@id": "#t0022",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "signed embedded verificationMethod",
+            "input": "issuer/0022-in.jsonld",
+            "expect": "issuer/0022-out.jsonld",
+            "context": "issuer/0001-context.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": {
+                    "@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+                    "@type": "Ed25519VerificationKey2020",
+                    "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
+                    "publicKeyMultibase": "z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"
+                },
+                "created": "2022-06-04T20:33:01Z"
+            }
+        },
         {
             "@id": "#t0023",
             "@type": [
@@ -196,7 +196,7 @@
                 "verificationMethod": "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y",
                 "created": "2022-05-28T17:02:05Z"
             }
-        },	
+        },
         {
             "@id": "#t0024",
             "@type": [
@@ -213,42 +213,42 @@
                 "created": "2022-06-18T19:00:44Z",
                 "domain": "4jt78h47fh47"
             }
-        },        	
-		{
-			"@id": "#t0030",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "proof set, co-sign",
-			"input": "issuer/0030-in.jsonld",
-			"expect": "issuer/0030-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": {
-					"@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-					"@type": "Ed25519VerificationKey2020",
-					"controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2"
-				},
-				"created": "2022-06-07T21:06:15Z"
-			}
-		},
-		{
-			"@id": "#t0050",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "compacted signed presentation",
-			"input": "issuer/0050-in.jsonld",
-			"expect": "issuer/0050-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "verifier/0005-verification-key.json",
-				"created": "2022-06-09T21:49:41Z"
-			}
-		}
-	]
+        },
+        {
+            "@id": "#t0030",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "proof set, co-sign",
+            "input": "issuer/0030-in.jsonld",
+            "expect": "issuer/0030-out.jsonld",
+            "context": "issuer/0001-context.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": {
+                    "@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+                    "@type": "Ed25519VerificationKey2020",
+                    "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2"
+                },
+                "created": "2022-06-07T21:06:15Z"
+            }
+        },
+        {
+            "@id": "#t0050",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "compacted signed presentation",
+            "input": "issuer/0050-in.jsonld",
+            "expect": "issuer/0050-out.jsonld",
+            "context": "issuer/0001-context.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verifier/0005-verification-key.json",
+                "created": "2022-06-09T21:49:41Z"
+            }
+        }
+    ]
 }
