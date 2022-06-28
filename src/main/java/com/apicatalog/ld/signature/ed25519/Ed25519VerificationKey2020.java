@@ -156,20 +156,30 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
             throw new DataError();
         }
 
-        final String privateKeyMultibase = ValueObject.getValue(key)
+        final String keyMultibase = ValueObject.getValue(key)
                 .filter(JsonUtils::isString)
                 .map(JsonString.class::cast)
                 .map(JsonString::getString)
                 .orElseThrow(DataError::new);
 
         // decode private key
-        final byte[] encodedKey = Multibase.decode(privateKeyMultibase);
+        final byte[] encodedKey = Multibase.decode(keyMultibase);
 
         final Codec codec = Multicodec.codec(Type.Key, encodedKey).orElseThrow(DataError::new);
 
         if (expected != codec) {
             throw new DataError();
         }
+
+        return Multicodec.decode(codec, encodedKey);
+    }
+    
+    public static byte[] decodeKey(final String multibase) throws DataError {
+        
+        // decode private key
+        final byte[] encodedKey = Multibase.decode(multibase);
+
+        final Codec codec = Multicodec.codec(Type.Key, encodedKey).orElseThrow(DataError::new);
 
         return Multicodec.decode(codec, encodedKey);
     }

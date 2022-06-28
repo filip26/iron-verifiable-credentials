@@ -39,7 +39,8 @@ public class Presentation implements Verifiable {
         return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
     }
 
-    public static Presentation from(JsonObject subject) throws DataError {
+    //TODO separate mandatory/optional validation
+    public static Presentation from(JsonObject subject, boolean issue /*FIXME hack, remove */) throws DataError {
 
         if (subject == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
@@ -77,7 +78,7 @@ public class Presentation implements Verifiable {
                 throw new DataError();
             }
 
-            presentation.credentials.add(Credential.from(credential.asJsonObject()));
+            presentation.credentials.add(Credential.from(credential.asJsonObject(), issue));
             //TODO proof somehow, do I need to parse it here?
         }
 

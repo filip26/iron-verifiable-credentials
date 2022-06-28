@@ -150,7 +150,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     private void verifyExpanded(JsonObject expanded) throws VerificationError, DataError {
 
         // data integrity checks
-        final Verifiable verifiable = Vc.get(expanded);
+        final Verifiable verifiable = Vc.get(expanded, false);
 
         // is expired?
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {

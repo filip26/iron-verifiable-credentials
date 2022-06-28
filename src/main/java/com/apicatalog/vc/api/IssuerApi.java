@@ -1,6 +1,7 @@
 package com.apicatalog.vc.api;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -16,12 +17,15 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.DefaultSignatureAdapters;
 import com.apicatalog.vc.StaticContextLoader;
 import com.apicatalog.vc.Verifiable;
 
+import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
 public final class IssuerApi extends CommonApi<IssuerApi> {
@@ -106,6 +110,17 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         }
     }
 
+    public JsonObject getCompacted(final JsonStructure context)  throws SigningError, DataError {
+
+        final JsonObject signed = getExpanded();
+
+        try {
+            return JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(context)).loader(loader).get();
+        } catch (JsonLdError e) {
+            throw new SigningError(e);
+        }
+    }
+
     private final JsonObject sign(final URI documentLocation, final URI keyPairLocation, final ProofOptions options) throws DataError, SigningError {
         try {
             // load the document
@@ -150,7 +165,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
                     //TODO ErrorCode
                 );
 
-        final Verifiable verifiable = Vc.get(object);
+        final Verifiable verifiable = Vc.get(object, true);
 
         // is expired?
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
@@ -167,7 +182,12 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
                                         .getSuiteByType(proof.getType())
                                         .orElseThrow(() -> new SigningError(Code.UnknownCryptoSuite));
 
-        final JsonObject data = EmbeddedProof.removeProof(object);
+        JsonObject data = EmbeddedProof.removeProof(object);
+        
+        // add issuance date if missing
+        if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
+            data = Json.createObjectBuilder(data).add(Credential.ISSUANCE_DATE, Instant.now().toString()).build();
+        }
 
         final LinkedDataSignature suite = new LinkedDataSignature(signatureSuite);
 
