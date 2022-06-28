@@ -88,6 +88,8 @@ public class Credential implements Verifiable {
         if (!JsonLdUtils.hasPredicate(subject, BASE + SUBJECT)) {
             throw new DataError(ErrorType.Missing, SUBJECT);
         }
+        
+        JsonLdUtils.assertId(subject, BASE, SUBJECT);   //TODO
 
         // issuer - mandatory
         credential.issuer = JsonLdUtils.assertId(subject, BASE, ISSUER);
