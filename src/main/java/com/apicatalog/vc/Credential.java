@@ -88,7 +88,7 @@ public class Credential implements Verifiable {
         if (!JsonLdUtils.hasPredicate(subject, BASE + SUBJECT)) {
             throw new DataError(ErrorType.Missing, SUBJECT);
         }
-        
+
         JsonLdUtils.assertId(subject, BASE, SUBJECT);   //TODO
 
         // issuer - mandatory
@@ -97,7 +97,7 @@ public class Credential implements Verifiable {
         // issuance date - mandatory for verification
         if (JsonLdUtils.hasPredicate(subject, BASE + ISSUANCE_DATE)) {
             credential.issuance = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
-            
+
         } else if (!issue) {
             throw new DataError(ErrorType.Missing, ISSUANCE_DATE);
         }

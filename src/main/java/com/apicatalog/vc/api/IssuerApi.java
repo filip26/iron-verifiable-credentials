@@ -184,12 +184,12 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
                                         .orElseThrow(() -> new SigningError(Code.UnknownCryptoSuite));
 
         JsonObject data = EmbeddedProof.removeProof(object);
-        
+
         // add issuance date if missing
         if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
 
             final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-            
+
             data = Json.createObjectBuilder(data).add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString()).build();
             object = Json.createObjectBuilder(object).add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString()).build();
         }

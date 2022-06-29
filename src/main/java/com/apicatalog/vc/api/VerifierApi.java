@@ -250,13 +250,13 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
             for (final JsonValue method : document) {
 
                 final Optional<VerificationKey> key = adapter.materializeKey(method);
-    
+
                 // take the first key that match
                 if (key.isPresent()) {
                     return key.get();
                 }
             }
-        
+
         } catch (JsonLdError e) {
             throw new VerificationError(e);
         }

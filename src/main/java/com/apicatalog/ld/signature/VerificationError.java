@@ -7,7 +7,7 @@ public class VerificationError extends Throwable {
         Expired,
         InvalidSignature,
         InvalidProofDomain,
-        UnknownCryptoSuite, 
+        UnknownCryptoSuite,
         UnknownVerificationKey,
     }
 

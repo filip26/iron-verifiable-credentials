@@ -173,9 +173,9 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
 
         return Multicodec.decode(codec, encodedKey);
     }
-    
+
     public static byte[] decodeKey(final String multibase) throws DataError {
-        
+
         // decode private key
         final byte[] encodedKey = Multibase.decode(multibase);
 
