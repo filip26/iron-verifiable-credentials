@@ -2,6 +2,7 @@ package com.apicatalog.vc.api;
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -160,7 +161,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
 
     private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DataError {
 
-        final JsonObject object = JsonUtils.findFirstObject(expanded).orElseThrow(() ->
+        JsonObject object = JsonUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
                     //TODO ErrorCode
                 );
@@ -186,7 +187,11 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         
         // add issuance date if missing
         if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
-            data = Json.createObjectBuilder(data).add(Credential.ISSUANCE_DATE, Instant.now().toString()).build();
+
+            final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            
+            data = Json.createObjectBuilder(data).add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString()).build();
+            object = Json.createObjectBuilder(object).add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString()).build();
         }
 
         final LinkedDataSignature suite = new LinkedDataSignature(signatureSuite);

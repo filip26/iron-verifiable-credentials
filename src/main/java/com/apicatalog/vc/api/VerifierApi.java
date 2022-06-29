@@ -193,28 +193,23 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
 
                 final JsonObject proofObject = proofValue.asJsonObject();
 
-                try {
+                final SignatureSuite suite =
+                        signatureAdapter
+                            .getSuiteByType(proof.getType())
+                            .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
 
-                    final SignatureSuite suite =
-                            signatureAdapter
-                                .getSuiteByType(proof.getType())
-                                .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
+                final VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), suite.getAdapter());
 
-                    final VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), suite.getAdapter());
+                final LinkedDataSignature signature = new LinkedDataSignature(suite);
 
-                    final LinkedDataSignature signature = new LinkedDataSignature(suite);
+                // verify signature
+                signature.verify(data, proofObject, verificationMethod, proof.getValue());
 
-                    // verify signature
-                    signature.verify(data, proofObject, verificationMethod, proof.getValue());
-
-                    // verify status
-                    if (statusVerifier != null && verifiable.isCredential()) {
-                        statusVerifier.verify(verifiable.asCredential().getCredentialStatus());
-                    }
-
-                } catch (JsonLdError e) {
-                    throw new VerificationError(e);
+                // verify status
+                if (statusVerifier != null && verifiable.isCredential()) {
+                    statusVerifier.verify(verifiable.asCredential().getCredentialStatus());
                 }
+
             }
 
             // all good
@@ -224,7 +219,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     }
 
     // refresh/fetch verification method
-    final VerificationKey get(final URI id, final SignatureAdapter adapter) throws JsonLdError, DataError {
+    final VerificationKey get(final URI id, final SignatureAdapter adapter) throws DataError, VerificationError {
 
         if (DidUrl.isDidUrl(id)) {
 
@@ -245,18 +240,27 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
                         .orElseThrow(IllegalStateException::new);
         }
 
-        final JsonArray document = JsonLd.expand(id).loader(loader).get();
+        try {
+            final JsonArray document = JsonLd
+                                            .expand(id)
+                                            .loader(loader)
+                                            .context("https://w3id.org/security/suites/ed25519-2020/v1")
+                                            .get();
 
-        for (final JsonValue method : document) {
+            for (final JsonValue method : document) {
 
-            final Optional<VerificationKey> key = adapter.materializeKey(method);
-
-            // take the first key that match
-            if (key.isPresent()) {
-                return key.get();
+                final Optional<VerificationKey> key = adapter.materializeKey(method);
+    
+                // take the first key that match
+                if (key.isPresent()) {
+                    return key.get();
+                }
             }
+        
+        } catch (JsonLdError e) {
+            throw new VerificationError(e);
         }
 
-        throw new IllegalStateException();
+        throw new VerificationError(Code.UnknownVerificationKey);
     }
 }
