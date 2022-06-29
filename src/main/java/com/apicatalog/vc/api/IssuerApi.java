@@ -100,7 +100,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
      * @throws SigningError
      * @throws DataError
      */
-    public JsonObject getCompacted(final URI context)  throws SigningError, DataError {
+    public JsonObject getCompacted(final URI context) throws SigningError, DataError {
 
         final JsonObject signed = getExpanded();
 
@@ -110,8 +110,24 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
             throw new SigningError(e);
         }
     }
+    
+    /**
+     * Get signed document compacted using standard contexts.
+     * 
+     * @return the signed document in compacted form
+     */
+    public JsonObject getCompacted() throws SigningError, DataError  {
+        
+        final JsonArray context = Json
+                                    .createArrayBuilder()
+                                    .add("https://www.w3.org/2018/credentials/v1")
+                                    .add("https://w3id.org/security/suites/ed25519-2020/v1")
+                                    .build();
 
-    public JsonObject getCompacted(final JsonStructure context)  throws SigningError, DataError {
+        return getCompacted(context);
+    }
+
+    public JsonObject getCompacted(final JsonStructure context) throws SigningError, DataError {
 
         final JsonObject signed = getExpanded();
 
