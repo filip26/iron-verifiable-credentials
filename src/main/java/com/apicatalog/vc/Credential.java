@@ -59,7 +59,8 @@ public class Credential implements Verifiable {
         return JsonUtils.isObject(subject) && JsonLdUtils.isTypeOf(BASE + TYPE, subject.asJsonObject());
     }
 
-    public static Credential from(JsonObject subject) throws DataError {
+    //TODO separate mandatory/optional validation
+    public static Credential from(JsonObject subject, boolean issue /*FIXME hack, remove */) throws DataError {
 
         if (subject == null) {
             throw new IllegalArgumentException("The 'subject' parameter must not be null.");
@@ -88,11 +89,18 @@ public class Credential implements Verifiable {
             throw new DataError(ErrorType.Missing, SUBJECT);
         }
 
+        JsonLdUtils.assertId(subject, BASE, SUBJECT);   //TODO
+
         // issuer - mandatory
         credential.issuer = JsonLdUtils.assertId(subject, BASE, ISSUER);
 
-        // issuance date - mandatory
-        credential.issuance = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
+        // issuance date - mandatory for verification
+        if (JsonLdUtils.hasPredicate(subject, BASE + ISSUANCE_DATE)) {
+            credential.issuance = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
+
+        } else if (!issue) {
+            throw new DataError(ErrorType.Missing, ISSUANCE_DATE);
+        }
 
         // expiration date - optional
         if (JsonLdUtils.hasPredicate(subject, BASE + EXPIRATION_DATE)) {

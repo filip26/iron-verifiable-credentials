@@ -8,6 +8,7 @@ public class VerificationError extends Throwable {
         InvalidSignature,
         InvalidProofDomain,
         UnknownCryptoSuite,
+        UnknownVerificationKey,
     }
 
     private static final long serialVersionUID = -3280731333804856855L;

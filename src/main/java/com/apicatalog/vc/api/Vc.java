@@ -91,14 +91,14 @@ public final class Vc {
         throw new KeyGenError(Code.UnknownCryptoSuite);
     }
 
-    protected static Verifiable get(JsonObject expanded) throws DataError {
+    protected static Verifiable get(JsonObject expanded, boolean issue /*FIXME hack remove */) throws DataError {
         // is a credential?
         if (Credential.isCredential(expanded)) {
 
             final JsonObject object = expanded.asJsonObject();
 
             // validate the credential object
-            final Credential credential = Credential.from(object);
+            final Credential credential = Credential.from(object, issue);
 
             return credential;
         }
@@ -109,7 +109,7 @@ public final class Vc {
             final JsonObject object =expanded.asJsonObject();
 
             // validate the presentation object
-            final Presentation presentation = Presentation.from(object);
+            final Presentation presentation = Presentation.from(object, issue);
 
             return presentation;
         }
