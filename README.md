@@ -11,12 +11,11 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 ## Features
 
-  * Verifying VC/VP
-  * Issuing VC/VP
-  * Signature
-    * Ed25519 Signature 2020
-  * [HTTP API & Service](https://github.com/filip26/vc-http-api)
-
+* Verifying VC/VP
+* Issuing VC/VP
+* Signature
+  * Ed25519 Signature 2020
+* [HTTP API & Service](https://github.com/filip26/vc-http-api)
 
 ## Usage
 
@@ -84,10 +83,10 @@ Fork and clone the project repository.
 ```
 
 ## Resources
-  * [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
-  * [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
-  * [Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
-  * [Data Integrity 1.0](https://w3c-ccg.github.io/data-integrity-spec/)
-  * [Ed25519 Signature 2020](https://w3c-ccg.github.io/lds-ed25519-2020/)
-  * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
-  * [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
+* [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
+* [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
+* [Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
+* [Data Integrity 1.0](https://w3c-ccg.github.io/data-integrity-spec/)
+* [Ed25519 Signature 2020](https://w3c-ccg.github.io/lds-ed25519-2020/)
+* [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
+* [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
