@@ -90,3 +90,13 @@ Fork and clone the project repository.
 * [Ed25519 Signature 2020](https://w3c-ccg.github.io/lds-ed25519-2020/)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
 * [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
+
+## Sponsors
+
+<a href="https://github.com/digitalbazaar">
+  <img src="https://avatars.githubusercontent.com/u/167436?s=200&v=4" width="40" />
+</a> 
+
+## Commercial Support
+Commercial support is available at filip26@gmail.com
+
