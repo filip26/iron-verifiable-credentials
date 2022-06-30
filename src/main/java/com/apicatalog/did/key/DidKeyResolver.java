@@ -12,7 +12,7 @@ public class DidKeyResolver implements DidResolver {
 
     private static final String MULTIKEY_TYPE = "Multikey";     //FIXME an absolute URI
     private static final String ED25519_VERIFICATION_KEY_2020_TYPE =  "https://w3id.org/security#Ed25519VerificationKey2020";
-    private static final String X25519_KEYAGREEMENT_KEY_2020_TYPE =  "https://w3id.org/security#X25519KeyAgreementKey2020";
+    //private static final String X25519_KEYAGREEMENT_KEY_2020_TYPE =  "https://w3id.org/security#X25519KeyAgreementKey2020";
 
     public DidKeyResolver() {
     }

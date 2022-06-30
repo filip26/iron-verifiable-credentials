@@ -177,7 +177,7 @@ public class JsonLdUtils {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
 
-        return com.apicatalog.jsonld.JsonUtils.findFirstObject(value)
+        return JsonLdUtils.findFirstObject(value)
                 .map(o -> o.get(Keywords.ID))
                 .filter(JsonUtils::isString)
                 .map(JsonString.class::cast)
@@ -218,4 +218,19 @@ public class JsonLdUtils {
         return setValue(objectBuilder, property, XSD_DATE_TIME, instant.toString());
     }
 
+    public static Optional<JsonObject> findFirstObject(JsonValue expanded) {
+        if (JsonUtils.isArray(expanded)) {
+
+            for (JsonValue item : expanded.asJsonArray()) {
+                if (JsonUtils.isObject(item)) {
+                    return Optional.of(item.asJsonObject());
+                }
+            }
+
+        } else if (JsonUtils.isObject(expanded)) {
+            return Optional.of(expanded.asJsonObject());
+        }
+
+        return Optional.empty();
+    }
 }

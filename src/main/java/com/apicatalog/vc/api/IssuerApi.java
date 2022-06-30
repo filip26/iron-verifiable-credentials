@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonUtils;
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.signature.DataError;
@@ -177,7 +177,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
 
     private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DataError {
 
-        JsonObject object = JsonUtils.findFirstObject(expanded).orElseThrow(() ->
+        JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
                     //TODO ErrorCode
                 );
