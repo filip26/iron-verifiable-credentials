@@ -110,14 +110,14 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
             throw new SigningError(e);
         }
     }
-    
+
     /**
      * Get signed document compacted using standard contexts.
-     * 
+     *
      * @return the signed document in compacted form
      */
     public JsonObject getCompacted() throws SigningError, DataError  {
-        
+
         final JsonArray context = Json
                                     .createArrayBuilder()
                                     .add("https://www.w3.org/2018/credentials/v1")

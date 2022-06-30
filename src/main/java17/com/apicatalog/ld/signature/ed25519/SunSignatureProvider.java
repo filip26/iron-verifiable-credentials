@@ -73,13 +73,13 @@ public class SunSignatureProvider implements SignatureAlgorithm {
 
         // determine if x was odd.
         boolean xisodd = false;
-        
+
         int lastbyteInt = publicKey[publicKey.length - 1];
-        
+
         if ((lastbyteInt & 255) >> 7 == 1) {
             xisodd = true;
         }
-        
+
         // make public key copy
         byte[] key = new byte[publicKey.length];
         System.arraycopy(publicKey, 0, key, 0, key.length);
@@ -88,7 +88,7 @@ public class SunSignatureProvider implements SignatureAlgorithm {
         key[key.length - 1] &= 127;
 
         key = reverse(key);
-        
+
         BigInteger y = new BigInteger(1, key);
 
         NamedParameterSpec paramSpec = new NamedParameterSpec(type);
