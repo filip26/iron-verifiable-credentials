@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 
@@ -13,7 +13,7 @@ import jakarta.json.JsonValue;
  * see {@link https://www.w3.org/TR/vc-data-model/#status}
  *
  */
-public class CredentialStatus {
+class CredentialStatus implements StatusVerifier.Status {
 
     private URI id;
     private String type;
@@ -32,14 +32,15 @@ public class CredentialStatus {
 
         status.id = JsonLdUtils.getId(object).orElseThrow(() -> new DataError(ErrorType.Missing, "status", Keywords.ID));
 
-
         return status;
     }
 
+    @Override
     public URI getId() {
         return id;
     }
 
+    @Override
     public String getType() {
         return type;
     }

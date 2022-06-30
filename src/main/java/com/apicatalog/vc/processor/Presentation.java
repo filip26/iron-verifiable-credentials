@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import com.apicatalog.ld.signature.DataError.ErrorType;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class Presentation implements Verifiable {
+class Presentation implements Verifiable {
 
     public static final String BASE = "https://www.w3.org/2018/credentials#";
 

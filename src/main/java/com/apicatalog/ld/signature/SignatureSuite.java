@@ -54,7 +54,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     }
 
     @Override
-    public KeyPair keygen(int length) {
+    public KeyPair keygen(int length) throws KeyGenError {
         return signer.keygen(length);
     }
 

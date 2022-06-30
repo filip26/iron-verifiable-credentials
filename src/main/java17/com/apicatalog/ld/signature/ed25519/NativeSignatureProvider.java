@@ -19,11 +19,11 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 
-public class SunSignatureProvider implements SignatureAlgorithm {
+class NativeSignatureProvider implements SignatureAlgorithm {
 
     private final String type;
 
-    public SunSignatureProvider(String type) {
+    public NativeSignatureProvider(String type) {
         this.type = type;
     }
 
@@ -64,7 +64,7 @@ public class SunSignatureProvider implements SignatureAlgorithm {
 
     @Override
     public KeyPair keygen(final int length) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Use iron-verifiable-credentials-jre8");
     }
 
     private PublicKey getPublicKey(final byte[] publicKey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {

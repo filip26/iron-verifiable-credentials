@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 import java.time.Instant;
@@ -19,7 +19,7 @@ import jakarta.json.JsonValue;
  *
  * see {@link https://www.w3.org/TR/vc-data-model/#credentials}
  */
-public class Credential implements Verifiable {
+class Credential implements Verifiable {
 
     public static final String BASE = "https://www.w3.org/2018/credentials#";
 

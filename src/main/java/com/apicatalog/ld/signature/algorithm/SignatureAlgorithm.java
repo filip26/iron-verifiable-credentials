@@ -1,5 +1,6 @@
 package com.apicatalog.ld.signature.algorithm;
 
+import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 
@@ -14,7 +15,7 @@ public interface SignatureAlgorithm {
 
     byte[] sign(byte[] privateKey, byte[] data) throws SigningError;
 
-    KeyPair keygen( int length);
+    KeyPair keygen(int length) throws KeyGenError;
 
     public class KeyPair {
         byte[] publicKey;

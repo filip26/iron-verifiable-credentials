@@ -1,4 +1,4 @@
-package com.apicatalog.vc.api;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 import java.util.Collection;
@@ -25,17 +25,13 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
-import com.apicatalog.vc.CredentialStatus;
-import com.apicatalog.vc.DefaultSignatureAdapters;
-import com.apicatalog.vc.StaticContextLoader;
-import com.apicatalog.vc.StatusVerifier;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public final class VerifierApi extends CommonApi<VerifierApi> {
+public final class Verifier extends Processor<Verifier> {
 
     private final URI location;
     private final JsonObject document;
@@ -44,12 +40,12 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     private StatusVerifier statusVerifier = null;
     private DidResolver didResolver = null;
 
-    protected VerifierApi(URI location) {
+    public Verifier(URI location) {
         this.location = location;
         this.document = null;
     }
 
-    protected VerifierApi(JsonObject document) {
+    public Verifier(JsonObject document) {
         this.document = document;
         this.location = null;
     }
@@ -61,17 +57,17 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
      * @param statusVerifier
      * @return
      */
-    public VerifierApi statusVerifier(StatusVerifier statusVerifier) {
+    public Verifier statusVerifier(StatusVerifier statusVerifier) {
         this.statusVerifier = statusVerifier;
         return this;
     }
 
-    public VerifierApi didResolver(final DidResolver didResolver) {
+    public Verifier didResolver(final DidResolver didResolver) {
         this.didResolver = didResolver;
         return this;
     }
 
-    public VerifierApi domain(final String domain) {
+    public Verifier domain(final String domain) {
         this.domain = domain;
         return this;
     }
@@ -93,7 +89,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
         }
 
         if (signatureAdapter == null) {
-            signatureAdapter = new DefaultSignatureAdapters();
+            signatureAdapter = DEFAULT_SIGNATURE_ADAPTERS;
         }
 
         if (document != null) {
@@ -150,7 +146,7 @@ public final class VerifierApi extends CommonApi<VerifierApi> {
     private void verifyExpanded(JsonObject expanded) throws VerificationError, DataError {
 
         // data integrity checks
-        final Verifiable verifiable = Vc.get(expanded, false);
+        final Verifiable verifiable = get(expanded, false);
 
         // is expired?
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {

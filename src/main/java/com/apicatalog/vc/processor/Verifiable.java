@@ -1,8 +1,8 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 
-public interface Verifiable {
+interface Verifiable {
 
     URI getId();
 

@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.loader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,11 +11,11 @@ import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
+import com.apicatalog.vc.Vc;
 
-//RENAME to BuindledContextloader
 public class StaticContextLoader implements DocumentLoader {
 
-    static Map<String, Document> staticCache = new HashMap<>();
+    protected static Map<String, Document> staticCache = new HashMap<>();
 
     static {
         staticCache.put("https://www.w3.org/2018/credentials/examples/v1", get("2018-credentials-examples-v1.jsonld"));
@@ -25,8 +25,10 @@ public class StaticContextLoader implements DocumentLoader {
         staticCache.put("https://www.w3.org/ns/did/v1", get("did-v1.jsonld"));
     }
 
-    static JsonDocument get(String name) {
-        try (final InputStream is = StaticContextLoader.class.getResourceAsStream(name)) {
+    protected final DocumentLoader defaultLoader;
+
+    protected static JsonDocument get(String name) {
+        try (final InputStream is = Vc.class.getResourceAsStream(name)) {
 
             return JsonDocument.of(is);
 
@@ -35,8 +37,6 @@ public class StaticContextLoader implements DocumentLoader {
         }
         return  null;
     }
-
-    DocumentLoader defaultLoader;
 
     public StaticContextLoader(DocumentLoader defaultLoader) {
         this.defaultLoader = defaultLoader;
@@ -54,5 +54,4 @@ public class StaticContextLoader implements DocumentLoader {
 
         return defaultLoader.loadDocument(url, options);
     }
-
 }

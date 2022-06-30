@@ -90,7 +90,7 @@ public class LinkedDataSignature {
         return result;
     }
 
-    public KeyPair keygen(URI id, int length) {
+    public KeyPair keygen(URI id, int length) throws KeyGenError {
 
         final SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
 

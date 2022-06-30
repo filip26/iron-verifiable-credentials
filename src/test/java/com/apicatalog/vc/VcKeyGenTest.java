@@ -14,7 +14,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.vc.api.Vc;
 
 @DisplayName("Keys Generation")
 @TestMethodOrder(OrderAnnotation.class)

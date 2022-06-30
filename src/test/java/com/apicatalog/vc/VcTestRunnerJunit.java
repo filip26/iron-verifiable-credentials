@@ -23,8 +23,7 @@ import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.ed25519.Ed25519ProofOptions2020;
-import com.apicatalog.vc.api.IssuerApi;
-import com.apicatalog.vc.api.Vc;
+import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -80,7 +79,7 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create("https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json");
                 }
 
-                IssuerApi issuer = Vc
+                Issuer issuer = Vc
                                     .sign(testCase.input, keyPairLocation, options)
                                     .loader(LOADER)
                                     ;

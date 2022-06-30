@@ -1,4 +1,4 @@
-package com.apicatalog.vc.api;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 import java.time.Instant;
@@ -18,10 +18,7 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
-import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.DefaultSignatureAdapters;
-import com.apicatalog.vc.StaticContextLoader;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -29,7 +26,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
-public final class IssuerApi extends CommonApi<IssuerApi> {
+public final class Issuer extends Processor<Issuer> {
 
     private final URI location;
     private final JsonObject document;
@@ -39,7 +36,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
 
     private final ProofOptions options;
 
-    protected IssuerApi(URI location, URI keyPairLocation, ProofOptions options) {
+    public Issuer(URI location, URI keyPairLocation, ProofOptions options) {
         this.location = location;
         this.document = null;
 
@@ -49,7 +46,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         this.options = options;
     }
 
-    protected IssuerApi(JsonObject document, KeyPair keyPair, ProofOptions options) {
+    public Issuer(JsonObject document, KeyPair keyPair, ProofOptions options) {
         this.document = document;
         this.location = null;
 
@@ -78,7 +75,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         }
 
         if (signatureAdapter == null) {
-            signatureAdapter = new DefaultSignatureAdapters();
+            signatureAdapter = DEFAULT_SIGNATURE_ADAPTERS;
         }
 
         if (document != null && keyPair != null)  {
@@ -182,7 +179,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
                     //TODO ErrorCode
                 );
 
-        final Verifiable verifiable = Vc.get(object, true);
+        final Verifiable verifiable = get(object, true);
 
         // is expired?
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
