@@ -12,10 +12,7 @@ public class DidKeyResolver implements DidResolver {
 
     private static final String MULTIKEY_TYPE = "Multikey";     //FIXME an absolute URI
     private static final String ED25519_VERIFICATION_KEY_2020_TYPE =  "https://w3id.org/security#Ed25519VerificationKey2020";
-    private static final String X25519_KEYAGREEMENT_KEY_2020_TYPE =  "https://w3id.org/security#X25519KeyAgreementKey2020";
-
-    public DidKeyResolver() {
-    }
+    //private static final String X25519_KEYAGREEMENT_KEY_2020_TYPE =  "https://w3id.org/security#X25519KeyAgreementKey2020";
 
     @Override
     public DidDocument resolve(final Did did) {
@@ -75,10 +72,10 @@ public class DidKeyResolver implements DidResolver {
         //TODO
 
         // 9.
-        if (MULTIKEY_TYPE.equals(encodingType)
-                || ED25519_VERIFICATION_KEY_2020_TYPE.equals(encodingType)) {
-            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
-        }
+//        if (MULTIKEY_TYPE.equals(encodingType)
+//                || ED25519_VERIFICATION_KEY_2020_TYPE.equals(encodingType)) {
+//            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
+//        }
 
         // 10.
         //TODO jwk
@@ -108,10 +105,10 @@ public class DidKeyResolver implements DidResolver {
         //TODO
 
         // 9.
-        if (MULTIKEY_TYPE.equals(encodingType)
-                || X25519_KEYAGREEMENT_KEY_2020_TYPE.equals(encodingType)) {
-            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
-        }
+//        if (MULTIKEY_TYPE.equals(encodingType)
+//                || X25519_KEYAGREEMENT_KEY_2020_TYPE.equals(encodingType)) {
+//            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
+//        }
 
         //TODO
 

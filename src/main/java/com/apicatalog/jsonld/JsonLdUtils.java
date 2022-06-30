@@ -90,16 +90,12 @@ public class JsonLdUtils {
             return Collections.emptyList();
         }
 
-        if (JsonUtils.isArray(value)) {
-            if (value.asJsonArray().size() == 1) {
-                value = value.asJsonArray().get(0);
-            }
+        if (JsonUtils.isArray(value) && value.asJsonArray().size() == 1) {
+            value = value.asJsonArray().get(0);
         }
 
-        if (JsonUtils.isObject(value)) {
-            if (value.asJsonObject().containsKey(Keywords.GRAPH) &&  value.asJsonObject().size() == 1) {
-                value = value.asJsonObject().get(Keywords.GRAPH);
-            }
+        if (JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.GRAPH) && value.asJsonObject().size() == 1) {
+            value = value.asJsonObject().get(Keywords.GRAPH);
         }
 
         return JsonUtils.toCollection(value);
@@ -181,7 +177,7 @@ public class JsonLdUtils {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
 
-        return com.apicatalog.jsonld.JsonUtils.findFirstObject(value)
+        return JsonLdUtils.findFirstObject(value)
                 .map(o -> o.get(Keywords.ID))
                 .filter(JsonUtils::isString)
                 .map(JsonString.class::cast)
@@ -201,7 +197,7 @@ public class JsonLdUtils {
     public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property, String id) {
         objectBuilder.add(property,
                 Json.createArrayBuilder()
-                        .add(Json.createObjectBuilder().add(Keywords.ID, id.toString())));
+                        .add(Json.createObjectBuilder().add(Keywords.ID, id)));
 
         return objectBuilder;
     }
@@ -222,4 +218,19 @@ public class JsonLdUtils {
         return setValue(objectBuilder, property, XSD_DATE_TIME, instant.toString());
     }
 
+    public static Optional<JsonObject> findFirstObject(JsonValue expanded) {
+        if (JsonUtils.isArray(expanded)) {
+
+            for (JsonValue item : expanded.asJsonArray()) {
+                if (JsonUtils.isObject(item)) {
+                    return Optional.of(item.asJsonObject());
+                }
+            }
+
+        } else if (JsonUtils.isObject(expanded)) {
+            return Optional.of(expanded.asJsonObject());
+        }
+
+        return Optional.empty();
+    }
 }

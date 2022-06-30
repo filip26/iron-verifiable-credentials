@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonUtils;
+import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.signature.DataError;
@@ -100,7 +100,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
      * @throws SigningError
      * @throws DataError
      */
-    public JsonObject getCompacted(final URI context)  throws SigningError, DataError {
+    public JsonObject getCompacted(final URI context) throws SigningError, DataError {
 
         final JsonObject signed = getExpanded();
 
@@ -111,7 +111,23 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
         }
     }
 
-    public JsonObject getCompacted(final JsonStructure context)  throws SigningError, DataError {
+    /**
+     * Get signed document compacted using standard contexts.
+     *
+     * @return the signed document in compacted form
+     */
+    public JsonObject getCompacted() throws SigningError, DataError  {
+
+        final JsonArray context = Json
+                                    .createArrayBuilder()
+                                    .add("https://www.w3.org/2018/credentials/v1")
+                                    .add("https://w3id.org/security/suites/ed25519-2020/v1")
+                                    .build();
+
+        return getCompacted(context);
+    }
+
+    public JsonObject getCompacted(final JsonStructure context) throws SigningError, DataError {
 
         final JsonObject signed = getExpanded();
 
@@ -161,7 +177,7 @@ public final class IssuerApi extends CommonApi<IssuerApi> {
 
     private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DataError {
 
-        JsonObject object = JsonUtils.findFirstObject(expanded).orElseThrow(() ->
+        JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
                     new SigningError() // malformed input, not single object to sign has been found
                     //TODO ErrorCode
                 );

@@ -17,9 +17,9 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
   * Ed25519 Signature 2020
 * [HTTP API & Service](https://github.com/filip26/vc-http-api)
 
-# Usage
+## Usage
 
-## Verifying 
+### Verifying 
 
 ```java
 
@@ -42,7 +42,7 @@ try {
 }
 ```
 
-## Issuing
+### Issuing
 
 ```java
 signed = Vc.sign(credential|presentation, keys, proofOptions)
@@ -62,27 +62,27 @@ signed = Vc.sign(credential|presentation, keys, proofOptions)
 
 ```
 
-# Contributing
+## Contributing
 
 All PR's welcome!
 
-## Building
+### Building
 
 Fork and clone the project repository.
 
-### Java 17
+#### Java 17
 ```bash
 > cd iron-verfiable-credentials
 > mvn clean package
 ```
 
-### Java 8
+#### Java 8
 ```bash
 > cd iron-verfiable-credentials
 > mvn -f pom_jre8.xml clean package
 ```
 
-# Resources
+## Resources
 * [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
 * [Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
@@ -90,5 +90,3 @@ Fork and clone the project repository.
 * [Ed25519 Signature 2020](https://w3c-ccg.github.io/lds-ed25519-2020/)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
 * [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
-
-

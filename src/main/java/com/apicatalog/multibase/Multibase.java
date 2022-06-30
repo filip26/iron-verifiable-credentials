@@ -26,6 +26,9 @@ public class Multibase {
         switch (algorithm) {
         case Base58Btc:
             return io.ipfs.multibase.Multibase.encode(io.ipfs.multibase.Multibase.Base.Base58BTC, data);
+
+        default:
+            break;
         }
 
         throw new IllegalArgumentException("Unsupported algorithm [" + algorithm + "].");
