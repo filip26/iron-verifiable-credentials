@@ -17,6 +17,41 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
   * Ed25519 Signature 2020
 * [HTTP API & Service](https://github.com/filip26/vc-http-api)
 
+## Installation
+
+### Maven
+
+```xml
+<!-- Java 17 -->
+<dependency>
+    <groupId>com.apicatalog</groupId>
+    <artifactId>iron-verifiable-credentials/artifactId>
+    <version>1.0.0</version>
+</dependency>
+
+```
+
+or
+
+```xml
+<!-- Android (Java 8, Tink) -->
+<dependency>
+    <groupId>com.apicatalog</groupId>
+    <artifactId>iron-verifiable-credentials-jre8</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+### Gradle
+
+```gradle
+compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '1.0.0'
+```
+
+## Documentation
+
+[![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
+
 ## Usage
 
 ### Verifying 
