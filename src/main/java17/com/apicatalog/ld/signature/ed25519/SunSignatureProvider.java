@@ -63,27 +63,33 @@ public class SunSignatureProvider implements SignatureAlgorithm {
     }
 
     @Override
-    public KeyPair keygen(int length) {
+    public KeyPair keygen(final int length) {
         throw new UnsupportedOperationException();
     }
 
-    private PublicKey getPublicKey(byte[] publicKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
+    private PublicKey getPublicKey(final byte[] publicKey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {
 
-        KeyFactory kf = KeyFactory.getInstance(type);
+        final KeyFactory kf = KeyFactory.getInstance(type);
 
         // determine if x was odd.
         boolean xisodd = false;
+        
         int lastbyteInt = publicKey[publicKey.length - 1];
+        
         if ((lastbyteInt & 255) >> 7 == 1) {
             xisodd = true;
         }
+        
+        // make public key copy
+        byte[] key = new byte[publicKey.length];
+        System.arraycopy(publicKey, 0, key, 0, key.length);
 
         // make sure most significant bit will be 0 - after reversing.
-        publicKey[publicKey.length - 1] &= 127;
+        key[key.length - 1] &= 127;
 
-        publicKey = reverse(publicKey);
-        BigInteger y = new BigInteger(1, publicKey);
+        key = reverse(key);
+        
+        BigInteger y = new BigInteger(1, key);
 
         NamedParameterSpec paramSpec = new NamedParameterSpec(type);
         EdECPoint ep = new EdECPoint(xisodd, y);

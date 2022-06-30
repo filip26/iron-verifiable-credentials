@@ -197,7 +197,7 @@ public class JsonLdUtils {
     public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property, String id) {
         objectBuilder.add(property,
                 Json.createArrayBuilder()
-                        .add(Json.createObjectBuilder().add(Keywords.ID, id.toString())));
+                        .add(Json.createObjectBuilder().add(Keywords.ID, id)));
 
         return objectBuilder;
     }
