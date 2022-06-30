@@ -90,16 +90,12 @@ public class JsonLdUtils {
             return Collections.emptyList();
         }
 
-        if (JsonUtils.isArray(value)) {
-            if (value.asJsonArray().size() == 1) {
-                value = value.asJsonArray().get(0);
-            }
+        if (JsonUtils.isArray(value) && value.asJsonArray().size() == 1) {
+            value = value.asJsonArray().get(0);
         }
 
-        if (JsonUtils.isObject(value)) {
-            if (value.asJsonObject().containsKey(Keywords.GRAPH) &&  value.asJsonObject().size() == 1) {
-                value = value.asJsonObject().get(Keywords.GRAPH);
-            }
+        if (JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.GRAPH) && value.asJsonObject().size() == 1) {
+            value = value.asJsonObject().get(Keywords.GRAPH);
         }
 
         return JsonUtils.toCollection(value);

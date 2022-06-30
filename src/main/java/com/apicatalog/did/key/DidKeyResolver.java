@@ -75,10 +75,10 @@ public class DidKeyResolver implements DidResolver {
         //TODO
 
         // 9.
-        if (MULTIKEY_TYPE.equals(encodingType)
-                || ED25519_VERIFICATION_KEY_2020_TYPE.equals(encodingType)) {
-            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
-        }
+//        if (MULTIKEY_TYPE.equals(encodingType)
+//                || ED25519_VERIFICATION_KEY_2020_TYPE.equals(encodingType)) {
+//            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
+//        }
 
         // 10.
         //TODO jwk
@@ -108,10 +108,10 @@ public class DidKeyResolver implements DidResolver {
         //TODO
 
         // 9.
-        if (MULTIKEY_TYPE.equals(encodingType)
-                || X25519_KEYAGREEMENT_KEY_2020_TYPE.equals(encodingType)) {
-            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
-        }
+//        if (MULTIKEY_TYPE.equals(encodingType)
+//                || X25519_KEYAGREEMENT_KEY_2020_TYPE.equals(encodingType)) {
+//            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
+//        }
 
         //TODO
 
