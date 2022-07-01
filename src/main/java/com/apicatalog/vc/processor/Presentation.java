@@ -60,10 +60,10 @@ class Presentation implements Verifiable {
 
         // @id - optional
         if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
-            presentation.id = JsonLdUtils.getId(subject)
-                    .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
+            presentation.id = JsonLdUtils
+    	    			.getId(subject)
+    	    			.orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
         }
-
         // holder - optional
         if (JsonLdUtils.hasPredicate(subject, BASE + HOLDER)) {
             presentation.holder = JsonLdUtils.assertId(subject, BASE, HOLDER);
@@ -72,14 +72,13 @@ class Presentation implements Verifiable {
         presentation.credentials = new ArrayList<>();
 
         // verifiableCredentials
-        for (JsonValue credential : JsonLdUtils.getObjects(subject, BASE + VERIFIABLE_CREDENTIALS)) {
+        for (final JsonValue credential : JsonLdUtils.getObjects(subject, BASE + VERIFIABLE_CREDENTIALS)) {
 
             if (JsonUtils.isNotObject(credential)) {
-                throw new DataError();
+                throw new DataError(ErrorType.Invalid, VERIFIABLE_CREDENTIALS);
             }
 
             presentation.credentials.add(Credential.from(credential.asJsonObject(), issue));
-            //TODO proof somehow, do I need to parse it here?
         }
 
         return presentation;

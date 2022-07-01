@@ -9,22 +9,23 @@ import jakarta.json.JsonStructure;
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization algorithm,
  * a message digest algorithm, and a signature algorithm.
- *
  */
 public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
     private final String id;
+    
     private final CanonicalizationAlgorithm canonicalization;
     private final DigestAlgorithm digester;
     private final SignatureAlgorithm signer;
+
     private final SignatureAdapter adapter;
 
     public SignatureSuite(
-            String id,
-            CanonicalizationAlgorithm canonicalization,
-            DigestAlgorithm digester,
-            SignatureAlgorithm signer,
-            SignatureAdapter adapter
+            final String id,
+            final CanonicalizationAlgorithm canonicalization,
+            final DigestAlgorithm digester,
+            final SignatureAlgorithm signer,
+            final SignatureAdapter adapter
             ) {
         this.id = id;
         this.canonicalization = canonicalization;

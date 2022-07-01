@@ -14,7 +14,7 @@ import com.apicatalog.ld.signature.ed25519.Ed25519SignatureAdapter;
 
 import jakarta.json.JsonObject;
 
-public abstract class Processor<T extends Processor<?>> {
+abstract class Processor<T extends Processor<?>> {
 
     protected static final SignatureAdapter DEFAULT_SIGNATURE_ADAPTERS =
                                 new SignatureAdapters(
@@ -36,9 +36,10 @@ public abstract class Processor<T extends Processor<?>> {
         this.signatureAdapter = null;
     }
 
+    @SuppressWarnings("unchecked")
     public T loader(DocumentLoader loader) {
         this.loader = loader;
-        return (T)this;
+        return (T) this;
     }
 
     /**
@@ -48,6 +49,7 @@ public abstract class Processor<T extends Processor<?>> {
      * @param enable
      * @return
      */
+    @SuppressWarnings("unchecked")
     public T useBundledContexts(boolean enable) {
         this.bundledContexts = enable;
         return (T)this;
@@ -59,11 +61,13 @@ public abstract class Processor<T extends Processor<?>> {
      * @param base
      * @return
      */
+    @SuppressWarnings("unchecked")
     public T base(URI base) {
        this.base = base;
        return (T)this;
     }
 
+    @SuppressWarnings("unchecked")
     public T signatureAdapter(SignatureAdapter adapter) {
         this.signatureAdapter = adapter;
         return (T)this;

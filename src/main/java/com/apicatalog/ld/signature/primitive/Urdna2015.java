@@ -9,6 +9,7 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.http.media.MediaType;
 import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.rdf.Rdf;
 import com.apicatalog.rdf.RdfDataset;
@@ -38,7 +39,7 @@ public class Urdna2015 implements CanonicalizationAlgorithm {
                     .getBytes(StandardCharsets.UTF_8);
 
         } catch (JsonLdError | UnsupportedContentException | IOException | RdfWriterException e) {
-            throw new DataError(e);
+            throw new DataError(ErrorType.Unknown, e);
         }
     }
 }

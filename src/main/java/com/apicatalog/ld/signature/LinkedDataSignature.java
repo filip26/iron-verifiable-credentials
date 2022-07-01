@@ -22,13 +22,13 @@ public class LinkedDataSignature {
     /**
      * Verifies the given signed VC/VP document.
      *
-     * see
-     * {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm}
+     * @see {@link <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification Algorithm</a>}
      *
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
      * @param verificationKey
      * @param signature
+     * 
      * @throws VerificationError
      * @throws DataError
      */
@@ -48,14 +48,17 @@ public class LinkedDataSignature {
     /**
      * Issues the given VC/VP document and returns the document signature.
      *
-     * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm}
+     * @see {@link <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm"Proof Algorithm</a>}
      *
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof options
      * @param keyPair
+     * @param options 
+     * 
      * @return computed signature
+     * 
+     * @throws SigningError 
      * @throws DataError
-     * @throws VerificationError
      */
     public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError, DataError {
 
@@ -65,17 +68,16 @@ public class LinkedDataSignature {
     }
 
     /**
-     * see
-     * {@link https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}
+     * @see {@link <a href="https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm">Hash Algorithm</a>}
      *
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
+     * 
      * @return computed hash code
+     * 
      * @throws DataError
-     *
-     * @throws VerificationError
      */
-    public byte[] hashCode(JsonStructure document, JsonObject proof) throws DataError {
+    byte[] hashCode(JsonStructure document, JsonObject proof) throws DataError {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 

@@ -42,8 +42,7 @@ class DidVerificationKey implements VerificationKey {
 
     @Override
     public JsonObject toJson() {
-        // TODO Auto-generated method stub
-        return null;
+	throw new UnsupportedOperationException();
     }
 
     @Override

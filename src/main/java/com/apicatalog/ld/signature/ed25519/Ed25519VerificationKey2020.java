@@ -60,8 +60,6 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
 
     public static Ed25519VerificationKey2020 from(JsonObject json) throws DataError {
 
-        // TODO check json object type!
-
         URI id =  JsonLdUtils.getId(json).orElse(null);
 
         final Ed25519VerificationKey2020 key = new Ed25519VerificationKey2020(id);
@@ -70,8 +68,6 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
     }
 
     protected static final <T extends Ed25519VerificationKey2020> T from(T key, JsonObject json) throws DataError {
-
-        // TODO check type key.type = json.getString(TYPE);
 
         // controller
         JsonLdUtils.getObjects(json, BASE + CONTROLLER)
@@ -149,26 +145,28 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
         }
 
         if (!ValueObject.isValueObject(key)) {
-            throw new DataError();
+            throw new DataError(ErrorType.Invalid, property);
         }
 
         if (!JsonLdUtils.isTypeOf(PUBLIC_KEY_TYPE_VALUE, key.asJsonObject())) {
-            throw new DataError();
+            throw new DataError(ErrorType.Invalid, property, Keywords.TYPE);
         }
 
-        final String keyMultibase = ValueObject.getValue(key)
-                .filter(JsonUtils::isString)
-                .map(JsonString.class::cast)
-                .map(JsonString::getString)
-                .orElseThrow(DataError::new);
-
+        final String keyMultibase = ValueObject
+        				.getValue(key)
+        				.filter(JsonUtils::isString)
+        				.map(JsonString.class::cast)
+        				.map(JsonString::getString)
+        				.orElseThrow(() -> new DataError(ErrorType.Invalid, property));
         // decode private key
         final byte[] encodedKey = Multibase.decode(keyMultibase);
 
-        final Codec codec = Multicodec.codec(Type.Key, encodedKey).orElseThrow(DataError::new);
+        final Codec codec = Multicodec
+        			.codec(Type.Key, encodedKey)
+        			.orElseThrow(() -> new DataError(ErrorType.Invalid, property));
 
         if (expected != codec) {
-            throw new DataError();
+            throw new DataError(ErrorType.Invalid, property);
         }
 
         return Multicodec.decode(codec, encodedKey);
@@ -179,7 +177,9 @@ public class Ed25519VerificationKey2020 implements VerificationKey {
         // decode private key
         final byte[] encodedKey = Multibase.decode(multibase);
 
-        final Codec codec = Multicodec.codec(Type.Key, encodedKey).orElseThrow(DataError::new);
+        final Codec codec = Multicodec
+        			.codec(Type.Key, encodedKey)
+        			.orElseThrow(() -> new DataError(ErrorType.Invalid, "key"));
 
         return Multicodec.decode(codec, encodedKey);
     }

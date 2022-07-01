@@ -16,7 +16,6 @@ import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 
 import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
@@ -140,11 +139,13 @@ public abstract class EmbeddedProof implements Proof {
                 throw new DataError(ErrorType.Invalid, "created");
             }
 
-            //TODO check @type
-
-            String createdString = ValueObject.getValue(createdItem).filter(JsonUtils::isString)
-            .map(JsonString.class::cast)
-            .map(JsonString::getString).orElseThrow(DataError::new);
+            final String createdString = 
+        	    		ValueObject
+        	    			.getValue(createdItem)
+        	    			.filter(JsonUtils::isString)
+        	    			.map(JsonString.class::cast)
+    	    				.map(JsonString::getString)
+    	    				.orElseThrow(() -> new DataError(ErrorType.Invalid, "created"));
 
             try {
                 OffsetDateTime created = OffsetDateTime.parse(createdString);
@@ -162,11 +163,14 @@ public abstract class EmbeddedProof implements Proof {
 
         // domain property
         if (proofObject.containsKey(BASE + PROOF_DOMAIN)) {
-            embeddedProof.domain = ValueObject.getValue(proofObject.get(BASE + PROOF_DOMAIN).asJsonArray().get(0)).filter(JsonUtils::isString)
-                    .map(JsonString.class::cast)
-                    .map(JsonString::getString).orElseThrow(DataError::new);
+            embeddedProof.domain = 
+        	    		ValueObject
+        	    			.getValue(proofObject.get(BASE + PROOF_DOMAIN).asJsonArray().get(0))
+        	    			.filter(JsonUtils::isString)
+        	    			.map(JsonString.class::cast)
+        	    			.map(JsonString::getString)
+        	    			.orElseThrow(() -> new DataError(ErrorType.Invalid, PROOF_DOMAIN));
         }
-
 
         return embeddedProof;
     }
@@ -212,25 +216,26 @@ public abstract class EmbeddedProof implements Proof {
      * If the document has been signed already then the proof is added into a proof set.
      *
      * @param document VC/VP document
+     * @param proof
+     * 
      * @return the given VC/VP with the proof attached
+     * 
      * @throws DataError
      */
-    public JsonObject addProofTo(final JsonObject document) throws DataError {
+    public static JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
         final JsonValue proofPropertyValue = document.get(BASE + PROOF);
 
-        final JsonArrayBuilder proofs;
-
-        if (proofPropertyValue == null) {
-            proofs  = Json.createArrayBuilder();
-
-        } else {
-            proofs = Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue));
-        }
-
-        proofs.add(toJson());
-
-        return Json.createObjectBuilder(document).add(BASE + PROOF, proofs).build();
+        return Json
+    		.createObjectBuilder(document)
+    		.add(BASE + PROOF,
+    	        	((proofPropertyValue != null)
+    	        		? Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue))
+    	    			: Json.createArrayBuilder()
+    	    			)
+    	        	.add(proof)
+        		)
+        	.build();
     }
 
 
@@ -259,6 +264,7 @@ public abstract class EmbeddedProof implements Proof {
         return value;
     }
 
+    @Override
     public void setValue(byte[] value) {
         this.value = value;
     }

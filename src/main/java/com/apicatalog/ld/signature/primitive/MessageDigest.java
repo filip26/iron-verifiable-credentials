@@ -3,16 +3,16 @@ package com.apicatalog.ld.signature.primitive;
 import java.security.NoSuchAlgorithmException;
 
 import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 
-public class MessageDigest implements DigestAlgorithm {
+public final class MessageDigest implements DigestAlgorithm {
 
     private final String type;
 
-    public MessageDigest(String type) {
+    public MessageDigest(final String type) {
         this.type = type;
     }
-
 
     @Override
     public byte[] digest(byte[] data) throws DataError {
@@ -22,7 +22,7 @@ public class MessageDigest implements DigestAlgorithm {
             return digest.digest(data);
 
         } catch (NoSuchAlgorithmException e) {
-            throw new DataError(e);
+            throw new DataError(ErrorType.UnknownCrypto, e);
         }
     }
 }

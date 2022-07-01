@@ -3,7 +3,7 @@ package com.apicatalog.did;
 /**
  * Performs {@link Did} resolution by expanding {@link Did} into {@link DidDocument}.
  *
- * @see {@link https://www.w3.org/TR/did-core/#dfn-did-resolvers}
+ * @see {@link <a href="https://www.w3.org/TR/did-core/#dfn-did-resolvers">DID resolvers</a>}
  */
 public interface DidResolver {
 

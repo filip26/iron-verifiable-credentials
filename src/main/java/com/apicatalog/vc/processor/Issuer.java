@@ -17,6 +17,7 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
+import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
@@ -112,6 +113,8 @@ public final class Issuer extends Processor<Issuer> {
      * Get signed document compacted using standard contexts.
      *
      * @return the signed document in compacted form
+     * @throws SigningError 
+     * @throws DataError 
      */
     public JsonObject getCompacted() throws SigningError, DataError  {
 
@@ -186,14 +189,14 @@ public final class Issuer extends Processor<Issuer> {
             throw new SigningError(Code.Expired);
         }
 
-        final EmbeddedProof proof =
+        final Proof proof =
                                 signatureAdapter
                                     .materialize(options)
                                     .orElseThrow(() -> new SigningError(Code.UnknownCryptoSuite));
 
         final SignatureSuite signatureSuite =
                                     signatureAdapter
-                                        .getSuiteByType(proof.getType())
+                                        .findSuiteByType(proof.getType())
                                         .orElseThrow(() -> new SigningError(Code.UnknownCryptoSuite));
 
         JsonObject data = EmbeddedProof.removeProof(object);
@@ -209,10 +212,10 @@ public final class Issuer extends Processor<Issuer> {
 
         final LinkedDataSignature suite = new LinkedDataSignature(signatureSuite);
 
-        byte[] signature = suite.sign(data, keyPair, proof.toJson());
+        final byte[] signature = suite.sign(data, keyPair, proof.toJson());
 
         proof.setValue(signature);
-
-        return proof.addProofTo(object);
+        
+        return EmbeddedProof.addProof(object, proof.toJson());
     }
 }

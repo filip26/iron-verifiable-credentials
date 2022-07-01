@@ -8,7 +8,7 @@ import com.apicatalog.ld.signature.SignatureAdapter;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.ld.signature.proof.EmbeddedProof;
+import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 
 import jakarta.json.JsonValue;
@@ -36,7 +36,7 @@ public class Ed25519SignatureAdapter implements SignatureAdapter {
     }
 
     @Override
-    public Optional<EmbeddedProof> materialize(ProofOptions options) {
+    public Optional<Proof> materialize(ProofOptions options) {
 
         if (Ed25519Proof2020.isTypeOf(options.getType())) {
             return Optional.of(Ed25519Proof2020.from(options));
@@ -46,7 +46,7 @@ public class Ed25519SignatureAdapter implements SignatureAdapter {
     }
 
     @Override
-    public Optional<SignatureSuite> getSuiteByType(String type) {
+    public Optional<SignatureSuite> findSuiteByType(String type) {
 
         if (Ed25519Signature2020.isTypeOf(type)) {
             return Optional.of(new Ed25519Signature2020());
@@ -56,7 +56,7 @@ public class Ed25519SignatureAdapter implements SignatureAdapter {
     }
 
     @Override
-    public Optional<EmbeddedProof> materializeProof(JsonValue value, DocumentLoader loader) throws DataError {
+    public Optional<Proof> materializeProof(JsonValue value, DocumentLoader loader) throws DataError {
 
         if (Ed25519Proof2020.isIstanceOf(value)) {
             return Optional.of(Ed25519Proof2020.from(value, loader));

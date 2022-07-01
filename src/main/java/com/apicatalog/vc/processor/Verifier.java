@@ -25,6 +25,7 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
+import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.JsonArray;
@@ -167,7 +168,7 @@ public final class Verifier extends Processor<Verifier> {
             // verify attached proofs' signatures
             for (final JsonValue proofValue : proofs) {
 
-                final Optional<EmbeddedProof> embeddedProof = signatureAdapter.materializeProof(proofValue, loader);
+                final Optional<Proof> embeddedProof = signatureAdapter.materializeProof(proofValue, loader);
 
                 // check proof type
                 if (!embeddedProof.isPresent()) {
@@ -180,7 +181,7 @@ public final class Verifier extends Processor<Verifier> {
                     throw new VerificationError(Code.UnknownCryptoSuite);
                 }
 
-                final EmbeddedProof proof = embeddedProof.get();
+                final Proof proof = embeddedProof.get();
 
                 // check domain
                 if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
@@ -191,7 +192,7 @@ public final class Verifier extends Processor<Verifier> {
 
                 final SignatureSuite suite =
                         signatureAdapter
-                            .getSuiteByType(proof.getType())
+                            .findSuiteByType(proof.getType())
                             .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
 
                 final VerificationKey verificationMethod = get(proof.getVerificationMethod().getId(), suite.getAdapter());

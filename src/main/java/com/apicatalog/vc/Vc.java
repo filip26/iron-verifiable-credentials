@@ -26,7 +26,7 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param location a location of the document to verify
-     * @return a verifier allowing to set options and assert document's validity
+     * @return {@link Verifier} allowing to set options and assert document's validity
      * 
      * @throws DataError
      * @throws VerificationError
@@ -39,7 +39,8 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param document the document to verify
-     * @return a verifier allowing to set options and assert document's validity
+     * 
+     * @return {@link Verifier} allowing to set options and assert document's validity
      *  
      * @throws DataError
      * @throws VerificationError
@@ -54,9 +55,11 @@ public final class Vc {
      * @param documentLocation
      * @param keyPairLocation
      * @param options
-     * @return signed VC/VP with proof property at the root level
+     * 
+     * @return {@link Issuer} allowing to set options and to sign the given document
+     * 
      * @throws DataError
-     * @throws VerificationError
+     * @throws SigningError 
      */
     public static Issuer sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataError, SigningError {
         return new Issuer(documentLocation, keyPairLocation, options);
@@ -68,9 +71,11 @@ public final class Vc {
      * @param document
      * @param keyPair
      * @param options
-     * @return signed VC/VP with proof property at the root level
+     * 
+     * @return {@link Issuer} allowing to set options and to sign the given document
+     * 
      * @throws DataError
-     * @throws VerificationError
+     * @throws SigningError 
      */
     public static Issuer sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
         return new Issuer(document, keyPair, options);
@@ -80,7 +85,10 @@ public final class Vc {
      * Generates public/private key pair.
      *
      * @param type requested key pair type, e.g. <code>https://w3id.org/security#Ed25519KeyPair2020</code>
-     * @return
+     * 
+     * @return {@link KeyGenError} allowing to set options and to generate key pair
+     * 
+     * @throws KeyGenError 
      */
     public static KeysGenerator generateKeys(String type) throws KeyGenError {
 

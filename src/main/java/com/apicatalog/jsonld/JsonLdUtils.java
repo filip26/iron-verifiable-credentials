@@ -31,7 +31,7 @@ public class JsonLdUtils {
      *
      * @param type
      * @param value
-     * @return
+     * @return <code>true</code> if the given value is {@link JsonObject} and has property @type including the given type
      */
     public static boolean isTypeOf(final String type, final JsonValue value) {
 
@@ -170,7 +170,6 @@ public class JsonLdUtils {
         throw new DataError(ErrorType.Invalid, property, Keywords.TYPE);
     }
 
-    @Deprecated
     public static final Optional<URI> getId(JsonValue value) {
 
         if (value == null) {

@@ -24,5 +24,4 @@ public class JsonLdValueObject {
                 .add(Keywords.VALUE, value)
                 .build();
     }
-
 }

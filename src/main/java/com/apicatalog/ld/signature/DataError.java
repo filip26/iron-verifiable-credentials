@@ -7,6 +7,7 @@ public class DataError extends Throwable {
     public enum ErrorType {
         Missing,
         Unknown,
+        UnknownCrypto,
         Invalid
     }
 
@@ -14,18 +15,9 @@ public class DataError extends Throwable {
     private final String subject;
     private final String[] attibutes;
 
-    @Deprecated
-    public DataError() {
-        this.type = null;
-        this.subject = null;
-        this.attibutes = null;
-    }
-
-
-    @Deprecated
-    public DataError(Throwable e) {
+    public DataError(ErrorType type, Throwable e) {
         super(e);
-        this.type = null;
+        this.type = type;
         this.subject = null;
         this.attibutes = null;
     }
