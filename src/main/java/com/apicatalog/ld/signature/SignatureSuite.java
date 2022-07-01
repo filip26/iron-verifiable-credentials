@@ -3,6 +3,8 @@ package com.apicatalog.ld.signature;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.proof.ProofAdapter;
 
 import jakarta.json.JsonStructure;
 
@@ -12,26 +14,26 @@ import jakarta.json.JsonStructure;
  */
 public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
-    private final String id;
+    protected final String id;
     
-    private final CanonicalizationAlgorithm canonicalization;
-    private final DigestAlgorithm digester;
-    private final SignatureAlgorithm signer;
+    protected final CanonicalizationAlgorithm canonicalization;
+    protected final DigestAlgorithm digester;
+    protected final SignatureAlgorithm signer;
 
-    private final SignatureAdapter adapter;
+    protected final ProofAdapter proofAdapter;
 
     public SignatureSuite(
             final String id,
             final CanonicalizationAlgorithm canonicalization,
             final DigestAlgorithm digester,
             final SignatureAlgorithm signer,
-            final SignatureAdapter adapter
+            final ProofAdapter proofAdapter
             ) {
         this.id = id;
         this.canonicalization = canonicalization;
         this.digester = digester;
         this.signer = signer;
-        this.adapter = adapter;
+        this.proofAdapter = proofAdapter;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
         return id;
     }
 
-    public SignatureAdapter getAdapter() {
-        return adapter;
+    public ProofAdapter getProofAdapter() {
+	return proofAdapter;
     }
 }

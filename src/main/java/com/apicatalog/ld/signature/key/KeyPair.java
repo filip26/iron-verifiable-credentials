@@ -1,7 +1,24 @@
 package com.apicatalog.ld.signature.key;
 
-public interface KeyPair extends VerificationKey {
+import java.net.URI;
 
-    byte[] getPrivateKey();
+public class KeyPair extends VerificationKey {
 
+    protected byte[] privateKey;
+    
+    public KeyPair() {
+	super();
+    }
+
+    public KeyPair(URI id) {
+	super(id);
+    }
+
+    public byte[] getPrivateKey() {
+	return privateKey;
+    }
+
+    public void setPrivateKey(byte[] privateKey) {
+	this.privateKey = privateKey;
+    }
 }

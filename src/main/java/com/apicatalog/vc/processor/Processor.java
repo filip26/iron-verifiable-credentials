@@ -1,39 +1,33 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
-import com.apicatalog.ld.signature.SignatureAdapter;
-import com.apicatalog.ld.signature.SignatureAdapters;
-import com.apicatalog.ld.signature.ed25519.Ed25519SignatureAdapter;
+import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 
 import jakarta.json.JsonObject;
 
 abstract class Processor<T extends Processor<?>> {
 
-    protected static final SignatureAdapter DEFAULT_SIGNATURE_ADAPTERS =
-                                new SignatureAdapters(
-                                        Arrays.asList(new SignatureAdapter[] {
-                                                new Ed25519SignatureAdapter()
-                                        }));
-
     protected DocumentLoader loader;
     protected boolean bundledContexts;
     protected URI base;
 
-    protected SignatureAdapter signatureAdapter;
-
+    protected final Map<String, SignatureSuite> suites;
+    
     protected Processor() {
         // default values
         this.loader = null;
         this.bundledContexts = true;
         this.base = null;
-        this.signatureAdapter = null;
+        this.suites = new LinkedHashMap<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -67,9 +61,14 @@ abstract class Processor<T extends Processor<?>> {
        return (T)this;
     }
 
+    /**
+     * Add a new signature suite. An existing suite of the same type is replaced.
+     * @param suite  a suite to add
+     * @return
+     */
     @SuppressWarnings("unchecked")
-    public T signatureAdapter(SignatureAdapter adapter) {
-        this.signatureAdapter = adapter;
+    public T suite(final SignatureSuite suite) {
+        this.suites.put(suite.getId(), suite);
         return (T)this;
     }
     
@@ -102,5 +101,9 @@ abstract class Processor<T extends Processor<?>> {
         }
 
         throw new DataError(ErrorType.Unknown, Keywords.TYPE);
+    }
+    
+    protected void addDefaultSuites() {
+	suite(new Ed25519Signature2020());
     }
 }

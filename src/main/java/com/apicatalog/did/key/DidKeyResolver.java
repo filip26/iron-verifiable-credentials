@@ -5,6 +5,7 @@ import com.apicatalog.did.DidDocument;
 import com.apicatalog.did.DidDocumentBuilder;
 import com.apicatalog.did.DidResolver;
 import com.apicatalog.did.DidUrl;
+import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 import com.apicatalog.multicodec.Multicodec;
 
@@ -24,7 +25,7 @@ public class DidKeyResolver implements DidResolver {
         final DidDocumentBuilder builder = DidDocumentBuilder.create();
 
         // 4.
-        DidVerificationKey signatureMethod = DidKeyResolver.createSignatureMethod(didKey);
+        VerificationKey signatureMethod = DidKeyResolver.createSignatureMethod(didKey);
         builder.add(signatureMethod);
 
         // 5.
@@ -51,7 +52,7 @@ public class DidKeyResolver implements DidResolver {
      *
      * @return The new verification key
      */
-    public static DidVerificationKey createSignatureMethod(DidKey didKey) {
+    public static VerificationKey createSignatureMethod(DidKey didKey) {
 
         if (!Multicodec.Codec.Ed25519PublicKey.equals(didKey.getCodec())) {
             throw new IllegalArgumentException();       //TODO
@@ -59,13 +60,15 @@ public class DidKeyResolver implements DidResolver {
         // 5.
         String encodingType = ED25519_VERIFICATION_KEY_2020_TYPE;
 
-        return new DidVerificationKey(
-                DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
-                encodingType,
-                DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
-                didKey.getRawKey()
-                );
-    }
+        final VerificationKey key = new VerificationKey();
+        
+        key.setId(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
+        key.setType(encodingType);
+        key.setController(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
+        key.setPublicKey(didKey.getRawKey());
+
+        return key;
+     }
 
     public static VerificationMethod createEncryptionMethod(final DidKey didKey) {
 
@@ -79,12 +82,13 @@ public class DidKeyResolver implements DidResolver {
         // 7.
 
         // 9.
-
-        return new DidVerificationKey(
-                DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
-                encodingType,
-                DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
-                didKey.getRawKey()
-                );
+        final VerificationKey key = new VerificationKey();
+        
+        key.setId(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
+        key.setType(encodingType);
+        key.setController(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
+        key.setPublicKey(didKey.getRawKey());
+        
+        return key;
     }
 }

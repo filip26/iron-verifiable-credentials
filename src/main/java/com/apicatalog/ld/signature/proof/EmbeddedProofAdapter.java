@@ -1,7 +1,5 @@
 package com.apicatalog.ld.signature.proof;
 
-import java.net.URI;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collection;
@@ -10,10 +8,9 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
-import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.ld.signature.key.VerificationMethodAdapter;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -24,7 +21,7 @@ import jakarta.json.JsonValue;
 /**
  * An embedded proof is included in the data, such as a Linked Data Signature.
  */
-public abstract class EmbeddedProof implements Proof {
+public abstract class EmbeddedProofAdapter implements ProofAdapter {
 
     protected static final String BASE = "https://w3id.org/security#";
 
@@ -38,38 +35,77 @@ public abstract class EmbeddedProof implements Proof {
 
     protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
-    protected URI purpose;
+    protected final String type;
+    protected final VerificationMethodAdapter keyAdapter;
+    
+    protected EmbeddedProofAdapter(String type, VerificationMethodAdapter keyAdapter) {
+	this.type = type;
+	this.keyAdapter = keyAdapter;
+    }
+    
+//    protected abstract void setValue(String encoding, String value) throws DataError;
 
-    protected VerificationMethod verificationMethod;
+//    protected abstract String getValue(String encoding) throws DataError;;
 
-    protected Instant created;
+    /**
+     * Appends the proof to the given VC/VP document.
+     * If the document has been signed already then the proof is added into a proof set.
+     *
+     * @param document VC/VP document
+     * @param proof
+     * 
+     * @return the given VC/VP with the proof attached
+     * 
+     * @throws DataError
+     */
+    public static JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
-    protected String domain;
+        final JsonValue proofPropertyValue = document.get(BASE + PROOF);
 
-    protected byte[] value;
-
-    protected EmbeddedProof() {}
-
-    public static boolean hasProof(JsonObject credential) {
-        return credential.containsKey(BASE + PROOF);
+        return Json
+    		.createObjectBuilder(document)
+    		.add(BASE + PROOF,
+    	        	((proofPropertyValue != null)
+    	        		? Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue))
+    	    			: Json.createArrayBuilder()
+    	    			)
+    	        	.add(proof)
+        		)
+        	.build();
     }
 
-    public static Collection<JsonValue> getProof(JsonObject credential) {
-        return JsonLdUtils.getObjects(credential, BASE + PROOF);
+    public static boolean hasProof(JsonObject proof) {
+        return proof.containsKey(BASE + PROOF);
     }
 
-    public static JsonObject removeProof(final JsonObject credential) {
-       return Json.createObjectBuilder(credential).remove(BASE + PROOF).build();
+    public static Collection<JsonValue> getProof(JsonObject proof) {
+        return JsonLdUtils.getObjects(proof, BASE + PROOF);
     }
 
-    public static JsonObject removeProofValue(final JsonObject credential) {
-        return Json.createObjectBuilder(credential).remove(BASE + PROOF_VALUE).build();
-     }
+    public static JsonObject removeProof(final JsonObject proof) {
+       return Json.createObjectBuilder(proof).remove(BASE + PROOF).build();
+    }
 
-    protected static EmbeddedProof from(EmbeddedProof embeddedProof, final JsonObject proofObject, final DocumentLoader loader) throws DataError {
+    public static JsonObject removeProofValue(final JsonObject proof) {
+        return Json.createObjectBuilder(proof).remove(BASE + PROOF_VALUE).build();
+    }
 
+    public static Collection<String> getProofType(final JsonObject proof) throws DataError {
+	return JsonLdUtils
+		.getObjects(proof, Keywords.TYPE)
+		.stream()
+		.filter(JsonUtils::isString)
+		.map(JsonString.class::cast)
+		.map(JsonString::getString)
+		.toList();
+    }
+    
+    protected abstract byte[] decodeValue(String encoding, String value) throws DataError;
+    protected abstract String encodeValue(String encoding, byte[] value) throws DataError;
+    
+    protected void read(Proof proof, JsonObject proofObject) throws DataError {
         // proofPurpose property
-        embeddedProof.purpose = JsonLdUtils.assertId(proofObject, BASE, PROOF_PURPOSE);
+        proof.purpose = JsonLdUtils.assertId(proofObject, BASE, PROOF_PURPOSE);
 
         // verificationMethod property
         if (!proofObject.containsKey(BASE + PROOF_VERIFICATION_METHOD)) {
@@ -83,7 +119,7 @@ public abstract class EmbeddedProof implements Proof {
             final JsonValue verificationMethodItem = verificationMethodValue.asJsonArray().get(0);
 
             if (JsonUtils.isNonEmptyObject(verificationMethodItem)) {
-                embeddedProof.verificationMethod = Ed25519KeyPair2020.from(verificationMethodItem.asJsonObject());
+                proof.verificationMethod = keyAdapter.deserialize(verificationMethodItem.asJsonObject());
 
             } else {
                 throw new DataError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD);
@@ -116,7 +152,7 @@ public abstract class EmbeddedProof implements Proof {
 
             String encodedProofValue =  embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
 
-            embeddedProof.setValue(proofValueType, encodedProofValue);
+            proof.value = decodeValue(proofValueType, encodedProofValue);
 
         } else {
             throw new DataError(ErrorType.Invalid, PROOF, Keywords.VALUE);
@@ -150,7 +186,7 @@ public abstract class EmbeddedProof implements Proof {
             try {
                 OffsetDateTime created = OffsetDateTime.parse(createdString);
 
-                embeddedProof.created = created.toInstant();
+                proof.created = created.toInstant();
 
             } catch (DateTimeParseException e) {
                 throw new DataError(ErrorType.Invalid, "created");
@@ -163,109 +199,62 @@ public abstract class EmbeddedProof implements Proof {
 
         // domain property
         if (proofObject.containsKey(BASE + PROOF_DOMAIN)) {
-            embeddedProof.domain = 
-        	    		ValueObject
-        	    			.getValue(proofObject.get(BASE + PROOF_DOMAIN).asJsonArray().get(0))
-        	    			.filter(JsonUtils::isString)
-        	    			.map(JsonString.class::cast)
-        	    			.map(JsonString::getString)
-        	    			.orElseThrow(() -> new DataError(ErrorType.Invalid, PROOF_DOMAIN));
+            proof.domain = 
+	    		ValueObject
+	    			.getValue(proofObject.get(BASE + PROOF_DOMAIN).asJsonArray().get(0))
+	    			.filter(JsonUtils::isString)
+	    			.map(JsonString.class::cast)
+	    			.map(JsonString::getString)
+	    			.orElseThrow(() -> new DataError(ErrorType.Invalid, PROOF_DOMAIN));
         }
-
-        return embeddedProof;
     }
-
-    public abstract void setValue(String encoding, String value) throws DataError;
-
-    public abstract String getValue(String encoding) throws DataError;;
-
-    public JsonObject toJson() throws DataError {
+    
+    protected JsonObject write(final Proof proof) throws DataError {
 
         final JsonObjectBuilder root =
                     Json.createObjectBuilder()
-                        .add(Keywords.TYPE, Json.createArrayBuilder().add(getType()));
+                        .add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
 
-        if (verificationMethod != null) {
+        if (proof.verificationMethod != null) {
             root.add(BASE + PROOF_VERIFICATION_METHOD,
                     Json.createArrayBuilder()
-                            .add(verificationMethod.toJson()));
+                            .add(keyAdapter.serialize(proof.verificationMethod)));
         }
 
-        if (created != null) {
-            JsonLdUtils.setValue(root, CREATED, created);
+        if (proof.created != null) {
+            JsonLdUtils.setValue(root, CREATED, proof.created);
         }
 
-        if (purpose != null) {
-            JsonLdUtils.setId(root, BASE + PROOF_PURPOSE, purpose);
+        if (proof.purpose != null) {
+            JsonLdUtils.setId(root, BASE + PROOF_PURPOSE, proof.purpose);
         }
 
-        if (domain != null) {
-            JsonLdUtils.setValue(root, BASE + PROOF_DOMAIN, domain);
+        if (proof.domain != null) {
+            JsonLdUtils.setValue(root, BASE + PROOF_DOMAIN, proof.domain);
         }
 
-        if (value != null) {
-            final String proofValue = getValue(MULTIBASE_TYPE);
+        if (proof.value != null) {
+            final String proofValue = encodeValue(MULTIBASE_TYPE, proof.value);
 
             JsonLdUtils.setValue(root, BASE + PROOF_VALUE, MULTIBASE_TYPE, proofValue);
         }
         return root.build();
     }
-
-    /**
-     * Appends the proof to the given VC/VP document.
-     * If the document has been signed already then the proof is added into a proof set.
-     *
-     * @param document VC/VP document
-     * @param proof
-     * 
-     * @return the given VC/VP with the proof attached
-     * 
-     * @throws DataError
-     */
-    public static JsonObject addProof(final JsonObject document, final JsonObject proof) {
-
-        final JsonValue proofPropertyValue = document.get(BASE + PROOF);
-
-        return Json
-    		.createObjectBuilder(document)
-    		.add(BASE + PROOF,
-    	        	((proofPropertyValue != null)
-    	        		? Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue))
-    	    			: Json.createArrayBuilder()
-    	    			)
-    	        	.add(proof)
-        		)
-        	.build();
-    }
-
-
+    
     @Override
-    public URI getPurpose() {
-        return purpose;
+    public JsonObject setProofValue(JsonObject proof, byte[] value) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+   
+    @Override
+    public VerificationMethodAdapter getKeyAdapter() {
+	return keyAdapter;
+    }
+    
+    @Override
+    public String type() {
+	return type;
     }
 
-    @Override
-    public VerificationMethod getVerificationMethod() {
-        return verificationMethod;
-    }
-
-    @Override
-    public Instant getCreated() {
-        return created;
-    }
-
-    @Override
-    public String getDomain() {
-        return domain;
-    }
-
-    @Override
-    public byte[] getValue() {
-        return value;
-    }
-
-    @Override
-    public void setValue(byte[] value) {
-        this.value = value;
-    }
 }

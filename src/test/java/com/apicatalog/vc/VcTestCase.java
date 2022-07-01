@@ -12,9 +12,8 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020Adapter;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
-import com.apicatalog.ld.signature.proof.VerificationMethodReference;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -99,7 +98,7 @@ public class VcTestCase {
 
                 if (JsonLdUtils.isTypeOf("https://w3id.org/security#Ed25519VerificationKey2020", method)) {
                     try {
-                        testCase.verificationMethod = Ed25519VerificationKey2020.from(method);
+                        testCase.verificationMethod = (new Ed25519VerificationKey2020Adapter()).deserialize(method);
 
                     } catch (DataError e) {
                         fail(e);
@@ -107,7 +106,7 @@ public class VcTestCase {
 
                 } else {
                     JsonLdUtils.getId(method)
-                            .ifPresent(id -> testCase.verificationMethod = new VerificationMethodReference(id));
+                            .ifPresent(id -> testCase.verificationMethod = new VerificationMethod(id));
                 }
             }
 

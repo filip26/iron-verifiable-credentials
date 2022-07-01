@@ -12,9 +12,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
+import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.json.JsonLdComparison;
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
@@ -22,10 +24,14 @@ import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.ed25519.Ed25519ProofOptions2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020Adapter;
+import com.apicatalog.ld.signature.ed25519.Ed25519Proof2020Adapter;
+import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
@@ -66,11 +72,15 @@ public class VcTestRunnerJunit {
 
                 assertNotNull(testCase.result);
 
-                Ed25519ProofOptions2020 options = new Ed25519ProofOptions2020();
-                options.setCreated(testCase.created);
-                options.setVerificationMethod(testCase.verificationMethod);
-                options.setPurpose(URI.create("https://w3id.org/security#assertionMethod"));
-                options.setDomain(testCase.domain);
+                ProofOptions options = 
+                		ProofOptions
+                			.create(
+                				Ed25519Proof2020Adapter.TYPE, 
+                				testCase.verificationMethod, 
+                				URI.create("https://w3id.org/security#assertionMethod")
+                				)
+                                        .created(testCase.created)
+                                        .domain(testCase.domain);
 
                 URI keyPairLocation = testCase.keyPair;
 
@@ -80,7 +90,7 @@ public class VcTestRunnerJunit {
                 }
 
                 Issuer issuer = Vc
-                                    .sign(testCase.input, keyPairLocation, options)
+                                    .sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
                                     .loader(LOADER)
                                     ;
 
@@ -203,7 +213,7 @@ public class VcTestRunnerJunit {
         System.out.println(stringWriter.toString());
     }
 
-    public static final void write(final PrintWriter writer, final JsonWriterFactory writerFactory, final String name, final JsonValue result) {
+    static final void write(final PrintWriter writer, final JsonWriterFactory writerFactory, final String name, final JsonValue result) {
 
         writer.println(name + ":");
 
@@ -215,6 +225,21 @@ public class VcTestRunnerJunit {
 
         writer.write(out.toString());
         writer.println();
+    }
+    
+    static final KeyPair getKeys(URI keyPairLocation, DocumentLoader loader) throws DataError, JsonLdError {
+
+        final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
+
+        for (final JsonValue key : keys) {
+
+            if (JsonUtils.isNotObject(key)) {
+        	continue;
+            }
+        	
+            return (KeyPair)(new Ed25519KeyPair2020Adapter()).deserialize(key.asJsonObject());
+        }
+        throw new IllegalStateException();
     }
 
 }

@@ -2,11 +2,9 @@ package com.apicatalog.ld.signature;
 
 import java.net.URI;
 
-import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.ld.signature.proof.EmbeddedProof;
+import com.apicatalog.ld.signature.proof.EmbeddedProofAdapter;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -38,7 +36,7 @@ public class LinkedDataSignature {
             throw new VerificationError();
         }
 
-       final JsonObject proofObject = EmbeddedProof.removeProofValue(proof);
+       final JsonObject proofObject = EmbeddedProofAdapter.removeProofValue(proof);
 
        final byte[] computeSignature = hashCode(document, proofObject);
 
@@ -93,14 +91,6 @@ public class LinkedDataSignature {
     }
 
     public KeyPair keygen(URI id, int length) throws KeyGenError {
-
-        final SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
-
-        final Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(id);
-
-        kp.setPublicKey(keyPair.getPublicKey());
-        kp.setPrivateKey(keyPair.getPrivateKey());
-
-        return kp;
+        return suite.keygen(length);
     }
 }

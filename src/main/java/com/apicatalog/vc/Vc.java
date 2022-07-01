@@ -53,7 +53,7 @@ public final class Vc {
      * Signs VC/VP document. Returns the provided VC/VP with added proof property.
      *
      * @param documentLocation
-     * @param keyPairLocation
+     * @param keyPair
      * @param options
      * 
      * @return {@link Issuer} allowing to set options and to sign the given document
@@ -61,8 +61,8 @@ public final class Vc {
      * @throws DataError
      * @throws SigningError 
      */
-    public static Issuer sign(URI documentLocation, URI keyPairLocation, ProofOptions options) throws DataError, SigningError {
-        return new Issuer(documentLocation, keyPairLocation, options);
+    public static Issuer sign(URI documentLocation, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
+        return new Issuer(documentLocation, keyPair, options);
     }
 
     /**

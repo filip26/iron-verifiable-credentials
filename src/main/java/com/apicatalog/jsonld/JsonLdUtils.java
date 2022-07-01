@@ -6,6 +6,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -52,6 +53,21 @@ public class JsonLdUtils {
                     .map(JsonString::getString)
                     .filter(StringUtils::isNotBlank)
                     .anyMatch(type::equals);
+    }
+
+    public static Collection<String> getType(final JsonObject value) {
+
+        if (value == null) {
+            throw new IllegalArgumentException("The 'object' parameter must not be null.");
+        }
+
+        return JsonUtils
+                    .toStream(value.get(Keywords.TYPE))
+                    .filter(JsonUtils::isString)
+                    .map(JsonString.class::cast)
+                    .map(JsonString::getString)
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.toSet());
     }
 
     public static boolean hasType(final JsonValue expanded) {

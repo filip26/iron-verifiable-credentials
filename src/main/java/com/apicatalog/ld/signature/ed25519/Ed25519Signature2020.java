@@ -8,19 +8,20 @@ import com.apicatalog.ld.signature.primitive.Urdna2015;
 
 public final class Ed25519Signature2020 extends SignatureSuite {
 
-    private static final String TYPE = "https://w3id.org/security#Ed25519Signature2020";
+    protected static final String BASE = "https://w3id.org/security#";
+    protected static final String TYPE = "Ed25519Signature2020";
 
     public Ed25519Signature2020() {
         super(
-            TYPE,
+            BASE + TYPE,
             new Urdna2015(),
             new MessageDigest("SHA-256"),
-            new NativeSignatureProvider("Ed25519"),
-            new Ed25519SignatureAdapter()
+            new Ed25519Signature2020Provider(),
+            new Ed25519Proof2020Adapter()
             );
     }
 
     public static boolean isTypeOf(final String type) {
-        return Objects.equals(TYPE, type);
+        return Objects.equals(BASE + TYPE, type);
     }
 }
