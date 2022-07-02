@@ -8,7 +8,8 @@ public class DataError extends Throwable {
         Missing,
         Unknown,
         UnknownCrypto,
-        Invalid
+        Invalid,
+        UnknownDigest,
     }
 
     private final ErrorType type;

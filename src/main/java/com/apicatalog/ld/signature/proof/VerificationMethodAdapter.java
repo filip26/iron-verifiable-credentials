@@ -1,7 +1,6 @@
-package com.apicatalog.ld.signature.key;
+package com.apicatalog.ld.signature.proof;
 
 import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 import jakarta.json.JsonObject;
 

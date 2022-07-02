@@ -37,7 +37,7 @@ class NativeSignatureProvider implements SignatureAlgorithm {
             suite.update(data);
 
             if (!suite.verify(signature)) {
-                throw new VerificationError(Code.InvalidSignature);     //TODO more details
+                throw new VerificationError(Code.InvalidSignature);
             }
 
         } catch (InvalidParameterSpecException | InvalidKeySpecException | InvalidKeyException

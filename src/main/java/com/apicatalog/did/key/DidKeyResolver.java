@@ -55,7 +55,7 @@ public class DidKeyResolver implements DidResolver {
     public static VerificationKey createSignatureMethod(DidKey didKey) {
 
         if (!Multicodec.Codec.Ed25519PublicKey.equals(didKey.getCodec())) {
-            throw new IllegalArgumentException();       //TODO
+            throw new IllegalArgumentException();
         }
         // 5.
         String encodingType = ED25519_VERIFICATION_KEY_2020_TYPE;

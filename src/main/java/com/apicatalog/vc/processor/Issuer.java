@@ -71,7 +71,7 @@ public final class Issuer extends Processor<Issuer> {
             loader = new StaticContextLoader(loader);
         }
 
-        if (suites == null) {
+        if (suites.isEmpty()) {
             addDefaultSuites();
         }
 

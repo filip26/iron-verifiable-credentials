@@ -22,7 +22,7 @@ public final class MessageDigest implements DigestAlgorithm {
             return digest.digest(data);
 
         } catch (NoSuchAlgorithmException e) {
-            throw new DataError(ErrorType.UnknownCrypto, e);
+            throw new DataError(ErrorType.UnknownDigest, e);
         }
     }
 }

@@ -89,7 +89,7 @@ class Credential implements Verifiable {
             throw new DataError(ErrorType.Missing, SUBJECT);
         }
 
-        JsonLdUtils.assertId(subject, BASE, SUBJECT);   //TODO
+        JsonLdUtils.assertId(subject, BASE, SUBJECT);
 
         // issuer - mandatory
         credential.issuer = JsonLdUtils.assertId(subject, BASE, ISSUER);

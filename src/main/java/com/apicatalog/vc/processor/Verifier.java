@@ -13,6 +13,7 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.signature.DataError;
@@ -21,11 +22,11 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
-import com.apicatalog.ld.signature.key.VerificationMethodAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
+import com.apicatalog.ld.signature.proof.VerificationMethodAdapter;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.JsonArray;
@@ -173,9 +174,15 @@ public final class Verifier extends Processor<Verifier> {
             if (JsonUtils.isNotObject(proofValue)) {
         	throw new DataError(ErrorType.Invalid, "proof");
             }
+            
+            final Collection<String> proofType = EmbeddedProofAdapter.getProofType(proofValue.asJsonObject());
 
+            if (proofType == null || proofType.isEmpty()) {
+        	throw new DataError(ErrorType.Missing, "proof", Keywords.TYPE);
+            }
+            
             final SignatureSuite signatureSuite = 
-        	    			EmbeddedProofAdapter.getProofType(proofValue.asJsonObject())
+    	    				proofType 
                 	    			.stream()
                 	    			.filter(suites::containsKey)
                 	    			.findFirst()
@@ -184,25 +191,12 @@ public final class Verifier extends Processor<Verifier> {
 
             final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 
-//TODO            // check proof type
-//            if (!embeddedProof.isPresent()) {
-//
-//                // @type property
-//                if (!JsonLdUtils.hasType(proofValue)) {
-//                    throw new DataError(ErrorType.Missing, "proof", Keywords.TYPE);
-//                }
-//
-//                throw new VerificationError(Code.UnknownCryptoSuite);
-//            }
-//
-//            final Proof proof = embeddedProof.get();
-
             // check domain
             if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
                 throw new VerificationError(Code.InvalidProofDomain);
             }
 
-            final VerificationMethod verificationMethod = get(proof.getVerificationMethod().getId(), loader, signatureSuite.getProofAdapter().getKeyAdapter()); 
+            final VerificationMethod verificationMethod = get(proof.getVerificationMethod().getId(), loader, signatureSuite.getProofAdapter().getMethodAdapter()); 
 
             if (!(verificationMethod instanceof VerificationKey)) {
         	throw new VerificationError(Code.UnknownVerificationMethod);

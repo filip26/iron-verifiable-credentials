@@ -97,6 +97,7 @@ public class VcTestCase {
                         .getJsonObject(0);
 
                 if (JsonLdUtils.isTypeOf("https://w3id.org/security#Ed25519VerificationKey2020", method)) {
+                    
                     try {
                         testCase.verificationMethod = (new Ed25519VerificationKey2020Adapter()).deserialize(method);
 

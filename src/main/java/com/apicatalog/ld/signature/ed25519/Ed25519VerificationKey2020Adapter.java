@@ -1,7 +1,5 @@
 package com.apicatalog.ld.signature.ed25519;
 
-import java.net.URI;
-
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -9,8 +7,8 @@ import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.ld.signature.key.VerificationMethodAdapter;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
+import com.apicatalog.ld.signature.proof.VerificationMethodAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
@@ -41,9 +39,11 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
 
     @Override
     public VerificationMethod deserialize(JsonObject object) throws DataError {
-        URI id =  JsonLdUtils.getId(object).orElse(null);
-
-        final VerificationKey key = new VerificationKey(id);
+	
+        final VerificationKey key = new VerificationKey();
+        
+        JsonLdUtils.getId(object).ifPresent(key::setId);
+        JsonLdUtils.getType(object).stream().findFirst().ifPresent(key::setType);
 
         return from(key, object);
     }
@@ -52,8 +52,6 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
     public JsonObject serialize(VerificationMethod proof) {
         return serialize(Json.createObjectBuilder(), proof).build();
     }
-
-    //FIXME -----
 
     static final VerificationKey from(VerificationKey key, JsonObject json) throws DataError {
 
@@ -75,9 +73,9 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
 
         // public key
         if (JsonLdUtils.hasPredicate(json, Ed25519Signature2020.BASE + PUBLIC_KEY_MULTIBASE)) {
-            key.setPublicKey(getKey(json, PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey));
+            key.setPublicKey(getKey(json, Ed25519Signature2020.BASE + PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey));
 
-            // verify verification key length - TODO needs to be clarified
+            // verify verification key length
             if (key.getPublicKey() != null
                     && key.getPublicKey().length != 32
                     && key.getPublicKey().length != 57
@@ -93,10 +91,10 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
     static byte[] getKey(JsonObject json, String property, Codec expected) throws DataError {
 
         JsonValue key = JsonLdUtils
-                            .getObjects(json, Ed25519Signature2020.BASE + property)
+                            .getObjects(json, property)
                             .stream()
                             .findFirst()
-                            .orElseThrow(() -> new DataError(ErrorType.Missing, Ed25519Signature2020.BASE + property));
+                            .orElseThrow(() -> new DataError(ErrorType.Missing, Keywords.TYPE));
 
         if (JsonUtils.isArray(key)) {
             key = key.asJsonArray().get(0);
@@ -142,12 +140,14 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
         return Multicodec.decode(codec, encodedKey);
     }
 
-    protected static JsonObjectBuilder serialize(JsonObjectBuilder builder, VerificationMethod key) {
+    static JsonObjectBuilder serialize(JsonObjectBuilder builder, VerificationMethod key) {
         if (key.getId() != null) {
             builder.add(Keywords.ID, key.getId().toString());
         }
 
-        builder.add(Keywords.TYPE, key.getType());
+        if (key.getType() != null) {
+            builder.add(Keywords.TYPE, key.getType());            
+        }
 
         if (key.getController()!= null) {
             JsonLdUtils.setId(builder, Ed25519Signature2020.BASE + CONTROLLER, key.getController());

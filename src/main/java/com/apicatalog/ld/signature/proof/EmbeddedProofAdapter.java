@@ -10,7 +10,6 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
-import com.apicatalog.ld.signature.key.VerificationMethodAdapter;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -250,7 +249,7 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
     }
    
     @Override
-    public VerificationMethodAdapter getKeyAdapter() {
+    public VerificationMethodAdapter getMethodAdapter() {
 	return keyAdapter;
     }
     
