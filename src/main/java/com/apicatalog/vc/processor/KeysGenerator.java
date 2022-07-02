@@ -16,11 +16,11 @@ public final class KeysGenerator extends Processor<KeysGenerator> {
 
     /**
      * Get generated keys
-     * @param id 
-     * @param keyLength 
+     * @param id
+     * @param keyLength
      *
      * @return
-     * @throws KeyGenError 
+     * @throws KeyGenError
      */
     public KeyPair get(URI id, int keyLength) throws KeyGenError {
       return lds.keygen(id, keyLength);

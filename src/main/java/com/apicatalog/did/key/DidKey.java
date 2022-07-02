@@ -13,7 +13,7 @@ import com.apicatalog.multicodec.Multicodec.Type;
  * <p>
  * did-key-format := did:key:MULTIBASE(base58-btc, MULTICODEC(public-key-type, raw-public-key-bytes))
  * </p>
- * 
+ *
  * @see {@link <a href="https://pr-preview.s3.amazonaws.com/w3c-ccg/did-method-key/pull/51.html">DID method key</a>}
  *
  */

@@ -5,20 +5,20 @@ import java.net.URI;
 public class KeyPair extends VerificationKey {
 
     protected byte[] privateKey;
-    
+
     public KeyPair() {
-	super();
+    super();
     }
 
     public KeyPair(URI id) {
-	super(id);
+    super(id);
     }
 
     public byte[] getPrivateKey() {
-	return privateKey;
+    return privateKey;
     }
 
     public void setPrivateKey(byte[] privateKey) {
-	this.privateKey = privateKey;
+    this.privateKey = privateKey;
     }
 }

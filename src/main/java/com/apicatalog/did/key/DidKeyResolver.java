@@ -45,8 +45,8 @@ public class DidKeyResolver implements DidResolver {
 
     /**
      * Creates a new verification key by expading the given DID key.
-     * 
-     * @param didKey 
+     *
+     * @param didKey
      *
      * @see {@link <a href="https://pr-preview.s3.amazonaws.com/w3c-ccg/did-method-key/pull/51.html#signature-method-creation-algorithm">Signature Method Algorithm</a>}
      *
@@ -61,7 +61,7 @@ public class DidKeyResolver implements DidResolver {
         String encodingType = ED25519_VERIFICATION_KEY_2020_TYPE;
 
         final VerificationKey key = new VerificationKey();
-        
+
         key.setId(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
         key.setType(encodingType);
         key.setController(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
@@ -83,12 +83,12 @@ public class DidKeyResolver implements DidResolver {
 
         // 9.
         final VerificationKey key = new VerificationKey();
-        
+
         key.setId(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
         key.setType(encodingType);
         key.setController(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
         key.setPublicKey(didKey.getRawKey());
-        
+
         return key;
     }
 }

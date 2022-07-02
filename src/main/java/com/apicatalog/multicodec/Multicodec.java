@@ -62,7 +62,7 @@ public final class Multicodec {
     static void add(final Codec codec) {
         KEY_REGISTRY.put(codec.asInteger(), codec);
     }
-    
+
     static Optional<Codec> find(byte[] code) {
         return Optional.ofNullable(KEY_REGISTRY.get(new BigInteger(code).intValue()));
     }
@@ -97,7 +97,7 @@ public final class Multicodec {
     public static byte[] decode(final Codec codec, final byte[] encoded) {
         return Arrays.copyOfRange(encoded, codec.length(), encoded.length);
     }
-    
+
     public static byte[] decode(final Type type, final byte[] encoded) throws IllegalArgumentException {
         return codec(type, encoded)
                 .map(codec -> decode(codec, encoded))

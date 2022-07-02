@@ -32,7 +32,7 @@ class DidDocumentImpl implements DidDocument {
     }
 
     protected JsonObjectBuilder toJson(final JsonObjectBuilder builder) {
-	throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException();
     }
 
     @Override
