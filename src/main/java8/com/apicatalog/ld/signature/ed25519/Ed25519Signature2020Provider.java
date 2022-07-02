@@ -59,9 +59,9 @@ public final class Ed25519Signature2020Provider implements SignatureAlgorithm {
             keyPair.setType("https://w3id.org/security#Ed25519KeyPair2020");
             keyPair.setPrivateKey(privateKey);
             keyPair.setPublicKey(publicKey);
-            
+
             return keyPair;
-            
+
         } catch (GeneralSecurityException e) {
             throw new KeyGenError(e);
         }
