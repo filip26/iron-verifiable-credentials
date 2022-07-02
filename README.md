@@ -27,7 +27,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials/artifactId>
-    <version>1.0.0</version>
+    <version>0.7.0</version>
 </dependency>
 
 ```
@@ -39,14 +39,14 @@ or
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials-jre8</artifactId>
-    <version>1.0.0</version>
+    <version>0.7.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```gradle
-compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '1.0.0'
+compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.7.0'
 ```
 
 ## Documentation
