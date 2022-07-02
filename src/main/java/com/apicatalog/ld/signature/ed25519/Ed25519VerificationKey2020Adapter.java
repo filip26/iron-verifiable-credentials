@@ -26,8 +26,7 @@ import jakarta.json.JsonValue;
  */
 public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdapter {
 
-    private static final String TYPE = "Ed25519VerificationKey2020";
-
+    protected static final String TYPE = "Ed25519VerificationKey2020";
     protected static final String CONTROLLER = "controller";
     protected static final String PUBLIC_KEY_MULTIBASE = "publicKeyMultibase";
     protected static final String PUBLIC_KEY_TYPE_VALUE = "https://w3id.org/security#multibase";

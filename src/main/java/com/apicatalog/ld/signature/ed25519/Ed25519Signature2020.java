@@ -30,6 +30,5 @@ public final class Ed25519Signature2020 extends SignatureSuite {
     
     public static ProofOptions createOptions(VerificationMethod method, URI purpose) {
 	return ProofOptions.create(BASE + TYPE, method, purpose);
-    }
-    
+    }    
 }

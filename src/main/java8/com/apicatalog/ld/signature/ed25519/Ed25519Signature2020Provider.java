@@ -7,6 +7,10 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.key.KeyPair;
+import com.google.crypto.tink.signature.SignatureConfig;
+import com.google.crypto.tink.subtle.Ed25519Sign;
+import com.google.crypto.tink.subtle.Ed25519Verify;
 
 public final class Ed25519Signature2020Provider implements SignatureAlgorithm {
 
@@ -51,8 +55,13 @@ public final class Ed25519Signature2020Provider implements SignatureAlgorithm {
             byte[] privateKey = kp.getPrivateKey();
             byte[] publicKey = kp.getPublicKey();
 
-            return new KeyPair(publicKey, privateKey);
-
+            final KeyPair keyPair = new KeyPair();
+            keyPair.setType("https://w3id.org/security#Ed25519KeyPair2020");
+            keyPair.setPrivateKey(privateKey);
+            keyPair.setPublicKey(publicKey);
+            
+            return keyPair;
+            
         } catch (GeneralSecurityException e) {
             throw new KeyGenError(e);
         }
