@@ -33,7 +33,7 @@ public class ProofOptions {
     return verificationMethod;
     }
 
-    public Instant ceated() {
+    public Instant created() {
     return ceated;
     }
 

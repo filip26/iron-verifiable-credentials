@@ -1,10 +1,13 @@
 package com.apicatalog.ld.signature.ed25519;
 
+import java.net.URI;
 import java.util.Objects;
 
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
+import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 public final class Ed25519Signature2020 extends SignatureSuite {
 
@@ -24,4 +27,9 @@ public final class Ed25519Signature2020 extends SignatureSuite {
     public static boolean isTypeOf(final String type) {
         return Objects.equals(BASE + TYPE, type);
     }
+    
+    public static ProofOptions createOptions(VerificationMethod method, URI purpose) {
+	return ProofOptions.create(BASE + TYPE, method, purpose);
+    }
+    
 }
