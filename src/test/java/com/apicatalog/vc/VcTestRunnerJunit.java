@@ -234,7 +234,7 @@ public class VcTestRunnerJunit {
         for (final JsonValue key : keys) {
 
             if (JsonUtils.isNotObject(key)) {
-            continue;
+                continue;
             }
 
             return (KeyPair)(new Ed25519KeyPair2020Adapter()).deserialize(key.asJsonObject());

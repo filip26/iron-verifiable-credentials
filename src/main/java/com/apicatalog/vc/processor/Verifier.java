@@ -211,7 +211,6 @@ public final class Verifier extends Processor<Verifier> {
             }
         }
         // all good
-        return;
     }
 
 
@@ -269,16 +268,16 @@ public final class Verifier extends Processor<Verifier> {
 
     private final void validate(Verifiable verifiable) throws DocumentError, VerificationError {
 
-    if (verifiable.isCredential()) {
+        if (verifiable.isCredential()) {
 
-        // is expired?
-        if (verifiable.asCredential().isExpired()) {
-        throw new VerificationError(Code.Expired);
+            // is expired?
+            if (verifiable.asCredential().isExpired()) {
+        	throw new VerificationError(Code.Expired);
             }
 
-        if (verifiable.asCredential().getIssuanceDate() == null) {
-        throw new DocumentError(ErrorType.Missing, Credential.ISSUANCE_DATE);
+            if (verifiable.asCredential().getIssuanceDate() == null) {
+        	throw new DocumentError(ErrorType.Missing, Credential.ISSUANCE_DATE);
+            }
         }
-    }
     }
 }

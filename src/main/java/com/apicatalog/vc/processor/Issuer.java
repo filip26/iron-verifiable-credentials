@@ -215,11 +215,8 @@ public final class Issuer extends Processor<Issuer> {
     private final void validate(Verifiable verifiable) throws SigningError {
 
         // is expired?
-        if (verifiable.isCredential()) {
-
-            if (verifiable.asCredential().isExpired()) {
+        if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
             throw new SigningError(Code.Expired);
-            }
         }
     }
 }

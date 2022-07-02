@@ -45,7 +45,7 @@ public class LinkedDataSignature {
            suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
 
        } catch (LinkedDataSuiteError e) {
-       throw new VerificationError(com.apicatalog.ld.signature.VerificationError.Code.Internal, e);
+           throw new VerificationError(e);
        }
     }
 
@@ -66,9 +66,9 @@ public class LinkedDataSignature {
     public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError {
 
     try {
-            final byte[] documentHashCode = hashCode(document, options);
+        final byte[] documentHashCode = hashCode(document, options);
 
-            return suite.sign(keyPair.getPrivateKey(), documentHashCode);
+        return suite.sign(keyPair.getPrivateKey(), documentHashCode);
 
     } catch (LinkedDataSuiteError e) {
         throw new SigningError(e);
