@@ -209,42 +209,44 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
         }
     }
     
-    protected JsonObject write(final Proof proof) throws DataError {
+    protected JsonObjectBuilder write(final JsonObjectBuilder builder, final Proof proof) throws DataError {
 
-        final JsonObjectBuilder root =
-                    Json.createObjectBuilder()
-                        .add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
+        
+	builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
 
         if (proof.verificationMethod != null) {
-            root.add(BASE + PROOF_VERIFICATION_METHOD,
+            builder.add(BASE + PROOF_VERIFICATION_METHOD,
                     Json.createArrayBuilder()
                             .add(keyAdapter.serialize(proof.verificationMethod)));
         }
 
         if (proof.created != null) {
-            JsonLdUtils.setValue(root, CREATED, proof.created);
+            JsonLdUtils.setValue(builder, CREATED, proof.created);
         }
 
         if (proof.purpose != null) {
-            JsonLdUtils.setId(root, BASE + PROOF_PURPOSE, proof.purpose);
+            JsonLdUtils.setId(builder, BASE + PROOF_PURPOSE, proof.purpose);
         }
 
         if (proof.domain != null) {
-            JsonLdUtils.setValue(root, BASE + PROOF_DOMAIN, proof.domain);
+            JsonLdUtils.setValue(builder, BASE + PROOF_DOMAIN, proof.domain);
         }
 
         if (proof.value != null) {
             final String proofValue = encodeValue(MULTIBASE_TYPE, proof.value);
 
-            JsonLdUtils.setValue(root, BASE + PROOF_VALUE, MULTIBASE_TYPE, proofValue);
+            JsonLdUtils.setValue(builder, BASE + PROOF_VALUE, MULTIBASE_TYPE, proofValue);
         }
-        return root.build();
+        
+        return builder;
     }
     
     @Override
-    public JsonObject setProofValue(JsonObject proof, byte[] value) {
-        // TODO Auto-generated method stub
-        return null;
+    public JsonObject setProofValue(final JsonObject proof, final byte[] value) throws DataError {
+      
+        final String proofValue = encodeValue(MULTIBASE_TYPE, value);
+        
+        return JsonLdUtils.setValue(Json.createObjectBuilder(proof), BASE + PROOF_VALUE, MULTIBASE_TYPE, proofValue).build();
     }
    
     @Override
@@ -256,5 +258,4 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
     public String type() {
 	return type;
     }
-
 }

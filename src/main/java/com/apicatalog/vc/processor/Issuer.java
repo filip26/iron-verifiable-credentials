@@ -206,11 +206,11 @@ public final class Issuer extends Processor<Issuer> {
 
         final LinkedDataSignature suite = new LinkedDataSignature(signatureSuite);
 
-        final JsonObject proof = signatureSuite.getProofAdapter().serialize(options.toUnsignedProof());
+        JsonObject proof = signatureSuite.getProofAdapter().serialize(options.toUnsignedProof());
 
         final byte[] signature = suite.sign(data, keyPair, proof);
 
-        signatureSuite.getProofAdapter().setProofValue(proof, signature);
+        proof = signatureSuite.getProofAdapter().setProofValue(proof, signature);
         
         return EmbeddedProofAdapter.addProof(object, proof);
     }

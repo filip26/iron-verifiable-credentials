@@ -13,7 +13,7 @@ public interface ProofAdapter {
 
     JsonObject serialize(Proof proof) throws DataError;
 
-    JsonObject setProofValue(JsonObject proof, byte[] value);
+    JsonObject setProofValue(JsonObject proof, byte[] value) throws DataError;
     
     VerificationMethodAdapter getKeyAdapter();
 }

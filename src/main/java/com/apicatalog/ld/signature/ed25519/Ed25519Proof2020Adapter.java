@@ -10,6 +10,7 @@ import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
 /**
@@ -91,8 +92,7 @@ public class Ed25519Proof2020Adapter extends EmbeddedProofAdapter {
     }
     
     @Override
-    public JsonObject serialize(Proof proof) {
-        // TODO Auto-generated method stub
-        return null;
+    public JsonObject serialize(Proof proof) throws DataError {
+	return write(Json.createObjectBuilder(), proof).build();
     }    
 }
