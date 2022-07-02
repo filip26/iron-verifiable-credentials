@@ -8,8 +8,8 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -36,15 +36,11 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
 
     protected final String type;
     protected final VerificationMethodAdapter keyAdapter;
-    
-    protected EmbeddedProofAdapter(String type, VerificationMethodAdapter keyAdapter) {
-	this.type = type;
-	this.keyAdapter = keyAdapter;
-    }
-    
-//    protected abstract void setValue(String encoding, String value) throws DataError;
 
-//    protected abstract String getValue(String encoding) throws DataError;;
+    protected EmbeddedProofAdapter(String type, VerificationMethodAdapter keyAdapter) {
+    this.type = type;
+    this.keyAdapter = keyAdapter;
+    }
 
     /**
      * Appends the proof to the given VC/VP document.
@@ -52,25 +48,25 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
      *
      * @param document VC/VP document
      * @param proof
-     * 
+     *
      * @return the given VC/VP with the proof attached
-     * 
-     * @throws DataError
+     *
+     * @throws DocumentError
      */
     public static JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
         final JsonValue proofPropertyValue = document.get(BASE + PROOF);
 
         return Json
-    		.createObjectBuilder(document)
-    		.add(BASE + PROOF,
-    	        	((proofPropertyValue != null)
-    	        		? Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue))
-    	    			: Json.createArrayBuilder()
-    	    			)
-    	        	.add(proof)
-        		)
-        	.build();
+            .createObjectBuilder(document)
+            .add(BASE + PROOF,
+                    ((proofPropertyValue != null)
+                        ? Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue))
+                        : Json.createArrayBuilder()
+                        )
+                    .add(proof)
+                )
+            .build();
     }
 
     public static boolean hasProof(JsonObject proof) {
@@ -89,26 +85,16 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
         return Json.createObjectBuilder(proof).remove(BASE + PROOF_VALUE).build();
     }
 
-    public static Collection<String> getProofType(final JsonObject proof) throws DataError {
-	return JsonLdUtils
-		.getObjects(proof, Keywords.TYPE)
-		.stream()
-		.filter(JsonUtils::isString)
-		.map(JsonString.class::cast)
-		.map(JsonString::getString)
-		.toList();
-    }
-    
-    protected abstract byte[] decodeValue(String encoding, String value) throws DataError;
-    protected abstract String encodeValue(String encoding, byte[] value) throws DataError;
-    
-    protected void read(Proof proof, JsonObject proofObject) throws DataError {
+    protected abstract byte[] decodeValue(String encoding, String value) throws DocumentError;
+    protected abstract String encodeValue(String encoding, byte[] value) throws DocumentError;
+
+    protected void read(Proof proof, JsonObject proofObject) throws DocumentError {
         // proofPurpose property
         proof.purpose = JsonLdUtils.assertId(proofObject, BASE, PROOF_PURPOSE);
 
         // verificationMethod property
         if (!proofObject.containsKey(BASE + PROOF_VERIFICATION_METHOD)) {
-            throw new DataError(ErrorType.Missing, PROOF_VERIFICATION_METHOD);
+            throw new DocumentError(ErrorType.Missing, PROOF_VERIFICATION_METHOD);
         }
 
         final JsonValue verificationMethodValue = proofObject.get(BASE + PROOF_VERIFICATION_METHOD);
@@ -121,16 +107,16 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
                 proof.verificationMethod = keyAdapter.deserialize(verificationMethodItem.asJsonObject());
 
             } else {
-                throw new DataError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD);
+                throw new DocumentError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD);
             }
 
         } else {
-            throw new DataError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD);
+            throw new DocumentError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD);
         }
 
         // proofValue property
         if (!proofObject.containsKey(BASE + PROOF_VALUE)) {
-            throw new DataError(ErrorType.Missing, PROOF, Keywords.VALUE);
+            throw new DocumentError(ErrorType.Missing, PROOF, Keywords.VALUE);
         }
 
         final JsonValue embeddedProofValue = proofObject.get(BASE + PROOF_VALUE);
@@ -143,7 +129,7 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
                             .map(o -> o.get(Keywords.VALUE))
                             .allMatch(JsonUtils::isString)
                     ) {
-                throw new DataError(ErrorType.Invalid, PROOF, Keywords.VALUE);
+                throw new DocumentError(ErrorType.Invalid, PROOF, Keywords.VALUE);
             }
 
 
@@ -154,12 +140,12 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
             proof.value = decodeValue(proofValueType, encodedProofValue);
 
         } else {
-            throw new DataError(ErrorType.Invalid, PROOF, Keywords.VALUE);
+            throw new DocumentError(ErrorType.Invalid, PROOF, Keywords.VALUE);
         }
 
         // created property
         if (!proofObject.containsKey(CREATED)) {
-            throw new DataError(ErrorType.Missing, "created");
+            throw new DocumentError(ErrorType.Missing, "created");
         }
 
         final JsonValue createdValue = proofObject.get(CREATED);
@@ -171,16 +157,16 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
 
             // expect value object and date in ISO 8601 format
             if (!ValueObject.isValueObject(createdItem)) {
-                throw new DataError(ErrorType.Invalid, "created");
+                throw new DocumentError(ErrorType.Invalid, "created");
             }
 
-            final String createdString = 
-        	    		ValueObject
-        	    			.getValue(createdItem)
-        	    			.filter(JsonUtils::isString)
-        	    			.map(JsonString.class::cast)
-    	    				.map(JsonString::getString)
-    	    				.orElseThrow(() -> new DataError(ErrorType.Invalid, "created"));
+            final String createdString =
+                        ValueObject
+                            .getValue(createdItem)
+                            .filter(JsonUtils::isString)
+                            .map(JsonString.class::cast)
+                            .map(JsonString::getString)
+                            .orElseThrow(() -> new DocumentError(ErrorType.Invalid, "created"));
 
             try {
                 OffsetDateTime created = OffsetDateTime.parse(createdString);
@@ -188,30 +174,30 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
                 proof.created = created.toInstant();
 
             } catch (DateTimeParseException e) {
-                throw new DataError(ErrorType.Invalid, "created");
+                throw new DocumentError(ErrorType.Invalid, "created");
             }
 
 
         } else {
-            throw new DataError(ErrorType.Invalid, "created");
+            throw new DocumentError(ErrorType.Invalid, "created");
         }
 
         // domain property
         if (proofObject.containsKey(BASE + PROOF_DOMAIN)) {
-            proof.domain = 
-	    		ValueObject
-	    			.getValue(proofObject.get(BASE + PROOF_DOMAIN).asJsonArray().get(0))
-	    			.filter(JsonUtils::isString)
-	    			.map(JsonString.class::cast)
-	    			.map(JsonString::getString)
-	    			.orElseThrow(() -> new DataError(ErrorType.Invalid, PROOF_DOMAIN));
+            proof.domain =
+                ValueObject
+                    .getValue(proofObject.get(BASE + PROOF_DOMAIN).asJsonArray().get(0))
+                    .filter(JsonUtils::isString)
+                    .map(JsonString.class::cast)
+                    .map(JsonString::getString)
+                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, PROOF_DOMAIN));
         }
     }
-    
-    protected JsonObjectBuilder write(final JsonObjectBuilder builder, final Proof proof) throws DataError {
 
-        
-	builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
+    protected JsonObjectBuilder write(final JsonObjectBuilder builder, final Proof proof) throws DocumentError {
+
+
+    builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
 
         if (proof.verificationMethod != null) {
             builder.add(BASE + PROOF_VERIFICATION_METHOD,
@@ -236,25 +222,25 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
 
             JsonLdUtils.setValue(builder, BASE + PROOF_VALUE, MULTIBASE_TYPE, proofValue);
         }
-        
+
         return builder;
     }
-    
+
     @Override
-    public JsonObject setProofValue(final JsonObject proof, final byte[] value) throws DataError {
-      
+    public JsonObject setProofValue(final JsonObject proof, final byte[] value) throws DocumentError {
+
         final String proofValue = encodeValue(MULTIBASE_TYPE, value);
-        
+
         return JsonLdUtils.setValue(Json.createObjectBuilder(proof), BASE + PROOF_VALUE, MULTIBASE_TYPE, proofValue).build();
     }
-   
+
     @Override
     public VerificationMethodAdapter getMethodAdapter() {
-	return keyAdapter;
+    return keyAdapter;
     }
-    
+
     @Override
     public String type() {
-	return type;
+    return type;
     }
 }

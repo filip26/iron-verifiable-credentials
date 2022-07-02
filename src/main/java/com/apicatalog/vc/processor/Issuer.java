@@ -9,8 +9,8 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SigningError;
@@ -56,11 +56,11 @@ public final class Issuer extends Processor<Issuer> {
      * Get signed document in expanded form.
      *
      * @return the signed document in expanded form
-     * 
+     *
      * @throws SigningError
-     * @throws DataError
+     * @throws DocumentError
      */
-    public JsonObject getExpanded() throws SigningError, DataError {
+    public JsonObject getExpanded() throws SigningError, DocumentError {
 
         if (loader == null) {
             // default loader
@@ -90,13 +90,13 @@ public final class Issuer extends Processor<Issuer> {
      * Get signed document in compacted form.
      *
      * @param contextLocation a context used to compact the document
-     * 
+     *
      * @return the signed document in compacted form
-     * 
+     *
      * @throws SigningError
-     * @throws DataError
+     * @throws DocumentError
      */
-    public JsonObject getCompacted(final URI contextLocation) throws SigningError, DataError {
+    public JsonObject getCompacted(final URI contextLocation) throws SigningError, DocumentError {
 
         final JsonObject signed = getExpanded();
 
@@ -111,11 +111,11 @@ public final class Issuer extends Processor<Issuer> {
      * Get signed document compacted using standard contexts.
      *
      * @return the signed document in compacted form
-     * 
-     * @throws SigningError 
-     * @throws DataError 
+     *
+     * @throws SigningError
+     * @throws DocumentError
      */
-    public JsonObject getCompacted() throws SigningError, DataError  {
+    public JsonObject getCompacted() throws SigningError, DocumentError  {
 
         final JsonArray context = Json
                                     .createArrayBuilder()
@@ -128,15 +128,15 @@ public final class Issuer extends Processor<Issuer> {
 
     /**
      * Get signed document in compacted form.
-     * 
+     *
      * @param context a context or an array of contexts used to compact the document
-     * 
+     *
      * @return the signed document in compacted form
-     * 
+     *
      * @throws SigningError
-     * @throws DataError
+     * @throws DocumentError
      */
-    public JsonObject getCompacted(final JsonStructure context) throws SigningError, DataError {
+    public JsonObject getCompacted(final JsonStructure context) throws SigningError, DocumentError {
 
         final JsonObject signed = getExpanded();
 
@@ -147,7 +147,7 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    private final JsonObject sign(final URI documentLocation, final KeyPair keyPair, final ProofOptions options) throws DataError, SigningError {
+    private final JsonObject sign(final URI documentLocation, final KeyPair keyPair, final ProofOptions options) throws DocumentError, SigningError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).base(base).get();
@@ -159,7 +159,7 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    private final JsonObject sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
+    private final JsonObject sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DocumentError, SigningError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).base(base).get();
@@ -171,26 +171,23 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DataError {
+    private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DocumentError {
 
         JsonObject object = JsonLdUtils
-        			.findFirstObject(expanded)
-        			.orElseThrow(() ->
-        				// malformed input, not single object to sign has been found
-        				new DataError(ErrorType.Invalid, "document")
-        				);
+                    .findFirstObject(expanded)
+                    .orElseThrow(() ->
+                        // malformed input, not single object to sign has been found
+                        new DocumentError(ErrorType.Invalid, "document")
+                        );
 
-        final Verifiable verifiable = get(object, true);
+        final Verifiable verifiable = get(object);
 
-        // is expired?
-        if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
-            throw new SigningError(Code.Expired);
-        }
+        validate(verifiable);
 
         final SignatureSuite signatureSuite = suites.get(options.type());
 
         if (signatureSuite == null) {
-            throw new SigningError(Code.UnknownCryptoSuite);   
+            throw new SigningError(Code.UnknownCryptoSuite);
         }
 
         JsonObject data = EmbeddedProofAdapter.removeProof(object);
@@ -211,7 +208,18 @@ public final class Issuer extends Processor<Issuer> {
         final byte[] signature = suite.sign(data, keyPair, proof);
 
         proof = signatureSuite.getProofAdapter().setProofValue(proof, signature);
-        
+
         return EmbeddedProofAdapter.addProof(object, proof);
+    }
+
+    private final void validate(Verifiable verifiable) throws SigningError {
+
+        // is expired?
+        if (verifiable.isCredential()) {
+
+            if (verifiable.asCredential().isExpired()) {
+            throw new SigningError(Code.Expired);
+            }
+        }
     }
 }

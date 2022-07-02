@@ -3,7 +3,7 @@ package com.apicatalog.ld.signature.ed25519;
 import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLdUtils;
-import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 import com.apicatalog.multicodec.Multicodec.Codec;
@@ -19,12 +19,12 @@ public class Ed25519KeyPair2020Adapter extends Ed25519VerificationKey2020Adapter
 
     @Override
     public String getType() {
-	return Ed25519Signature2020.BASE + TYPE;
+    return Ed25519Signature2020.BASE + TYPE;
     }
-    
+
     @Override
-    public VerificationMethod deserialize(JsonObject object) throws DataError {
-	
+    public VerificationMethod deserialize(JsonObject object) throws DocumentError {
+
         URI id =  JsonLdUtils.getId(object).orElse(null);
 
         final KeyPair key = new KeyPair(id);
@@ -51,5 +51,5 @@ public class Ed25519KeyPair2020Adapter extends Ed25519VerificationKey2020Adapter
 
         return builder.build();
 
-    }    
+    }
 }

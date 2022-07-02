@@ -21,7 +21,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020Adapter;
@@ -72,13 +72,13 @@ public class VcTestRunnerJunit {
 
                 assertNotNull(testCase.result);
 
-                ProofOptions options = 
-                		ProofOptions
-                			.create(
-                				Ed25519Proof2020Adapter.TYPE, 
-                				testCase.verificationMethod, 
-                				URI.create("https://w3id.org/security#assertionMethod")
-                				)
+                ProofOptions options =
+                        ProofOptions
+                            .create(
+                                Ed25519Proof2020Adapter.TYPE,
+                                testCase.verificationMethod,
+                                URI.create("https://w3id.org/security#assertionMethod")
+                                )
                                         .created(testCase.created)
                                         .domain(testCase.domain);
 
@@ -137,7 +137,7 @@ public class VcTestRunnerJunit {
         } catch (SigningError e) {
             assertException(e.getCode() != null ? e.getCode().name() : null, e);
 
-        } catch (DataError e) {
+        } catch (DocumentError e) {
             assertException(toCode(e), e);
 
         } catch (JsonLdError e) {
@@ -146,7 +146,7 @@ public class VcTestRunnerJunit {
         }
     }
 
-    final static String toCode(DataError e) {
+    final static String toCode(DocumentError e) {
         final StringBuilder sb = new StringBuilder();
         if (e.getType() != null) {
             sb.append(e.getType().name());
@@ -226,17 +226,17 @@ public class VcTestRunnerJunit {
         writer.write(out.toString());
         writer.println();
     }
-    
-    static final KeyPair getKeys(URI keyPairLocation, DocumentLoader loader) throws DataError, JsonLdError {
+
+    static final KeyPair getKeys(URI keyPairLocation, DocumentLoader loader) throws DocumentError, JsonLdError {
 
         final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
 
         for (final JsonValue key : keys) {
 
             if (JsonUtils.isNotObject(key)) {
-        	continue;
+            continue;
             }
-        	
+
             return (KeyPair)(new Ed25519KeyPair2020Adapter()).deserialize(key.asJsonObject());
         }
         throw new IllegalStateException();

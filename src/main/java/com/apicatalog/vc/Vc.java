@@ -2,7 +2,7 @@ package com.apicatalog.vc;
 
 import java.net.URI;
 
-import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.KeyGenError.Code;
 import com.apicatalog.ld.signature.LinkedDataSignature;
@@ -27,11 +27,11 @@ public final class Vc {
      *
      * @param location a location of the document to verify
      * @return {@link Verifier} allowing to set options and assert document's validity
-     * 
-     * @throws DataError
+     *
+     * @throws DocumentError
      * @throws VerificationError
      */
-    public static Verifier verify(URI location) throws DataError, VerificationError {
+    public static Verifier verify(URI location) throws DocumentError, VerificationError {
         return new Verifier(location);
     }
 
@@ -39,13 +39,13 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param document the document to verify
-     * 
+     *
      * @return {@link Verifier} allowing to set options and assert document's validity
-     *  
-     * @throws DataError
+     *
+     * @throws DocumentError
      * @throws VerificationError
      */
-    public static Verifier verify(JsonObject document) throws DataError, VerificationError {
+    public static Verifier verify(JsonObject document) throws DocumentError, VerificationError {
         return new Verifier(document);
     }
 
@@ -55,13 +55,13 @@ public final class Vc {
      * @param documentLocation
      * @param keyPair
      * @param options
-     * 
+     *
      * @return {@link Issuer} allowing to set options and to sign the given document
-     * 
-     * @throws DataError
-     * @throws SigningError 
+     *
+     * @throws DocumentError
+     * @throws SigningError
      */
-    public static Issuer sign(URI documentLocation, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
+    public static Issuer sign(URI documentLocation, KeyPair keyPair, ProofOptions options) throws DocumentError, SigningError {
         return new Issuer(documentLocation, keyPair, options);
     }
 
@@ -71,13 +71,13 @@ public final class Vc {
      * @param document
      * @param keyPair
      * @param options
-     * 
+     *
      * @return {@link Issuer} allowing to set options and to sign the given document
-     * 
-     * @throws DataError
-     * @throws SigningError 
+     *
+     * @throws DocumentError
+     * @throws SigningError
      */
-    public static Issuer sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DataError, SigningError {
+    public static Issuer sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DocumentError, SigningError {
         return new Issuer(document, keyPair, options);
     }
 
@@ -85,10 +85,10 @@ public final class Vc {
      * Generates public/private key pair.
      *
      * @param type requested key pair type, e.g. <code>https://w3id.org/security#Ed25519KeyPair2020</code>
-     * 
+     *
      * @return {@link KeyGenError} allowing to set options and to generate key pair
-     * 
-     * @throws KeyGenError 
+     *
+     * @throws KeyGenError
      */
     public static KeysGenerator generateKeys(String type) throws KeyGenError {
 

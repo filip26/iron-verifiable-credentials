@@ -1,6 +1,6 @@
 package com.apicatalog.ld.signature.algorithm;
 
-import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.LinkedDataSuiteError;
 
 import jakarta.json.JsonStructure;
 
@@ -11,6 +11,6 @@ import jakarta.json.JsonStructure;
  */
 public interface CanonicalizationAlgorithm {
 
-    byte[] canonicalize(JsonStructure json) throws DataError;
+    byte[] canonicalize(JsonStructure json) throws LinkedDataSuiteError;
 
 }

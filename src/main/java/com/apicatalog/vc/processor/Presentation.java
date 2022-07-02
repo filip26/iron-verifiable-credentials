@@ -7,8 +7,8 @@ import java.util.Collection;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -39,8 +39,7 @@ class Presentation implements Verifiable {
         return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
     }
 
-    //TODO separate mandatory/optional validation
-    public static Presentation from(JsonObject subject, boolean issue /*FIXME hack, remove */) throws DataError {
+    public static Presentation from(JsonObject subject) throws DocumentError {
 
         if (subject == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
@@ -52,17 +51,17 @@ class Presentation implements Verifiable {
         if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
 
             if (!JsonLdUtils.hasType(subject)) {
-                throw new DataError(ErrorType.Missing, Keywords.TYPE);
+                throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
             }
 
-            throw new DataError(ErrorType.Unknown, Keywords.TYPE);
+            throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
         }
 
         // @id - optional
         if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
             presentation.id = JsonLdUtils
-    	    			.getId(subject)
-    	    			.orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
+                        .getId(subject)
+                        .orElseThrow(() -> new DocumentError(ErrorType.Invalid, Keywords.ID));
         }
         // holder - optional
         if (JsonLdUtils.hasPredicate(subject, BASE + HOLDER)) {
@@ -75,10 +74,10 @@ class Presentation implements Verifiable {
         for (final JsonValue credential : JsonLdUtils.getObjects(subject, BASE + VERIFIABLE_CREDENTIALS)) {
 
             if (JsonUtils.isNotObject(credential)) {
-                throw new DataError(ErrorType.Invalid, VERIFIABLE_CREDENTIALS);
+                throw new DocumentError(ErrorType.Invalid, VERIFIABLE_CREDENTIALS);
             }
 
-            presentation.credentials.add(Credential.from(credential.asJsonObject(), issue));
+            presentation.credentials.add(Credential.from(credential.asJsonObject()));
         }
 
         return presentation;

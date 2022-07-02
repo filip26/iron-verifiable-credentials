@@ -7,8 +7,8 @@ import java.util.Map;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 
@@ -21,7 +21,7 @@ abstract class Processor<T extends Processor<?>> {
     protected URI base;
 
     protected final Map<String, SignatureSuite> suites;
-    
+
     protected Processor() {
         // default values
         this.loader = null;
@@ -71,15 +71,15 @@ abstract class Processor<T extends Processor<?>> {
         this.suites.put(suite.getId(), suite);
         return (T)this;
     }
-    
-    protected static Verifiable get(JsonObject expanded, boolean issue /*FIXME hack remove */) throws DataError {
+
+    protected static Verifiable get(JsonObject expanded) throws DocumentError {
         // is a credential?
         if (Credential.isCredential(expanded)) {
 
             final JsonObject object = expanded.asJsonObject();
 
             // validate the credential object
-            final Credential credential = Credential.from(object, issue);
+            final Credential credential = Credential.from(object);
 
             return credential;
         }
@@ -90,20 +90,20 @@ abstract class Processor<T extends Processor<?>> {
             final JsonObject object =expanded.asJsonObject();
 
             // validate the presentation object
-            final Presentation presentation = Presentation.from(object, issue);
+            final Presentation presentation = Presentation.from(object);
 
             return presentation;
         }
 
         // is not expanded JSON-LD object
         if (!JsonLdUtils.hasType(expanded)) {
-            throw new DataError(ErrorType.Missing, Keywords.TYPE);
+            throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
         }
 
-        throw new DataError(ErrorType.Unknown, Keywords.TYPE);
+        throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
     }
-    
+
     protected void addDefaultSuites() {
-	suite(new Ed25519Signature2020());
+    suite(new Ed25519Signature2020());
     }
 }

@@ -12,8 +12,8 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.uri.UriUtils;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -117,17 +117,17 @@ public class JsonLdUtils {
         return JsonUtils.toCollection(value);
     }
 
-    public static URI assertId(JsonValue subject, String base, String property) throws DataError {
+    public static URI assertId(JsonValue subject, String base, String property) throws DocumentError {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), base + property)) {
-            throw new DataError(ErrorType.Missing, property);
+            throw new DocumentError(ErrorType.Missing, property);
         }
 
         JsonValue value = JsonLdUtils
                                     .getObjects(subject.asJsonObject(), base + property)
                                     .stream()
                                     .findFirst()
-                                    .orElseThrow(() -> new DataError(ErrorType.Missing, property));
+                                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, property));
 
         if (JsonUtils.isObject(value)) {
             value  = value.asJsonObject().get(Keywords.ID);
@@ -139,27 +139,27 @@ public class JsonLdUtils {
             id = ((JsonString)value).getString();
 
         } else {
-            throw new DataError(ErrorType.Invalid, property);
+            throw new DocumentError(ErrorType.Invalid, property);
         }
 
         if (UriUtils.isURI(id)) {
             return URI.create(id);
         }
 
-        throw new DataError(ErrorType.Invalid, property, Keywords.ID);
+        throw new DocumentError(ErrorType.Invalid, property, Keywords.ID);
     }
 
-    public static Instant assertXsdDateTime(JsonValue subject, String base, String property) throws DataError {
+    public static Instant assertXsdDateTime(JsonValue subject, String base, String property) throws DocumentError {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), base + property)) {
-            throw new DataError(ErrorType.Missing, property);
+            throw new DocumentError(ErrorType.Missing, property);
         }
 
         final JsonValue value = JsonLdUtils
                                     .getObjects(subject.asJsonObject(), base + property)
                                     .stream()
                                     .findFirst()
-                                    .orElseThrow(() -> new DataError(ErrorType.Missing, property, Keywords.VALUE));
+                                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, property, Keywords.VALUE));
 
         if (isXsdDateTime(value)) {
             return JsonUtils.toStream(value)
@@ -181,9 +181,9 @@ public class JsonLdUtils {
                         }
                         return null;
                     })
-                    .orElseThrow(() ->  new DataError(ErrorType.Invalid, property, Keywords.VALUE));
+                    .orElseThrow(() ->  new DocumentError(ErrorType.Invalid, property, Keywords.VALUE));
         }
-        throw new DataError(ErrorType.Invalid, property, Keywords.TYPE);
+        throw new DocumentError(ErrorType.Invalid, property, Keywords.TYPE);
     }
 
     public static final Optional<URI> getId(JsonValue value) {

@@ -4,8 +4,8 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 import com.apicatalog.ld.signature.proof.VerificationMethodAdapter;
@@ -34,14 +34,14 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
 
     @Override
     public String getType() {
-	return Ed25519Signature2020.BASE + TYPE;
+    return Ed25519Signature2020.BASE + TYPE;
     }
 
     @Override
-    public VerificationMethod deserialize(JsonObject object) throws DataError {
-	
+    public VerificationMethod deserialize(JsonObject object) throws DocumentError {
+
         final VerificationKey key = new VerificationKey();
-        
+
         JsonLdUtils.getId(object).ifPresent(key::setId);
         JsonLdUtils.getType(object).stream().findFirst().ifPresent(key::setType);
 
@@ -53,7 +53,7 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
         return serialize(Json.createObjectBuilder(), proof).build();
     }
 
-    static final VerificationKey from(VerificationKey key, JsonObject json) throws DataError {
+    static final VerificationKey from(VerificationKey key, JsonObject json) throws DocumentError {
 
         // controller
         JsonLdUtils.getObjects(json, Ed25519Signature2020.BASE + CONTROLLER)
@@ -81,61 +81,61 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
                     && key.getPublicKey().length != 57
                     && key.getPublicKey().length != 114
                     ) {
-                throw new DataError(ErrorType.Invalid, "proof", Keywords.VALUE, "length");
+                throw new DocumentError(ErrorType.Invalid, "proof", Keywords.VALUE, "length");
             }
         }
         return key;
     }
 
 
-    static byte[] getKey(JsonObject json, String property, Codec expected) throws DataError {
+    static byte[] getKey(JsonObject json, String property, Codec expected) throws DocumentError {
 
         JsonValue key = JsonLdUtils
                             .getObjects(json, property)
                             .stream()
                             .findFirst()
-                            .orElseThrow(() -> new DataError(ErrorType.Missing, Keywords.TYPE));
+                            .orElseThrow(() -> new DocumentError(ErrorType.Missing, Keywords.TYPE));
 
         if (JsonUtils.isArray(key)) {
             key = key.asJsonArray().get(0);
         }
 
         if (!ValueObject.isValueObject(key)) {
-            throw new DataError(ErrorType.Invalid, property);
+            throw new DocumentError(ErrorType.Invalid, property);
         }
 
         if (!JsonLdUtils.isTypeOf(PUBLIC_KEY_TYPE_VALUE, key.asJsonObject())) {
-            throw new DataError(ErrorType.Invalid, property, Keywords.TYPE);
+            throw new DocumentError(ErrorType.Invalid, property, Keywords.TYPE);
         }
 
         final String keyMultibase = ValueObject
-        				.getValue(key)
-        				.filter(JsonUtils::isString)
-        				.map(JsonString.class::cast)
-        				.map(JsonString::getString)
-        				.orElseThrow(() -> new DataError(ErrorType.Invalid, property));
+                        .getValue(key)
+                        .filter(JsonUtils::isString)
+                        .map(JsonString.class::cast)
+                        .map(JsonString::getString)
+                        .orElseThrow(() -> new DocumentError(ErrorType.Invalid, property));
         // decode private key
         final byte[] encodedKey = Multibase.decode(keyMultibase);
 
         final Codec codec = Multicodec
-        			.codec(Type.Key, encodedKey)
-        			.orElseThrow(() -> new DataError(ErrorType.Invalid, property));
+                    .codec(Type.Key, encodedKey)
+                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, property));
 
         if (expected != codec) {
-            throw new DataError(ErrorType.Invalid, property);
+            throw new DocumentError(ErrorType.Invalid, property);
         }
 
         return Multicodec.decode(codec, encodedKey);
     }
 
-    static byte[] decodeKey(final String multibase) throws DataError {
+    static byte[] decodeKey(final String multibase) throws DocumentError {
 
         // decode private key
         final byte[] encodedKey = Multibase.decode(multibase);
 
         final Codec codec = Multicodec
-        			.codec(Type.Key, encodedKey)
-        			.orElseThrow(() -> new DataError(ErrorType.Invalid, "key"));
+                    .codec(Type.Key, encodedKey)
+                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, "key"));
 
         return Multicodec.decode(codec, encodedKey);
     }
@@ -146,17 +146,17 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
         }
 
         if (key.getType() != null) {
-            builder.add(Keywords.TYPE, key.getType());            
+            builder.add(Keywords.TYPE, key.getType());
         }
 
         if (key.getController()!= null) {
             JsonLdUtils.setId(builder, Ed25519Signature2020.BASE + CONTROLLER, key.getController());
         }
-        
+
         if (key instanceof VerificationKey) {
             return setKey(builder, ((VerificationKey)key).getPublicKey(), Ed25519Signature2020.BASE + PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
         }
-        
+
         return builder;
     }
 

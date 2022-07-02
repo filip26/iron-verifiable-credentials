@@ -16,8 +16,8 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.VerificationError;
@@ -77,9 +77,9 @@ public final class Verifier extends Processor<Verifier> {
     /**
      * Verifies VC/VP document. Throws VerificationError if the document is not valid or cannot be verified.
      * @throws VerificationError
-     * @throws DataError
+     * @throws DocumentError
      */
-    public void isValid() throws VerificationError, DataError {
+    public void isValid() throws VerificationError, DocumentError {
 
         if (loader == null) {
             // default loader
@@ -107,7 +107,7 @@ public final class Verifier extends Processor<Verifier> {
         throw new IllegalStateException();
     }
 
-    private void verify(URI location) throws VerificationError, DataError {
+    private void verify(URI location) throws VerificationError, DocumentError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(location).loader(loader).base(base).get();
@@ -119,7 +119,7 @@ public final class Verifier extends Processor<Verifier> {
         }
     }
 
-    private void verify(JsonObject document) throws VerificationError, DataError {
+    private void verify(JsonObject document) throws VerificationError, DocumentError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).base(base).get();
@@ -131,63 +131,60 @@ public final class Verifier extends Processor<Verifier> {
         }
     }
 
-    private void verifyExpanded(JsonArray expanded) throws VerificationError, DataError {
+    private void verifyExpanded(JsonArray expanded) throws VerificationError, DocumentError {
 
         if (expanded == null || expanded.isEmpty()) {
-            throw new DataError(ErrorType.Invalid, "document");
+            throw new DocumentError(ErrorType.Invalid, "document");
         }
 
         for (final JsonValue item : expanded) {
             if (JsonUtils.isNotObject(item)) {
-                throw new VerificationError();
+                throw new DocumentError(ErrorType.Invalid, "document");
             }
             verifyExpanded(item.asJsonObject());
         }
     }
 
-    private void verifyExpanded(JsonObject expanded) throws VerificationError, DataError {
+    private void verifyExpanded(JsonObject expanded) throws VerificationError, DocumentError {
 
         // data integrity checks
-        final Verifiable verifiable = get(expanded, false);
+        final Verifiable verifiable = get(expanded);
 
-        // is expired?
-        if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
-            throw new VerificationError(Code.Expired);
-        }
+        validate(verifiable);
 
         // proof set
         if (!EmbeddedProofAdapter.hasProof(expanded)) {
-            throw new DataError(ErrorType.Missing, "proof");
+            throw new DocumentError(ErrorType.Missing, "proof");
         }
 
         final Collection<JsonValue> proofs = EmbeddedProofAdapter.getProof(expanded);
 
         if (proofs == null || proofs.size() == 0) {
-            throw new DataError(ErrorType.Missing, "proof");
+            throw new DocumentError(ErrorType.Missing, "proof");
         }
 
         final JsonObject data = EmbeddedProofAdapter.removeProof(expanded);
 
         // verify attached proofs' signatures
         for (final JsonValue proofValue : proofs) {
-    	
+
             if (JsonUtils.isNotObject(proofValue)) {
-        	throw new DataError(ErrorType.Invalid, "proof");
+            throw new DocumentError(ErrorType.Invalid, "proof");
             }
-            
-            final Collection<String> proofType = EmbeddedProofAdapter.getProofType(proofValue.asJsonObject());
+
+            final Collection<String> proofType = JsonLdUtils.getType(proofValue.asJsonObject());
 
             if (proofType == null || proofType.isEmpty()) {
-        	throw new DataError(ErrorType.Missing, "proof", Keywords.TYPE);
+            throw new DocumentError(ErrorType.Missing, "proof", Keywords.TYPE);
             }
-            
-            final SignatureSuite signatureSuite = 
-    	    				proofType 
-                	    			.stream()
-                	    			.filter(suites::containsKey)
-                	    			.findFirst()
-                	    			.map(suites::get)
-          	    				.orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
+
+            final SignatureSuite signatureSuite =
+                            proofType
+                                    .stream()
+                                    .filter(suites::containsKey)
+                                    .findFirst()
+                                    .map(suites::get)
+                                  .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
 
             final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 
@@ -196,10 +193,10 @@ public final class Verifier extends Processor<Verifier> {
                 throw new VerificationError(Code.InvalidProofDomain);
             }
 
-            final VerificationMethod verificationMethod = get(proof.getVerificationMethod().getId(), loader, signatureSuite.getProofAdapter().getMethodAdapter()); 
+            final VerificationMethod verificationMethod = get(proof.getVerificationMethod().getId(), loader, signatureSuite.getProofAdapter().getMethodAdapter());
 
             if (!(verificationMethod instanceof VerificationKey)) {
-        	throw new VerificationError(Code.UnknownVerificationMethod);
+            throw new VerificationError(Code.UnknownVerificationMethod);
             }
 
             final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite);
@@ -215,10 +212,10 @@ public final class Verifier extends Processor<Verifier> {
         // all good
         return;
     }
-    
+
 
     // refresh/fetch verification method
-    final VerificationMethod get(final URI id, final DocumentLoader loader, VerificationMethodAdapter keyAdapter) throws DataError, VerificationError {
+    final VerificationMethod get(final URI id, final DocumentLoader loader, VerificationMethodAdapter keyAdapter) throws DocumentError, VerificationError {
 
         if (DidUrl.isDidUrl(id)) {
 
@@ -248,18 +245,18 @@ public final class Verifier extends Processor<Verifier> {
 
             for (final JsonValue method : document) {
 
-    		if (JsonUtils.isNotObject(method)) {
-        	    continue;
-        	}
+            if (JsonUtils.isNotObject(method)) {
+                continue;
+            }
 
                 // take the first key that match
-        	if (JsonLdUtils
-            		.getType(method.asJsonObject())
-            		.stream()
-            		.anyMatch(m -> keyAdapter.getType().equals(m))) {
-        	    
-        	    return keyAdapter.deserialize(method.asJsonObject());
-        	}
+            if (JsonLdUtils
+                    .getType(method.asJsonObject())
+                    .stream()
+                    .anyMatch(m -> keyAdapter.getType().equals(m))) {
+
+                return keyAdapter.deserialize(method.asJsonObject());
+            }
             }
 
         } catch (JsonLdError e) {
@@ -267,5 +264,20 @@ public final class Verifier extends Processor<Verifier> {
         }
 
         throw new VerificationError(Code.UnknownVerificationKey);
+    }
+
+    private final void validate(Verifiable verifiable) throws DocumentError, VerificationError {
+
+    if (verifiable.isCredential()) {
+
+        // is expired?
+        if (verifiable.asCredential().isExpired()) {
+        throw new VerificationError(Code.Expired);
+            }
+
+        if (verifiable.asCredential().getIssuanceDate() == null) {
+        throw new DocumentError(ErrorType.Missing, Credential.ISSUANCE_DATE);
+        }
+    }
     }
 }

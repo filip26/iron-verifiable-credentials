@@ -15,7 +15,7 @@ import jakarta.json.JsonStructure;
 public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
     protected final String id;
-    
+
     protected final CanonicalizationAlgorithm canonicalization;
     protected final DigestAlgorithm digester;
     protected final SignatureAlgorithm signer;
@@ -47,12 +47,12 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     }
 
     @Override
-    public byte[] digest(byte[] data) throws DataError {
+    public byte[] digest(byte[] data) throws LinkedDataSuiteError {
         return digester.digest(data);
     }
 
     @Override
-    public byte[] canonicalize(JsonStructure document) throws DataError {
+    public byte[] canonicalize(JsonStructure document) throws LinkedDataSuiteError {
         return canonicalization.canonicalize(document);
     }
 
@@ -66,6 +66,6 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     }
 
     public ProofAdapter getProofAdapter() {
-	return proofAdapter;
+    return proofAdapter;
     }
 }

@@ -4,8 +4,8 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 
 import jakarta.json.JsonValue;
 
@@ -22,15 +22,15 @@ class CredentialStatus implements StatusVerifier.Status {
 
     }
 
-    public static CredentialStatus from(final JsonValue object) throws DataError {
+    public static CredentialStatus from(final JsonValue object) throws DocumentError {
 
         final CredentialStatus status = new CredentialStatus();
 
         if (!JsonLdUtils.hasType(object)) {
-            throw new DataError(ErrorType.Missing, "status", Keywords.TYPE);
+            throw new DocumentError(ErrorType.Missing, "status", Keywords.TYPE);
         }
 
-        status.id = JsonLdUtils.getId(object).orElseThrow(() -> new DataError(ErrorType.Missing, "status", Keywords.ID));
+        status.id = JsonLdUtils.getId(object).orElseThrow(() -> new DocumentError(ErrorType.Missing, "status", Keywords.ID));
 
         return status;
     }

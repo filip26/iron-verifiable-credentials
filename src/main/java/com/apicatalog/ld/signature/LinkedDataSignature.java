@@ -2,6 +2,7 @@ package com.apicatalog.ld.signature;
 
 import java.net.URI;
 
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.EmbeddedProofAdapter;
@@ -26,21 +27,26 @@ public class LinkedDataSignature {
      * @param proof expanded proof with no proofValue
      * @param verificationKey
      * @param signature
-     * 
+     *
      * @throws VerificationError
-     * @throws DataError
+     * @throws DocumentError
      */
-    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DataError {
+    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DocumentError {
 
         if (verificationKey == null || verificationKey.getPublicKey() == null) {
-            throw new VerificationError();
+            throw new VerificationError(VerificationError.Code.MissingVerificationKey);
         }
 
        final JsonObject proofObject = EmbeddedProofAdapter.removeProofValue(proof);
 
-       final byte[] computeSignature = hashCode(document, proofObject);
+       try {
+           final byte[] computeSignature = hashCode(document, proofObject);
 
-       suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
+           suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
+
+       } catch (LinkedDataSuiteError e) {
+       throw new VerificationError(com.apicatalog.ld.signature.VerificationError.Code.Internal, e);
+       }
     }
 
     /**
@@ -51,18 +57,23 @@ public class LinkedDataSignature {
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof options
      * @param keyPair
-     * @param options 
-     * 
+     * @param options
+     *
      * @return computed signature
-     * 
-     * @throws SigningError 
-     * @throws DataError
+     *
+     * @throws SigningError
+     * @throws DocumentError
      */
-    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError, DataError {
+    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError {
 
-        final byte[] documentHashCode = hashCode(document, options);
+    try {
+            final byte[] documentHashCode = hashCode(document, options);
 
-        return suite.sign(keyPair.getPrivateKey(), documentHashCode);
+            return suite.sign(keyPair.getPrivateKey(), documentHashCode);
+
+    } catch (LinkedDataSuiteError e) {
+        throw new SigningError(e);
+    }
     }
 
     /**
@@ -70,12 +81,12 @@ public class LinkedDataSignature {
      *
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
-     * 
+     *
      * @return computed hash code
-     * 
-     * @throws DataError
+     *
+     * @throws LinkedDataSuiteError
      */
-    byte[] hashCode(JsonStructure document, JsonObject proof) throws DataError {
+    byte[] hashCode(JsonStructure document, JsonObject proof) throws LinkedDataSuiteError {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 

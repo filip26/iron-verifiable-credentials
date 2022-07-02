@@ -11,7 +11,7 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020Adapter;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 
@@ -97,11 +97,11 @@ public class VcTestCase {
                         .getJsonObject(0);
 
                 if (JsonLdUtils.isTypeOf("https://w3id.org/security#Ed25519VerificationKey2020", method)) {
-                    
+
                     try {
                         testCase.verificationMethod = (new Ed25519VerificationKey2020Adapter()).deserialize(method);
 
-                    } catch (DataError e) {
+                    } catch (DocumentError e) {
                         fail(e);
                     }
 

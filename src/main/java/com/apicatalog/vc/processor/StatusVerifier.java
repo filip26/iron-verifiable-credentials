@@ -2,15 +2,14 @@ package com.apicatalog.vc.processor;
 
 import java.net.URI;
 
-import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.DocumentError;
 
 public interface StatusVerifier {
-
-    void verify(Status status) throws DataError, VerifyError;
 
     public interface Status {
         URI getId();
         String getType();
     }
-    
+
+    void verify(Status status) throws DocumentError, VerifyError;
 }
