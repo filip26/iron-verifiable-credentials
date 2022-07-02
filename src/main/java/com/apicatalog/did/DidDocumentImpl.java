@@ -12,9 +12,6 @@ import jakarta.json.JsonObjectBuilder;
 
 class DidDocumentImpl implements DidDocument {
 
-    /**
-     * @see {@link https://www.w3.org/TR/did-core/#did-document-properties}
-     */
     protected Did id;
 
     protected Set<URI> alsoKnownAs;
@@ -29,16 +26,13 @@ class DidDocumentImpl implements DidDocument {
     protected Set<DidUrl> capabilityDelegation;
     protected Set<DidUrl> keyAgreement;
 
-    //TODO  service
-
     @Override
     public JsonObject toJson() {
         return toJson(Json.createObjectBuilder()).build();
     }
 
     protected JsonObjectBuilder toJson(final JsonObjectBuilder builder) {
-        //TODO
-        return builder;
+    throw new UnsupportedOperationException();
     }
 
     @Override
@@ -55,5 +49,4 @@ class DidDocumentImpl implements DidDocument {
     public Set<VerificationMethod> getVerificationMethod() {
         return verificationMethod;
     }
-
 }

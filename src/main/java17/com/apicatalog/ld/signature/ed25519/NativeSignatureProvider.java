@@ -18,12 +18,13 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.key.KeyPair;
 
-public class SunSignatureProvider implements SignatureAlgorithm {
+class NativeSignatureProvider implements SignatureAlgorithm {
 
     private final String type;
 
-    public SunSignatureProvider(String type) {
+    public NativeSignatureProvider(String type) {
         this.type = type;
     }
 
@@ -36,7 +37,7 @@ public class SunSignatureProvider implements SignatureAlgorithm {
             suite.update(data);
 
             if (!suite.verify(signature)) {
-                throw new VerificationError(Code.InvalidSignature);     //TODO more details
+                throw new VerificationError(Code.InvalidSignature);
             }
 
         } catch (InvalidParameterSpecException | InvalidKeySpecException | InvalidKeyException
@@ -64,7 +65,7 @@ public class SunSignatureProvider implements SignatureAlgorithm {
 
     @Override
     public KeyPair keygen(final int length) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Use iron-verifiable-credentials-jre8");
     }
 
     private PublicKey getPublicKey(final byte[] publicKey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidParameterSpecException {

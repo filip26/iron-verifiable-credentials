@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 import java.time.Instant;
@@ -9,17 +9,18 @@ import java.util.Optional;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
 /**
+ * Represents a verifiable credentials (VC).
  *
- * see {@link https://www.w3.org/TR/vc-data-model/#credentials}
+ * @see <a href="https://www.w3.org/TR/vc-data-model/#credentials">Credentials</a>
  */
-public class Credential implements Verifiable {
+class Credential implements Verifiable {
 
     public static final String BASE = "https://www.w3.org/2018/credentials#";
 
@@ -59,8 +60,7 @@ public class Credential implements Verifiable {
         return JsonUtils.isObject(subject) && JsonLdUtils.isTypeOf(BASE + TYPE, subject.asJsonObject());
     }
 
-    //TODO separate mandatory/optional validation
-    public static Credential from(JsonObject subject, boolean issue /*FIXME hack, remove */) throws DataError {
+    public static Credential from(JsonObject subject) throws DocumentError {
 
         if (subject == null) {
             throw new IllegalArgumentException("The 'subject' parameter must not be null.");
@@ -72,24 +72,25 @@ public class Credential implements Verifiable {
         if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
 
             if (!JsonLdUtils.hasType(subject)) {
-                throw new DataError(ErrorType.Missing, Keywords.TYPE);
+                throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
             }
 
-            throw new DataError(ErrorType.Unknown, Keywords.TYPE);
+            throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
         }
 
         // @id - optional
         if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
             credential.id = JsonLdUtils.getId(subject)
-                    .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
+                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, Keywords.ID));
         }
 
         // subject - mandatory
         if (!JsonLdUtils.hasPredicate(subject, BASE + SUBJECT)) {
-            throw new DataError(ErrorType.Missing, SUBJECT);
+            throw new DocumentError(ErrorType.Missing, SUBJECT);
         }
 
-        JsonLdUtils.assertId(subject, BASE, SUBJECT);   //TODO
+        // subject @id
+        JsonLdUtils.assertId(subject, BASE, SUBJECT);
 
         // issuer - mandatory
         credential.issuer = JsonLdUtils.assertId(subject, BASE, ISSUER);
@@ -97,9 +98,6 @@ public class Credential implements Verifiable {
         // issuance date - mandatory for verification
         if (JsonLdUtils.hasPredicate(subject, BASE + ISSUANCE_DATE)) {
             credential.issuance = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
-
-        } else if (!issue) {
-            throw new DataError(ErrorType.Missing, ISSUANCE_DATE);
         }
 
         // expiration date - optional
@@ -127,8 +125,8 @@ public class Credential implements Verifiable {
 
     /**
      *
-     * see {@link https://www.w3.org/TR/vc-data-model/#issuer}
-     * @return
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
+     * @return {@link URI} identifying the issuer
      */
     public URI getIssuer() {
         return issuer;
@@ -136,16 +134,16 @@ public class Credential implements Verifiable {
 
     /**
      *
-     * see {@link https://www.w3.org/TR/vc-data-model/#issuance-date}
-     * @return
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance Date</a>
+     * @return the issuance date
      */
     public Instant getIssuanceDate() {
         return issuance;
     }
 
     /**
-     * see {@link https://www.w3.org/TR/vc-data-model/#expiration}
-     * @return
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>
+     * @return the expiration date or <code>null</code> if not set
      */
     public Instant getExpiration() {
         return expiration;

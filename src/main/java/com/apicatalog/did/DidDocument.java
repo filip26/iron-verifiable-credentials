@@ -7,11 +7,12 @@ import com.apicatalog.ld.signature.proof.VerificationMethod;
 import jakarta.json.JsonObject;
 
 /**
- * @see {@link https://www.w3.org/TR/did-core/#did-document-properties}
+ * DID Document
+ *
+ * @see <a href="https://www.w3.org/TR/did-core/#did-document-properties">DID document properties</a>
  */
 
 public interface DidDocument {
-
 
     Did getId();
 
@@ -19,8 +20,5 @@ public interface DidDocument {
 
     Set<VerificationMethod> getVerificationMethod();
 
-    //TODO getters
-
     JsonObject toJson();
-
 }

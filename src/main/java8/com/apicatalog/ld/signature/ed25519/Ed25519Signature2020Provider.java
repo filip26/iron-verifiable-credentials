@@ -2,15 +2,17 @@ package com.apicatalog.ld.signature.ed25519;
 
 import java.security.GeneralSecurityException;
 
+import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.key.KeyPair;
 import com.google.crypto.tink.signature.SignatureConfig;
 import com.google.crypto.tink.subtle.Ed25519Sign;
 import com.google.crypto.tink.subtle.Ed25519Verify;
 
-public class TinkSignature implements SignatureAlgorithm {
+public final class Ed25519Signature2020Provider implements SignatureAlgorithm {
 
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
@@ -22,7 +24,7 @@ public class TinkSignature implements SignatureAlgorithm {
             verifier.verify(signature, data);
 
         } catch (GeneralSecurityException e) {
-            throw new VerificationError(Code.InvalidSignature, e);     //TODO more details
+            throw new VerificationError(Code.InvalidSignature, e);
         }
     }
 
@@ -45,7 +47,7 @@ public class TinkSignature implements SignatureAlgorithm {
     }
 
     @Override
-    public KeyPair keygen(int length) {
+    public KeyPair keygen(int length) throws KeyGenError {
 
         try {
             Ed25519Sign.KeyPair kp = Ed25519Sign.KeyPair.newKeyPair();
@@ -53,15 +55,15 @@ public class TinkSignature implements SignatureAlgorithm {
             byte[] privateKey = kp.getPrivateKey();
             byte[] publicKey = kp.getPublicKey();
 
-            return new KeyPair(publicKey, privateKey);
+            final KeyPair keyPair = new KeyPair();
+            keyPair.setType("https://w3id.org/security#Ed25519KeyPair2020");
+            keyPair.setPrivateKey(privateKey);
+            keyPair.setPublicKey(publicKey);
+
+            return keyPair;
 
         } catch (GeneralSecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new KeyGenError(e);
         }
-
-        //TODO
-        return null;
-
     }
 }

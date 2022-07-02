@@ -1,4 +1,4 @@
-# Iron Verifiable Credentials Processor & API
+# Iron Verifiable Credentials Processor
 
 An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) in Java.
 
@@ -16,7 +16,42 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 * Issuing VC/VP
 * Signature
   * Ed25519 Signature 2020
-* [HTTP API & Service](https://github.com/filip26/vc-http-api)
+* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
+
+## Installation
+
+### Maven
+
+```xml
+<!-- Java 17 -->
+<dependency>
+    <groupId>com.apicatalog</groupId>
+    <artifactId>iron-verifiable-credentials/artifactId>
+    <version>0.7.0</version>
+</dependency>
+
+```
+
+or
+
+```xml
+<!-- Android (Java 8, Tink) -->
+<dependency>
+    <groupId>com.apicatalog</groupId>
+    <artifactId>iron-verifiable-credentials-jre8</artifactId>
+    <version>0.7.0</version>
+</dependency>
+```
+
+### Gradle
+
+```gradle
+compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.7.0'
+```
+
+## Documentation
+
+[![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
 
 ## Usage
 
@@ -91,3 +126,12 @@ Fork and clone the project repository.
 * [Ed25519 Signature 2020](https://w3c-ccg.github.io/lds-ed25519-2020/)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
 * [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
+
+## Sponsors
+
+<a href="https://github.com/digitalbazaar">
+  <img src="https://avatars.githubusercontent.com/u/167436?s=200&v=4" width="40" />
+</a> 
+
+## Commercial Support
+Commercial support is available at filip26@gmail.com

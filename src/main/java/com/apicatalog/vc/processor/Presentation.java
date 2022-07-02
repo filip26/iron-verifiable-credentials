@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -7,13 +7,13 @@ import java.util.Collection;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class Presentation implements Verifiable {
+class Presentation implements Verifiable {
 
     public static final String BASE = "https://www.w3.org/2018/credentials#";
 
@@ -39,8 +39,7 @@ public class Presentation implements Verifiable {
         return JsonUtils.isObject(expanded) && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
     }
 
-    //TODO separate mandatory/optional validation
-    public static Presentation from(JsonObject subject, boolean issue /*FIXME hack, remove */) throws DataError {
+    public static Presentation from(JsonObject subject) throws DocumentError {
 
         if (subject == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
@@ -52,18 +51,18 @@ public class Presentation implements Verifiable {
         if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
 
             if (!JsonLdUtils.hasType(subject)) {
-                throw new DataError(ErrorType.Missing, Keywords.TYPE);
+                throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
             }
 
-            throw new DataError(ErrorType.Unknown, Keywords.TYPE);
+            throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
         }
 
         // @id - optional
         if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
-            presentation.id = JsonLdUtils.getId(subject)
-                    .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
+            presentation.id = JsonLdUtils
+                        .getId(subject)
+                        .orElseThrow(() -> new DocumentError(ErrorType.Invalid, Keywords.ID));
         }
-
         // holder - optional
         if (JsonLdUtils.hasPredicate(subject, BASE + HOLDER)) {
             presentation.holder = JsonLdUtils.assertId(subject, BASE, HOLDER);
@@ -72,14 +71,13 @@ public class Presentation implements Verifiable {
         presentation.credentials = new ArrayList<>();
 
         // verifiableCredentials
-        for (JsonValue credential : JsonLdUtils.getObjects(subject, BASE + VERIFIABLE_CREDENTIALS)) {
+        for (final JsonValue credential : JsonLdUtils.getObjects(subject, BASE + VERIFIABLE_CREDENTIALS)) {
 
             if (JsonUtils.isNotObject(credential)) {
-                throw new DataError();
+                throw new DocumentError(ErrorType.Invalid, VERIFIABLE_CREDENTIALS);
             }
 
-            presentation.credentials.add(Credential.from(credential.asJsonObject(), issue));
-            //TODO proof somehow, do I need to parse it here?
+            presentation.credentials.add(Credential.from(credential.asJsonObject()));
         }
 
         return presentation;
@@ -101,8 +99,8 @@ public class Presentation implements Verifiable {
     }
 
     /**
-     * see {@link https://www.w3.org/TR/vc-data-model/#dfn-holders}
-     * @return
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#dfn-holders">Holder</a>
+     * @return {@link URI} identifying the holder
      */
     public URI getHolder() {
         return holder;

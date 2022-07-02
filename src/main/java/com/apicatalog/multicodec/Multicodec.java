@@ -8,10 +8,10 @@ import java.util.Optional;
 
 /**
  *
- * see {@link https://github.com/multiformats/multicodec/blob/master/table.csv}
+ * @see <a href="https://github.com/multiformats/multicodec/blob/master/table.csv">Codes Table</a>
  *
  */
-public class Multicodec {
+public final class Multicodec {
 
     public enum Type {
         Key,
@@ -50,7 +50,7 @@ public class Multicodec {
         }
     }
 
-    private static Map<Integer, Codec> KEY_REGISTRY = new HashMap<>();
+    static Map<Integer, Codec> KEY_REGISTRY = new HashMap<>();
 
     static {
         add(Codec.Identity);
@@ -59,40 +59,29 @@ public class Multicodec {
         add(Codec.X25519PublicKey);
     }
 
-    public static void add(final Codec codec) {
+    static void add(final Codec codec) {
         KEY_REGISTRY.put(codec.asInteger(), codec);
+    }
+
+    static Optional<Codec> find(byte[] code) {
+        return Optional.ofNullable(KEY_REGISTRY.get(new BigInteger(code).intValue()));
     }
 
     public static Optional<Codec> codec(Type type, final byte[] encoded) {
 
         switch (type) {
         case Key:
-
-            Integer byte4 = new BigInteger(Arrays.copyOf(encoded, 4)).intValue();
-            if (Multicodec.KEY_REGISTRY.containsKey(byte4)) {
-                return Optional.of(KEY_REGISTRY.get(byte4));
-            }
-
-
-            Integer byte2 = new BigInteger(Arrays.copyOf(encoded, 2)).intValue();
-
-            if (Multicodec.KEY_REGISTRY.containsKey(byte2)) {
-                return Optional.of(KEY_REGISTRY.get(byte2));
-            }
-
-            Integer byte1 = (int) encoded[0];
-
-            if (Multicodec.KEY_REGISTRY.containsKey(byte1)) {
-                return Optional.of(KEY_REGISTRY.get(byte1));
-            }
-
-            break;
+            return Optional.of(find(Arrays.copyOf(encoded, 4))      // try first 4 bytes
+                    .orElseGet(() -> find(Arrays.copyOf(encoded, 2))    // try first 2 bytes
+                    .orElseGet(() -> find(Arrays.copyOf(encoded, 1))    // try the first byte
+                    .orElse(null)
+                    )));
 
         default:
             break;
         }
 
-        return Optional.empty();
+        throw new IllegalArgumentException("Unsupported type [" + type + "].");
     }
 
     public static byte[] encode(Codec codec, byte[] value) {
@@ -105,7 +94,13 @@ public class Multicodec {
         return encoded;
     }
 
-    public static byte[] decode(Codec codec, byte[] encoded) {
+    public static byte[] decode(final Codec codec, final byte[] encoded) {
         return Arrays.copyOfRange(encoded, codec.length(), encoded.length);
+    }
+
+    public static byte[] decode(final Type type, final byte[] encoded) throws IllegalArgumentException {
+        return codec(type, encoded)
+                .map(codec -> decode(codec, encoded))
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported multicode encoding"));
     }
 }

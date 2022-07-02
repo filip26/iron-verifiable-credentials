@@ -5,14 +5,13 @@ import com.apicatalog.did.DidDocument;
 import com.apicatalog.did.DidDocumentBuilder;
 import com.apicatalog.did.DidResolver;
 import com.apicatalog.did.DidUrl;
+import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 import com.apicatalog.multicodec.Multicodec;
 
 public class DidKeyResolver implements DidResolver {
 
-    private static final String MULTIKEY_TYPE = "Multikey";     //FIXME an absolute URI
     private static final String ED25519_VERIFICATION_KEY_2020_TYPE =  "https://w3id.org/security#Ed25519VerificationKey2020";
-    //private static final String X25519_KEYAGREEMENT_KEY_2020_TYPE =  "https://w3id.org/security#X25519KeyAgreementKey2020";
 
     @Override
     public DidDocument resolve(final Did did) {
@@ -25,9 +24,8 @@ public class DidKeyResolver implements DidResolver {
 
         final DidDocumentBuilder builder = DidDocumentBuilder.create();
 
-        //TODO use configurable DidResolvers, steps 4-5
         // 4.
-        DidVerificationKey signatureMethod = DidKeyResolver.createSignatureMethod(didKey);
+        VerificationKey signatureMethod = DidKeyResolver.createSignatureMethod(didKey);
         builder.add(signatureMethod);
 
         // 5.
@@ -37,16 +35,10 @@ public class DidKeyResolver implements DidResolver {
         builder.id(did);
 
         // 7.
-        //TODO toJson();
 
         // 8.
-        builder.addAuthentication(signatureMethod.id);
-        builder.addAssertionMethod(signatureMethod.getId());
-        builder.addCapabilityInvocation(signatureMethod.getId());
-        builder.addCapabilityDelegation(signatureMethod.getId());
 
         // 9.
-        //TODO
 
         return builder.build();
     }
@@ -54,69 +46,49 @@ public class DidKeyResolver implements DidResolver {
     /**
      * Creates a new verification key by expading the given DID key.
      *
-     * see {@link https://pr-preview.s3.amazonaws.com/w3c-ccg/did-method-key/pull/51.html#signature-method-creation-algorithm}
+     * @param didKey
+     *
+     * @see <a href="https://pr-preview.s3.amazonaws.com/w3c-ccg/did-method-key/pull/51.html#signature-method-creation-algorithm">Signature Method Algorithm</a>
      *
      * @return The new verification key
      */
-    public static DidVerificationKey createSignatureMethod(DidKey didKey) {
+    public static VerificationKey createSignatureMethod(DidKey didKey) {
 
         if (!Multicodec.Codec.Ed25519PublicKey.equals(didKey.getCodec())) {
-            throw new IllegalArgumentException();       //TODO
+            throw new IllegalArgumentException();
         }
-
         // 5.
         String encodingType = ED25519_VERIFICATION_KEY_2020_TYPE;
-        //TODO use options
 
-        // 6.
-        //TODO
+        final VerificationKey key = new VerificationKey();
 
-        // 9.
-//        if (MULTIKEY_TYPE.equals(encodingType)
-//                || ED25519_VERIFICATION_KEY_2020_TYPE.equals(encodingType)) {
-//            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
-//        }
+        key.setId(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
+        key.setType(encodingType);
+        key.setController(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
+        key.setPublicKey(didKey.getRawKey());
 
-        // 10.
-        //TODO jwk
-
-        return new DidVerificationKey(
-                DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
-                encodingType,
-                DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
-                didKey.getRawKey()
-                );
-
-    }
+        return key;
+     }
 
     public static VerificationMethod createEncryptionMethod(final DidKey didKey) {
 
         // 3.
-        //TODO
 
         // 5.
-        String encodingType = MULTIKEY_TYPE;
-        //TODO use options
+        String encodingType = "MultiKey";
 
         // 6.
-        //TODO
 
         // 7.
-        //TODO
 
         // 9.
-//        if (MULTIKEY_TYPE.equals(encodingType)
-//                || X25519_KEYAGREEMENT_KEY_2020_TYPE.equals(encodingType)) {
-//            //FIXME verificationMethod.publicKeyMultibase = didKey.getMethodSpecificId();
-//        }
+        final VerificationKey key = new VerificationKey();
 
-        //TODO
+        key.setId(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
+        key.setType(encodingType);
+        key.setController(DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()).toUri());
+        key.setPublicKey(didKey.getRawKey());
 
-        return new DidVerificationKey(
-                DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
-                encodingType,
-                DidUrl.from(didKey, null, null,  didKey.getMethodSpecificId()),
-                didKey.getRawKey()
-                );
+        return key;
     }
 }
