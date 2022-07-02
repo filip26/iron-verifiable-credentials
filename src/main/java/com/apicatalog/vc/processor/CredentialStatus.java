@@ -10,7 +10,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import jakarta.json.JsonValue;
 
 /**
- * see {@link https://www.w3.org/TR/vc-data-model/#status}
+ * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>
  *
  */
 class CredentialStatus implements StatusVerifier.Status {

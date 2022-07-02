@@ -9,7 +9,7 @@ import jakarta.json.JsonObject;
 /**
  * DID Document
  *
- * @see {@link <a href="https://www.w3.org/TR/did-core/#did-document-properties">DID document properties</a>}
+ * @see <a href="https://www.w3.org/TR/did-core/#did-document-properties">DID document properties</a>
  */
 
 public interface DidDocument {

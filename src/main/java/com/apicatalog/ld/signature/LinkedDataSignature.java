@@ -21,7 +21,7 @@ public class LinkedDataSignature {
     /**
      * Verifies the given signed VC/VP document.
      *
-     * @see {@link <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification Algorithm</a>}
+     * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
@@ -52,10 +52,9 @@ public class LinkedDataSignature {
     /**
      * Issues the given VC/VP document and returns the document signature.
      *
-     * @see {@link <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm"Proof Algorithm</a>}
+     * @see <A href="https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm">Proof Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
-     * @param proof expanded proof options
      * @param keyPair
      * @param options
      *
@@ -77,7 +76,7 @@ public class LinkedDataSignature {
     }
 
     /**
-     * @see {@link <a href="https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm">Hash Algorithm</a>}
+     * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm">Hash Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue

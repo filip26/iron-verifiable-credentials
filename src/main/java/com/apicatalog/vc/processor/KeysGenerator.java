@@ -19,7 +19,7 @@ public final class KeysGenerator extends Processor<KeysGenerator> {
      * @param id
      * @param keyLength
      *
-     * @return
+     * @return the generated key pair instance
      * @throws KeyGenError
      */
     public KeyPair get(URI id, int keyLength) throws KeyGenError {

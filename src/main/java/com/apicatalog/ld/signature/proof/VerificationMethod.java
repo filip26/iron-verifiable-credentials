@@ -5,7 +5,7 @@ import java.net.URI;
 /**
  * Represents proof verification method declaration.
  *
- * @see {@link <a href="https://w3c-ccg.github.io/data-integrity-spec/#verification-methods">Verification Methods</a>}
+ * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#verification-methods">Verification Methods</a>
  *
  */
 public class VerificationMethod {

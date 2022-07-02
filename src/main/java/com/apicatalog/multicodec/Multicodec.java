@@ -8,7 +8,7 @@ import java.util.Optional;
 
 /**
  *
- * see {@link https://github.com/multiformats/multicodec/blob/master/table.csv}
+ * @see <a href="https://github.com/multiformats/multicodec/blob/master/table.csv">Codes Table</a>
  *
  */
 public final class Multicodec {

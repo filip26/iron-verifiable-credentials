@@ -18,7 +18,7 @@ import jakarta.json.JsonValue;
 /**
  * Represents a verifiable credentials (VC).
  *
- * @see {@link <a href="https://www.w3.org/TR/vc-data-model/#credentials">Credentials</a>}
+ * @see <a href="https://www.w3.org/TR/vc-data-model/#credentials">Credentials</a>
  */
 class Credential implements Verifiable {
 
@@ -125,8 +125,8 @@ class Credential implements Verifiable {
 
     /**
      *
-     * see {@link https://www.w3.org/TR/vc-data-model/#issuer}
-     * @return
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
+     * @return {@link URI} identifying the issuer
      */
     public URI getIssuer() {
         return issuer;
@@ -134,16 +134,16 @@ class Credential implements Verifiable {
 
     /**
      *
-     * see {@link https://www.w3.org/TR/vc-data-model/#issuance-date}
-     * @return
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance Date</a>
+     * @return the issuance date
      */
     public Instant getIssuanceDate() {
         return issuance;
     }
 
     /**
-     * see {@link https://www.w3.org/TR/vc-data-model/#expiration}
-     * @return
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>
+     * @return the expiration date or <code>null</code> if not set
      */
     public Instant getExpiration() {
         return expiration;

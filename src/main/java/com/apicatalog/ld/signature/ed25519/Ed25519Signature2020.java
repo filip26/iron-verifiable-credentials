@@ -27,8 +27,8 @@ public final class Ed25519Signature2020 extends SignatureSuite {
     public static boolean isTypeOf(final String type) {
         return Objects.equals(BASE + TYPE, type);
     }
-    
+
     public static ProofOptions createOptions(VerificationMethod method, URI purpose) {
-	return ProofOptions.create(BASE + TYPE, method, purpose);
-    }    
+    return ProofOptions.create(BASE + TYPE, method, purpose);
+    }
 }

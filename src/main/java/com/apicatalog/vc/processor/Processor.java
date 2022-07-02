@@ -41,7 +41,7 @@ abstract class Processor<T extends Processor<?>> {
      * <code>true</code> by default. Disabling might cause slower processing.
      *
      * @param enable
-     * @return
+     * @return the processor instance
      */
     @SuppressWarnings("unchecked")
     public T useBundledContexts(boolean enable) {
@@ -53,7 +53,7 @@ abstract class Processor<T extends Processor<?>> {
      * If set, this overrides the input document's IRI.
      *
      * @param base
-     * @return
+     * @return the processor instance
      */
     @SuppressWarnings("unchecked")
     public T base(URI base) {
@@ -64,7 +64,7 @@ abstract class Processor<T extends Processor<?>> {
     /**
      * Add a new signature suite. An existing suite of the same type is replaced.
      * @param suite  a suite to add
-     * @return
+     * @return the processor instance
      */
     @SuppressWarnings("unchecked")
     public T suite(final SignatureSuite suite) {

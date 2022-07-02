@@ -99,8 +99,8 @@ class Presentation implements Verifiable {
     }
 
     /**
-     * see {@link https://www.w3.org/TR/vc-data-model/#dfn-holders}
-     * @return
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#dfn-holders">Holder</a>
+     * @return {@link URI} identifying the holder
      */
     public URI getHolder() {
         return holder;

@@ -57,7 +57,7 @@ public final class Verifier extends Processor<Verifier> {
      * If not set then <code>credentialStatus</code> is not verified.
      *
      * @param statusVerifier
-     * @return
+     * @return the verifier instance
      */
     public Verifier statusVerifier(StatusVerifier statusVerifier) {
         this.statusVerifier = statusVerifier;
@@ -76,6 +76,7 @@ public final class Verifier extends Processor<Verifier> {
 
     /**
      * Verifies VC/VP document. Throws VerificationError if the document is not valid or cannot be verified.
+     *
      * @throws VerificationError
      * @throws DocumentError
      */
