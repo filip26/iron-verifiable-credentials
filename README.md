@@ -26,7 +26,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 <!-- Java 17 -->
 <dependency>
     <groupId>com.apicatalog</groupId>
-    <artifactId>iron-verifiable-credentials/artifactId>
+    <artifactId>iron-verifiable-credentials</artifactId>
     <version>0.7.0</version>
 </dependency>
 
