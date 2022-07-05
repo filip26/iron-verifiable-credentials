@@ -102,7 +102,9 @@ public final class Issuer extends Processor<Issuer> {
 
         try {
             return JsonLd.compact(JsonDocument.of(signed), contextLocation).loader(loader).get();
+            
         } catch (JsonLdError e) {
+            failWithJsonLd(e);
             throw new SigningError(e);
         }
     }
@@ -142,7 +144,9 @@ public final class Issuer extends Processor<Issuer> {
 
         try {
             return JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(context)).loader(loader).get();
+            
         } catch (JsonLdError e) {
+            failWithJsonLd(e);
             throw new SigningError(e);
         }
     }
@@ -155,6 +159,7 @@ public final class Issuer extends Processor<Issuer> {
             return sign(expanded, keyPair, options);
 
         } catch (JsonLdError e) {
+            failWithJsonLd(e);
             throw new SigningError(e);
         }
     }
@@ -167,6 +172,7 @@ public final class Issuer extends Processor<Issuer> {
             return sign(expanded, keyPair, options);
 
         } catch (JsonLdError e) {
+            failWithJsonLd(e);
             throw new SigningError(e);
         }
     }

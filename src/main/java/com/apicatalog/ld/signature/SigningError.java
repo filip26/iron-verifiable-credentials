@@ -8,7 +8,7 @@ public class SigningError extends Throwable {
         Expired,
         UnknownVerificatioonKey,
         UnknownCryptoSuite,
-        Internal,
+        Internal, 
     }
 
     private Code code;
