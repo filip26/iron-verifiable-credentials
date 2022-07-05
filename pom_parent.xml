@@ -54,7 +54,7 @@
 
         <jakarta.json.version>2.0.1</jakarta.json.version>
         <titanium.version>1.3.1</titanium.version>
-
+        <multiformats.version>1.1.0</multiformats.version>
         <!-- dev resources -->
 
         <!-- test resources -->
@@ -66,16 +66,16 @@
             <artifactId>jakarta.json</artifactId>
             <version>${jakarta.json.version}</version>
         </dependency>
-       <dependency>
+        <dependency>
+            <groupId>com.github.multiformats</groupId>
+            <artifactId>java-multibase</artifactId>
+            <version>${multiformats.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.multiformats</groupId>
-            <artifactId>java-multibase</artifactId>
-            <version>v1.1.0</version>
         </dependency>
     </dependencies>
     <build>

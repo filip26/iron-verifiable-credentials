@@ -65,6 +65,11 @@
               <version>${titanium.version}</version>
             </dependency>
             <dependency>
+              <groupId>io.setl</groupId>
+              <artifactId>rdf-urdna</artifactId>
+              <version>1.2</version>
+            </dependency>
+            <dependency>
               <groupId>com.google.crypto.tink</groupId>
               <artifactId>tink</artifactId>
               <version>${tink.version}</version>
