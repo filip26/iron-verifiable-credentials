@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.JsonLdErrorCode;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
@@ -104,6 +106,16 @@ abstract class Processor<T extends Processor<?>> {
     }
 
     protected void addDefaultSuites() {
-    suite(new Ed25519Signature2020());
+	suite(new Ed25519Signature2020());
+    }
+
+    protected void failWithJsonLd(JsonLdError e) throws DocumentError {
+        if (JsonLdErrorCode.LOADING_DOCUMENT_FAILED == e.getCode()) {
+            throw new DocumentError(ErrorType.Invalid, "remote", "document");
+        }
+
+        if (JsonLdErrorCode.LOADING_REMOTE_CONTEXT_FAILED == e.getCode()) {
+            throw new DocumentError(ErrorType.Invalid, "remote", "context");
+        }
     }
 }

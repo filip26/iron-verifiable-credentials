@@ -12,7 +12,7 @@ public class VerificationError extends Throwable {
         MissingVerificationKey,
         UnknownVerificationKey,
         UnknownVerificationMethod,
-        Internal,
+        Internal, 
     }
 
     private Code code;

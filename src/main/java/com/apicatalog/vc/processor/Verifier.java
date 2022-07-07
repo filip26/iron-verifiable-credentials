@@ -116,6 +116,7 @@ public final class Verifier extends Processor<Verifier> {
             verifyExpanded(expanded);
 
         } catch (JsonLdError e) {
+            failWithJsonLd(e);
             throw new VerificationError(e);
         }
     }
@@ -128,6 +129,7 @@ public final class Verifier extends Processor<Verifier> {
             verifyExpanded(expanded);
 
         } catch (JsonLdError e) {
+            failWithJsonLd(e);
             throw new VerificationError(e);
         }
     }
@@ -245,21 +247,22 @@ public final class Verifier extends Processor<Verifier> {
 
             for (final JsonValue method : document) {
 
-            if (JsonUtils.isNotObject(method)) {
-                continue;
-            }
+        	if (JsonUtils.isNotObject(method)) {
+        	    continue;
+            	}
 
                 // take the first key that match
-            if (JsonLdUtils
+            	if (JsonLdUtils
                     .getType(method.asJsonObject())
                     .stream()
                     .anyMatch(m -> keyAdapter.getType().equals(m))) {
 
-                return keyAdapter.deserialize(method.asJsonObject());
-            }
+                	return keyAdapter.deserialize(method.asJsonObject());
+            	}
             }
 
         } catch (JsonLdError e) {
+            failWithJsonLd(e);
             throw new VerificationError(e);
         }
 
