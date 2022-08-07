@@ -1,14 +1,17 @@
 package com.apicatalog.ld.signature.ed25519;
 
+import java.net.URI;
+import java.util.Optional;
+
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.signature.json.VerificationMethodJsonAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
-import com.apicatalog.ld.signature.proof.VerificationMethodAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
@@ -24,7 +27,7 @@ import jakarta.json.JsonValue;
 /**
  * Ed25519 Verification Key 2020 Suite.
  */
-public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdapter {
+public class Ed25519VerificationKey2020Adapter implements VerificationMethodJsonAdapter {
 
     protected static final String TYPE = "Ed25519VerificationKey2020";
     protected static final String CONTROLLER = "controller";
@@ -33,59 +36,70 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
 
     @Override
     public String getType() {
-    return Ed25519Signature2020.BASE + TYPE;
+        return Ed25519Signature2020.BASE + TYPE;
     }
 
     @Override
     public VerificationMethod deserialize(JsonObject object) throws DocumentError {
+ 
+        URI id = JsonLdUtils.getId(object).orElse(null);
+        
+        URI controller = controllerFrom(object).orElse(null);
+        
+        String type = JsonLdUtils.getType(object).stream().findFirst().orElse(null);
+        
+        byte[] publicKey = publicKeyFrom(object).orElse(null);
 
-        final VerificationKey key = new VerificationKey();
-
-        JsonLdUtils.getId(object).ifPresent(key::setId);
-        JsonLdUtils.getType(object).stream().findFirst().ifPresent(key::setType);
-
-        return from(key, object);
+        return new Ed25519VerificationKey2020(
+                        id,
+                        controller,
+                        type,
+                        publicKey
+                        );
     }
 
     @Override
     public JsonObject serialize(VerificationMethod proof) {
         return serialize(Json.createObjectBuilder(), proof).build();
     }
-
-    static final VerificationKey from(VerificationKey key, JsonObject json) throws DocumentError {
+    
+    static final Optional<URI> controllerFrom(JsonObject json) throws DocumentError {
 
         // controller
-        JsonLdUtils.getObjects(json, Ed25519Signature2020.BASE + CONTROLLER)
+        return JsonLdUtils.getObjects(json, Ed25519Signature2020.BASE + CONTROLLER)
             .stream()
             .findFirst()
-            .ifPresent(controller -> {
+            .map(controller -> {
 
                 if (JsonUtils.isArray(controller)) {
                     controller = controller.asJsonArray().get(0);
                 }
 
-                JsonLdUtils.getId(controller)
-                    .ifPresent(id -> {
-                        key.setController(id);
-                    });
+                return JsonLdUtils.getId(controller).orElse(null);
             });
+    }
+    
+    static final Optional<byte[]> publicKeyFrom(JsonObject json) throws DocumentError {
 
         // public key
         if (JsonLdUtils.hasPredicate(json, Ed25519Signature2020.BASE + PUBLIC_KEY_MULTIBASE)) {
-            key.setPublicKey(getKey(json, Ed25519Signature2020.BASE + PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey));
-
+            
+            byte[] publicKey = getKey(json, Ed25519Signature2020.BASE + PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey); 
+            
             // verify verification key length
-            if (key.getPublicKey() != null
-                    && key.getPublicKey().length != 32
-                    && key.getPublicKey().length != 57
-                    && key.getPublicKey().length != 114
+            if (publicKey != null
+                    && publicKey.length != 32
+                    && publicKey.length != 57
+                    && publicKey.length != 114
                     ) {
                 throw new DocumentError(ErrorType.Invalid, "proof", Keywords.VALUE, "length");
             }
-        }
-        return key;
-    }
 
+            return Optional.ofNullable(publicKey);
+        }
+
+        return Optional.empty();
+    }
 
     static byte[] getKey(JsonObject json, String property, Codec expected) throws DocumentError {
 
@@ -140,20 +154,20 @@ public class Ed25519VerificationKey2020Adapter implements VerificationMethodAdap
     }
 
     static JsonObjectBuilder serialize(JsonObjectBuilder builder, VerificationMethod key) {
-        if (key.getId() != null) {
-            builder.add(Keywords.ID, key.getId().toString());
+        if (key.id() != null) {
+            builder.add(Keywords.ID, key.id().toString());
         }
 
-        if (key.getType() != null) {
-            builder.add(Keywords.TYPE, key.getType());
+        if (key.type() != null) {
+            builder.add(Keywords.TYPE, key.type());
         }
 
-        if (key.getController()!= null) {
-            JsonLdUtils.setId(builder, Ed25519Signature2020.BASE + CONTROLLER, key.getController());
+        if (key.controller()!= null) {
+            JsonLdUtils.setId(builder, Ed25519Signature2020.BASE + CONTROLLER, key.controller());
         }
 
         if (key instanceof VerificationKey) {
-            return setKey(builder, ((VerificationKey)key).getPublicKey(), Ed25519Signature2020.BASE + PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
+            return setKey(builder, ((VerificationKey)key).publicKey(), Ed25519Signature2020.BASE + PUBLIC_KEY_MULTIBASE, Codec.Ed25519PublicKey);
         }
 
         return builder;

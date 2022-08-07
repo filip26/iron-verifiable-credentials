@@ -1,10 +1,11 @@
-package com.apicatalog.ld.signature.proof;
+package com.apicatalog.ld.signature.json;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.signature.proof.Proof;
 
 import jakarta.json.JsonObject;
 
-public interface ProofAdapter {
+public interface ProofJsonAdapter {
 
     String type();
 
@@ -14,5 +15,5 @@ public interface ProofAdapter {
 
     JsonObject setProofValue(JsonObject proof, byte[] value) throws DocumentError;
 
-    VerificationMethodAdapter getMethodAdapter();
+    VerificationMethodJsonAdapter getMethodAdapter();
 }

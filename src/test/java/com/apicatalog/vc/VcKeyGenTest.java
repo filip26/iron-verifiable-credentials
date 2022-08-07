@@ -26,11 +26,11 @@ class VcKeyGenTest {
     void generate32L() throws KeyGenError {
         KeyPair kp = Vc.generateKeys("https://w3id.org/security#Ed25519KeyPair2020").get(URI.create("urn:1"), 256);
         assertNotNull(kp);
-        assertEquals("urn:1", kp.getId());
-        assertEquals("https://w3id.org/security#Ed25519KeyPair2020", kp.getType());
-        assertNotNull(kp.getPublicKey());
-        assertNotNull(kp.getPrivateKey());
-        assertEquals(32, kp.getPublicKey().length);
-        assertEquals(32, kp.getPrivateKey().length);
+        assertEquals("urn:1", kp.id());
+        assertEquals("https://w3id.org/security#Ed25519KeyPair2020", kp.type());
+        assertNotNull(kp.publicKey());
+        assertNotNull(kp.privateKey());
+        assertEquals(32, kp.publicKey().length);
+        assertEquals(32, kp.privateKey().length);
     }
 }

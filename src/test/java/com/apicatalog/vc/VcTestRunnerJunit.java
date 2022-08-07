@@ -79,8 +79,8 @@ public class VcTestRunnerJunit {
                                 testCase.verificationMethod,
                                 URI.create("https://w3id.org/security#assertionMethod")
                                 )
-                                        .created(testCase.created)
-                                        .domain(testCase.domain);
+                                .created(testCase.created)
+                                .domain(testCase.domain);
 
                 URI keyPairLocation = testCase.keyPair;
 

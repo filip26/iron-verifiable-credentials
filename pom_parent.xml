@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron</artifactId>
-    <version>0.7.1-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Iron Verifiable Credentials</name>
@@ -50,26 +50,21 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <envClassifier></envClassifier>
-
-        <jakarta.json.version>2.0.1</jakarta.json.version>
         <titanium.version>1.3.1</titanium.version>
-        <multiformats.version>1.1.0</multiformats.version>
+        <carbon.version>0.0.1-SNAPSHOT</carbon.version>
+
+        <jakarta.json.version>2.0.1</jakarta.json.version>        
         <!-- dev resources -->
 
         <!-- test resources -->
         <junit.version>5.8.2</junit.version>
     </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.json</artifactId>
             <version>${jakarta.json.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.multiformats</groupId>
-            <artifactId>java-multibase</artifactId>
-            <version>${multiformats.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -196,13 +191,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-    
     <profiles>
     <profile>
       <id>maven-central</id>

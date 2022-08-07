@@ -5,7 +5,7 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.proof.EmbeddedProofAdapter;
+import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
@@ -21,7 +21,7 @@ public class Ed25519Proof2020Adapter extends EmbeddedProofAdapter {
     public static final String TYPE = "https://w3id.org/security#Ed25519Signature2020";
 
     public Ed25519Proof2020Adapter() {
-    super(TYPE, new Ed25519VerificationKey2020Adapter());
+        super(TYPE, new Ed25519VerificationKey2020Adapter());
     }
 
     @Override
@@ -84,11 +84,7 @@ public class Ed25519Proof2020Adapter extends EmbeddedProofAdapter {
             throw new DocumentError(ErrorType.Unknown, "cryptoSuite", Keywords.TYPE);
         }
 
-        final Proof proof = new Proof();
-
-        read(proof, proofObject);
-
-        return proof;
+        return read(proofObject);
     }
 
     @Override

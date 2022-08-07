@@ -25,17 +25,27 @@ public class Ed25519KeyPair2020Adapter extends Ed25519VerificationKey2020Adapter
     @Override
     public VerificationMethod deserialize(JsonObject object) throws DocumentError {
 
-        URI id =  JsonLdUtils.getId(object).orElse(null);
+        final URI id =  JsonLdUtils.getId(object).orElse(null);
 
-        final KeyPair key = new KeyPair(id);
+        URI controller = controllerFrom(object).orElse(null);
+        
+        String type = JsonLdUtils.getType(object).stream().findFirst().orElse(null);
+        
+        byte[] publicKey = publicKeyFrom(object).orElse(null);
 
-        Ed25519VerificationKey2020Adapter.from(key, object);
-
+        byte[] privateKey = null;
+        
         if (JsonLdUtils.hasPredicate(object, Ed25519Signature2020.BASE + PRIVATE_KEY_MULTIBASE)) {
-            key.setPrivateKey(getKey(object, Ed25519Signature2020.BASE + PRIVATE_KEY_MULTIBASE, Codec.Ed25519PrivateKey));
+            privateKey = getKey(object, Ed25519Signature2020.BASE + PRIVATE_KEY_MULTIBASE, Codec.Ed25519PrivateKey);
         }
 
-        return key;
+        return new Ed25519KeyPair2020(
+                        id,
+                        controller,
+                        type,
+                        publicKey,
+                        privateKey
+                        );
     }
 
 
@@ -46,7 +56,7 @@ public class Ed25519KeyPair2020Adapter extends Ed25519VerificationKey2020Adapter
         final JsonObjectBuilder builder = Json.createObjectBuilder(super.serialize(proof));
 
         if (proof instanceof KeyPair) {
-            setKey(builder, ((KeyPair) proof).getPrivateKey(), PRIVATE_KEY_MULTIBASE, Codec.Ed25519PrivateKey);
+            setKey(builder, ((KeyPair) proof).privateKey(), PRIVATE_KEY_MULTIBASE, Codec.Ed25519PrivateKey);
         }
 
         return builder.build();
