@@ -28,12 +28,12 @@ public class Ed25519Proof2020Adapter extends EmbeddedProofAdapter {
     protected byte[] decodeValue(String encoding, String value) throws DocumentError {
         // verify supported proof value encoding
         if (!"https://w3id.org/security#multibase".equals(encoding)) {
-            throw new DocumentError(ErrorType.Invalid, PROOF, Keywords.VALUE);
+            throw new DocumentError(ErrorType.Invalid, PROOF_KEY, Keywords.VALUE);
         }
 
         // verify proof value
         if (value == null || !Multibase.isAlgorithmSupported(value)) {
-            throw new DocumentError(ErrorType.Invalid, PROOF, Keywords.VALUE);
+            throw new DocumentError(ErrorType.Invalid, PROOF_KEY, Keywords.VALUE);
         }
 
         // decode proof value
@@ -41,7 +41,7 @@ public class Ed25519Proof2020Adapter extends EmbeddedProofAdapter {
 
         // verify proof value length
         if (rawProofValue.length != 64) {
-            throw new DocumentError(ErrorType.Invalid, PROOF, Keywords.VALUE, "length");
+            throw new DocumentError(ErrorType.Invalid, PROOF_KEY, Keywords.VALUE, "length");
         }
 
         return rawProofValue;
@@ -51,7 +51,7 @@ public class Ed25519Proof2020Adapter extends EmbeddedProofAdapter {
     protected String encodeValue(String encoding, byte[] value) throws DocumentError {
       // verify supported proof value encoding
       if (!"https://w3id.org/security#multibase".equals(encoding)) {
-          throw new DocumentError(ErrorType.Invalid, PROOF, Keywords.VALUE);
+          throw new DocumentError(ErrorType.Invalid, PROOF_KEY, Keywords.VALUE);
       }
 
       if (value == null) {
@@ -69,7 +69,7 @@ public class Ed25519Proof2020Adapter extends EmbeddedProofAdapter {
 
         // data integrity checks
         if (JsonUtils.isNotObject(object)) {
-            throw new DocumentError(ErrorType.Invalid, PROOF);
+            throw new DocumentError(ErrorType.Invalid, PROOF_KEY);
         }
 
         final JsonObject proofObject = object.asJsonObject();
@@ -78,7 +78,7 @@ public class Ed25519Proof2020Adapter extends EmbeddedProofAdapter {
 
             // @type property
             if (!JsonLdUtils.hasType(proofObject)) {
-                throw new DocumentError(ErrorType.Missing, PROOF, Keywords.TYPE);
+                throw new DocumentError(ErrorType.Missing, PROOF_KEY, Keywords.TYPE);
             }
 
             throw new DocumentError(ErrorType.Unknown, "cryptoSuite", Keywords.TYPE);
