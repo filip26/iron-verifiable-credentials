@@ -12,6 +12,7 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020Adapter;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 
@@ -107,7 +108,7 @@ public class VcTestCase {
 
                 } else {
                     JsonLdUtils.getId(method)
-                            .ifPresent(id -> testCase.verificationMethod = new VerificationMethod(id));
+                            .ifPresent(id -> testCase.verificationMethod = new Ed25519VerificationKey2020(id, null, null, null));
                 }
             }
 

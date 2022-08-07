@@ -11,61 +11,62 @@ public class ProofOptions {
 
     protected final URI purpose;
 
-    protected Instant ceated;
+    protected Instant created;
 
     protected String domain;
 
     protected ProofOptions(
-        String type,
-        VerificationMethod verificationMethod,
-        URI purpose
-        ) {
-    this.type = type;
-    this.verificationMethod = verificationMethod;
-    this.purpose = purpose;
+                String type,
+                VerificationMethod verificationMethod,
+                URI purpose
+                ) {
+        this.type = type;
+        this.verificationMethod = verificationMethod;
+        this.purpose = purpose;
     }
 
     public static ProofOptions create(String type, VerificationMethod verificationMethod, URI purpose) {
-    return new ProofOptions(type, verificationMethod, purpose);
+        return new ProofOptions(type, verificationMethod, purpose);
     }
 
     public VerificationMethod verificationMethod() {
-    return verificationMethod;
+        return verificationMethod;
     }
 
     public Instant created() {
-    return ceated;
+        return created;
     }
 
     public String domain() {
-    return domain;
+        return domain;
     }
 
     public String type() {
-    return type;
+        return type;
     }
 
     public URI purpose() {
-    return purpose;
+        return purpose;
     }
 
-    public ProofOptions created(Instant ceated) {
-    this.ceated = ceated;
-    return this;
+    public ProofOptions created(Instant created) {
+        this.created = created;
+        return this;
     }
 
     public ProofOptions domain(String domain) {
-    this.domain = domain;
-    return this;
+        this.domain = domain;
+        return this;
     }
 
     public Proof toUnsignedProof() {
-    final Proof proof = new Proof();
-    proof.type = type;
-    proof.created = ceated;
-    proof.domain = domain;
-    proof.purpose = purpose;
-    proof.verificationMethod = verificationMethod;
-    return proof;
+        return new Proof(
+                type,
+                purpose,
+                verificationMethod,
+                created,
+                domain,
+                null
+                );
     }
 }

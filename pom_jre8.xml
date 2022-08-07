@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron</artifactId>
-    <version>0.7.1-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <relativePath>pom_parent.xml</relativePath>
   </parent>
 
@@ -36,6 +36,11 @@
       <groupId>com.apicatalog</groupId>
       <artifactId>titanium-json-ld-jre8</artifactId>
       <version>${titanium.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.apicatalog</groupId>
+      <artifactId>carbon-did-jre8</artifactId>
+      <version>${carbon.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.crypto.tink</groupId>

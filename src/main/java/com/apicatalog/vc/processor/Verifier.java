@@ -3,9 +3,9 @@ package com.apicatalog.vc.processor;
 import java.net.URI;
 import java.util.Collection;
 
-import com.apicatalog.did.DidDocument;
 import com.apicatalog.did.DidResolver;
 import com.apicatalog.did.DidUrl;
+import com.apicatalog.did.document.DidDocument;
 import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -22,11 +22,12 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
+import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
+import com.apicatalog.ld.signature.json.VerificationMethodJsonAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.ld.signature.proof.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
-import com.apicatalog.ld.signature.proof.VerificationMethodAdapter;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.JsonArray;
@@ -172,13 +173,13 @@ public final class Verifier extends Processor<Verifier> {
         for (final JsonValue proofValue : proofs) {
 
             if (JsonUtils.isNotObject(proofValue)) {
-            throw new DocumentError(ErrorType.Invalid, "proof");
+                throw new DocumentError(ErrorType.Invalid, "proof");
             }
 
             final Collection<String> proofType = JsonLdUtils.getType(proofValue.asJsonObject());
 
             if (proofType == null || proofType.isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, "proof", Keywords.TYPE);
+                throw new DocumentError(ErrorType.Missing, "proof", Keywords.TYPE);
             }
 
             final SignatureSuite signatureSuite =
@@ -196,10 +197,10 @@ public final class Verifier extends Processor<Verifier> {
                 throw new VerificationError(Code.InvalidProofDomain);
             }
 
-            final VerificationMethod verificationMethod = get(proof.getVerificationMethod().getId(), loader, signatureSuite.getProofAdapter().getMethodAdapter());
+            final VerificationMethod verificationMethod = get(proof.getVerificationMethod().id(), loader, signatureSuite.getProofAdapter().getMethodAdapter());
 
             if (!(verificationMethod instanceof VerificationKey)) {
-            throw new VerificationError(Code.UnknownVerificationMethod);
+                throw new VerificationError(Code.UnknownVerificationMethod);
             }
 
             final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite);
@@ -217,7 +218,7 @@ public final class Verifier extends Processor<Verifier> {
 
 
     // refresh/fetch verification method
-    final VerificationMethod get(final URI id, final DocumentLoader loader, VerificationMethodAdapter keyAdapter) throws DocumentError, VerificationError {
+    final VerificationMethod get(final URI id, final DocumentLoader loader, VerificationMethodJsonAdapter keyAdapter) throws DocumentError, VerificationError {
 
         if (DidUrl.isDidUrl(id)) {
 
@@ -230,10 +231,15 @@ public final class Verifier extends Processor<Verifier> {
             final DidDocument didDocument = resolver.resolve(DidUrl.from(id));
 
             return didDocument
-                        .getVerificationMethod()
+                        .verificationMethod()
                         .stream()
-                        .filter(vm -> keyAdapter.getType().equals(vm.getType()))
-                        .map(VerificationKey.class::cast)
+                        .filter(vm -> keyAdapter.getType().equals(vm.type()))
+                        .map(did -> new Ed25519VerificationKey2020(
+                                        did.id().toUri(),
+                                        did.controller().toUri(),
+                                        did.type(),
+                                        did.publicKey()
+                                    ))
                         .findFirst()
                         .orElseThrow(IllegalStateException::new);
         }

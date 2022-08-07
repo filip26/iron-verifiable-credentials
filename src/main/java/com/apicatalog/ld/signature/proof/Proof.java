@@ -18,6 +18,15 @@ public class Proof {
     protected String domain;
     protected byte[] value;
 
+    public Proof(String type, URI purpose, VerificationMethod verificationMethod, Instant created, String domain, byte[] value) {
+        this.type = type;
+        this.purpose = purpose;
+        this.verificationMethod = verificationMethod;
+        this.created = created;
+        this.domain = domain;
+        this.value = value;
+    }
+    
     /**
      * The proof type used.
      *
@@ -27,7 +36,7 @@ public class Proof {
      * @return the proof type
      */
     public String getType() {
-	return type;
+        return type;
     }
 
     /**
@@ -39,7 +48,7 @@ public class Proof {
      * @return {@link URI} identifying the purpose
      */
     public URI getPurpose() {
-	return purpose;
+        return purpose;
     }
 
     /**
@@ -49,7 +58,7 @@ public class Proof {
      * @return {@link VerificationMethod} to verify the proof signature
      */
     public VerificationMethod getVerificationMethod() {
-	return verificationMethod;
+        return verificationMethod;
     }
 
     /**
@@ -58,7 +67,7 @@ public class Proof {
      * @return the date time when the proof has been created
      */
     public Instant getCreated() {
-	return created;
+        return created;
     }
 
     /**
@@ -67,7 +76,7 @@ public class Proof {
      * @return the domain
      */
     public String getDomain() {
-	return domain;
+        return domain;
     }
 
     /**
@@ -76,6 +85,6 @@ public class Proof {
      * @return the proof value as byte array
      */
     public byte[] getValue() {
-	return value;
+        return value;
     }
 }

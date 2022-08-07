@@ -3,9 +3,9 @@ package com.apicatalog.ld.signature;
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.ld.signature.proof.EmbeddedProofAdapter;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -33,7 +33,7 @@ public class LinkedDataSignature {
      */
     public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DocumentError {
 
-        if (verificationKey == null || verificationKey.getPublicKey() == null) {
+        if (verificationKey == null || verificationKey.publicKey() == null) {
             throw new VerificationError(VerificationError.Code.MissingVerificationKey);
         }
 
@@ -42,7 +42,7 @@ public class LinkedDataSignature {
        try {
            final byte[] computeSignature = hashCode(document, proofObject);
 
-           suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
+           suite.verify(verificationKey.publicKey(), signature, computeSignature);
 
        } catch (LinkedDataSuiteError e) {
            throw new VerificationError(e);
@@ -68,7 +68,7 @@ public class LinkedDataSignature {
     try {
         final byte[] documentHashCode = hashCode(document, options);
 
-        return suite.sign(keyPair.getPrivateKey(), documentHashCode);
+        return suite.sign(keyPair.privateKey(), documentHashCode);
 
     } catch (LinkedDataSuiteError e) {
         throw new SigningError(e);
