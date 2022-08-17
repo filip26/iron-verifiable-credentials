@@ -78,7 +78,7 @@ public class JwsProof {
     }
 
     /**
-     * @return Json Web Signature
+     *Returns json Web Signature.
      */
     public String getJws() {
         return jws;
