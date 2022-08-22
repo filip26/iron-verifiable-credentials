@@ -1,5 +1,15 @@
 package com.apicatalog.jsonld;
 
+import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
+import com.apicatalog.jsonld.lang.ValueObject;
+import com.apicatalog.jsonld.uri.UriUtils;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import jakarta.json.*;
+
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -7,19 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.lang.ValueObject;
-import com.apicatalog.jsonld.uri.UriUtils;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
-
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
 
 public class JsonLdUtils {
 
@@ -248,4 +245,28 @@ public class JsonLdUtils {
 
         return Optional.empty();
     }
+
+    /**
+     * Convert json string to jakarta json object
+     */
+    public static JsonObject stringToJakartaJsonObj(String jsonString) throws JsonException, IllegalStateException {
+        StringReader stringReader = new StringReader(jsonString);
+        JsonReader jsonReader = Json.createReader(stringReader);
+        JsonObject jsonObject = jsonReader.readObject();
+        jsonReader.close();
+        return jsonObject;
+    }
+
+    /**
+     * Convert jakarta json object to string
+     */
+    public static String jakartaJsonObjToString(JsonObject jsonObject) throws JsonException, IllegalStateException {
+        StringWriter stringWriter = new StringWriter();
+        JsonWriter jsonWriter = Json.createWriter(stringWriter);
+        jsonWriter.writeObject(jsonObject);
+        String jsonString = stringWriter.toString();
+        jsonWriter.close();
+        return jsonString;
+    }
+
 }

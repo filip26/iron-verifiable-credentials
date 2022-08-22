@@ -4,8 +4,8 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.ed25519.Ed25519Proof2020Adapter;
-
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
@@ -32,7 +32,7 @@ public class JsonWebProof2020Adapter extends JwsEmbeddedProofAdapter {
 
         // data integrity checks
         if (JsonUtils.isNotObject(object)) {
-            throw new DocumentError(DocumentError.ErrorType.Invalid, PROOF);
+            throw new DocumentError(ErrorType.Invalid, PROOF);
         }
 
         final JsonObject proofObject = object.asJsonObject();
@@ -41,10 +41,10 @@ public class JsonWebProof2020Adapter extends JwsEmbeddedProofAdapter {
 
             // @type property
             if (!JsonLdUtils.hasType(proofObject)) {
-                throw new DocumentError(DocumentError.ErrorType.Missing, PROOF, Keywords.TYPE);
+                throw new DocumentError(ErrorType.Missing, PROOF, Keywords.TYPE);
             }
 
-            throw new DocumentError(DocumentError.ErrorType.Unknown, "cryptoSuite", Keywords.TYPE);
+            throw new DocumentError(ErrorType.Unknown, "cryptoSuite", Keywords.TYPE);
         }
 
         final JwsProof proof = new JwsProof();

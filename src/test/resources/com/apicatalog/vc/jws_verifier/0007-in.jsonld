@@ -1,0 +1,60 @@
+[
+  {
+    "https://www.w3.org/2018/credentials#credentialSubject": [
+      {
+        "http://schema.org/alumniOf": [
+          {
+            "@id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
+            "http://schema.org/name": [
+              {}
+            ]
+          }
+        ],
+        "@id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+      }
+    ],
+    "@id": "http://example.edu/credentials/1872",
+    "https://www.w3.org/2018/credentials#issuanceDate": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+        "@value": "2010-01-01T19:23:24Z"
+      }
+    ],
+    "https://www.w3.org/2018/credentials#issuer": [
+      {
+        "@id": "https://example.edu/issuers/565049"
+      }
+    ],
+    "https://w3id.org/security#proof": [
+      {
+        "@graph": [
+          {
+            "http://purl.org/dc/terms/created": [
+              {
+                "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                "@value": "2022-02-25T14:58:42Z"
+              }
+            ],
+            "https://w3id.org/security#proofPurpose": [
+              {
+                "@id": "https://w3id.org/security#assertionMethod"
+              }
+            ],
+            "https://w3id.org/security#jws":{
+                "@value":"eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFUzM4NCJ9..RZ6DwduwbGQ4FJoLUz4UVO_zXKr5UBWBEDF-ulL7hykfeBFLQClxB0pkrDaKO6SZgMNPiCHiaVlSLTWoo4uqdEzkJnYCAl2rWrk4TD_8S0AbKnN0i5Vu10NPvAwYW9OL"
+            },
+            "https://w3id.org/security#verificationMethod": [
+              {
+                "@id": "https://example.edu/issuers/565049#key-1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "@type": [
+      "https://www.w3.org/2018/credentials#VerifiableCredential",
+      "https://example.org/examples#AlumniCredential"
+    ]
+  }
+]

@@ -1,0 +1,18 @@
+{"verifiableCredential":{ "id":"https://apicatalog/com/vc/test-credentials#0023",
+    "type": "VerifiableCredential",
+    "issuer": "https://github.com/filip26/iron-verifiable-credentials/jws_issuer/23",
+    "issuanceDate": "2022-06-13T19:54:42Z",
+    "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+    "sec:proof": {
+        "type": "JsonWebSignature2020",
+        "verificationMethod": "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y",
+        "created": "2022-05-28T17:02:05Z",
+        "proofPurpose": "assertionMethod",
+        "jws": "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJQUzI1NiJ9..Aimsl4sB9B5FdGLjuMSht9wCzjoDJxrN-PKCE8YYltfKtgj3OCnlbd3pI0JWBr8RIrT5qZHR7mqdVaMmQbw_k-URSYA4tSZQ-6wohdlabaKV4NZkXVXkdj9VVW5W9Ww0RnbKI_vvPPLU2O4OOJUpW1TuW0-MiYng762aD7HSU4PxESL_jva3e9nPlP0Na-phprc-pQiVvuHp0cuKf97yiVcDNiHZ5wN2PLFeUE3nFyrCTan9nXds0GOmasjR2oOFOUmmbNOsvB273sNzaRk5wf2YoAR5ktIPKjhmzceJCs6fu3RH_a0hj_v9mZw4tLOkf3ReSE_03AqyIhXhToSsHA"
+    },
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://w3id.org/security/suites/jws-2020/v1"
+    ]
+    }
+}

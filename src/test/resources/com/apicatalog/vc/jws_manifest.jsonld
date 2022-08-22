@@ -1,0 +1,15 @@
+{
+    "@context": [
+        "jws_context.jsonld",
+        {
+            "@base": "jws_manifest"
+        }
+    ],
+    "@id": "",
+    "@type": "mf:Manifest",
+    "name": "Json Web Signature 2020 Test Suite",
+    "sequence": [
+        "jws_verifier-manifest.jsonld",
+        "jws_issuer-manifest.jsonld"
+    ]
+}

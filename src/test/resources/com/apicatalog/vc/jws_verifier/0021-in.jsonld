@@ -1,0 +1,34 @@
+{
+    "id": "https://apicatalog/com/vc/test-credentials#0001",
+    "type": "VerifiableCredential",
+    "issuer": "https://github.com/filip26/iron-verifiable-credentials/jws_issuer/1",
+    "issuanceDate": "2022-06-03T21:18:40Z",
+    "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+    "sec:proof": [
+        {
+            "type": "JsonWebSignature2020",
+            "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/jws_verifier/0005-jws-verification-key.json",
+            "created": "2022-06-04T20:33:01Z",
+            "proofPurpose": "assertionMethod",
+            "jws": "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFUzM4NCJ9..XqS1wNAo2UMWFaC0ZN14TDYPLF9lQSEAEWQ9Yy4jTHZUoNieo_mf3vCAExf3doSxePTu3HSrAOCl-Du3HBhotmGj5__OE2XeXKrv0_L03xSpjVOQPWr7cXVxGuBufon-"
+        },
+        {
+            "type": "JsonWebSignature2020",
+            "verificationMethod": {
+                "id": "https://github.com/filip26/iron-verifiable-credentials/jws_verifier/0005-jws-verification-key.json",
+                "type": "JsonWebKey2020",
+                "https://w3id.org/security#controller":{
+                    "id":"https://github.com/filip26/iron-verifiable-credentials/jws_issuer/2"
+                }
+            },
+            "created": "2022-06-07T21:06:15Z",
+            "proofPurpose": "assertionMethod",
+            "jws": "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFUzM4NCJ9..XqS1wNAo2UMWFaC0ZN14TDYPLF9lQSEAEWQ9Yy4jTHZUoNieo_mf3vCAExf3doSxePTu3HSrAOCl-Du3HBhotmGj5__OE2XeXKrv0_L03xSpjVOQPWr7cXVxGuBufon-"
+        }
+
+    ],
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://w3id.org/security/suites/jws-2020/v1"
+    ]
+}

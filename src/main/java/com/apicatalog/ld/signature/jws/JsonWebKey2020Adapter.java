@@ -6,13 +6,15 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020Adapter;
-import com.apicatalog.ld.signature.jws.from_lib_v070.VerificationMethodAdapter;
+import com.apicatalog.ld.signature.json.VerificationMethodJsonAdapter;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 import com.nimbusds.jose.jwk.JWK;
 import jakarta.json.*;
 
 import java.text.ParseException;
-//import com.apicatalog.ld.signature.proof.VerificationMethodAdapter;
+
+import static com.apicatalog.jsonld.JsonLdUtils.jakartaJsonObjToString;
+import static com.apicatalog.jsonld.JsonLdUtils.stringToJakartaJsonObj;
 
 /**
  * Json Web Key 2020 Suite.
@@ -21,13 +23,13 @@ import java.text.ParseException;
  *
  * @author petr apeltauer, KAPRION Technologies GmbH
  */
-public class JsonWebKey2020Adapter implements VerificationMethodAdapter {
+public class JsonWebKey2020Adapter implements VerificationMethodJsonAdapter {
 
 
     protected static final String TYPE = "JsonWebKey2020";
     protected static final String CONTROLLER = "controller";
     protected static final String PUBLIC_KEY_JWK = "publicKeyJwk";
-    protected static final String PUBLIC_KEY_TYPE_VALUE = "https://w3id.org/security#publicKeyJwk";
+    protected static final String KEY_TYPE_VALUE = "@json";
 
     @Override
     public String getType() {
@@ -91,16 +93,33 @@ public class JsonWebKey2020Adapter implements VerificationMethodAdapter {
             throw new DocumentError(DocumentError.ErrorType.Invalid, property);
         }
 
-        if (!JsonLdUtils.isTypeOf(PUBLIC_KEY_TYPE_VALUE, key.asJsonObject())) {
+        if (!JsonLdUtils.isTypeOf(KEY_TYPE_VALUE, key.asJsonObject())) {
             throw new DocumentError(DocumentError.ErrorType.Invalid, property, Keywords.TYPE);
         }
 
-        final String jwkString = ValueObject
+//        final String jwkString = ValueObject
+//                .getValue(key)
+//                .filter(JsonUtils::isString)
+//                .map(JsonString.class::cast)
+//                .map(JsonString::getString)
+//                .orElseThrow(() -> new DocumentError(DocumentError.ErrorType.Invalid, property));
+
+//        JsonValue jsonValue = ValueObject.getValue(key).orElseThrow(() -> new DocumentError(DocumentError.ErrorType.Invalid, property));
+//        if(JsonUtils.isString(jsonValue))
+//            System.out.println("getKey - jsonValue is string = " + jsonValue.toString());
+//        else if (JsonUtils.isObject(jsonValue))
+//            System.out.println("getKey - jsonValue is object = " + jakartaJsonObjToString((JsonObject) jsonValue));
+
+        String jwkString = ValueObject
                 .getValue(key)
-                .filter(JsonUtils::isString)
-                .map(JsonString.class::cast)
-                .map(JsonString::getString)
+                .filter(JsonUtils::isObject)
+                .map(JsonObject.class::cast) //map JsonValue to JsonObject
+                .map(keyJsonObj -> {         //map JsonObject to String
+                    return jakartaJsonObjToString(keyJsonObj);
+                })
                 .orElseThrow(() -> new DocumentError(DocumentError.ErrorType.Invalid, property));
+
+        System.out.println("getKey - jwkString = " + jwkString);
 
         try {
             return JWK.parse(jwkString);
@@ -138,7 +157,34 @@ public class JsonWebKey2020Adapter implements VerificationMethodAdapter {
 
         final String jwkString = key.toString();
 
-        return JsonLdUtils.setValue(builder, property, PUBLIC_KEY_TYPE_VALUE, jwkString);
+        System.out.println("setKey - jwkString = " + jwkString);
+
+        //@value
+        final JsonObject value = stringToJakartaJsonObj(jwkString);
+//        return JsonLdUtils.setValue(builder, property, KEY_TYPE_VALUE, value); //does not take JsonObject, only String
+
+        //entry of https://w3id.org/security#publicKeyJwk or https://w3id.org/security#privateKeyJwk json parameter
+        JsonObject keyJwkObject = Json.createObjectBuilder()
+                .add(Keywords.TYPE, KEY_TYPE_VALUE)             //set value of json parameter @type
+                .add(Keywords.VALUE, value)                     //set value of json parameter @value
+                .build();
+        //value of https://w3id.org/security#publicKeyJwk or https://w3id.org/security#privateKeyJwk json parameter
+        JsonArray keyJwkObjectArray = Json.createArrayBuilder().add(keyJwkObject).build();
+
+//        //example of "keyJwkObjectArray" json array with "keyJwkObject" json object inside:
+//        "https://w3id.org/security#publicKeyJwk":[
+//            {
+//                "@type":"@json",
+//                "@value": {
+//                    "kty": "EC",
+//                    "crv": "P-384",
+//                    "x": "eQbMauiHc9HuiqXT894gW5XTCrOpeY8cjLXAckfRtdVBLzVHKaiXAAxBFeVrSB75",
+//                    "y": "YOjxhMkdH9QnNmGCGuGXJrjAtk8CQ1kTmEEi9cg2R9ge-zh8SFT1Xu6awoUjK5Bv"
+//                }
+//            }
+//        ]
+
+        return builder.add(property, keyJwkObjectArray);
     }
 
 }

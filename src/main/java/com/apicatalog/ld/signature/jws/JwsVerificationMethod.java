@@ -1,11 +1,13 @@
-package com.apicatalog.ld.signature.jws.from_lib_v070;
+package com.apicatalog.ld.signature.jws;
+
+import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 import java.net.URI;
 
 /**
  * Originally class {@link com.apicatalog.ld.signature.proof.VerificationMethod} (in library version 0.7.0)
  */
-public class VerificationMethod implements com.apicatalog.ld.signature.proof.VerificationMethod {
+public class JwsVerificationMethod implements VerificationMethod {
 
     protected URI id;
 
@@ -13,11 +15,11 @@ public class VerificationMethod implements com.apicatalog.ld.signature.proof.Ver
 
     protected URI controller;
 
-    public VerificationMethod() {
+    public JwsVerificationMethod() {
         this(null);
     }
 
-    public VerificationMethod(URI id) {
+    public JwsVerificationMethod(URI id) {
         this.id = id;
     }
 

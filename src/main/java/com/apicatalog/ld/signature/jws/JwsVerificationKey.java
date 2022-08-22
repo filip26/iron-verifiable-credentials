@@ -1,7 +1,6 @@
 package com.apicatalog.ld.signature.jws;
 
 //import com.apicatalog.ld.signature.proof.VerificationMethod;
-import com.apicatalog.ld.signature.jws.from_lib_v070.VerificationMethod;
 import com.nimbusds.jose.jwk.JWK;
 
 import java.net.URI;
@@ -11,7 +10,7 @@ import java.net.URI;
  *
  * @author petr apeltauer, KAPRION Technologies GmbH
  */
-public class JwsVerificationKey extends VerificationMethod {
+public class JwsVerificationKey extends JwsVerificationMethod {
 
     protected JWK publicKey;
 

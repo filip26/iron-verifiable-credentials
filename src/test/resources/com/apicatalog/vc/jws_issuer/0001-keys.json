@@ -1,0 +1,19 @@
+{
+	"@context": "https://github.com/filip26/iron-verifiable-credentials/jws_security-context.jsonld",
+	"id": "https://github.com/filip26/iron-verifiable-credentials/jws_issuer/0001-keys.json",
+	"type": "JsonWebKey2020",
+	"controller": "https://github.com/filip26/iron-verifiable-credentials/jws_issuer/1",
+	"publicKeyJwk": {
+		"kty": "EC",
+		"crv": "P-384",
+		"x": "eQbMauiHc9HuiqXT894gW5XTCrOpeY8cjLXAckfRtdVBLzVHKaiXAAxBFeVrSB75",
+		"y": "YOjxhMkdH9QnNmGCGuGXJrjAtk8CQ1kTmEEi9cg2R9ge-zh8SFT1Xu6awoUjK5Bv"
+	},
+	"privateKeyJwk": {
+		"kty": "EC",
+		"crv": "P-384",
+		"x": "eQbMauiHc9HuiqXT894gW5XTCrOpeY8cjLXAckfRtdVBLzVHKaiXAAxBFeVrSB75",
+		"y": "YOjxhMkdH9QnNmGCGuGXJrjAtk8CQ1kTmEEi9cg2R9ge-zh8SFT1Xu6awoUjK5Bv",
+		"d": "dXghMAzYZmv46SNRuxmfDIuAlv7XIhvlkPzW3vXsopB1ihWp47tx0hqjZmYO6fJa"
+	}
+}

@@ -22,7 +22,7 @@ public class JwsSignatureSuite implements CanonicalizationAlgorithm, DigestAlgor
     protected final DigestAlgorithm digester;
     protected final JwsSignatureAlgorithm signer;
 
-    protected final JwsProofAdapter proofAdapter;
+    protected final JwsProofJsonAdapter proofAdapter;
 
     final String alg;
 
@@ -31,7 +31,7 @@ public class JwsSignatureSuite implements CanonicalizationAlgorithm, DigestAlgor
             final CanonicalizationAlgorithm canonicalization,
             final DigestAlgorithm digester,
             final JwsSignatureAlgorithm signer,
-            final JwsProofAdapter proofAdapter,
+            final JwsProofJsonAdapter proofAdapter,
             final String alg
     ) {
         this.id = id;
@@ -81,7 +81,7 @@ public class JwsSignatureSuite implements CanonicalizationAlgorithm, DigestAlgor
         return id;
     }
 
-    public JwsProofAdapter getProofAdapter() {
+    public JwsProofJsonAdapter getProofAdapter() {
         return proofAdapter;
     }
 

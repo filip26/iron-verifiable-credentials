@@ -1,12 +1,5 @@
 package com.apicatalog.vc;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.net.URI;
-import java.time.Instant;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -14,11 +7,18 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020Adapter;
+import com.apicatalog.ld.signature.jws.JsonWebKey2020Adapter;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
-
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
+
+import java.net.URI;
+import java.time.Instant;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class VcTestCase {
 
@@ -101,6 +101,15 @@ public class VcTestCase {
 
                     try {
                         testCase.verificationMethod = (new Ed25519VerificationKey2020Adapter()).deserialize(method);
+
+                    } catch (DocumentError e) {
+                        fail(e);
+                    }
+
+                } else if (JsonLdUtils.isTypeOf("https://w3id.org/security#JsonWebKey2020", method)) {
+
+                    try {
+                        testCase.verificationMethod = (new JsonWebKey2020Adapter()).deserialize(method);
 
                     } catch (DocumentError e) {
                         fail(e);

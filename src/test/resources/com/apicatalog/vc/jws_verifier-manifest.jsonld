@@ -1,0 +1,233 @@
+{
+    "@context": [
+        "jws_context.jsonld",
+        {
+            "@base": "jws_verifier-manifest"
+        }
+    ],
+    "@id": "",
+    "@type": "mf:Manifest",
+    "name": "Json Web Signature 2020 - Verifiable Credentials Verifier Test Suite",
+    "sequence": [
+        {
+            "@id": "#t0001",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "unknown proof type",
+            "input": "jws_verifier/0001-in.jsonld",
+            "expectErrorCode": "UnknownCryptoSuite"
+        },
+        {
+            "@id": "#t0003",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "missing proof",
+            "input": "jws_verifier/0003-in.jsonld",
+            "expectErrorCode": "MissingProof"
+        },
+        {
+            "@id": "#t0005",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "valid signed VC",
+            "input": "jws_verifier/0005-in.jsonld"
+        },
+        {
+            "@id": "#t0006",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "forged credentials subject",
+            "input": "jws_verifier/0006-in.jsonld",
+            "expectErrorCode": "InvalidSignature"
+        },
+        {
+            "@id": "#t0007",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "missing @type property",
+            "input": "jws_verifier/0007-in.jsonld",
+            "expectErrorCode": "MissingProofType"
+        },
+        {
+            "@id": "#t0008",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "valid VC with embedded verification method",
+            "input": "jws_verifier/0008-in.jsonld"
+        },
+        {
+            "@id": "#t0009",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "missing created property",
+            "input": "jws_verifier/0009-in.jsonld",
+            "expectErrorCode": "MissingCreated"
+        },
+        {
+            "@id": "#t0010",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid created property",
+            "input": "jws_verifier/0010-in.jsonld",
+            "expectErrorCode": "InvalidCreated"
+        },
+        {
+            "@id": "#t0011",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "missing verificationMethod property",
+            "input": "jws_verifier/0011-in.jsonld",
+            "expectErrorCode": "MissingVerificationMethod"
+        },
+        {
+            "@id": "#t0012",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid verificationMethod property",
+            "input": "jws_verifier/0012-in.jsonld",
+            "expectErrorCode": "InvalidVerificationMethod"
+        },
+        {
+            "@id": "#t0013",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "missing proofPurpose property",
+            "input": "jws_verifier/0013-in.jsonld",
+            "expectErrorCode": "MissingProofPurpose"
+        },
+        {
+            "@id": "#t0014",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid proofPurpose property",
+            "input": "jws_verifier/0014-in.jsonld",
+            "expectErrorCode": "InvalidProofPurpose"
+        },
+        {
+            "@id": "#t0015",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "missing jws property",
+            "input": "jws_verifier/0015-in.jsonld",
+            "expectErrorCode": "MissingProofValue"
+        },
+        {
+            "@id": "#t0016",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid jws property",
+            "input": "jws_verifier/0016-in.jsonld",
+            "expectErrorCode": "InvalidProofValue"
+        },
+        {
+            "@id": "#t0018",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid document using embededed credentials",
+            "input": "jws_verifier/0018-in.jsonld",
+            "expectErrorCode": "InvalidDocument"
+        },
+        {
+            "@id": "#t0020",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "proof set of two valid proofs",
+            "input": "jws_verifier/0020-in.jsonld"
+        },
+        {
+            "@id": "#t0021",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "proof set having one forged proof",
+            "input": "jws_verifier/0021-in.jsonld",
+            "expectErrorCode": "InvalidSignature"
+        },
+        {
+            "@id": "#t0022",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "DID key as a verification method",
+            "input": "jws_verifier/0022-in.jsonld"
+        },
+        {
+            "@id": "#t0023",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "valid proof domain property",
+            "input": "jws_verifier/0023-in.jsonld",
+            "options": {
+                "domain": "4jt78h47fh47"
+            }
+        },
+        {
+            "@id": "#t0024",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid proof domain property",
+            "input": "jws_verifier/0024-in.jsonld",
+            "options": {
+                "domain": "4jt"
+            },
+            "expectErrorCode": "InvalidProofDomain"
+        },
+        {
+            "@id": "#t0050",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "valid signed VP",
+            "input": "jws_verifier/0050-in.jsonld"
+        },
+        {
+            "@id": "#t0051",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "forged signed VP",
+            "input": "jws_verifier/0051-in.jsonld",
+            "expectErrorCode": "InvalidSignature"
+        }
+    ]
+}

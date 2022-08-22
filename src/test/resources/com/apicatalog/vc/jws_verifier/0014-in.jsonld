@@ -1,0 +1,28 @@
+{
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://www.w3.org/2018/credentials/examples/v1",
+        "https://w3id.org/security/suites/jws-2020/v1"
+    ],
+    "id": "http://example.edu/credentials/3732",
+    "type": [
+        "VerifiableCredential",
+        "UniversityDegreeCredential"
+    ],
+    "issuer": "https://example.edu/issuers/14",
+    "issuanceDate": "2010-01-01T19:23:24Z",
+    "credentialSubject": {
+        "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+        "degree": {
+            "type": "BachelorDegree",
+            "name": "Bachelor of Science and Arts"
+        }
+    },
+    "proof": {
+        "type": "JsonWebSignature2020",
+        "created": "2022-02-25T14:58:43Z",
+        "verificationMethod": "https://example.edu/issuers/14#key-1",
+        "proofPurpose": 1,
+        "jws": "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJQUzI1NiJ9..Aimsl4sB9B5FdGLjuMSht9wCzjoDJxrN-PKCE8YYltfKtgj3OCnlbd3pI0JWBr8RIrT5qZHR7mqdVaMmQbw_k-URSYA4tSZQ-6wohdlabaKV4NZkXVXkdj9VVW5W9Ww0RnbKI_vvPPLU2O4OOJUpW1TuW0-MiYng762aD7HSU4PxESL_jva3e9nPlP0Na-phprc-pQiVvuHp0cuKf97yiVcDNiHZ5wN2PLFeUE3nFyrCTan9nXds0GOmasjR2oOFOUmmbNOsvB273sNzaRk5wf2YoAR5ktIPKjhmzceJCs6fu3RH_a0hj_v9mZw4tLOkf3ReSE_03AqyIhXhToSsHA"
+    }
+}

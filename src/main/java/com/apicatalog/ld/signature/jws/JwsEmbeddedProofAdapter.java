@@ -5,8 +5,7 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.DocumentError;
-//import com.apicatalog.ld.signature.proof.EmbeddedProofAdapter;
-import com.apicatalog.ld.signature.jws.from_lib_v070.VerificationMethodAdapter;
+import com.apicatalog.ld.signature.json.VerificationMethodJsonAdapter;
 import jakarta.json.*;
 
 import java.time.OffsetDateTime;
@@ -20,7 +19,7 @@ import java.util.Collection;
  *
  * @author petr apeltauer, KAPRION Technologies GmbH
  */
-public abstract class JwsEmbeddedProofAdapter implements JwsProofAdapter {
+public abstract class JwsEmbeddedProofAdapter implements JwsProofJsonAdapter {
 
     protected static final String BASE = "https://w3id.org/security#";
 
@@ -36,9 +35,9 @@ public abstract class JwsEmbeddedProofAdapter implements JwsProofAdapter {
 //    protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
     protected final String type;
-    protected final VerificationMethodAdapter keyAdapter;
+    protected final VerificationMethodJsonAdapter keyAdapter;
 
-    protected JwsEmbeddedProofAdapter(String type, VerificationMethodAdapter keyAdapter) {
+    protected JwsEmbeddedProofAdapter(String type, VerificationMethodJsonAdapter keyAdapter) {
         this.type = type;
         this.keyAdapter = keyAdapter;
     }
@@ -127,30 +126,16 @@ public abstract class JwsEmbeddedProofAdapter implements JwsProofAdapter {
         final JsonValue embeddedProofValue = proofObject.get(BASE + JWS);
 
         if (JsonUtils.isArray(embeddedProofValue)) {
-//            if (!embeddedProofValue.asJsonArray().stream().allMatch(ValueObject::isValueObject)
-//                    || !embeddedProofValue.asJsonArray().stream()
-//                    .map(JsonValue::asJsonObject)
-//                    .map(o -> o.get(Keywords.VALUE))
-//                    .allMatch(JsonUtils::isString)
-//            ) {
-//                throw new DocumentError(DocumentError.ErrorType.Invalid, PROOF, Keywords.VALUE);
-//            }
-//
-//
-//            String proofValueType = embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.TYPE);
-//
-//            String encodedProofValue =  embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
-//
-//            proof.value = decodeValue(proofValueType, encodedProofValue);
-
-            final JsonValue jwsItem = embeddedProofValue.asJsonArray().get(0);
-
-            if (JsonUtils.isNonEmptyObject(jwsItem)) {
-                proof.jws = jwsItem.asJsonObject().getString(Keywords.VALUE);
-
-            } else {
-                throw new DocumentError(DocumentError.ErrorType.Invalid, JWS);
+            if (!embeddedProofValue.asJsonArray().stream().allMatch(ValueObject::isValueObject)
+                    || !embeddedProofValue.asJsonArray().stream()
+                    .map(JsonValue::asJsonObject)
+                    .map(o -> o.get(Keywords.VALUE))
+                    .allMatch(JsonUtils::isString)
+            ) {
+                throw new DocumentError(DocumentError.ErrorType.Invalid, PROOF, Keywords.VALUE);
             }
+
+            proof.jws = embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
 
         } else {
             throw new DocumentError(DocumentError.ErrorType.Invalid, PROOF, Keywords.VALUE);
@@ -259,7 +244,7 @@ public abstract class JwsEmbeddedProofAdapter implements JwsProofAdapter {
     }
 
     @Override
-    public VerificationMethodAdapter getMethodAdapter() {
+    public VerificationMethodJsonAdapter getMethodAdapter() {
         return keyAdapter;
     }
 

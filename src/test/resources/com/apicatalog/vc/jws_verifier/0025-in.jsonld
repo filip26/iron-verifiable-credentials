@@ -1,0 +1,24 @@
+// CANNOT TEST "did:key verification method" - data integrity (expiration) requires access to package private classes, I use only TestVerifier now
+// {
+//     "@context": [
+//         "https://www.w3.org/2018/credentials/v1",
+//         "https://w3id.org/security/suites/jws-2020/v1"
+//     ],
+//     "issuanceDate": "2022-03-31T19:21:25Z",
+//     "issuer": "did:key:z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP",
+//     "type": [
+//         "VerifiableCredential"
+//     ],
+//     "credentialSubject": {
+//         "id": "did:key:z6MkhTNL7i2etLerDK8Acz5t528giE5KA4p75T6ka1E1D74r"
+//     },
+//     "id": "urn:uuid:797f719c-e4ac-4e9e-8da8-bc60a9c8ba91",
+//     "proof": {
+//         "proofPurpose": "assertionMethod",
+//         "verificationMethod": "did:key:z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP#z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP",
+//         "type": "JsonWebSignature2020",
+//         "created": "2022-03-31T19:21:26Z",
+//         "jws": "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFZERTQSJ9..mkhJ2uH689xSJm9FnLAfMwjlMvsCr_yA_1j2BXUX_Sp1ckBBuJzRoJ6kBm1cObnwP-V6RcRgsrJEFsH6wFQcDQ"
+//     },
+//     "expirationDate": "2022-05-31T19:21:25Z"
+// }
