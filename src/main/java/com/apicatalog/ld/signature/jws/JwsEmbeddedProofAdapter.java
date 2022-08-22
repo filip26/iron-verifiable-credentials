@@ -51,7 +51,7 @@ public abstract class JwsEmbeddedProofAdapter implements JwsProofJsonAdapter {
      *
      * @return the given VC/VP with the proof attached
      *
-     * @throws DocumentError
+     *
      */
     public static JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
