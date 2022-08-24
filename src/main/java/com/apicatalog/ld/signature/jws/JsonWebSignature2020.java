@@ -5,6 +5,7 @@ import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.JWK;
 
 import java.net.URI;
 import java.util.Objects;
@@ -153,6 +154,21 @@ public class JsonWebSignature2020 extends JwsSignatureSuite {
             throw new IllegalArgumentException(getUnsupportedCurveErr(curve));
         }
         return alg;
+    }
+
+    /**
+     * Get signature algorithm from given JWK
+     *
+     * @param jwk Json Web Key
+     * @return related algorithm
+     */
+    public static String getAlgorithm(JWK jwk) {
+        Object crv = jwk.toJSONObject().get("crv");
+        String curveName = ((crv != null) ? crv.toString() : null);
+        System.out.println("SIGNING TEST - curve = " + curveName);
+        String algorithm = JsonWebSignature2020.getAlgorithm(curveName);
+        System.out.println("SIGNING TEST - algorithm = " + algorithm);
+        return algorithm;
     }
 
     public static String getUnsupportedAlgErr(String algorithm) {

@@ -2,23 +2,20 @@ package com.apicatalog.vc;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdErrorCode;
-import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.jws.*;
-import com.apicatalog.ld.signature.jws.JwsVerificationMethod;
 import com.apicatalog.ld.signature.proof.ProofOptions;
-import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.processor.JwsIssuer;
+import com.apicatalog.vc.processor.JwsVerifier;
 import com.nimbusds.jose.jwk.JWK;
-import jakarta.json.*;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -29,20 +26,23 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URI;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.apicatalog.jsonld.JsonLdUtils.stringToJakartaJsonObj;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
+/**
+ * Tester of Json Web Signature 2020 suite
+ *
+ * @author petr apeltauer, KAPRION Technologies GmbH
+ */
 @DisplayName("Json Web Signature 2020 Test Suite")
 @TestMethodOrder(OrderAnnotation.class)
 public class JsonWebSignature2020Test {
@@ -77,6 +77,7 @@ public class JsonWebSignature2020Test {
      * {@link JsonWebSignature2020#sign(PrivateKey, PublicKey, String, byte[])} and
      * {@link JsonWebSignature2020#verify(PublicKey, String, String, byte[])} to solve this.
      */
+    @DisplayName("JsonWebSignature2020 Signing & Verification Test of all signature algorithms")
     @Order(1)
     @Test
     void testAllSupportedSignatureAlgorithmsForSigningAndVerification() {
@@ -90,161 +91,70 @@ public class JsonWebSignature2020Test {
         signatureAlgorithmsToTest.add("PS256");
 //        signatureAlgorithmsToTest.add("ES512"); //ES512 is not supported by JsonWebSignature2020!
 
+        JsonArray context = Json.createArrayBuilder()
+                .add("https://www.w3.org/2018/credentials/v1")
+                .add("https://www.w3.org/2018/credentials/examples/v1")
+                .add("https://w3id.org/security/suites/jws-2020/v1")
+                .build();
+
+        JsonObject input = stringToJakartaJsonObj(notSignedVc);
+
+        ProofOptions options = ProofOptions.create(
+                        "https://w3id.org/security#JsonWebSignature2020",  //"type":"JsonWebSignature2020"
+                        new JwsVerificationMethod(                              //"verificationMethod":"did:example:123456#keys-0"
+                                URI.create("did:example:123456#keys-0")
+                        ),
+                        URI.create("https://w3id.org/security#assertionMethod") //"proofPurpose":"assertionMethod"
+                )
+                .created(Instant.parse("2022-07-29T04:30:20.100Z")); // .created(Instant.now())
 
         for (String signatureAlgorithmToTest : signatureAlgorithmsToTest) {
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            //Code below is based on com.apicatalog.vc.processor.Issuer and com.apicatalog.vc.processor.Verifier
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
 
             System.out.println("\n\n--------------------------------------------------------------");
             System.out.println("\n\n----- JsonWebSignature2020 - Testing signature algorithm: -----");
             System.out.println("\n\n-------------------------" + signatureAlgorithmToTest + "------------------------------");
             System.out.println("\n\n--------------------------------------------------------------");
 
-            JsonObject docToSign = stringToJakartaJsonObj(notSignedVc);
-            DocumentLoader contextLoader = SchemeRouter.defaultInstance();
-            contextLoader = new StaticContextLoader(contextLoader); //https://w3id.org/security/suites/jws-2020/v1 is now in StaticContextLoader
-
-            //Proof json obj. without the signature
-            ProofOptions options = ProofOptions.create(
-                            "https://w3id.org/security#JsonWebSignature2020",  //"type":"JsonWebSignature2020"
-                            new JwsVerificationMethod(                                     //"verificationMethod":"https://example.edu/issuers/14#key-1"
-                                    URI.create("did:example:123456#keys-0")
-                            ),
-                            URI.create("https://w3id.org/security#assertionMethod") //"proofPurpose":"assertionMethod"
-                    )
-                    // .created(Instant.now())
-                    .created(Instant.parse("2022-07-29T04:30:20.100Z"));
+            JwsSignatureSuite signatureSuite = new JsonWebSignature2020(signatureAlgorithmToTest); //JsonWebSignature2020("ES256K")
+            JwsLinkedDataSignature suite = new JwsLinkedDataSignature(signatureSuite);
 
             try {
 
-                System.out.println("TEST - testJsonWebSignature2020 started");
-
-                //////////////////////////////////
-                ///////////// SIGNING ////////////
-                //////////////////////////////////
-
-                // load and expand the document ("not signed VC") with JSON-LD entries in @context field
-                JsonArray expanded = JsonLd.expand(JsonDocument.of(docToSign)).loader(contextLoader).get();
-                JsonObject firstObj = JsonLdUtils
-                        .findFirstObject(expanded)
-                        .orElseThrow(() ->
-                                new DocumentError(DocumentError.ErrorType.Invalid, "document")
-                        );
-
-                JwsSignatureSuite signatureSuite = new JsonWebSignature2020(signatureAlgorithmToTest); //JsonWebSignature2020("ES256K")
-
-                JsonObject data = JwsEmbeddedProofAdapter.removeProof(firstObj);
-
-                JwsLinkedDataSignature suite = new JwsLinkedDataSignature(signatureSuite);
-
                 JWK jwk = suite.keygen();
-                //JWK can be also loaded from string like this:
-//              JWK jwk = JWK.parse("{\"kty\":\"EC\",\"crv\":\"secp256k1\",\"x\":\"GBMxavme-AfIVDKqI6WBJ4V5wZItsxJ9muhxPByllHQ\",\"y\":\"SChlfVBhTXG_sRGc9ZdFeCYzI3Kbph3ivE12OFVk4jo\"}");
 
-                System.out.println("SIGNING TEST - JWK (private) = \n " + jwk.toString());
+                JwsKeyPair keys = new JwsKeyPair();
+                keys.setId(options.verificationMethod().id());
+                keys.setController(options.verificationMethod().controller());
+                keys.setType("https://w3id.org/security#JsonWebKey2020");
+                keys.setPrivateKey(jwk);
+                keys.setPublicKey(jwk.toPublicJWK());
 
-                JsonObject proof = signatureSuite.getProofAdapter().serialize(JsonWebSignature2020.toUnsignedJwsProof(options)); //uses JsonWebProof2020Adapter#serialize()
+                System.out.println("SIGNING TEST - JWK (private) = \n " + keys.getPrivateKey());
 
-//                KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA"); //when using java.security
-//                gen.initialize(2048);
-//                KeyPair keyPair = gen.generateKeyPair();
-//                String jws = suite.sign(data, keyPair.getPrivate(), keyPair.getPublic(), "123", proof);
-                String jws = suite.sign(data, jwk, proof);
+                JwsIssuer issuer = new JwsIssuer(input, keys, options);
+                JsonObject signedVc = issuer.getCompacted(
+                        Json.createArrayBuilder()
+                                .add("https://www.w3.org/2018/credentials/v1")
+                                .add("https://www.w3.org/2018/credentials/examples/v1")
+                                .add("https://w3id.org/security/suites/jws-2020/v1")
+                                .build()
+                );
 
-                proof = signatureSuite.getProofAdapter().setProofValue(proof, jws); //uses JsonWebProof2020Adapter#setProofValue()
+                System.out.println("SIGNING TEST - SIGNED VC = \n " + signedVc);
 
-                JsonObject expandedSignedVc = JwsEmbeddedProofAdapter.addProof(firstObj, proof);
+                System.out.println("VERIFICATION TEST - JWK (public) = \n " + keys.getPublicKey());
 
-                String expandedSignedVcString = jakartaJsonObjToString(expandedSignedVc);
-                System.out.println("SIGNING TEST - EXPANDED SIGNED VC = \n " +expandedSignedVcString);
-
-                JsonArray context = Json.createArrayBuilder()
-                        .add("https://www.w3.org/2018/credentials/v1")
-                        .add("https://www.w3.org/2018/credentials/examples/v1")
-                        .add("https://w3id.org/security/suites/jws-2020/v1")
-                        .build();
-
-                String signedVcString;
-                try {
-                    //might require online connection if the needed linked data documents are not stored offline in contextLoader
-                    JsonObject compactedSignedVc = JsonLd.compact(JsonDocument.of(expandedSignedVc), JsonDocument.of(context)).loader(contextLoader).get();
-                    String compactedSignedVcString = jakartaJsonObjToString(compactedSignedVc);
-                    System.out.println("SIGNING TEST - COMPACTED SIGNED VC = \n " + compactedSignedVcString);
-                    signedVcString = compactedSignedVcString;
-                } catch (Exception e) {
-                    //thrown if online connection is not available or linked data document cannot be found online
-                    e.printStackTrace();
-                    System.out.println("SIGNING TEST - CANNOT COMPACT THE VC");
-                    signedVcString = expandedSignedVcString;
-                }
-
-
-
-                //////////////////////////////////
-                ////////// VERIFICATION //////////
-                //////////////////////////////////
-
-                JWK pubJwk = jwk.toPublicJWK();
-                JsonObject docToVerify = stringToJakartaJsonObj(signedVcString);
-                // load and expand the document (signed VC) with JSON-LD entries in @context field
-                JsonArray expanded2 = JsonLd.expand(JsonDocument.of(docToVerify)).loader(contextLoader).get();
-
-                for (JsonValue item : expanded2) {
-                    if (JsonUtils.isNotObject(item)) {
-                        throw new DocumentError(DocumentError.ErrorType.Invalid, "document");
-                    }
-                    JsonObject currObj = item.asJsonObject();
-                    System.out.println("VERIFICATION TEST - EXPANDED SIGNED VC = \n " + currObj);
-
-                    Collection<JsonValue> proofs = JwsEmbeddedProofAdapter.getProof(currObj);
-                    if (proofs == null || proofs.isEmpty())
-                        throw new DocumentError(DocumentError.ErrorType.Missing, "proof");
-
-                    JsonObject data2 = JwsEmbeddedProofAdapter.removeProof(currObj);
-
-                    // verify attached proofs' signatures
-                    for (JsonValue proofValue : proofs) {
-
-                        if (JsonUtils.isNotObject(proofValue))
-                            throw new DocumentError(DocumentError.ErrorType.Invalid, "proof");
-
-                        final Collection<String> proofType = JsonLdUtils.getType(proofValue.asJsonObject());
-                        if (proofType == null || proofType.isEmpty())
-                            throw new DocumentError(DocumentError.ErrorType.Missing, "proof", Keywords.TYPE);
-
-                        System.out.println("VERIFICATION TEST - JWK (public) = \n " + pubJwk);
-
-                        String algorithm = getSignatureAlgorithmFromJwk(pubJwk);
-
-                        JwsSignatureSuite signatureSuite2 = new JsonWebSignature2020(algorithm);
-
-                        JwsProof proof2 = signatureSuite2.getProofAdapter().deserialize(proofValue.asJsonObject());
-                        JwsLinkedDataSignature suite2 = new JwsLinkedDataSignature(signatureSuite2);
-
-                        // verify signature
-                        System.out.println("VERIFICATION TEST - JWS = " + proof2.getJws());
-//                        boolean isValid = suite2.verify(data2, proofValue.asJsonObject(), keyPair.getPublic(), "123", proof2.getJws());
-                        boolean isValid = suite2.verify(data2, proofValue.asJsonObject(), pubJwk, proof2.getJws());
-                        System.out.println("VERIFICATION TEST - IS VALID = " + isValid);
-
-                        assertTrue(isValid);
-
-//                      if (statusVerifier != null && verifiable.isCredential()) {
-//                          statusVerifier.verify(verifiable.asCredential().getCredentialStatus())
-//                      }
-
-                    }
-
-                }
-
+                JwsVerifier verifier = new JwsVerifier(signedVc, keys.getPublicKey());
+                /*boolean isValid = */verifier.isValid();
 
             } catch (Exception | DocumentError | KeyGenError | SigningError | VerificationError e){
-                if(e instanceof KeyGenError && e.getMessage().contains("secp256k1"))
+                if(e instanceof KeyGenError && e.getMessage().contains("secp256k1")) {
                     System.err.println("\nCurve secp256k1 (alg. ES256K) is supported on Java 8 (used by Android), but it is NOT supported on Java 17! " +
                             "(see https://connect2id.com/products/nimbus-jose-jwt/jca-algorithm-support#alg-support-table)\n");
-                e.printStackTrace();
+                    e.printStackTrace();
+                } else {
+                    fail(e); //SHOULD NOT THROW ANY OTHER EXCEPTION (like InvalidSignature...)
+                }
             }
 
         }
@@ -256,6 +166,13 @@ public class JsonWebSignature2020Test {
     @MethodSource({ "verifierManifest" })
     @Order(2)
     void verify(VcTestCase testCase) {
+
+        assumeFalse("t0002".equals(testCase.id.getFragment()));       // skip "unknown proof value encoding" - there is no proofValue encoding used in JWS
+
+        assumeFalse("t0004".equals(testCase.id.getFragment()));       // skip "invalid proof value length" - JWS length is variable
+
+        assumeFalse("t0017".equals(testCase.id.getFragment()));       // skip "unsupported proofValue codec" - there is no codec encoding used in JWS
+
         new JsonWebSignature2020TestRunnerJunit(testCase).execute();
     }
 
@@ -301,46 +218,5 @@ public class JsonWebSignature2020Test {
 
 
 
-    /**
-     * Convert json string to jakarta json object
-     */
-    public static JsonObject stringToJakartaJsonObj(String jsonString) throws JsonException, IllegalStateException {
-        StringReader stringReader = new StringReader(jsonString);
-        JsonReader jsonReader = Json.createReader(stringReader);
-        JsonObject jsonObject = jsonReader.readObject();
-        jsonReader.close();
-        return jsonObject;
-    }
-
-    /**
-     * Convert jakarta json object to string
-     */
-    public static String jakartaJsonObjToString(JsonObject jsonObject) throws JsonException, IllegalStateException {
-        StringWriter stringWriter = new StringWriter();
-        JsonWriter jsonWriter = Json.createWriter(stringWriter);
-        jsonWriter.writeObject(jsonObject);
-        String jsonString = stringWriter.toString();
-        jsonWriter.close();
-        return jsonString;
-    }
-
-    public static String getSignatureAlgorithmFromJwk(JWK jwk) {
-        Object crv = jwk.toJSONObject().get("crv");
-        String curveName = ((crv != null) ? crv.toString() : null);
-        System.out.println("SIGNING TEST - curve = " + curveName);
-        String algorithm = JsonWebSignature2020.getAlgorithm(curveName);
-        System.out.println("SIGNING TEST - algorithm = " + algorithm);
-        return algorithm;
-    }
-
-    public static void failWithJsonLd(JsonLdError e) throws DocumentError {
-        if (JsonLdErrorCode.LOADING_DOCUMENT_FAILED == e.getCode()) {
-            throw new DocumentError(DocumentError.ErrorType.Invalid, "remote", "document");
-        }
-
-        if (JsonLdErrorCode.LOADING_REMOTE_CONTEXT_FAILED == e.getCode()) {
-            throw new DocumentError(DocumentError.ErrorType.Invalid, "remote", "context");
-        }
-    }
 
 }

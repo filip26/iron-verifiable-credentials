@@ -77,8 +77,8 @@ public abstract class JwsEmbeddedProofAdapter implements JwsProofJsonAdapter {
         return JsonLdUtils.getObjects(proof, BASE + PROOF);
     }
 
-    public static JsonObject removeProof(final JsonObject proof) {
-        return Json.createObjectBuilder(proof).remove(BASE + PROOF).build();
+    public static JsonObject removeProof(final JsonObject document) {
+        return Json.createObjectBuilder(document).remove(BASE + PROOF).build();
     }
 
     public static JsonObject removeProofValue(final JsonObject proof) {

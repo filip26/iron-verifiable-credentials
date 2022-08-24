@@ -20,6 +20,16 @@
             "expectErrorCode": "UnknownCryptoSuite"
         },
         {
+            "@id": "#t0002",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "unknown proof value encoding",
+            "input": "jws_verifier/0002-in.jsonld",
+            "expectErrorCode": "InvalidProofValue"
+        },
+        {
             "@id": "#t0003",
             "@type": [
                 "NegativeEvaluationTest",
@@ -28,6 +38,16 @@
             "name": "missing proof",
             "input": "jws_verifier/0003-in.jsonld",
             "expectErrorCode": "MissingProof"
+        },
+        {
+            "@id": "#t0004",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid proof value length",
+            "input": "jws_verifier/0004-in.jsonld",
+            "expectErrorCode": "InvalidProofValueLength"
         },
         {
             "@id": "#t0005",
@@ -148,6 +168,16 @@
             "expectErrorCode": "InvalidProofValue"
         },
         {
+            "@id": "#t0017",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "unsupported proofValue codec",
+            "input": "verifier/0017-in.jsonld",
+            "expectErrorCode": "InvalidProofValue"
+        },
+        {
             "@id": "#t0018",
             "@type": [
                 "NegativeEvaluationTest",
@@ -209,6 +239,16 @@
                 "domain": "4jt"
             },
             "expectErrorCode": "InvalidProofDomain"
+        },
+        {
+            "@id": "#t0025",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "did:key verification method",
+            "input": "jws_verifier/0025-in.jsonld",
+            "expectErrorCode": "Expired"
         },
         {
             "@id": "#t0050",

@@ -119,7 +119,7 @@ public class JsonWebKey2020Adapter implements VerificationMethodJsonAdapter {
                 })
                 .orElseThrow(() -> new DocumentError(DocumentError.ErrorType.Invalid, property));
 
-        System.out.println("getKey - jwkString = " + jwkString);
+//        System.out.println("getKey - jwkString = " + jwkString);
 
         try {
             return JWK.parse(jwkString);

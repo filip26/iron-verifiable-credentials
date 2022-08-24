@@ -1,11 +1,5 @@
 package com.apicatalog.ld.signature.json;
 
-import java.net.URI;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeParseException;
-import java.util.Collection;
-
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -14,12 +8,13 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
+import jakarta.json.*;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
+import java.net.URI;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.Collection;
 
 /**
  * An embedded proof is included in the data, such as a Linked Data Signature.
@@ -82,8 +77,8 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
         return JsonLdUtils.getObjects(proof, BASE + PROOF_KEY);
     }
 
-    public static JsonObject removeProof(final JsonObject proof) {
-       return Json.createObjectBuilder(proof).remove(BASE + PROOF_KEY).build();
+    public static JsonObject removeProof(final JsonObject document) {
+       return Json.createObjectBuilder(document).remove(BASE + PROOF_KEY).build();
     }
 
     public static JsonObject removeProofValue(final JsonObject proof) {

@@ -135,7 +135,7 @@
                 "PositiveEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "a simple credential to sign",
+            "name": "a simple credential to sign (compared without variable 'jws')",
             "input": "jws_issuer/0020-in.jsonld",
             "expect": "jws_issuer/0020-out.jsonld",
             "options": {
@@ -150,7 +150,7 @@
                 "PositiveEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "compacted signed credential",
+            "name": "compacted signed credential (compared without variable 'jws')",
             "input": "jws_issuer/0021-in.jsonld",
             "expect": "jws_issuer/0021-out.jsonld",
             "context": "jws_issuer/0001-context.jsonld",
@@ -166,7 +166,7 @@
                 "PositiveEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "signed embedded verificationMethod",
+            "name": "signed embedded verificationMethod (compared without variable 'jws')",
             "input": "jws_issuer/0022-in.jsonld",
             "expect": "jws_issuer/0022-out.jsonld",
             "context": "jws_issuer/0001-context.jsonld",
@@ -192,7 +192,7 @@
                 "PositiveEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "a credential with DID key as a verification method",
+            "name": "a credential with DID key as a verification method (compared without variable 'jws')",
             "input": "jws_issuer/0023-in.jsonld",
             "expect": "jws_issuer/0023-out.jsonld",
             "context": "jws_issuer/0001-context.jsonld",
@@ -208,7 +208,7 @@
                 "PositiveEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "proof domain property",
+            "name": "proof domain property (compared without variable 'jws')",
             "input": "jws_issuer/0024-in.jsonld",
             "expect": "jws_issuer/0024-out.jsonld",
             "context": "jws_issuer/0001-context.jsonld",
@@ -225,7 +225,7 @@
                 "PositiveEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "proof set, co-sign",
+            "name": "proof set, co-sign (compared without variable 'jws')",
             "input": "jws_issuer/0030-in.jsonld",
             "expect": "jws_issuer/0030-out.jsonld",
             "context": "jws_issuer/0001-context.jsonld",
@@ -245,7 +245,7 @@
                 "PositiveEvaluationTest",
                 "IssuerTest"
             ],
-            "name": "compacted signed presentation",
+            "name": "compacted signed presentation (compared without variable 'jws')",
             "input": "jws_issuer/0050-in.jsonld",
             "expect": "jws_issuer/0050-out.jsonld",
             "context": "jws_issuer/0001-context.jsonld",
