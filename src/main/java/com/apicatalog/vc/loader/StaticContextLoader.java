@@ -43,6 +43,16 @@ public class StaticContextLoader implements DocumentLoader {
         this.defaultLoader = defaultLoader;
     }
 
+    /**
+     * Add new Linked Data Document, so it can be loaded offline from this loader whenever needed
+     *
+     * @param uri URI of the document (e.g. https://www.w3.org/2018/credentials/examples/v1)
+     * @param linkedDataDocument the document available under the URI
+     */
+    public void add(String uri, Document linkedDataDocument) {
+        staticCache.put(uri, linkedDataDocument);
+    }
+
     @Override
     public Document loadDocument(URI url, DocumentLoaderOptions options) throws JsonLdError {
 
