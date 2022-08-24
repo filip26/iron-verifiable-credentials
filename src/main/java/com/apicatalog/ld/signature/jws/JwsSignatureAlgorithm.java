@@ -18,7 +18,7 @@ import java.security.PublicKey;
 public interface JwsSignatureAlgorithm {
 
     /**
-     * Verify the provided data [within SW]
+     * Verify the provided data
      *
      * @param publicKey Json Web Key (public)
      * @param jws Json Web Signature with detached payload (using JWS Compact Serialization)
@@ -29,7 +29,7 @@ public interface JwsSignatureAlgorithm {
     boolean verify(JWK publicKey, String jws, byte[] data) throws VerificationError;
 
     /**
-     * Sign the provided data [within SW]
+     * Sign the provided data
      *
      * @param privateKey Json Web Key (private)
      * @param data payload to be signed
@@ -39,7 +39,7 @@ public interface JwsSignatureAlgorithm {
     String sign(JWK privateKey, byte[] data) throws SigningError;
 
     /**
-     * Verify the provided data [within SW]
+     * Verify the provided data
      *
      * @param publicKey public key
      * @param keyId key ID may be null. If null, random UUID will be generated.
@@ -51,7 +51,7 @@ public interface JwsSignatureAlgorithm {
     boolean verify(PublicKey publicKey, String keyId, String jws, byte[] data) throws VerificationError;
 
     /**
-     * Sign the provided data [within SW]
+     * Sign the provided data
      *
      * @param privateKey private key
      * @param publicKey public key (also needed in case of Json Web Key creation)
@@ -65,9 +65,11 @@ public interface JwsSignatureAlgorithm {
     //-------------------------------------------------------------------------------------------
 
     /**
-     * Generate JWK key pair [within SW]
+     * Generate JWK key pair
+     *
+     * @param length use only with RSA keys (alg. PS256), for other keys the provided length is ignored
      * @return key pair
      * @throws KeyGenError any error during key pair generation
      */
-    JWK keygen(/*int length*/) throws KeyGenError;
+    JWK keygen(int length) throws KeyGenError;
 }

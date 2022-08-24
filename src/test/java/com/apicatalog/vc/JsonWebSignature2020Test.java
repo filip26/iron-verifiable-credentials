@@ -13,7 +13,6 @@ import com.apicatalog.vc.processor.JwsIssuer;
 import com.apicatalog.vc.processor.JwsVerifier;
 import com.nimbusds.jose.jwk.JWK;
 import jakarta.json.Json;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import org.junit.jupiter.api.DisplayName;
@@ -88,14 +87,9 @@ public class JsonWebSignature2020Test {
         signatureAlgorithmsToTest.add("ES256K");
         signatureAlgorithmsToTest.add("ES256");
         signatureAlgorithmsToTest.add("ES384");
-        signatureAlgorithmsToTest.add("PS256");
+        signatureAlgorithmsToTest.add("PS256"); //2048 key length
+        signatureAlgorithmsToTest.add("PS256"); //4096 key length
 //        signatureAlgorithmsToTest.add("ES512"); //ES512 is not supported by JsonWebSignature2020!
-
-        JsonArray context = Json.createArrayBuilder()
-                .add("https://www.w3.org/2018/credentials/v1")
-                .add("https://www.w3.org/2018/credentials/examples/v1")
-                .add("https://w3id.org/security/suites/jws-2020/v1")
-                .build();
 
         JsonObject input = stringToJakartaJsonObj(notSignedVc);
 
@@ -108,6 +102,7 @@ public class JsonWebSignature2020Test {
                 )
                 .created(Instant.parse("2022-07-29T04:30:20.100Z")); // .created(Instant.now())
 
+        int i = 0;
         for (String signatureAlgorithmToTest : signatureAlgorithmsToTest) {
 
             System.out.println("\n\n--------------------------------------------------------------");
@@ -120,7 +115,12 @@ public class JsonWebSignature2020Test {
 
             try {
 
-                JWK jwk = suite.keygen();
+                JWK jwk;
+                if(i == 5)
+                    jwk = suite.keygen(4096); //PS256 alg. with 4096 big RSA key
+                else
+                    jwk = suite.keygen();
+                i++;
 
                 JwsKeyPair keys = new JwsKeyPair();
                 keys.setId(options.verificationMethod().id());
@@ -149,7 +149,8 @@ public class JsonWebSignature2020Test {
 
             } catch (Exception | DocumentError | KeyGenError | SigningError | VerificationError e){
                 if(e instanceof KeyGenError && e.getMessage().contains("secp256k1")) {
-                    System.err.println("\nCurve secp256k1 (alg. ES256K) is supported on Java 8 (used by Android), but it is NOT supported on Java 17! " +
+                    i++;
+                    System.err.println("\nCurve secp256k1 (alg. ES256K) is supported in Java 8 (used by Android), but it is NOT supported in Java 17! " +
                             "(see https://connect2id.com/products/nimbus-jose-jwt/jca-algorithm-support#alg-support-table)\n");
                     e.printStackTrace();
                 } else {

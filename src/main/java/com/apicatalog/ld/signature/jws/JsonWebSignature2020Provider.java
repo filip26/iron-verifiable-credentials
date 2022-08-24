@@ -40,7 +40,7 @@ public class JsonWebSignature2020Provider implements JwsSignatureAlgorithm {
     }
 
     /**
-     * Verify provided signature over provided data with public key [within SW]
+     * Verify provided signature over provided data with public key
      *
      * @param publicKey Json Web Key (public)
      * @param jws Json Web Signature with unencoded (detached) payload (using JWS Compact Serialization)
@@ -83,7 +83,7 @@ public class JsonWebSignature2020Provider implements JwsSignatureAlgorithm {
     }
 
     /**
-     * Sign provided data with private key [within SW]
+     * Sign provided data with private key
      *
      * @param privateKey Json Web Key (private)
      * @param data payload to be signed
@@ -191,13 +191,13 @@ public class JsonWebSignature2020Provider implements JwsSignatureAlgorithm {
     }
 
     /**
-     * Generate JWK (Json Web Key) key pair [within SW]
+     * Generate JWK (Json Web Key) key pair
      *
      * @return JWK (with public and private key attributes)
      * @throws KeyGenError thrown in case generation fails
      */
     @Override
-    public JWK keygen(/*int length*/) throws KeyGenError {
+    public JWK keygen(int length) throws KeyGenError {
         //https://connect2id.com/products/nimbus-jose-jwt/examples/jwk-generation
         Curve curve = getCurve(alg);
         try {
@@ -215,7 +215,7 @@ public class JsonWebSignature2020Provider implements JwsSignatureAlgorithm {
                         .generate();
             } else if (curve == null) {
                 // Generate the RSA key pair (for alg. PS256)
-                return new RSAKeyGenerator(2048)
+                return new RSAKeyGenerator(length)
                         .keyUse(KeyUse.SIGNATURE) // indicate the intended use of the key
                         .keyID(UUID.randomUUID().toString()) // give the key a unique ID
                         .generate();

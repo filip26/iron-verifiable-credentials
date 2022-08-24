@@ -137,13 +137,27 @@ public class JwsLinkedDataSignature {
     }
 
     /**
-     * Generate JWK (Json Web Key) key pair [within SW]
+     * Generate JWK (Json Web Key) key pair
      *
      * @return JWK (with public and private key attributes)
      * @throws KeyGenError thrown in case generation fails
      */
-    public JWK keygen(/*URI id, int length*/) throws KeyGenError {
-        return suite.keygen(/*length*/);
+    public JWK keygen() throws KeyGenError {
+        return keygen(0);
+    }
+
+    /**
+     * Generate JWK (Json Web Key) key pair
+     *
+     * @param length use only in case of RSA keys (PS256 algorithm)
+     * @return JWK (with public and private key attributes)
+     * @throws KeyGenError thrown in case generation fails
+     */
+    public JWK keygen(/*URI id,*/ int length) throws KeyGenError {
+        if (suite.alg.equals("PS256") && length == 0) {
+            length = 2048; //default for RSA keys
+        }
+        return suite.keygen(length); //length is ignored if the alg. is not PS256
     }
 
 }

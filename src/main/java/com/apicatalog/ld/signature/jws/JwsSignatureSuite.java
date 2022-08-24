@@ -73,8 +73,8 @@ public class JwsSignatureSuite implements CanonicalizationAlgorithm, DigestAlgor
     }
 
     @Override
-    public JWK keygen(/*int length*/) throws KeyGenError {
-        return signer.keygen(/*length*/);
+    public JWK keygen(int length) throws KeyGenError {
+        return signer.keygen(length);
     }
 
     public String getId() {
