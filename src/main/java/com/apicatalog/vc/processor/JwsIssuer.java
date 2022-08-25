@@ -30,7 +30,7 @@ import static com.apicatalog.ld.signature.jws.JsonWebSignature2020.getAlgorithm;
  *
  * @author petr apeltauer, KAPRION Technologies GmbH
  */
-public class JwsIssuer extends Processor<JwsIssuer> {
+public final class JwsIssuer extends Processor<JwsIssuer> {
 
     private final URI location;
     private final JsonObject document;
