@@ -52,5 +52,10 @@
       <artifactId>rdf-urdna</artifactId>
       <version>${rdf-urdna.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>nimbus-jose-jwt</artifactId>
+      <version>9.16-preview.1</version>
+    </dependency>
   </dependencies>
 </project>
