@@ -4,11 +4,10 @@ import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.KeyGenError;
-import com.apicatalog.ld.signature.KeyGenError.Code;
 import com.apicatalog.ld.signature.LinkedDataSignature;
+import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.processor.Issuer;
@@ -84,19 +83,16 @@ public final class Vc {
     /**
      * Generates public/private key pair.
      *
-     * @param type requested key pair type, e.g. <code>https://w3id.org/security#Ed25519KeyPair2020</code>
+     * @param signatureSuite a signature suite used to generate a key pair.
      *
      * @return {@link KeyGenError} allowing to set options and to generate key pair
      *
      * @throws KeyGenError
      */
-    public static KeysGenerator generateKeys(String type) throws KeyGenError {
-
-        if (Ed25519Signature2020.isTypeOf(type)) {
-            final LinkedDataSignature lds = new LinkedDataSignature(new Ed25519Signature2020());
-
-            return new KeysGenerator(lds);
-        }
-        throw new KeyGenError(Code.UnknownCryptoSuite);
+    public static KeysGenerator generateKeys(SignatureSuite signatureSuite) throws KeyGenError {
+    	if (signatureSuite == null) {
+    		throw new IllegalArgumentException("The signatureSuite parameter must not be null.");
+    	}
+    	return new KeysGenerator(new LinkedDataSignature(signatureSuite));
     }
 }
