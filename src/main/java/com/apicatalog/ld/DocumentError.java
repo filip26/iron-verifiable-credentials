@@ -14,6 +14,13 @@ public class DocumentError extends Throwable {
     private final String subject;
     private final String[] attibutes;
 
+    public DocumentError(Throwable e) {
+    	super(e);
+    	this.type = ErrorType.Invalid;
+    	this.subject = null;
+    	this.attibutes = null;
+    }
+    
     public DocumentError(ErrorType type, String subject, String... attributes) {
         super();
         this.type = type;
