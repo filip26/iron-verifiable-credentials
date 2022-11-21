@@ -21,161 +21,219 @@ import jakarta.json.JsonValue;
  */
 public class Credential implements Verifiable {
 
-    public static final String BASE = "https://www.w3.org/2018/credentials#";
+	public static final String BASE = "https://www.w3.org/2018/credentials#";
 
-    public static final String TYPE = "VerifiableCredential";
+	public static final String TYPE = "VerifiableCredential";
 
-    // known properties
-    public static final String SUBJECT = "credentialSubject";
-    public static final String ISSUER = "issuer";
-    public static final String ISSUANCE_DATE = "issuanceDate";
-    public static final String EXPIRATION_DATE = "expirationDate";
-    public static final String CREDENTIAL_STATUS = "credentialStatus";
-    public static final String CREDENTIAL_SCHEMA = "credentialSchema";
-    public static final String REFRESH_SERVICE = "refreshService";
-    public static final String TERMS_OF_USE = "termsOfUse";
-    public static final String EVIDENCE = "evidence";
+	// known properties
+	public static final String SUBJECT = "credentialSubject";
+	public static final String ISSUER = "issuer";
 
-    protected URI id;
+	// is expected to be deprecated in favor of validFrom in the next version of the
+	// specification
+	// https://www.w3.org/TR/vc-data-model/#issuance-date see NOTE
+	public static final String ISSUANCE_DATE = "issuanceDate";
 
-    protected URI issuer;
+	// Introduced in advance see above
+	public static final String VALID_FROM = "validFrom";
+	public static final String ISSUED = "issued";
 
-    protected Instant issuance;
+	public static final String EXPIRATION_DATE = "expirationDate";
+	public static final String CREDENTIAL_STATUS = "credentialStatus";
+	public static final String CREDENTIAL_SCHEMA = "credentialSchema";
+	public static final String REFRESH_SERVICE = "refreshService";
+	public static final String TERMS_OF_USE = "termsOfUse";
+	public static final String EVIDENCE = "evidence";
 
-    protected Instant expiration;
+	protected URI id;
 
-    protected CredentialStatus status;
+	protected URI issuer;
 
-    protected Collection<JsonValue> subjects;
+	protected Instant issuanceDate;
+	
+	// reserved for the next specification version
+	protected Instant validFrom;
+	protected Instant issued;
 
-    protected Map<String, JsonValue> extensions;
+	protected Instant expiration;
 
-    protected Credential() {}
+	protected CredentialStatus status;
 
-    public static boolean isCredential(JsonValue subject) {
-        if (subject == null) {
-            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
-        }
-        return JsonUtils.isObject(subject) && JsonLdUtils.isTypeOf(BASE + TYPE, subject.asJsonObject());
-    }
+	protected Collection<JsonValue> subjects;
 
-    public static Credential from(JsonObject subject) throws DataError {
+	protected Map<String, JsonValue> extensions;
 
-        if (subject == null) {
-            throw new IllegalArgumentException("The 'subject' parameter must not be null.");
-        }
+	protected Credential() {
+	}
 
-        final Credential credential = new Credential();
+	public static boolean isCredential(JsonValue subject) {
+		if (subject == null) {
+			throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
+		}
+		return JsonUtils.isObject(subject) && JsonLdUtils.isTypeOf(BASE + TYPE, subject.asJsonObject());
+	}
 
-        // @type
-        if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
+	public static Credential from(JsonObject subject) throws DataError {
 
-            if (!JsonLdUtils.hasType(subject)) {
-                throw new DataError(ErrorType.Missing, Keywords.TYPE);
-            }
+		if (subject == null) {
+			throw new IllegalArgumentException("The 'subject' parameter must not be null.");
+		}
 
-            throw new DataError(ErrorType.Unknown, Keywords.TYPE);
-        }
+		final Credential credential = new Credential();
 
-        // @id - optional
-        if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
-            credential.id = JsonLdUtils.getId(subject)
-                    .orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
-        }
+		// @type
+		if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
 
-        // subject - mandatory
-        if (!JsonLdUtils.hasPredicate(subject, BASE + SUBJECT)) {
-            throw new DataError(ErrorType.Missing, SUBJECT);
-        }
+			if (!JsonLdUtils.hasType(subject)) {
+				throw new DataError(ErrorType.Missing, Keywords.TYPE);
+			}
 
-        // issuer - mandatory
-        credential.issuer = JsonLdUtils.assertId(subject, BASE, ISSUER);
+			throw new DataError(ErrorType.Unknown, Keywords.TYPE);
+		}
 
-        // issuance date - mandatory
-        credential.issuance = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
+		// @id - optional
+		if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
+			credential.id = JsonLdUtils.getId(subject).orElseThrow(() -> new DataError(ErrorType.Invalid, Keywords.ID));
+		}
 
-        // expiration date - optional
-        if (JsonLdUtils.hasPredicate(subject, BASE + EXPIRATION_DATE)) {
-            credential.expiration = JsonLdUtils.assertXsdDateTime(subject, BASE, EXPIRATION_DATE);
-        }
+		// subject - mandatory
+		if (!JsonLdUtils.hasPredicate(subject, BASE + SUBJECT)) {
+			throw new DataError(ErrorType.Missing, SUBJECT);
+		}
 
-        // status
-        final Optional<JsonValue> status = JsonLdUtils
-                                                .getObjects(subject, BASE + CREDENTIAL_STATUS)
-                                                .stream()
-                                                .findFirst();
+		// issuer - mandatory
+		credential.issuer = JsonLdUtils.assertId(subject, BASE, ISSUER);
 
-        if (status.isPresent()) {
-            credential.status = CredentialStatus.from(status.get());
-        }
+		// issuance date - mandatory
+		if (JsonLdUtils.hasPredicate(subject, BASE + ISSUANCE_DATE)) {
+			credential.issuanceDate = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
+		}
 
-        return credential;
-    }
+		// validFrom - the next version
+		if (JsonLdUtils.hasPredicate(subject, BASE + VALID_FROM)) {
+			credential.validFrom = JsonLdUtils.assertXsdDateTime(subject, BASE, VALID_FROM);
+		}
+		
+		// issued - the next version
+		if (JsonLdUtils.hasPredicate(subject, BASE + ISSUED)) {
+			credential.issued = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUED);
+		}
+		
+		if (credential.issuanceDate == null && credential.validFrom == null) {
+			throw new DataError(ErrorType.Missing, ISSUANCE_DATE);	
+		}
 
-    @Override
-    public URI getId() {
-        return id;
-    }
+		// expiration date - optional
+		if (JsonLdUtils.hasPredicate(subject, BASE + EXPIRATION_DATE)) {
+			credential.expiration = JsonLdUtils.assertXsdDateTime(subject, BASE, EXPIRATION_DATE);
+		}
 
-    /**
-     *
-     * see {@link https://www.w3.org/TR/vc-data-model/#issuer}
-     * @return
-     */
-    public URI getIssuer() {
-        return issuer;
-    }
+		// status
+		final Optional<JsonValue> status = JsonLdUtils.getObjects(subject, BASE + CREDENTIAL_STATUS).stream()
+				.findFirst();
 
-    /**
-     *
-     * see {@link https://www.w3.org/TR/vc-data-model/#issuance-date}
-     * @return
-     */
-    public Instant getIssuanceDate() {
-        return issuance;
-    }
+		if (status.isPresent()) {
+			credential.status = CredentialStatus.from(status.get());
+		}
 
-    /**
-     * see {@link https://www.w3.org/TR/vc-data-model/#expiration}
-     * @return
-     */
-    public Instant getExpiration() {
-        return expiration;
-    }
+		return credential;
+	}
 
-    /**
-     * Checks if the credential is expired.
-     *
-     * @return <code>true</code> if the credential is expired
-     */
-    public boolean isExpired() {
-        return expiration != null && expiration.isBefore(Instant.now());
-    }
+	@Override
+	public URI getId() {
+		return id;
+	}
 
-    /**
-     * see {@link https://www.w3.org/TR/vc-data-model/#status}
-     * @return
-     */
-    public CredentialStatus getCredentialStatus() {
-        return status;
-    }
+	/**
+	 *
+	 * see {@link https://www.w3.org/TR/vc-data-model/#issuer}
+	 * 
+	 * @return an issuer URI
+	 */
+	public URI getIssuer() {
+		return issuer;
+	}
 
-    @Override
-    public boolean isCredential() {
-        return true;
-    }
+	/**
+	 *
+	 * see {@link https://www.w3.org/TR/vc-data-model/#issuance-date}
+	 * 
+	 * @return
+	 */
+	public Instant getIssuanceDate() {
+		return issuanceDate;
+	}
 
-    @Override
-    public Credential asCredential() {
-        return this;
-    }
+	/**
+	 * see {@link https://www.w3.org/TR/vc-data-model/#expiration}
+	 * 
+	 * @return a date time
+	 */
+	public Instant getExpiration() {
+		return expiration;
+	}
+	
+	/**
+	 * A date time when the credential has been issued. Reserved for the next specification version.
+	 * 
+	 * see {@link https://www.w3.org/TR/vc-data-model/#issuance-date}
+	 * 
+	 * @since 0.8.1
+	 * 
+	 * @return a date time
+	 */
+	public Instant getIssued() {
+		return issued;
+	}
+	
+	/**
+	 * A date time from the credential is valid. Reserved for the next specification version.
+	 * 
+	 * see {@link https://www.w3.org/TR/vc-data-model/#issuance-date}
+	 * 
+	 * @since 0.8.1
+	 * 
+	 * @return a date time
+	 */
+	public Instant getValidFrom() {
+		return validFrom;
+	}
 
-    /**
-     * Returns a map of predicates and objects that are not recognized by this implementation.
-     *
-     * @return an immutable map of extensions
-     */
-    public Map<String, JsonValue> getExtensions() {
-        return extensions;
-    }
+	/**
+	 * Checks if the credential is expired.
+	 *
+	 * @return <code>true</code> if the credential is expired
+	 */
+	public boolean isExpired() {
+		return expiration != null && expiration.isBefore(Instant.now());
+	}
+
+	/**
+	 * see {@link https://www.w3.org/TR/vc-data-model/#status}
+	 * 
+	 * @return
+	 */
+	public CredentialStatus getCredentialStatus() {
+		return status;
+	}
+
+	@Override
+	public boolean isCredential() {
+		return true;
+	}
+
+	@Override
+	public Credential asCredential() {
+		return this;
+	}
+
+	/**
+	 * Returns a map of predicates and objects that are not recognized by this
+	 * implementation.
+	 *
+	 * @return an immutable map of extensions
+	 */
+	public Map<String, JsonValue> getExtensions() {
+		return extensions;
+	}
 }
