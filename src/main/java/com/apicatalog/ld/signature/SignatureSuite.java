@@ -3,34 +3,37 @@ package com.apicatalog.ld.signature;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.json.ProofJsonAdapter;
+import com.apicatalog.ld.signature.key.KeyPair;
 
 import jakarta.json.JsonStructure;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization algorithm,
  * a message digest algorithm, and a signature algorithm.
- *
  */
 public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
-    private final String id;
-    private final CanonicalizationAlgorithm canonicalization;
-    private final DigestAlgorithm digester;
-    private final SignatureAlgorithm signer;
-    private final SignatureAdapter adapter;
+    protected final String id;
+
+    protected final CanonicalizationAlgorithm canonicalization;
+    protected final DigestAlgorithm digester;
+    protected final SignatureAlgorithm signer;
+
+    protected final ProofJsonAdapter proofAdapter;
 
     public SignatureSuite(
-            String id,
-            CanonicalizationAlgorithm canonicalization,
-            DigestAlgorithm digester,
-            SignatureAlgorithm signer,
-            SignatureAdapter adapter
+            final String id,
+            final CanonicalizationAlgorithm canonicalization,
+            final DigestAlgorithm digester,
+            final SignatureAlgorithm signer,
+            final ProofJsonAdapter proofAdapter
             ) {
         this.id = id;
         this.canonicalization = canonicalization;
         this.digester = digester;
         this.signer = signer;
-        this.adapter = adapter;
+        this.proofAdapter = proofAdapter;
     }
 
     @Override
@@ -44,17 +47,17 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     }
 
     @Override
-    public byte[] digest(byte[] data) throws DataError {
+    public byte[] digest(byte[] data) throws LinkedDataSuiteError {
         return digester.digest(data);
     }
 
     @Override
-    public byte[] canonicalize(JsonStructure document) throws DataError {
+    public byte[] canonicalize(JsonStructure document) throws LinkedDataSuiteError {
         return canonicalization.canonicalize(document);
     }
 
     @Override
-    public KeyPair keygen(int length) {
+    public KeyPair keygen(int length) throws KeyGenError {
         return signer.keygen(length);
     }
 
@@ -62,7 +65,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
         return id;
     }
 
-    public SignatureAdapter getAdapter() {
-        return adapter;
+    public ProofJsonAdapter getProofAdapter() {
+    return proofAdapter;
     }
 }

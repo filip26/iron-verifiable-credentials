@@ -1,9 +1,9 @@
 package com.apicatalog.ld.signature.algorithm;
 
-import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.signature.LinkedDataSuiteError;
 
 public interface DigestAlgorithm {
 
-    byte[] digest(byte[] data) throws DataError;
+    byte[] digest(byte[] data) throws LinkedDataSuiteError;
 
 }

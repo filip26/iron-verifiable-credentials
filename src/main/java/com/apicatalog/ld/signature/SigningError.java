@@ -5,17 +5,13 @@ public class SigningError extends Throwable {
     private static final long serialVersionUID = 8441020241391845866L;
 
     public enum Code {
-        Unknown,
         Expired,
         UnknownVerificatioonKey,
         UnknownCryptoSuite,
+        Internal, 
     }
 
     private Code code;
-
-    public SigningError() {
-        this(Code.Unknown);
-    }
 
     public SigningError(Code code) {
         super(code.name());
@@ -23,11 +19,11 @@ public class SigningError extends Throwable {
     }
 
     public SigningError(Throwable e) {
-        this(Code.Unknown, e);
+        this(Code.Internal, e);
     }
 
     public SigningError(Code code, Throwable e) {
-        super(e);
+        super(code.name(), e);
         this.code = code;
     }
 

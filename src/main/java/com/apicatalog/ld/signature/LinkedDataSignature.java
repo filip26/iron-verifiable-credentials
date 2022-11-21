@@ -2,11 +2,10 @@ package com.apicatalog.ld.signature;
 
 import java.net.URI;
 
-import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.ld.signature.proof.EmbeddedProof;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -22,60 +21,71 @@ public class LinkedDataSignature {
     /**
      * Verifies the given signed VC/VP document.
      *
-     * see
-     * {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm}
+     * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
      * @param verificationKey
      * @param signature
+     *
      * @throws VerificationError
-     * @throws DataError
+     * @throws DocumentError
      */
-    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DataError {
+    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DocumentError {
 
-        if (verificationKey == null || verificationKey.getPublicKey() == null) {
-            throw new VerificationError();
+        if (verificationKey == null || verificationKey.publicKey() == null) {
+            throw new VerificationError(VerificationError.Code.MissingVerificationKey);
         }
 
-       final JsonObject proofObject = EmbeddedProof.removeProofValue(proof);
+       final JsonObject proofObject = EmbeddedProofAdapter.removeProofValue(proof);
 
-       final byte[] computeSignature = hashCode(document, proofObject);
+       try {
+           final byte[] computeSignature = hashCode(document, proofObject);
 
-       suite.verify(verificationKey.getPublicKey(), signature, computeSignature);
+           suite.verify(verificationKey.publicKey(), signature, computeSignature);
+
+       } catch (LinkedDataSuiteError e) {
+           throw new VerificationError(e);
+       }
     }
 
     /**
      * Issues the given VC/VP document and returns the document signature.
      *
-     * see {@link https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm}
+     * @see <A href="https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm">Proof Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
-     * @param proof expanded proof options
      * @param keyPair
+     * @param options
+     *
      * @return computed signature
-     * @throws DataError
-     * @throws VerificationError
+     *
+     * @throws SigningError
+     * @throws DocumentError
      */
-    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError, DataError {
+    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError {
 
+    try {
         final byte[] documentHashCode = hashCode(document, options);
 
-        return suite.sign(keyPair.getPrivateKey(), documentHashCode);
+        return suite.sign(keyPair.privateKey(), documentHashCode);
+
+    } catch (LinkedDataSuiteError e) {
+        throw new SigningError(e);
+    }
     }
 
     /**
-     * see
-     * {@link https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}
+     * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm">Hash Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
      * @param proof expanded proof with no proofValue
-     * @return computed hash code
-     * @throws DataError
      *
-     * @throws VerificationError
+     * @return computed hash code
+     *
+     * @throws LinkedDataSuiteError
      */
-    public byte[] hashCode(JsonStructure document, JsonObject proof) throws DataError {
+    byte[] hashCode(JsonStructure document, JsonObject proof) throws LinkedDataSuiteError {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 
@@ -90,15 +100,7 @@ public class LinkedDataSignature {
         return result;
     }
 
-    public KeyPair keygen(URI id, int length) {
-
-        final SignatureAlgorithm.KeyPair keyPair = suite.keygen(length);
-
-        final Ed25519KeyPair2020 kp = new Ed25519KeyPair2020(id);
-
-        kp.setPublicKey(keyPair.getPublicKey());
-        kp.setPrivateKey(keyPair.getPrivateKey());
-
-        return kp;
+    public KeyPair keygen(URI id, int length) throws KeyGenError {
+        return suite.keygen(length);
     }
 }

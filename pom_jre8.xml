@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <relativePath>pom_parent.xml</relativePath>
   </parent>
 
@@ -28,6 +28,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <envSources>src/main/java8</envSources>
     <tink.version>1.6.1</tink.version>
+    <rdf-urdna.version>1.2</rdf-urdna.version>
   </properties>
 
   <dependencies>
@@ -37,9 +38,19 @@
       <version>${titanium.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.apicatalog</groupId>
+      <artifactId>carbon-did-jre8</artifactId>
+      <version>${carbon.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.crypto.tink</groupId>
       <artifactId>tink</artifactId>
       <version>${tink.version}</version>
-    </dependency>         
+    </dependency>
+    <dependency>
+      <groupId>io.setl</groupId>
+      <artifactId>rdf-urdna</artifactId>
+      <version>${rdf-urdna.version}</version>
+    </dependency>
   </dependencies>
 </project>

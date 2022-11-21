@@ -2,26 +2,17 @@ package com.apicatalog.ld.signature.proof;
 
 import java.net.URI;
 
-import jakarta.json.JsonObject;
-
 /**
+ * Represents proof verification method declaration.
  *
- * see {@link https://w3c-ccg.github.io/data-integrity-spec/#verification-methods}
+ * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#verification-methods">Verification Methods</a>
  *
  */
 public interface VerificationMethod {
 
-    URI getId();
-
-    String getType();
-
-    URI getController();
-
-    /**
-     * Serializes the verification method as {@link JsonObject}.
-     * Uses {@link #getType()} to determine {@link JsonObject} .
-     *
-     * @return
-     */
-    JsonObject toJson();
+    URI id();
+    
+    String type();
+    
+    URI controller();
 }

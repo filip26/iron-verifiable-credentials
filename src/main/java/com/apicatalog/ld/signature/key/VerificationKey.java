@@ -4,6 +4,6 @@ import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 public interface VerificationKey extends VerificationMethod {
 
-    byte[] getPublicKey();
+    byte[] publicKey();
 
 }

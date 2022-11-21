@@ -1,7 +1,9 @@
 package com.apicatalog.ld.signature.algorithm;
 
+import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.key.KeyPair;
 
 /**
  * An algorithm that takes an input message and produces an output value
@@ -14,23 +16,5 @@ public interface SignatureAlgorithm {
 
     byte[] sign(byte[] privateKey, byte[] data) throws SigningError;
 
-    KeyPair keygen( int length);
-
-    public class KeyPair {
-        byte[] publicKey;
-        byte[] privateKey;
-
-        public KeyPair(byte[] publicKey, byte[] privateKey) {
-            this.publicKey = publicKey;
-            this.privateKey = privateKey;
-        }
-
-        public byte[] getPublicKey() {
-            return publicKey;
-        }
-
-        public byte[] getPrivateKey() {
-            return privateKey;
-        }
-    }
+    KeyPair keygen(int length) throws KeyGenError;
 }

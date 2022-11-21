@@ -6,13 +6,14 @@ import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.uri.UriUtils;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -31,7 +32,7 @@ public class JsonLdUtils {
      *
      * @param type
      * @param value
-     * @return
+     * @return <code>true</code> if the given value is {@link JsonObject} and has property @type including the given type
      */
     public static boolean isTypeOf(final String type, final JsonValue value) {
 
@@ -52,6 +53,21 @@ public class JsonLdUtils {
                     .map(JsonString::getString)
                     .filter(StringUtils::isNotBlank)
                     .anyMatch(type::equals);
+    }
+
+    public static Collection<String> getType(final JsonObject value) {
+
+        if (value == null) {
+            throw new IllegalArgumentException("The 'object' parameter must not be null.");
+        }
+
+        return JsonUtils
+                    .toStream(value.get(Keywords.TYPE))
+                    .filter(JsonUtils::isString)
+                    .map(JsonString.class::cast)
+                    .map(JsonString::getString)
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.toSet());
     }
 
     public static boolean hasType(final JsonValue expanded) {
@@ -90,32 +106,28 @@ public class JsonLdUtils {
             return Collections.emptyList();
         }
 
-        if (JsonUtils.isArray(value)) {
-            if (value.asJsonArray().size() == 1) {
-                value = value.asJsonArray().get(0);
-            }
+        if (JsonUtils.isArray(value) && value.asJsonArray().size() == 1) {
+            value = value.asJsonArray().get(0);
         }
 
-        if (JsonUtils.isObject(value)) {
-            if (value.asJsonObject().containsKey(Keywords.GRAPH) &&  value.asJsonObject().size() == 1) {
-                value = value.asJsonObject().get(Keywords.GRAPH);
-            }
+        if (JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.GRAPH) && value.asJsonObject().size() == 1) {
+            value = value.asJsonObject().get(Keywords.GRAPH);
         }
 
         return JsonUtils.toCollection(value);
     }
 
-    public static URI assertId(JsonValue subject, String base, String property) throws DataError {
+    public static URI assertId(JsonValue subject, String base, String property) throws DocumentError {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), base + property)) {
-            throw new DataError(ErrorType.Missing, property);
+            throw new DocumentError(ErrorType.Missing, property);
         }
 
         JsonValue value = JsonLdUtils
                                     .getObjects(subject.asJsonObject(), base + property)
                                     .stream()
                                     .findFirst()
-                                    .orElseThrow(() -> new DataError(ErrorType.Missing, property));
+                                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, property));
 
         if (JsonUtils.isObject(value)) {
             value  = value.asJsonObject().get(Keywords.ID);
@@ -127,27 +139,27 @@ public class JsonLdUtils {
             id = ((JsonString)value).getString();
 
         } else {
-            throw new DataError(ErrorType.Invalid, property);
+            throw new DocumentError(ErrorType.Invalid, property);
         }
 
         if (UriUtils.isURI(id)) {
             return URI.create(id);
         }
 
-        throw new DataError(ErrorType.Invalid, property, Keywords.ID);
+        throw new DocumentError(ErrorType.Invalid, property, Keywords.ID);
     }
 
-    public static Instant assertXsdDateTime(JsonValue subject, String base, String property) throws DataError {
+    public static Instant assertXsdDateTime(JsonValue subject, String base, String property) throws DocumentError {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), base + property)) {
-            throw new DataError(ErrorType.Missing, property);
+            throw new DocumentError(ErrorType.Missing, property);
         }
 
         final JsonValue value = JsonLdUtils
                                     .getObjects(subject.asJsonObject(), base + property)
                                     .stream()
                                     .findFirst()
-                                    .orElseThrow(() -> new DataError(ErrorType.Missing, property, Keywords.VALUE));
+                                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, property, Keywords.VALUE));
 
         if (isXsdDateTime(value)) {
             return JsonUtils.toStream(value)
@@ -169,19 +181,18 @@ public class JsonLdUtils {
                         }
                         return null;
                     })
-                    .orElseThrow(() ->  new DataError(ErrorType.Invalid, property, Keywords.VALUE));
+                    .orElseThrow(() ->  new DocumentError(ErrorType.Invalid, property, Keywords.VALUE));
         }
-        throw new DataError(ErrorType.Invalid, property, Keywords.TYPE);
+        throw new DocumentError(ErrorType.Invalid, property, Keywords.TYPE);
     }
 
-    @Deprecated
     public static final Optional<URI> getId(JsonValue value) {
 
         if (value == null) {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
 
-        return com.apicatalog.jsonld.JsonUtils.findFirstObject(value)
+        return JsonLdUtils.findFirstObject(value)
                 .map(o -> o.get(Keywords.ID))
                 .filter(JsonUtils::isString)
                 .map(JsonString.class::cast)
@@ -201,7 +212,7 @@ public class JsonLdUtils {
     public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property, String id) {
         objectBuilder.add(property,
                 Json.createArrayBuilder()
-                        .add(Json.createObjectBuilder().add(Keywords.ID, id.toString())));
+                        .add(Json.createObjectBuilder().add(Keywords.ID, id)));
 
         return objectBuilder;
     }
@@ -222,4 +233,19 @@ public class JsonLdUtils {
         return setValue(objectBuilder, property, XSD_DATE_TIME, instant.toString());
     }
 
+    public static Optional<JsonObject> findFirstObject(JsonValue expanded) {
+        if (JsonUtils.isArray(expanded)) {
+
+            for (JsonValue item : expanded.asJsonArray()) {
+                if (JsonUtils.isObject(item)) {
+                    return Optional.of(item.asJsonObject());
+                }
+            }
+
+        } else if (JsonUtils.isObject(expanded)) {
+            return Optional.of(expanded.asJsonObject());
+        }
+
+        return Optional.empty();
+    }
 }
