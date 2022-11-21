@@ -22,7 +22,6 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
-import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.json.VerificationMethodJsonAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
@@ -157,17 +156,11 @@ public final class Verifier extends Processor<Verifier> {
 
 		validate(verifiable);
 
-		// proof set
-		if (!EmbeddedProofAdapter.hasProof(expanded)) {
-			throw new DocumentError(ErrorType.Missing, "proof");
-		}
+		// get proofs - throws an exception if there is no proof, never null nor an
+		// empty collection
+		final Collection<JsonValue> proofs = EmbeddedProofAdapter.assertProof(expanded);
 
-		final Collection<JsonValue> proofs = EmbeddedProofAdapter.getProof(expanded);
-
-		if (proofs == null || proofs.size() == 0) {
-			throw new DocumentError(ErrorType.Missing, "proof");
-		}
-
+		// a data before issuance - no proof attached
 		final JsonObject data = EmbeddedProofAdapter.removeProof(expanded);
 
 		// verify attached proofs' signatures
@@ -228,7 +221,7 @@ public final class Verifier extends Processor<Verifier> {
 			final DidDocument didDocument = resolver.resolve(DidUrl.from(id));
 
 			return didDocument.verificationMethod().stream().filter(vm -> keyAdapter.getType().equals(vm.type()))
-					.map(did -> new Ed25519VerificationKey2020(did.id().toUri(), did.controller().toUri(), did.type(),
+					.map(did -> new VerificationKeyImpl(did.id().toUri(), did.controller().toUri(), did.type(),
 							did.publicKey()))
 					.findFirst().orElseThrow(IllegalStateException::new);
 		}
@@ -245,7 +238,6 @@ public final class Verifier extends Processor<Verifier> {
 
 				// take the first key that match
 				if (JsonLdUtils.getType(method.asJsonObject()).stream().anyMatch(m -> keyAdapter.getType().equals(m))) {
-
 					return keyAdapter.deserialize(method.asJsonObject());
 				}
 			}
@@ -267,9 +259,47 @@ public final class Verifier extends Processor<Verifier> {
 				throw new VerificationError(Code.Expired);
 			}
 
-			if (verifiable.asCredential().getIssuanceDate() == null && verifiable.asCredential().getValidFrom() == null) {
+			if (verifiable.asCredential().getIssuanceDate() == null
+					&& verifiable.asCredential().getValidFrom() == null) {
 				throw new DocumentError(ErrorType.Missing, Credential.ISSUANCE_DATE);
 			}
 		}
 	}
+
+	class VerificationKeyImpl implements VerificationKey {
+
+		final URI id;
+		final String type;
+		final URI controller;
+		final byte[] publicKey;
+
+		public VerificationKeyImpl(URI id, URI controller, String type, byte[] publicKey) {
+			this.id = id;
+			this.type = type;
+			this.controller = controller;
+			this.publicKey = publicKey;
+		}
+
+		@Override
+		public URI id() {
+			return id;
+		}
+
+		@Override
+		public String type() {
+			return type;
+		}
+
+		@Override
+		public URI controller() {
+			return controller;
+		}
+
+		@Override
+		public byte[] publicKey() {
+			return publicKey;
+		}
+
+	}
+
 }
