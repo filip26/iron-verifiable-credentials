@@ -57,7 +57,7 @@ public final class Verifier extends Processor<Verifier> {
 	 * Sets {@link CredentialStatus} verifier. If not set then
 	 * <code>credentialStatus</code> is not verified.
 	 *
-	 * @param statusVerifier
+	 * @param statusVerifier a custom status verifier instance
 	 * @return the verifier instance
 	 */
 	public Verifier statusVerifier(StatusVerifier statusVerifier) {
