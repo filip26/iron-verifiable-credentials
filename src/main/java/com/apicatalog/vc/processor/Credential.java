@@ -29,7 +29,17 @@ class Credential implements Verifiable {
     // known properties
     public static final String SUBJECT = "credentialSubject";
     public static final String ISSUER = "issuer";
-    public static final String ISSUANCE_DATE = "issuanceDate";
+    
+	// is expected to be deprecated in favor of validFrom in the next version of the
+	// specification
+	// https://www.w3.org/TR/vc-data-model/#issuance-date see NOTE
+	public static final String ISSUANCE_DATE = "issuanceDate";
+
+	// Introduced in an advance see above
+	public static final String VALID_FROM = "validFrom";
+	public static final String ISSUED = "issued";
+
+    
     public static final String EXPIRATION_DATE = "expirationDate";
     public static final String CREDENTIAL_STATUS = "credentialStatus";
     public static final String CREDENTIAL_SCHEMA = "credentialSchema";
@@ -42,6 +52,11 @@ class Credential implements Verifiable {
     protected URI issuer;
 
     protected Instant issuance;
+    
+	// reserved for the next specification version
+    // see https://www.w3.org/TR/vc-data-model/#issuance-date - Issuance Date - Note 
+	protected Instant validFrom;
+	protected Instant issued;
 
     protected Instant expiration;
 
@@ -100,6 +115,16 @@ class Credential implements Verifiable {
             credential.issuance = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
         }
 
+		// validFrom - the next version
+		if (JsonLdUtils.hasPredicate(subject, BASE + VALID_FROM)) {
+			credential.validFrom = JsonLdUtils.assertXsdDateTime(subject, BASE, VALID_FROM);
+		}
+		
+		// issued - the next version
+		if (JsonLdUtils.hasPredicate(subject, BASE + ISSUED)) {
+			credential.issued = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUED);
+		}
+
         // expiration date - optional
         if (JsonLdUtils.hasPredicate(subject, BASE + EXPIRATION_DATE)) {
             credential.expiration = JsonLdUtils.assertXsdDateTime(subject, BASE, EXPIRATION_DATE);
@@ -148,6 +173,32 @@ class Credential implements Verifiable {
     public Instant getExpiration() {
         return expiration;
     }
+
+	/**
+	 * A date time when the credential has been issued. Reserved for the next specification version.
+	 * 
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance Date - Note</a>
+	 * 
+	 * @since 0.8.1
+	 * 
+	 * @return a date time
+	 */
+	public Instant getIssued() {
+		return issued;
+	}
+	
+	/**
+	 * A date time from the credential is valid. Reserved for the next specification version.
+	 * 
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance Date - Note</a>
+	 * 
+	 * @since 0.8.1
+	 * 
+	 * @return a date time
+	 */
+	public Instant getValidFrom() {
+		return validFrom;
+	}
 
     /**
      * Checks if the credential is expired.
