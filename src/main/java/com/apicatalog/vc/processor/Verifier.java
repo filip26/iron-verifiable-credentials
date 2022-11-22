@@ -20,6 +20,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
@@ -35,6 +36,8 @@ import jakarta.json.JsonValue;
 
 public final class Verifier extends Processor<Verifier> {
 
+	protected final SignatureSuiteProvider suiteProvider;
+	
 	private final URI location;
 	private final JsonObject document;
 
@@ -42,14 +45,16 @@ public final class Verifier extends Processor<Verifier> {
 	private StatusVerifier statusVerifier = null;
 	private DidResolver didResolver = null;
 
-	public Verifier(URI location) {
+	public Verifier(URI location, final SignatureSuiteProvider suiteProvider) {
 		this.location = location;
 		this.document = null;
+		this.suiteProvider = suiteProvider;
 	}
 
-	public Verifier(JsonObject document) {
+	public Verifier(JsonObject document, final SignatureSuiteProvider suiteProvider) {
 		this.document = document;
 		this.location = null;
+		this.suiteProvider = suiteProvider;
 	}
 
 	/**
@@ -90,10 +95,6 @@ public final class Verifier extends Processor<Verifier> {
 
 		if (bundledContexts) {
 			loader = new StaticContextLoader(loader);
-		}
-
-		if (suites.isEmpty()) {
-			addDefaultSuites();
 		}
 
 		if (document != null) {
@@ -176,8 +177,8 @@ public final class Verifier extends Processor<Verifier> {
 				throw new DocumentError(ErrorType.Missing, "proof", Keywords.TYPE);
 			}
 
-			final SignatureSuite signatureSuite = proofType.stream().filter(suites::containsKey).findFirst()
-					.map(suites::get).orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
+			final SignatureSuite signatureSuite = proofType.stream().filter(suiteProvider::isSupported).findFirst()
+					.map(suiteProvider::getSignatureSuite).orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
 
 			final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 

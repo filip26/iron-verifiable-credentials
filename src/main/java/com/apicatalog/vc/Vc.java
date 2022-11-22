@@ -6,10 +6,10 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.processor.Issuer;
 import com.apicatalog.vc.processor.KeysGenerator;
 import com.apicatalog.vc.processor.Verifier;
@@ -30,8 +30,8 @@ public final class Vc {
      * @throws DocumentError
      * @throws VerificationError
      */
-    public static Verifier verify(URI location) throws DocumentError, VerificationError {
-        return new Verifier(location);
+    public static Verifier verify(final URI location, final SignatureSuiteProvider suiteProvider) throws DocumentError, VerificationError {
+        return new Verifier(location, suiteProvider);
     }
 
     /**
@@ -44,8 +44,8 @@ public final class Vc {
      * @throws DocumentError
      * @throws VerificationError
      */
-    public static Verifier verify(JsonObject document) throws DocumentError, VerificationError {
-        return new Verifier(document);
+    public static Verifier verify(final JsonObject document, final SignatureSuiteProvider suiteProvider) throws DocumentError, VerificationError {
+        return new Verifier(document, suiteProvider);
     }
 
     /**
@@ -60,8 +60,8 @@ public final class Vc {
      * @throws DocumentError
      * @throws SigningError
      */
-    public static Issuer sign(URI documentLocation, KeyPair keyPair, ProofOptions options) throws DocumentError, SigningError {
-        return new Issuer(documentLocation, keyPair, options);
+    public static Issuer sign(URI documentLocation, KeyPair keyPair, final SignatureSuite signatureSuite) throws DocumentError, SigningError {
+        return new Issuer(documentLocation, keyPair, signatureSuite);
     }
 
     /**
@@ -76,8 +76,8 @@ public final class Vc {
      * @throws DocumentError
      * @throws SigningError
      */
-    public static Issuer sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DocumentError, SigningError {
-        return new Issuer(document, keyPair, options);
+    public static Issuer sign(JsonObject document, KeyPair keyPair, final SignatureSuite signatureSuite) throws DocumentError, SigningError {
+        return new Issuer(document, keyPair, signatureSuite);
     }
 
     /**
@@ -89,7 +89,7 @@ public final class Vc {
      *
      * @throws KeyGenError
      */
-    public static KeysGenerator generateKeys(SignatureSuite signatureSuite) throws KeyGenError {
+    public static KeysGenerator generateKeysfinal(final SignatureSuite signatureSuite) throws KeyGenError {
     	if (signatureSuite == null) {
     		throw new IllegalArgumentException("The signatureSuite parameter must not be null.");
     	}
