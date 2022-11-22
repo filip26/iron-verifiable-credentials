@@ -119,7 +119,7 @@ public final class Verifier extends Processor<Verifier> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-			throw new VerificationError(e);
+			throw new DocumentError(ErrorType.Invalid, "document", e);
 		}
 	}
 
@@ -132,7 +132,7 @@ public final class Verifier extends Processor<Verifier> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-			throw new VerificationError(e);
+			throw new DocumentError(ErrorType.Invalid, "document", e);
 		}
 	}
 
@@ -250,7 +250,7 @@ public final class Verifier extends Processor<Verifier> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-			throw new VerificationError(e);
+			throw new DocumentError(ErrorType.Invalid, "document", e);
 		}
 
 		throw new VerificationError(Code.UnknownVerificationKey);

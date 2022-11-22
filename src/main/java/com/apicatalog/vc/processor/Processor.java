@@ -90,11 +90,11 @@ abstract class Processor<T extends Processor<?>> {
 
 	protected void failWithJsonLd(JsonLdError e) throws DocumentError {
 		if (JsonLdErrorCode.LOADING_DOCUMENT_FAILED == e.getCode()) {
-			throw new DocumentError(ErrorType.Invalid, "RemoteDocument");
+			throw new DocumentError(ErrorType.Invalid, "RemoteDocument", e);
 		}
 
 		if (JsonLdErrorCode.LOADING_REMOTE_CONTEXT_FAILED == e.getCode()) {
-			throw new DocumentError(ErrorType.Invalid, "RemoteContext");
+			throw new DocumentError(ErrorType.Invalid, "RemoteContext", e);
 		}
 	}
 }

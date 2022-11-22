@@ -7,25 +7,29 @@ public class DocumentError extends Throwable {
     private static final long serialVersionUID = -7146533158378348477L;
 
     public enum ErrorType {
-        Missing,
-        Unknown,
-        Invalid,
+        Missing, Unknown, Invalid,
     }
 
     private final ErrorType type;
     private final String subject;
-    
+
     public DocumentError(ErrorType type, ProofProperty property) {
-    	this(type, "Proof".concat(property.name()));
+        this(type, "Proof".concat(property.name()));
     }
-    
-    //TODO revise
+
     public DocumentError(ErrorType type, String subject) {
         super();
         this.type = type;
         this.subject = subject;
     }
 
+    public DocumentError(ErrorType type, String subject, Throwable e) {
+        super(e);
+        this.type = type;
+        this.subject = subject;
+    }
+
+    
     public ErrorType getType() {
         return type;
     }

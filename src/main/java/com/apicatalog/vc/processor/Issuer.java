@@ -154,7 +154,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-			throw new SigningError(e);
+			throw new DocumentError(ErrorType.Invalid, "Document", e);
 		}
 	}
 
@@ -195,7 +195,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-			throw new SigningError(e);
+            throw new DocumentError(ErrorType.Invalid, "Document", e);
 		}
 	}
 
@@ -210,7 +210,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-			throw new SigningError(e);
+            throw new DocumentError(ErrorType.Invalid, "Document", e);
 		}
 	}
 
@@ -225,7 +225,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-			throw new SigningError(e);
+            throw new DocumentError(ErrorType.Invalid, "Document", e);
 		}
 	}
 

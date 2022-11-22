@@ -6,19 +6,12 @@ public class VerificationError extends Throwable {
 
     public enum Code {
         Expired,
-        
-        InvalidSignature,
-        InvalidProofDomain,
-        
-        UnknownCryptoSuite,
-        UnknownVerificationKey,
-        UnknownVerificationMethod,
-        
-        Internal,	//TODO ?!?! 
-        
-        //TODO remove!! it's a document error
-        MissingVerificationKey,
 
+        InvalidSignature, InvalidProofDomain,
+
+        UnknownCryptoSuite, UnknownVerificationKey, UnknownVerificationMethod,
+        
+        LinkedDataSignature,
     }
 
     private Code code;
@@ -28,9 +21,9 @@ public class VerificationError extends Throwable {
         this.code = code;
     }
 
-    public VerificationError(Throwable e) {
-    this(Code.Internal, e);
-    }
+//    public VerificationError(Throwable e) {
+//        this(Code.Internal, e);
+//    }
 
     public VerificationError(Code code, Throwable e) {
         super(code.name(), e);

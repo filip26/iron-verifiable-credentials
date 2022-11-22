@@ -218,18 +218,22 @@ public class JsonLdUtils {
     }
 
     public static JsonObjectBuilder setId(JsonObjectBuilder builder, String property, String id) {
-        return builder.add(property, Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, id)));
+        return builder.add(property,
+                Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, id)));
     }
 
-    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property, String type, String value) {
+    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property,
+            String type, String value) {
         return builder.add(property, JsonLdValueObject.toJson(type, value));
     }
 
-    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property, String value) {
+    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property,
+            String value) {
         return builder.add(property, JsonLdValueObject.toJson(value));
     }
 
-    public static JsonObjectBuilder setValue(final JsonObjectBuilder builder, final String property, Instant instant) {
+    public static JsonObjectBuilder setValue(final JsonObjectBuilder builder, final String property,
+            Instant instant) {
         return setValue(builder, property, XSD_DATE_TIME, instant.toString());
     }
 

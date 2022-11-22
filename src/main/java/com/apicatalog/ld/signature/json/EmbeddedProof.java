@@ -6,7 +6,6 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.proof.ProofProperty;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
