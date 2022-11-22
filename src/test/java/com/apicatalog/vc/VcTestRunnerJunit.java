@@ -24,10 +24,7 @@ import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020Adapter;
-import com.apicatalog.ld.signature.ed25519.Ed25519Proof2020Adapter;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -41,205 +38,198 @@ import jakarta.json.stream.JsonGenerator;
 
 public class VcTestRunnerJunit {
 
-    private final VcTestCase testCase;
+	private final VcTestCase testCase;
 
-    public final static DocumentLoader LOADER =
-            new UriBaseRewriter(
-                    "https://github.com/filip26/iron-verifiable-credentials/",
-                    "classpath:",
-                    new SchemeRouter()
-                    .set("http", HttpLoader.defaultInstance())
-                    .set("https", HttpLoader.defaultInstance())
-                    .set("classpath", new ClasspathLoader())
-                );
+	public final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
+			new SchemeRouter().set("http", HttpLoader.defaultInstance())
+					.set("https", HttpLoader.defaultInstance())
+					.set("classpath", new ClasspathLoader()));
 
-    public VcTestRunnerJunit(VcTestCase testCase) {
-        this.testCase = testCase;
-    }
+	public VcTestRunnerJunit(VcTestCase testCase) {
+		this.testCase = testCase;
+	}
 
-    public void execute() {
+	public void execute() {
 
-        assertNotNull(testCase.type);
-        assertNotNull(testCase.input);
+		assertNotNull(testCase.type);
+		assertNotNull(testCase.input);
 
-        try {
-            if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VeriferTest")) {
+		try {
+			if (testCase.type.contains(VcTestCase.vocab("VeriferTest"))) {
 
-                Vc.verify(testCase.input).loader(LOADER).domain(testCase.domain).isValid();
-                assertFalse(isNegative(), "Expected error " + testCase.result);
+				Vc.verify(testCase.input, new TestCryptoSuite()).loader(LOADER)
+						.domain(testCase.domain).isValid();
+				assertFalse(isNegative(), "Expected error " + testCase.result);
 
-            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssuerTest")) {
+			} else if (testCase.type.contains(VcTestCase.vocab("IssuerTest"))) {
 
-                assertNotNull(testCase.result);
+				assertNotNull(testCase.result);
 
-                ProofOptions options =
-                        ProofOptions
-                            .create(
-                                Ed25519Proof2020Adapter.TYPE,
-                                testCase.verificationMethod,
-                                URI.create("https://w3id.org/security#assertionMethod")
-                                )
-                                .created(testCase.created)
-                                .domain(testCase.domain);
+				URI keyPairLocation = testCase.keyPair;
 
-                URI keyPairLocation = testCase.keyPair;
+				if (keyPairLocation == null) {
+					// set dummy key pair
+					keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
+				}
 
-                if (keyPairLocation == null) {
-                    // set dummy key pair
-                    keyPairLocation = URI.create("https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json");
-                }
+				Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), new TestCryptoSuite())
+						.loader(LOADER)
+						// proof options
+						.verificationMethod(testCase.verificationMethod)
+						.purpose(URI.create("https://w3id.org/security#assertionMethod"))
+						.created(testCase.created)
+						.domain(testCase.domain)
+						;
 
-                Issuer issuer = Vc
-                                    .sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
-                                    .loader(LOADER)
-                                    ;
+				JsonObject signed = null;
 
-                JsonObject signed = null;
+				if (testCase.context != null) {
 
-                if (testCase.context != null) {
+					signed = issuer.getCompacted(testCase.context);
 
-                    signed = issuer.getCompacted(testCase.context);
+				} else {
+					signed = issuer.getExpanded();
+				}
 
-                } else {
-                    signed = issuer.getExpanded();
-                }
+				assertFalse(isNegative(), "Expected error " + testCase.result);
 
-                assertFalse(isNegative(), "Expected error " + testCase.result);
+				assertNotNull(signed);
 
-                assertNotNull(signed);
+				final Document expected = LOADER.loadDocument(URI.create((String) testCase.result),
+						new DocumentLoaderOptions());
 
-                final Document expected = LOADER.loadDocument(URI.create((String)testCase.result), new DocumentLoaderOptions());
+				boolean match = JsonLdComparison.equals(signed,
+						expected.getJsonContent().orElse(null));
 
-                boolean match = JsonLdComparison.equals(signed, expected.getJsonContent().orElse(null));
+				if (!match) {
 
-                if (!match) {
+					write(testCase, signed, expected.getJsonContent().orElse(null));
 
-                    write(testCase, signed, expected.getJsonContent().orElse(null));
+					fail("Expected result does not match");
+				}
 
+			} else {
+				fail("Unknown test execution method: " + testCase.type);
+				return;
+			}
 
-                    fail("Expected result does not match");
-                }
+			if (testCase.type.stream().noneMatch(o -> o.endsWith("PositiveEvaluationTest"))) {
+				fail();
+				return;
+			}
 
+		} catch (VerificationError e) {
+			assertException(e.getCode() != null ? e.getCode().name() : null, e);
 
-            } else {
-                fail("Unknown test execution method: " + testCase.type);
-                return;
-            }
+		} catch (SigningError e) {
+			assertException(e.getCode() != null ? e.getCode().name() : null, e);
 
-             if (testCase.type.stream().noneMatch(o -> o.endsWith("PositiveEvaluationTest"))) {
-                 fail();
-                 return;
-             }
+		} catch (DocumentError e) {
+			assertException(toCode(e), e);
 
-        } catch (VerificationError e) {
-            assertException(e.getCode() != null ? e.getCode().name() : null, e);
+		} catch (JsonLdError e) {
+			e.printStackTrace();
+			fail(e);
+		}
+	}
 
-        } catch (SigningError e) {
-            assertException(e.getCode() != null ? e.getCode().name() : null, e);
+	final static String toCode(DocumentError e) {
+		final StringBuilder sb = new StringBuilder();
+		if (e.getType() != null) {
+			sb.append(e.getType().name());
+		}
+		if (e.getSubject() != null) {
 
-        } catch (DocumentError e) {
-            assertException(toCode(e), e);
+			int index = (e.getSubject().startsWith("@")) ? 1 : 0;
 
-        } catch (JsonLdError e) {
-            e.printStackTrace();
-            fail(e);
-        }
-    }
+			sb.append(Character.toUpperCase(e.getSubject().charAt(index)));
+			sb.append(e.getSubject().substring(index + 1));
+		}
+		if (e.getAttibutes() != null) {
 
-    final static String toCode(DocumentError e) {
-        final StringBuilder sb = new StringBuilder();
-        if (e.getType() != null) {
-            sb.append(e.getType().name());
-        }
-        if (e.getSubject() != null) {
+			Arrays.stream(e.getAttibutes()).forEach(attribute -> {
+				int index = (attribute.startsWith("@")) ? 1 : 0;
 
-            int index = (e.getSubject().startsWith("@")) ? 1 : 0;
+				sb.append(Character.toUpperCase(attribute.charAt(index)));
+				sb.append(attribute.substring(index + 1));
+			});
+		}
+		return sb.toString();
+	}
 
-            sb.append(Character.toUpperCase(e.getSubject().charAt(index)));
-            sb.append(e.getSubject().substring(index + 1));
-        }
-        if (e.getAttibutes() != null) {
+	final void assertException(final String code, Throwable e) {
 
-            Arrays.stream(e.getAttibutes())
-                .forEach(attribute -> {
-                    int index = (attribute.startsWith("@")) ? 1 : 0;
+		if (!isNegative()) {
+			e.printStackTrace();
+			fail(e);
+			return;
+		}
 
-                    sb.append(Character.toUpperCase(attribute.charAt(index)));
-                    sb.append(attribute.substring(index + 1));
-                });
-        }
-        return sb.toString();
-    }
+		if (!Objects.equals(testCase.result, code)) {
+			e.printStackTrace();
+		}
 
-    final void assertException(final String code, Throwable e) {
+		// compare expected exception
+		assertEquals(testCase.result, code);
+	}
 
-        if (!isNegative()) {
-            e.printStackTrace();
-            fail(e);
-            return;
-        }
+	final boolean isNegative() {
+		return testCase.type.stream().anyMatch(o -> o.endsWith("NegativeEvaluationTest"));
+	}
 
-        if (!Objects.equals(testCase.result, code)) {
-            e.printStackTrace();
-        }
+	public static void write(final VcTestCase testCase, final JsonStructure result,
+			final JsonStructure expected) {
+		final StringWriter stringWriter = new StringWriter();
 
-        // compare expected exception
-        assertEquals(testCase.result, code);
-    }
+		try (final PrintWriter writer = new PrintWriter(stringWriter)) {
+			writer.println("Test " + testCase.id + ": " + testCase.name);
 
-    final boolean isNegative() {
-        return testCase.type.stream().anyMatch(o -> o.endsWith("NegativeEvaluationTest"));
-    }
+			final JsonWriterFactory writerFactory = Json.createWriterFactory(
+					Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
 
-    public static void write(final VcTestCase testCase, final JsonStructure result, final JsonStructure expected) {
-        final StringWriter stringWriter = new StringWriter();
+			if (expected != null) {
+				write(writer, writerFactory, "Expected", expected);
+				writer.println();
+			}
 
-        try (final PrintWriter writer = new PrintWriter(stringWriter)) {
-            writer.println("Test " + testCase.id + ": " + testCase.name);
+			if (result != null) {
+				write(writer, writerFactory, "Actual", result);
+				writer.println();
+			}
+		}
 
-            final JsonWriterFactory writerFactory = Json.createWriterFactory(Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
+		System.out.println(stringWriter.toString());
+	}
 
-            if (expected != null) {
-                write(writer, writerFactory, "Expected", expected);
-                writer.println();
-            }
+	static final void write(final PrintWriter writer, final JsonWriterFactory writerFactory,
+			final String name, final JsonValue result) {
 
-            if (result != null) {
-                write(writer, writerFactory, "Actual", result);
-                writer.println();
-            }
-        }
+		writer.println(name + ":");
 
-        System.out.println(stringWriter.toString());
-    }
+		final StringWriter out = new StringWriter();
 
-    static final void write(final PrintWriter writer, final JsonWriterFactory writerFactory, final String name, final JsonValue result) {
+		try (final JsonWriter jsonWriter = writerFactory.createWriter(out)) {
+			jsonWriter.write(result);
+		}
 
-        writer.println(name + ":");
+		writer.write(out.toString());
+		writer.println();
+	}
 
-        final StringWriter out = new StringWriter();
+	static final KeyPair getKeys(URI keyPairLocation, DocumentLoader loader)
+			throws DocumentError, JsonLdError {
 
-        try (final JsonWriter jsonWriter = writerFactory.createWriter(out)) {
-            jsonWriter.write(result);
-        }
+		final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
 
-        writer.write(out.toString());
-        writer.println();
-    }
+		for (final JsonValue key : keys) {
 
-    static final KeyPair getKeys(URI keyPairLocation, DocumentLoader loader) throws DocumentError, JsonLdError {
+			if (JsonUtils.isNotObject(key)) {
+				continue;
+			}
 
-        final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
-
-        for (final JsonValue key : keys) {
-
-            if (JsonUtils.isNotObject(key)) {
-                continue;
-            }
-
-            return (KeyPair)(new Ed25519KeyPair2020Adapter()).deserialize(key.asJsonObject());
-        }
-        throw new IllegalStateException();
-    }
+			return (KeyPair) (new TestVerificationMethodAdapter()).deserialize(key.asJsonObject());
+		}
+		throw new IllegalStateException();
+	}
 
 }

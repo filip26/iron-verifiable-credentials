@@ -26,244 +26,259 @@ import jakarta.json.JsonValue;
  */
 public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
 
-    protected static final String BASE = "https://w3id.org/security#";
+	protected static final String BASE = "https://w3id.org/security#";
 
-    protected static final String CREATED = "http://purl.org/dc/terms/created";
-    protected static final String CREATED_KEY = "created";
+	protected static final String CREATED = "http://purl.org/dc/terms/created";
+	protected static final String CREATED_KEY = "created";
 
-    protected static final String PROOF_KEY = "proof";
-    protected static final String PROOF_PURPOSE_KEY = "proofPurpose";
-    protected static final String PROOF_VERIFICATION_METHOD_KEY = "verificationMethod";
-    protected static final String PROOF_DOMAIN_KEY = "domain";
-    protected static final String PROOF_VALUE_KEY = "proofValue";
+	protected static final String PROOF_KEY = "proof";
+	protected static final String PROOF_PURPOSE_KEY = "proofPurpose";
+	protected static final String PROOF_VERIFICATION_METHOD_KEY = "verificationMethod";
+	protected static final String PROOF_DOMAIN_KEY = "domain";
+	protected static final String PROOF_VALUE_KEY = "proofValue";
 
-    protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
+	protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
-    protected final String type;
-    protected final VerificationMethodJsonAdapter keyAdapter;
+	protected final String proofType;
+	protected final VerificationMethodJsonAdapter keyAdapter;
 
-    protected EmbeddedProofAdapter(String type, VerificationMethodJsonAdapter keyAdapter) {
-    this.type = type;
-    this.keyAdapter = keyAdapter;
-    }
+	protected EmbeddedProofAdapter(String proofType, VerificationMethodJsonAdapter keyAdapter) {
+		this.proofType = proofType;
+		this.keyAdapter = keyAdapter;
+	}
 
-    /**
-     * Appends the proof to the given VC/VP document.
-     * If the document has been signed already then the proof is added into a proof set.
-     *
-     * @param document VC/VP document
-     * @param proof
-     *
-     * @return the given VC/VP with the proof attached
-     *
-     * @throws DocumentError
-     */
-    public static JsonObject addProof(final JsonObject document, final JsonObject proof) {
+	/**
+	 * Appends the proof to the given VC/VP document. If the document has been
+	 * signed already then the proof is added into a proof set.
+	 *
+	 * @param document VC/VP document
+	 * @param proof
+	 *
+	 * @return the given VC/VP with the proof attached
+	 *
+	 * @throws DocumentError
+	 */
+	public static JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
-        final JsonValue proofPropertyValue = document.get(BASE + PROOF_KEY);
+		final JsonValue proofPropertyValue = document.get(BASE + PROOF_KEY);
 
-        return Json
-            .createObjectBuilder(document)
-            .add(BASE + PROOF_KEY,
-                    ((proofPropertyValue != null)
-                        ? Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue))
-                        : Json.createArrayBuilder()
-                        )
-                    .add(proof)
-                )
-            .build();
-    }
+		return Json.createObjectBuilder(document)
+				.add(BASE + PROOF_KEY,
+						((proofPropertyValue != null)
+								? Json.createArrayBuilder(JsonUtils.toJsonArray(proofPropertyValue))
+								: Json.createArrayBuilder()).add(proof))
+				.build();
+	}
 
-    public static boolean hasProof(JsonObject proof) {
-        return proof.containsKey(BASE + PROOF_KEY);
-    }
+	/**
+	 * Returns a proof set or throws an error if there is no proof.
+	 * 
+	 * @param expandedCredential a {@link JsonObject} representing an serialized verifiable credential in an expanded form 
+	 * @return non-empty collection of proofs attached to the given verifiable credentials. 
+	 *                   never <code>null</code> nor an empty collection 
+	 * @throws DocumentError if there is no single proof
+	 */
+	public static Collection<JsonValue> assertProof(final JsonObject expandedCredential) throws DocumentError {
+		final Collection<JsonValue> proofs = JsonLdUtils.getObjects(expandedCredential, BASE + PROOF_KEY);
+		if (proofs == null || proofs.size() == 0) {
+			throw new DocumentError(ErrorType.Missing, PROOF_KEY);
+		}
+		return proofs;
+	}
 
-    public static Collection<JsonValue> getProof(JsonObject proof) {
-        return JsonLdUtils.getObjects(proof, BASE + PROOF_KEY);
-    }
+	public static JsonObject removeProof(final JsonObject expandedCredential) {
+		return Json.createObjectBuilder(expandedCredential).remove(BASE + PROOF_KEY).build();
+	}
 
-    public static JsonObject removeProof(final JsonObject proof) {
-       return Json.createObjectBuilder(proof).remove(BASE + PROOF_KEY).build();
-    }
+	public static JsonObject removeProofValue(final JsonObject expandedProof) {
+		return Json.createObjectBuilder(expandedProof).remove(BASE + PROOF_VALUE_KEY).build();
+	}
 
-    public static JsonObject removeProofValue(final JsonObject proof) {
-        return Json.createObjectBuilder(proof).remove(BASE + PROOF_VALUE_KEY).build();
-    }
+	protected abstract byte[] decodeValue(String encoding, String value) throws DocumentError;
 
-    protected abstract byte[] decodeValue(String encoding, String value) throws DocumentError;
-    protected abstract String encodeValue(String encoding, byte[] value) throws DocumentError;
+	protected abstract String encodeValue(String encoding, byte[] value) throws DocumentError;
 
-    protected Proof read(JsonObject proofObject) throws DocumentError {
+	protected Proof read(JsonObject proofObject) throws DocumentError {
 
-        // proofPurpose property
-        URI purpose = JsonLdUtils.assertId(proofObject, BASE, PROOF_PURPOSE_KEY);
+		// proofPurpose property
+		URI purpose = JsonLdUtils.assertId(proofObject, BASE, PROOF_PURPOSE_KEY);
 
-        // verificationMethod property
-        if (!proofObject.containsKey(BASE + PROOF_VERIFICATION_METHOD_KEY)) {
-            throw new DocumentError(ErrorType.Missing, PROOF_VERIFICATION_METHOD_KEY);
-        }
+		// verificationMethod property
+		if (!proofObject.containsKey(BASE + PROOF_VERIFICATION_METHOD_KEY)) {
+			throw new DocumentError(ErrorType.Missing, PROOF_VERIFICATION_METHOD_KEY);
+		}
 
-        final JsonValue verificationMethodValue = proofObject.get(BASE + PROOF_VERIFICATION_METHOD_KEY);
+		final JsonValue verificationMethodValue = proofObject.get(BASE + PROOF_VERIFICATION_METHOD_KEY);
 
-        VerificationMethod verificationMethod = null;
-        
-        if (JsonUtils.isArray(verificationMethodValue) && verificationMethodValue.asJsonArray().size() > 0) {
+		VerificationMethod verificationMethod = null;
 
-            final JsonValue verificationMethodItem = verificationMethodValue.asJsonArray().get(0);
+		if (JsonUtils.isArray(verificationMethodValue) && verificationMethodValue.asJsonArray().size() > 0) {
 
-            if (JsonUtils.isNonEmptyObject(verificationMethodItem)) {
-                verificationMethod = keyAdapter.deserialize(verificationMethodItem.asJsonObject());
+			final JsonValue verificationMethodItem = verificationMethodValue.asJsonArray().get(0);
 
-            } else {
-                throw new DocumentError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD_KEY);
-            }
+			if (JsonUtils.isNonEmptyObject(verificationMethodItem)) {
+				verificationMethod = keyAdapter.deserialize(verificationMethodItem.asJsonObject());
 
-        } else {
-            throw new DocumentError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD_KEY);
-        }
+			} else {
+				throw new DocumentError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD_KEY);
+			}
 
-        // proofValue property
-        if (!proofObject.containsKey(BASE + PROOF_VALUE_KEY)) {
-            throw new DocumentError(ErrorType.Missing, PROOF_KEY, Keywords.VALUE);
-        }
+		} else {
+			throw new DocumentError(ErrorType.Invalid, PROOF_VERIFICATION_METHOD_KEY);
+		}
 
-        final JsonValue embeddedProofValue = proofObject.get(BASE + PROOF_VALUE_KEY);
+		// proofValue property
+		if (!proofObject.containsKey(BASE + PROOF_VALUE_KEY)) {
+			throw new DocumentError(ErrorType.Missing, PROOF_KEY, Keywords.VALUE);
+		}
 
-        byte[] value = null;
-        
-        if (JsonUtils.isArray(embeddedProofValue)) {
+		final JsonValue embeddedProofValue = proofObject.get(BASE + PROOF_VALUE_KEY);
 
-            if (!embeddedProofValue.asJsonArray().stream().allMatch(ValueObject::isValueObject)
-                    || !embeddedProofValue.asJsonArray().stream()
-                            .map(JsonValue::asJsonObject)
-                            .map(o -> o.get(Keywords.VALUE))
-                            .allMatch(JsonUtils::isString)
-                    ) {
-                throw new DocumentError(ErrorType.Invalid, PROOF_KEY, Keywords.VALUE);
-            }
+		byte[] value = null;
 
+		if (JsonUtils.isArray(embeddedProofValue)) {
 
-            String proofValueType = embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.TYPE);
+			if (!embeddedProofValue.asJsonArray().stream().allMatch(ValueObject::isValueObject)
+					|| !embeddedProofValue.asJsonArray().stream().map(JsonValue::asJsonObject)
+							.map(o -> o.get(Keywords.VALUE)).allMatch(JsonUtils::isString)) {
+				throw new DocumentError(ErrorType.Invalid, PROOF_KEY, Keywords.VALUE);
+			}
 
-            String encodedProofValue =  embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
+			String proofValueType = embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.TYPE);
 
-            value = decodeValue(proofValueType, encodedProofValue);
+			String encodedProofValue = embeddedProofValue.asJsonArray().getJsonObject(0).getString(Keywords.VALUE);
 
-        } else {
-            throw new DocumentError(ErrorType.Invalid, PROOF_KEY, Keywords.VALUE);
-        }
+			value = decodeValue(proofValueType, encodedProofValue);
 
-        // created property
-        if (!proofObject.containsKey(CREATED)) {
-            throw new DocumentError(ErrorType.Missing, CREATED_KEY);
-        }
+		} else {
+			throw new DocumentError(ErrorType.Invalid, PROOF_KEY, Keywords.VALUE);
+		}
 
-        final JsonValue createdValue = proofObject.get(CREATED);
+		// created property
+		if (!proofObject.containsKey(CREATED)) {
+			throw new DocumentError(ErrorType.Missing, CREATED_KEY);
+		}
 
-        Instant created = null;
-        
-        if (JsonUtils.isArray(createdValue)) {
+		final JsonValue createdValue = proofObject.get(CREATED);
 
-            // take first created property
-            final JsonValue createdItem = createdValue.asJsonArray().get(0);
+		Instant created = null;
 
-            // expect value object and date in ISO 8601 format
-            if (!ValueObject.isValueObject(createdItem)) {
-                throw new DocumentError(ErrorType.Invalid, CREATED_KEY);
-            }
+		if (JsonUtils.isArray(createdValue)) {
 
-            final String createdString =
-                        ValueObject
-                            .getValue(createdItem)
-                            .filter(JsonUtils::isString)
-                            .map(JsonString.class::cast)
-                            .map(JsonString::getString)
-                            .orElseThrow(() -> new DocumentError(ErrorType.Invalid, CREATED_KEY));
+			// take first created property
+			final JsonValue createdItem = createdValue.asJsonArray().get(0);
 
-            try {
-                OffsetDateTime createdOffset = OffsetDateTime.parse(createdString);
+			// expect value object and date in ISO 8601 format
+			if (!ValueObject.isValueObject(createdItem)) {
+				throw new DocumentError(ErrorType.Invalid, CREATED_KEY);
+			}
 
-                created = createdOffset.toInstant();
+			final String createdString = ValueObject.getValue(createdItem).filter(JsonUtils::isString)
+					.map(JsonString.class::cast).map(JsonString::getString)
+					.orElseThrow(() -> new DocumentError(ErrorType.Invalid, CREATED_KEY));
 
-            } catch (DateTimeParseException e) {
-                throw new DocumentError(ErrorType.Invalid, CREATED_KEY);
-            }
+			try {
+				OffsetDateTime createdOffset = OffsetDateTime.parse(createdString);
 
+				created = createdOffset.toInstant();
 
-        } else {
-            throw new DocumentError(ErrorType.Invalid, CREATED_KEY);
-        }
-        
-        String domain = null;
+			} catch (DateTimeParseException e) {
+				throw new DocumentError(ErrorType.Invalid, CREATED_KEY);
+			}
 
-        // domain property
-        if (proofObject.containsKey(BASE + PROOF_DOMAIN_KEY)) {
-            domain =
-                ValueObject
-                    .getValue(proofObject.get(BASE + PROOF_DOMAIN_KEY).asJsonArray().get(0))
-                    .filter(JsonUtils::isString)
-                    .map(JsonString.class::cast)
-                    .map(JsonString::getString)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, PROOF_DOMAIN_KEY));
-        }
-        
-        return new Proof(
-                    type,
-                    purpose,
-                    verificationMethod,
-                    created,
-                    domain,
-                    value
-                    );
-    }
+		} else {
+			throw new DocumentError(ErrorType.Invalid, CREATED_KEY);
+		}
 
-    protected JsonObjectBuilder write(final JsonObjectBuilder builder, final Proof proof) throws DocumentError {
+		String domain = null;
 
+		// domain property
+		if (proofObject.containsKey(BASE + PROOF_DOMAIN_KEY)) {
+			domain = ValueObject.getValue(proofObject.get(BASE + PROOF_DOMAIN_KEY).asJsonArray().get(0))
+					.filter(JsonUtils::isString).map(JsonString.class::cast).map(JsonString::getString)
+					.orElseThrow(() -> new DocumentError(ErrorType.Invalid, PROOF_DOMAIN_KEY));
+		}
 
-    builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
+		return new Proof(proofType, purpose, verificationMethod, created, domain, value);
+	}
 
-        if (proof.getVerificationMethod() != null) {
-            builder.add(BASE + PROOF_VERIFICATION_METHOD_KEY,
-                    Json.createArrayBuilder()
-                            .add(keyAdapter.serialize(proof.getVerificationMethod())));
-        }
+	protected JsonObjectBuilder write(final JsonObjectBuilder builder, final Proof proof) throws DocumentError {
 
-        if (proof.getCreated() != null) {
-            JsonLdUtils.setValue(builder, CREATED, proof.getCreated());
-        }
+		builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
 
-        if (proof.getPurpose() != null) {
-            JsonLdUtils.setId(builder, BASE + PROOF_PURPOSE_KEY, proof.getPurpose());
-        }
+		if (proof.getVerificationMethod() != null) {
+			builder.add(BASE + PROOF_VERIFICATION_METHOD_KEY,
+					Json.createArrayBuilder().add(keyAdapter.serialize(proof.getVerificationMethod())));
+		}
 
-        if (proof.getDomain() != null) {
-            JsonLdUtils.setValue(builder, BASE + PROOF_DOMAIN_KEY, proof.getDomain());
-        }
+		if (proof.getCreated() != null) {
+			JsonLdUtils.setValue(builder, CREATED, proof.getCreated());
+		}
 
-        if (proof.getValue() != null) {
-            final String proofValue = encodeValue(MULTIBASE_TYPE, proof.getValue());
+		if (proof.getPurpose() != null) {
+			JsonLdUtils.setId(builder, BASE + PROOF_PURPOSE_KEY, proof.getPurpose());
+		}
 
-            JsonLdUtils.setValue(builder, BASE + PROOF_VALUE_KEY, MULTIBASE_TYPE, proofValue);
-        }
+		if (proof.getDomain() != null) {
+			JsonLdUtils.setValue(builder, BASE + PROOF_DOMAIN_KEY, proof.getDomain());
+		}
 
-        return builder;
-    }
+		if (proof.getValue() != null) {
+			final String proofValue = encodeValue(MULTIBASE_TYPE, proof.getValue());
 
-    @Override
-    public JsonObject setProofValue(final JsonObject proof, final byte[] value) throws DocumentError {
+			JsonLdUtils.setValue(builder, BASE + PROOF_VALUE_KEY, MULTIBASE_TYPE, proofValue);
+		}
 
-        final String proofValue = encodeValue(MULTIBASE_TYPE, value);
+		return builder;
+	}
 
-        return JsonLdUtils.setValue(Json.createObjectBuilder(proof), BASE + PROOF_VALUE_KEY, MULTIBASE_TYPE, proofValue).build();
-    }
+	@Override
+	public JsonObject setProofValue(final JsonObject proof, final byte[] value) throws DocumentError {
 
-    @Override
-    public VerificationMethodJsonAdapter getMethodAdapter() {
-    return keyAdapter;
-    }
+		final String proofValue = encodeValue(MULTIBASE_TYPE, value);
 
-    @Override
-    public String type() {
-    return type;
-    }
+		return JsonLdUtils.setValue(Json.createObjectBuilder(proof), BASE + PROOF_VALUE_KEY, MULTIBASE_TYPE, proofValue)
+				.build();
+	}
+
+	@Override
+	public VerificationMethodJsonAdapter getMethodAdapter() {
+		return keyAdapter;
+	}
+
+	@Override
+	public String type() {
+		return proofType;
+	}
+	
+	@Override
+	public JsonObject serialize(Proof proof) throws DocumentError {
+		return write(Json.createObjectBuilder(), proof).build();
+	}
+	
+	@Override
+	public Proof deserialize(JsonObject object) throws DocumentError {
+		if (object == null) {
+			throw new IllegalArgumentException("Parameter 'object' must not be null.");
+		}
+
+		// data integrity checks
+		if (JsonUtils.isNotObject(object)) {
+			throw new DocumentError(ErrorType.Invalid, PROOF_KEY);
+		}
+
+		final JsonObject proofObject = object.asJsonObject();
+
+		if (!JsonLdUtils.isTypeOf(proofType, proofObject)) {
+
+			// @type property
+			if (!JsonLdUtils.hasType(proofObject)) {
+				throw new DocumentError(ErrorType.Missing, PROOF_KEY, Keywords.TYPE);
+			}
+
+			throw new DocumentError(ErrorType.Unknown, "cryptoSuite", Keywords.TYPE);
+		}
+		return read(proofObject);
+	}
+
 }

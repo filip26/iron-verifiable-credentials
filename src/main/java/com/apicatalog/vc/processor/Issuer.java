@@ -17,7 +17,8 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.ld.signature.proof.VerificationMethod;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.Json;
@@ -27,202 +28,254 @@ import jakarta.json.JsonStructure;
 
 public final class Issuer extends Processor<Issuer> {
 
-    private final URI location;
-    private final JsonObject document;
+	// mandatory properties
+	private final URI location;
+	private final JsonObject document;
 
-    private final KeyPair keyPair;
+	private final KeyPair keyPair;
 
-    private final ProofOptions options;
+	protected final SignatureSuite signatureSuite;
 
-    public Issuer(URI location, KeyPair keyPair, ProofOptions options) {
-        this.location = location;
-        this.document = null;
+	// proof options
+	protected VerificationMethod verificationMethod;
 
-        this.keyPair = keyPair;
+	protected URI purpose;
 
-        this.options = options;
-    }
+	protected Instant created;
 
-    public Issuer(JsonObject document, KeyPair keyPair, ProofOptions options) {
-        this.document = document;
-        this.location = null;
+	protected String domain;
 
-        this.keyPair = keyPair;
+	public Issuer(URI location, KeyPair keyPair, final SignatureSuite signatureSuite) {
+		this.location = location;
+		this.document = null;
 
-        this.options = options;
-    }
+		this.keyPair = keyPair;
 
-    /**
-     * Get signed document in expanded form.
-     *
-     * @return the signed document in expanded form
-     *
-     * @throws SigningError
-     * @throws DocumentError
-     */
-    public JsonObject getExpanded() throws SigningError, DocumentError {
+		this.signatureSuite = signatureSuite;
+	}
+	
+	public Issuer(JsonObject document, KeyPair keyPair, final SignatureSuite signatureSuite) {
+		this.document = document;
+		this.location = null;
 
-        if (loader == null) {
-            // default loader
-            loader = SchemeRouter.defaultInstance();
-        }
+		this.keyPair = keyPair;
 
-        if (bundledContexts) {
-            loader = new StaticContextLoader(loader);
-        }
+		this.signatureSuite = signatureSuite;
+	}
 
-        if (suites.isEmpty()) {
-            addDefaultSuites();
-        }
+	/**
+	 * Set the proof verification method
+	 * 
+	 * @param method a proof verification method
+	 * @return the issuer instance
+	 */
+	public Issuer verificationMethod(VerificationMethod method) {
+		this.verificationMethod = null;
+		return this;
+	}
+	
+	/**
+	 * Set the proof purpose
+	 * 
+	 * @param purpose a proof purpose
+	 * @return the issuer instance
+	 */
+	public Issuer purpose(URI purpose) {
+		this.purpose = purpose;
+		return this;
+	}
+	
+	/**
+	 * Set date time of the proof creation
+	 * @param created date time
+	 * @return the issuer instance
+	 */
+	public Issuer created(Instant created) {
+		this.created = created;
+		return this;
+	}
+	
+	/**
+	 * Set the proof domain
+	 * @param domain a proof domain
+	 * @return the issuer instance
+	 */
+	public Issuer domain(String domain) {
+		this.domain = domain;
+		return this;
+	}
+	
+	/**
+	 * Get signed document in expanded form.
+	 *
+	 * @return the signed document in expanded form
+	 *
+	 * @throws SigningError
+	 * @throws DocumentError
+	 */
+	public JsonObject getExpanded() throws SigningError, DocumentError {
 
-        if (document != null && keyPair != null)  {
-            return sign(document, keyPair, options);
-        }
+		if (loader == null) {
+			// default loader
+			loader = SchemeRouter.defaultInstance();
+		}
 
-        if (location != null && keyPair != null)  {
-            return sign(location, keyPair, options);
-        }
+		if (bundledContexts) {
+			loader = new StaticContextLoader(loader);
+		}
 
-        throw new IllegalStateException();
-    }
+		if (document != null && keyPair != null) {
+			return sign(document, keyPair, signatureSuite);
+		}
 
-    /**
-     * Get signed document in compacted form.
-     *
-     * @param contextLocation a context used to compact the document
-     *
-     * @return the signed document in compacted form
-     *
-     * @throws SigningError
-     * @throws DocumentError
-     */
-    public JsonObject getCompacted(final URI contextLocation) throws SigningError, DocumentError {
+		if (location != null && keyPair != null) {
+			return sign(location, keyPair, signatureSuite);
+		}
 
-        final JsonObject signed = getExpanded();
+		throw new IllegalStateException();
+	}
 
-        try {
-            return JsonLd.compact(JsonDocument.of(signed), contextLocation).loader(loader).get();
-            
-        } catch (JsonLdError e) {
-            failWithJsonLd(e);
-            throw new SigningError(e);
-        }
-    }
+	/**
+	 * Get signed document in compacted form.
+	 *
+	 * @param contextLocation a context used to compact the document
+	 *
+	 * @return the signed document in compacted form
+	 *
+	 * @throws SigningError
+	 * @throws DocumentError
+	 */
+	public JsonObject getCompacted(final URI contextLocation) throws SigningError, DocumentError {
 
-    /**
-     * Get signed document compacted using standard contexts.
-     *
-     * @return the signed document in compacted form
-     *
-     * @throws SigningError
-     * @throws DocumentError
-     */
-    public JsonObject getCompacted() throws SigningError, DocumentError  {
+		final JsonObject signed = getExpanded();
 
-        final JsonArray context = Json
-                                    .createArrayBuilder()
-                                    .add("https://www.w3.org/2018/credentials/v1")
-                                    .add("https://w3id.org/security/suites/ed25519-2020/v1")
-                                    .build();
+		try {
+			return JsonLd.compact(JsonDocument.of(signed), contextLocation).loader(loader).get();
 
-        return getCompacted(context);
-    }
+		} catch (JsonLdError e) {
+			failWithJsonLd(e);
+			throw new SigningError(e);
+		}
+	}
 
-    /**
-     * Get signed document in compacted form.
-     *
-     * @param context a context or an array of contexts used to compact the document
-     *
-     * @return the signed document in compacted form
-     *
-     * @throws SigningError
-     * @throws DocumentError
-     */
-    public JsonObject getCompacted(final JsonStructure context) throws SigningError, DocumentError {
+	/**
+	 * Get signed document compacted using standard contexts.
+	 *
+	 * @return the signed document in compacted form
+	 *
+	 * @throws SigningError
+	 * @throws DocumentError
+	 */
+	public JsonObject getCompacted() throws SigningError, DocumentError {
 
-        final JsonObject signed = getExpanded();
+		final JsonArray context = Json.createArrayBuilder()
+				.add("https://www.w3.org/2018/credentials/v1")
+				.add("https://w3id.org/security/suites/ed25519-2020/v1").build();
 
-        try {
-            return JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(context)).loader(loader).get();
-            
-        } catch (JsonLdError e) {
-            failWithJsonLd(e);
-            throw new SigningError(e);
-        }
-    }
+		return getCompacted(context);
+	}
 
-    private final JsonObject sign(final URI documentLocation, final KeyPair keyPair, final ProofOptions options) throws DocumentError, SigningError {
-        try {
-            // load the document
-            final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).base(base).get();
+	/**
+	 * Get signed document in compacted form.
+	 *
+	 * @param context a context or an array of contexts used to compact the document
+	 *
+	 * @return the signed document in compacted form
+	 *
+	 * @throws SigningError
+	 * @throws DocumentError
+	 */
+	public JsonObject getCompacted(final JsonStructure context) throws SigningError, DocumentError {
 
-            return sign(expanded, keyPair, options);
+		final JsonObject signed = getExpanded();
 
-        } catch (JsonLdError e) {
-            failWithJsonLd(e);
-            throw new SigningError(e);
-        }
-    }
+		try {
+			return JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(context)).loader(loader)
+					.get();
 
-    private final JsonObject sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DocumentError, SigningError {
-        try {
-            // load the document
-            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).base(base).get();
+		} catch (JsonLdError e) {
+			failWithJsonLd(e);
+			throw new SigningError(e);
+		}
+	}
 
-            return sign(expanded, keyPair, options);
+	private final JsonObject sign(final URI documentLocation, final KeyPair keyPair,
+			final SignatureSuite signatureSuite) throws DocumentError, SigningError {
+		try {
+			// load the document
+			final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).base(base)
+					.get();
 
-        } catch (JsonLdError e) {
-            failWithJsonLd(e);
-            throw new SigningError(e);
-        }
-    }
+			return sign(expanded, keyPair, signatureSuite);
 
-    private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair, final ProofOptions options) throws SigningError, DocumentError {
+		} catch (JsonLdError e) {
+			failWithJsonLd(e);
+			throw new SigningError(e);
+		}
+	}
 
-        JsonObject object = JsonLdUtils
-                    .findFirstObject(expanded)
-                    .orElseThrow(() ->
-                        // malformed input, not single object to sign has been found
-                        new DocumentError(ErrorType.Invalid, "document")
-                        );
+	private final JsonObject sign(final JsonObject document, final KeyPair keyPair,
+			final SignatureSuite signatureSuite) throws DocumentError, SigningError {
+		try {
+			// load the document
+			final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
+					.base(base).get();
 
-        final Verifiable verifiable = get(object);
+			return sign(expanded, keyPair, signatureSuite);
 
-        validate(verifiable);
+		} catch (JsonLdError e) {
+			failWithJsonLd(e);
+			throw new SigningError(e);
+		}
+	}
 
-        final SignatureSuite signatureSuite = suites.get(options.type());
+	private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair,
+			final SignatureSuite signatureSuites) throws SigningError, DocumentError {
 
-        if (signatureSuite == null) {
-            throw new SigningError(Code.UnknownCryptoSuite);
-        }
+		JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
+		// malformed input, not single object to sign has been found
+		new DocumentError(ErrorType.Invalid, "document"));
 
-        JsonObject data = EmbeddedProofAdapter.removeProof(object);
+		final Verifiable verifiable = get(object);
 
-        // add issuance date if missing
-        if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
+		validate(verifiable);
 
-            final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+		if (signatureSuite == null) {
+			throw new SigningError(Code.UnknownCryptoSuite);
+		}
 
-            data = Json.createObjectBuilder(data).add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString()).build();
-            object = Json.createObjectBuilder(object).add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString()).build();
-        }
+		JsonObject data = EmbeddedProofAdapter.removeProof(object);
 
-        final LinkedDataSignature suite = new LinkedDataSignature(signatureSuite);
+		// add issuance date if missing
+		if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
 
-        JsonObject proof = signatureSuite.getProofAdapter().serialize(options.toUnsignedProof());
+			final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
-        final byte[] signature = suite.sign(data, keyPair, proof);
+			data = Json.createObjectBuilder(data)
+					.add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString())
+					.build();
+			object = Json.createObjectBuilder(object)
+					.add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString())
+					.build();
+		}
 
-        proof = signatureSuite.getProofAdapter().setProofValue(proof, signature);
+		final LinkedDataSignature suite = new LinkedDataSignature(signatureSuite);
 
-        return EmbeddedProofAdapter.addProof(object, proof);
-    }
+		JsonObject proof = signatureSuite.getProofAdapter().serialize(new Proof(
+				signatureSuites.getId(), purpose, verificationMethod, created, domain, null));
 
-    private final void validate(Verifiable verifiable) throws SigningError {
+		final byte[] signature = suite.sign(data, keyPair, proof);
 
-        // is expired?
-        if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
-            throw new SigningError(Code.Expired);
-        }
-    }
+		proof = signatureSuite.getProofAdapter().setProofValue(proof, signature);
+
+		return EmbeddedProofAdapter.addProof(object, proof);
+	}
+
+	private final void validate(Verifiable verifiable) throws SigningError {
+
+		// is expired?
+		if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
+			throw new SigningError(Code.Expired);
+		}
+	}
 }

@@ -27,7 +27,6 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
     <envSources>src/main/java8</envSources>
-    <tink.version>1.6.1</tink.version>
     <rdf-urdna.version>1.2</rdf-urdna.version>
   </properties>
 
@@ -41,11 +40,6 @@
       <groupId>com.apicatalog</groupId>
       <artifactId>carbon-did-jre8</artifactId>
       <version>${carbon.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.crypto.tink</groupId>
-      <artifactId>tink</artifactId>
-      <version>${tink.version}</version>
     </dependency>
     <dependency>
       <groupId>io.setl</groupId>
