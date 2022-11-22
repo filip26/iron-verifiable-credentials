@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -147,15 +146,6 @@ public class VcTestRunnerJunit {
 
 			sb.append(Character.toUpperCase(e.getSubject().charAt(index)));
 			sb.append(e.getSubject().substring(index + 1));
-		}
-		if (e.getAttibutes() != null) {
-
-			Arrays.stream(e.getAttibutes()).forEach(attribute -> {
-				int index = (attribute.startsWith("@")) ? 1 : 0;
-
-				sb.append(Character.toUpperCase(attribute.charAt(index)));
-				sb.append(attribute.substring(index + 1));
-			});
 		}
 		return sb.toString();
 	}

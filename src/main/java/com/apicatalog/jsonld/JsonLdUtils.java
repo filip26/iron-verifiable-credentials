@@ -213,39 +213,27 @@ public class JsonLdUtils {
                 + value + "] is not JSON string but [" + value.getValueType() + "].");
     }
 
-    public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property,
-            URI id) {
-        return setId(objectBuilder, property, id.toString());
+    public static JsonObjectBuilder setId(JsonObjectBuilder builder, String property, URI id) {
+        return setId(builder, property, id.toString());
     }
 
-    public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property,
-            String id) {
-        objectBuilder.add(property,
-                Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, id)));
-
-        return objectBuilder;
+    public static JsonObjectBuilder setId(JsonObjectBuilder builder, String property, String id) {
+        return builder.add(property, Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, id)));
     }
 
-    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property,
-            String type, String value) {
-
-        objectBuilder.add(property, JsonLdValueObject.toJson(type, value));
-
-        return objectBuilder;
+    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property, String type, String value) {
+        return builder.add(property, JsonLdValueObject.toJson(type, value));
     }
 
-    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property,
-            String value) {
-        objectBuilder.add(property, JsonLdValueObject.toJson(value));
-        return objectBuilder;
+    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property, String value) {
+        return builder.add(property, JsonLdValueObject.toJson(value));
     }
 
-    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property,
-            Instant instant) {
-        return setValue(objectBuilder, property, XSD_DATE_TIME, instant.toString());
+    public static JsonObjectBuilder setValue(final JsonObjectBuilder builder, final String property, Instant instant) {
+        return setValue(builder, property, XSD_DATE_TIME, instant.toString());
     }
 
-    public static Optional<JsonObject> findFirstObject(JsonValue expanded) {
+    public static Optional<JsonObject> findFirstObject(final JsonValue expanded) {
         if (JsonUtils.isArray(expanded)) {
 
             for (JsonValue item : expanded.asJsonArray()) {

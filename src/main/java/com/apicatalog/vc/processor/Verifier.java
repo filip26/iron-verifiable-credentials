@@ -13,7 +13,6 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
@@ -24,10 +23,10 @@ import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.json.EmbeddedProof;
-import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.json.VerificationMethodJsonAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.ld.signature.proof.ProofProperty;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
@@ -169,13 +168,13 @@ public final class Verifier extends Processor<Verifier> {
 		for (final JsonValue proofValue : proofs) {
 
 			if (JsonUtils.isNotObject(proofValue)) {
-				throw new DocumentError(ErrorType.Invalid, "proof");
+				throw new DocumentError(ErrorType.Invalid, "Proof");
 			}
 
 			final Collection<String> proofType = JsonLdUtils.getType(proofValue.asJsonObject());
 
 			if (proofType == null || proofType.isEmpty()) {
-				throw new DocumentError(ErrorType.Missing, "proof", Keywords.TYPE);
+				throw new DocumentError(ErrorType.Missing, "ProofType");
 			}
 
 			final SignatureSuite signatureSuite = proofType.stream().filter(suiteProvider::isSupported).findFirst()
@@ -278,22 +277,22 @@ public final class Verifier extends Processor<Verifier> {
 		
 		// purpose
 		if (proof.getPurpose() == null) {
-			throw new DocumentError(ErrorType.Missing, "proof", "proofPurpose");
+			throw new DocumentError(ErrorType.Missing, ProofProperty.Purpose);
 		}
 		
 		// verification method
 		if (proof.getVerificationMethod() == null) {
-			throw new DocumentError(ErrorType.Missing, "proof", "verificationMethod");
+			throw new DocumentError(ErrorType.Missing, ProofProperty.VerificationMethod);
 		}
 		
 		// value
 		if (proof.getValue() == null || proof.getValue().length == 0) {
-			throw new DocumentError(ErrorType.Missing, "proof", "proofValue");
+			throw new DocumentError(ErrorType.Missing, ProofProperty.Value);
 		}
 		
 		// created
 		if (proof.getCreated() == null) {
-			throw new DocumentError(ErrorType.Missing, "proof", "created");
+			throw new DocumentError(ErrorType.Missing, ProofProperty.Created);
 		}
 		
 		// domain

@@ -242,7 +242,7 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
 
         // data integrity checks
         if (JsonUtils.isNotObject(object)) {
-            throw new DocumentError(ErrorType.Invalid, "proof");
+            throw new DocumentError(ErrorType.Invalid, "Proof");
         }
 
         final JsonObject proofObject = object.asJsonObject();
@@ -251,10 +251,10 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
 
             // @type property
             if (!JsonLdUtils.hasType(proofObject)) {
-                throw new DocumentError(ErrorType.Missing, "proof", Keywords.TYPE);
+                throw new DocumentError(ErrorType.Missing, "ProofType");
             }
 
-            throw new DocumentError(ErrorType.Unknown, "cryptoSuite", Keywords.TYPE);
+            throw new DocumentError(ErrorType.Unknown, "CryptoSuiteType");
         }
         return read(proofObject);
     }

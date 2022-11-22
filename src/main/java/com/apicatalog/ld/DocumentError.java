@@ -14,18 +14,16 @@ public class DocumentError extends Throwable {
 
     private final ErrorType type;
     private final String subject;
-    private final String[] attibutes;
     
     public DocumentError(ErrorType type, ProofProperty property) {
-    	this(type, "Proof", property.name());
+    	this(type, "Proof".concat(property.name()));
     }
     
     //TODO revise
-    public DocumentError(ErrorType type, String subject, String... attributes) {
+    public DocumentError(ErrorType type, String subject) {
         super();
         this.type = type;
         this.subject = subject;
-        this.attibutes = attributes;
     }
 
     public ErrorType getType() {
@@ -34,9 +32,5 @@ public class DocumentError extends Throwable {
 
     public String getSubject() {
         return subject;
-    }
-
-    public String[] getAttibutes() {
-        return attibutes;
     }
 }
