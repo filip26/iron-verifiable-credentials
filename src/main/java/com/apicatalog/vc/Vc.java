@@ -6,6 +6,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.ld.signature.SignatureSuiteMap;
 import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
@@ -34,6 +35,10 @@ public final class Vc {
         return new Verifier(location, suiteProvider);
     }
 
+    public static Verifier verify(final URI location, final SignatureSuite suite) throws DocumentError, VerificationError {
+        return new Verifier(location, new SignatureSuiteMap().add(suite));
+    }
+    
     /**
      * Verifies VC/VP document data integrity and signature.
      *
@@ -48,6 +53,10 @@ public final class Vc {
         return new Verifier(document, suiteProvider);
     }
 
+    public static Verifier verify(final JsonObject document, final SignatureSuite suite) throws DocumentError, VerificationError {
+    	return new Verifier(document, new SignatureSuiteMap().add(suite));
+    }
+    
     /**
      * Signs VC/VP document. Returns the provided VC/VP with added proof property.
      *
