@@ -36,8 +36,11 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
     protected final String proofType;
     protected final VerificationMethodJsonAdapter keyAdapter;
 
-    protected EmbeddedProofAdapter(final String proofType,
-            final VerificationMethodJsonAdapter keyAdapter, final EmbeddedProofProperty property) {
+    protected EmbeddedProofAdapter(
+                final String proofType,
+                final VerificationMethodJsonAdapter keyAdapter, 
+                final EmbeddedProofProperty property
+                ) {
         this.proofType = proofType;
         this.keyAdapter = keyAdapter;
         this.property = property;
@@ -52,7 +55,7 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
 
         try {
             // proofPurpose property
-            URI purpose = JsonLdUtils.getId(proofObject, property.expand(ProofProperty.Purpose));
+            URI purpose = JsonLdUtils.getId(proofObject, property.expand(ProofProperty.Purpose)).orElse(null);
 
             // verificationMethod property
             VerificationMethod verificationMethod = null;

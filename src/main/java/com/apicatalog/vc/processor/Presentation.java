@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -15,96 +16,102 @@ import jakarta.json.JsonValue;
 
 class Presentation implements Verifiable {
 
-	public static final String BASE = "https://www.w3.org/2018/credentials#";
+    public static final String BASE = "https://www.w3.org/2018/credentials#";
 
-	public static final String TYPE = "VerifiablePresentation";
+    public static final String TYPE = "VerifiablePresentation";
 
-	public static final String HOLDER = "holder";
+    public static final String HOLDER = "holder";
 
-	public static final String VERIFIABLE_CREDENTIALS = "verifiableCredential";
+    public static final String VERIFIABLE_CREDENTIALS = "verifiableCredential";
 
-	protected URI id;
+    protected URI id;
 
-	protected URI holder;
+    protected URI holder;
 
-	protected Collection<Credential> credentials;
+    protected Collection<Credential> credentials;
 
-	protected Presentation() {
-	}
+    protected Presentation() {
+    }
 
-	public static boolean isPresentation(JsonValue expanded) {
-		if (expanded == null) {
-			throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
-		}
+    public static boolean isPresentation(JsonValue expanded) {
+        if (expanded == null) {
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
+        }
 
-		return JsonUtils.isObject(expanded)
-				&& JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
-	}
+        return JsonUtils.isObject(expanded)
+                && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
+    }
 
-	public static Presentation from(JsonObject subject) throws DocumentError {
+    public static Presentation from(JsonObject subject) throws DocumentError {
 
-		if (subject == null) {
-			throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
-		}
+        if (subject == null) {
+            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
+        }
 
-		final Presentation presentation = new Presentation();
+        final Presentation presentation = new Presentation();
 
-		// @type
-		if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
+        // @type
+        if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
 
-			if (!JsonLdUtils.hasType(subject)) {
-				throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
-			}
+            if (!JsonLdUtils.hasType(subject)) {
+                throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
+            }
 
-			throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
-		}
+            throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
+        }
 
-		// @id - optional
-		if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
-			presentation.id = JsonLdUtils.getId(subject)
-					.orElseThrow(() -> new DocumentError(ErrorType.Invalid, Keywords.ID));
-		}
-		// holder - optional
-		if (JsonLdUtils.hasPredicate(subject, BASE + HOLDER)) {
-			presentation.holder = JsonLdUtils.assertId(subject, BASE, HOLDER);
-		}
+        try {
+            
+            // @id - optional
+            if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
+                presentation.id = JsonLdUtils.getId(subject).orElse(null);
+            }
 
-		presentation.credentials = new ArrayList<>();
+            // holder - optional
+            presentation.holder = JsonLdUtils.getId(subject, BASE + HOLDER).orElse(null);
 
-		// verifiableCredentials
-		for (final JsonValue credential : JsonLdUtils.getObjects(subject,
-				BASE + VERIFIABLE_CREDENTIALS)) {
+        } catch (InvalidJsonLdValue e) {
+            if (Keywords.ID.equals(e.getProperty())) {
+                throw new DocumentError(ErrorType.Invalid, e.getProperty()); 
+            }
+            throw new DocumentError(ErrorType.Invalid, e.getProperty().substring(0, BASE.length()));
+        }
+        presentation.credentials = new ArrayList<>();
 
-			if (JsonUtils.isNotObject(credential)) {
-				throw new DocumentError(ErrorType.Invalid, VERIFIABLE_CREDENTIALS);
-			}
+        // verifiableCredentials
+        for (final JsonValue credential : JsonLdUtils.getObjects(subject,
+                BASE + VERIFIABLE_CREDENTIALS)) {
 
-			presentation.credentials.add(Credential.from(credential.asJsonObject()));
-		}
+            if (JsonUtils.isNotObject(credential)) {
+                throw new DocumentError(ErrorType.Invalid, VERIFIABLE_CREDENTIALS);
+            }
 
-		return presentation;
-	}
+            presentation.credentials.add(Credential.from(credential.asJsonObject()));
+        }
 
-	@Override
-	public boolean isPresentation() {
-		return true;
-	}
+        return presentation;
+    }
 
-	@Override
-	public Presentation asPresentation() {
-		return this;
-	}
+    @Override
+    public boolean isPresentation() {
+        return true;
+    }
 
-	@Override
-	public URI getId() {
-		return id;
-	}
+    @Override
+    public Presentation asPresentation() {
+        return this;
+    }
 
-	/**
-	 * @see <a href="https://www.w3.org/TR/vc-data-model/#dfn-holders">Holder</a>
-	 * @return {@link URI} identifying the holder
-	 */
-	public URI getHolder() {
-		return holder;
-	}
+    @Override
+    public URI getId() {
+        return id;
+    }
+
+    /**
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#dfn-holders">Holder</a>
+     * @return {@link URI} identifying the holder
+     */
+    public URI getHolder() {
+        return holder;
+    }
 }

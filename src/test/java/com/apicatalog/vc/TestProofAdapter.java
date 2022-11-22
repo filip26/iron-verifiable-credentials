@@ -6,7 +6,9 @@ import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 public class TestProofAdapter extends EmbeddedProofAdapter {
 
 	protected TestProofAdapter(String type) {
-		super(type, new TestVerificationMethodAdapter(), null);	//FIXME
+		super(
+	        type, 
+	        new TestVerificationMethodAdapter(), null);	//FIXME
 		// TODO Auto-generated constructor stub
 	}
 

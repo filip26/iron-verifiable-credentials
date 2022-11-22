@@ -95,24 +95,23 @@ class Credential implements Verifiable {
 
             throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
         }
-
-        // @id - optional
-        if (JsonLdUtils.hasPredicate(document, Keywords.ID)) {
-            credential.id = JsonLdUtils.getId(document)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, Keywords.ID));
-        }
-
+        
         // subject - mandatory
         if (!JsonLdUtils.hasPredicate(document, BASE + SUBJECT)) {
             throw new DocumentError(ErrorType.Missing, SUBJECT);
         }
 
-        try {
-            // subject @id
-            JsonLdUtils.assertId(document, BASE, SUBJECT);
+        try {            
+            // @id - optional
+            credential.id = JsonLdUtils.getId(document).orElse(null);
+
+            // subject @id - mandatory
+            JsonLdUtils.getId(document, BASE + SUBJECT)
+                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, SUBJECT));
 
             // issuer - mandatory
-            credential.issuer = JsonLdUtils.assertId(document, BASE, ISSUER);
+            credential.issuer = JsonLdUtils.getId(document, BASE + ISSUER)
+                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, ISSUER));
 
             // issuance date - mandatory for verification
             credential.issuance = JsonLdUtils.getXsdDateTime(document, BASE + ISSUANCE_DATE);
@@ -127,6 +126,9 @@ class Credential implements Verifiable {
             credential.expiration = JsonLdUtils.getXsdDateTime(document, BASE + EXPIRATION_DATE);
 
         } catch (InvalidJsonLdValue e) {
+            if (Keywords.ID.equals(e.getProperty())) {
+                throw new DocumentError(ErrorType.Invalid, Keywords.ID);
+            }
             throw new DocumentError(ErrorType.Invalid, e.getProperty().substring(0, BASE.length()));
         }
 

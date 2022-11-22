@@ -2,8 +2,8 @@ package com.apicatalog.vc.processor;
 
 import java.net.URI;
 
+import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdUtils;
-import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 
@@ -27,10 +27,15 @@ class CredentialStatus implements StatusVerifier.Status {
         final CredentialStatus status = new CredentialStatus();
 
         if (!JsonLdUtils.hasType(object)) {
-            throw new DocumentError(ErrorType.Missing, "status", Keywords.TYPE);
+            throw new DocumentError(ErrorType.Missing, "StatusType");
         }
 
-        status.id = JsonLdUtils.getId(object).orElseThrow(() -> new DocumentError(ErrorType.Missing, "status", Keywords.ID));
+        try {
+            status.id = JsonLdUtils.getId(object).orElseThrow(() -> new DocumentError(ErrorType.Missing, "StatusId"));
+            
+        } catch (InvalidJsonLdValue e) {
+            throw new DocumentError(ErrorType.Invalid, "StatusId");
+        }
 
         return status;
     }
