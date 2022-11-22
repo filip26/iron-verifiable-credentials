@@ -5,8 +5,8 @@ import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 
 public class TestProofAdapter extends EmbeddedProofAdapter {
 
-	protected TestProofAdapter() {
-		super("TestSignature2022", new TestVerificationMethodAdapter());
+	protected TestProofAdapter(String type) {
+		super(type, new TestVerificationMethodAdapter(), null);	//FIXME
 		// TODO Auto-generated constructor stub
 	}
 

@@ -15,7 +15,7 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
-import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
+import com.apicatalog.ld.signature.json.EmbeddedProof;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
@@ -244,7 +244,7 @@ public final class Issuer extends Processor<Issuer> {
 			throw new SigningError(Code.UnknownCryptoSuite);
 		}
 
-		JsonObject data = EmbeddedProofAdapter.removeProof(object);
+		JsonObject data = EmbeddedProof.removeProof(object);
 
 		// add issuance date if missing
 		if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
@@ -268,7 +268,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		proof = signatureSuite.getProofAdapter().setProofValue(proof, signature);
 
-		return EmbeddedProofAdapter.addProof(object, proof);
+		return EmbeddedProof.addProof(object, proof);
 	}
 
 	private final void validate(Verifiable verifiable) throws SigningError {

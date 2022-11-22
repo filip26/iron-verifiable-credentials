@@ -6,13 +6,19 @@ public class VerificationError extends Throwable {
 
     public enum Code {
         Expired,
+        
         InvalidSignature,
         InvalidProofDomain,
+        
         UnknownCryptoSuite,
-        MissingVerificationKey,
         UnknownVerificationKey,
         UnknownVerificationMethod,
-        Internal, 
+        
+        Internal,	//TODO ?!?! 
+        
+        //TODO remove!! it's a document error
+        MissingVerificationKey,
+
     }
 
     private Code code;

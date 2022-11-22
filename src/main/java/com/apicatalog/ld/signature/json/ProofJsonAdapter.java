@@ -7,13 +7,15 @@ import jakarta.json.JsonObject;
 
 public interface ProofJsonAdapter {
 
-    String type();
+	String type();
 
-    Proof deserialize(JsonObject object) throws DocumentError;
+	Proof deserialize(JsonObject proof) throws DocumentError;
 
-    JsonObject serialize(Proof proof) throws DocumentError;
+	JsonObject serialize(Proof proof) throws DocumentError;
 
-    JsonObject setProofValue(JsonObject proof, byte[] value) throws DocumentError;
+	JsonObject setProofValue(JsonObject proof, byte[] value) throws DocumentError;
+
+	JsonObject removeProofValue(JsonObject proof) throws DocumentError;
 
     VerificationMethodJsonAdapter getMethodAdapter();
 }

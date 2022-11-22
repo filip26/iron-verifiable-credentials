@@ -23,6 +23,7 @@ import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.json.EmbeddedProof;
 import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.json.VerificationMethodJsonAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
@@ -159,10 +160,10 @@ public final class Verifier extends Processor<Verifier> {
 
 		// get proofs - throws an exception if there is no proof, never null nor an
 		// empty collection
-		final Collection<JsonValue> proofs = EmbeddedProofAdapter.assertProof(expanded);
+		final Collection<JsonValue> proofs = EmbeddedProof.assertProof(expanded);
 
 		// a data before issuance - no proof attached
-		final JsonObject data = EmbeddedProofAdapter.removeProof(expanded);
+		final JsonObject data = EmbeddedProof.removeProof(expanded);
 
 		// verify attached proofs' signatures
 		for (final JsonValue proofValue : proofs) {
@@ -182,13 +183,13 @@ public final class Verifier extends Processor<Verifier> {
 
 			final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 
-			// check domain
-			if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
-				throw new VerificationError(Code.InvalidProofDomain);
-			}
+			validate(proof);
 
-			final VerificationMethod verificationMethod = get(proof.getVerificationMethod().id(), loader,
-					signatureSuite.getProofAdapter().getMethodAdapter());
+			final VerificationMethod verificationMethod = get(
+															proof.getVerificationMethod().id(), 
+															loader,
+															signatureSuite.getProofAdapter().getMethodAdapter()
+															);
 
 			if (!(verificationMethod instanceof VerificationKey)) {
 				throw new VerificationError(Code.UnknownVerificationMethod);
@@ -197,7 +198,12 @@ public final class Verifier extends Processor<Verifier> {
 			final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite);
 
 			// verify signature
-			signature.verify(data, proofValue.asJsonObject(), (VerificationKey) verificationMethod, proof.getValue());
+			signature.verify(
+							data, 
+							proofValue.asJsonObject(), 
+							(VerificationKey) verificationMethod, 
+							proof.getValue()
+						);
 
 			// verify status
 			if (statusVerifier != null && verifiable.isCredential()) {
@@ -255,15 +261,44 @@ public final class Verifier extends Processor<Verifier> {
 
 		if (verifiable.isCredential()) {
 
-			// is expired?
-			if (verifiable.asCredential().isExpired()) {
-				throw new VerificationError(Code.Expired);
-			}
-
+			// data integrity - issuance date is a mandatory property
 			if (verifiable.asCredential().getIssuanceDate() == null
 					&& verifiable.asCredential().getValidFrom() == null) {
 				throw new DocumentError(ErrorType.Missing, Credential.ISSUANCE_DATE);
 			}
+			
+			// is expired?
+			if (verifiable.asCredential().isExpired()) {
+				throw new VerificationError(Code.Expired);
+			}
+		}
+	}
+	
+	private final void validate(Proof proof) throws VerificationError, DocumentError {
+		
+		// purpose
+		if (proof.getPurpose() == null) {
+			throw new DocumentError(ErrorType.Missing, "proof", "proofPurpose");
+		}
+		
+		// verification method
+		if (proof.getVerificationMethod() == null) {
+			throw new DocumentError(ErrorType.Missing, "proof", "verificationMethod");
+		}
+		
+		// value
+		if (proof.getValue() == null || proof.getValue().length == 0) {
+			throw new DocumentError(ErrorType.Missing, "proof", "proofValue");
+		}
+		
+		// created
+		if (proof.getCreated() == null) {
+			throw new DocumentError(ErrorType.Missing, "proof", "created");
+		}
+		
+		// domain
+		if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
+			throw new VerificationError(Code.InvalidProofDomain);
 		}
 	}
 
@@ -300,7 +335,5 @@ public final class Verifier extends Processor<Verifier> {
 		public byte[] publicKey() {
 			return publicKey;
 		}
-
 	}
-
 }

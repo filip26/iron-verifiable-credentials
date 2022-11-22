@@ -25,14 +25,17 @@ public class JsonLdUtils {
 
     static final String XSD_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
 
-    protected JsonLdUtils() {}
+    protected JsonLdUtils() {
+    }
 
     /**
-     * Checks if the given {@link JsonValue} is {@link JsonObject} has the given type listed as one of its <code>@type</code> declarations.
+     * Checks if the given {@link JsonValue} is {@link JsonObject} has the given
+     * type listed as one of its <code>@type</code> declarations.
      *
      * @param type
      * @param value
-     * @return <code>true</code> if the given value is {@link JsonObject} and has property @type including the given type
+     * @return <code>true</code> if the given value is {@link JsonObject} and has
+     *         property @type including the given type
      */
     public static boolean isTypeOf(final String type, final JsonValue value) {
 
@@ -44,15 +47,11 @@ public class JsonLdUtils {
             throw new IllegalArgumentException("The 'object' parameter must not be null.");
         }
 
-        return JsonUtils.isObject(value)
-                && value.asJsonObject().containsKey(Keywords.TYPE)
-                && JsonUtils
-                    .toStream(value.asJsonObject().get(Keywords.TYPE))
-                    .filter(JsonUtils::isString)
-                    .map(JsonString.class::cast)
-                    .map(JsonString::getString)
-                    .filter(StringUtils::isNotBlank)
-                    .anyMatch(type::equals);
+        return JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.TYPE)
+                && JsonUtils.toStream(value.asJsonObject().get(Keywords.TYPE))
+                        .filter(JsonUtils::isString).map(JsonString.class::cast)
+                        .map(JsonString::getString).filter(StringUtils::isNotBlank)
+                        .anyMatch(type::equals);
     }
 
     public static Collection<String> getType(final JsonObject value) {
@@ -61,13 +60,9 @@ public class JsonLdUtils {
             throw new IllegalArgumentException("The 'object' parameter must not be null.");
         }
 
-        return JsonUtils
-                    .toStream(value.get(Keywords.TYPE))
-                    .filter(JsonUtils::isString)
-                    .map(JsonString.class::cast)
-                    .map(JsonString::getString)
-                    .filter(StringUtils::isNotBlank)
-                    .collect(Collectors.toSet());
+        return JsonUtils.toStream(value.get(Keywords.TYPE)).filter(JsonUtils::isString)
+                .map(JsonString.class::cast).map(JsonString::getString)
+                .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
     }
 
     public static boolean hasType(final JsonValue expanded) {
@@ -85,13 +80,8 @@ public class JsonLdUtils {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
 
-        return JsonUtils
-                    .toStream(value)
-                    .filter(JsonUtils::isObject)
-                    .map(JsonValue::asJsonObject)
-                    .map(o -> isTypeOf(XSD_DATE_TIME, o))
-                    .findAny()
-                    .orElse(false);
+        return JsonUtils.toStream(value).filter(JsonUtils::isObject).map(JsonValue::asJsonObject)
+                .map(o -> isTypeOf(XSD_DATE_TIME, o)).findAny().orElse(false);
     }
 
     public static boolean hasPredicate(JsonObject subject, String predicate) {
@@ -110,69 +100,69 @@ public class JsonLdUtils {
             value = value.asJsonArray().get(0);
         }
 
-        if (JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.GRAPH) && value.asJsonObject().size() == 1) {
+        if (JsonUtils.isObject(value) && value.asJsonObject().containsKey(Keywords.GRAPH)
+                && value.asJsonObject().size() == 1) {
             value = value.asJsonObject().get(Keywords.GRAPH);
         }
 
         return JsonUtils.toCollection(value);
     }
 
-    public static URI assertId(JsonValue subject, String base, String property) throws DocumentError {
+    public static URI getId(JsonValue subject, String property) throws InvalidJsonLdValue {
 
-        if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), base + property)) {
-            throw new DocumentError(ErrorType.Missing, property);
+        if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), property)) {
+            return null;
         }
 
-        JsonValue value = JsonLdUtils
-                                    .getObjects(subject.asJsonObject(), base + property)
-                                    .stream()
-                                    .findFirst()
-                                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, property));
+        final Optional<JsonValue> object = JsonLdUtils.getObjects(subject.asJsonObject(), property)
+                .stream().findFirst();
+
+        if (!object.isPresent()) {
+            return null;
+        }
+
+        JsonValue value = object.get();
 
         if (JsonUtils.isObject(value)) {
-            value  = value.asJsonObject().get(Keywords.ID);
+            value = value.asJsonObject().get(Keywords.ID);
         }
 
         final String id;
 
+        if (JsonUtils.isNull(value)) {
+            return null;
+        }
+
         if (JsonUtils.isString(value)) {
-            id = ((JsonString)value).getString();
+            id = ((JsonString) value).getString();
 
-        } else {
-            throw new DocumentError(ErrorType.Invalid, property);
+            if (UriUtils.isURI(id)) {
+                return URI.create(id);
+            }
+            throw new InvalidJsonLdValue(property, value,
+                    "Property [" + property + "] @id value [" + id + "] is not valid URI.");
+
         }
-
-        if (UriUtils.isURI(id)) {
-            return URI.create(id);
-        }
-
-        throw new DocumentError(ErrorType.Invalid, property, Keywords.ID);
+        throw new InvalidJsonLdValue(property, value, "Property [" + property + "] @id value ["
+                + value + "] is not JSON string but [" + value.getValueType() + "].");
     }
 
-    public static Instant assertXsdDateTime(JsonValue subject, String base, String property) throws DocumentError {
+    public static Instant assertXsdDateTime(final JsonValue subject, final String property)
+            throws InvalidJsonLdValue, MissingJsonLdProperty {
 
-        if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), base + property)) {
-            throw new DocumentError(ErrorType.Missing, property);
+        if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), property)) {
+            throw new MissingJsonLdProperty(property);
         }
 
-        final JsonValue value = JsonLdUtils
-                                    .getObjects(subject.asJsonObject(), base + property)
-                                    .stream()
-                                    .findFirst()
-                                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, property, Keywords.VALUE));
+        final JsonValue value = JsonLdUtils.getObjects(subject.asJsonObject(), property).stream()
+                .findFirst().orElseThrow(() -> new MissingJsonLdProperty(property));
 
         if (isXsdDateTime(value)) {
-            return JsonUtils.toStream(value)
-                    .filter(ValueObject::isValueObject)
+            return JsonUtils.toStream(value).filter(ValueObject::isValueObject)
                     .filter(item -> isTypeOf(XSD_DATE_TIME, item.asJsonObject()))
-                    .map(ValueObject::getValue)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .filter(JsonUtils::isString)
-                    .findFirst()
-                    .map(JsonString.class::cast)
-                    .map(JsonString::getString)
-                    .map(datetimeValue -> {
+                    .map(ValueObject::getValue).filter(Optional::isPresent).map(Optional::get)
+                    .filter(JsonUtils::isString).findFirst().map(JsonString.class::cast)
+                    .map(JsonString::getString).map(datetimeValue -> {
                         try {
                             return Instant.parse(datetimeValue);
 
@@ -180,23 +170,57 @@ public class JsonLdUtils {
                             // invalid date time format
                         }
                         return null;
-                    })
-                    .orElseThrow(() ->  new DocumentError(ErrorType.Invalid, property, Keywords.VALUE));
+                    }).orElseThrow(() -> new InvalidJsonLdValue(property, value, "The property ["
+                            + property + "] value is not valid XsdDateTime but [" + value + "]."));
         }
-        throw new DocumentError(ErrorType.Invalid, property, Keywords.TYPE);
+        throw new InvalidJsonLdValue(property, value,
+                "The property [" + property + "] @type is not XsdDateTime.");
     }
 
-    public static final Optional<URI> getId(JsonValue value) {
+    public static Instant getXsdDateTime(final JsonValue subject, final String property)
+            throws InvalidJsonLdValue {
 
-        if (value == null) {
+        if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), property)) {
+            return null;
+        }
+
+        final Optional<JsonValue> propertyValue = JsonLdUtils
+                .getObjects(subject.asJsonObject(), property).stream().findFirst();
+        
+        if (!propertyValue.isPresent()) {
+            return null;
+        }
+        
+        JsonValue value = propertyValue.get();
+
+        if (isXsdDateTime(value)) {
+            return JsonUtils.toStream(value).filter(ValueObject::isValueObject)
+                    .filter(item -> isTypeOf(XSD_DATE_TIME, item.asJsonObject()))
+                    .map(ValueObject::getValue).filter(Optional::isPresent).map(Optional::get)
+                    .filter(JsonUtils::isString).findFirst().map(JsonString.class::cast)
+                    .map(JsonString::getString).map(datetimeValue -> {
+                        try {
+                            return Instant.parse(datetimeValue);
+
+                        } catch (DateTimeParseException e) {
+                            // invalid date time format
+                        }
+                        return null;
+                    }).orElseThrow(() -> new InvalidJsonLdValue(property, value, "The property ["
+                            + property + "] value is not valid XsdDateTime but [" + value + "]."));
+        }
+        throw new InvalidJsonLdValue(property, value,
+                "The property [" + property + "] @type is not XsdDateTime.");
+    }
+
+    public static final Optional<URI> getId(JsonValue subject) {
+
+        if (subject == null) {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
 
-        return JsonLdUtils.findFirstObject(value)
-                .map(o -> o.get(Keywords.ID))
-                .filter(JsonUtils::isString)
-                .map(JsonString.class::cast)
-                .map(JsonString::getString)
+        return JsonLdUtils.findFirstObject(subject).map(o -> o.get(Keywords.ID))
+                .filter(JsonUtils::isString).map(JsonString.class::cast).map(JsonString::getString)
                 .map(id -> {
                     if (UriUtils.isURI(id)) {
                         return URI.create(id);
@@ -205,31 +229,35 @@ public class JsonLdUtils {
                 });
     }
 
-    public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property, URI id) {
+    public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property,
+            URI id) {
         return setId(objectBuilder, property, id.toString());
     }
 
-    public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property, String id) {
+    public static JsonObjectBuilder setId(JsonObjectBuilder objectBuilder, String property,
+            String id) {
         objectBuilder.add(property,
-                Json.createArrayBuilder()
-                        .add(Json.createObjectBuilder().add(Keywords.ID, id)));
+                Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, id)));
 
         return objectBuilder;
     }
 
-    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property, String type, String value) {
+    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property,
+            String type, String value) {
 
         objectBuilder.add(property, JsonLdValueObject.toJson(type, value));
 
         return objectBuilder;
     }
 
-    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property, String value) {
+    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property,
+            String value) {
         objectBuilder.add(property, JsonLdValueObject.toJson(value));
         return objectBuilder;
     }
 
-    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property, Instant instant) {
+    public static JsonObjectBuilder setValue(JsonObjectBuilder objectBuilder, String property,
+            Instant instant) {
         return setValue(objectBuilder, property, XSD_DATE_TIME, instant.toString());
     }
 
@@ -247,5 +275,36 @@ public class JsonLdUtils {
         }
 
         return Optional.empty();
+    }
+
+    public static URI assertId(JsonValue subject, String base, String property)
+            throws DocumentError {
+
+        if (JsonUtils.isNotObject(subject)
+                || !hasPredicate(subject.asJsonObject(), base + property)) {
+            throw new DocumentError(ErrorType.Missing, property);
+        }
+
+        JsonValue value = JsonLdUtils.getObjects(subject.asJsonObject(), base + property).stream()
+                .findFirst().orElseThrow(() -> new DocumentError(ErrorType.Missing, property));
+
+        if (JsonUtils.isObject(value)) {
+            value = value.asJsonObject().get(Keywords.ID);
+        }
+
+        final String id;
+
+        if (JsonUtils.isString(value)) {
+            id = ((JsonString) value).getString();
+
+        } else {
+            throw new DocumentError(ErrorType.Invalid, property);
+        }
+
+        if (UriUtils.isURI(id)) {
+            return URI.create(id);
+        }
+
+        throw new DocumentError(ErrorType.Invalid, property, Keywords.ID);
     }
 }

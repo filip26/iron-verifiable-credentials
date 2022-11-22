@@ -20,7 +20,7 @@ import jakarta.json.JsonValue;
 public class VcTestCase {
 
 	static final String BASE = "https://github.com/filip26/iron-verifiable-credentials/";
-	
+
 	public URI id;
 
 	public String name;
@@ -47,24 +47,29 @@ public class VcTestCase {
 
 		testCase.id = URI.create(test.getString(Keywords.ID));
 
-		testCase.type = test.getJsonArray(Keywords.TYPE).stream().map(JsonString.class::cast)
-				.map(JsonString::getString).collect(Collectors.toSet());
+		testCase.type = test.getJsonArray(Keywords.TYPE)
+							.stream()
+							.map(JsonString.class::cast)
+							.map(JsonString::getString)
+							.collect(Collectors.toSet());
 
-		testCase.name = test.getJsonArray(vocab("name")).getJsonObject(0).getString(Keywords.VALUE);
+		testCase.name = test.getJsonArray(da("name")).getJsonObject(0).getString(Keywords.VALUE);
 
-		testCase.input = URI
-				.create(test.getJsonArray(vocab("action")).getJsonObject(0).getString(Keywords.ID));
+		testCase.input = URI.create(test.getJsonArray(da("action"))
+										.getJsonObject(0)
+										.getString(Keywords.ID));
 
-		if (test.containsKey(vocab("context"))) {
-			testCase.context = URI.create(
-					test.getJsonArray(vocab("context")).getJsonObject(0).getString(Keywords.ID));
+		if (test.containsKey(da("context"))) {
+			testCase.context = URI.create(test
+											.getJsonArray(da("context"))
+											.getJsonObject(0)
+											.getString(Keywords.ID));
 		}
 
-		if (test.containsKey(vocab("result"))) {
-			final JsonObject result = test.getJsonArray(vocab("result")).getJsonObject(0);
+		if (test.containsKey(da("result"))) {
+			final JsonObject result = test.getJsonArray(da("result")).getJsonObject(0);
 
-			JsonValue resultValue = result.getOrDefault(Keywords.ID,
-					result.getOrDefault(Keywords.VALUE, null));
+			JsonValue resultValue = result.getOrDefault(Keywords.ID, result.getOrDefault(Keywords.VALUE, null));
 
 			if (JsonUtils.isString(resultValue)) {
 				testCase.result = ((JsonString) resultValue).getString();
@@ -85,7 +90,8 @@ public class VcTestCase {
 
 			if (options.containsKey(vocab("verificationMethod"))) {
 
-				final JsonObject method = options.getJsonArray(vocab("verificationMethod")).getJsonObject(0);
+				final JsonObject method = options.getJsonArray(vocab("verificationMethod"))
+						.getJsonObject(0);
 
 //				if (JsonLdUtils.isTypeOf(vocab("TestVerificationKey2022"), method)) {
 //
@@ -94,10 +100,12 @@ public class VcTestCase {
 //					JsonLdUtils.getId(method).ifPresent(
 //							id -> testCase.verificationMethod = new vocab(id, null, null, null));
 //				}
-				
-				try {
-					testCase.verificationMethod = (new TestVerificationMethodAdapter()).deserialize(method);
 
+				try {
+
+					testCase.verificationMethod = (new TestVerificationMethodAdapter())
+							.deserialize(method);
+System.out.println(">>> " + testCase.verificationMethod);
 				} catch (DocumentError e) {
 					fail(e);
 				}
@@ -126,7 +134,11 @@ public class VcTestCase {
 	static String base(String url) {
 		return BASE.concat(url);
 	}
-	
+
+	static String da(String term) {
+		return "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#".concat(term);
+	}
+
 	static String vocab(String term) {
 		return base("tests/vocab#").concat(term);
 	}

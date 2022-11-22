@@ -3,7 +3,6 @@ package com.apicatalog.ld.signature;
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 
@@ -31,13 +30,18 @@ public class LinkedDataSignature {
      * @throws VerificationError
      * @throws DocumentError
      */
-    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DocumentError {
+    public void verify(
+    				final JsonObject document, 
+    				final JsonObject proof, 
+    				final VerificationKey verificationKey, 
+    				final byte[] signature
+    				) throws VerificationError, DocumentError {
 
         if (verificationKey == null || verificationKey.publicKey() == null) {
             throw new VerificationError(VerificationError.Code.MissingVerificationKey);
         }
 
-       final JsonObject proofObject = EmbeddedProofAdapter.removeProofValue(proof);
+       final JsonObject proofObject = suite.getProofAdapter().removeProofValue(proof);
 
        try {
            final byte[] computeSignature = hashCode(document, proofObject);

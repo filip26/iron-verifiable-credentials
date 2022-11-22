@@ -57,8 +57,11 @@ public class VcTestRunnerJunit {
 		try {
 			if (testCase.type.contains(VcTestCase.vocab("VeriferTest"))) {
 
-				Vc.verify(testCase.input, new TestCryptoSuite()).loader(LOADER)
-						.domain(testCase.domain).isValid();
+				Vc.verify(testCase.input, new TestCryptoSuite())
+					.loader(LOADER)
+					.domain(testCase.domain)
+					.isValid();
+				
 				assertFalse(isNegative(), "Expected error " + testCase.result);
 
 			} else if (testCase.type.contains(VcTestCase.vocab("IssuerTest"))) {
