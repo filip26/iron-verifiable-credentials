@@ -144,37 +144,38 @@ public class JsonLdUtils {
                 + value + "] is not JSON string but [" + value.getValueType() + "].");
     }
 
-    public static Instant getXsdDateTime(final JsonValue subject, final String property)
+    public static Optional<Instant> getXsdDateTime(final JsonValue subject, final String property)
             throws InvalidJsonLdValue {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), property)) {
-            return null;
+            return Optional.empty();
         }
 
         final Optional<JsonValue> propertyValue = JsonLdUtils
                 .getObjects(subject.asJsonObject(), property).stream().findFirst();
 
         if (!propertyValue.isPresent()) {
-            return null;
+            return Optional.empty();
         }
 
         JsonValue value = propertyValue.get();
 
         if (isXsdDateTime(value)) {
-            return JsonUtils.toStream(value).filter(ValueObject::isValueObject)
+            String datetime = JsonUtils.toStream(value).filter(ValueObject::isValueObject)
                     .filter(item -> isTypeOf(XSD_DATE_TIME, item.asJsonObject()))
                     .map(ValueObject::getValue).filter(Optional::isPresent).map(Optional::get)
                     .filter(JsonUtils::isString).findFirst().map(JsonString.class::cast)
-                    .map(JsonString::getString).map(datetimeValue -> {
-                        try {
-                            return Instant.parse(datetimeValue);
-
-                        } catch (DateTimeParseException e) {
-                            // invalid date time format
-                        }
-                        return null;
-                    }).orElseThrow(() -> new InvalidJsonLdValue(property, value, "The property ["
+                    .map(JsonString::getString)
+                    .orElseThrow(() -> new InvalidJsonLdValue(property, value, "The property ["
                             + property + "] value is not valid XsdDateTime but [" + value + "]."));
+
+            try {
+                return Optional.of(Instant.parse(datetime));
+
+            } catch (DateTimeParseException e) {
+                throw new InvalidJsonLdValue(property, value,
+                        "The property [" + property + "] is not valid XsdDateTime.", e);
+            }
         }
         throw new InvalidJsonLdValue(property, value,
                 "The property [" + property + "] @type is not XsdDateTime.");

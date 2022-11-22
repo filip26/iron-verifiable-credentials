@@ -15,6 +15,12 @@ public final class InvalidJsonLdValue extends Throwable {
         this.value = value;
     }
 
+    public InvalidJsonLdValue(final String property, final JsonValue value, final String message, final Throwable exception) {
+        super(message, exception);
+        this.property = property;
+        this.value = value;
+    }
+
     public JsonValue getValue() {
         return value;
     }

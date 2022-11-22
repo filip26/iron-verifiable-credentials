@@ -114,16 +114,16 @@ class Credential implements Verifiable {
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, ISSUER));
 
             // issuance date - mandatory for verification
-            credential.issuance = JsonLdUtils.getXsdDateTime(document, BASE + ISSUANCE_DATE);
+            credential.issuance = JsonLdUtils.getXsdDateTime(document, BASE + ISSUANCE_DATE).orElse(null);
 
             // validFrom - the next version
-            credential.validFrom = JsonLdUtils.getXsdDateTime(document, BASE + VALID_FROM);
+            credential.validFrom = JsonLdUtils.getXsdDateTime(document, BASE + VALID_FROM).orElse(null);
 
             // issued - the next version
-            credential.issued = JsonLdUtils.getXsdDateTime(document, BASE + ISSUED);
+            credential.issued = JsonLdUtils.getXsdDateTime(document, BASE + ISSUED).orElse(null);
 
             // expiration date - optional
-            credential.expiration = JsonLdUtils.getXsdDateTime(document, BASE + EXPIRATION_DATE);
+            credential.expiration = JsonLdUtils.getXsdDateTime(document, BASE + EXPIRATION_DATE).orElse(null);
 
         } catch (InvalidJsonLdValue e) {
             if (Keywords.ID.equals(e.getProperty())) {
