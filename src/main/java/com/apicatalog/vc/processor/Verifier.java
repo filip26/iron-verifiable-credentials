@@ -63,8 +63,8 @@ public final class Verifier extends Processor<Verifier> {
     }
 
     /**
-     * Sets {@link CredentialStatus} verifier. If not set then
-     * <code>credentialStatus</code> is not verified.
+     * Set a credential status verifier. If not set then
+     * <code>credentialStatus</code> is ignored if present.
      *
      * @param statusVerifier a custom status verifier instance
      * @return the verifier instance
@@ -74,6 +74,18 @@ public final class Verifier extends Processor<Verifier> {
         return this;
     }
 
+    /**
+     * Set a credential subject verifier. If not set then
+     * <code>credentialStatus</code> is not verified.
+     *
+     * @param subjectVerifier a custom subject verifier instance
+     * @return the verifier instance
+     */
+    public Verifier subjectVerifier(SubjectVerifier subjectVerifier) {
+        this.subjectVerifier = subjectVerifier;
+        return this;
+    }
+    
     public Verifier didResolver(final DidResolver didResolver) {
         this.didResolver = didResolver;
         return this;
