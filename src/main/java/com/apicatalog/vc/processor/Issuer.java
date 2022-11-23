@@ -232,10 +232,11 @@ public final class Issuer extends Processor<Issuer> {
 	private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair,
 			final SignatureSuite signatureSuites) throws SigningError, DocumentError {
 
-		JsonObject object = JsonLdUtils.findFirstObject(expanded).orElseThrow(() ->
-		// malformed input, not single object to sign has been found
-		new DocumentError(ErrorType.Invalid, "document"));
-
+		final JsonObject object = 
+		        JsonLdUtils
+		            .findFirstObject(expanded)
+		            .orElseThrow(() -> new DocumentError(ErrorType.Invalid, "document")); // malformed input, not single object to sign has been found
+		            
 		final Verifiable verifiable = get(object);
 
 		validate(verifiable);
@@ -254,9 +255,10 @@ public final class Issuer extends Processor<Issuer> {
 			data = Json.createObjectBuilder(data)
 					.add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString())
 					.build();
-			object = Json.createObjectBuilder(object)
-					.add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString())
-					.build();
+
+//			object = Json.createObjectBuilder(object)
+//					.add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString())
+//					.build();
 		}
 
 		final LinkedDataSignature suite = new LinkedDataSignature(signatureSuite);
@@ -268,7 +270,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		proof = signatureSuite.getProofAdapter().setProofValue(proof, signature);
 
-		return EmbeddedProof.addProof(object, proof);
+		return EmbeddedProof.addProof(data, proof);
 	}
 
 	private final void validate(Verifiable verifiable) throws SigningError {

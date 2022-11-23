@@ -7,7 +7,7 @@ import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 import jakarta.json.JsonObject;
 
-public interface VerificationMethodJsonAdapter {
+public interface MethodAdapter {
 
     /**
      * Returns <code>true</code> if the adapter supports (can (de)serialize the given method type
@@ -16,6 +16,7 @@ public interface VerificationMethodJsonAdapter {
      * @return <code>true</code> if the given type is supported by the adapter, otherwise <code>false</code> 
      */
     boolean isSupportedType(String type);
+    
     VerificationMethod deserialize(JsonObject object) throws DocumentError;
 
     JsonObject serialize(VerificationMethod proof) throws DocumentError;

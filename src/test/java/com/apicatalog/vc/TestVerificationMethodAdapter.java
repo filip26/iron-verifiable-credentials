@@ -3,12 +3,12 @@ package com.apicatalog.vc;
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.json.VerificationMethodJsonAdapter;
+import com.apicatalog.ld.signature.json.MethodAdapter;
 import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 import jakarta.json.JsonObject;
 
-public class TestVerificationMethodAdapter implements VerificationMethodJsonAdapter {
+public class TestVerificationMethodAdapter implements MethodAdapter {
 
 	@Override
 	public VerificationMethod deserialize(JsonObject object) throws DocumentError {

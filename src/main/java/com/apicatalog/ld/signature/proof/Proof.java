@@ -12,10 +12,15 @@ import java.time.Instant;
 public class Proof {
 
     protected String type;
+    
     protected URI purpose;
+    
     protected VerificationMethod nethod;
+    
     protected Instant created;
+    
     protected String domain;
+    
     protected byte[] value;
 
     public Proof(String type, URI purpose, VerificationMethod method, Instant created, String domain, byte[] value) {

@@ -5,7 +5,9 @@ import com.apicatalog.ld.signature.proof.Proof;
 
 import jakarta.json.JsonObject;
 
-public interface ProofJsonAdapter {
+// replace with EmbeddedProofAdapter 
+@Deprecated
+public interface ProofAdapter {
 
 	String type();
 
@@ -16,6 +18,4 @@ public interface ProofJsonAdapter {
 	JsonObject setProofValue(JsonObject proof, byte[] value) throws DocumentError;
 
 	JsonObject removeProofValue(JsonObject proof) throws DocumentError;
-
-    VerificationMethodJsonAdapter getMethodAdapter();
 }

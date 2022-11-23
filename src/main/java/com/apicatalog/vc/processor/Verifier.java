@@ -25,7 +25,7 @@ import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.json.EmbeddedProof;
-import com.apicatalog.ld.signature.json.VerificationMethodJsonAdapter;
+import com.apicatalog.ld.signature.json.MethodAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.ProofProperty;
@@ -230,13 +230,16 @@ public final class Verifier extends Processor<Verifier> {
                     .map(suiteProvider::getSignatureSuite)
                     .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
 
-            final Proof proof = signatureSuite.getProofAdapter()
-                    .deserialize(proofValue.asJsonObject());
+            final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 
             validate(proof);
 
-            final VerificationMethod verificationMethod = getMethod(proof.getMethod().id(),
-                    loader, signatureSuite.getProofAdapter().getMethodAdapter());
+            final VerificationMethod verificationMethod = 
+                    getMethod(
+                        proof.getMethod().id(),
+                        loader, 
+                        signatureSuite.getMethodAdapter()
+                        );
 
             if (!(verificationMethod instanceof VerificationKey)) {
                 throw new VerificationError(Code.UnknownVerificationMethod);
@@ -245,14 +248,18 @@ public final class Verifier extends Processor<Verifier> {
             final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite);
 
             // verify signature
-            signature.verify(data, proofValue.asJsonObject(), (VerificationKey) verificationMethod,
-                    proof.getValue());
+            signature.verify(
+                        data, 
+                        proofValue.asJsonObject(), 
+                        (VerificationKey) verificationMethod,
+                        proof.getValue()
+                    );
         }
         // all good
     }
 
     // refresh/fetch verification method
-    final VerificationMethod getMethod(final URI id, final DocumentLoader loader, VerificationMethodJsonAdapter keyAdapter) throws DocumentError, VerificationError {
+    final VerificationMethod getMethod(final URI id, final DocumentLoader loader, MethodAdapter keyAdapter) throws DocumentError, VerificationError {
 
         if (DidUrl.isDidUrl(id)) {
 
@@ -362,6 +369,10 @@ public final class Verifier extends Processor<Verifier> {
         // created
         if (proof.getCreated() == null) {
             throw new DocumentError(ErrorType.Missing, ProofProperty.Created);
+        }
+        
+        if (proof.getCreated().isBefore(Instant.now())) {
+            throw new VerificationError(Code.NotValidYet);
         }
 
         // domain

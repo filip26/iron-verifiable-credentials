@@ -13,7 +13,8 @@ class TestCryptoSuite extends SignatureSuite {
 	            new Urdna2015(),
 	            new MessageDigest("MD5"),
 	            new TestAlgorithm(),
-	            new TestProofAdapter(TYPE)	
+	            new TestProofAdapter(TYPE)	,
+	            new TestVerificationMethodAdapter()
 				);
 
 	}

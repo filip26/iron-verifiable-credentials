@@ -25,7 +25,7 @@ import jakarta.json.JsonValue;
 /**
  * An embedded proof is included in the data, such as a Linked Data Signature.
  */
-public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
+public abstract class EmbeddedProofAdapter implements ProofAdapter {
 
     protected final EmbeddedProofProperty property;
 
@@ -34,15 +34,12 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
     protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
     protected final String proofType;
-    protected final VerificationMethodJsonAdapter keyAdapter;
 
     protected EmbeddedProofAdapter(
-                final String proofType,
-                final VerificationMethodJsonAdapter keyAdapter, 
+                final String proofType, 
                 final EmbeddedProofProperty property
                 ) {
         this.proofType = proofType;
-        this.keyAdapter = keyAdapter;
         this.property = property;
     }
 
@@ -73,13 +70,14 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
                 final JsonValue verificationMethodItem = verificationMethodValue.asJsonArray()
                         .get(0);
 
-                if (JsonUtils.isNonEmptyObject(verificationMethodItem)) {
-                    verificationMethod = keyAdapter
-                            .deserialize(verificationMethodItem.asJsonObject());
-
-                } else {
-                    throw new DocumentError(ErrorType.Invalid, ProofProperty.VerificationMethod);
-                }
+                //FIXME
+//                if (JsonUtils.isNonEmptyObject(verificationMethodItem)) {
+//                    verificationMethod = keyAdapter
+//                            .deserialize(verificationMethodItem.asJsonObject());
+//
+//                } else {
+//                    throw new DocumentError(ErrorType.Invalid, ProofProperty.VerificationMethod);
+//                }
             }
 
             byte[] value = null;
@@ -176,10 +174,11 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
 
         builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
 
-        if (proof.getMethod() != null) {
-            builder.add(property.expand(ProofProperty.VerificationMethod), Json.createArrayBuilder()
-                    .add(keyAdapter.serialize(proof.getMethod())));
-        }
+        //FIXME
+//        if (proof.getMethod() != null) {
+//            builder.add(property.expand(ProofProperty.VerificationMethod), Json.createArrayBuilder()
+//                    .add(keyAdapter.serialize(proof.getMethod())));
+//        }
 
         if (proof.getCreated() != null) {
             JsonLdUtils.setValue(builder, property.expand(ProofProperty.Created),
@@ -217,11 +216,6 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
     public JsonObject removeProofValue(final JsonObject proof) {
         final String propertyName = property.expand(ProofProperty.Value);
         return Json.createObjectBuilder(proof).remove(propertyName).build();
-    }
-
-    @Override
-    public VerificationMethodJsonAdapter getMethodAdapter() {
-        return keyAdapter;
     }
 
     @Override

@@ -8,7 +8,7 @@ public class TestProofAdapter extends EmbeddedProofAdapter {
 	protected TestProofAdapter(String type) {
 		super(
 	        type, 
-	        new TestVerificationMethodAdapter(), null);	//FIXME
+	         null);	//FIXME
 		// TODO Auto-generated constructor stub
 	}
 
@@ -23,6 +23,12 @@ public class TestProofAdapter extends EmbeddedProofAdapter {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public String type() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 	
 }
 

@@ -3,7 +3,8 @@ package com.apicatalog.ld.signature;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.json.ProofJsonAdapter;
+import com.apicatalog.ld.signature.json.ProofAdapter;
+import com.apicatalog.ld.signature.json.MethodAdapter;
 import com.apicatalog.ld.signature.key.KeyPair;
 
 import jakarta.json.JsonStructure;
@@ -20,15 +21,25 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
 	protected final DigestAlgorithm digester;
 	protected final SignatureAlgorithm signer;
 
-	protected final ProofJsonAdapter proofAdapter;
+	protected final ProofAdapter proofAdapter;
+    protected final MethodAdapter methodAdapter;
 
+    /*
+     * https://www.w3.org/TR/vc-data-integrity/#verification-material
+     *  A cryptographic suite specification is responsible for specifying the verification method 
+     */
+    
+    
 	public SignatureSuite(final String id, final CanonicalizationAlgorithm canonicalization,
-			final DigestAlgorithm digester, final SignatureAlgorithm signer, final ProofJsonAdapter proofAdapter) {
+			final DigestAlgorithm digester, final SignatureAlgorithm signer, final ProofAdapter proofAdapter,
+			final MethodAdapter methodAdapter
+	        ) {
 		this.id = id;
 		this.canonicalization = canonicalization;
 		this.digester = digester;
 		this.signer = signer;
 		this.proofAdapter = proofAdapter;
+		this.methodAdapter = methodAdapter;
 	}
 
 	@Override
@@ -60,7 +71,11 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
 		return id;
 	}
 
-	public ProofJsonAdapter getProofAdapter() {
+	public ProofAdapter getProofAdapter() {
 		return proofAdapter;
 	}
+
+    public MethodAdapter getMethodAdapter() {
+        return methodAdapter;
+    }
 }
