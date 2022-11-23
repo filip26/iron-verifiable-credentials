@@ -27,9 +27,9 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.json.EmbeddedProof;
 import com.apicatalog.ld.signature.json.MethodAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.ProofProperty;
-import com.apicatalog.ld.signature.proof.VerificationMethod;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.JsonArray;

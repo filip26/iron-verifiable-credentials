@@ -75,6 +75,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
 		return proofAdapter;
 	}
 
+	//TODO a type parameter?
     public MethodAdapter getMethodAdapter() {
         return methodAdapter;
     }

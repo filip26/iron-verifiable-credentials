@@ -3,6 +3,8 @@ package com.apicatalog.ld.signature.proof;
 import java.net.URI;
 import java.time.Instant;
 
+import com.apicatalog.ld.signature.method.VerificationMethod;
+
 /**
  * Represents VC/VP proof.
  *
@@ -23,6 +25,8 @@ public class Proof {
     
     protected byte[] value;
 
+    protected Proof() { /* protected */ }
+    
     public Proof(String type, URI purpose, VerificationMethod method, Instant created, String domain, byte[] value) {
         this.type = type;
         this.purpose = purpose;

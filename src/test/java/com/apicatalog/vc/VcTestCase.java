@@ -11,7 +11,7 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.proof.VerificationMethod;
+import com.apicatalog.ld.signature.method.VerificationMethod;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;

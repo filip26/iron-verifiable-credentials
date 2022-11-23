@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.proof;
+package com.apicatalog.ld.signature.method;
 
 import java.net.URI;
 
@@ -13,5 +13,7 @@ public interface MethodResolver {
      * @return The new {@link DidDocument}
      */
     VerificationMethod resolve(URI uri);
+    
+    boolean isAccepted(URI uri);
     
 }

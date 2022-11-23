@@ -12,9 +12,9 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.ProofProperty;
-import com.apicatalog.ld.signature.proof.VerificationMethod;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
