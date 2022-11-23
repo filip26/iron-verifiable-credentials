@@ -15,4 +15,5 @@ public interface VerificationMethod {
     String type();
     
     URI controller();
+
 }

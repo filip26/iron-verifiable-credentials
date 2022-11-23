@@ -176,9 +176,9 @@ public abstract class EmbeddedProofAdapter implements ProofJsonAdapter {
 
         builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
 
-        if (proof.getVerificationMethod() != null) {
+        if (proof.getMethod() != null) {
             builder.add(property.expand(ProofProperty.VerificationMethod), Json.createArrayBuilder()
-                    .add(keyAdapter.serialize(proof.getVerificationMethod())));
+                    .add(keyAdapter.serialize(proof.getMethod())));
         }
 
         if (proof.getCreated() != null) {

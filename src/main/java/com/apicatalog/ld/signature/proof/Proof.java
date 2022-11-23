@@ -57,7 +57,7 @@ public class Proof {
      *
      * @return {@link VerificationMethod} to verify the proof signature
      */
-    public VerificationMethod getVerificationMethod() {
+    public VerificationMethod getMethod() {
         return nethod;
     }
 
