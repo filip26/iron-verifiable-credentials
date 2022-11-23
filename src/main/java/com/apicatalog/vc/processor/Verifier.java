@@ -44,7 +44,10 @@ public final class Verifier extends Processor<Verifier> {
     private final JsonObject document;
 
     private String domain = null;
+    
     private StatusVerifier statusVerifier = null;
+    private SubjectVerifier subjectVerifier = null;
+    
     private DidResolver didResolver = null;
 
     public Verifier(URI location, final SignatureSuiteProvider suiteProvider) {
@@ -161,7 +164,7 @@ public final class Verifier extends Processor<Verifier> {
         if (veri1fiable.isCredential()) {
 
             // data integrity and metadata validation
-            validate(veri1fiable.asCredential(), statusVerifier);
+            validate(veri1fiable.asCredential(), statusVerifier, subjectVerifier);
 
             verifyProofs(expanded);
 
@@ -177,7 +180,7 @@ public final class Verifier extends Processor<Verifier> {
                 }
 
                 // data integrity and metadata validation
-                validate(credential.asCredential(), statusVerifier);
+                validate(credential.asCredential(), statusVerifier, subjectVerifier);
 
                 verifyProofs(expandedCredential);
             }
@@ -289,7 +292,7 @@ public final class Verifier extends Processor<Verifier> {
         throw new VerificationError(Code.UnknownVerificationKey);
     }
 
-    private static final void validate(final Credential credential, final StatusVerifier statusVerifier)
+    private static final void validate(final Credential credential, final StatusVerifier statusVerifier, final SubjectVerifier subjectVerifier)
             throws DocumentError, VerificationError {
 
         // data integrity - issuance date is a mandatory property
@@ -317,8 +320,13 @@ public final class Verifier extends Processor<Verifier> {
         }
 
         // status check
-        if (statusVerifier != null && credential.getCredentialStatus() != null) {
-            statusVerifier.verify(credential.getCredentialStatus());
+        if (statusVerifier != null && credential.getStatus() != null) {
+            statusVerifier.verify(credential.getStatus());
+        }
+
+        // subject check
+        if (subjectVerifier != null) {
+            subjectVerifier.verify(credential.getSubject());
         }
     }
 

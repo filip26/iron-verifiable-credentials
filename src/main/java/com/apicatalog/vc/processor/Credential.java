@@ -213,14 +213,23 @@ class Credential implements Verifiable {
     }
 
     /**
-     * see {@link https://www.w3.org/TR/vc-data-model/#status}
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>
      * 
      * @return
      */
-    public JsonValue getCredentialStatus() {
+    public JsonValue getStatus() {
         return status;
     }
-
+    
+    /**
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#credential-subject">Credential Subject</a>
+     * 
+     * @return
+     */
+    public JsonValue getSubject() {
+        return subject;
+    }
+    
     @Override
     public boolean isCredential() {
         return true;

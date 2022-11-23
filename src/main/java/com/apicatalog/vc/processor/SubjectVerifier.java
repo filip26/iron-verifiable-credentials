@@ -12,9 +12,9 @@ import jakarta.json.JsonValue;
 public interface SubjectVerifier {
 
     /**
-     * Verify the given subject claims in an expanded JSON-LD
+     * Verify the given subject claims in an expanded JSON-LD form
      * 
-     * @param subject an expanded JSON-LD 
+     * @param subject in an expanded JSON-LD form 
      * @throws DocumentError
      * @throws VerifyError
      */
