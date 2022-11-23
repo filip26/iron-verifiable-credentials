@@ -1,6 +1,7 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Collection;
 
 import com.apicatalog.did.DidResolver;
@@ -13,6 +14,7 @@ import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
@@ -36,303 +38,333 @@ import jakarta.json.JsonValue;
 
 public final class Verifier extends Processor<Verifier> {
 
-	protected final SignatureSuiteProvider suiteProvider;
-	
-	private final URI location;
-	private final JsonObject document;
+    protected final SignatureSuiteProvider suiteProvider;
 
-	private String domain = null;
-	private StatusVerifier statusVerifier = null;
-	private DidResolver didResolver = null;
+    private final URI location;
+    private final JsonObject document;
 
-	public Verifier(URI location, final SignatureSuiteProvider suiteProvider) {
-		this.location = location;
-		this.document = null;
-		this.suiteProvider = suiteProvider;
-	}
+    private String domain = null;
+    private StatusVerifier statusVerifier = null;
+    private DidResolver didResolver = null;
 
-	public Verifier(JsonObject document, final SignatureSuiteProvider suiteProvider) {
-		this.document = document;
-		this.location = null;
-		this.suiteProvider = suiteProvider;
-	}
+    public Verifier(URI location, final SignatureSuiteProvider suiteProvider) {
+        this.location = location;
+        this.document = null;
+        this.suiteProvider = suiteProvider;
+    }
 
-	/**
-	 * Sets {@link CredentialStatus} verifier. If not set then
-	 * <code>credentialStatus</code> is not verified.
-	 *
-	 * @param statusVerifier a custom status verifier instance
-	 * @return the verifier instance
-	 */
-	public Verifier statusVerifier(StatusVerifier statusVerifier) {
-		this.statusVerifier = statusVerifier;
-		return this;
-	}
+    public Verifier(JsonObject document, final SignatureSuiteProvider suiteProvider) {
+        this.document = document;
+        this.location = null;
+        this.suiteProvider = suiteProvider;
+    }
 
-	public Verifier didResolver(final DidResolver didResolver) {
-		this.didResolver = didResolver;
-		return this;
-	}
+    /**
+     * Sets {@link CredentialStatus} verifier. If not set then
+     * <code>credentialStatus</code> is not verified.
+     *
+     * @param statusVerifier a custom status verifier instance
+     * @return the verifier instance
+     */
+    public Verifier statusVerifier(StatusVerifier statusVerifier) {
+        this.statusVerifier = statusVerifier;
+        return this;
+    }
 
-	public Verifier domain(final String domain) {
-		this.domain = domain;
-		return this;
-	}
+    public Verifier didResolver(final DidResolver didResolver) {
+        this.didResolver = didResolver;
+        return this;
+    }
 
-	/**
-	 * Verifies VC/VP document. Throws VerificationError if the document is not
-	 * valid or cannot be verified.
-	 *
-	 * @throws VerificationError
-	 * @throws DocumentError
-	 */
-	public void isValid() throws VerificationError, DocumentError {
+    public Verifier domain(final String domain) {
+        this.domain = domain;
+        return this;
+    }
 
-		if (loader == null) {
-			// default loader
-			loader = SchemeRouter.defaultInstance();
-		}
+    /**
+     * Verifies VC/VP document. Throws VerificationError if the document is not
+     * valid or cannot be verified.
+     *
+     * @throws VerificationError
+     * @throws DocumentError
+     */
+    public void isValid() throws VerificationError, DocumentError {
 
-		if (bundledContexts) {
-			loader = new StaticContextLoader(loader);
-		}
+        if (loader == null) {
+            // default loader
+            loader = SchemeRouter.defaultInstance();
+        }
 
-		if (document != null) {
-			verify(document);
-			return;
-		}
+        if (bundledContexts) {
+            loader = new StaticContextLoader(loader);
+        }
 
-		if (location != null) {
-			verify(location);
-			return;
-		}
+        if (document != null) {
+            verify(document);
+            return;
+        }
 
-		throw new IllegalStateException();
-	}
+        if (location != null) {
+            verify(location);
+            return;
+        }
 
-	private void verify(URI location) throws VerificationError, DocumentError {
-		try {
-			// load the document
-			final JsonArray expanded = JsonLd.expand(location).loader(loader).base(base).get();
+        throw new IllegalStateException();
+    }
 
-			verifyExpanded(expanded);
+    private void verify(final URI location) throws VerificationError, DocumentError {
+        try {
+            // load the document
+            final JsonArray expanded = JsonLd.expand(location).loader(loader).base(base).get();
 
-		} catch (JsonLdError e) {
-			failWithJsonLd(e);
-			throw new DocumentError(ErrorType.Invalid, "document", e);
-		}
-	}
+            verifyExpanded(expanded);
 
-	private void verify(JsonObject document) throws VerificationError, DocumentError {
-		try {
-			// load the document
-			final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader).base(base).get();
+        } catch (JsonLdError e) {
+            failWithJsonLd(e);
+            throw new DocumentError(ErrorType.Invalid, "document", e);
+        }
+    }
 
-			verifyExpanded(expanded);
+    private void verify(final JsonObject document) throws VerificationError, DocumentError {
+        try {
+            // load the document
+            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
+                    .base(base).get();
 
-		} catch (JsonLdError e) {
-			failWithJsonLd(e);
-			throw new DocumentError(ErrorType.Invalid, "document", e);
-		}
-	}
+            verifyExpanded(expanded);
 
-	private void verifyExpanded(JsonArray expanded) throws VerificationError, DocumentError {
+        } catch (JsonLdError e) {
+            failWithJsonLd(e);
+            throw new DocumentError(ErrorType.Invalid, "document", e);
+        }
+    }
 
-		if (expanded == null || expanded.isEmpty()) {
-			throw new DocumentError(ErrorType.Invalid, "document");
-		}
+    private void verifyExpanded(JsonArray expanded) throws VerificationError, DocumentError {
 
-		for (final JsonValue item : expanded) {
-			if (JsonUtils.isNotObject(item)) {
-				throw new DocumentError(ErrorType.Invalid, "document");
-			}
-			verifyExpanded(item.asJsonObject());
-		}
-	}
+        if (expanded == null || expanded.isEmpty()) {
+            throw new DocumentError(ErrorType.Invalid, "document");
+        }
 
-	private void verifyExpanded(JsonObject expanded) throws VerificationError, DocumentError {
+        for (final JsonValue item : expanded) {
+            if (JsonUtils.isNotObject(item)) {
+                throw new DocumentError(ErrorType.Invalid, "document");
+            }
+            verifyExpanded(item.asJsonObject());
+        }
+    }
 
-		// data integrity checks
-		final Verifiable verifiable = get(expanded);
+    private void verifyExpanded(JsonObject expanded) throws VerificationError, DocumentError {
 
-		validate(verifiable);
+        // get a verifiable representation
+        final Verifiable veri1fiable = get(expanded);
+        
+        if (veri1fiable.isCredential()) {
+            
+            // data integrity and metadata validation
+            validate(veri1fiable.asCredential(), statusVerifier);
+            
+            verifyProofs(expanded);
+            return;
+        }
 
-		// get proofs - throws an exception if there is no proof, never null nor an
-		// empty collection
-		final Collection<JsonValue> proofs = EmbeddedProof.assertProof(expanded);
+        if (veri1fiable.isPresentation()) {
+            verifyProofs(expanded);
+            
+            // verify embedded credentials
+            for (final Credential credential : veri1fiable.asPresentation().getCredentials()) {
+                // data integrity and metadata validation
+                validate(credential, statusVerifier);
+            }
+        }
+        
+        throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
+    }
+    
+    private void verifyProofs(JsonObject expanded) throws VerificationError, DocumentError {
+    
+        // get proofs - throws an exception if there is no proof, never null nor an
+        // empty collection
+        final Collection<JsonValue> proofs = EmbeddedProof.assertProof(expanded);
 
-		// a data before issuance - no proof attached
-		final JsonObject data = EmbeddedProof.removeProof(expanded);
+        // a data before issuance - no proof attached
+        final JsonObject data = EmbeddedProof.removeProof(expanded);
 
-		// verify attached proofs' signatures
-		for (final JsonValue proofValue : proofs) {
+        // verify attached proofs' signatures
+        for (final JsonValue proofValue : proofs) {
 
-			if (JsonUtils.isNotObject(proofValue)) {
-				throw new DocumentError(ErrorType.Invalid, "Proof");
-			}
+            if (JsonUtils.isNotObject(proofValue)) {
+                throw new DocumentError(ErrorType.Invalid, "Proof");
+            }
 
-			final Collection<String> proofType = JsonLdUtils.getType(proofValue.asJsonObject());
+            final Collection<String> proofType = JsonLdUtils.getType(proofValue.asJsonObject());
 
-			if (proofType == null || proofType.isEmpty()) {
-				throw new DocumentError(ErrorType.Missing, "ProofType");
-			}
+            if (proofType == null || proofType.isEmpty()) {
+                throw new DocumentError(ErrorType.Missing, "ProofType");
+            }
 
-			final SignatureSuite signatureSuite = proofType.stream().filter(suiteProvider::isSupported).findFirst()
-					.map(suiteProvider::getSignatureSuite).orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
+            final SignatureSuite signatureSuite = proofType.stream()
+                    .filter(suiteProvider::isSupported).findFirst()
+                    .map(suiteProvider::getSignatureSuite)
+                    .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
 
-			final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
+            final Proof proof = signatureSuite.getProofAdapter()
+                    .deserialize(proofValue.asJsonObject());
 
-			validate(proof);
+            validate(proof);
 
-			final VerificationMethod verificationMethod = get(
-															proof.getVerificationMethod().id(), 
-															loader,
-															signatureSuite.getProofAdapter().getMethodAdapter()
-															);
+            final VerificationMethod verificationMethod = get(proof.getVerificationMethod().id(),
+                    loader, signatureSuite.getProofAdapter().getMethodAdapter());
 
-			if (!(verificationMethod instanceof VerificationKey)) {
-				throw new VerificationError(Code.UnknownVerificationMethod);
-			}
+            if (!(verificationMethod instanceof VerificationKey)) {
+                throw new VerificationError(Code.UnknownVerificationMethod);
+            }
 
-			final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite);
+            final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite);
 
-			// verify signature
-			signature.verify(
-							data, 
-							proofValue.asJsonObject(), 
-							(VerificationKey) verificationMethod, 
-							proof.getValue()
-						);
+            // verify signature
+            signature.verify(data, proofValue.asJsonObject(), (VerificationKey) verificationMethod,
+                    proof.getValue());
+        }
+        // all good
+    }
 
-			// verify status
-			if (statusVerifier != null && verifiable.isCredential()) {
-				statusVerifier.verify(verifiable.asCredential().getCredentialStatus());
-			}
-		}
-		// all good
-	}
+    // refresh/fetch verification method
+    final VerificationMethod get(final URI id, final DocumentLoader loader,
+            VerificationMethodJsonAdapter keyAdapter) throws DocumentError, VerificationError {
 
-	// refresh/fetch verification method
-	final VerificationMethod get(final URI id, final DocumentLoader loader, VerificationMethodJsonAdapter keyAdapter)
-			throws DocumentError, VerificationError {
+        if (DidUrl.isDidUrl(id)) {
 
-		if (DidUrl.isDidUrl(id)) {
+            DidResolver resolver = didResolver;
 
-			DidResolver resolver = didResolver;
+            if (resolver == null) {
+                resolver = new DidKeyResolver();
+            }
 
-			if (resolver == null) {
-				resolver = new DidKeyResolver();
-			}
+            final DidDocument didDocument = resolver.resolve(DidUrl.from(id));
 
-			final DidDocument didDocument = resolver.resolve(DidUrl.from(id));
+            return didDocument.verificationMethod().stream()
+                    .filter(vm -> keyAdapter.getType().equals(vm.type()))
+                    .map(did -> new VerificationKeyImpl(did.id().toUri(), did.controller().toUri(),
+                            did.type(), did.publicKey()))
+                    .findFirst().orElseThrow(IllegalStateException::new);
+        }
 
-			return didDocument.verificationMethod().stream().filter(vm -> keyAdapter.getType().equals(vm.type()))
-					.map(did -> new VerificationKeyImpl(did.id().toUri(), did.controller().toUri(), did.type(),
-							did.publicKey()))
-					.findFirst().orElseThrow(IllegalStateException::new);
-		}
+        try {
+            final JsonArray document = JsonLd.expand(id).loader(loader)
+                    .context("https://w3id.org/security/suites/ed25519-2020/v1").get();
 
-		try {
-			final JsonArray document = JsonLd.expand(id).loader(loader)
-					.context("https://w3id.org/security/suites/ed25519-2020/v1").get();
+            for (final JsonValue method : document) {
 
-			for (final JsonValue method : document) {
+                if (JsonUtils.isNotObject(method)) {
+                    continue;
+                }
 
-				if (JsonUtils.isNotObject(method)) {
-					continue;
-				}
+                // take the first key that match
+                if (JsonLdUtils.getType(method.asJsonObject()).stream()
+                        .anyMatch(m -> keyAdapter.getType().equals(m))) {
+                    return keyAdapter.deserialize(method.asJsonObject());
+                }
+            }
 
-				// take the first key that match
-				if (JsonLdUtils.getType(method.asJsonObject()).stream().anyMatch(m -> keyAdapter.getType().equals(m))) {
-					return keyAdapter.deserialize(method.asJsonObject());
-				}
-			}
+        } catch (JsonLdError e) {
+            failWithJsonLd(e);
+            throw new DocumentError(ErrorType.Invalid, "document", e);
+        }
 
-		} catch (JsonLdError e) {
-			failWithJsonLd(e);
-			throw new DocumentError(ErrorType.Invalid, "document", e);
-		}
+        throw new VerificationError(Code.UnknownVerificationKey);
+    }
 
-		throw new VerificationError(Code.UnknownVerificationKey);
-	}
+    private static final void validate(final Credential credential, final StatusVerifier statusVerifier) throws DocumentError, VerificationError {
 
-	private final void validate(Verifiable verifiable) throws DocumentError, VerificationError {
+        // data integrity - issuance date is a mandatory property
+        if (credential.getIssuanceDate() == null 
+                && (credential.getValidFrom() == null && credential.getIssued() == null)) {
+            throw new DocumentError(ErrorType.Missing, Credential.ISSUANCE_DATE);
+        }
 
-		if (verifiable.isCredential()) {
+        // validation
+        if (credential.isExpired()) {
+            throw new VerificationError(Code.Expired);
+        }
+        
+        if ((credential.getIssuanceDate() != null
+                && credential.getIssuanceDate().isAfter(Instant.now()))
+                
+            || (credential.getIssued() != null
+                && credential.getIssued().isAfter(Instant.now()))
+            
+            || (credential.getValidFrom() != null
+                && credential.getValidFrom().isAfter(Instant.now()))
+        ) {
+            throw new VerificationError(Code.NotValidYet);
+        }
+        
+        // status check
+        if (statusVerifier != null && credential.getCredentialStatus() != null) {
+            statusVerifier.verify(credential.getCredentialStatus());
+        }
+    }
 
-			// data integrity - issuance date is a mandatory property
-			if (verifiable.asCredential().getIssuanceDate() == null
-					&& verifiable.asCredential().getValidFrom() == null) {
-				throw new DocumentError(ErrorType.Missing, Credential.ISSUANCE_DATE);
-			}
-			
-			// is expired?
-			if (verifiable.asCredential().isExpired()) {
-				throw new VerificationError(Code.Expired);
-			}
-		}
-	}
-	
-	private final void validate(Proof proof) throws VerificationError, DocumentError {
-		
-		// purpose
-		if (proof.getPurpose() == null) {
-			throw new DocumentError(ErrorType.Missing, ProofProperty.Purpose);
-		}
-		
-		// verification method
-		if (proof.getVerificationMethod() == null) {
-			throw new DocumentError(ErrorType.Missing, ProofProperty.VerificationMethod);
-		}
-		
-		// value
-		if (proof.getValue() == null || proof.getValue().length == 0) {
-			throw new DocumentError(ErrorType.Missing, ProofProperty.Value);
-		}
-		
-		// created
-		if (proof.getCreated() == null) {
-			throw new DocumentError(ErrorType.Missing, ProofProperty.Created);
-		}
-		
-		// domain
-		if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
-			throw new VerificationError(Code.InvalidProofDomain);
-		}
-	}
+    private final void validate(Proof proof) throws VerificationError, DocumentError {
 
-	class VerificationKeyImpl implements VerificationKey {
+        // purpose
+        if (proof.getPurpose() == null) {
+            throw new DocumentError(ErrorType.Missing, ProofProperty.Purpose);
+        }
 
-		final URI id;
-		final String type;
-		final URI controller;
-		final byte[] publicKey;
+        // verification method
+        if (proof.getVerificationMethod() == null) {
+            throw new DocumentError(ErrorType.Missing, ProofProperty.VerificationMethod);
+        }
 
-		public VerificationKeyImpl(URI id, URI controller, String type, byte[] publicKey) {
-			this.id = id;
-			this.type = type;
-			this.controller = controller;
-			this.publicKey = publicKey;
-		}
+        // value
+        if (proof.getValue() == null || proof.getValue().length == 0) {
+            throw new DocumentError(ErrorType.Missing, ProofProperty.Value);
+        }
 
-		@Override
-		public URI id() {
-			return id;
-		}
+        // created
+        if (proof.getCreated() == null) {
+            throw new DocumentError(ErrorType.Missing, ProofProperty.Created);
+        }
 
-		@Override
-		public String type() {
-			return type;
-		}
+        // domain
+        if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
+            throw new VerificationError(Code.InvalidProofDomain);
+        }
+    }
 
-		@Override
-		public URI controller() {
-			return controller;
-		}
+    class VerificationKeyImpl implements VerificationKey {
 
-		@Override
-		public byte[] publicKey() {
-			return publicKey;
-		}
-	}
+        final URI id;
+        final String type;
+        final URI controller;
+        final byte[] publicKey;
+
+        public VerificationKeyImpl(URI id, URI controller, String type, byte[] publicKey) {
+            this.id = id;
+            this.type = type;
+            this.controller = controller;
+            this.publicKey = publicKey;
+        }
+
+        @Override
+        public URI id() {
+            return id;
+        }
+
+        @Override
+        public String type() {
+            return type;
+        }
+
+        @Override
+        public URI controller() {
+            return controller;
+        }
+
+        @Override
+        public byte[] publicKey() {
+            return publicKey;
+        }
+    }
 }

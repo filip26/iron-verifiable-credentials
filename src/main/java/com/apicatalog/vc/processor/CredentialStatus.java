@@ -1,6 +1,7 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
+import java.util.Collection;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdUtils;
@@ -16,22 +17,21 @@ import jakarta.json.JsonValue;
 class CredentialStatus implements StatusVerifier.Status {
 
     private URI id;
-    private String type;
+    private Collection<String> type;
 
-    protected CredentialStatus() {
+    protected CredentialStatus() { /* protected */ }
 
-    }
-
-    public static CredentialStatus from(final JsonValue object) throws DocumentError {
+    public static CredentialStatus from(final JsonValue document) throws DocumentError {
 
         final CredentialStatus status = new CredentialStatus();
 
-        if (!JsonLdUtils.hasType(object)) {
+        if (!JsonLdUtils.hasType(document)) {
             throw new DocumentError(ErrorType.Missing, "StatusType");
         }
 
         try {
-            status.id = JsonLdUtils.getId(object).orElseThrow(() -> new DocumentError(ErrorType.Missing, "StatusId"));
+            status.type = JsonLdUtils.getType(document.asJsonObject());
+            status.id = JsonLdUtils.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, "StatusId"));
             
         } catch (InvalidJsonLdValue e) {
             throw new DocumentError(ErrorType.Invalid, "StatusId");
@@ -46,7 +46,7 @@ class CredentialStatus implements StatusVerifier.Status {
     }
 
     @Override
-    public String getType() {
+    public Collection<String> getType() {
         return type;
     }
 }

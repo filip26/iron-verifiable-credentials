@@ -57,27 +57,18 @@ abstract class Processor<T extends Processor<?>> {
 		return (T) this;
 	}
 
-	protected static Verifiable get(JsonObject expanded) throws DocumentError {
+	protected static Verifiable get(final JsonObject expanded) throws DocumentError {
+
 		// is a credential?
 		if (Credential.isCredential(expanded)) {
-
-			final JsonObject object = expanded.asJsonObject();
-
 			// validate the credential object
-			final Credential credential = Credential.from(object);
-
-			return credential;
+			return Credential.from(expanded);
 		}
 
 		// is a presentation?
 		if (Presentation.isPresentation(expanded)) {
-
-			final JsonObject object = expanded.asJsonObject();
-
 			// validate the presentation object
-			final Presentation presentation = Presentation.from(object);
-
-			return presentation;
+			return Presentation.from(expanded);
 		}
 
 		// is not expanded JSON-LD object

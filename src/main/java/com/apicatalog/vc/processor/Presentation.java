@@ -33,54 +33,49 @@ class Presentation implements Verifiable {
     protected Presentation() {
     }
 
-    public static boolean isPresentation(JsonValue expanded) {
-        if (expanded == null) {
-            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
+    public static boolean isPresentation(final JsonValue document) {
+        if (document == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
-
-        return JsonUtils.isObject(expanded)
-                && JsonLdUtils.isTypeOf(BASE + TYPE, expanded.asJsonObject());
+        return JsonLdUtils.isTypeOf(BASE + TYPE, document);
     }
 
-    public static Presentation from(JsonObject subject) throws DocumentError {
+    public static Presentation from(final JsonObject document) throws DocumentError {
 
-        if (subject == null) {
-            throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
+        if (document == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
         final Presentation presentation = new Presentation();
 
         // @type
-        if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
+        if (!JsonLdUtils.isTypeOf(BASE + TYPE, document)) {
 
-            if (!JsonLdUtils.hasType(subject)) {
+            if (!JsonLdUtils.hasType(document)) {
                 throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
             }
-
             throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
         }
 
         try {
-            
+
             // @id - optional
-            if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
-                presentation.id = JsonLdUtils.getId(subject).orElse(null);
-            }
+            presentation.id = JsonLdUtils.getId(document).orElse(null);
 
             // holder - optional
-            presentation.holder = JsonLdUtils.getId(subject, BASE + HOLDER).orElse(null);
+            presentation.holder = JsonLdUtils.getId(document, BASE + HOLDER).orElse(null);
 
         } catch (InvalidJsonLdValue e) {
             if (Keywords.ID.equals(e.getProperty())) {
-                throw new DocumentError(ErrorType.Invalid, e.getProperty()); 
+                throw new DocumentError(ErrorType.Invalid, e.getProperty());
             }
             throw new DocumentError(ErrorType.Invalid, e.getProperty().substring(0, BASE.length()));
         }
+
         presentation.credentials = new ArrayList<>();
 
         // verifiableCredentials
-        for (final JsonValue credential : JsonLdUtils.getObjects(subject,
-                BASE + VERIFIABLE_CREDENTIALS)) {
+        for (final JsonValue credential : JsonLdUtils.getObjects(document, BASE + VERIFIABLE_CREDENTIALS)) {
 
             if (JsonUtils.isNotObject(credential)) {
                 throw new DocumentError(ErrorType.Invalid, VERIFIABLE_CREDENTIALS);
@@ -107,6 +102,10 @@ class Presentation implements Verifiable {
         return id;
     }
 
+    public Collection<Credential> getCredentials() {
+        return credentials;
+    }
+    
     /**
      * @see <a href="https://www.w3.org/TR/vc-data-model/#dfn-holders">Holder</a>
      * @return {@link URI} identifying the holder

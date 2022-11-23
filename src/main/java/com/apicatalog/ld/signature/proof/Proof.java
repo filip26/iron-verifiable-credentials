@@ -13,15 +13,15 @@ public class Proof {
 
     protected String type;
     protected URI purpose;
-    protected VerificationMethod verificationMethod;
+    protected VerificationMethod nethod;
     protected Instant created;
     protected String domain;
     protected byte[] value;
 
-    public Proof(String type, URI purpose, VerificationMethod verificationMethod, Instant created, String domain, byte[] value) {
+    public Proof(String type, URI purpose, VerificationMethod method, Instant created, String domain, byte[] value) {
         this.type = type;
         this.purpose = purpose;
-        this.verificationMethod = verificationMethod;
+        this.nethod = method;
         this.created = created;
         this.domain = domain;
         this.value = value;
@@ -58,7 +58,7 @@ public class Proof {
      * @return {@link VerificationMethod} to verify the proof signature
      */
     public VerificationMethod getVerificationMethod() {
-        return verificationMethod;
+        return nethod;
     }
 
     /**
