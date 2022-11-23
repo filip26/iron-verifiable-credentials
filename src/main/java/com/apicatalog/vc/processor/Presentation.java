@@ -28,7 +28,7 @@ class Presentation implements Verifiable {
 
     protected URI holder;
 
-    protected Collection<Credential> credentials;
+    protected Collection<JsonObject> credentials;
 
     protected Presentation() {
     }
@@ -81,7 +81,7 @@ class Presentation implements Verifiable {
                 throw new DocumentError(ErrorType.Invalid, VERIFIABLE_CREDENTIALS);
             }
 
-            presentation.credentials.add(Credential.from(credential.asJsonObject()));
+            presentation.credentials.add(credential.asJsonObject());
         }
 
         return presentation;
@@ -102,7 +102,7 @@ class Presentation implements Verifiable {
         return id;
     }
 
-    public Collection<Credential> getCredentials() {
+    public Collection<JsonObject> getCredentials() {
         return credentials;
     }
     

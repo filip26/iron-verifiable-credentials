@@ -168,9 +168,18 @@ public final class Verifier extends Processor<Verifier> {
         } else if (veri1fiable.isPresentation()) {
 
             // verify embedded credentials
-            for (final Credential credential : veri1fiable.asPresentation().getCredentials()) {
+            for (final JsonObject expandedCredential : veri1fiable.asPresentation().getCredentials()) {
+                
+                final Verifiable credential = get(expandedCredential);
+                
+                if (!credential.isCredential()) {
+                    throw new DocumentError(ErrorType.Invalid, "CredentialType");
+                }
+
                 // data integrity and metadata validation
-                validate(credential, statusVerifier);
+                validate(credential.asCredential(), statusVerifier);
+
+                verifyProofs(expandedCredential);
             }
 
             verifyProofs(expanded);

@@ -2,9 +2,7 @@ package com.apicatalog.vc.processor;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdUtils;
@@ -55,9 +53,8 @@ class Credential implements Verifiable {
     protected Instant validUntil;
     protected Instant validFrom;
 
-    protected CredentialStatus status;
-
-    protected Collection<JsonValue> subjects;
+    protected JsonValue status;
+    protected JsonValue subject;
 
     protected Map<String, JsonValue> extensions;
 
@@ -129,12 +126,14 @@ class Credential implements Verifiable {
             throw new DocumentError(ErrorType.Invalid, e.getProperty().substring(0, BASE.length()));
         }
 
+        // subject
+        
+        
         // status
-        final Optional<JsonValue> status = JsonLdUtils.getObjects(document, BASE + CREDENTIAL_STATUS).stream().findFirst();
-
-        if (status.isPresent()) {
-            credential.status = CredentialStatus.from(status.get());
-        }
+        JsonLdUtils
+            .getObjects(document, BASE + CREDENTIAL_STATUS).stream()
+            .findFirst()
+            .ifPresent(s -> credential.status = s);
 
         return credential;
     }
@@ -218,7 +217,7 @@ class Credential implements Verifiable {
      * 
      * @return
      */
-    public CredentialStatus getCredentialStatus() {
+    public JsonValue getCredentialStatus() {
         return status;
     }
 

@@ -9,6 +9,7 @@ public class VerificationError extends Throwable {
 
         InvalidSignature, InvalidProofDomain,
 
+        //TODO revise and possibly remove in favor of DocumentError
         UnknownCryptoSuite, UnknownVerificationKey, UnknownVerificationMethod,
         
         LinkedDataSignature,
@@ -20,10 +21,6 @@ public class VerificationError extends Throwable {
         super(code.name());
         this.code = code;
     }
-
-//    public VerificationError(Throwable e) {
-//        this(Code.Internal, e);
-//    }
 
     public VerificationError(Code code, Throwable e) {
         super(code.name(), e);

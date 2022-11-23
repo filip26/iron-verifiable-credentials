@@ -1,18 +1,15 @@
 package com.apicatalog.vc.processor;
 
-import java.net.URI;
-import java.util.Collection;
-
 import com.apicatalog.ld.DocumentError;
 
+import jakarta.json.JsonValue;
+
+/**
+ * Allows to implement a custom verifiable credential status verifier
+ *
+ */
 public interface StatusVerifier {
 
-    public interface Status {
-        
-        URI getId();
-        
-        Collection<String> getType();
-    }
+    void verify(JsonValue status) throws DocumentError, VerifyError;
 
-    void verify(Status status) throws DocumentError, VerifyError;
 }

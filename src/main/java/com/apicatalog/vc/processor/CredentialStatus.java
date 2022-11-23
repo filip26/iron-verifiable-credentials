@@ -14,7 +14,7 @@ import jakarta.json.JsonValue;
  * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>
  *
  */
-class CredentialStatus implements StatusVerifier.Status {
+class CredentialStatus {
 
     private URI id;
     private Collection<String> type;
@@ -40,12 +40,10 @@ class CredentialStatus implements StatusVerifier.Status {
         return status;
     }
 
-    @Override
     public URI getId() {
         return id;
     }
 
-    @Override
     public Collection<String> getType() {
         return type;
     }
