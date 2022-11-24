@@ -3,6 +3,9 @@ package com.apicatalog.vc.processor;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Optional;
 
 import com.apicatalog.did.DidResolver;
 import com.apicatalog.did.DidUrl;
@@ -27,6 +30,7 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.json.EmbeddedProof;
 import com.apicatalog.ld.signature.json.MethodAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.ld.signature.method.MethodResolver;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.ProofProperty;
@@ -48,18 +52,23 @@ public final class Verifier extends Processor<Verifier> {
     private StatusVerifier statusVerifier = null;
     private SubjectVerifier subjectVerifier = null;
     
+    @Deprecated
     private DidResolver didResolver = null;
+    
+    private Collection<MethodResolver> methodResolvers;
 
     public Verifier(URI location, final SignatureSuiteProvider suiteProvider) {
         this.location = location;
         this.document = null;
         this.suiteProvider = suiteProvider;
+        this.methodResolvers = new LinkedHashSet<>();
     }
 
     public Verifier(JsonObject document, final SignatureSuiteProvider suiteProvider) {
         this.document = document;
         this.location = null;
         this.suiteProvider = suiteProvider;
+        this.methodResolvers = new LinkedHashSet<>();
     }
 
     /**
@@ -233,13 +242,28 @@ public final class Verifier extends Processor<Verifier> {
             final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 
             validate(proof);
+            
+            VerificationMethod verificationMethod = proof.getMethod(); 
+            
+            // if the verification is not a verification 
+            if (!(proof.getMethod() instanceof VerificationKey)) {
+                // then try to resolve the method
+                final Optional<MethodResolver> resolver = 
+                        methodResolvers.stream()
+                                    .filter(r -> r.isAccepted(proof.getMethod().id()))
+                                    .findFirst();
+                
+                if (resolver.isPresent()) {
+                    verificationMethod = resolver.get().resolve(proof.getMethod().id(), signatureSuite);
+                }
+            }
 
-            final VerificationMethod verificationMethod = 
-                    getMethod(
-                        proof.getMethod().id(),
-                        loader, 
-                        signatureSuite.getMethodAdapter()
-                        );
+//            final VerificationMethod verificationMethod = 
+//                    getMethod(
+//                        proof.getMethod().id(),
+//                        loader, 
+//                        signatureSuite.getMethodAdapter()
+//                        );
 
             if (!(verificationMethod instanceof VerificationKey)) {
                 throw new VerificationError(Code.UnknownVerificationMethod);
@@ -259,57 +283,57 @@ public final class Verifier extends Processor<Verifier> {
     }
 
     // refresh/fetch verification method
-    final VerificationMethod getMethod(final URI id, final DocumentLoader loader, MethodAdapter keyAdapter) throws DocumentError, VerificationError {
-
-        if (DidUrl.isDidUrl(id)) {
-
-            DidResolver resolver = didResolver;
-
-            if (resolver == null) {
-                resolver = new DidKeyResolver();
-            }
-
-            final DidDocument didDocument = resolver.resolve(DidUrl.from(id));
-
-            return didDocument.verificationMethod().stream()
-                    .filter(vm -> keyAdapter.isSupportedType(vm.type()))
-                    .map(did -> new VerificationKeyImpl(
-                            did.id().toUri(),
-                            did.controller().toUri(),
-                            did.type(),
-                            did.publicKey()))
-                    .findFirst().orElseThrow(() -> new VerificationError(Code.UnknownVerificationKey));
-        }
-
-        try {
-            final JsonArray document = JsonLd.expand(id)
-                                            .loader(loader)
-                                            .context(keyAdapter.getContextFor(id)) // an optional expansion context
-                                            .get();
-
-            for (final JsonValue method : document) {
-
-                if (JsonUtils.isNotObject(method)) {
-                    continue;
-                }
-
-                // take the first method matching type
-                if (JsonLdUtils
-                        .getType(method.asJsonObject())
-                        .stream()
-                        .anyMatch(m -> keyAdapter.isSupportedType(m))) {
-
-                    return keyAdapter.deserialize(method.asJsonObject());
-                }
-            }
-
-        } catch (JsonLdError e) {
-            failWithJsonLd(e);
-            throw new DocumentError(ErrorType.Invalid, "document", e);
-        }
-
-        throw new VerificationError(Code.UnknownVerificationKey);
-    }
+//    final VerificationMethod getMethod(final URI id, final DocumentLoader loader, MethodAdapter keyAdapter) throws DocumentError, VerificationError {
+//
+//        if (DidUrl.isDidUrl(id)) {
+//
+//            DidResolver resolver = didResolver;
+//
+//            if (resolver == null) {
+//                resolver = new DidKeyResolver();
+//            }
+//
+//            final DidDocument didDocument = resolver.resolve(DidUrl.from(id));
+//
+//            return didDocument.verificationMethod().stream()
+//                    .filter(vm -> keyAdapter.isSupportedType(vm.type()))
+//                    .map(did -> new VerificationKeyImpl(
+//                            did.id().toUri(),
+//                            did.controller().toUri(),
+//                            did.type(),
+//                            did.publicKey()))
+//                    .findFirst().orElseThrow(() -> new VerificationError(Code.UnknownVerificationKey));
+//        }
+//
+//        try {
+//            final JsonArray document = JsonLd.expand(id)
+//                                            .loader(loader)
+//                                            .context(keyAdapter.getContextFor(id)) // an optional expansion context
+//                                            .get();
+//
+//            for (final JsonValue method : document) {
+//
+//                if (JsonUtils.isNotObject(method)) {
+//                    continue;
+//                }
+//
+//                // take the first method matching type
+//                if (JsonLdUtils
+//                        .getType(method.asJsonObject())
+//                        .stream()
+//                        .anyMatch(m -> keyAdapter.isSupportedType(m))) {
+//
+//                    return keyAdapter.deserialize(method.asJsonObject());
+//                }
+//            }
+//
+//        } catch (JsonLdError e) {
+//            failWithJsonLd(e);
+//            throw new DocumentError(ErrorType.Invalid, "document", e);
+//        }
+//
+//        throw new VerificationError(Code.UnknownVerificationKey);
+//    }
 
     private static final void validate(final Credential credential, final StatusVerifier statusVerifier, final SubjectVerifier subjectVerifier)
             throws DocumentError, VerificationError {

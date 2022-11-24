@@ -23,13 +23,13 @@ public class TestVerificationMethodAdapter implements MethodAdapter {
 	}
 
     @Override
-    public boolean isSupportedType(String type) {
+    public URI contextFor(URI id) {
         // TODO Auto-generated method stub
-        return false;
+        return null;
     }
 
     @Override
-    public URI getContextFor(URI id) {
+    public String type() {
         // TODO Auto-generated method stub
         return null;
     }

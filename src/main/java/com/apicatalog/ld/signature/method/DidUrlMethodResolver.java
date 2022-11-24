@@ -6,6 +6,7 @@ import com.apicatalog.did.DidResolver;
 import com.apicatalog.did.DidUrl;
 import com.apicatalog.did.document.DidDocument;
 import com.apicatalog.did.key.DidKeyResolver;
+import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 
@@ -19,7 +20,7 @@ public class DidUrlMethodResolver implements MethodResolver {
     }
     
     @Override
-    public VerificationMethod resolve(URI uri) {
+    public VerificationMethod resolve(URI uri, SignatureSuite suite) {
         
         final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));
 

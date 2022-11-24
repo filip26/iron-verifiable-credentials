@@ -10,13 +10,17 @@ import jakarta.json.JsonObject;
 public interface MethodAdapter {
 
     /**
-     * Returns <code>true</code> if the adapter supports (can (de)serialize the given method type
-     * 
-     * @param type an {@link URI} representing a verification method type
-     * @return <code>true</code> if the given type is supported by the adapter, otherwise <code>false</code> 
+     * An adapter type 
+     * @return an absolute URI identifying the method JSON-LD type
      */
-    boolean isSupportedType(String type);
+    String type();
     
+    /**
+     * Transforms the given JSON object into a verification method, verification key, or a key pair 
+     * @param object
+     * @return
+     * @throws DocumentError
+     */
     VerificationMethod deserialize(JsonObject object) throws DocumentError;
 
     JsonObject serialize(VerificationMethod proof) throws DocumentError;
@@ -26,6 +30,7 @@ public interface MethodAdapter {
      * 
      * @return an {@link URI} referencing a JSON-LD context or <code>null</code> if a context is embedded or not needed
      */
-    URI getContextFor(URI id);
-
+    URI contextFor(URI id);
+    
+    //TODO URI getBase(URI id);
 }
