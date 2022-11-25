@@ -21,9 +21,11 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -73,14 +75,20 @@ public class VcTestRunnerJunit {
 					// set dummy key pair
 					keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
 				}
+				
+				final SignatureSuite suite = new TestCryptoSuite();
+				
+				final ProofOptions options = suite.createOptions(); //FIXME should be builder
+				        //FIXME
+                        // proof options
+                        //.verificationMethod(testCase.verificationMethod)
+                        //.purpose(URI.create("https://w3id.org/security#assertionMethod"))
+                        //.created(testCase.created)
+                        //.domain(testCase.domain)
 
-				Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), new TestCryptoSuite())
+
+				Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
 						.loader(LOADER)
-						// proof options
-						.verificationMethod(testCase.verificationMethod)
-						.purpose(URI.create("https://w3id.org/security#assertionMethod"))
-						.created(testCase.created)
-						.domain(testCase.domain)
 						;
 
 				JsonObject signed = null;

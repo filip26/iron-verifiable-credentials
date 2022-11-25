@@ -1,7 +1,5 @@
 package com.apicatalog.ld.signature.json;
 
-import java.net.URI;
-
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 
@@ -24,13 +22,4 @@ public interface MethodAdapter {
     VerificationMethod deserialize(JsonObject object) throws DocumentError;
 
     JsonObject serialize(VerificationMethod proof) throws DocumentError;
-
-    /**
-     * Get an optional JSON-LD context used when expanding remote verification method fetched on-demand.
-     * 
-     * @return an {@link URI} referencing a JSON-LD context or <code>null</code> if a context is embedded or not needed
-     */
-    URI contextFor(URI id);
-    
-    //TODO URI getBase(URI id);
 }

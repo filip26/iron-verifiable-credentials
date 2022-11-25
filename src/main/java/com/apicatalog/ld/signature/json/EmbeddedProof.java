@@ -18,7 +18,7 @@ public final class EmbeddedProof {
 
 	public static final String PROPERTY_NAME = "https://w3id.org/security#proof";
 	
-	protected EmbeddedProof() { /* protected */ }
+    protected EmbeddedProof() { /* protected */ }
 
 	/**
 	 * Appends the proof to the given VC/VP document. If the document has been

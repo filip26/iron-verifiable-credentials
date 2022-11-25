@@ -11,6 +11,7 @@ import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.processor.Issuer;
 import com.apicatalog.vc.processor.KeysGenerator;
 import com.apicatalog.vc.processor.Verifier;
@@ -69,8 +70,8 @@ public final class Vc {
      * @throws DocumentError
      * @throws SigningError
      */
-    public static Issuer sign(URI documentLocation, KeyPair keyPair, final SignatureSuite signatureSuite) throws DocumentError, SigningError {
-        return new Issuer(documentLocation, keyPair, signatureSuite);
+    public static Issuer sign(URI documentLocation, KeyPair keyPair, final ProofOptions options) throws DocumentError, SigningError {
+        return new Issuer(documentLocation, keyPair, options);
     }
 
     /**
@@ -85,8 +86,8 @@ public final class Vc {
      * @throws DocumentError
      * @throws SigningError
      */
-    public static Issuer sign(JsonObject document, KeyPair keyPair, final SignatureSuite signatureSuite) throws DocumentError, SigningError {
-        return new Issuer(document, keyPair, signatureSuite);
+    public static Issuer sign(JsonObject document, KeyPair keyPair, final ProofOptions options) throws DocumentError, SigningError {
+        return new Issuer(document, keyPair, options);
     }
 
     /**

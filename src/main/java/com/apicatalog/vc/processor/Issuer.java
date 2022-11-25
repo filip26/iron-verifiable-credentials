@@ -12,13 +12,11 @@ import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.LinkedDataSignature;
-import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.json.EmbeddedProof;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.Json;
@@ -34,77 +32,27 @@ public final class Issuer extends Processor<Issuer> {
 
 	private final KeyPair keyPair;
 
-	protected final SignatureSuite signatureSuite;
+	protected final ProofOptions options;
 
-	// proof options
-	protected VerificationMethod verificationMethod;
-
-	protected URI purpose;
-
-	protected Instant created;
-
-	protected String domain;
-
-	public Issuer(URI location, KeyPair keyPair, final SignatureSuite signatureSuite) {
+	public Issuer(URI location, KeyPair keyPair, final ProofOptions options) {
 		this.location = location;
 		this.document = null;
 
 		this.keyPair = keyPair;
 
-		this.signatureSuite = signatureSuite;
+		this.options = options;
 	}
 	
-	public Issuer(JsonObject document, KeyPair keyPair, final SignatureSuite signatureSuite) {
+	public Issuer(JsonObject document, KeyPair keyPair, final ProofOptions options) {
 		this.document = document;
 		this.location = null;
 
 		this.keyPair = keyPair;
 
-		this.signatureSuite = signatureSuite;
+		this.options = options;
 	}
 
-	/**
-	 * Set the proof verification method
-	 * 
-	 * @param method a proof verification method
-	 * @return the issuer instance
-	 */
-	public Issuer verificationMethod(VerificationMethod method) {
-		this.verificationMethod = null;
-		return this;
-	}
-	
-	/**
-	 * Set the proof purpose
-	 * 
-	 * @param purpose a proof purpose
-	 * @return the issuer instance
-	 */
-	public Issuer purpose(URI purpose) {
-		this.purpose = purpose;
-		return this;
-	}
-	
-	/**
-	 * Set date time of the proof creation
-	 * @param created date time
-	 * @return the issuer instance
-	 */
-	public Issuer created(Instant created) {
-		this.created = created;
-		return this;
-	}
-	
-	/**
-	 * Set the proof domain
-	 * @param domain a proof domain
-	 * @return the issuer instance
-	 */
-	public Issuer domain(String domain) {
-		this.domain = domain;
-		return this;
-	}
-	
+
 	/**
 	 * Get signed document in expanded form.
 	 *
@@ -125,11 +73,11 @@ public final class Issuer extends Processor<Issuer> {
 		}
 
 		if (document != null && keyPair != null) {
-			return sign(document, keyPair, signatureSuite);
+			return sign(document, keyPair, options);
 		}
 
 		if (location != null && keyPair != null) {
-			return sign(location, keyPair, signatureSuite);
+			return sign(location, keyPair, options);
 		}
 
 		throw new IllegalStateException();
@@ -200,13 +148,13 @@ public final class Issuer extends Processor<Issuer> {
 	}
 
 	private final JsonObject sign(final URI documentLocation, final KeyPair keyPair,
-			final SignatureSuite signatureSuite) throws DocumentError, SigningError {
+			final ProofOptions options) throws DocumentError, SigningError {
 		try {
 			// load the document
 			final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).base(base)
 					.get();
 
-			return sign(expanded, keyPair, signatureSuite);
+			return sign(expanded, keyPair, options);
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
@@ -215,13 +163,13 @@ public final class Issuer extends Processor<Issuer> {
 	}
 
 	private final JsonObject sign(final JsonObject document, final KeyPair keyPair,
-			final SignatureSuite signatureSuite) throws DocumentError, SigningError {
+			final ProofOptions options) throws DocumentError, SigningError {
 		try {
 			// load the document
 			final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
 					.base(base).get();
 
-			return sign(expanded, keyPair, signatureSuite);
+			return sign(expanded, keyPair, options);
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
@@ -230,9 +178,9 @@ public final class Issuer extends Processor<Issuer> {
 	}
 
 	private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair,
-			final SignatureSuite signatureSuites) throws SigningError, DocumentError {
+			final ProofOptions options) throws SigningError, DocumentError {
 
-		final JsonObject object = 
+		JsonObject object = 
 		        JsonLdUtils
 		            .findFirstObject(expanded)
 		            .orElseThrow(() -> new DocumentError(ErrorType.Invalid, "document")); // malformed input, not single object to sign has been found
@@ -241,36 +189,31 @@ public final class Issuer extends Processor<Issuer> {
 
 		validate(verifiable);
 
-		if (signatureSuite == null) {
+		if (options.getSuite() == null) {
 			throw new SigningError(Code.UnknownCryptoSuite);
 		}
-
-		JsonObject data = EmbeddedProof.removeProof(object);
 
 		// add issuance date if missing
 		if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
 
 			final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
-			data = Json.createObjectBuilder(data)
-					.add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString())
-					.build();
-
-//			object = Json.createObjectBuilder(object)
-//					.add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString())
-//					.build();
+			object = Json.createObjectBuilder(object)
+					    .add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString())
+					    .build();
 		}
 
-		final LinkedDataSignature suite = new LinkedDataSignature(signatureSuite);
+        final JsonObject data = EmbeddedProof.removeProof(object);
 
-		JsonObject proof = signatureSuite.getProofAdapter().serialize(new Proof(
-				signatureSuites.getId(), purpose, verificationMethod, created, domain, null));
+        final LinkedDataSignature suite = new LinkedDataSignature(options.getSuite());
+
+		JsonObject proof = options.getSuite().getProofAdapter().serialize(options);
 
 		final byte[] signature = suite.sign(data, keyPair, proof);
 
-		proof = signatureSuite.getProofAdapter().setProofValue(proof, signature);
+		proof = options.getSuite().getProofAdapter().setProofValue(proof, signature);
 
-		return EmbeddedProof.addProof(data, proof);
+		return EmbeddedProof.addProof(object, proof);
 	}
 
 	private final void validate(Verifiable verifiable) throws SigningError {

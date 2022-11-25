@@ -1,7 +1,5 @@
 package com.apicatalog.vc;
 
-import java.net.URI;
-
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.json.MethodAdapter;
 import com.apicatalog.ld.signature.method.VerificationMethod;
@@ -21,12 +19,6 @@ public class TestVerificationMethodAdapter implements MethodAdapter {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-    @Override
-    public URI contextFor(URI id) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public String type() {

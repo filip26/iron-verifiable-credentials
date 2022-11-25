@@ -1,11 +1,14 @@
 package com.apicatalog.ld.signature;
 
+import java.util.Collection;
+
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.json.ProofAdapter;
 import com.apicatalog.ld.signature.json.MethodAdapter;
+import com.apicatalog.ld.signature.json.ProofAdapter;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.proof.ProofOptions;
 
 import jakarta.json.JsonStructure;
 
@@ -22,8 +25,9 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
 	protected final SignatureAlgorithm signer;
 
 	protected final ProofAdapter proofAdapter;
-    protected final MethodAdapter methodAdapter;
+    protected final Collection<MethodAdapter> methodAdapter;
 
+    
     /*
      * https://www.w3.org/TR/vc-data-integrity/#verification-material
      *  A cryptographic suite specification is responsible for specifying the verification method 
@@ -32,7 +36,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
     
 	public SignatureSuite(final String id, final CanonicalizationAlgorithm canonicalization,
 			final DigestAlgorithm digester, final SignatureAlgorithm signer, final ProofAdapter proofAdapter,
-			final MethodAdapter methodAdapter
+			final Collection<MethodAdapter> methodAdapter
 	        ) {
 		this.id = id;
 		this.canonicalization = canonicalization;
@@ -75,8 +79,25 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
 		return proofAdapter;
 	}
 
-	//TODO a type parameter?
-    public MethodAdapter getMethodAdapter() {
-        return methodAdapter;
+    public MethodAdapter getMethodAdapter(String type) {
+//        return methodAdapter;
+        //FIXME
+        return null;
     }
+
+    public ProofOptions createOptions() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+//    /**
+//     * A JSON-LD context used to expand the proof
+//     * 
+//     * @return an {@link URI} referencing a JSON-LD context or <code>null</code> if a context is embedded or not needed
+//     */
+//    public URI contexs() {
+//        return context;
+//    }
+    
+    //TODO URI getBase(URI id);
 }

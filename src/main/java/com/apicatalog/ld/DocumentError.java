@@ -7,7 +7,11 @@ public class DocumentError extends Throwable {
     private static final long serialVersionUID = -7146533158378348477L;
 
     public enum ErrorType {
-        Missing, Unknown, Invalid,
+        //TODO merge Unknown and Invalid?
+        Missing,
+        Unknown,
+     Invalid,
+        //Malformed,
     }
 
     private final ErrorType type;

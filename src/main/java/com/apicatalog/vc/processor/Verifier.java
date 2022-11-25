@@ -3,14 +3,10 @@ package com.apicatalog.vc.processor;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 
 import com.apicatalog.did.DidResolver;
-import com.apicatalog.did.DidUrl;
-import com.apicatalog.did.document.DidDocument;
-import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdUtils;
@@ -18,7 +14,6 @@ import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -28,7 +23,6 @@ import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.json.EmbeddedProof;
-import com.apicatalog.ld.signature.json.MethodAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.method.MethodResolver;
 import com.apicatalog.ld.signature.method.VerificationMethod;
@@ -245,14 +239,20 @@ public final class Verifier extends Processor<Verifier> {
             
             VerificationMethod verificationMethod = proof.getMethod(); 
             
-            // if the verification is not a verification 
-            if (!(proof.getMethod() instanceof VerificationKey)) {
-                // then try to resolve the method
+            // if the verification is not a verification key
+            if ((!(proof.getMethod() instanceof VerificationKey)
+                    // or does not have public key
+                    || (((VerificationKey)proof.getMethod()).publicKey() == null)
+                    )   
+                && proof.getMethod().id() != null) {
+
+                // find the method id resolver
                 final Optional<MethodResolver> resolver = 
                         methodResolvers.stream()
                                     .filter(r -> r.isAccepted(proof.getMethod().id()))
                                     .findFirst();
                 
+                // try to resolve the method                
                 if (resolver.isPresent()) {
                     verificationMethod = resolver.get().resolve(proof.getMethod().id(), signatureSuite);
                 }
@@ -405,38 +405,38 @@ public final class Verifier extends Processor<Verifier> {
         }
     }
 
-    class VerificationKeyImpl implements VerificationKey {
-
-        final URI id;
-        final String type;
-        final URI controller;
-        final byte[] publicKey;
-
-        public VerificationKeyImpl(URI id, URI controller, String type, byte[] publicKey) {
-            this.id = id;
-            this.type = type;
-            this.controller = controller;
-            this.publicKey = publicKey;
-        }
-
-        @Override
-        public URI id() {
-            return id;
-        }
-
-        @Override
-        public String type() {
-            return type;
-        }
-
-        @Override
-        public URI controller() {
-            return controller;
-        }
-
-        @Override
-        public byte[] publicKey() {
-            return publicKey;
-        }
-    }
+//    class VerificationKeyImpl implements VerificationKey {
+//
+//        final URI id;
+//        final String type;
+//        final URI controller;
+//        final byte[] publicKey;
+//
+//        public VerificationKeyImpl(URI id, URI controller, String type, byte[] publicKey) {
+//            this.id = id;
+//            this.type = type;
+//            this.controller = controller;
+//            this.publicKey = publicKey;
+//        }
+//
+//        @Override
+//        public URI id() {
+//            return id;
+//        }
+//
+//        @Override
+//        public String type() {
+//            return type;
+//        }
+//
+//        @Override
+//        public URI controller() {
+//            return controller;
+//        }
+//
+//        @Override
+//        public byte[] publicKey() {
+//            return publicKey;
+//        }
+//    }
 }

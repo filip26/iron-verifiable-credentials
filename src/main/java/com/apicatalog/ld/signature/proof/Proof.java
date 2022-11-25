@@ -11,8 +11,8 @@ import com.apicatalog.ld.signature.method.VerificationMethod;
  * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#proofs">Proofs</a>
  *
  */
-public class Proof {
-
+public class Proof  {
+    
     protected String type;
     
     protected URI purpose;
@@ -24,9 +24,9 @@ public class Proof {
     protected String domain;
     
     protected byte[] value;
-
-    protected Proof() { /* protected */ }
     
+    protected Proof() { /* protected */ }
+
     public Proof(String type, URI purpose, VerificationMethod method, Instant created, String domain, byte[] value) {
         this.type = type;
         this.purpose = purpose;
@@ -96,4 +96,5 @@ public class Proof {
     public byte[] getValue() {
         return value;
     }
+
 }
