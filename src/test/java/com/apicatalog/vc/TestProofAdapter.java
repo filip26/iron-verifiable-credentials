@@ -3,9 +3,9 @@ package com.apicatalog.vc;
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
+import com.apicatalog.ld.signature.json.DataIntegrityProofAdapter;
 
-public class TestProofAdapter extends EmbeddedProofAdapter {
+public class TestProofAdapter extends DataIntegrityProofAdapter {
 
 	protected TestProofAdapter(URI type) {
 		super(

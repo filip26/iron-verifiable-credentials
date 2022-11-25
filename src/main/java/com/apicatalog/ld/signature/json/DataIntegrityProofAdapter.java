@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
+import com.apicatalog.jsonld.JsonLdObjectBuilder;
 import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -18,24 +19,21 @@ import com.apicatalog.ld.signature.proof.ProofProperty;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
 /**
- * An embedded proof is included in the data, such as a Linked Data Signature.
+ * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  */
-public abstract class EmbeddedProofAdapter implements ProofAdapter {
+public abstract class DataIntegrityProofAdapter implements ProofAdapter {
 
     protected final EmbeddedProofProperty property;
 
-    // TODO remove, does not belong here
-    @Deprecated
     protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
     protected final URI proofType;
 
-    protected EmbeddedProofAdapter(
+    protected DataIntegrityProofAdapter(
                 final URI proofType, 
                 final EmbeddedProofProperty property
                 ) {
@@ -194,11 +192,10 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
         return null;
     }
 
-    protected JsonObjectBuilder write(final JsonObjectBuilder builder, final Proof proof)
-            throws DocumentError {
-
-        builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType().toString()));
-
+    protected JsonLdObjectBuilder write(final JsonLdObjectBuilder builder, final Proof proof) throws DocumentError {
+        
+        builder.setType(proof.getType());
+        
         //FIXME
 //        if (proof.getMethod() != null) {
 //            builder.add(property.expand(ProofProperty.VerificationMethod), Json.createArrayBuilder()
@@ -206,22 +203,23 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
 //        }
 
         if (proof.getCreated() != null) {
-            JsonLdUtils.setValue(builder, property.expand(ProofProperty.Created),
-                    proof.getCreated());
+            builder.vocab("https://w3id.org/security#");
+            builder.add(property.expand(ProofProperty.Created), proof.getCreated());
         }
 
+        builder.vocab("https://w3id.org/security#");
+        
         if (proof.getPurpose() != null) {
-            JsonLdUtils.setId(builder, property.expand(ProofProperty.Purpose), proof.getPurpose());
+            builder.setId(property.expand(ProofProperty.Purpose), proof.getPurpose());
         }
 
         if (proof.getDomain() != null) {
-            JsonLdUtils.setValue(builder, property.expand(ProofProperty.Domain), proof.getDomain());
+            builder.add(property.expand(ProofProperty.Domain), proof.getDomain());
         }
 
         if (proof.getValue() != null) {
             final String proofValue = encodeValue(MULTIBASE_TYPE, proof.getValue());
-            JsonLdUtils.setValue(builder, property.expand(ProofProperty.Value), MULTIBASE_TYPE,
-                    proofValue);
+            builder.add(property.expand(ProofProperty.Value), MULTIBASE_TYPE, proofValue);
         }
 
         return builder;
@@ -233,8 +231,9 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
 
         final String proofValue = encodeValue(MULTIBASE_TYPE, value);
 
-        return JsonLdUtils.setValue(Json.createObjectBuilder(proof),
-                property.expand(ProofProperty.Value), MULTIBASE_TYPE, proofValue).build();
+        return new JsonLdObjectBuilder(proof)
+                .add(property.expand(ProofProperty.Value), MULTIBASE_TYPE, proofValue)
+                .build();
     }
 
     @Override
@@ -250,7 +249,7 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
 
     @Override
     public JsonObject serialize(Proof proof) throws DocumentError {
-        return write(Json.createObjectBuilder(), proof).build();
+        return write(new JsonLdObjectBuilder(), proof).build();
     }
 
     @Override

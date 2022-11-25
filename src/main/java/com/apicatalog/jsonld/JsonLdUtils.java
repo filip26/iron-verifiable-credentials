@@ -13,12 +13,16 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.uri.UriUtils;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
+/**
+ * 
+ * Use {@link JsonLdObjectBuilder} Writer? or Reader
+ * TODO
+ */
+@Deprecated
 public class JsonLdUtils {
 
     static final String XSD_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
@@ -214,29 +218,29 @@ public class JsonLdUtils {
                 + value + "] is not JSON string but [" + value.getValueType() + "].");
     }
 
-    public static JsonObjectBuilder setId(JsonObjectBuilder builder, String property, URI id) {
-        return setId(builder, property, id.toString());
-    }
-
-    public static JsonObjectBuilder setId(JsonObjectBuilder builder, String property, String id) {
-        return builder.add(property,
-                Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, id)));
-    }
-
-    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property,
-            String type, String value) {
-        return builder.add(property, JsonLdValueObject.toJson(type, value));
-    }
-
-    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property,
-            String value) {
-        return builder.add(property, JsonLdValueObject.toJson(value));
-    }
-
-    public static JsonObjectBuilder setValue(final JsonObjectBuilder builder, final String property,
-            Instant instant) {
-        return setValue(builder, property, XSD_DATE_TIME, instant.toString());
-    }
+//    public static JsonObjectBuilder setId(JsonObjectBuilder builder, String property, URI id) {
+//        return setId(builder, property, id.toString());
+//    }
+//
+//    public static JsonObjectBuilder setId(JsonObjectBuilder builder, String property, String id) {
+//        return builder.add(property,
+//                Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, id)));
+//    }
+//
+//    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property,
+//            String type, String value) {
+//        return builder.add(property, JsonLdValueObject.toJson(type, value));
+//    }
+//
+//    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property,
+//            String value) {
+//        return builder.add(property, JsonLdValueObject.toJson(value));
+//    }
+//
+//    public static JsonObjectBuilder setValue(final JsonObjectBuilder builder, final String property,
+//            Instant instant) {
+//        return setValue(builder, property, XSD_DATE_TIME, instant.toString());
+//    }
 
     public static Optional<JsonObject> findFirstObject(final JsonValue expanded) {
         if (JsonUtils.isArray(expanded)) {
