@@ -1,5 +1,7 @@
 package com.apicatalog.ld.signature.json;
 
+import java.net.URI;
+
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.proof.Proof;
 
@@ -8,7 +10,7 @@ import jakarta.json.JsonObject;
 //TODO replace with EmbeddedProofAdapter 
 public interface ProofAdapter {
 
-    String type();
+    URI type();
 
     /**
      * Deserialize the given JSON-LD document in an expanded form representing a proof. Used when verifying.

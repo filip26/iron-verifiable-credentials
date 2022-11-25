@@ -1,11 +1,13 @@
 package com.apicatalog.vc;
 
+import java.net.URI;
+
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
 
 public class TestProofAdapter extends EmbeddedProofAdapter {
 
-	protected TestProofAdapter(String type) {
+	protected TestProofAdapter(URI type) {
 		super(
 	        type, 
 	         null);	//FIXME
@@ -25,7 +27,7 @@ public class TestProofAdapter extends EmbeddedProofAdapter {
 	}
 
     @Override
-    public String type() {
+    public URI type() {
         // TODO Auto-generated method stub
         return null;
     }

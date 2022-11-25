@@ -8,12 +8,12 @@ import com.apicatalog.ld.signature.method.VerificationMethod;
 /**
  * Represents VC/VP proof.
  *
- * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#proofs">Proofs</a>
+ * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
 public class Proof  {
     
-    protected String type;
+    protected URI type;
     
     protected URI purpose;
     
@@ -21,35 +21,38 @@ public class Proof  {
     
     protected Instant created;
     
+    protected byte[] value;
+
     protected String domain;
     
-    protected byte[] value;
-    
+    protected String challenge;
+        
     protected Proof() { /* protected */ }
 
-    public Proof(String type, URI purpose, VerificationMethod method, Instant created, String domain, byte[] value) {
+    public Proof(URI type, URI purpose, VerificationMethod method, Instant created, byte[] value) {
         this.type = type;
         this.purpose = purpose;
         this.nethod = method;
         this.created = created;
-        this.domain = domain;
         this.value = value;
+        this.domain = null;
+        this.challenge = null;
     }
     
     /**
-     * The proof type used.
+     * The proof type used. Mandatory
      *
      * For example, an Ed25519Signature2020 type indicates that the proof includes
      * a digital signature produced by an ed25519 cryptographic key.
      *
      * @return the proof type
      */
-    public String getType() {
+    public URI getType() {
         return type;
     }
 
     /**
-     * The intent for the proof, the reason why an entity created it.
+     * The intent for the proof, the reason why an entity created it. Mandatory
      * e.g. assertion or authentication
      *
      * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-purposes">Proof Purposes</a>
@@ -62,7 +65,7 @@ public class Proof  {
 
     /**
      * A set of parameters required to independently verify the proof,
-     * such as an identifier for a public/private key pair that would be used in the proof.
+     * such as an identifier for a public/private key pair that would be used in the proof. Mandatory
      *
      * @return {@link VerificationMethod} to verify the proof signature
      */
@@ -71,7 +74,7 @@ public class Proof  {
     }
 
     /**
-     * The string value of an ISO8601.
+     * The string value of an ISO8601. Mandatory
      *
      * @return the date time when the proof has been created
      */
@@ -82,10 +85,28 @@ public class Proof  {
     /**
      * A string value specifying the restricted domain of the proof.
      *
-     * @return the domain
+     * @return the domain or <code>null</code>
      */
     public String getDomain() {
         return domain;
+    }
+    
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    /**
+     * A string value used once for a particular domain and/or time.
+     * Used to mitigate replay attacks.
+     *  
+     * @return the challenge or <code>null</code>
+     */
+    public String getChallenge() {
+        return challenge;
+    }
+    
+    public void setChallenge(String challenge) {
+        this.challenge = challenge;
     }
 
     /**
@@ -96,5 +117,4 @@ public class Proof  {
     public byte[] getValue() {
         return value;
     }
-
 }

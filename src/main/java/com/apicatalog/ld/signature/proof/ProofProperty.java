@@ -6,5 +6,6 @@ public enum ProofProperty {
 	VerificationMethod,
 	Created,
 	Domain,
+	Challenge,
 	Value,
 }

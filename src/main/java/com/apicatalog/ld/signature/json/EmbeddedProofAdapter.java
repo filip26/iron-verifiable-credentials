@@ -33,10 +33,10 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
     @Deprecated
     protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
-    protected final String proofType;
+    protected final URI proofType;
 
     protected EmbeddedProofAdapter(
-                final String proofType, 
+                final URI proofType, 
                 final EmbeddedProofProperty property
                 ) {
         this.proofType = proofType;
@@ -149,18 +149,43 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
                 }
             }
 
-            String domain = null;
-
+            final Proof proof = new Proof(proofType, purpose, verificationMethod, created, value);
+            
             // domain property
             if (proofObject.containsKey(property.expand(ProofProperty.Domain))) {
-                domain = ValueObject
+                proof.setDomain(ValueObject
                         .getValue(proofObject.get(property.expand(ProofProperty.Domain))
                                 .asJsonArray().get(0))
                         .filter(JsonUtils::isString).map(JsonString.class::cast)
                         .map(JsonString::getString).orElseThrow(
-                                () -> new DocumentError(ErrorType.Invalid, ProofProperty.Domain));
+                                () -> new DocumentError(ErrorType.Invalid, ProofProperty.Domain))
+                        );
             }
-            return new Proof(proofType, purpose, verificationMethod, created, domain, value);
+
+            // domain property
+            if (proofObject.containsKey(property.expand(ProofProperty.Domain))) {
+                proof.setDomain(ValueObject
+                        .getValue(proofObject.get(property.expand(ProofProperty.Domain))
+                                .asJsonArray().get(0))
+                        .filter(JsonUtils::isString).map(JsonString.class::cast)
+                        .map(JsonString::getString).orElseThrow(
+                                () -> new DocumentError(ErrorType.Invalid, ProofProperty.Domain))
+                        );
+            }
+
+            // challenge property
+            if (proofObject.containsKey(property.expand(ProofProperty.Challenge))) {
+                proof.setDomain(ValueObject
+                        .getValue(proofObject.get(property.expand(ProofProperty.Challenge))
+                                .asJsonArray().get(0))
+                        .filter(JsonUtils::isString).map(JsonString.class::cast)
+                        .map(JsonString::getString).orElseThrow(
+                                () -> new DocumentError(ErrorType.Invalid, ProofProperty.Challenge))
+                        );
+            }
+
+            
+            return proof;
             
         } catch (InvalidJsonLdValue e) {
             e.printStackTrace();            
@@ -172,7 +197,7 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
     protected JsonObjectBuilder write(final JsonObjectBuilder builder, final Proof proof)
             throws DocumentError {
 
-        builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType()));
+        builder.add(Keywords.TYPE, Json.createArrayBuilder().add(proof.getType().toString()));
 
         //FIXME
 //        if (proof.getMethod() != null) {
@@ -219,7 +244,7 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
     }
 
     @Override
-    public String type() {
+    public URI type() {
         return proofType;
     }
 
@@ -241,7 +266,7 @@ public abstract class EmbeddedProofAdapter implements ProofAdapter {
 
         final JsonObject proofObject = object.asJsonObject();
 
-        if (!JsonLdUtils.isTypeOf(proofType, proofObject)) {
+        if (!JsonLdUtils.isTypeOf(proofType.toString(), proofObject)) {
 
             // @type property
             if (!JsonLdUtils.hasType(proofObject)) {

@@ -1,5 +1,6 @@
 package com.apicatalog.ld.signature;
 
+import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
@@ -18,7 +19,7 @@ import jakarta.json.JsonStructure;
  */
 public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
-	protected final String id;
+	protected final URI id;
 
 	protected final CanonicalizationAlgorithm canonicalization;
 	protected final DigestAlgorithm digester;
@@ -32,9 +33,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
      * https://www.w3.org/TR/vc-data-integrity/#verification-material
      *  A cryptographic suite specification is responsible for specifying the verification method 
      */
-    
-    
-	public SignatureSuite(final String id, final CanonicalizationAlgorithm canonicalization,
+	public SignatureSuite(final URI id, final CanonicalizationAlgorithm canonicalization,
 			final DigestAlgorithm digester, final SignatureAlgorithm signer, final ProofAdapter proofAdapter,
 			final Collection<MethodAdapter> methodAdapter
 	        ) {
@@ -71,7 +70,7 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
 		return signer.keygen(length);
 	}
 
-	public String getId() {
+	public URI getId() {
 		return id;
 	}
 
@@ -85,11 +84,11 @@ public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorith
         return null;
     }
 
-    public ProofOptions createOptions() {
+    public <T extends ProofOptions> T createOptions() {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
 //    /**
 //     * A JSON-LD context used to expand the proof
 //     * 

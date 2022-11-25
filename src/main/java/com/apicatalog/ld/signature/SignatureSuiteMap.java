@@ -23,7 +23,7 @@ public final class SignatureSuiteMap extends LinkedHashMap<String, SignatureSuit
 	 * @return the processor instance
 	 */
 	public SignatureSuiteMap add(final SignatureSuite suite) {
-		put(suite.getId(), suite);
+		put(suite.getId().toString(), suite);
 		return this;
 	}	
 }
