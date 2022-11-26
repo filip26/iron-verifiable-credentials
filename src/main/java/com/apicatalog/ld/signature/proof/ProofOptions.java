@@ -1,13 +1,11 @@
 package com.apicatalog.ld.signature.proof;
 
 import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.ld.signature.method.VerificationMethod;
 
-//FIXME -> wrong inheritance
-public class ProofOptions extends DataIntegrityProof {
+public interface ProofOptions {
 
-    SignatureSuite suite;
+    SignatureSuite getSuite();
     
-    public SignatureSuite getSuite() {
-        return suite;
-    }
+    VerificationMethod getMethod();
 }
