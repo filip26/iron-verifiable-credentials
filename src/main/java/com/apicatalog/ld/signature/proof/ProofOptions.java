@@ -2,7 +2,8 @@ package com.apicatalog.ld.signature.proof;
 
 import com.apicatalog.ld.signature.SignatureSuite;
 
-public class ProofOptions extends Proof {
+//FIXME -> wrong inheritance
+public class ProofOptions extends DataIntegrityProof {
 
     SignatureSuite suite;
     

@@ -8,7 +8,7 @@ import com.apicatalog.ld.signature.proof.Proof;
 import jakarta.json.JsonObject;
 
 //TODO replace with EmbeddedProofAdapter 
-public interface ProofAdapter {
+public interface ProofAdapter<T extends Proof> {
 
     URI type();
 
@@ -18,7 +18,7 @@ public interface ProofAdapter {
      * @return
      * @throws DocumentError
      */
-    Proof deserialize(JsonObject proof) throws DocumentError;
+    T deserialize(JsonObject proof) throws DocumentError;
 
     /**
      * Remove a proof value from the given JSON-LD document in an expanded form representing a proof. Used when verifying.
@@ -36,7 +36,7 @@ public interface ProofAdapter {
      * @return a serialized proof with no value set
      * @throws DocumentError
      */
-    JsonObject serialize(Proof proof) throws DocumentError;
+    JsonObject serialize(T proof) throws DocumentError;
 
     /**
      * Set a proof value (a signature) to the given JSON-LD object representing

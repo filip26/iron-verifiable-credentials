@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.Map;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -64,7 +64,7 @@ class Credential implements Verifiable {
         if (document == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
-        return JsonLdUtils.isTypeOf(BASE + TYPE, document);
+        return JsonLdReader.isTypeOf(BASE + TYPE, document);
     }
 
     public static Credential from(final JsonObject document) throws DocumentError {
@@ -76,9 +76,9 @@ class Credential implements Verifiable {
         final Credential credential = new Credential();
 
         // @type
-        if (!JsonLdUtils.isTypeOf(BASE + TYPE, document)) {
+        if (!JsonLdReader.isTypeOf(BASE + TYPE, document)) {
 
-            if (!JsonLdUtils.hasType(document)) {
+            if (!JsonLdReader.hasType(document)) {
                 throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
             }
 
@@ -86,38 +86,38 @@ class Credential implements Verifiable {
         }
         
         // subject - mandatory
-        if (!JsonLdUtils.hasPredicate(document, BASE + SUBJECT)) {
+        if (!JsonLdReader.hasPredicate(document, BASE + SUBJECT)) {
             throw new DocumentError(ErrorType.Missing, SUBJECT);
         }
 
         try {            
             // @id - optional
-            credential.id = JsonLdUtils.getId(document).orElse(null);
+            credential.id = JsonLdReader.getId(document).orElse(null);
 
             // subject @id - mandatory
-            JsonLdUtils
+            JsonLdReader
                     .getId(document, BASE + SUBJECT)
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, SUBJECT));
 
             // issuer - mandatory
-            credential.issuer = JsonLdUtils
+            credential.issuer = JsonLdReader
                                     .getId(document, BASE + ISSUER)
                                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, ISSUER));
 
             // issuance date - mandatory for verification
-            credential.issuance = JsonLdUtils.getXsdDateTime(document, BASE + ISSUANCE_DATE).orElse(null);
+            credential.issuance = JsonLdReader.getXsdDateTime(document, BASE + ISSUANCE_DATE).orElse(null);
 
             // validFrom - optional
-            credential.validFrom = JsonLdUtils.getXsdDateTime(document, BASE + VALID_FROM).orElse(null);
+            credential.validFrom = JsonLdReader.getXsdDateTime(document, BASE + VALID_FROM).orElse(null);
 
             // validFrom - optional
-            credential.validUntil = JsonLdUtils.getXsdDateTime(document, BASE + VALID_UNTIL).orElse(null);
+            credential.validUntil = JsonLdReader.getXsdDateTime(document, BASE + VALID_UNTIL).orElse(null);
 
             // issued - optional
-            credential.issued = JsonLdUtils.getXsdDateTime(document, BASE + ISSUED).orElse(null);
+            credential.issued = JsonLdReader.getXsdDateTime(document, BASE + ISSUED).orElse(null);
 
             // expiration date - optional
-            credential.expiration = JsonLdUtils.getXsdDateTime(document, BASE + EXPIRATION_DATE).orElse(null);
+            credential.expiration = JsonLdReader.getXsdDateTime(document, BASE + EXPIRATION_DATE).orElse(null);
 
         } catch (InvalidJsonLdValue e) {
             if (Keywords.ID.equals(e.getProperty())) {
@@ -130,7 +130,7 @@ class Credential implements Verifiable {
         
         
         // status
-        JsonLdUtils
+        JsonLdReader
             .getObjects(document, BASE + CREDENTIAL_STATUS).stream()
             .findFirst()
             .ifPresent(s -> credential.status = s);

@@ -11,7 +11,7 @@ import com.apicatalog.ld.signature.method.VerificationMethod;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof  {
+public class DataIntegrityProof implements Proof {
     
     protected URI type;
     

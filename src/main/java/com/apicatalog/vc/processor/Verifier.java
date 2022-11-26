@@ -9,7 +9,7 @@ import java.util.Optional;
 import com.apicatalog.did.DidResolver;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -26,6 +26,7 @@ import com.apicatalog.ld.signature.json.EmbeddedProof;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.ld.signature.method.MethodResolver;
 import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.ld.signature.proof.DataIntegrityProof;
 import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.ProofProperty;
 import com.apicatalog.vc.loader.StaticContextLoader;
@@ -222,7 +223,7 @@ public final class Verifier extends Processor<Verifier> {
                 throw new DocumentError(ErrorType.Invalid, "Proof");
             }
 
-            final Collection<String> proofType = JsonLdUtils.getType(proofValue.asJsonObject());
+            final Collection<String> proofType = JsonLdReader.getType(proofValue.asJsonObject());
 
             if (proofType == null || proofType.isEmpty()) {
                 throw new DocumentError(ErrorType.Missing, "ProofType");
@@ -375,11 +376,6 @@ public final class Verifier extends Processor<Verifier> {
 
     private final void validate(final Proof proof) throws VerificationError, DocumentError {
 
-        // purpose
-        if (proof.getPurpose() == null) {
-            throw new DocumentError(ErrorType.Missing, ProofProperty.Purpose);
-        }
-
         // verification method
         if (proof.getMethod() == null) {
             throw new DocumentError(ErrorType.Missing, ProofProperty.VerificationMethod);
@@ -388,6 +384,17 @@ public final class Verifier extends Processor<Verifier> {
         // value
         if (proof.getValue() == null || proof.getValue().length == 0) {
             throw new DocumentError(ErrorType.Missing, ProofProperty.Value);
+        }
+
+        if (proof instanceof DataIntegrityProof) {
+            validate((DataIntegrityProof)proof);
+        }
+    }
+    
+    private final void validate(final DataIntegrityProof proof) throws VerificationError, DocumentError {
+        // purpose
+        if (proof.getPurpose() == null) {
+            throw new DocumentError(ErrorType.Missing, ProofProperty.Purpose);
         }
 
         // created

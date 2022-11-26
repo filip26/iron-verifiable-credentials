@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 
@@ -25,13 +25,13 @@ class CredentialStatus {
 
         final CredentialStatus status = new CredentialStatus();
 
-        if (!JsonLdUtils.hasType(document)) {
+        if (!JsonLdReader.hasType(document)) {
             throw new DocumentError(ErrorType.Missing, "StatusType");
         }
 
         try {
-            status.type = JsonLdUtils.getType(document.asJsonObject());
-            status.id = JsonLdUtils.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, "StatusId"));
+            status.type = JsonLdReader.getType(document.asJsonObject());
+            status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, "StatusId"));
             
         } catch (InvalidJsonLdValue e) {
             throw new DocumentError(ErrorType.Invalid, "StatusId");

@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -72,7 +72,7 @@ abstract class Processor<T extends Processor<?>> {
 		}
 
 		// is not expanded JSON-LD object
-		if (!JsonLdUtils.hasType(expanded)) {
+		if (!JsonLdReader.hasType(expanded)) {
 			throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
 		}
 

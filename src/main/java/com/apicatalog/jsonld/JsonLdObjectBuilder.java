@@ -49,12 +49,17 @@ public class JsonLdObjectBuilder {
         setValue(expandNameOrFail(vocab, name), value);
         return this;
     }
-    
-    public void setId(String property, URI id) {
-        setId(property, id.toString());
+
+    public JsonLdObjectBuilder addReference(String name, String id) {
+        setId(expandNameOrFail(vocab, name), id);
+        return this;
     }
 
-    public void setId(String property, String id) {
+    public JsonLdObjectBuilder addReference(String name, URI id) {
+        return addReference(name, id.toString());
+    }
+
+    void setId(String property, String id) {
         builder.add(property, Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, id)));
     }
     
@@ -84,7 +89,6 @@ public class JsonLdObjectBuilder {
         builder.add(Keywords.TYPE, Json.createArrayBuilder().add(type.toString()));
         return this;
     }
-    //TODO addType
     
     public JsonObject build() {
         return builder.build();

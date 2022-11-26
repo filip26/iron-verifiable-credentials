@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
@@ -37,7 +37,7 @@ class Presentation implements Verifiable {
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
-        return JsonLdUtils.isTypeOf(BASE + TYPE, document);
+        return JsonLdReader.isTypeOf(BASE + TYPE, document);
     }
 
     public static Presentation from(final JsonObject document) throws DocumentError {
@@ -49,9 +49,9 @@ class Presentation implements Verifiable {
         final Presentation presentation = new Presentation();
 
         // @type
-        if (!JsonLdUtils.isTypeOf(BASE + TYPE, document)) {
+        if (!JsonLdReader.isTypeOf(BASE + TYPE, document)) {
 
-            if (!JsonLdUtils.hasType(document)) {
+            if (!JsonLdReader.hasType(document)) {
                 throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
             }
             throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
@@ -60,10 +60,10 @@ class Presentation implements Verifiable {
         try {
 
             // @id - optional
-            presentation.id = JsonLdUtils.getId(document).orElse(null);
+            presentation.id = JsonLdReader.getId(document).orElse(null);
 
             // holder - optional
-            presentation.holder = JsonLdUtils.getId(document, BASE + HOLDER).orElse(null);
+            presentation.holder = JsonLdReader.getId(document, BASE + HOLDER).orElse(null);
 
         } catch (InvalidJsonLdValue e) {
             if (Keywords.ID.equals(e.getProperty())) {
@@ -75,7 +75,7 @@ class Presentation implements Verifiable {
         presentation.credentials = new ArrayList<>();
 
         // verifiableCredentials
-        for (final JsonValue credential : JsonLdUtils.getObjects(document, BASE + VERIFIABLE_CREDENTIALS)) {
+        for (final JsonValue credential : JsonLdReader.getObjects(document, BASE + VERIFIABLE_CREDENTIALS)) {
 
             if (JsonUtils.isNotObject(credential)) {
                 throw new DocumentError(ErrorType.Invalid, VERIFIABLE_CREDENTIALS);

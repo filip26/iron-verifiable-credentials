@@ -2,7 +2,7 @@ package com.apicatalog.ld.signature.json;
 
 import java.util.Collection;
 
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -53,7 +53,7 @@ public final class EmbeddedProof {
 	 */
 	public static Collection<JsonValue> assertProof(final JsonObject document) throws DocumentError {
 		
-		final Collection<JsonValue> proofs = JsonLdUtils.getObjects(document, PROPERTY_NAME);
+		final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, PROPERTY_NAME);
 		
 		if (proofs == null || proofs.size() == 0) {
 			throw new DocumentError(ErrorType.Missing, "proof");

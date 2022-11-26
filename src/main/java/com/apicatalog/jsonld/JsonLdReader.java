@@ -17,17 +17,11 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
-/**
- * 
- * Use {@link JsonLdObjectBuilder} Writer? or Reader
- * TODO
- */
-@Deprecated
-public class JsonLdUtils {
+public class JsonLdReader {
 
     static final String XSD_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
 
-    protected JsonLdUtils() {
+    protected JsonLdReader() {
     }
 
     /**
@@ -117,7 +111,7 @@ public class JsonLdUtils {
             return Optional.empty();
         }
 
-        final Optional<JsonValue> object = JsonLdUtils.getObjects(subject.asJsonObject(), property)
+        final Optional<JsonValue> object = JsonLdReader.getObjects(subject.asJsonObject(), property)
                 .stream().findFirst();
 
         if (!object.isPresent()) {
@@ -155,7 +149,7 @@ public class JsonLdUtils {
             return Optional.empty();
         }
 
-        final Optional<JsonValue> propertyValue = JsonLdUtils
+        final Optional<JsonValue> propertyValue = JsonLdReader
                 .getObjects(subject.asJsonObject(), property).stream().findFirst();
 
         if (!propertyValue.isPresent()) {
@@ -191,7 +185,7 @@ public class JsonLdUtils {
             throw new IllegalArgumentException("The 'value' parameter must not be null.");
         }
 
-        final Optional<JsonValue> propertyValue = JsonLdUtils.findFirstObject(subject)
+        final Optional<JsonValue> propertyValue = JsonLdReader.findFirstObject(subject)
                 .map(o -> o.get(Keywords.ID));
 
         if (!propertyValue.isPresent()) {
@@ -217,30 +211,6 @@ public class JsonLdUtils {
         throw new InvalidJsonLdValue(Keywords.ID, value, "Property [" + Keywords.ID + "] value ["
                 + value + "] is not JSON string but [" + value.getValueType() + "].");
     }
-
-//    public static JsonObjectBuilder setId(JsonObjectBuilder builder, String property, URI id) {
-//        return setId(builder, property, id.toString());
-//    }
-//
-//    public static JsonObjectBuilder setId(JsonObjectBuilder builder, String property, String id) {
-//        return builder.add(property,
-//                Json.createArrayBuilder().add(Json.createObjectBuilder().add(Keywords.ID, id)));
-//    }
-//
-//    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property,
-//            String type, String value) {
-//        return builder.add(property, JsonLdValueObject.toJson(type, value));
-//    }
-//
-//    public static JsonObjectBuilder setValue(JsonObjectBuilder builder, String property,
-//            String value) {
-//        return builder.add(property, JsonLdValueObject.toJson(value));
-//    }
-//
-//    public static JsonObjectBuilder setValue(final JsonObjectBuilder builder, final String property,
-//            Instant instant) {
-//        return setValue(builder, property, XSD_DATE_TIME, instant.toString());
-//    }
 
     public static Optional<JsonObject> findFirstObject(final JsonValue expanded) {
         if (JsonUtils.isArray(expanded)) {

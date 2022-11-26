@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
@@ -181,7 +181,7 @@ public final class Issuer extends Processor<Issuer> {
 			final ProofOptions options) throws SigningError, DocumentError {
 
 		JsonObject object = 
-		        JsonLdUtils
+		        JsonLdReader
 		            .findFirstObject(expanded)
 		            .orElseThrow(() -> new DocumentError(ErrorType.Invalid, "document")); // malformed input, not single object to sign has been found
 		            

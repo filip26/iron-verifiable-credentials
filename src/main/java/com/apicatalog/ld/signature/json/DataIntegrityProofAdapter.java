@@ -7,14 +7,14 @@ import java.time.format.DateTimeParseException;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdObjectBuilder;
-import com.apicatalog.jsonld.JsonLdUtils;
+import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.ld.signature.proof.DataIntegrityProof;
 import com.apicatalog.ld.signature.proof.ProofProperty;
 
 import jakarta.json.Json;
@@ -25,7 +25,7 @@ import jakarta.json.JsonValue;
 /**
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  */
-public abstract class DataIntegrityProofAdapter implements ProofAdapter {
+public abstract class DataIntegrityProofAdapter implements ProofAdapter<DataIntegrityProof> {
 
     protected final EmbeddedProofProperty property;
 
@@ -45,12 +45,12 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter {
 
     protected abstract String encodeValue(String encoding, byte[] value) throws DocumentError;
 
-    protected Proof read(JsonObject proofObject) throws DocumentError {
+    protected DataIntegrityProof read(JsonObject proofObject) throws DocumentError {
         System.out.println(">> " + proofObject);
 
         try {
             // proofPurpose property
-            URI purpose = JsonLdUtils.getId(proofObject, property.expand(ProofProperty.Purpose)).orElse(null);
+            URI purpose = JsonLdReader.getId(proofObject, property.expand(ProofProperty.Purpose)).orElse(null);
 
             // verificationMethod property
             VerificationMethod verificationMethod = null;
@@ -147,7 +147,7 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter {
                 }
             }
 
-            final Proof proof = new Proof(proofType, purpose, verificationMethod, created, value);
+            final DataIntegrityProof proof = new DataIntegrityProof(proofType, purpose, verificationMethod, created, value);
             
             // domain property
             if (proofObject.containsKey(property.expand(ProofProperty.Domain))) {
@@ -192,7 +192,7 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter {
         return null;
     }
 
-    protected JsonLdObjectBuilder write(final JsonLdObjectBuilder builder, final Proof proof) throws DocumentError {
+    protected JsonLdObjectBuilder write(final JsonLdObjectBuilder builder, final DataIntegrityProof proof) throws DocumentError {
         
         builder.setType(proof.getType());
         
@@ -210,7 +210,7 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter {
         builder.vocab("https://w3id.org/security#");
         
         if (proof.getPurpose() != null) {
-            builder.setId(property.expand(ProofProperty.Purpose), proof.getPurpose());
+            builder.addReference(property.expand(ProofProperty.Purpose), proof.getPurpose());
         }
 
         if (proof.getDomain() != null) {
@@ -248,12 +248,12 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter {
     }
 
     @Override
-    public JsonObject serialize(Proof proof) throws DocumentError {
+    public JsonObject serialize(DataIntegrityProof proof) throws DocumentError {
         return write(new JsonLdObjectBuilder(), proof).build();
     }
 
     @Override
-    public Proof deserialize(JsonObject object) throws DocumentError {
+    public DataIntegrityProof deserialize(JsonObject object) throws DocumentError {
         if (object == null) {
             throw new IllegalArgumentException("Parameter 'object' must not be null.");
         }
@@ -265,10 +265,10 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter {
 
         final JsonObject proofObject = object.asJsonObject();
 
-        if (!JsonLdUtils.isTypeOf(proofType.toString(), proofObject)) {
+        if (!JsonLdReader.isTypeOf(proofType.toString(), proofObject)) {
 
             // @type property
-            if (!JsonLdUtils.hasType(proofObject)) {
+            if (!JsonLdReader.hasType(proofObject)) {
                 throw new DocumentError(ErrorType.Missing, "ProofType");
             }
 
