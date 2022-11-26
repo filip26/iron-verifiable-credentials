@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.json;
+package com.apicatalog.ld.signature.adapter;
 
 import java.net.URI;
 

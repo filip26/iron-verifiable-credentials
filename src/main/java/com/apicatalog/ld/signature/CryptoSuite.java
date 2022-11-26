@@ -2,11 +2,11 @@ package com.apicatalog.ld.signature;
 
 import java.net.URI;
 
+import com.apicatalog.ld.signature.adapter.MethodAdapter;
+import com.apicatalog.ld.signature.adapter.ProofAdapter;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.json.MethodAdapter;
-import com.apicatalog.ld.signature.json.ProofAdapter;
 import com.apicatalog.ld.signature.key.KeyPair;
 
 import jakarta.json.JsonStructure;

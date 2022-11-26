@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.json;
+package com.apicatalog.ld.signature.proof;
 
 import java.util.Collection;
 

@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.json;
+package com.apicatalog.ld.signature.adapter;
 
 import java.net.URI;
 import java.time.Instant;
@@ -26,6 +26,16 @@ import jakarta.json.JsonValue;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  */
 public abstract class DataIntegrityProofAdapter implements ProofAdapter<DataIntegrityProof> {
+
+    static final String CREATED =  "created";
+    
+    static final String SEC_BASE = "https://w3id.org/security#";
+    
+    static final String PURPOSE = "proofPurpose";
+    static final String VERIFICATION_METHOD = "verificationMethod";
+    static final String DOMAIN = "domain";
+    static final String CHALLENGE = "challenge";
+    static final String PROOF_VALUE = "proofValue";
 
     protected final EmbeddedProofProperty property;
 
@@ -203,23 +213,27 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter<DataInte
 //        }
 
         if (proof.getCreated() != null) {
-            builder.vocab("https://w3id.org/security#");
-            builder.add(property.expand(ProofProperty.Created), proof.getCreated());
+            builder.vocab("http://purl.org/dc/terms/");
+            builder.add(CREATED, proof.getCreated());
         }
 
         builder.vocab("https://w3id.org/security#");
         
         if (proof.getPurpose() != null) {
-            builder.addReference(property.expand(ProofProperty.Purpose), proof.getPurpose());
+            builder.addReference(PURPOSE, proof.getPurpose());
         }
 
         if (proof.getDomain() != null) {
-            builder.add(property.expand(ProofProperty.Domain), proof.getDomain());
+            builder.add(DOMAIN, proof.getDomain());
+        }
+        
+        if (proof.getChallenge() != null) {
+            builder.add(CHALLENGE, proof.getChallenge());
         }
 
         if (proof.getValue() != null) {
             final String proofValue = encodeValue(MULTIBASE_TYPE, proof.getValue());
-            builder.add(property.expand(ProofProperty.Value), MULTIBASE_TYPE, proofValue);
+            builder.add(PROOF_VALUE, MULTIBASE_TYPE, proofValue);
         }
 
         return builder;
@@ -232,14 +246,14 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter<DataInte
         final String proofValue = encodeValue(MULTIBASE_TYPE, value);
 
         return new JsonLdObjectBuilder(proof)
-                .add(property.expand(ProofProperty.Value), MULTIBASE_TYPE, proofValue)
-                .build();
+                    .vocab(SEC_BASE)
+                    .add(PROOF_VALUE, MULTIBASE_TYPE, proofValue)
+                    .build();
     }
 
     @Override
     public JsonObject removeProofValue(final JsonObject proof) {
-        final String propertyName = property.expand(ProofProperty.Value);
-        return Json.createObjectBuilder(proof).remove(propertyName).build();
+        return Json.createObjectBuilder(proof).remove(SEC_BASE + PROOF_VALUE).build();
     }
 
     @Override

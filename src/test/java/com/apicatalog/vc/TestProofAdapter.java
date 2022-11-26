@@ -3,7 +3,7 @@ package com.apicatalog.vc;
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.json.DataIntegrityProofAdapter;
+import com.apicatalog.ld.signature.adapter.DataIntegrityProofAdapter;
 
 public class TestProofAdapter extends DataIntegrityProofAdapter {
 

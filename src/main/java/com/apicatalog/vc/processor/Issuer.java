@@ -14,8 +14,8 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
-import com.apicatalog.ld.signature.json.EmbeddedProof;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.loader.StaticContextLoader;
 

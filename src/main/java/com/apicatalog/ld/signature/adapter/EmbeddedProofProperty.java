@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.json;
+package com.apicatalog.ld.signature.adapter;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.apicatalog.ld.signature.proof.ProofProperty;
 
+@Deprecated
 public class EmbeddedProofProperty {
 
     protected static final Map<ProofProperty, String> EXPANDED_KEYS;
