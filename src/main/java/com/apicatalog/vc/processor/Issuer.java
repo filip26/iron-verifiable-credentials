@@ -207,7 +207,7 @@ public final class Issuer extends Processor<Issuer> {
 
         final LinkedDataSignature suite = new LinkedDataSignature(options.getSuite());
 
-		JsonObject proof = options.getSuite().getProofAdapter().serialize(options);
+		JsonObject proof = options.getSuite().getProofAdapter().serialize(options.toUnsignedProof());
 
 		final byte[] signature = suite.sign(data, keyPair, proof);
 

@@ -15,6 +15,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.DataIntegrityProof;
+import com.apicatalog.ld.signature.proof.DataIntegrityProofOptions;
 import com.apicatalog.ld.signature.proof.ProofProperty;
 
 import jakarta.json.Json;

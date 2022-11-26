@@ -4,6 +4,9 @@ import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.adapter.DataIntegrityProofAdapter;
+import com.apicatalog.ld.signature.proof.ProofOptions;
+
+import jakarta.json.JsonObject;
 
 public class TestProofAdapter extends DataIntegrityProofAdapter {
 
@@ -30,7 +33,6 @@ public class TestProofAdapter extends DataIntegrityProofAdapter {
     public URI type() {
         // TODO Auto-generated method stub
         return null;
-    }
-	
+    }	
 }
 

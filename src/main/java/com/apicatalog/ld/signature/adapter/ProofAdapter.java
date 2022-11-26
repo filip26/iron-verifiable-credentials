@@ -8,7 +8,7 @@ import com.apicatalog.ld.signature.proof.Proof;
 import jakarta.json.JsonObject;
 
 //TODO replace with EmbeddedProofAdapter 
-public interface ProofAdapter<T extends Proof> {
+public interface ProofAdapter<T extends Proof>  {
 
     URI type();
 

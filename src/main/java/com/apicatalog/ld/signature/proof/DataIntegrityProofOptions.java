@@ -15,4 +15,9 @@ public class DataIntegrityProofOptions extends DataIntegrityProof implements Pro
     public SignatureSuite getSuite() {
         return suite;
     }
+
+    @Override
+    public Proof toUnsignedProof() {
+        return this;
+    }
 }
