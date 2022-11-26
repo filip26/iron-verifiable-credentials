@@ -1,12 +1,13 @@
-package com.apicatalog.ld.signature.proof;
+package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 import java.time.Instant;
 
 import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.ld.signature.proof.Proof;
 
 /**
- * Represents VC/VP proof.
+ * Represents data integrity proof.
  *
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
@@ -18,7 +19,7 @@ public class DataIntegrityProof implements Proof {
     
     protected URI purpose;
     
-    protected VerificationMethod nethod;
+    protected VerificationMethod method;
     
     protected Instant created;
     
@@ -34,7 +35,7 @@ public class DataIntegrityProof implements Proof {
     public DataIntegrityProof(URI type, URI purpose, VerificationMethod method, Instant created, byte[] value) {
         this.type = type;
         this.purpose = purpose;
-        this.nethod = method;
+        this.method = method;
         this.created = created;
         this.value = value;
         this.domain = null;
@@ -60,7 +61,7 @@ public class DataIntegrityProof implements Proof {
 
     @Override
     public VerificationMethod getMethod() {
-        return nethod;
+        return method;
     }
 
     /**

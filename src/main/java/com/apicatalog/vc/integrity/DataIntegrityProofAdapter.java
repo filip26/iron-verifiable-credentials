@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.adapter;
+package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 import java.time.Instant;
@@ -13,9 +13,9 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.signature.adapter.EmbeddedProofProperty;
+import com.apicatalog.ld.signature.adapter.ProofAdapter;
 import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.DataIntegrityProof;
-import com.apicatalog.ld.signature.proof.DataIntegrityProofOptions;
 import com.apicatalog.ld.signature.proof.ProofProperty;
 
 import jakarta.json.Json;
@@ -252,7 +252,6 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter<DataInte
                     .build();
     }
 
-    @Override
     public JsonObject removeProofValue(final JsonObject proof) {
         return Json.createObjectBuilder(proof).remove(SEC_BASE + PROOF_VALUE).build();
     }
@@ -267,7 +266,6 @@ public abstract class DataIntegrityProofAdapter implements ProofAdapter<DataInte
         return write(new JsonLdObjectBuilder(), proof).build();
     }
 
-    @Override
     public DataIntegrityProof deserialize(JsonObject object) throws DocumentError {
         if (object == null) {
             throw new IllegalArgumentException("Parameter 'object' must not be null.");

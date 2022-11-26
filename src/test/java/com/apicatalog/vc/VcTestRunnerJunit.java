@@ -76,15 +76,16 @@ public class VcTestRunnerJunit {
 					keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
 				}
 				
-				final SignatureSuite suite = new TestCryptoSuite();
+				final TestCryptoSuite suite = new TestCryptoSuite();
 				
-				final ProofOptions options = suite.createOptions(); //FIXME should be builder
+				final ProofOptions options = suite.createOptions() //FIXME should be builder
 				        //FIXME
                         // proof options
-                        //.verificationMethod(testCase.verificationMethod)
-                        //.purpose(URI.create("https://w3id.org/security#assertionMethod"))
-                        //.created(testCase.created)
-                        //.domain(testCase.domain)
+//                        .verificationMethod(testCase.verificationMethod)
+//                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
+                        .created(testCase.created)
+                        .domain(testCase.domain)
+				        .build();
 
 
 				Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), options)

@@ -1,94 +1,47 @@
 package com.apicatalog.ld.signature;
 
 import java.net.URI;
-import java.util.Collection;
 
+import com.apicatalog.jsonld.PropertyName;
 import com.apicatalog.ld.signature.adapter.MethodAdapter;
 import com.apicatalog.ld.signature.adapter.ProofAdapter;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.ld.signature.proof.ProofBuilder;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 
-import jakarta.json.JsonStructure;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
  * algorithm, a message digest algorithm, and a signature algorithm.
  */
-public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
+public interface SignatureSuite<P extends Proof> extends CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
-	protected final URI id;
+	URI getId();
 
-	protected final CanonicalizationAlgorithm canonicalization;
-	protected final DigestAlgorithm digester;
-	protected final SignatureAlgorithm signer;
+	ProofAdapter<P> getProofAdapter();
 
-	protected final ProofAdapter proofAdapter;
-    protected final Collection<MethodAdapter> methodAdapter;
+	MethodAdapter getMethodAdapter(String type);
 
+    <O extends ProofOptions> ProofBuilder<O>  createOptions();
+
+    PropertyName proofValue();
+
+    PropertyName proofMethod();
+
+    JsonValue encodeProofValue(byte[] value);
     
-    /*
-     * https://www.w3.org/TR/vc-data-integrity/#verification-material
-     *  A cryptographic suite specification is responsible for specifying the verification method 
-     */
-	public SignatureSuite(final URI id, final CanonicalizationAlgorithm canonicalization,
-			final DigestAlgorithm digester, final SignatureAlgorithm signer, final ProofAdapter proofAdapter,
-			final Collection<MethodAdapter> methodAdapter
-	        ) {
-		this.id = id;
-		this.canonicalization = canonicalization;
-		this.digester = digester;
-		this.signer = signer;
-		this.proofAdapter = proofAdapter;
-		this.methodAdapter = methodAdapter;
-	}
-
-	@Override
-	public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
-		signer.verify(publicKey, signature, data);
-	}
-
-	@Override
-	public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
-		return signer.sign(privateKey, data);
-	}
-
-	@Override
-	public byte[] digest(byte[] data) throws LinkedDataSuiteError {
-		return digester.digest(data);
-	}
-
-	@Override
-	public byte[] canonicalize(JsonStructure document) throws LinkedDataSuiteError {
-		return canonicalization.canonicalize(document);
-	}
-
-	@Override
-	public KeyPair keygen(int length) throws KeyGenError {
-		return signer.keygen(length);
-	}
-
-	public URI getId() {
-		return id;
-	}
-
-	public ProofAdapter getProofAdapter() {
-		return proofAdapter;
-	}
-
-    public MethodAdapter getMethodAdapter(String type) {
-//        return methodAdapter;
-        //FIXME
-        return null;
-    }
-
-    public <T extends ProofOptions> T createOptions() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+    byte[] decodeProofValue(JsonValue value);
+    
+    byte[] decodeVerificationKey(JsonObject objectO);
+    
+    //TODO proof assertions!!!!!
+    
 //    /**
 //     * A JSON-LD context used to expand the proof
 //     * 

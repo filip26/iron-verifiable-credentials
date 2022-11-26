@@ -59,7 +59,7 @@ public final class Vc {
     }
     
     /**
-     * Signs VC/VP document. Returns the provided VC/VP with added proof property.
+     * Signs VC/VP document. Returns the provided VC/VP with an new proof
      *
      * @param documentLocation
      * @param keyPair
@@ -75,7 +75,7 @@ public final class Vc {
     }
 
     /**
-     * Signs VC/VP document. Returns the provided VC/VP with added proof property.
+     * Signs VC/VP document. Returns the provided VC/VP with a new proof
      *
      * @param document
      * @param keyPair

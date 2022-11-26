@@ -3,8 +3,8 @@ package com.apicatalog.vc;
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.adapter.DataIntegrityProofAdapter;
 import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.vc.integrity.DataIntegrityProofAdapter;
 
 import jakarta.json.JsonObject;
 

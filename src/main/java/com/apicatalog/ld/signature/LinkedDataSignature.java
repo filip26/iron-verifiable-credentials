@@ -8,6 +8,7 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
@@ -22,10 +23,12 @@ public class LinkedDataSignature {
     /**
      * Verifies the given signed VC/VP document.
      *
-     * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification Algorithm</a>
+     * @see <a href=
+     *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification
+     *      Algorithm</a>
      *
-     * @param document expanded unsigned VC/VP document
-     * @param proof expanded proof with no proofValue
+     * @param document        expanded unsigned VC/VP document
+     * @param proof           expanded proof with no proofValue
      * @param verificationKey
      * @param signature
      *
@@ -33,32 +36,37 @@ public class LinkedDataSignature {
      * @throws DocumentError
      */
     public void verify(
-    				final JsonObject document, 
-    				final JsonObject proof, 
-    				final VerificationKey verificationKey, 
-    				final byte[] signature
-    				) throws VerificationError, DocumentError {
+            final JsonObject document,
+            final JsonObject proof,
+            final VerificationKey verificationKey,
+            final byte[] signature) throws VerificationError, DocumentError {
 
         if (verificationKey == null || verificationKey.publicKey() == null) {
             throw new DocumentError(ErrorType.Missing, "ProofVerificationKey");
         }
 
-       final JsonObject proofObject = suite.getProofAdapter().removeProofValue(proof);
+        // remote a proof value
+        final JsonObject unsignedProof = 
+                    Json.createObjectBuilder(proof)
+                        .remove(suite.proofValue().id())
+                        .build();
 
-       try {
-           final byte[] computeSignature = hashCode(document, proofObject);
+        try {
+            final byte[] computeSignature = hashCode(document, unsignedProof);
 
-           suite.verify(verificationKey.publicKey(), signature, computeSignature);
+            suite.verify(verificationKey.publicKey(), signature, computeSignature);
 
-       } catch (LinkedDataSuiteError e) {
-           throw new VerificationError(Code.LinkedDataSignature, e);
-       }
+        } catch (LinkedDataSuiteError e) {
+            throw new VerificationError(Code.LinkedDataSignature, e);
+        }
     }
 
     /**
      * Issues the given VC/VP document and returns the document signature.
      *
-     * @see <A href="https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm">Proof Algorithm</a>
+     * @see <A href=
+     *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm">Proof
+     *      Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
      * @param keyPair
@@ -71,21 +79,23 @@ public class LinkedDataSignature {
      */
     public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError {
 
-    try {
-        final byte[] documentHashCode = hashCode(document, options);
+        try {
+            final byte[] documentHashCode = hashCode(document, options);
 
-        return suite.sign(keyPair.privateKey(), documentHashCode);
+            return suite.sign(keyPair.privateKey(), documentHashCode);
 
-    } catch (LinkedDataSuiteError e) {
-        throw new SigningError(SigningError.Code.LinkedDataSignature, e);
-    }
+        } catch (LinkedDataSuiteError e) {
+            throw new SigningError(SigningError.Code.LinkedDataSignature, e);
+        }
     }
 
     /**
-     * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm">Hash Algorithm</a>
+     * @see <a href=
+     *      "https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm">Hash
+     *      Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
-     * @param proof expanded proof with no proofValue
+     * @param proof    expanded proof with no proofValue
      *
      * @return computed hash code
      *
