@@ -2,18 +2,20 @@ package com.apicatalog.ld.signature.proof;
 
 import java.net.URI;
 
-import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.jsonld.PropertyName;
 
 public interface ProofType {
 
     // proof type id
     URI id();   
 
+    PropertyName proofValue();
+
+    PropertyName method();
     
+    URI context();
     
     // property
-//    String name();
-//    String vocabulary();
     
     //TODO how to deal with embedded properties? a selector?
     // assertThat(subject).hasId()

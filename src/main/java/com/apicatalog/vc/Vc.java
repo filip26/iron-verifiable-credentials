@@ -6,7 +6,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.ld.signature.SignatureSuiteMap;
+import com.apicatalog.ld.signature.SignatureSuiteMapper;
 import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
@@ -37,7 +37,7 @@ public final class Vc {
     }
 
     public static Verifier verify(final URI location, final SignatureSuite suite) throws DocumentError, VerificationError {
-        return new Verifier(location, new SignatureSuiteMap().add(suite));
+        return new Verifier(location, new SignatureSuiteMapper().add(suite));
     }
     
     /**
@@ -55,7 +55,7 @@ public final class Vc {
     }
 
     public static Verifier verify(final JsonObject document, final SignatureSuite suite) throws DocumentError, VerificationError {
-    	return new Verifier(document, new SignatureSuiteMap().add(suite));
+    	return new Verifier(document, new SignatureSuiteMapper().add(suite));
     }
     
     /**
@@ -103,6 +103,6 @@ public final class Vc {
     	if (signatureSuite == null) {
     		throw new IllegalArgumentException("The signatureSuite parameter must not be null.");
     	}
-    	return new KeysGenerator(new LinkedDataSignature(signatureSuite));
+    	return new KeysGenerator(new LinkedDataSignature(signatureSuite.getCryptoSuite()));
     }
 }

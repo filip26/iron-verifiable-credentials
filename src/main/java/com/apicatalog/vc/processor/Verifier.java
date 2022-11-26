@@ -7,12 +7,10 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.apicatalog.did.DidResolver;
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.JsonLdValueObject;
 import com.apicatalog.jsonld.PropertyName;
 import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
@@ -29,17 +27,18 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.adapter.MethodAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.ld.signature.method.DidUrlMethodResolver;
+import com.apicatalog.ld.signature.method.HttpMethodResolver;
 import com.apicatalog.ld.signature.method.MethodResolver;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.Proof;
-import com.apicatalog.ld.signature.proof.ProofProperty;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
+import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
 public final class Verifier extends Processor<Verifier> {
@@ -54,8 +53,8 @@ public final class Verifier extends Processor<Verifier> {
     private StatusVerifier statusVerifier = null;
     private SubjectVerifier subjectVerifier = null;
     
-    @Deprecated
-    private DidResolver didResolver = null;
+//    @Deprecated
+//    private DidResolver didResolver = null;
     
     private Collection<MethodResolver> methodResolvers;
 
@@ -63,16 +62,28 @@ public final class Verifier extends Processor<Verifier> {
         this.location = location;
         this.document = null;
         this.suiteProvider = suiteProvider;
-        this.methodResolvers = new LinkedHashSet<>();
+        this.methodResolvers = defaultResolvers();
     }
 
     public Verifier(JsonObject document, final SignatureSuiteProvider suiteProvider) {
         this.document = document;
         this.location = null;
         this.suiteProvider = suiteProvider;
-        this.methodResolvers = new LinkedHashSet<>();
+        this.methodResolvers = defaultResolvers();
+    }
+    
+    public static final Collection<MethodResolver>  defaultResolvers() {
+        Collection<MethodResolver> resolvers = new LinkedHashSet<>();
+        resolvers.add(new DidUrlMethodResolver());
+        resolvers.add(new HttpMethodResolver());
+        return resolvers;
     }
 
+    public Verifier ethodResolvers(Collection<MethodResolver> resolvers) {
+        this.methodResolvers = resolvers; 
+        return this;
+    }
+    
     /**
      * Set a credential status verifier. If not set then
      * <code>credentialStatus</code> is ignored if present.
@@ -97,10 +108,10 @@ public final class Verifier extends Processor<Verifier> {
         return this;
     }
     
-    public Verifier didResolver(final DidResolver didResolver) {
-        this.didResolver = didResolver;
-        return this;
-    }
+//    public Verifier didResolver(final DidResolver didResolver) {
+//        this.didResolver = didResolver;
+//        return this;
+//    }
 
     public Verifier domain(final String domain) {
         this.domain = domain;
@@ -209,9 +220,10 @@ public final class Verifier extends Processor<Verifier> {
             }
 
             verifyProofs(expanded);
-        }
 
-        throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
+        } else {
+            throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
+        }
     }
 
     private void verifyProofs(JsonObject expanded) throws VerificationError, DocumentError {
@@ -241,20 +253,47 @@ public final class Verifier extends Processor<Verifier> {
             final SignatureSuite signatureSuite = proofType.stream()
                     .filter(suiteProvider::isSupported).findFirst()
                     .map(suiteProvider::getSignatureSuite)
-                    .orElseThrow(() -> new VerificationError(Code.UnknownCryptoSuite));
+                    .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "CryptoSuite"));
 
             //FIXMe run assertions validate(proof);
             
-            final PropertyName proofValueName = signatureSuite.proofValue();
+            final PropertyName proofValueName = signatureSuite.getProofType().proofValue();
+            System.out.println(">>> " + proofValueName.id());
+            System.out.println(">>> " + proofObject);
             
             if (!proofObject.containsKey(proofValueName.id())) {
-                throw new DocumentError(ErrorType.Missing, ProofProperty.Value);
+                throw new DocumentError(ErrorType.Missing, "ProofValue");
             }
             
-            final byte[] proofValue = signatureSuite.decodeProofValue(proofObject.get(proofValueName.id()));
+            JsonArray jsonValue = proofObject.getJsonArray(proofValueName.id());
+
+            if (!jsonValue.stream().allMatch(ValueObject::isValueObject)
+                    || !jsonValue.stream()
+                            .map(JsonValue::asJsonObject)
+                            .map(o -> o.get(Keywords.VALUE))
+                            .allMatch(JsonUtils::isString)
+                    ) {
+                throw new DocumentError(ErrorType.Invalid, "ProofValue");
+            }
+            
+            String proofValueType = jsonValue.getJsonObject(0).getString(Keywords.TYPE);
+            
+            if (!signatureSuite.getProofValueAdapter().id().toString().equals(proofValueType)) {
+                throw new DocumentError(ErrorType.Invalid, "ProofValueType");
+            }
+
+            String encodedProofValue = jsonValue.getJsonObject(0).getString(Keywords.VALUE);
+            
+                        
+            final byte[] proofValue = signatureSuite.getProofValueAdapter().decode(encodedProofValue);
+            
+            if (proofValue == null || proofValue.length == 0) {
+                throw new DocumentError(ErrorType.Missing, "ProofValue");
+            }
+            
             //final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 
-            final PropertyName proofMethodName = signatureSuite.proofMethod();
+            final PropertyName proofMethodName = signatureSuite.getProofType().method();
             
             VerificationMethod verificationMethod = getMethod(proofMethodName, proofObject, signatureSuite)
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, "ProofVerificationMethod"));
@@ -286,18 +325,25 @@ public final class Verifier extends Processor<Verifier> {
 //                        );
 
             if (!(verificationMethod instanceof VerificationKey)) {
-                throw new VerificationError(Code.UnknownVerificationMethod);
+                throw new DocumentError(ErrorType.Unknown, "VerificationMethod");
             }
 
-            final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite);
+
+            // remote a proof value
+            final JsonObject unsignedProof = 
+                        Json.createObjectBuilder(proofObject)
+                            .remove(signatureSuite.getProofType().proofValue().id())
+                            .build();
+            
+            final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite.getCryptoSuite());
 
             // verify signature
             signature.verify(
-                        data, 
-                        proofObject, 
-                        (VerificationKey) verificationMethod,
-                        proofValue
-                    );
+                            data, 
+                            unsignedProof, 
+                            (VerificationKey) verificationMethod,
+                            proofValue
+                        );
         }
         // all good
     }
@@ -318,7 +364,7 @@ public final class Verifier extends Processor<Verifier> {
 
             final JsonObject methodObject = methodValue.asJsonObject();
             
-            final Collection<String> types = JsonLdReader.getType(proofObject);
+            final Collection<String> types = JsonLdReader.getType(methodObject);
             
             if (types == null || types.isEmpty()) {
                 return resolve(methodObject, suite);
@@ -328,7 +374,7 @@ public final class Verifier extends Processor<Verifier> {
                                             .map(suite::getMethodAdapter)
                                             .filter(Objects::nonNull)
                                             .findFirst()
-                                            .orElseThrow(() -> new VerificationError(Code.UnknownVerificationMethod));
+                                            .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "VerificationMethod"));
             
             final VerificationMethod method = adapter.deserialize(methodObject);
             
@@ -356,21 +402,20 @@ public final class Verifier extends Processor<Verifier> {
 
     }
 
-    VerificationMethod resolve(URI id, SignatureSuite suite) throws VerificationError {
+    VerificationMethod resolve(URI id, SignatureSuite suite) throws DocumentError {
 
         // find the method id resolver
         final Optional<MethodResolver> resolver = 
                 methodResolvers.stream()
-                    .filter(r -> r.isAccepted(id))
-                    .findFirst();
+                        .filter(r -> r.isAccepted(id))
+                        .findFirst();
 
-          // try to resolve the method                
-          if (resolver.isPresent()) {
-              return resolver.get().resolve(id, suite);
-          }
-          
-          throw new VerificationError(Code.UnknownVerificationMethod);
-        
+        // try to resolve the method
+        if (resolver.isPresent()) {
+            return resolver.get().resolve(id, loader, suite);
+        }
+
+        throw new DocumentError(ErrorType.Unknown, "VerificationMethod");        
     }
     
     // refresh/fetch verification method
@@ -468,12 +513,12 @@ public final class Verifier extends Processor<Verifier> {
 
         // verification method
         if (proof.getMethod() == null) {
-            throw new DocumentError(ErrorType.Missing, ProofProperty.VerificationMethod);
+            throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");
         }
 
         // value
         if (proof.getValue() == null || proof.getValue().length == 0) {
-            throw new DocumentError(ErrorType.Missing, ProofProperty.Value);
+            throw new DocumentError(ErrorType.Missing, "ProofValue");
         }
 
         if (proof instanceof DataIntegrityProof) {
@@ -484,12 +529,12 @@ public final class Verifier extends Processor<Verifier> {
     private final void validate(final DataIntegrityProof proof) throws VerificationError, DocumentError {
         // purpose
         if (proof.getPurpose() == null) {
-            throw new DocumentError(ErrorType.Missing, ProofProperty.Purpose);
+            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
         }
 
         // created
         if (proof.getCreated() == null) {
-            throw new DocumentError(ErrorType.Missing, ProofProperty.Created);
+            throw new DocumentError(ErrorType.Missing, "ProofCreated");
         }
         
         if (proof.getCreated().isBefore(Instant.now())) {

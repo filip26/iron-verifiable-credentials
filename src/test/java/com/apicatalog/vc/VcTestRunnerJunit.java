@@ -42,7 +42,8 @@ public class VcTestRunnerJunit {
 	private final VcTestCase testCase;
 
 	public final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
-			new SchemeRouter().set("http", HttpLoader.defaultInstance())
+			new SchemeRouter()
+			        .set("http", HttpLoader.defaultInstance())
 					.set("https", HttpLoader.defaultInstance())
 					.set("classpath", new ClasspathLoader()));
 
@@ -58,7 +59,7 @@ public class VcTestRunnerJunit {
 		try {
 			if (testCase.type.contains(VcTestCase.vocab("VeriferTest"))) {
 
-				Vc.verify(testCase.input, new TestCryptoSuite())
+				Vc.verify(testCase.input, new TestSignatureSuite())
 					.loader(LOADER)
 					.domain(testCase.domain)
 					.isValid();
@@ -76,15 +77,15 @@ public class VcTestRunnerJunit {
 					keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
 				}
 				
-				final TestCryptoSuite suite = new TestCryptoSuite();
+				final TestSignatureSuite suite = new TestSignatureSuite();
 				
 				final ProofOptions options = suite.createOptions() //FIXME should be builder
 				        //FIXME
                         // proof options
 //                        .verificationMethod(testCase.verificationMethod)
 //                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
-                        .created(testCase.created)
-                        .domain(testCase.domain)
+//                        .created(testCase.created)
+//                        .domain(testCase.domain)
 				        .build();
 
 
@@ -229,7 +230,7 @@ public class VcTestRunnerJunit {
 				continue;
 			}
 
-			return (KeyPair) (new TestVerificationMethodAdapter()).deserialize(key.asJsonObject());
+//FIXME			return (KeyPair) (new TestVerificationMethodAdapter()).deserialize(key.asJsonObject());
 		}
 		throw new IllegalStateException();
 	}

@@ -101,14 +101,14 @@ public class VcTestCase {
 //							id -> testCase.verificationMethod = new vocab(id, null, null, null));
 //				}
 
-				try {
-
-					testCase.verificationMethod = (new TestVerificationMethodAdapter())
-							.deserialize(method);
-System.out.println(">>> " + testCase.verificationMethod);
-				} catch (DocumentError e) {
-					fail(e);
-				}
+//FIXME				try {
+//
+//					testCase.verificationMethod = (new TestVerificationMethodAdapter())
+//							.deserialize(method);
+//System.out.println(">>> " + testCase.verificationMethod);
+//				} catch (DocumentError e) {
+//					fail(e);
+//				}
 
 			}
 

@@ -2,7 +2,7 @@ package com.apicatalog.ld.signature;
 
 import java.util.LinkedHashMap;
 
-public final class SignatureSuiteMap extends LinkedHashMap<String, SignatureSuite> implements SignatureSuiteProvider {
+public final class SignatureSuiteMapper extends LinkedHashMap<String, SignatureSuite> implements SignatureSuiteProvider {
 
 	private static final long serialVersionUID = -8895021841340234772L;
 
@@ -22,8 +22,12 @@ public final class SignatureSuiteMap extends LinkedHashMap<String, SignatureSuit
 	 * @param suite a suite to add
 	 * @return the processor instance
 	 */
-	public SignatureSuiteMap add(final SignatureSuite suite) {
-		put(suite.getId().toString(), suite);
+	public SignatureSuiteMapper add(final SignatureSuite suite) {
+	    if (suite == null) {
+	        throw new IllegalArgumentException("The 'suite' paramenter must not be null.");
+	    }
+	    
+		put(suite.getProofType().id().toString(), suite);
 		return this;
 	}	
 }

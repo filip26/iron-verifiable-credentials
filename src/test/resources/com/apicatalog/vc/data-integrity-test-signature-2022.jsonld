@@ -1,0 +1,88 @@
+{
+	"@context": {
+		"id": "@id",
+		"type": "@type",
+		
+		"sec": "https://example.org/security#",
+		
+		"proof": {
+			"@id": "https://w3id.org/security#proof",
+			"@type": "@id",
+			"@container": "@graph"
+		},
+		"TestVerificationKey2022": {
+			"@id": "sec:TestVerificationKey2022",
+			"@context": {
+				"id": "@id",
+				"type": "@type",
+				"controller": {
+					"@id": "sec:controller",
+					"@type": "@id"
+				},
+				"publicKeyMultibase": {
+					"@id": "sec:publicKeyMultibase",
+					"@type": "sec:multibase"
+				}
+			}
+		},
+		"TestSignatureSuite2022": {
+			"@id": "sec:TestSignatureSuite2022",
+			"@context": {
+				"id": "@id",
+				"type": "@type",
+				"challenge": "sec:challenge",
+				"created": {
+					"@id": "http://purl.org/dc/terms/created",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+				},
+				"domain": "sec:domain",
+				"expires": {
+					"@id": "sec:expiration",
+					"@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+				},
+				"nonce": "sec:nonce",
+				"proofPurpose": {
+					"@id": "sec:proofPurpose",
+					"@type": "@vocab",
+					"@context": {
+						"id": "@id",
+						"type": "@type",
+						"assertionMethod": {
+							"@id": "sec:assertionMethod",
+							"@type": "@id",
+							"@container": "@set"
+						},
+						"authentication": {
+							"@id": "sec:authenticationMethod",
+							"@type": "@id",
+							"@container": "@set"
+						},
+						"capabilityInvocation": {
+							"@id": "sec:capabilityInvocationMethod",
+							"@type": "@id",
+							"@container": "@set"
+						},
+						"capabilityDelegation": {
+							"@id": "sec:capabilityDelegationMethod",
+							"@type": "@id",
+							"@container": "@set"
+						},
+						"keyAgreement": {
+							"@id": "sec:keyAgreementMethod",
+							"@type": "@id",
+							"@container": "@set"
+						}
+					}
+				},
+				"proofValue": {
+					"@id": "sec:proofValue",
+					"@type": "sec:multibase"
+				},
+				"verificationMethod": {
+					"@id": "sec:verificationMethod",
+					"@type": "@id"
+				}
+			}
+		}
+	}
+}

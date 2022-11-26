@@ -1,45 +1,27 @@
 package com.apicatalog.ld.signature;
 
-import java.net.URI;
-
-import com.apicatalog.jsonld.PropertyName;
 import com.apicatalog.ld.signature.adapter.MethodAdapter;
-import com.apicatalog.ld.signature.adapter.ProofAdapter;
-import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
-import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
-import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.ld.signature.adapter.ProofValueAdapter;
 import com.apicatalog.ld.signature.proof.ProofBuilder;
 import com.apicatalog.ld.signature.proof.ProofOptions;
-
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
+import com.apicatalog.ld.signature.proof.ProofType;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
  * algorithm, a message digest algorithm, and a signature algorithm.
  */
-public interface SignatureSuite<P extends Proof> extends CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
+public interface SignatureSuite {
 
-	URI getId();
+	ProofType getProofType();
 
-	ProofAdapter<P> getProofAdapter();
+	ProofValueAdapter getProofValueAdapter();
 
 	MethodAdapter getMethodAdapter(String type);
+	
+	CryptoSuite getCryptoSuite();
 
     <O extends ProofOptions> ProofBuilder<O>  createOptions();
 
-    PropertyName proofValue();
-
-    PropertyName proofMethod();
-
-    JsonValue encodeProofValue(byte[] value);
-    
-    byte[] decodeProofValue(JsonValue value);
-    
-    byte[] decodeVerificationKey(JsonObject objectO);
-    
     //TODO proof assertions!!!!!
     
 //    /**

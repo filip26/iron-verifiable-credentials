@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.signature.adapter.MethodAdapter;
-import com.apicatalog.ld.signature.adapter.ProofAdapter;
+import com.apicatalog.ld.signature.adapter.ProofValueAdapter;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
@@ -25,7 +25,7 @@ public class SignatureSuite3 implements CanonicalizationAlgorithm, DigestAlgorit
 	protected final DigestAlgorithm digester;
 	protected final SignatureAlgorithm signer;
 
-	protected final ProofAdapter proofAdapter;
+	protected final ProofValueAdapter proofAdapter;
     protected final Collection<MethodAdapter> methodAdapter;
 
     
@@ -34,7 +34,7 @@ public class SignatureSuite3 implements CanonicalizationAlgorithm, DigestAlgorit
      *  A cryptographic suite specification is responsible for specifying the verification method 
      */
 	public SignatureSuite3(final URI id, final CanonicalizationAlgorithm canonicalization,
-			final DigestAlgorithm digester, final SignatureAlgorithm signer, final ProofAdapter proofAdapter,
+			final DigestAlgorithm digester, final SignatureAlgorithm signer, final ProofValueAdapter proofAdapter,
 			final Collection<MethodAdapter> methodAdapter
 	        ) {
 		this.id = id;
@@ -74,7 +74,7 @@ public class SignatureSuite3 implements CanonicalizationAlgorithm, DigestAlgorit
 		return id;
 	}
 
-	public ProofAdapter getProofAdapter() {
+	public ProofValueAdapter getProofAdapter() {
 		return proofAdapter;
 	}
 

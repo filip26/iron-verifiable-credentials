@@ -14,9 +14,9 @@ import jakarta.json.JsonStructure;
 
 public class LinkedDataSignature {
 
-    private final SignatureSuite suite;
+    private final CryptoSuite suite;
 
-    public LinkedDataSignature(SignatureSuite suite) {
+    public LinkedDataSignature(CryptoSuite suite) {
         this.suite = suite;
     }
 
@@ -28,7 +28,7 @@ public class LinkedDataSignature {
      *      Algorithm</a>
      *
      * @param document        expanded unsigned VC/VP document
-     * @param proof           expanded proof with no proofValue
+     * @param unsignedProof   expanded proof with no proofValue
      * @param verificationKey
      * @param signature
      *
@@ -37,19 +37,16 @@ public class LinkedDataSignature {
      */
     public void verify(
             final JsonObject document,
-            final JsonObject proof,
+            final JsonObject unsignedProof,
             final VerificationKey verificationKey,
             final byte[] signature) throws VerificationError, DocumentError {
 
         if (verificationKey == null || verificationKey.publicKey() == null) {
             throw new DocumentError(ErrorType.Missing, "ProofVerificationKey");
         }
-
-        // remote a proof value
-        final JsonObject unsignedProof = 
-                    Json.createObjectBuilder(proof)
-                        .remove(suite.proofValue().id())
-                        .build();
+        if (signature == null) {
+            throw new DocumentError(ErrorType.Missing, "ProofValue");
+        }
 
         try {
             final byte[] computeSignature = hashCode(document, unsignedProof);

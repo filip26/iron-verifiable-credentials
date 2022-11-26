@@ -8,6 +8,7 @@ import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.document.JsonDocument;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -22,6 +23,7 @@ import com.apicatalog.vc.loader.StaticContextLoader;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
 
 public final class Issuer extends Processor<Issuer> {
@@ -205,14 +207,23 @@ public final class Issuer extends Processor<Issuer> {
 
         final JsonObject data = EmbeddedProof.removeProof(object);
 
-        final LinkedDataSignature suite = new LinkedDataSignature(options.getSuite());
+        final LinkedDataSignature suite = new LinkedDataSignature(options.getSuite().getCryptoSuite());
 
-		JsonObject proof = options.getSuite().getProofAdapter().serialize(options.toUnsignedProof());
+		JsonObject proof = options.toUnsignedProof(); // options.getSuite().getProofAdapter().serialize(options.toUnsignedProof());
 
 		final byte[] signature = suite.sign(data, keyPair, proof);
 
-		proof = options.getSuite().getProofAdapter().setProofValue(proof, signature);
-
+		final String proofValue = options.getSuite().getProofValueAdapter().encode(signature);
+		
+		final JsonObjectBuilder proofValueObject = Json.createObjectBuilder()
+		      .add(Keywords.VALUE, proofValue)
+		      .add(Keywords.TYPE, options.getSuite().getProofValueAdapter().id().toString())
+		      ;
+		
+		proof = Json.createObjectBuilder(proof).add(options.getSuite().getProofType().proofValue().id(),
+		        Json.createArrayBuilder().add(proofValueObject)
+		        ).build();
+		
 		return EmbeddedProof.addProof(object, proof);
 	}
 
