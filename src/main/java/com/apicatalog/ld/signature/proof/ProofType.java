@@ -2,16 +2,16 @@ package com.apicatalog.ld.signature.proof;
 
 import java.net.URI;
 
-import com.apicatalog.jsonld.PropertyName;
+import com.apicatalog.ld.schema.LdTerm;
 
 public interface ProofType {
 
     // proof type id
     URI id();   
 
-    PropertyName proofValue();
+    LdTerm proofValue();
 
-    PropertyName method();
+    LdTerm method();
     
     URI context();
     

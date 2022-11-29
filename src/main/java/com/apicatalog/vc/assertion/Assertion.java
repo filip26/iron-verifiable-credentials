@@ -1,21 +1,38 @@
 package com.apicatalog.vc.assertion;
 
+import com.apicatalog.ld.schema.LdTerm;
+
 import jakarta.json.JsonValue;
 
-public interface Assertion {
+public class Assertion {
 
-    enum Location {
-        Subject,
-        Issuer,
-        Proof
+    protected AssertionScope scope;
+    
+    public Assertion(AssertionScope scope) {
+        this.scope = scope;
     }
     
-    Location location();
+    public boolean apply(JsonValue value) {
+        return false;
+    }
     
-    String property();
-    String vocabulary();
+    public static ObjectAssertion thatProof() {
+        return null;
+    }
+        
     
-    boolean match(JsonValue value);
+//    enum Location {
+//        Subject,
+//        Issuer,
+//        Proof
+//    }
+//    
+//    Location location();
+//    
+//    String property();
+//    String vocabulary();
+//    
+//    boolean match(JsonValue value);
     
     // isTrue
     // equals 

@@ -5,12 +5,12 @@ import java.util.Optional;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.PropertyName;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.key.MultibasePublicKey;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.multibase.Multibase;
@@ -26,9 +26,9 @@ public class MultibaseKeyAdapter implements MethodAdapter {
 
     protected final URI type;
     protected final Codec codec;
-    protected final PropertyName keyProperty;
+    protected final LdTerm keyProperty;
     
-    public MultibaseKeyAdapter(URI type, Codec codec, PropertyName keyProperty) {
+    public MultibaseKeyAdapter(URI type, Codec codec, LdTerm keyProperty) {
         this.type = type;
         this.codec = codec;
         this.keyProperty = keyProperty;
@@ -93,7 +93,7 @@ public class MultibaseKeyAdapter implements MethodAdapter {
         return Optional.empty();
     }
 
-    static byte[] getKey(JsonObject json, PropertyName property, Codec expected) throws DocumentError {
+    static byte[] getKey(JsonObject json, LdTerm property, Codec expected) throws DocumentError {
 
         JsonValue key = JsonLdReader
                             .getObjects(json, property.id())

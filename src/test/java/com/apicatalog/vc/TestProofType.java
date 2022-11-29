@@ -2,7 +2,7 @@ package com.apicatalog.vc;
 
 import java.net.URI;
 
-import com.apicatalog.jsonld.PropertyName;
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.proof.ProofType;
 
 public class TestProofType implements ProofType {
@@ -13,8 +13,8 @@ public class TestProofType implements ProofType {
     
     static final URI CONTEXT = URI.create("classpath:data-integrity-test-signature-2022.jsonld");
 
-    static final PropertyName PROOF_VALUE = PropertyName.create("proofValue", VOCAB);
-    static final PropertyName PROOF_METHOD = PropertyName.create("verificationMethod", VOCAB);
+    static final LdTerm PROOF_VALUE = LdTerm.create("proofValue", VOCAB);
+    static final LdTerm PROOF_METHOD = LdTerm.create("verificationMethod", VOCAB);
 
     @Override
     public URI id() {
@@ -22,12 +22,12 @@ public class TestProofType implements ProofType {
     }
 
     @Override
-    public PropertyName proofValue() {
+    public LdTerm proofValue() {
         return PROOF_VALUE;
     }
 
     @Override
-    public PropertyName method() {
+    public LdTerm method() {
         return PROOF_METHOD;
     }
 

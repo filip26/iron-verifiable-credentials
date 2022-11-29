@@ -1,13 +1,16 @@
 package com.apicatalog.vc.integrity;
 
 import java.net.URI;
+import java.time.Instant;
 
 import com.apicatalog.jsonld.JsonLdObjectBuilder;
 import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.adapter.ProofValueAdapter;
+import com.apicatalog.vc.assertion.Assertion;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -16,10 +19,8 @@ import jakarta.json.JsonObject;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  */
 @Deprecated
-public abstract class DataIntegrityProofAdapter implements ProofValueAdapter {
+public class DataIntegrityProofAdapter  {
 
-    static final String CREATED =  "created";
-    
     static final String SEC_BASE = "https://w3id.org/security#";
     
     static final String PURPOSE = "proofPurpose";
@@ -28,6 +29,8 @@ public abstract class DataIntegrityProofAdapter implements ProofValueAdapter {
     static final String CHALLENGE = "challenge";
     static final String PROOF_VALUE = "proofValue";
 
+    static final LdTerm Created = LdTerm.create("created", "http://purl.org/dc/terms/");
+    static final LdTerm Purpose = LdTerm.create("proofPurpose", SEC_BASE);
 
     protected static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
@@ -39,9 +42,47 @@ public abstract class DataIntegrityProofAdapter implements ProofValueAdapter {
         this.proofType = proofType;
     }
 
-    protected abstract byte[] decodeValue(String encoding, String value) throws DocumentError;
-
-    protected abstract String encodeValue(String encoding, byte[] value) throws DocumentError;
+    public Assertion assertions(String doamin) {
+        
+//        return Assertion.thatProof(
+//            type(proofType),
+//            property(Created,
+//                    xsdDateTime(
+//                            test(created -> Instant.now().isAfter(created)),
+//                            defaultValue(Instant.now())
+//                            )
+//                    ).required(),
+//                
+//            .property(Purpose)
+//                .isObject()
+//                .type("")
+//                .property()
+//                  .isString()
+//                  .type()
+//             
+//            
+//        );
+//        AssertionA
+//            .isType(proofType)
+//            
+//            .property(Purpose).isUri()
+//            
+//            .propertty(Created).isXsdDateTime().when(created -> Instant.now().after(created))
+//            
+//            .property(ProofValue).isValueObject().isType(MULTIBASE_TYPE)
+//            
+////            .object()
+//            
+//            .hasValue(Created, MULTIBASE_TYPE, created -> Instant.now().after(created))
+//            .hasValue(ProofValue, MULTIBASE_TYPE)
+//            
+            return null;
+        
+    }
+    
+//    protected abstract byte[] decodeValue(String encoding, String value) throws DocumentError;
+//
+//    protected abstract String encodeValue(String encoding, byte[] value) throws DocumentError;
 
 //    protected DataIntegrityProof read(JsonObject proofObject) throws DocumentError {
 //        System.out.println(">> " + proofObject);
@@ -202,7 +243,7 @@ public abstract class DataIntegrityProofAdapter implements ProofValueAdapter {
 
         if (proof.getCreated() != null) {
             builder.vocab("http://purl.org/dc/terms/");
-            builder.add(CREATED, proof.getCreated());
+//            builder.add(CREATED, proof.getCreated());
         }
 
         builder.vocab("https://w3id.org/security#");
@@ -220,8 +261,8 @@ public abstract class DataIntegrityProofAdapter implements ProofValueAdapter {
         }
 
         if (proof.getValue() != null) {
-            final String proofValue = encodeValue(MULTIBASE_TYPE, proof.getValue());
-            builder.add(PROOF_VALUE, MULTIBASE_TYPE, proofValue);
+      //      final String proofValue = encodeValue(MULTIBASE_TYPE, proof.getValue());
+        //    builder.add(PROOF_VALUE, MULTIBASE_TYPE, proofValue);
         }
 
         return builder;
@@ -231,11 +272,11 @@ public abstract class DataIntegrityProofAdapter implements ProofValueAdapter {
     public JsonObject setProofValue(final JsonObject proof, final byte[] value)
             throws DocumentError {
 
-        final String proofValue = encodeValue(MULTIBASE_TYPE, value);
+  //      final String proofValue = encodeValue(MULTIBASE_TYPE, value);
 
         return new JsonLdObjectBuilder(proof)
                     .vocab(SEC_BASE)
-                    .add(PROOF_VALUE, MULTIBASE_TYPE, proofValue)
+    //                .add(PROOF_VALUE, MULTIBASE_TYPE, proofValue)
                     .build();
     }
 

@@ -1,6 +1,5 @@
 package com.apicatalog.ld.signature.proof;
 
-import com.apicatalog.jsonld.Property;
 import com.apicatalog.ld.signature.SignatureSuite;
 
 import jakarta.json.JsonObject;

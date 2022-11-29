@@ -11,7 +11,6 @@ import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.PropertyName;
 import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -20,6 +19,7 @@ import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SignatureSuiteProvider;
@@ -257,7 +257,7 @@ public final class Verifier extends Processor<Verifier> {
 
             //FIXMe run assertions validate(proof);
             
-            final PropertyName proofValueName = signatureSuite.getProofType().proofValue();
+            final LdTerm proofValueName = signatureSuite.getProofType().proofValue();
             System.out.println(">>> " + proofValueName.id());
             System.out.println(">>> " + proofObject);
             
@@ -293,7 +293,7 @@ public final class Verifier extends Processor<Verifier> {
             
             //final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 
-            final PropertyName proofMethodName = signatureSuite.getProofType().method();
+            final LdTerm proofMethodName = signatureSuite.getProofType().method();
             
             VerificationMethod verificationMethod = getMethod(proofMethodName, proofObject, signatureSuite)
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, "ProofVerificationMethod"));
@@ -348,7 +348,7 @@ public final class Verifier extends Processor<Verifier> {
         // all good
     }
 
-    Optional<VerificationMethod> getMethod(final PropertyName proofMethodName, final JsonObject proofObject, final SignatureSuite suite) throws VerificationError, DocumentError {
+    Optional<VerificationMethod> getMethod(final LdTerm proofMethodName, final JsonObject proofObject, final SignatureSuite suite) throws VerificationError, DocumentError {
         
         final JsonArray expanded = proofObject.getJsonArray(proofMethodName.id());
         

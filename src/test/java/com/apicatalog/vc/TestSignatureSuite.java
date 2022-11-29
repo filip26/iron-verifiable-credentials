@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.apicatalog.jsonld.PropertyName;
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.adapter.MethodAdapter;
 import com.apicatalog.ld.signature.adapter.MultibaseKeyAdapter;
@@ -38,7 +38,7 @@ class TestSignatureSuite extends DataIntegritySuite {
 	    MultibaseKeyAdapter multibase = new MultibaseKeyAdapter(
 	            URI.create("https://example.org/security#TestVerificationKey2022"),
 	            Codec.Ed25519PublicKey,
-	            PropertyName.create("publicKeyMultibase", "https://example.org/security#")
+	            LdTerm.create("publicKeyMultibase", "https://example.org/security#")
 	            );
 	    
 	    methods.put("https://example.org/security#TestVerificationKey2022", multibase);
