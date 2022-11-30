@@ -8,13 +8,13 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 public class DataIntegrityKeyPair implements KeyPair {
 
     final URI id;
-    final String type;
+    final URI type;
     final URI controller;
 
     final byte[] publicKey;
     final byte[] privateKey;
     
-    protected DataIntegrityKeyPair(URI id, String type, URI controller, byte[] publicKey, byte[] privateKey) {
+    protected DataIntegrityKeyPair(URI id, URI type, URI controller, byte[] publicKey, byte[] privateKey) {
         this.id = id;
         this.type = type;
         this.controller = controller;
@@ -22,7 +22,7 @@ public class DataIntegrityKeyPair implements KeyPair {
         this.privateKey = privateKey;
     }
     
-    public static DataIntegrityKeyPair createVerificationKey(URI id, String type, URI controller, byte[] publicKey) {
+    public static DataIntegrityKeyPair createVerificationKey(URI id, URI type, URI controller, byte[] publicKey) {
         return new DataIntegrityKeyPair(id, type, controller, publicKey, null);
     }
     
@@ -37,7 +37,7 @@ public class DataIntegrityKeyPair implements KeyPair {
     }
 
     @Override
-    public String type() {
+    public URI type() {
         return type;
     }
 

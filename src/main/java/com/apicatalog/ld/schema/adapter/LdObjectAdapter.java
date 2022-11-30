@@ -29,25 +29,24 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
     
     @Override
     public LdObject read(JsonValue json) {
-        System.out.println(">> " + json);
+
         if (JsonUtils.isNotObject(json)) {
             throw new IllegalArgumentException();
         }
         
         JsonObject object = json.asJsonObject();
         
-        System.out.println("> " + object);
-        System.out.println("> " + terms);
+
         final Map<String, Object> values = new LinkedHashMap<>(object.size());
         
         for (final Map.Entry<String, JsonValue> entry : object.entrySet()) {
             
             // ignore if undefined
             if (!terms.containsKey(entry.getKey())) {
-                System.out.println(">> skip " + entry.getKey());
+
                 continue;
             }
-            System.out.println(">> " + entry.getKey());
+
             
             JsonValue value = entry.getValue();
 
@@ -88,11 +87,12 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
                 continue;
             }
             System.out.println(">> " + entry.getKey());
+            System.out.println(">> " + entry.getValue());
             
             LdProperty<Object> property = (LdProperty<Object>) terms.get(entry.getKey());
             
             JsonValue value =  property.write(entry.getValue());
-            
+System.out.println(">>>>>>>>>>>>>> " + entry.getValue());            
             // wrap
             value = Json.createArrayBuilder().add(value).build();
 

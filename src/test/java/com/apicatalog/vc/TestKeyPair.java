@@ -7,6 +7,9 @@ import com.apicatalog.ld.signature.key.KeyPair;
 public class TestKeyPair implements KeyPair {
 
     URI id;
+    URI type;
+    URI controller;
+    
     byte[] publicKey;
     byte[] privateKey;
     
@@ -26,14 +29,13 @@ public class TestKeyPair implements KeyPair {
     }
 
     @Override
-    public String type() {
-        return "";
+    public URI type() {
+        return type;
     }
 
     @Override
     public URI controller() {
-        // TODO Auto-generated method stub
-        return null;
+        return controller;
     }
 
     @Override

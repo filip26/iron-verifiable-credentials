@@ -36,13 +36,13 @@ public class DataIntegritySchema {
 //                        .defaultValue(Instant.now())
                                 .required(),
 
-                        property(PURPOSE, reference()).required(),
+                        property(PURPOSE, link()).required(),
 
                         verificationMethod(VERIFICATION_METHOD, object(
                                 new DataIntegrityKeysAdapter(),
                                 id(),
                                 type(type),
-                                property(CONTROLLER, uri()),
+                                property(CONTROLLER, link()),
                                 property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Type.Key))
                                 
                                 )).required(),

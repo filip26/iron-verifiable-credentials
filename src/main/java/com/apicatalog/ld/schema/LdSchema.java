@@ -6,6 +6,7 @@ import java.time.Instant;
 import com.apicatalog.ld.schema.adapter.LdFlatMap;
 import com.apicatalog.ld.schema.adapter.LdObjectAdapter;
 import com.apicatalog.ld.schema.adapter.LdValueObjectAdapter;
+import com.apicatalog.ld.schema.adapter.LinkAdapter;
 import com.apicatalog.ld.schema.adapter.MultibaseAdapter;
 import com.apicatalog.ld.schema.adapter.StringAdapter;
 import com.apicatalog.ld.schema.adapter.UriAdapter;
@@ -60,7 +61,7 @@ public class LdSchema {
     }
 
     public static final LdProperty<?> type(LdTerm id) {
-        return property(LdTerm.TYPE, LdPipe.map(array(new StringAdapter()), new UriAdapter()));
+        return property(LdTerm.TYPE, LdPipe.map(new StringAdapter(), new UriAdapter()));
     }
 
     public static final <X> LdProperty<X> property(LdTerm id, LdValueAdapter<JsonValue, X> adapter) {
@@ -91,8 +92,8 @@ public class LdSchema {
         return LdPipe.map(value(new StringAdapter()), adapter);
     }
     
-    public static final LdValueAdapter<JsonValue, LdObject> reference() {
-        return object(id());
+    public static final LdValueAdapter<JsonValue, URI> link() {
+        return new LinkAdapter();
     }
     
     public static final LdProperty<byte[]> proofValue(LdTerm id, LdValueAdapter<JsonValue, byte[]> adapter) {

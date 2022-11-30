@@ -29,7 +29,7 @@ public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
         if (multicodec == null) {
             return debased;
         }
-        System.out.println(">>> " + algorithm + ", " + multicodec);
+
         final Codec codec = Multicodec
                                     .codec(multicodec, debased)
                                     .orElseThrow(() -> new IllegalArgumentException());
@@ -42,16 +42,16 @@ public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
     public String write(byte[] value) {
         return Multibase.encode(algorithm, value);
     }
-    
-    public static void main(String[] args) {
-        
-        byte[] x = Multibase.decode("zF9RuvG5hsw3QBW5ZzwdiHXZTESQ5qQDoPcLDbwojW818");
-        x = Multicodec.encode(Codec.Ed25519PublicKey,x);
-        
-        System.out.println(Multibase.encode(Algorithm.Base58Btc, x));
-        
-        
-        
-    }
-
+//    
+//    public static void main(String[] args) {
+//        
+//        byte[] x = Multibase.decode("zF9RuvG5hsw3QBW5ZzwdiHXZTESQ5qQDoPcLDbwojW818");
+//        x = Multicodec.encode(Codec.Ed25519PublicKey,x);
+//        
+//        System.out.println(Multibase.encode(Algorithm.Base58Btc, x));
+//        
+//        
+//        
+//    }
+//
 }

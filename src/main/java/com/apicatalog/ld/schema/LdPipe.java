@@ -2,6 +2,8 @@ package com.apicatalog.ld.schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import com.apicatalog.ld.schema.adapter.LdObjectAdapter;
 
@@ -21,9 +23,8 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
     public B read(A value) {
         
         Object result = value;
-        
+        System.out.println(" in  > " + result);
         for (final LdValueAdapter<Object, Object> adapter : adapters) {
-            System.out.println(" in  > " + result);
             result = adapter.read(result);
             System.out.println(" out > " + result);
         }
@@ -33,8 +34,19 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
 
     @Override
     public A write(B value) {
-        // TODO Auto-generated method stub
-        return null;
+
+        final List<LdValueAdapter<Object, Object>> reversed = new ArrayList<>(adapters);
+        
+        Collections.reverse(reversed);
+        
+        Object result = value;
+        System.out.println(" write  > " + result);
+        for (final LdValueAdapter<Object, Object> adapter :  reversed) {
+            result = adapter.write(result);
+            System.out.println("        > " + result);
+        }
+        
+        return (A)result;
     }
     
     @SuppressWarnings("unchecked")

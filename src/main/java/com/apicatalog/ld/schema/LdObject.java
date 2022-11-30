@@ -13,14 +13,11 @@ public class LdObject  {
     }
     
     public boolean contains(LdTerm term) {
-        System.out.println(">>> " + values);
-        System.out.println(">>> " + term.id);
 
         return values.containsKey(term.id);
     }
 
     public <X> X value(LdTerm term) {
-        System.out.println("VALUE " + term.name + ", " + values);
         return (X) values.get(term.id);
     }
     

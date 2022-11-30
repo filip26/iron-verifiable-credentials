@@ -12,7 +12,7 @@ public interface VerificationMethod {
 
     URI id();
     
-    String type();
+    URI type();
     
     URI controller();
 

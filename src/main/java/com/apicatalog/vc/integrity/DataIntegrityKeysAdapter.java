@@ -13,7 +13,7 @@ public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, Verifi
     public VerificationMethod read(LdObject object) {
 
         URI id = object.value(LdTerm.ID);
-        String type = object.value(LdTerm.TYPE);
+        URI type = object.value(LdTerm.TYPE);
         
         byte[] publicKey = object.value(DataIntegritySchema.MULTIBASE_PUB_KEY);
         byte[] privateKey = object.value(DataIntegritySchema.MULTIBASE_PRIV_KEY);
