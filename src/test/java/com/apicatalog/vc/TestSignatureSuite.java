@@ -1,19 +1,10 @@
 package com.apicatalog.vc;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.adapter.MethodAdapter;
-import com.apicatalog.ld.signature.adapter.MultibaseKeyAdapter;
-import com.apicatalog.ld.signature.adapter.MultibaseProofValueAdapter;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.ld.signature.proof.ProofType;
-import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
 

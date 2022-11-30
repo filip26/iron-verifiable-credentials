@@ -1,6 +1,7 @@
 package com.apicatalog.vc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.apicatalog.ld.schema.LdSchema.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -21,11 +22,19 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.schema.LdObject;
+import com.apicatalog.ld.schema.LdValueAdapter;
+import com.apicatalog.ld.schema.adapter.LdObjectAdapter;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.multibase.Multibase.Algorithm;
+import com.apicatalog.multicodec.Multicodec.Type;
+import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
+import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -79,14 +88,13 @@ public class VcTestRunnerJunit {
 				
 				final TestSignatureSuite suite = new TestSignatureSuite();
 				
-				final ProofOptions options = suite.createOptions() //FIXME should be builder
-				        //FIXME
+				final ProofOptions options = suite.createOptions()
                         // proof options
-//                        .verificationMethod(testCase.verificationMethod)
-//                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
-//                        .created(testCase.created)
-//                        .domain(testCase.domain)
-				        .build();
+                        .verificationMethod(testCase.verificationMethod)
+                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
+                        .created(testCase.created)
+                        .domain(testCase.domain)
+                        ;
 
 
 				Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
@@ -230,7 +238,15 @@ public class VcTestRunnerJunit {
 				continue;
 			}
 
-//FIXME			return (KeyPair) (new TestVerificationMethodAdapter()).deserialize(key.asJsonObject());
+			LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
+                    new DataIntegrityKeysAdapter(),
+                    id(),
+                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Type.Key)),
+                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Type.Key))
+			        );
+			
+			return (KeyPair) adapter.read(key);
+
 		}
 		throw new IllegalStateException();
 	}

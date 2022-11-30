@@ -12,7 +12,9 @@ import com.apicatalog.ld.schema.LdTag;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.LdValueAdapter;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonValue;
 
 public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
@@ -68,11 +70,36 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
     }
 
     @Override
-    public JsonObject write(LdObject value) {
+    public JsonObject write(LdObject object) {
         
+        JsonObjectBuilder builder = Json.createObjectBuilder();
         
-        // TODO Auto-generated method stub
-        return null;
+
+        for (final Map.Entry<String, Object> entry : object.entrySet()) {
+            
+            //TODO defaultValue?
+            if (entry.getValue() == null) {
+                continue;
+            }
+            
+            // ignore if undefined
+            if (!terms.containsKey(entry.getKey())) {
+                System.out.println(">> skip " + entry.getKey());
+                continue;
+            }
+            System.out.println(">> " + entry.getKey());
+            
+            LdProperty<Object> property = (LdProperty<Object>) terms.get(entry.getKey());
+            
+            JsonValue value =  property.write(entry.getValue());
+            
+            // wrap
+            value = Json.createArrayBuilder().add(value).build();
+
+            builder.add(entry.getKey(), value);
+        }        
+        
+        return builder.build();
     }
 
 

@@ -1,12 +1,8 @@
 package com.apicatalog.ld.schema;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
-
-import jakarta.json.JsonObject;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class LdObject  {
 
@@ -26,6 +22,10 @@ public class LdObject  {
     public <X> X value(LdTerm term) {
         System.out.println("VALUE " + term.name + ", " + values);
         return (X) values.get(term.id);
+    }
+    
+    public Set<Entry<String, Object>> entrySet() {
+        return values.entrySet();
     }
 
     

@@ -2,7 +2,6 @@ package com.apicatalog.ld.signature.proof;
 
 import java.net.URI;
 
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 
@@ -38,13 +37,4 @@ public interface Proof  {
      * @return the proof value as byte array
      */
     byte[] getValue();
-    
-    /**
-     * Validates the proof data integrity. Does data integrity checks unrelated to a computed signature.
-     * e.g. mandatory fields, values (created < now) e.g.
-     * 
-     * @throws DocumentError
-     */
-//FIXME ?!?!?!    void validate() throws DocumentError;
-
 }

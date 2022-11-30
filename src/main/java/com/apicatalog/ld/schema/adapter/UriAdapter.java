@@ -19,8 +19,7 @@ public class UriAdapter implements LdValueAdapter<String, URI> {
 
     @Override
     public String write(URI value) {
-        // TODO Auto-generated method stub
-        return null;
+        return value.toString();
     }
 
 }

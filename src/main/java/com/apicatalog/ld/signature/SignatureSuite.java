@@ -1,7 +1,6 @@
 package com.apicatalog.ld.signature;
 
 import com.apicatalog.ld.schema.LdSchema;
-import com.apicatalog.ld.signature.proof.ProofBuilder;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.ld.signature.proof.ProofType;
 
@@ -21,7 +20,7 @@ public interface SignatureSuite {
 	
 	CryptoSuite getCryptoSuite();
 
-    <O extends ProofOptions> ProofBuilder<O>  createOptions();
+    ProofOptions  createOptions();
 
     //TODO proof assertions!!!!!
     

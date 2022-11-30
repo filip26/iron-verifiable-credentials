@@ -1,15 +1,10 @@
 package com.apicatalog.vc.integrity;
 
 import java.net.URI;
-import java.time.Instant;
 
 import com.apicatalog.jsonld.JsonLdObjectBuilder;
-import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.signature.adapter.ProofValueAdapter;
 import com.apicatalog.vc.assertion.Assertion;
 
 import jakarta.json.Json;

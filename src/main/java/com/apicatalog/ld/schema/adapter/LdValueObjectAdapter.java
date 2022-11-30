@@ -8,7 +8,9 @@ import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.LdValueAdapter;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonValue;
 
 public class LdValueObjectAdapter implements LdValueAdapter<JsonValue, JsonValue> {
@@ -37,8 +39,16 @@ public class LdValueObjectAdapter implements LdValueAdapter<JsonValue, JsonValue
 
     @Override
     public JsonValue write(JsonValue value) {
-        // TODO Auto-generated method stub
-        return null;
+
+        final JsonObjectBuilder builder = Json.createObjectBuilder();
+        
+        if (type != null) {
+            builder.add(Keywords.TYPE, type.id());
+        }
+        
+        builder.add(Keywords.VALUE, value);
+        
+        return builder.build();
     }
 
 }

@@ -36,8 +36,7 @@ public class LdSchema {
     }
 
     public JsonObject write(LdObject value) {
-        // TODO Auto-generated method stub
-        return null;
+        return schema.write(value);
     }
     
     public LdObject read(JsonObject value) {
