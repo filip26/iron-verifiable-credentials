@@ -5,7 +5,7 @@ import java.util.function.Function;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class LdValueObject implements LdValue<JsonValue, JsonValue> {
+public class LdValueObject implements LdValueAdapter<JsonValue, JsonValue> {
 
     protected final LdTerm type;
     
@@ -18,22 +18,15 @@ public class LdValueObject implements LdValue<JsonValue, JsonValue> {
     }
     
     @Override
-    public JsonValue apply(JsonValue value) {
+    public JsonValue read(JsonValue value) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public JsonValue inverse(JsonValue value) {
+    public JsonValue write(JsonValue value) {
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
-    public <X> LdValue<JsonValue, X> map(LdValueAdapter<JsonValue, X> adapter) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 
 }

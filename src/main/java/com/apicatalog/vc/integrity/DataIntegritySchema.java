@@ -7,7 +7,7 @@ import static com.apicatalog.ld.schema.LdSchema.property;
 import static com.apicatalog.ld.schema.LdSchema.reference;
 import static com.apicatalog.ld.schema.LdSchema.string;
 import static com.apicatalog.ld.schema.LdSchema.type;
-import static com.apicatalog.ld.schema.LdSchema.verificationMethod;
+import static com.apicatalog.ld.schema.LdSchema.*;
 import static com.apicatalog.ld.schema.LdSchema.xsdDateTime;
 
 import java.time.Instant;
@@ -30,15 +30,15 @@ public class DataIntegritySchema {
 
     public static void main(String[] args) {
 
-        LdSchema schema = 
+        var schema = 
                 object(
                     type(TYPE).required(),
                     
                     property(CREATED, xsdDateTime())
                         .test(created -> Instant.now().isAfter(created))
-                        .defaultValue(Instant.now())
+//                        .defaultValue(Instant.now())
                         .required(),
-                        
+
                     property(PURPOSE, reference()).required(),
                     
                     verificationMethod(VERIFICATION_METHOD, multibase() 
@@ -46,7 +46,7 @@ public class DataIntegritySchema {
                     
                     property(DOMAIN, string()),
                     
-                    property(CHALLENGE, string()),
+                    property(CHALLENGE, value(string())),
                     
                     proofValue(PROOF_VALUE, multibase())
                         .test(key -> key.length == 64)
@@ -54,6 +54,12 @@ public class DataIntegritySchema {
                     
         );
         
+//        Ld.get(CREATED, Json.createObjectBuilder().add(CREATED.id(), 
+//                Json.createArrayBuilder()
+//                .add(Json.createObjectBuilder().add(Keywords.VALUE, "AAAAAAA").add(Keywords.TYPE,"http://www.w3.org/2001/XMLSchema#dateTime"))
+//                    ).build()
+//                );
+//        
 //        schema.read(Json.createArrayBuilder().build());
     }
 

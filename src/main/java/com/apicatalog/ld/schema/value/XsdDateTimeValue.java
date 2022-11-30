@@ -3,17 +3,21 @@ package com.apicatalog.ld.schema.value;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
+import com.apicatalog.ld.schema.LdValue;
 import com.apicatalog.ld.schema.LdValueAdapter;
 
 public class XsdDateTimeValue implements LdValueAdapter<String, Instant> {
 
     @Override
-    public Instant apply(String value) {
+    public Instant read(String value) {
                 
         try {
             OffsetDateTime createdOffset = OffsetDateTime.parse(value);
-
+            
             return createdOffset.toInstant();
 
         } catch (DateTimeParseException e) {
@@ -23,7 +27,7 @@ public class XsdDateTimeValue implements LdValueAdapter<String, Instant> {
     }
 
     @Override
-    public String inverse(Instant value) {
+    public String write(Instant value) {
         return value.toString();
     }
 

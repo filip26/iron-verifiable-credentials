@@ -2,6 +2,7 @@ package com.apicatalog.vc.integrity;
 
 import java.util.Map;
 
+import com.apicatalog.ld.schema.LdSchema;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.adapter.MethodAdapter;
@@ -31,10 +32,10 @@ public class DataIntegritySuite implements SignatureSuite {
 
     }
 
-    @Override
-    public MethodAdapter getMethodAdapter(String type) {
-        return methodAdapter.get(type);
-    }
+//    @Override
+//    public MethodAdapter getMethodAdapter(String type) {
+//        return methodAdapter.get(type);
+//    }
 
     //FIXME should  return something what enforces all required fields
     
@@ -43,12 +44,12 @@ public class DataIntegritySuite implements SignatureSuite {
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
-    public ProofValueAdapter getProofValueAdapter() {
-        return proofValueAdapter;
-    }
-    
+//
+//    @Override
+//    public ProofValueAdapter getProofValueAdapter() {
+//        return proofValueAdapter;
+//    }
+//    
     @Override
     public ProofType getProofType() {
         return type;
@@ -57,5 +58,11 @@ public class DataIntegritySuite implements SignatureSuite {
     @Override
     public CryptoSuite getCryptoSuite() {
         return crypto;
+    }
+
+    @Override
+    public LdSchema getSchema() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -9,9 +9,9 @@ public interface ProofType {
     // proof type id
     URI id();   
 
-    LdTerm proofValue();
+//    LdTerm proofValue();
 
-    LdTerm method();
+//    LdTerm method();
     
     URI context();
     

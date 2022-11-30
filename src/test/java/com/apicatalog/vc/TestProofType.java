@@ -21,15 +21,15 @@ public class TestProofType implements ProofType {
         return ID;
     }
 
-    @Override
-    public LdTerm proofValue() {
-        return PROOF_VALUE;
-    }
-
-    @Override
-    public LdTerm method() {
-        return PROOF_METHOD;
-    }
+//    @Override
+//    public LdTerm proofValue() {
+//        return PROOF_VALUE;
+//    }
+//
+//    @Override
+//    public LdTerm method() {
+//        return PROOF_METHOD;
+//    }
 
     @Override
     public URI context() {

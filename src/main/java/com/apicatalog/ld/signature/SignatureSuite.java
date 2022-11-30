@@ -1,7 +1,6 @@
 package com.apicatalog.ld.signature;
 
-import com.apicatalog.ld.signature.adapter.MethodAdapter;
-import com.apicatalog.ld.signature.adapter.ProofValueAdapter;
+import com.apicatalog.ld.schema.LdSchema;
 import com.apicatalog.ld.signature.proof.ProofBuilder;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.ld.signature.proof.ProofType;
@@ -12,11 +11,13 @@ import com.apicatalog.ld.signature.proof.ProofType;
  */
 public interface SignatureSuite {
 
+    LdSchema getSchema();
+    
 	ProofType getProofType();
 
-	ProofValueAdapter getProofValueAdapter();
+//	ProofValueAdapter getProofValueAdapter();
 
-	MethodAdapter getMethodAdapter(String type);
+//	MethodAdapter getMethodAdapter(String type);
 	
 	CryptoSuite getCryptoSuite();
 

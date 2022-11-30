@@ -2,25 +2,23 @@ package com.apicatalog.ld.schema;
 
 import java.util.function.Function;
 
+import com.apicatalog.ld.signature.method.VerificationMethod;
+
 import jakarta.json.JsonValue;
 
 public class LdProperty<T> {
 
-    public enum Tag {
-        ProofValue,
-    }
+    protected final LdTerm term;
+    protected final LdValueAdapter<JsonValue, T> adapter;
+    protected final LdTag tag;
     
-    protected final LdTerm id;
-    protected final LdValue<JsonValue, T> value;
-    protected final Tag tag;
-    
-    public LdProperty(LdTerm id, LdValue<JsonValue, T> value) {
-        this(id, value, null);
+    public LdProperty(LdTerm term, LdValueAdapter<JsonValue, T> adapter) {
+        this(term, adapter, null);
     }
 
-    public LdProperty(LdTerm id, LdValue<JsonValue, T> value, Tag tag) {
-        this.id = id;
-        this.value = value;
+    public LdProperty(LdTerm term, LdValueAdapter<JsonValue, T> adapter, LdTag tag) {
+        this.term = term;
+        this.adapter = adapter;
         this.tag = tag;
     }
 
@@ -36,8 +34,16 @@ public class LdProperty<T> {
         return null;
     }
 
-    public LdProperty<T> defaultValue(T value) {
-        return null;
+    public LdTerm term() {
+        return term;
+    }
+
+    public JsonValue write(T value) {
+        return adapter.write(value);        
+    }
+
+    public T read(JsonValue value) {
+        return adapter.read(value);
     }
 
 }

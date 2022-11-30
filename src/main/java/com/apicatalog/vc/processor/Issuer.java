@@ -3,6 +3,7 @@ package com.apicatalog.vc.processor;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -12,6 +13,9 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.LdProperty;
+import com.apicatalog.ld.schema.LdSchema;
+import com.apicatalog.ld.schema.LdTag;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
@@ -25,6 +29,7 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
+import jakarta.json.JsonValue;
 
 public final class Issuer extends Processor<Issuer> {
 
@@ -207,28 +212,34 @@ public final class Issuer extends Processor<Issuer> {
 
         final JsonObject data = EmbeddedProof.removeProof(object);
 
-        final LinkedDataSignature suite = new LinkedDataSignature(options.getSuite().getCryptoSuite());
+        final LinkedDataSignature ldSignature = new LinkedDataSignature(options.getSuite().getCryptoSuite());
 
-		JsonObject proof = options.toUnsignedProof(); // options.getSuite().getProofAdapter().serialize(options.toUnsignedProof());
+		JsonObject proof = options.getSuite().getSchema().write(new HashMap<>()); //FIXME use options 
+		        
+        //options.toUnsignedProof(); 
+		// options.getSuite().getProofAdapter().serialize(options.toUnsignedProof());
 
-		final byte[] signature = suite.sign(data, keyPair, proof);
-
-		final String proofValue = options.getSuite().getProofValueAdapter().encode(signature);
 		
-		final JsonObjectBuilder proofValueObject = Json.createObjectBuilder()
-		      .add(Keywords.VALUE, proofValue)
-		      .add(Keywords.TYPE, options.getSuite().getProofValueAdapter().id().toString())
-		      ;
+		final LdProperty<byte[]> proofValueProperty = options.getSuite().getSchema().property(LdTag.ProofValue); 
+
+		final byte[] signature = ldSignature.sign(data, keyPair, proof);
+
+		final JsonValue proofValue = proofValueProperty.write(signature);
+
+//		final JsonObjectBuilder proofValueObject = Json.createObjectBuilder()
+//		      .add(Keywords.VALUE, proofValue)
+//		      .add(Keywords.TYPE, options.getSuite().getProofValueAdapter().id().toString())
+//		      ;
 		
-		proof = Json.createObjectBuilder(proof).add(options.getSuite().getProofType().proofValue().id(),
-		        Json.createArrayBuilder().add(proofValueObject)
-		        ).build();
+		proof = Json.createObjectBuilder(proof)
+	                .add(proofValueProperty.term().id(), proofValue)
+//		        Json.createArrayBuilder().add(proofValueObject)
+		            .build();
 		
 		return EmbeddedProof.addProof(object, proof);
 	}
 
 	private final void validate(Verifiable verifiable) throws SigningError {
-
 		// is expired?
 		if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
 			throw new SigningError(Code.Expired);

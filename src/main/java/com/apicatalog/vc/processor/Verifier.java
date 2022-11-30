@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -19,6 +20,8 @@ import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.LdProperty;
+import com.apicatalog.ld.schema.LdTag;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
@@ -257,35 +260,41 @@ public final class Verifier extends Processor<Verifier> {
 
             //FIXMe run assertions validate(proof);
             
-            final LdTerm proofValueName = signatureSuite.getProofType().proofValue();
-            System.out.println(">>> " + proofValueName.id());
-            System.out.println(">>> " + proofObject);
+            final LdProperty<byte[]> proofValueProperty = signatureSuite.getSchema().property(LdTag.ProofValue);
+
+            final Map<String, Object> proof = signatureSuite.getSchema().read(proofObject);
             
-            if (!proofObject.containsKey(proofValueName.id())) {
+//            final LdTerm proofValueName = signatureSuite.getProofType().proofValue();
+//            System.out.println(">>> " + proofValueName.id());
+//            System.out.println(">>> " + proofObject);
+            
+            if (!proof.containsKey(proofValueProperty.term().id())) {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");
             }
             
-            JsonArray jsonValue = proofObject.getJsonArray(proofValueName.id());
-
-            if (!jsonValue.stream().allMatch(ValueObject::isValueObject)
-                    || !jsonValue.stream()
-                            .map(JsonValue::asJsonObject)
-                            .map(o -> o.get(Keywords.VALUE))
-                            .allMatch(JsonUtils::isString)
-                    ) {
-                throw new DocumentError(ErrorType.Invalid, "ProofValue");
-            }
+//            JsonArray jsonValue = proofObject.getJsonArray(proofValueName.id());
+//
+//            if (!jsonValue.stream().allMatch(ValueObject::isValueObject)
+//                    || !jsonValue.stream()
+//                            .map(JsonValue::asJsonObject)
+//                            .map(o -> o.get(Keywords.VALUE))
+//                            .allMatch(JsonUtils::isString)
+//                    ) {
+//                throw new DocumentError(ErrorType.Invalid, "ProofValue");
+//            }
+//            
+//            String proofValueType = jsonValue.getJsonObject(0).getString(Keywords.TYPE);
             
-            String proofValueType = jsonValue.getJsonObject(0).getString(Keywords.TYPE);
-            
-            if (!signatureSuite.getProofValueAdapter().id().toString().equals(proofValueType)) {
-                throw new DocumentError(ErrorType.Invalid, "ProofValueType");
-            }
+//            if (!signatureSuite.getProofValueAdapter().id().toString().equals(proofValueType)) {
+//                throw new DocumentError(ErrorType.Invalid, "ProofValueType");
+//            }
 
-            String encodedProofValue = jsonValue.getJsonObject(0).getString(Keywords.VALUE);
+//            String encodedProofValue = jsonValue.getJsonObject(0).getString(Keywords.VALUE);
             
                         
-            final byte[] proofValue = signatureSuite.getProofValueAdapter().decode(encodedProofValue);
+//            final byte[] proofValue = signatureSuite.getProofValueAdapter().decode(encodedProofValue);
+            
+            final byte[] proofValue = (byte[]) proof.get(proofValueProperty.term().id());
             
             if (proofValue == null || proofValue.length == 0) {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");
@@ -293,7 +302,7 @@ public final class Verifier extends Processor<Verifier> {
             
             //final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 
-            final LdTerm proofMethodName = signatureSuite.getProofType().method();
+            final LdTerm proofMethodName = signatureSuite.getSchema().property(LdTag.VerificationMethod).term();
             
             VerificationMethod verificationMethod = getMethod(proofMethodName, proofObject, signatureSuite)
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, "ProofVerificationMethod"));
@@ -332,7 +341,7 @@ public final class Verifier extends Processor<Verifier> {
             // remote a proof value
             final JsonObject unsignedProof = 
                         Json.createObjectBuilder(proofObject)
-                            .remove(signatureSuite.getProofType().proofValue().id())
+                            .remove(proofValueProperty.term().id())
                             .build();
             
             final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite.getCryptoSuite());
@@ -370,14 +379,18 @@ public final class Verifier extends Processor<Verifier> {
                 return resolve(methodObject, suite);
             }
             
-            final MethodAdapter adapter = types.stream()
-                                            .map(suite::getMethodAdapter)
-                                            .filter(Objects::nonNull)
-                                            .findFirst()
-                                            .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "VerificationMethod"));
-            
-            final VerificationMethod method = adapter.deserialize(methodObject);
-            
+//            final MethodAdapter adapter = types.stream()
+//                                            .map(suite::getMethodAdapter)
+//                                            .filter(Objects::nonNull)
+//                                            .findFirst()
+//                                            .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "VerificationMethod"));
+//            
+//            final VerificationMethod method = adapter.deserialize(methodObject);
+
+            final LdProperty<VerificationMethod> property = suite.getSchema().property(LdTag.VerificationMethod);
+
+            final VerificationMethod method = property.read(methodObject);
+
             if (method != null && method instanceof VerificationKey) {
                 return Optional.of(method);
             }
