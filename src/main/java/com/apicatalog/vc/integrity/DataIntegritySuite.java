@@ -13,23 +13,17 @@ public class DataIntegritySuite implements SignatureSuite {
     
     protected final ProofType type;
     protected final CryptoSuite crypto;
-    
-    protected final ProofValueAdapter proofValueAdapter;
-    protected final Map<String, MethodAdapter> methodAdapter;
+    protected final LdSchema schema;
 
     protected DataIntegritySuite(
             ProofType type, 
             CryptoSuite crypto,
-            ProofValueAdapter proofAdapter,
-            Map<String, MethodAdapter> methodAdapter
+            LdSchema schema
             ) {
 
         this.type = type;
         this.crypto = crypto;
-
-        this.proofValueAdapter = proofAdapter;
-        this.methodAdapter = methodAdapter;
-
+        this.schema = schema;
     }
 
 //    @Override
@@ -62,7 +56,6 @@ public class DataIntegritySuite implements SignatureSuite {
 
     @Override
     public LdSchema getSchema() {
-        // TODO Auto-generated method stub
-        return null;
+        return schema;
     }
 }

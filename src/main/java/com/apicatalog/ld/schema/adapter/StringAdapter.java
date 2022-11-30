@@ -1,4 +1,4 @@
-package com.apicatalog.ld.schema.value;
+package com.apicatalog.ld.schema.adapter;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.schema.LdValue;
@@ -8,7 +8,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
-public class StringValue implements LdValueAdapter<JsonValue, String> {
+public class StringAdapter implements LdValueAdapter<JsonValue, String> {
 
     @Override
     public String read(JsonValue value) {

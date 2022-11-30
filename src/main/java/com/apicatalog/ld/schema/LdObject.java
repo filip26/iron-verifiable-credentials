@@ -1,25 +1,27 @@
 package com.apicatalog.ld.schema;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import jakarta.json.JsonObject;
 
-public class LdObject implements LdValueAdapter<JsonObject, JsonObject> {
+public class LdObject  {
 
-    @Override
-    public JsonObject read(JsonObject value) {
-        // TODO Auto-generated method stub
-        return null;
+    final Map<String, Object> values;
+    
+    public LdObject(Map<String, Object> values) {
+        this.values = values;
+    }
+    
+    public boolean contains(LdTerm term) {
+        return values.containsKey(term.id);
     }
 
-    @Override
-    public JsonObject write(JsonObject value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    public static LdObject create(LdProperty<?>[] properties) {
-        // TODO Auto-generated method stub
-        return null;
+    public <X> X value(LdTerm term) {
+        return (X) values.get(term.id);
     }
 
     

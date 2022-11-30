@@ -14,6 +14,7 @@ import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.ld.signature.proof.ProofType;
 import com.apicatalog.multicodec.Multicodec.Codec;
+import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
@@ -27,27 +28,27 @@ class TestSignatureSuite extends DataIntegritySuite {
 	            new TestAlgorithm()
             );
 	
-	static final MultibaseProofValueAdapter ADAPTER = new MultibaseProofValueAdapter(URI.create("https://example.org/security#multibase"));
-	
-	static final Map<String, MethodAdapter> METHOD_ADAPTERS;
-	
-	static {
-	    
-	    Map<String, MethodAdapter> methods = new LinkedHashMap<>();
-	    
-	    MultibaseKeyAdapter multibase = new MultibaseKeyAdapter(
-	            URI.create("https://example.org/security#TestVerificationKey2022"),
-	            Codec.Ed25519PublicKey,
-	            LdTerm.create("publicKeyMultibase", "https://example.org/security#")
-	            );
-	    
-	    methods.put("https://example.org/security#TestVerificationKey2022", multibase);
-	    
-	    METHOD_ADAPTERS = Collections.unmodifiableMap(methods);
-	    
-	}
+//	static final MultibaseProofValueAdapter ADAPTER = new MultibaseProofValueAdapter(URI.create("https://example.org/security#multibase"));
+//	
+//	static final Map<String, MethodAdapter> METHOD_ADAPTERS;
+//	
+//	static {
+//	    
+//	    Map<String, MethodAdapter> methods = new LinkedHashMap<>();
+//	    
+//	    MultibaseKeyAdapter multibase = new MultibaseKeyAdapter(
+//	            URI.create("https://example.org/security#TestVerificationKey2022"),
+//	            Codec.Ed25519PublicKey,
+//	            LdTerm.create("publicKeyMultibase", "https://example.org/security#")
+//	            );
+//	    
+//	    methods.put("https://example.org/security#TestVerificationKey2022", multibase);
+//	    
+//	    METHOD_ADAPTERS = Collections.unmodifiableMap(methods);
+//	    
+//	}
 	
 	public TestSignatureSuite() {
-	    super(TYPE, CRYPTO, ADAPTER, METHOD_ADAPTERS);
+	    super(TYPE, CRYPTO, DataIntegritySchema.getSchema(LdTerm.create("TestSignatureSuite2022", "https://example.org/security#")));
 	}	
 }

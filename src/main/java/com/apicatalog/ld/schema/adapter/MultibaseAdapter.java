@@ -1,9 +1,9 @@
-package com.apicatalog.ld.schema.value;
+package com.apicatalog.ld.schema.adapter;
 
 import com.apicatalog.ld.schema.LdValue;
 import com.apicatalog.ld.schema.LdValueAdapter;
 
-public class MultibaseValue implements LdValueAdapter<String, byte[]> {
+public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
 
     @Override
     public byte[] read(String value) {

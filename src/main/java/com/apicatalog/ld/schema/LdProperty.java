@@ -23,7 +23,8 @@ public class LdProperty<T> {
     }
 
     public LdProperty<T> required() {
-        return null;
+        //TODO
+        return this;
     }
     
     public LdProperty<T> optional() {
@@ -31,7 +32,8 @@ public class LdProperty<T> {
     }
     
     public LdProperty<T> test(Function<T, Boolean> fnc) {
-        return null;
+        //TODO
+        return this;
     }
 
     public LdTerm term() {
@@ -44,6 +46,10 @@ public class LdProperty<T> {
 
     public T read(JsonValue value) {
         return adapter.read(value);
+    }
+
+    public LdTag tag() {
+        return tag;
     }
 
 }

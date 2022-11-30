@@ -1,4 +1,4 @@
-package com.apicatalog.ld.schema.value;
+package com.apicatalog.ld.schema.adapter;
 
 import java.net.URI;
 import java.util.function.Function;
@@ -8,7 +8,7 @@ import com.apicatalog.ld.schema.LdValueAdapter;
 
 import jakarta.json.JsonValue;
 
-public class UriValue implements LdValueAdapter<String, URI> {
+public class UriAdapter implements LdValueAdapter<String, URI> {
 
     @Override
     public URI read(String value) {

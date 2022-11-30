@@ -20,6 +20,7 @@ import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.schema.LdTag;
 import com.apicatalog.ld.schema.LdTerm;
@@ -258,17 +259,25 @@ public final class Verifier extends Processor<Verifier> {
                     .map(suiteProvider::getSignatureSuite)
                     .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "CryptoSuite"));
 
+            if (signatureSuite.getSchema() == null) {
+                throw new IllegalStateException("The suite [" + signatureSuite.getProofType().id() + "] does not provide proof schema.");
+            }
+            
             //FIXMe run assertions validate(proof);
             
             final LdProperty<byte[]> proofValueProperty = signatureSuite.getSchema().property(LdTag.ProofValue);
 
-            final Map<String, Object> proof = signatureSuite.getSchema().read(proofObject);
+            if (proofValueProperty == null) {
+                throw new IllegalStateException("The proof schema does not define the proof value.");
+            }
             
+            final LdObject proof = signatureSuite.getSchema().read(proofObject);
+
 //            final LdTerm proofValueName = signatureSuite.getProofType().proofValue();
 //            System.out.println(">>> " + proofValueName.id());
 //            System.out.println(">>> " + proofObject);
             
-            if (!proof.containsKey(proofValueProperty.term().id())) {
+            if (!proof.contains(proofValueProperty.term())) {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");
             }
             
@@ -294,15 +303,21 @@ public final class Verifier extends Processor<Verifier> {
                         
 //            final byte[] proofValue = signatureSuite.getProofValueAdapter().decode(encodedProofValue);
             
-            final byte[] proofValue = (byte[]) proof.get(proofValueProperty.term().id());
+            final byte[] proofValue = (byte[]) proof.value(proofValueProperty.term());
             
             if (proofValue == null || proofValue.length == 0) {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");
             }
             
             //final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
+            
+            final LdProperty<byte[]> methodProperty = signatureSuite.getSchema().property(LdTag.VerificationMethod);
+            
+            if (methodProperty == null) {
+                throw new IllegalStateException("The proof schema does not define a verification method.");
+            }
 
-            final LdTerm proofMethodName = signatureSuite.getSchema().property(LdTag.VerificationMethod).term();
+            final LdTerm proofMethodName = methodProperty.term();
             
             VerificationMethod verificationMethod = getMethod(proofMethodName, proofObject, signatureSuite)
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, "ProofVerificationMethod"));

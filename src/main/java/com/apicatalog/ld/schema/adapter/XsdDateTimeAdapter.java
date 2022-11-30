@@ -1,4 +1,4 @@
-package com.apicatalog.ld.schema.value;
+package com.apicatalog.ld.schema.adapter;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import com.apicatalog.ld.schema.LdValue;
 import com.apicatalog.ld.schema.LdValueAdapter;
 
-public class XsdDateTimeValue implements LdValueAdapter<String, Instant> {
+public class XsdDateTimeAdapter implements LdValueAdapter<String, Instant> {
 
     @Override
     public Instant read(String value) {

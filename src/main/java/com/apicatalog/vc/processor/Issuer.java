@@ -214,7 +214,7 @@ public final class Issuer extends Processor<Issuer> {
 
         final LinkedDataSignature ldSignature = new LinkedDataSignature(options.getSuite().getCryptoSuite());
 
-		JsonObject proof = options.getSuite().getSchema().write(new HashMap<>()); //FIXME use options 
+		JsonObject proof = options.getSuite().getSchema().write(options.toUnsignedProof()); 
 		        
         //options.toUnsignedProof(); 
 		// options.getSuite().getProofAdapter().serialize(options.toUnsignedProof());
