@@ -3,21 +3,32 @@ package com.apicatalog.ld.schema;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.apicatalog.ld.schema.adapter.LdObjectAdapter;
+
 import jakarta.json.JsonValue;
 
 public class LdPipe<A, B> implements LdValueAdapter<A, B> {
 
-    private final Collection<LdValueAdapter<?, ?>> adapters;
+    private final Collection<LdValueAdapter<Object, Object>> adapters;
     
+    @SuppressWarnings("unchecked")
     public LdPipe(LdValueAdapter<A, B> adapter) {
         this.adapters = new ArrayList<>(5);
-        this.adapters.add(adapter);
+        this.adapters.add((LdValueAdapter<Object, Object>) adapter);
     }
 
     @Override
     public B read(A value) {
-        // TODO Auto-generated method stub
-        return null;
+        
+        Object result = value;
+        
+        for (final LdValueAdapter<Object, Object> adapter : adapters) {
+            System.out.println(" in  > " + result);
+            result = adapter.read(result);
+            System.out.println(" out > " + result);
+        }
+        
+        return (B)result;
     }
 
     @Override
@@ -28,7 +39,7 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
     
     @SuppressWarnings("unchecked")
     public <C> LdPipe<A, C> map(LdValueAdapter<B, C> adapter) {
-        adapters.add(adapter);
+        adapters.add((LdValueAdapter<Object, Object>) adapter);
         return (LdPipe<A, C>)this;
     }
 
@@ -39,5 +50,5 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
         }
         
         return new LdPipe<A, B>(adapter1).map(adapter2);
-    }    
+    }
 }

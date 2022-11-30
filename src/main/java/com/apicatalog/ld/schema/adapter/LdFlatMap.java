@@ -1,12 +1,16 @@
-package com.apicatalog.ld.schema;
+package com.apicatalog.ld.schema.adapter;
+
+import com.apicatalog.ld.schema.LdValueAdapter;
 
 import jakarta.json.JsonValue;
 
-public class LdArray implements LdValueAdapter<JsonValue, JsonValue> {
+public class LdFlatMap implements LdValueAdapter<JsonValue, JsonValue> {
 
     @Override
     public JsonValue read(JsonValue value) {
-        // TODO Auto-generated method stub
+
+//        if ()
+        
         return null;
     }
 

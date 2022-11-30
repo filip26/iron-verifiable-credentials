@@ -3,7 +3,7 @@
 		"id": "@id",
 		"type": "@type",
 		
-		"sec": "https://example.org/security#",
+		"sec": "https://w3id.org/security#",
 		
 		"proof": {
 			"@id": "https://w3id.org/security#proof",

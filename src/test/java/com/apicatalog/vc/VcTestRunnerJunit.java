@@ -164,7 +164,7 @@ public class VcTestRunnerJunit {
 
 		if (!isNegative()) {
 			e.printStackTrace();
-			fail(e);
+			fail(e.getMessage(), e);
 			return;
 		}
 

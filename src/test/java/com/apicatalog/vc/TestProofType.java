@@ -7,7 +7,7 @@ import com.apicatalog.ld.signature.proof.ProofType;
 
 public class TestProofType implements ProofType {
 
-    static final String VOCAB = "https://example.org/security#";
+    static final String VOCAB = "https://w3id.org/security#";
     
     static final URI ID = URI.create(VOCAB + "TestSignatureSuite2022");
     

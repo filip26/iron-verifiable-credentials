@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.schema.LdTag;
@@ -14,7 +15,7 @@ import com.apicatalog.ld.schema.LdValueAdapter;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class LdObjectAdapter implements LdValueAdapter<JsonObject, LdObject> {
+public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
     protected final Map<String, LdProperty<?>> terms;
     protected final Map<LdTag, LdProperty<?>> tags;
@@ -25,20 +26,40 @@ public class LdObjectAdapter implements LdValueAdapter<JsonObject, LdObject> {
     }
     
     @Override
-    public LdObject read(JsonObject object) {
+    public LdObject read(JsonValue json) {
+        System.out.println(">> " + json);
+        if (JsonUtils.isNotObject(json)) {
+            throw new IllegalArgumentException();
+        }
         
+        JsonObject object = json.asJsonObject();
+        
+        System.out.println("> " + object);
+        System.out.println("> " + terms);
         final Map<String, Object> values = new LinkedHashMap<>(object.size());
         
         for (final Map.Entry<String, JsonValue> entry : object.entrySet()) {
             
             // ignore if undefined
             if (!terms.containsKey(entry.getKey())) {
+                System.out.println(">> skip " + entry.getKey());
                 continue;
             }
+            System.out.println(">> " + entry.getKey());
             
             JsonValue value = entry.getValue();
+
+            // unwrap 
+            if (JsonUtils.isArray(value) && value.asJsonArray().size() == 1) {
+                value = value.asJsonArray().get(0);
+            }
             
             LdProperty<?> property = terms.get(entry.getKey());
+            
+            if (JsonUtils.isNull(value)) {
+                //FIXME !!!
+                continue;
+            }
             
             values.put(entry.getKey(), property.read(value));
         }

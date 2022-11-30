@@ -6,8 +6,8 @@ import com.apicatalog.jsonld.lang.Keywords;
 
 public class LdTerm {
 
-    protected static final LdTerm ID = new LdTerm(Keywords.ID);
-    protected static final LdTerm TYPE = new LdTerm(Keywords.TYPE);
+    public static final LdTerm ID = new LdTerm(Keywords.ID);
+    public static final LdTerm TYPE = new LdTerm(Keywords.TYPE);
     
     final String name;
     final String vocabulary;

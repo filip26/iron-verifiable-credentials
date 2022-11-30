@@ -3,6 +3,7 @@ package com.apicatalog.ld.schema.adapter;
 import java.net.URI;
 import java.util.function.Function;
 
+import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.schema.LdValue;
 import com.apicatalog.ld.schema.LdValueAdapter;
 
@@ -12,8 +13,8 @@ public class UriAdapter implements LdValueAdapter<String, URI> {
 
     @Override
     public URI read(String value) {
-        // TODO Auto-generated method stub
-        return null;
+
+        return UriUtils.create(value);
     }
 
     @Override
