@@ -67,17 +67,17 @@ public class LinkedDataSignature {
      *
      * @param document expanded unsigned VC/VP document
      * @param keyPair
-     * @param options
+     * @param proof
      *
      * @return computed signature
      *
      * @throws SigningError
      * @throws DocumentError
      */
-    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError {
-
+    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject proof) throws SigningError {
+System.out.println(">> " + proof);
         try {
-            final byte[] documentHashCode = hashCode(document, options);
+            final byte[] documentHashCode = hashCode(document, proof);
 
             return suite.sign(keyPair.privateKey(), documentHashCode);
 

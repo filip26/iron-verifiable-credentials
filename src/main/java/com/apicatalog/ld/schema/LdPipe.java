@@ -23,10 +23,10 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
     public B read(A value) {
         
         Object result = value;
-        System.out.println(" in  > " + result);
+//        System.out.println(" in  > " + result);
         for (final LdValueAdapter<Object, Object> adapter : adapters) {
             result = adapter.read(result);
-            System.out.println(" out > " + result);
+  //          System.out.println(" out > " + result);
         }
         
         return (B)result;

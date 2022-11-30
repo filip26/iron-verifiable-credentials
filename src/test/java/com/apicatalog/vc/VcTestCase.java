@@ -1,5 +1,9 @@
 package com.apicatalog.vc;
 
+import static com.apicatalog.ld.schema.LdSchema.id;
+import static com.apicatalog.ld.schema.LdSchema.multibase;
+import static com.apicatalog.ld.schema.LdSchema.object;
+import static com.apicatalog.ld.schema.LdSchema.property;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.URI;
@@ -11,7 +15,13 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.schema.LdValueAdapter;
+import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.multibase.Multibase.Algorithm;
+import com.apicatalog.multicodec.Multicodec.Type;
+import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
+import com.apicatalog.vc.integrity.DataIntegritySchema;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -93,10 +103,19 @@ public class VcTestCase {
 				final JsonObject method = options.getJsonArray(vocab("verificationMethod"))
 						.getJsonObject(0);
 
+	            LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
+	                    new DataIntegrityKeysAdapter(),
+	                    id(),
+	                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Type.Key)),
+	                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Type.Key))
+	                    );
+	            
+	            testCase.verificationMethod = adapter.read(method);
+				 
 //				if (JsonLdUtils.isTypeOf(vocab("TestVerificationKey2022"), method)) {
 //
 //				} else {
-//					method = J
+//					method = 
 //					JsonLdUtils.getId(method).ifPresent(
 //							id -> testCase.verificationMethod = new vocab(id, null, null, null));
 //				}

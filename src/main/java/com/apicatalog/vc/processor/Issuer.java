@@ -232,8 +232,8 @@ public final class Issuer extends Processor<Issuer> {
 //		      ;
 		
 		proof = Json.createObjectBuilder(proof)
-	                .add(proofValueProperty.term().id(), proofValue)
-//		        Json.createArrayBuilder().add(proofValueObject)
+	                .add(proofValueProperty.term().id(),
+		        Json.createArrayBuilder().add(proofValue))
 		            .build();
 		
 		return EmbeddedProof.addProof(object, proof);

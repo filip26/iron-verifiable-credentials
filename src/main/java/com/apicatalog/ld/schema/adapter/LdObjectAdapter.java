@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.schema.LdTag;
@@ -75,7 +76,8 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
         
 
         for (final Map.Entry<String, Object> entry : object.entrySet()) {
-            
+            System.out.println("key " + entry.getKey());
+            System.out.println("value " + entry.getValue());
             //TODO defaultValue?
             if (entry.getValue() == null) {
                 continue;
@@ -86,15 +88,17 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
                 System.out.println(">> skip " + entry.getKey());
                 continue;
             }
-            System.out.println(">> " + entry.getKey());
-            System.out.println(">> " + entry.getValue());
+
+
             
             LdProperty<Object> property = (LdProperty<Object>) terms.get(entry.getKey());
             
             JsonValue value =  property.write(entry.getValue());
-System.out.println(">>>>>>>>>>>>>> " + entry.getValue());            
+            
             // wrap
-            value = Json.createArrayBuilder().add(value).build();
+            if (!Keywords.ID.equalsIgnoreCase(entry.getKey())) {
+                value = Json.createArrayBuilder().add(value).build();
+            }
 
             builder.add(entry.getKey(), value);
         }        
