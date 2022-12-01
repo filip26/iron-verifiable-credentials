@@ -49,10 +49,5 @@ public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, Verifi
         }
         
         return new LdObject(result);
-    }
-
-    
-    
-    
-    
+    }    
 }

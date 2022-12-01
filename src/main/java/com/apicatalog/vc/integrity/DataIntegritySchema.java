@@ -49,7 +49,7 @@ public class DataIntegritySchema {
 
                         verificationMethod(VERIFICATION_METHOD, object(
                                 new DataIntegrityKeysAdapter(),
-                                id(),
+                                id().required(),
                                 type(verificationType),
                                 property(CONTROLLER, link()),
                                 property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Type.Key))
