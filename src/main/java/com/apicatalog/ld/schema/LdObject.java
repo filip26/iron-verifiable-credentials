@@ -17,6 +17,7 @@ public class LdObject  {
         return values.containsKey(term.id);
     }
 
+    @SuppressWarnings("unchecked")
     public <X> X value(LdTerm term) {
         return (X) values.get(term.id);
     }

@@ -19,7 +19,6 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdProperty;
-import com.apicatalog.ld.schema.LdTag;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SignatureSuite;
@@ -33,6 +32,7 @@ import com.apicatalog.ld.signature.method.MethodResolver;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.vc.VcSchemaTag;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
@@ -261,7 +261,7 @@ public final class Verifier extends Processor<Verifier> {
             
             //FIXMe run assertions validate(proof);
             
-            final LdProperty<byte[]> proofValueProperty = signatureSuite.getSchema().property(LdTag.ProofValue);
+            final LdProperty<byte[]> proofValueProperty = signatureSuite.getSchema().property(VcSchemaTag.ProofValue.name());
 
             if (proofValueProperty == null) {
                 throw new IllegalStateException("The proof schema does not define the proof value.");
@@ -307,7 +307,7 @@ public final class Verifier extends Processor<Verifier> {
             
             //final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
             
-            final LdProperty<byte[]> methodProperty = signatureSuite.getSchema().property(LdTag.VerificationMethod);
+            final LdProperty<byte[]> methodProperty = signatureSuite.getSchema().property(VcSchemaTag.VerificationMethod.name());
             
             if (methodProperty == null) {
                 throw new IllegalStateException("The proof schema does not define a verification method.");
@@ -398,7 +398,7 @@ public final class Verifier extends Processor<Verifier> {
 //            
 //            final VerificationMethod method = adapter.deserialize(methodObject);
 
-            final LdProperty<VerificationMethod> property = suite.getSchema().property(LdTag.VerificationMethod);
+            final LdProperty<VerificationMethod> property = suite.getSchema().property(VcSchemaTag.VerificationMethod.name());
 
             final VerificationMethod method = property.read(methodObject);
 

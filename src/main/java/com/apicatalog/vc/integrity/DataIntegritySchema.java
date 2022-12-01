@@ -1,23 +1,12 @@
 package com.apicatalog.vc.integrity;
 
-import static com.apicatalog.ld.schema.LdSchema.id;
-import static com.apicatalog.ld.schema.LdSchema.link;
-import static com.apicatalog.ld.schema.LdSchema.multibase;
-import static com.apicatalog.ld.schema.LdSchema.object;
-import static com.apicatalog.ld.schema.LdSchema.proofValue;
-import static com.apicatalog.ld.schema.LdSchema.property;
-import static com.apicatalog.ld.schema.LdSchema.string;
-import static com.apicatalog.ld.schema.LdSchema.type;
-import static com.apicatalog.ld.schema.LdSchema.verificationMethod;
-import static com.apicatalog.ld.schema.LdSchema.xsdDateTime;
-
+import static com.apicatalog.vc.VcSchema.*;
 import java.time.Instant;
 
 import com.apicatalog.ld.schema.LdSchema;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.multicodec.Multicodec.Type;
 
 public class DataIntegritySchema {
 
@@ -38,7 +27,7 @@ public class DataIntegritySchema {
     
     public static final LdSchema getSchema(LdTerm proofType, LdTerm verificationType) {
         return new LdSchema(
-                object(
+                proof(
                         type(proofType).required(),
 
                         property(CREATED, xsdDateTime())
@@ -57,7 +46,9 @@ public class DataIntegritySchema {
                                 
                                 )).required(),
 
-                        property(DOMAIN, string()),
+                        property(DOMAIN, string())
+                            .test((domain, params) -> !params.containsKey("domain")
+                                        || params.get("domain").equals(domain)),
 
                         property(CHALLENGE, string()),
 
@@ -65,7 +56,6 @@ public class DataIntegritySchema {
                                 .test(key -> key.length == 64)
                                 .required()
                 ));
-
     }
 
 }

@@ -33,7 +33,6 @@ import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.multicodec.Multicodec.Type;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.processor.Issuer;
@@ -97,10 +96,8 @@ public class VcTestRunnerJunit {
                         .domain(testCase.domain)
                         ;
 
-
-				Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
-						.loader(LOADER)
-						;
+				final Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
+						                  .loader(LOADER);
 
 				JsonObject signed = null;
 

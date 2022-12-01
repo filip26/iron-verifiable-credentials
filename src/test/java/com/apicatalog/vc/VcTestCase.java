@@ -1,6 +1,11 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.ld.schema.LdSchema.*;
+import static com.apicatalog.ld.schema.LdSchema.id;
+import static com.apicatalog.ld.schema.LdSchema.link;
+import static com.apicatalog.ld.schema.LdSchema.multibase;
+import static com.apicatalog.ld.schema.LdSchema.object;
+import static com.apicatalog.ld.schema.LdSchema.property;
+import static com.apicatalog.ld.schema.LdSchema.type;
 
 import java.net.URI;
 import java.time.Instant;
@@ -15,7 +20,6 @@ import com.apicatalog.ld.schema.LdValueAdapter;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.multicodec.Multicodec.Type;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 

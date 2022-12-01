@@ -11,7 +11,6 @@ import com.apicatalog.ld.schema.adapter.MultibaseAdapter;
 import com.apicatalog.ld.schema.adapter.StringAdapter;
 import com.apicatalog.ld.schema.adapter.UriAdapter;
 import com.apicatalog.ld.schema.adapter.XsdDateTimeAdapter;
-import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
 
@@ -32,7 +31,7 @@ public class LdSchema {
         this.schema = schema;
     }
     
-    public <X> LdProperty<X> property(LdTag tag) {
+    public <X> LdProperty<X> property(String tag) {
         return schema.property(tag);
     }
 
@@ -68,7 +67,7 @@ public class LdSchema {
         return new LdProperty<X>(id, adapter);
     }
 
-    public static final <X> LdProperty<X> property(LdTerm id, LdValueAdapter<JsonValue, X> adapter, LdTag tag) {
+    public static final <X> LdProperty<X> property(LdTerm id, LdValueAdapter<JsonValue, X> adapter, String tag) {
         return new LdProperty<X>(id, adapter, tag);
     }
 
@@ -96,10 +95,6 @@ public class LdSchema {
         return new LinkAdapter();
     }
     
-    public static final LdProperty<byte[]> proofValue(LdTerm id, LdValueAdapter<JsonValue, byte[]> adapter) {
-        return property(id, adapter, LdTag.ProofValue);
-    }
-    
     public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm) {
         return LdPipe.map(value(MULTIBASE_TYPE, (new StringAdapter())), new MultibaseAdapter(algorithm));
     }
@@ -108,19 +103,11 @@ public class LdSchema {
         return LdPipe.map(value(MULTIBASE_TYPE, (new StringAdapter())), new MultibaseAdapter(algorithm, codec));
     }
 
-    
-    public static final LdProperty<VerificationMethod> verificationMethod(LdTerm id, LdValueAdapter<JsonValue, VerificationMethod> adapter) {
-        return property(id, adapter, LdTag.VerificationMethod);
-    }
-    
     public static final LdValueAdapter<JsonValue, URI> uri() {
         return string(new UriAdapter());
     }
         
     public static final <X> LdValueAdapter<JsonValue, X> array(LdValueAdapter<JsonValue, X> adapter) {
         return LdPipe.map(new LdFlatMap(), adapter);
-    }
-
-    //public static final <X> LdValueAdapter<JsonValue, X> pipe(LdValueAdapter<JsonValue, X> adapter)
-    
+    }    
 }

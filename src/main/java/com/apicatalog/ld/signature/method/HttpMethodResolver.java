@@ -11,8 +11,8 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdProperty;
-import com.apicatalog.ld.schema.LdTag;
 import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.vc.VcSchemaTag;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonValue;
@@ -40,7 +40,7 @@ public class HttpMethodResolver implements MethodResolver {
                     continue;
                 }
                 
-                final LdProperty<VerificationMethod> property = suite.getSchema().property(LdTag.VerificationMethod);
+                final LdProperty<VerificationMethod> property = suite.getSchema().property(VcSchemaTag.VerificationMethod.name());
 
                 return property.read(method);
             }

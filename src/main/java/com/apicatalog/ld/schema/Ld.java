@@ -6,14 +6,5 @@ public class Ld {
     
     public Ld(LdSchema schema) {
         this.schema = schema;
-    }
-    
-    
-//    public <X> X get(LdTerm id, JsonValue value) {
-//        
-//        
-//        
-//        return null;
-//    }
-    
+    }    
 }

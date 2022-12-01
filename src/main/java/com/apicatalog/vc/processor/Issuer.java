@@ -12,13 +12,13 @@ import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdProperty;
-import com.apicatalog.ld.schema.LdTag;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.vc.VcSchemaTag;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.Json;
@@ -216,7 +216,7 @@ public final class Issuer extends Processor<Issuer> {
 		// options.getSuite().getProofAdapter().serialize(options.toUnsignedProof());
 
 		
-		final LdProperty<byte[]> proofValueProperty = options.getSuite().getSchema().property(LdTag.ProofValue); 
+		final LdProperty<byte[]> proofValueProperty = options.getSuite().getSchema().property(VcSchemaTag.ProofValue.name()); 
 
 		final byte[] signature = ldSignature.sign(data, keyPair, proof);
 

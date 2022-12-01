@@ -8,7 +8,6 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdProperty;
-import com.apicatalog.ld.schema.LdTag;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.LdValueAdapter;
 
@@ -20,9 +19,9 @@ import jakarta.json.JsonValue;
 public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
     protected final Map<String, LdProperty<?>> terms;
-    protected final Map<LdTag, LdProperty<?>> tags;
+    protected final Map<String, LdProperty<?>> tags;
     
-    protected LdObjectAdapter(Map<String, LdProperty<?>> terms, Map<LdTag, LdProperty<?>> tags) {
+    protected LdObjectAdapter(Map<String, LdProperty<?>> terms, Map<String, LdProperty<?>> tags) {
         this.terms = terms;
         this.tags = tags;
     }
@@ -86,8 +85,7 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
                 continue;
             }
 
-
-            
+            @SuppressWarnings("unchecked")
             LdProperty<Object> property = (LdProperty<Object>) terms.get(entry.getKey());
             
             JsonValue value =  property.write(entry.getValue());
@@ -103,11 +101,10 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
         return builder.build();
     }
 
-
     public static LdObjectAdapter create(LdProperty<?>[] properties) {
         
         final Map<String, LdProperty<?>> terms = new LinkedHashMap<>(properties.length);
-        final Map<LdTag, LdProperty<?>> tags = new LinkedHashMap<>(LdTag.values().length);
+        final Map<String, LdProperty<?>> tags = new LinkedHashMap<>(5);
         
         for (LdProperty<?> property : properties) {
             if (property.tag() != null) {
@@ -123,12 +120,12 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
     }
 
     @SuppressWarnings("unchecked")
-    public <X> LdProperty<X> property(LdTag tag) {
+    public <X> LdProperty<X> property(String tag) {
         return (LdProperty<X>) tags.get(tag);
     }
 
     public boolean contains(LdTerm term) {
-        return terms.containsKey(term);
+        return terms.containsKey(term.id());
     }
      
 }
