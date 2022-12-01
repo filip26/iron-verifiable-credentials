@@ -1,7 +1,10 @@
 package com.apicatalog.vc;
 
+import static com.apicatalog.ld.schema.LdSchema.id;
+import static com.apicatalog.ld.schema.LdSchema.multibase;
+import static com.apicatalog.ld.schema.LdSchema.object;
+import static com.apicatalog.ld.schema.LdSchema.property;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static com.apicatalog.ld.schema.LdSchema.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -22,10 +25,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdValueAdapter;
-import com.apicatalog.ld.schema.adapter.LdObjectAdapter;
-import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
