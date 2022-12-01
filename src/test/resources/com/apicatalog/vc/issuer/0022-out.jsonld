@@ -10,11 +10,11 @@
             "id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
             "type": "TestVerificationKey2022",
             "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
-            "publicKeyMultibase": "zEJK6D9xg4rv3rLjQeWcsDfj9JiPKDZhT5NLcVdsN41Fb"
+            "publicKeyMultibase": "z6ejggrxgQ5P3TveDtQ1VURtUmt3Rvh6z4VfNS6cebL8T"
         },
         "created": "2022-06-04T20:33:01Z",
         "proofPurpose": "assertionMethod",
-        "proofValue": "zFJCzQy8CrZ1E82EQ2j17cAqDMhiTUvBnydKp3ZmiqfQa"
+        "proofValue": "zFaNkpXxHKkayXjdyLmfQijtUCCZz9g2K2fkzb4hH9E5z"
     },
     "@context": [
         "https://www.w3.org/2018/credentials/v1",

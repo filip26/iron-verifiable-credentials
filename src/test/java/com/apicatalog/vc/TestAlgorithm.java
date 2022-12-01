@@ -11,6 +11,8 @@ import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
+import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.Multicodec.Codec;
 
 class TestAlgorithm implements SignatureAlgorithm {
 
@@ -55,8 +57,12 @@ System.out.println(">>> " + Multibase.encode(Algorithm.Base58Btc, result));
         
         KeyPair pair = new TestAlgorithm().keygen(32);
         
-        String enc = Multibase.encode(Algorithm.Base58Btc, pair.publicKey());
+        String enc = Multibase.encode(Algorithm.Base58Btc, Multicodec.encode(Codec.Ed25519PublicKey, pair.publicKey()));
+                ;
                 
+        System.out.println(">> " + enc);
+        
+        enc = Multibase.encode(Algorithm.Base58Btc, Multicodec.encode(Codec.Ed25519PrivateKey, pair.privateKey()));
         System.out.println(">> " + enc);
     }
 }

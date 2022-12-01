@@ -6,10 +6,10 @@
 	"credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
 	"sec:proof": {
 		"type": "TestSignatureSuite2022",
-		"verificationMethod": "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y",
+		"verificationMethod": "did:key:z6Mkk6zjH7D7jcsWaRUvZxyLKXSUbTKHLaMLkWaJGNafWYuq",
 		"created": "2022-05-28T17:02:05Z",
 		"proofPurpose": "assertionMethod",
-		"proofValue": "z6RbeuNSPcbezcaTQDS8FxXqTrAvXbdS9gQEpVZSxBqfi"
+		"proofValue": "z8GNNetbQ3T7KMDfvAUoPS23sqrMmFXHZsxiXTgRULpXY"
 	},
 	"@context": [
 		"https://www.w3.org/2018/credentials/v1",

@@ -12,7 +12,7 @@
             "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
             "created": "2022-06-04T20:33:01Z",
             "proofPurpose": "assertionMethod",
-            "proofValue": "z4XRCSmN1S86TcVfLfNQYiGhmAuEymVCAs9Nztm7UoXuBqyzGqaJd5giEsJHEoddprFXkpGHuhbrhvTMGwV6qVi4U"
+            "proofValue": "zAve8nRHWPjVwzQBna5BHLEXYYQfiesRyLHVy6PNkY3W"
         }
     },
     "sec:proof": {
@@ -20,7 +20,7 @@
         "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
         "created": "2022-06-09T21:49:41Z",
         "proofPurpose": "assertionMethod",
-        "proofValue": "zEajrHRQqbX3a6pUs6Gubciwewd7Rxr9aM9Eu2tRS3YwR"
+        "proofValue": "z7SWVk2sFDWGUqjkpfeSauY4QSMf4a5krovoMeDGnTUSr"
     },
     "@context": [
         "https://www.w3.org/2018/credentials/v1",

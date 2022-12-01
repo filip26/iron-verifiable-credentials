@@ -13,7 +13,7 @@
 		"verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
 		"created": "2022-06-18T19:00:44Z",
 		"proofPurpose": "assertionMethod",
-		"proofValue": "zD4KeqdfPoX43F73iwtVnYA3yrbW8ecLjhEGVvyq2eCDu",
+		"proofValue": "z3WUZYFbyYtkhEMZazV9H7s6j5mqcxtF1U5mVrRuSLCEM",
 		"domain": "4jt78h47fh47"
 	}
 }
