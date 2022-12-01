@@ -216,7 +216,7 @@
                 "NegativeEvaluationTest",
                 "VeriferTest"
             ],
-            "name": "did:key verification method",
+            "name": "expired certificate",
             "input": "verifier/0025-in.jsonld",
             "expectErrorCode": "Expired"
         },

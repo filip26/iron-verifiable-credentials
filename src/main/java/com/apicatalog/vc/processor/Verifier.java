@@ -402,11 +402,11 @@ public final class Verifier extends Processor<Verifier> {
 
             final VerificationMethod method = property.read(methodObject);
 
-            if (method != null && method instanceof VerificationKey) {
+            if (method != null && method instanceof VerificationKey && (((VerificationKey)method).publicKey() != null)) {
                 return Optional.of(method);
             }
             
-            return resolve(methodObject, suite);
+            return resolve(method.id(), suite);
         }
         
         return Optional.empty();
@@ -418,7 +418,7 @@ public final class Verifier extends Processor<Verifier> {
                         .getId(method)
                         .orElseThrow(() -> new DocumentError(ErrorType.Missing, "VerificationMethodId"));
             
-            return Optional.ofNullable(resolve(id, suite));
+            return resolve(id, suite);
             
         } catch (InvalidJsonLdValue e) {
             throw new DocumentError(ErrorType.Invalid, "VerificationMethodId", e);
@@ -426,7 +426,7 @@ public final class Verifier extends Processor<Verifier> {
 
     }
 
-    VerificationMethod resolve(URI id, SignatureSuite suite) throws DocumentError {
+    Optional<VerificationMethod> resolve(URI id, SignatureSuite suite) throws DocumentError {
 
         // find the method id resolver
         final Optional<MethodResolver> resolver = 
@@ -436,7 +436,7 @@ public final class Verifier extends Processor<Verifier> {
 
         // try to resolve the method
         if (resolver.isPresent()) {
-            return resolver.get().resolve(id, loader, suite);
+            return Optional.ofNullable(resolver.get().resolve(id, loader, suite));
         }
 
         throw new DocumentError(ErrorType.Unknown, "VerificationMethod");        

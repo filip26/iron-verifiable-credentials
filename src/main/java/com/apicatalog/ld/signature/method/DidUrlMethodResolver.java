@@ -7,7 +7,10 @@ import com.apicatalog.did.DidUrl;
 import com.apicatalog.did.document.DidDocument;
 import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.vc.integrity.DataIntegrityKeyPair;
 
 public class DidUrlMethodResolver implements MethodResolver {
 
@@ -19,23 +22,20 @@ public class DidUrlMethodResolver implements MethodResolver {
     }
     
     @Override
-    public VerificationMethod resolve(URI uri, DocumentLoader loader, SignatureSuite suite) {
+    public VerificationMethod resolve(URI uri, DocumentLoader loader, SignatureSuite suite) throws DocumentError {
         
         final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));
 
-        //FIXME
-        return null;
-//        return didDocument
-//                .verificationMethod().stream()
-//                .filter(vm -> keyAdapter.isSupportedType(vm.type()))
-//                .map(did -> new VerificationKeyImpl(
-//                        did.id().toUri(),
-//                        did.controller().toUri(),
-//                        did.type(),
-//                        did.publicKey()))
-//                .findFirst()
-//                .orElse(null);  //FIXME
-                //.orElseThrow(() -> new VerificationError(Code.UnknownVerificationKey));
+        return didDocument
+                .verificationMethod().stream()
+//TODO                .filter(vm -> keyAdapter.isSupportedType(vm.type()))                
+                .map(did -> DataIntegrityKeyPair.createVerificationKey(
+                        did.id().toUri(),
+                        did.controller().toUri(),
+                        URI.create(did.type()), //TODO did.type should return URI
+                        did.publicKey()))
+                .findFirst()
+                .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "VerificationMethod"));
     }
 
     @Override

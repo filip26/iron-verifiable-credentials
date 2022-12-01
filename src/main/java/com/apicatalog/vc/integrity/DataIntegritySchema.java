@@ -16,6 +16,7 @@ import java.time.Instant;
 import com.apicatalog.ld.schema.LdSchema;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.multibase.Multibase.Algorithm;
+import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.multicodec.Multicodec.Type;
 
 public class DataIntegritySchema {
@@ -52,7 +53,7 @@ public class DataIntegritySchema {
                                 id().required(),
                                 type(verificationType),
                                 property(CONTROLLER, link()),
-                                property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Type.Key))
+                                property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey))
                                 
                                 )).required(),
 

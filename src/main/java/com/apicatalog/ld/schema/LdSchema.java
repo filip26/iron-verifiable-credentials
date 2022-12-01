@@ -13,7 +13,7 @@ import com.apicatalog.ld.schema.adapter.UriAdapter;
 import com.apicatalog.ld.schema.adapter.XsdDateTimeAdapter;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec.Type;
+import com.apicatalog.multicodec.Multicodec;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -104,8 +104,8 @@ public class LdSchema {
         return LdPipe.map(value(MULTIBASE_TYPE, (new StringAdapter())), new MultibaseAdapter(algorithm));
     }
 
-    public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm, Type multicodec) {
-        return LdPipe.map(value(MULTIBASE_TYPE, (new StringAdapter())), new MultibaseAdapter(algorithm, multicodec));
+    public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm, Multicodec.Codec codec) {
+        return LdPipe.map(value(MULTIBASE_TYPE, (new StringAdapter())), new MultibaseAdapter(algorithm, codec));
     }
 
     

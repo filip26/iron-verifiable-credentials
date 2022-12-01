@@ -5,20 +5,19 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.multicodec.Multicodec.Type;
 
 public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
 
     protected final Algorithm algorithm;
-    protected final Type multicodec;
+    protected final Codec codec;
     
     public MultibaseAdapter(Algorithm algorithm) {
         this(algorithm, null);
     }
 
-    public MultibaseAdapter(Algorithm algorithm, Type multicodec) {
+    public MultibaseAdapter(Algorithm algorithm,  Codec codec) {
         this.algorithm = algorithm;
-        this.multicodec = multicodec;
+        this.codec = codec;
     }
 
     @Override
@@ -26,34 +25,20 @@ public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
         
         final byte[] debased = Multibase.decode(value); // ;)
         
-        if (multicodec == null) {
+        if (codec == null) {
             return debased;
         }
-
-        System.out.println(">>> " + Multicodec.codec(Type.Key, debased));
-        
-        final Codec codec = Multicodec
-                                    .codec(multicodec, debased)
-                                    .orElseThrow(() -> new IllegalArgumentException());
-
 
         return Multicodec.decode(codec, debased); 
     }
 
     @Override
     public String write(byte[] value) {
-        return Multibase.encode(algorithm, value);
+        
+        if (codec == null) {
+            return Multibase.encode(algorithm, value);            
+        }
+        
+        return Multibase.encode(algorithm, Multicodec.encode(codec, value));
     }
-//    
-//    public static void main(String[] args) {
-//        
-//        byte[] x = Multibase.decode("zF9RuvG5hsw3QBW5ZzwdiHXZTESQ5qQDoPcLDbwojW818");
-//        x = Multicodec.encode(Codec.Ed25519PublicKey,x);
-//        
-//        System.out.println(Multibase.encode(Algorithm.Base58Btc, x));
-//        
-//        
-//        
-//    }
-//
 }

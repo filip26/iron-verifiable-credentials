@@ -32,6 +32,7 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase.Algorithm;
+import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.multicodec.Multicodec.Type;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
@@ -241,8 +242,8 @@ public class VcTestRunnerJunit {
 			LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
                     new DataIntegrityKeysAdapter(),
                     id(),
-                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Type.Key)),
-                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Type.Key))
+                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
+                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))
 			        );
 			
 			return (KeyPair) adapter.read(key);

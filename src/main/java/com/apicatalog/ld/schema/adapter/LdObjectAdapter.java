@@ -75,8 +75,7 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
         
 
         for (final Map.Entry<String, Object> entry : object.entrySet()) {
-            System.out.println("key " + entry.getKey());
-            System.out.println("value " + entry.getValue());
+
             //TODO defaultValue?
             if (entry.getValue() == null) {
                 continue;
@@ -84,7 +83,6 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
             
             // ignore if undefined
             if (!terms.containsKey(entry.getKey())) {
-                System.out.println(">> skip " + entry.getKey());
                 continue;
             }
 

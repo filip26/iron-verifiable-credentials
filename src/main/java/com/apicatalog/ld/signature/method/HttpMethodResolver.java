@@ -39,20 +39,10 @@ public class HttpMethodResolver implements MethodResolver {
                 if (types == null || types.isEmpty()) {
                     continue;
                 }
-                System.out.println(">> >> " + types);                
+                
                 final LdProperty<VerificationMethod> property = suite.getSchema().property(LdTag.VerificationMethod);
 
                 return property.read(method);
-
-//                // take the first method matching type
-//                final MethodAdapter adapter = types.stream()
-//                        .map(suite::getMethodAdapter)
-//                        .filter(Objects::nonNull)
-//                        .findFirst()
-//                        .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "VerificationMethod"));
-//
-//                return adapter.deserialize(method.asJsonObject());
-                
             }
 
         } catch (JsonLdError e) {
@@ -64,7 +54,6 @@ public class HttpMethodResolver implements MethodResolver {
 
     @Override
     public boolean isAccepted(URI id) {
-        System.out.println("!!! >>> " + id);
         return "http".equalsIgnoreCase(id.getScheme())
                 || "https".equalsIgnoreCase(id.getScheme());
     }

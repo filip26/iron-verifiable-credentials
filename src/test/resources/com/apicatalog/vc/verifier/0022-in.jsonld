@@ -5,14 +5,14 @@
     "issuanceDate": "2022-06-13T19:54:42Z",
     "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
     "sec:proof": {
-        "type": "Ed25519Signature2020",
-        "verificationMethod": "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y",
+        "type": "TestSignatureSuite2022",
+        "verificationMethod": "did:key:z6Mkk6zjH7D7jcsWaRUvZxyLKXSUbTKHLaMLkWaJGNafWYuq",
         "created": "2022-05-28T17:02:05Z",
         "proofPurpose": "assertionMethod",
-        "proofValue": "z3aTVwakBRYkJScYKeCcVh1NTogaj7UTA83B1TrEqKsBJwstWAvv9qekPXGvCZeptq7vTEk8VHBtK4EQLEWc7uYMC"
+        "proofValue": "z8GNNetbQ3T7KMDfvAUoPS23sqrMmFXHZsxiXTgRULpXY"
     },
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "https://w3id.org/security/suites/ed25519-2020/v1"
+        "classpath:data-integrity-test-signature-2022.jsonld"
     ]
 }

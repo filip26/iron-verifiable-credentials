@@ -74,7 +74,7 @@ public class LinkedDataSignature {
      * @throws DocumentError
      */
     public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject proof) throws SigningError {
-System.out.println(">> " + proof);
+
         try {
             final byte[] documentHashCode = hashCode(document, proof);
 

@@ -19,10 +19,9 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
     public B read(A value) {
         
         Object result = value;
-//        System.out.println(" in  > " + result);
+
         for (final LdValueAdapter<Object, Object> adapter : adapters) {
             result = adapter.read(result);
-  //          System.out.println(" out > " + result);
         }
         
         return (B)result;
@@ -36,10 +35,9 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
         Collections.reverse(reversed);
         
         Object result = value;
-        System.out.println(" write  > " + result);
+
         for (final LdValueAdapter<Object, Object> adapter :  reversed) {
             result = adapter.write(result);
-            System.out.println("        > " + result);
         }
         
         return (A)result;
