@@ -42,7 +42,7 @@
             ],
             "https://w3id.org/security#proofValue": [
                 {
-                    "@value": "zBzv7Ujc7wk6wi91wztvakF8oC5tHAGnpeBECm5Njsxcj",
+                    "@value": "z7rwHRfuQaD1m4VyMuHDnqvpRyEZ5uLPeRBMS9AQYESYW",
                     "@type": "https://w3id.org/security#multibase"
                 }
             ]

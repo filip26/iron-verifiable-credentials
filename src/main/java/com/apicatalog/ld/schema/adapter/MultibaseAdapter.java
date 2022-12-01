@@ -30,12 +30,14 @@ public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
             return debased;
         }
 
+        System.out.println(">>> " + Multicodec.codec(Type.Key, debased));
+        
         final Codec codec = Multicodec
                                     .codec(multicodec, debased)
                                     .orElseThrow(() -> new IllegalArgumentException());
 
 
-        return Multicodec.decode(codec, debased ); 
+        return Multicodec.decode(codec, debased); 
     }
 
     @Override

@@ -22,7 +22,8 @@ class TestAlgorithm implements SignatureAlgorithm {
         for (int i = 0; i < Math.min(publicKey.length, data.length); i++) {
             result[i] = (byte) (data[i] ^ publicKey[i]);
         }
-
+        System.out.println(">>> " + Multibase.encode(Algorithm.Base58Btc, signature));        
+System.out.println(">>> " + Multibase.encode(Algorithm.Base58Btc, result));
         if (!Arrays.equals(result, signature)) {
             throw new VerificationError(Code.InvalidSignature);
         }

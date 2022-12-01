@@ -354,7 +354,7 @@ public final class Verifier extends Processor<Verifier> {
                         Json.createObjectBuilder(proofObject)
                             .remove(proofValueProperty.term().id())
                             .build();
-            
+
             final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite.getCryptoSuite());
 
             // verify signature
