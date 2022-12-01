@@ -174,7 +174,7 @@
                 "keyPair": "issuer/0001-keys.json",
                 "verificationMethod": {
                     "@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-                    "@type": "Ed25519VerificationKey2020",
+                    "@type": "TestVerificationKey2022",
                     "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
                     "publicKeyMultibase": "z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"
                 },

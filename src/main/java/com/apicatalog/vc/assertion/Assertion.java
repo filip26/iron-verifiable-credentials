@@ -1,7 +1,5 @@
 package com.apicatalog.vc.assertion;
 
-import com.apicatalog.ld.schema.LdTerm;
-
 import jakarta.json.JsonValue;
 
 public class Assertion {

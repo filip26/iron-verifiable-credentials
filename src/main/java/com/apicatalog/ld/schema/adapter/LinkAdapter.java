@@ -1,17 +1,9 @@
 package com.apicatalog.ld.schema.adapter;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.ld.schema.LdObject;
-import com.apicatalog.ld.schema.LdProperty;
-import com.apicatalog.ld.schema.LdTag;
-import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.LdValueAdapter;
 
 import jakarta.json.Json;

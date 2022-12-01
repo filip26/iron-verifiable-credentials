@@ -10,7 +10,6 @@ import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.ProofOptions;
-import com.apicatalog.vc.processor.Verifier;
 
 public class DataIntegrityProofOptions extends DataIntegrityProof implements ProofOptions {
 

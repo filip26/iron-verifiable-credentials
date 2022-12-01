@@ -1,9 +1,6 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.ld.schema.LdSchema.id;
-import static com.apicatalog.ld.schema.LdSchema.multibase;
-import static com.apicatalog.ld.schema.LdSchema.object;
-import static com.apicatalog.ld.schema.LdSchema.property;
+import static com.apicatalog.ld.schema.LdSchema.*;
 
 import java.net.URI;
 import java.time.Instant;
@@ -13,6 +10,7 @@ import java.util.stream.Collectors;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.LdValueAdapter;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
@@ -103,12 +101,14 @@ public class VcTestCase {
 	            LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
 	                    new DataIntegrityKeysAdapter(),
 	                    id(),
+	                    type(LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#")),
+	                    property(DataIntegritySchema.CONTROLLER, link()),
 	                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Type.Key)),
 	                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Type.Key))
 	                    );
-	            
+
 	            testCase.verificationMethod = adapter.read(method);
-				 
+
 //				if (JsonLdUtils.isTypeOf(vocab("TestVerificationKey2022"), method)) {
 //
 //				} else {

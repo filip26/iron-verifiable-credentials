@@ -5,10 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.apicatalog.ld.schema.adapter.LdObjectAdapter;
-
-import jakarta.json.JsonValue;
-
 public class LdPipe<A, B> implements LdValueAdapter<A, B> {
 
     private final Collection<LdValueAdapter<Object, Object>> adapters;

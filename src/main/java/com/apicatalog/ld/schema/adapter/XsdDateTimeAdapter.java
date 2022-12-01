@@ -3,12 +3,8 @@ package com.apicatalog.ld.schema.adapter;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
 
 import com.apicatalog.jsonld.StringUtils;
-import com.apicatalog.ld.schema.LdValue;
 import com.apicatalog.ld.schema.LdValueAdapter;
 
 public class XsdDateTimeAdapter implements LdValueAdapter<String, Instant> {

@@ -17,11 +17,12 @@ public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, Verifi
 
         URI id = object.value(LdTerm.ID);
         URI type = object.value(LdTerm.TYPE);
+        URI controller = object.value(DataIntegritySchema.CONTROLLER);
         
         byte[] publicKey = object.value(DataIntegritySchema.MULTIBASE_PUB_KEY);
         byte[] privateKey = object.value(DataIntegritySchema.MULTIBASE_PRIV_KEY);
         
-        return new DataIntegrityKeyPair(id, type, null, publicKey, privateKey);
+        return new DataIntegrityKeyPair(id, type, controller, publicKey, privateKey);
     }
 
     @Override

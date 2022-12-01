@@ -40,6 +40,9 @@ class TestSignatureSuite extends DataIntegritySuite {
 //	}
 	
 	public TestSignatureSuite() {
-	    super(TYPE, CRYPTO, DataIntegritySchema.getSchema(LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#")));
+	    super(TYPE, CRYPTO, DataIntegritySchema.getSchema(
+	            LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
+	            LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")
+	            ));
 	}	
 }

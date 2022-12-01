@@ -2,8 +2,6 @@ package com.apicatalog.ld.schema;
 
 import java.util.function.Function;
 
-import com.apicatalog.ld.signature.method.VerificationMethod;
-
 import jakarta.json.JsonValue;
 
 public class LdProperty<T> {

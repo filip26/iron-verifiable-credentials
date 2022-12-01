@@ -1,6 +1,15 @@
 package com.apicatalog.vc.integrity;
 
-import static com.apicatalog.ld.schema.LdSchema.*;
+import static com.apicatalog.ld.schema.LdSchema.id;
+import static com.apicatalog.ld.schema.LdSchema.link;
+import static com.apicatalog.ld.schema.LdSchema.multibase;
+import static com.apicatalog.ld.schema.LdSchema.object;
+import static com.apicatalog.ld.schema.LdSchema.proofValue;
+import static com.apicatalog.ld.schema.LdSchema.property;
+import static com.apicatalog.ld.schema.LdSchema.string;
+import static com.apicatalog.ld.schema.LdSchema.type;
+import static com.apicatalog.ld.schema.LdSchema.verificationMethod;
+import static com.apicatalog.ld.schema.LdSchema.xsdDateTime;
 
 import java.time.Instant;
 
@@ -26,10 +35,10 @@ public class DataIntegritySchema {
     public static final LdTerm MULTIBASE_PUB_KEY = LdTerm.create("publicKeyMultibase", SEC_VOCAB);
     public static final LdTerm MULTIBASE_PRIV_KEY = LdTerm.create("privateKeyMultibase", SEC_VOCAB);
     
-    public static final LdSchema getSchema(LdTerm type) {
+    public static final LdSchema getSchema(LdTerm proofType, LdTerm verificationType) {
         return new LdSchema(
                 object(
-                        type(type).required(),
+                        type(proofType).required(),
 
                         property(CREATED, xsdDateTime())
                                 .test(created -> Instant.now().isAfter(created))
@@ -41,7 +50,7 @@ public class DataIntegritySchema {
                         verificationMethod(VERIFICATION_METHOD, object(
                                 new DataIntegrityKeysAdapter(),
                                 id(),
-                                type(type),
+                                type(verificationType),
                                 property(CONTROLLER, link()),
                                 property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Type.Key))
                                 

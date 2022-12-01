@@ -3,7 +3,6 @@ package com.apicatalog.vc.integrity;
 import java.net.URI;
 
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.key.VerificationKey;
 
 public class DataIntegrityKeyPair implements KeyPair {
 
