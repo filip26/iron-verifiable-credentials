@@ -4,7 +4,6 @@ import static com.apicatalog.ld.schema.LdSchema.id;
 import static com.apicatalog.ld.schema.LdSchema.multibase;
 import static com.apicatalog.ld.schema.LdSchema.object;
 import static com.apicatalog.ld.schema.LdSchema.property;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.URI;
 import java.time.Instant;
@@ -14,9 +13,7 @@ import java.util.stream.Collectors;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.LdValueAdapter;
-import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Type;
@@ -69,9 +66,9 @@ public class VcTestCase {
 										.getJsonObject(0)
 										.getString(Keywords.ID));
 
-		if (test.containsKey(da("context"))) {
+		if (test.containsKey(vocab("context"))) {
 			testCase.context = URI.create(test
-											.getJsonArray(da("context"))
+											.getJsonArray(vocab("context"))
 											.getJsonObject(0)
 											.getString(Keywords.ID));
 		}

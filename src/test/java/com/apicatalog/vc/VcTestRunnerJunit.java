@@ -87,7 +87,7 @@ public class VcTestRunnerJunit {
 				}
 				
 				final TestSignatureSuite suite = new TestSignatureSuite();
-				System.out.println("VM " + testCase.verificationMethod);
+
 				final ProofOptions options = suite.createOptions()
                         // proof options
                         .verificationMethod(testCase.verificationMethod)
