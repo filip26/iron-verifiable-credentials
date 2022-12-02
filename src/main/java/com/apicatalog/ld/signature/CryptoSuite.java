@@ -1,7 +1,6 @@
 package com.apicatalog.ld.signature;
 
-import java.net.URI;
-
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
@@ -15,7 +14,7 @@ import jakarta.json.JsonStructure;
  */
 public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
-    protected final URI id;
+    protected final LdTerm id;
 
     protected final CanonicalizationAlgorithm canonicalization;
     protected final DigestAlgorithm digester;
@@ -27,7 +26,7 @@ public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, 
      * verification method
      */
     public CryptoSuite(
-            final URI id,
+            final LdTerm id,
             final CanonicalizationAlgorithm canonicalization,
             final DigestAlgorithm digester,
             final SignatureAlgorithm signer) {
@@ -62,7 +61,7 @@ public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, 
         return signer.keygen(length);
     }
 
-    public URI getId() {
+    public LdTerm getId() {
         return id;
     }
 }

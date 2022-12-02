@@ -192,7 +192,7 @@ public final class Issuer extends Processor<Issuer> {
         validate(verifiable);
 
         if (options.getSuite() == null) {
-            throw new SigningError(Code.UnknownCryptoSuite);
+            throw new SigningError(Code.UnsupportedCryptoSuite);
         }
 
         // add issuance date if missing

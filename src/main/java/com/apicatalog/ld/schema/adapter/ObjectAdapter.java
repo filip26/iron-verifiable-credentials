@@ -101,6 +101,7 @@ public class ObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
         return builder.build();
     }
 
+    @SuppressWarnings("unchecked")
     public static ObjectAdapter create(LdProperty<?>[] properties) {
 
         final Map<String, LdProperty<Object>> terms = new LinkedHashMap<>(properties.length);

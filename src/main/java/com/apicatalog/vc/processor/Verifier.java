@@ -182,6 +182,9 @@ public final class Verifier extends Processor<Verifier> {
 
         } else if (veri1fiable.isPresentation()) {
 
+            // verify presentation proofs
+            verifyProofs(expanded);
+            
             // verify embedded credentials
             for (final JsonObject expandedCredential : veri1fiable.asPresentation().getCredentials()) {
 
@@ -196,8 +199,6 @@ public final class Verifier extends Processor<Verifier> {
 
                 verifyProofs(expandedCredential);
             }
-
-            verifyProofs(expanded);
 
         } else {
             throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
@@ -235,7 +236,7 @@ public final class Verifier extends Processor<Verifier> {
                     .orElseThrow(() -> new VerificationError(Code.UnsupportedCryptoSuite));
 
             if (signatureSuite.getSchema() == null) {
-                throw new IllegalStateException("The suite [" + signatureSuite.getProofType().id() + "] does not provide proof schema.");
+                throw new IllegalStateException("The suite [" + signatureSuite.getId() + "] does not provide proof schema.");
             }
 
             final LdProperty<byte[]> proofValueProperty = signatureSuite.getSchema().tagged(VcTag.ProofValue.name());

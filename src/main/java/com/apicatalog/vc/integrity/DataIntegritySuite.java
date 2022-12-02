@@ -1,22 +1,27 @@
 package com.apicatalog.vc.integrity;
 
+import java.net.URI;
+
 import com.apicatalog.ld.schema.LdSchema;
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.ld.signature.proof.ProofType;
 
 public class DataIntegritySuite implements SignatureSuite {
 
-    protected final ProofType type;
+    protected final LdTerm id;
+    protected final URI context;
     protected final CryptoSuite crypto;
     protected final LdSchema schema;
 
     protected DataIntegritySuite(
-            ProofType type,
+            LdTerm id,
+            URI context,
             CryptoSuite crypto,
             LdSchema schema) {
 
-        this.type = type;
+        this.id = id;
+        this.context = context;
         this.crypto = crypto;
         this.schema = schema;
     }
@@ -27,11 +32,6 @@ public class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public ProofType getProofType() {
-        return type;
-    }
-
-    @Override
     public CryptoSuite getCryptoSuite() {
         return crypto;
     }
@@ -39,5 +39,15 @@ public class DataIntegritySuite implements SignatureSuite {
     @Override
     public LdSchema getSchema() {
         return schema;
+    }
+    
+    @Override
+    public LdTerm getId() {
+        return id;
+    }
+
+    @Override
+    public URI getContext() {
+        return context;
     }
 }
