@@ -10,7 +10,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.vc.VcSchemaTag;
+import com.apicatalog.vc.VcTag;
 import com.apicatalog.vc.integrity.DataIntegrityKeyPair;
 
 public class DidUrlMethodResolver implements MethodResolver {
@@ -36,7 +36,7 @@ public class DidUrlMethodResolver implements MethodResolver {
                         URI.create(did.type()), // TODO did.type should return URI
                         did.publicKey()))
                 .findFirst()
-                .orElseThrow(() -> new DocumentError(ErrorType.Unknown, suite.getSchema().property(VcSchemaTag.VerificationMethod.name()).term()));
+                .orElseThrow(() -> new DocumentError(ErrorType.Unknown, suite.getSchema().tagged(VcTag.VerificationMethod.name()).term()));
     }
 
     @Override

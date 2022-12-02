@@ -33,7 +33,7 @@ public class LdSchema {
         this.schema = schema;
     }
 
-    public <X> LdProperty<X> property(String tag) {
+    public <X> LdProperty<X> tagged(String tag) {
         return schema.property(tag);
     }
 

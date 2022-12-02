@@ -11,16 +11,12 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.vc.VcSchema;
+import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
 class Presentation implements Verifiable {
-
-    public static final String BASE = "https://www.w3.org/2018/credentials#";
-
-    public static final String TYPE = "VerifiablePresentation";
 
     protected URI id;
 
@@ -35,7 +31,7 @@ class Presentation implements Verifiable {
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
-        return JsonLdReader.isTypeOf(BASE + TYPE, document);
+        return JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.id(), document);
     }
 
     public static Presentation from(final JsonObject document) throws DocumentError {
@@ -47,7 +43,7 @@ class Presentation implements Verifiable {
         final Presentation presentation = new Presentation();
 
         // @type
-        if (!JsonLdReader.isTypeOf(BASE + TYPE, document)) {
+        if (!JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.id(), document)) {
 
             if (!JsonLdReader.hasType(document)) {
                 throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
@@ -61,22 +57,22 @@ class Presentation implements Verifiable {
             presentation.id = JsonLdReader.getId(document).orElse(null);
 
             // holder - optional
-            presentation.holder = JsonLdReader.getId(document, VcSchema.HOLDER.id()).orElse(null);
+            presentation.holder = JsonLdReader.getId(document, VcVocab.HOLDER.id()).orElse(null);
 
         } catch (InvalidJsonLdValue e) {
             if (Keywords.ID.equals(e.getProperty())) {
                 throw new DocumentError(ErrorType.Invalid, LdTerm.ID);
             }
-            throw new DocumentError(ErrorType.Invalid, VcSchema.HOLDER);
+            throw new DocumentError(ErrorType.Invalid, VcVocab.HOLDER);
         }
 
         presentation.credentials = new ArrayList<>();
 
         // verifiableCredentials
-        for (final JsonValue credential : JsonLdReader.getObjects(document, VcSchema.VERIFIABLE_CREDENTIALS.id())) {
+        for (final JsonValue credential : JsonLdReader.getObjects(document, VcVocab.VERIFIABLE_CREDENTIALS.id())) {
 
             if (JsonUtils.isNotObject(credential)) {
-                throw new DocumentError(ErrorType.Invalid, VcSchema.VERIFIABLE_CREDENTIALS);
+                throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS);
             }
 
             presentation.credentials.add(credential.asJsonObject());

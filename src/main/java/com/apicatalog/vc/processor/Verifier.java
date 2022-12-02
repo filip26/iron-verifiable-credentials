@@ -31,8 +31,8 @@ import com.apicatalog.ld.signature.method.HttpMethodResolver;
 import com.apicatalog.ld.signature.method.MethodResolver;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
-import com.apicatalog.vc.VcSchema;
-import com.apicatalog.vc.VcSchemaTag;
+import com.apicatalog.vc.VcTag;
+import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.Json;
@@ -218,7 +218,7 @@ public final class Verifier extends Processor<Verifier> {
                 final Verifiable credential = get(expandedCredential);
 
                 if (!credential.isCredential()) {
-                    throw new DocumentError(ErrorType.Invalid, VcSchema.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
+                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
                 }
 
                 // data integrity and metadata validation
@@ -247,7 +247,7 @@ public final class Verifier extends Processor<Verifier> {
         for (final JsonValue embeddedProof : proofs) {
 
             if (JsonUtils.isNotObject(embeddedProof)) {
-                throw new DocumentError(ErrorType.Invalid, VcSchema.PROOF);
+                throw new DocumentError(ErrorType.Invalid, VcVocab.PROOF);
             }
 
             final JsonObject proofObject = embeddedProof.asJsonObject();
@@ -255,7 +255,7 @@ public final class Verifier extends Processor<Verifier> {
             final Collection<String> proofType = JsonLdReader.getType(proofObject);
 
             if (proofType == null || proofType.isEmpty()) {
-                throw new DocumentError(ErrorType.Missing, VcSchema.PROOF, LdTerm.TYPE);
+                throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, LdTerm.TYPE);
             }
 
             final SignatureSuite signatureSuite = proofType.stream()
@@ -269,7 +269,7 @@ public final class Verifier extends Processor<Verifier> {
 
             // FIXMe run assertions validate(proof);
 
-            final LdProperty<byte[]> proofValueProperty = signatureSuite.getSchema().property(VcSchemaTag.ProofValue.name());
+            final LdProperty<byte[]> proofValueProperty = signatureSuite.getSchema().tagged(VcTag.ProofValue.name());
 
             if (proofValueProperty == null) {
                 throw new IllegalStateException("The proof schema does not define the proof value.");
@@ -313,7 +313,7 @@ public final class Verifier extends Processor<Verifier> {
             // final Proof proof =
             // signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
 
-            final LdProperty<VerificationMethod> methodProperty = signatureSuite.getSchema().property(VcSchemaTag.VerificationMethod.name());
+            final LdProperty<VerificationMethod> methodProperty = signatureSuite.getSchema().tagged(VcTag.VerificationMethod.name());
 
             if (methodProperty == null) {
                 throw new IllegalStateException("The proof schema does not define a verification method.");
@@ -504,7 +504,7 @@ public final class Verifier extends Processor<Verifier> {
         if (credential.getIssuanceDate() == null
                 && credential.getValidFrom() == null
                 && credential.getIssued() == null) {
-            throw new DocumentError(ErrorType.Missing, VcSchema.ISSUANCE_DATE);
+            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
         }
 
         // validation

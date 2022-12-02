@@ -8,7 +8,7 @@ import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.vc.VcSchema;
+import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.JsonValue;
 
@@ -29,15 +29,15 @@ class CredentialStatus {
         final CredentialStatus status = new CredentialStatus();
 
         if (!JsonLdReader.hasType(document)) {
-            throw new DocumentError(ErrorType.Missing, VcSchema.STATUS, LdTerm.TYPE);
+            throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.TYPE);
         }
 
         try {
             status.type = JsonLdReader.getType(document.asJsonObject());
-            status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, VcSchema.STATUS, LdTerm.ID));
+            status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.ID));
 
         } catch (InvalidJsonLdValue e) {
-            throw new DocumentError(ErrorType.Invalid, VcSchema.STATUS, LdTerm.ID);
+            throw new DocumentError(ErrorType.Invalid, VcVocab.STATUS, LdTerm.ID);
         }
 
         return status;

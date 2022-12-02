@@ -18,8 +18,8 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
-import com.apicatalog.vc.VcSchema;
-import com.apicatalog.vc.VcSchemaTag;
+import com.apicatalog.vc.VcTag;
+import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.Json;
@@ -201,7 +201,7 @@ public final class Issuer extends Processor<Issuer> {
             final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
             object = Json.createObjectBuilder(object)
-                    .add(VcSchema.ISSUANCE_DATE.id(), issuanceDate.toString())
+                    .add(VcVocab.ISSUANCE_DATE.id(), issuanceDate.toString())
                     .build();
         }
 
@@ -214,7 +214,7 @@ public final class Issuer extends Processor<Issuer> {
         // options.toUnsignedProof();
         // options.getSuite().getProofAdapter().serialize(options.toUnsignedProof());
 
-        final LdProperty<byte[]> proofValueProperty = options.getSuite().getSchema().property(VcSchemaTag.ProofValue.name());
+        final LdProperty<byte[]> proofValueProperty = options.getSuite().getSchema().tagged(VcTag.ProofValue.name());
 
         final byte[] signature = ldSignature.sign(data, keyPair, proof);
 

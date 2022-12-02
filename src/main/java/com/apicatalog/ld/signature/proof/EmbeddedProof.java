@@ -6,7 +6,7 @@ import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.VcSchema;
+import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -33,10 +33,10 @@ public final class EmbeddedProof {
      */
     public static final JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
-        final JsonValue propertyValue = document.get(VcSchema.PROOF.id());
+        final JsonValue propertyValue = document.get(VcVocab.PROOF.id());
 
         return Json.createObjectBuilder(document)
-                .add(VcSchema.PROOF.id(),
+                .add(VcVocab.PROOF.id(),
                         ((propertyValue != null)
                                 ? Json.createArrayBuilder(JsonUtils.toJsonArray(propertyValue))
                                 : Json.createArrayBuilder()).add(proof))
@@ -54,15 +54,15 @@ public final class EmbeddedProof {
      */
     public static Collection<JsonValue> assertProof(final JsonObject document) throws DocumentError {
 
-        final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, VcSchema.PROOF.id());
+        final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, VcVocab.PROOF.id());
 
         if (proofs == null || proofs.size() == 0) {
-            throw new DocumentError(ErrorType.Missing, VcSchema.PROOF);
+            throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
         }
         return proofs;
     }
 
     public static JsonObject removeProof(final JsonObject document) {
-        return Json.createObjectBuilder(document).remove(VcSchema.PROOF.id()).build();
+        return Json.createObjectBuilder(document).remove(VcVocab.PROOF.id()).build();
     }
 }

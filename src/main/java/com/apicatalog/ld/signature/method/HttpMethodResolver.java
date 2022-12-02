@@ -12,7 +12,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.vc.VcSchemaTag;
+import com.apicatalog.vc.VcTag;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonValue;
@@ -22,7 +22,7 @@ public class HttpMethodResolver implements MethodResolver {
     @Override
     public VerificationMethod resolve(URI id, DocumentLoader loader, SignatureSuite suite) throws DocumentError {
 
-        final LdProperty<VerificationMethod> property = suite.getSchema().property(VcSchemaTag.VerificationMethod.name());
+        final LdProperty<VerificationMethod> property = suite.getSchema().tagged(VcTag.VerificationMethod.name());
 
         try {
             final JsonArray document = JsonLd.expand(id)
