@@ -56,11 +56,11 @@ public class LdProperty<T> {
         return term;
     }
 
-    public JsonValue write(T value) {
+    public JsonValue write(T value) throws DocumentError {
         return adapter.write(value);        
     }
 
-    public T read(JsonValue value) {
+    public T read(JsonValue value) throws DocumentError {
         return adapter.read(value);
     }
 

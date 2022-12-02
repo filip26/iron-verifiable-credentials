@@ -2,7 +2,7 @@
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
         "https://www.w3.org/2018/credentials/examples/v1",
-        "https://w3id.org/security/suites/ed25519-2020/v1"
+        "classpath:data-integrity-test-signature-2022.jsonld"
     ],
     "id": "http://example.gov/credentials/3732",
     "type": [
@@ -19,7 +19,7 @@
         }
     },
     "proof": {
-        "type": "Ed25519Signature2020",
+        "type": "TestSignatureSuite2022",
         "verificationMethod": "https://example.edu/issuers/14#key-1",
         "proofPurpose": "assertionMethod",
         "proofValue": "z58DAdFfa9SkqZMVPxAQpic7ndSayn1PzZs6ZjWp1CktyGesjuTSwRdoWhAfGFCF5bppETSTojQCrfFPP2oumHKtz"

@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.apicatalog.ld.DocumentError;
+
 public class LdPipe<A, B> implements LdValueAdapter<A, B> {
 
     private final Collection<LdValueAdapter<Object, Object>> adapters;
@@ -16,7 +18,7 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
     }
 
     @Override
-    public B read(A value) {
+    public B read(A value) throws DocumentError {
         
         Object result = value;
 
@@ -28,7 +30,7 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
     }
 
     @Override
-    public A write(B value) {
+    public A write(B value) throws DocumentError {
 
         final List<LdValueAdapter<Object, Object>> reversed = new ArrayList<>(adapters);
         

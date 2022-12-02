@@ -17,7 +17,7 @@
             ],
             "name": "unknown proof type",
             "input": "verifier/0001-in.jsonld",
-            "expectErrorCode": "UnknownCryptoSuite"
+            "expectErrorCode": "UnsupportedCryptoSuite"
         },
         {
             "@id": "#t0003",
@@ -208,7 +208,7 @@
             "options": {
                 "domain": "4jt"
             },
-            "expectErrorCode": "InvalidProofDomain"
+            "expectErrorCode": "InvalidDomain"
         },
         {
             "@id": "#t0025",

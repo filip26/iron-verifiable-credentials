@@ -278,11 +278,7 @@ public final class Verifier extends Processor<Verifier> {
             final LdObject proof = signatureSuite.getSchema().read(proofObject);
 
             signatureSuite.getSchema().validate(proof, params);
-            
-//            final LdTerm proofValueName = signatureSuite.getProofType().proofValue();
-//            System.out.println(">>> " + proofValueName.id());
-//            System.out.println(">>> " + proofObject);
-            
+                        
             if (!proof.contains(proofValueProperty.term())) {
                 throw new DocumentError(ErrorType.Missing, proofValueProperty.term());
             }
@@ -434,6 +430,10 @@ public final class Verifier extends Processor<Verifier> {
 
     Optional<VerificationMethod> resolve(URI id, SignatureSuite suite, LdProperty<VerificationMethod> property) throws DocumentError {
 
+        if (id == null) {
+            throw new DocumentError(ErrorType.Invalid, property.term());
+        }
+        
         // find the method id resolver
         final Optional<MethodResolver> resolver = 
                 methodResolvers.stream()

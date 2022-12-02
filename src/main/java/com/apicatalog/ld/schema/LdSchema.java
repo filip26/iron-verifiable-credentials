@@ -37,7 +37,7 @@ public class LdSchema {
         return schema.property(tag);
     }
 
-    public LdObject read(JsonObject value) {
+    public LdObject read(JsonObject value) throws DocumentError {
         return schema.read(value);
     }
     
@@ -45,7 +45,7 @@ public class LdSchema {
         schema.validate(value, params);
     }
 
-    public JsonObject write(LdObject value) {
+    public JsonObject write(LdObject value) throws DocumentError {
         return schema.write(value);
     }
     

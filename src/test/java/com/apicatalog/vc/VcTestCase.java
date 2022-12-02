@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.LdValueAdapter;
 import com.apicatalog.ld.signature.method.VerificationMethod;
@@ -112,7 +113,11 @@ public class VcTestCase {
 	                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))
 	                    );
 
-	            testCase.verificationMethod = adapter.read(method);
+	            try {
+                    testCase.verificationMethod = adapter.read(method);
+                } catch (DocumentError e) {
+                    throw new IllegalStateException(e);
+                }
 
 //				if (JsonLdUtils.isTypeOf(vocab("TestVerificationKey2022"), method)) {
 //

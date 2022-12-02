@@ -7,6 +7,7 @@ import java.util.Map;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.schema.LdTerm;
@@ -28,7 +29,7 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
     }
     
     @Override
-    public LdObject read(JsonValue json) {
+    public LdObject read(JsonValue json) throws DocumentError {
 
         if (JsonUtils.isNotObject(json)) {
             throw new IllegalArgumentException();
@@ -59,14 +60,18 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
                 continue;
             }
             
-            values.put(entry.getKey(), property.read(jsonValue));
+            try {
+                values.put(entry.getKey(), property.read(jsonValue));
+            } catch (IllegalArgumentException e) {
+                throw new DocumentError(e, ErrorType.Invalid, property.term());
+            }
         }
         
         return new LdObject(Collections.unmodifiableMap(values));
     }
 
     @Override
-    public JsonObject write(LdObject object) {
+    public JsonObject write(LdObject object) throws DocumentError {
         
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
@@ -82,7 +87,6 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
                 continue;
             }
 
-            @SuppressWarnings("unchecked")
             LdProperty<Object> property = (LdProperty<Object>) terms.get(entry.getKey());
             
             JsonValue value =  property.write(entry.getValue());
