@@ -5,16 +5,9 @@ public class VerificationError extends Throwable {
     private static final long serialVersionUID = 5031043246158660527L;
 
     public enum Code {
-        Expired, NotValidYet,
-
-        InvalidSignature, InvalidProofDomain,
-
-        //TODO revise and possibly remove in favor of DocumentError
-        //UnknownCryptoSuite,
-        //UnknownVerificationKey, 
-        //UnknownVerificationMethod,
-        
-        LinkedDataSignature, 
+        Expired,
+        NotValidYet,
+        InvalidSignature,
         UnsupportedCryptoSuite,
     }
 

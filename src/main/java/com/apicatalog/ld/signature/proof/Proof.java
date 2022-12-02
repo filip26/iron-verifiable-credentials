@@ -3,7 +3,6 @@ package com.apicatalog.ld.signature.proof;
 import java.net.URI;
 
 import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.vc.integrity.DataIntegrityProof;
 
 /**
  * Represents generic VC/VP proof. 

@@ -30,9 +30,9 @@ import com.apicatalog.ld.signature.method.DidUrlMethodResolver;
 import com.apicatalog.ld.signature.method.HttpMethodResolver;
 import com.apicatalog.ld.signature.method.MethodResolver;
 import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.vc.VcSchema;
 import com.apicatalog.vc.VcSchemaTag;
-import com.apicatalog.vc.integrity.EmbeddedProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.Json;

@@ -1,4 +1,4 @@
-package com.apicatalog.vc.integrity;
+package com.apicatalog.ld.signature.proof;
 
 import java.util.Collection;
 

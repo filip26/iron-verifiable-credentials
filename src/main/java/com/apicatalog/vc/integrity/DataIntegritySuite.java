@@ -22,23 +22,11 @@ public class DataIntegritySuite implements SignatureSuite {
         this.schema = schema;
     }
 
-//    @Override
-//    public MethodAdapter getMethodAdapter(String type) {
-//        return methodAdapter.get(type);
-//    }
-
-    //FIXME should  return something what enforces all required fields
-    
     @Override
     public DataIntegrityProofOptions createOptions() {
         return new DataIntegrityProofOptions(this);
     }
-//
-//    @Override
-//    public ProofValueAdapter getProofValueAdapter() {
-//        return proofValueAdapter;
-//    }
-//    
+
     @Override
     public ProofType getProofType() {
         return type;

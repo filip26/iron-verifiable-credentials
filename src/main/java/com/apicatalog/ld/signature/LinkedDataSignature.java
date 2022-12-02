@@ -50,7 +50,7 @@ public class LinkedDataSignature {
             suite.verify(verificationKey.publicKey(), signature, computeSignature);
 
         } catch (LinkedDataSuiteError e) {
-            throw new VerificationError(Code.LinkedDataSignature, e);
+            throw new VerificationError(Code.InvalidSignature, e);
         }
     }
 
