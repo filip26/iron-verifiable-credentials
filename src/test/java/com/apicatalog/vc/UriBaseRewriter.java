@@ -1,6 +1,5 @@
 package com.apicatalog.vc;
 
-
 import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLdError;

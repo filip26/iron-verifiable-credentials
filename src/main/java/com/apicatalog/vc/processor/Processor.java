@@ -1,18 +1,18 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
-import com.apicatalog.jsonld.JsonLdUtils;
-import com.apicatalog.jsonld.lang.Keywords;
+import com.apicatalog.jsonld.JsonLdReader;
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.status.StatusPropertiesValidator;
+import com.apicatalog.vc.status.StatusValidator;
 
 import jakarta.json.JsonObject;
 
@@ -22,14 +22,17 @@ abstract class Processor<T extends Processor<?>> {
     protected boolean bundledContexts;
     protected URI base;
 
-    protected final Map<String, SignatureSuite> suites;
-
+    protected StatusValidator statusValidator;
+    protected SubjectValidator subjectValidator;
+    
     protected Processor() {
         // default values
         this.loader = null;
         this.bundledContexts = true;
         this.base = null;
-        this.suites = new LinkedHashMap<>();
+
+        this.statusValidator = new StatusPropertiesValidator();
+        this.subjectValidator = null;
     }
 
     @SuppressWarnings("unchecked")
@@ -39,8 +42,9 @@ abstract class Processor<T extends Processor<?>> {
     }
 
     /**
-     * Use well-known contexts that are bundled with the library instead of fetching it online.
-     * <code>true</code> by default. Disabling might cause slower processing.
+     * Use well-known contexts that are bundled with the library instead of fetching
+     * it online. <code>true</code> by default. Disabling might cause slower
+     * processing.
      *
      * @param enable
      * @return the processor instance
@@ -48,7 +52,7 @@ abstract class Processor<T extends Processor<?>> {
     @SuppressWarnings("unchecked")
     public T useBundledContexts(boolean enable) {
         this.bundledContexts = enable;
-        return (T)this;
+        return (T) this;
     }
 
     /**
@@ -59,63 +63,86 @@ abstract class Processor<T extends Processor<?>> {
      */
     @SuppressWarnings("unchecked")
     public T base(URI base) {
-       this.base = base;
-       return (T)this;
+        this.base = base;
+        return (T) this;
     }
 
     /**
-     * Add a new signature suite. An existing suite of the same type is replaced.
-     * @param suite  a suite to add
-     * @return the processor instance
+     * Set a credential status verifier. If not set then
+     * <code>credentialStatus</code> is ignored if present.
+     *
+     * @param statusValidator a custom status verifier instance
+     * @return the verifier instance
      */
     @SuppressWarnings("unchecked")
-    public T suite(final SignatureSuite suite) {
-        this.suites.put(suite.getId(), suite);
-        return (T)this;
+    public T statusValidator(StatusValidator statusValidator) {
+        this.statusValidator = statusValidator;
+        return (T) this;
     }
 
-    protected static Verifiable get(JsonObject expanded) throws DocumentError {
+    
+
+    /**
+     * Set a credential subject verifier. If not set then
+     * <code>credentialStatus</code> is not verified.
+     *
+     * @param subjectValidator a custom subject verifier instance
+     * @return the verifier instance
+     */
+    @SuppressWarnings("unchecked")    
+    public T subjectValidator(SubjectValidator subjectValidator) {
+        this.subjectValidator = subjectValidator;
+        return (T) this;
+    }
+    protected static Verifiable get(final JsonObject expanded) throws DocumentError {
+
         // is a credential?
         if (Credential.isCredential(expanded)) {
-
-            final JsonObject object = expanded.asJsonObject();
-
             // validate the credential object
-            final Credential credential = Credential.from(object);
-
-            return credential;
+            return Credential.from(expanded);
         }
 
         // is a presentation?
         if (Presentation.isPresentation(expanded)) {
-
-            final JsonObject object =expanded.asJsonObject();
-
             // validate the presentation object
-            final Presentation presentation = Presentation.from(object);
-
-            return presentation;
+            return Presentation.from(expanded);
         }
 
         // is not expanded JSON-LD object
-        if (!JsonLdUtils.hasType(expanded)) {
-            throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
+        if (!JsonLdReader.hasType(expanded)) {
+            throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
         }
 
-        throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
-    }
-
-    protected void addDefaultSuites() {
-	suite(new Ed25519Signature2020());
+        throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
     }
 
     protected void failWithJsonLd(JsonLdError e) throws DocumentError {
         if (JsonLdErrorCode.LOADING_DOCUMENT_FAILED == e.getCode()) {
-            throw new DocumentError(ErrorType.Invalid, "remote", "document");
+            throw new DocumentError(e, ErrorType.Invalid);
         }
 
         if (JsonLdErrorCode.LOADING_REMOTE_CONTEXT_FAILED == e.getCode()) {
-            throw new DocumentError(ErrorType.Invalid, "remote", "context");
+            throw new DocumentError(e, ErrorType.Invalid);
+        }
+    }
+    
+    protected void validateData(final Credential credential) throws DocumentError {
+
+        // data integrity - issuance date is a mandatory property
+        if (credential.getIssuanceDate() == null
+                && credential.getValidFrom() == null
+                && credential.getIssued() == null) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
+        }
+
+        // status check
+        if (statusValidator != null && JsonUtils.isNotNull(credential.getStatus())) {
+            statusValidator.verify(credential.getStatus());
+        }
+
+        // subject check
+        if (statusValidator != null && JsonUtils.isNotNull(credential.getSubject())) {
+            statusValidator.verify(credential.getSubject());
         }
     }
 }

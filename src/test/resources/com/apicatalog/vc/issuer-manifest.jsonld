@@ -67,7 +67,7 @@
             ],
             "name": "issuanceDate @type must be xsd:DateTime",
             "input": "issuer/0006-in.jsonld",
-            "expectErrorCode": "InvalidIssuanceDateType"
+            "expectErrorCode": "InvalidIssuanceDate"
         },
         {
             "@id": "#t0007",
@@ -77,7 +77,7 @@
             ],
             "name": "invalid issuanceDate @value",
             "input": "issuer/0007-in.jsonld",
-            "expectErrorCode": "InvalidIssuanceDateValue"
+            "expectErrorCode": "InvalidIssuanceDate"
         },
         {
             "@id": "#t0008",
@@ -87,7 +87,7 @@
             ],
             "name": "expirationDate @type must be xsd:DateTime",
             "input": "issuer/0008-in.jsonld",
-            "expectErrorCode": "InvalidExpirationDateType"
+            "expectErrorCode": "InvalidExpirationDate"
         },
         {
             "@id": "#t0009",
@@ -97,7 +97,7 @@
             ],
             "name": "invalid expirationDate @value",
             "input": "issuer/0009-in.jsonld",
-            "expectErrorCode": "InvalidExpirationDateValue"
+            "expectErrorCode": "InvalidExpirationDate"
         },
         {
             "@id": "#t0010",
@@ -117,7 +117,7 @@
             ],
             "name": "missing credentialStatus @id",
             "input": "issuer/0011-in.jsonld",
-            "expectErrorCode": "MissingStatusId"
+            "expectErrorCode": "MissingCredentialStatusId"
         },
         {
             "@id": "#t0012",
@@ -127,7 +127,7 @@
             ],
             "name": "missing credentialStatus @type",
             "input": "issuer/0012-in.jsonld",
-            "expectErrorCode": "MissingStatusType"
+            "expectErrorCode": "MissingCredentialStatusType"
         },
         {
             "@id": "#t0020",
@@ -174,9 +174,9 @@
                 "keyPair": "issuer/0001-keys.json",
                 "verificationMethod": {
                     "@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-                    "@type": "Ed25519VerificationKey2020",
+                    "@type": "TestVerificationKey2022",
                     "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
-                    "publicKeyMultibase": "z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"
+                    "publicKeyMultibase": "z6Mkk6zjH7D7jcsWaRUvZxyLKXSUbTKHLaMLkWaJGNafWYuq"
                 },
                 "created": "2022-06-04T20:33:01Z"
             }
@@ -193,7 +193,7 @@
             "context": "issuer/0001-context.jsonld",
             "options": {
                 "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y",
+                "verificationMethod": "did:key:z6Mkk6zjH7D7jcsWaRUvZxyLKXSUbTKHLaMLkWaJGNafWYuq",
                 "created": "2022-05-28T17:02:05Z"
             }
         },
@@ -228,7 +228,7 @@
                 "keyPair": "issuer/0001-keys.json",
                 "verificationMethod": {
                     "@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-                    "@type": "Ed25519VerificationKey2020",
+                    "@type": "TestVerificationKey2022",
                     "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2"
                 },
                 "created": "2022-06-07T21:06:15Z"

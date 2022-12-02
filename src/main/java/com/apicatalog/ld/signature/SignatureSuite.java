@@ -1,71 +1,20 @@
 package com.apicatalog.ld.signature;
 
-import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
-import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
-import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.json.ProofJsonAdapter;
-import com.apicatalog.ld.signature.key.KeyPair;
-
-import jakarta.json.JsonStructure;
+import com.apicatalog.ld.schema.LdSchema;
+import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.ld.signature.proof.ProofType;
 
 /**
- * A specified set of cryptographic primitives consisting of a canonicalization algorithm,
- * a message digest algorithm, and a signature algorithm.
+ * A specified set of cryptographic primitives consisting of a canonicalization
+ * algorithm, a message digest algorithm, and a signature algorithm.
  */
-public class SignatureSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
+public interface SignatureSuite {
 
-    protected final String id;
+    LdSchema getSchema();
 
-    protected final CanonicalizationAlgorithm canonicalization;
-    protected final DigestAlgorithm digester;
-    protected final SignatureAlgorithm signer;
+    ProofType getProofType();
 
-    protected final ProofJsonAdapter proofAdapter;
+    CryptoSuite getCryptoSuite();
 
-    public SignatureSuite(
-            final String id,
-            final CanonicalizationAlgorithm canonicalization,
-            final DigestAlgorithm digester,
-            final SignatureAlgorithm signer,
-            final ProofJsonAdapter proofAdapter
-            ) {
-        this.id = id;
-        this.canonicalization = canonicalization;
-        this.digester = digester;
-        this.signer = signer;
-        this.proofAdapter = proofAdapter;
-    }
-
-    @Override
-    public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
-        signer.verify(publicKey, signature, data);
-    }
-
-    @Override
-    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
-        return signer.sign(privateKey, data);
-    }
-
-    @Override
-    public byte[] digest(byte[] data) throws LinkedDataSuiteError {
-        return digester.digest(data);
-    }
-
-    @Override
-    public byte[] canonicalize(JsonStructure document) throws LinkedDataSuiteError {
-        return canonicalization.canonicalize(document);
-    }
-
-    @Override
-    public KeyPair keygen(int length) throws KeyGenError {
-        return signer.keygen(length);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public ProofJsonAdapter getProofAdapter() {
-    return proofAdapter;
-    }
+    ProofOptions createOptions();
 }

@@ -1,24 +1,13 @@
-[
-  {
-    "https://www.w3.org/2018/credentials#credentialSubject": [
-      {
-        "@id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
-      }
+{
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1"
     ],
-    "@id": "https://apicatalog/com/vc/test-credentials#0001",
-    "https://www.w3.org/2018/credentials#issuanceDate": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-        "@value": "2022-06-03T21:18:40Z"
-      }
-    ],
-    "https://www.w3.org/2018/credentials#issuer": [
-      {
-
-      }
-    ],
-    "@type": [
-      "https://www.w3.org/2018/credentials#VerifiableCredential"
-    ]
-  }
-]
+    "id": "https://apicatalog/com/vc/test-credentials#0001",
+    "type": "VerifiableCredential",
+    "issuanceDate": "2022-06-03T21:18:40Z",
+    "credentialSubject": {
+        "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+    },
+    "issuer": {
+    }
+}

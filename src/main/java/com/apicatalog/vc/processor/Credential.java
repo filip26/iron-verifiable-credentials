@@ -2,15 +2,15 @@ package com.apicatalog.vc.processor;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
-import com.apicatalog.jsonld.JsonLdUtils;
-import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.InvalidJsonLdValue;
+import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -18,127 +18,105 @@ import jakarta.json.JsonValue;
 /**
  * Represents a verifiable credentials (VC).
  *
- * @see <a href="https://www.w3.org/TR/vc-data-model/#credentials">Credentials</a>
+ * @see <a href=
+ *      "https://www.w3.org/TR/vc-data-model/#credentials">Credentials</a>
  */
 class Credential implements Verifiable {
-
-    public static final String BASE = "https://www.w3.org/2018/credentials#";
-
-    public static final String TYPE = "VerifiableCredential";
-
-    // known properties
-    public static final String SUBJECT = "credentialSubject";
-    public static final String ISSUER = "issuer";
-    
-	// is expected to be deprecated in favor of validFrom in the next version of the
-	// specification
-	// https://www.w3.org/TR/vc-data-model/#issuance-date see NOTE
-	public static final String ISSUANCE_DATE = "issuanceDate";
-
-	// Introduced in an advance see above
-	public static final String VALID_FROM = "validFrom";
-	public static final String ISSUED = "issued";
-
-    
-    public static final String EXPIRATION_DATE = "expirationDate";
-    public static final String CREDENTIAL_STATUS = "credentialStatus";
-    public static final String CREDENTIAL_SCHEMA = "credentialSchema";
-    public static final String REFRESH_SERVICE = "refreshService";
-    public static final String TERMS_OF_USE = "termsOfUse";
-    public static final String EVIDENCE = "evidence";
 
     protected URI id;
 
     protected URI issuer;
 
-    protected Instant issuance;
-    
-	// reserved for the next specification version
-    // see https://www.w3.org/TR/vc-data-model/#issuance-date - Issuance Date - Note 
-	protected Instant validFrom;
-	protected Instant issued;
+    protected Instant issuance; // issuanceDate
+    protected Instant issued;
+    protected Instant expiration; // expirationDate
 
-    protected Instant expiration;
+    protected Instant validUntil;
+    protected Instant validFrom;
 
-    protected CredentialStatus status;
-
-    protected Collection<JsonValue> subjects;
+    protected JsonValue status;
+    protected JsonValue subject;
 
     protected Map<String, JsonValue> extensions;
 
-    protected Credential() {}
+    protected Credential() {
+        /* protected */ }
 
-    public static boolean isCredential(JsonValue subject) {
-        if (subject == null) {
+    public static boolean isCredential(final JsonValue document) {
+        if (document == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
-        return JsonUtils.isObject(subject) && JsonLdUtils.isTypeOf(BASE + TYPE, subject.asJsonObject());
+        return JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document);
     }
 
-    public static Credential from(JsonObject subject) throws DocumentError {
+    public static Credential from(final JsonObject document) throws DocumentError {
 
-        if (subject == null) {
-            throw new IllegalArgumentException("The 'subject' parameter must not be null.");
+        if (document == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
         final Credential credential = new Credential();
 
         // @type
-        if (!JsonLdUtils.isTypeOf(BASE + TYPE, subject)) {
+        if (!JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document)) {
 
-            if (!JsonLdUtils.hasType(subject)) {
-                throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
+            if (!JsonLdReader.hasType(document)) {
+                throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
             }
 
-            throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
-        }
-
-        // @id - optional
-        if (JsonLdUtils.hasPredicate(subject, Keywords.ID)) {
-            credential.id = JsonLdUtils.getId(subject)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, Keywords.ID));
+            throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
         }
 
         // subject - mandatory
-        if (!JsonLdUtils.hasPredicate(subject, BASE + SUBJECT)) {
-            throw new DocumentError(ErrorType.Missing, SUBJECT);
+        if (!JsonLdReader.hasPredicate(document, VcVocab.SUBJECT.uri())) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
         }
 
-        // subject @id
-        JsonLdUtils.assertId(subject, BASE, SUBJECT);
+        try {
+            // @id - optional
+            credential.id = JsonLdReader.getId(document).orElse(null);
 
-        // issuer - mandatory
-        credential.issuer = JsonLdUtils.assertId(subject, BASE, ISSUER);
+            // subject @id - mandatory
+            JsonLdReader
+                    .getId(document, VcVocab.SUBJECT.uri())
+                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.SUBJECT));
 
-        // issuance date - mandatory for verification
-        if (JsonLdUtils.hasPredicate(subject, BASE + ISSUANCE_DATE)) {
-            credential.issuance = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUANCE_DATE);
-        }
+            if (!JsonLdReader.hasPredicate(document, VcVocab.ISSUER.uri())) {
+                throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
+            }
 
-		// validFrom - the next version
-		if (JsonLdUtils.hasPredicate(subject, BASE + VALID_FROM)) {
-			credential.validFrom = JsonLdUtils.assertXsdDateTime(subject, BASE, VALID_FROM);
-		}
-		
-		// issued - the next version
-		if (JsonLdUtils.hasPredicate(subject, BASE + ISSUED)) {
-			credential.issued = JsonLdUtils.assertXsdDateTime(subject, BASE, ISSUED);
-		}
+            // issuer - mandatory
+            credential.issuer = JsonLdReader
+                    .getId(document, VcVocab.ISSUER.uri())
+                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, VcVocab.ISSUER));
 
-        // expiration date - optional
-        if (JsonLdUtils.hasPredicate(subject, BASE + EXPIRATION_DATE)) {
-            credential.expiration = JsonLdUtils.assertXsdDateTime(subject, BASE, EXPIRATION_DATE);
+            // issuance date - mandatory for verification
+            credential.issuance = JsonLdReader.getXsdDateTime(document, VcVocab.ISSUANCE_DATE.uri()).orElse(null);
+
+            // validFrom - optional
+            credential.validFrom = JsonLdReader.getXsdDateTime(document, VcVocab.VALID_FROM.uri()).orElse(null);
+
+            // validFrom - optional
+            credential.validUntil = JsonLdReader.getXsdDateTime(document, VcVocab.VALID_UNTIL.uri()).orElse(null);
+
+            // issued - optional
+            credential.issued = JsonLdReader.getXsdDateTime(document, VcVocab.ISSUED.uri()).orElse(null);
+
+            // expiration date - optional
+            credential.expiration = JsonLdReader.getXsdDateTime(document, VcVocab.EXPIRATION_DATE.uri()).orElse(null);
+
+        } catch (InvalidJsonLdValue e) {
+            if (Keywords.ID.equals(e.getProperty())) {
+                throw new DocumentError(ErrorType.Invalid, LdTerm.ID);
+            }
+            throw new DocumentError(ErrorType.Invalid, LdTerm.create(e.getProperty().substring(VcVocab.CREDENTIALS_VOCAB.length()), VcVocab.CREDENTIALS_VOCAB));
         }
 
         // status
-        final Optional<JsonValue> status = JsonLdUtils
-                                                .getObjects(subject, BASE + CREDENTIAL_STATUS)
-                                                .stream()
-                                                .findFirst();
-
-        if (status.isPresent()) {
-            credential.status = CredentialStatus.from(status.get());
-        }
+        JsonLdReader
+                .getObjects(document, VcVocab.STATUS.uri()).stream()
+                .findFirst()
+                .ifPresent(s -> credential.status = s);
 
         return credential;
     }
@@ -159,7 +137,8 @@ class Credential implements Verifiable {
 
     /**
      *
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance Date</a>
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
+     *      Date</a>
      * @return the issuance date
      */
     public Instant getIssuanceDate() {
@@ -174,31 +153,37 @@ class Credential implements Verifiable {
         return expiration;
     }
 
-	/**
-	 * A date time when the credential has been issued. Reserved for the next specification version.
-	 * 
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance Date - Note</a>
-	 * 
-	 * @since 0.8.1
-	 * 
-	 * @return a date time
-	 */
-	public Instant getIssued() {
-		return issued;
-	}
-	
-	/**
-	 * A date time from the credential is valid. Reserved for the next specification version.
-	 * 
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance Date - Note</a>
-	 * 
-	 * @since 0.8.1
-	 * 
-	 * @return a date time
-	 */
-	public Instant getValidFrom() {
-		return validFrom;
-	}
+    /**
+     * A date time when the credential has been issued.
+     * 
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
+     *      Date - Note</a>
+     * 
+     * @since 0.8.1
+     * 
+     * @return a date time
+     */
+    public Instant getIssued() {
+        return issued;
+    }
+
+    /**
+     * A date time from the credential is valid.
+     * 
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
+     *      Date - Note</a>
+     * 
+     * @since 0.8.1
+     * 
+     * @return a date time
+     */
+    public Instant getValidFrom() {
+        return validFrom;
+    }
+
+    public Instant getValidUntil() {
+        return validUntil;
+    }
 
     /**
      * Checks if the credential is expired.
@@ -206,15 +191,28 @@ class Credential implements Verifiable {
      * @return <code>true</code> if the credential is expired
      */
     public boolean isExpired() {
-        return expiration != null && expiration.isBefore(Instant.now());
+        return (expiration != null && expiration.isBefore(Instant.now()))
+                || (validUntil != null && validUntil.isBefore(Instant.now()));
     }
 
     /**
-     * see {@link https://www.w3.org/TR/vc-data-model/#status}
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>
+     * 
      * @return
      */
-    public CredentialStatus getCredentialStatus() {
+    public JsonValue getStatus() {
         return status;
+    }
+
+    /**
+     * @see <a href=
+     *      "https://www.w3.org/TR/vc-data-model/#credential-subject">Credential
+     *      Subject</a>
+     * 
+     * @return
+     */
+    public JsonValue getSubject() {
+        return subject;
     }
 
     @Override
@@ -228,7 +226,8 @@ class Credential implements Verifiable {
     }
 
     /**
-     * Returns a map of predicates and objects that are not recognized by this implementation.
+     * Returns a map of predicates and objects that are not recognized by this
+     * implementation.
      *
      * @return an immutable map of extensions
      */

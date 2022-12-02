@@ -4,11 +4,12 @@ import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.KeyGenError;
-import com.apicatalog.ld.signature.KeyGenError.Code;
 import com.apicatalog.ld.signature.LinkedDataSignature;
+import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.ld.signature.SignatureSuiteMapper;
+import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.processor.Issuer;
@@ -26,13 +27,18 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param location a location of the document to verify
-     * @return {@link Verifier} allowing to set options and assert document's validity
+     * @return {@link Verifier} allowing to set options and assert document's
+     *         validity
      *
      * @throws DocumentError
      * @throws VerificationError
      */
-    public static Verifier verify(URI location) throws DocumentError, VerificationError {
-        return new Verifier(location);
+    public static Verifier verify(final URI location, final SignatureSuiteProvider suiteProvider) throws DocumentError, VerificationError {
+        return new Verifier(location, suiteProvider);
+    }
+
+    public static Verifier verify(final URI location, final SignatureSuite suite) throws DocumentError, VerificationError {
+        return new Verifier(location, new SignatureSuiteMapper().add(suite));
     }
 
     /**
@@ -40,17 +46,22 @@ public final class Vc {
      *
      * @param document the document to verify
      *
-     * @return {@link Verifier} allowing to set options and assert document's validity
+     * @return {@link Verifier} allowing to set options and assert document's
+     *         validity
      *
      * @throws DocumentError
      * @throws VerificationError
      */
-    public static Verifier verify(JsonObject document) throws DocumentError, VerificationError {
-        return new Verifier(document);
+    public static Verifier verify(final JsonObject document, final SignatureSuiteProvider suiteProvider) throws DocumentError, VerificationError {
+        return new Verifier(document, suiteProvider);
+    }
+
+    public static Verifier verify(final JsonObject document, final SignatureSuite suite) throws DocumentError, VerificationError {
+        return new Verifier(document, new SignatureSuiteMapper().add(suite));
     }
 
     /**
-     * Signs VC/VP document. Returns the provided VC/VP with added proof property.
+     * Signs VC/VP document. Returns the provided VC/VP with an new proof
      *
      * @param documentLocation
      * @param keyPair
@@ -61,12 +72,12 @@ public final class Vc {
      * @throws DocumentError
      * @throws SigningError
      */
-    public static Issuer sign(URI documentLocation, KeyPair keyPair, ProofOptions options) throws DocumentError, SigningError {
+    public static Issuer sign(URI documentLocation, KeyPair keyPair, final ProofOptions options) throws DocumentError, SigningError {
         return new Issuer(documentLocation, keyPair, options);
     }
 
     /**
-     * Signs VC/VP document. Returns the provided VC/VP with added proof property.
+     * Signs VC/VP document. Returns the provided VC/VP with a new proof
      *
      * @param document
      * @param keyPair
@@ -77,26 +88,23 @@ public final class Vc {
      * @throws DocumentError
      * @throws SigningError
      */
-    public static Issuer sign(JsonObject document, KeyPair keyPair, ProofOptions options) throws DocumentError, SigningError {
+    public static Issuer sign(JsonObject document, KeyPair keyPair, final ProofOptions options) throws DocumentError, SigningError {
         return new Issuer(document, keyPair, options);
     }
 
     /**
      * Generates public/private key pair.
      *
-     * @param type requested key pair type, e.g. <code>https://w3id.org/security#Ed25519KeyPair2020</code>
+     * @param signatureSuite a signature suite used to generate a key pair.
      *
      * @return {@link KeyGenError} allowing to set options and to generate key pair
      *
      * @throws KeyGenError
      */
-    public static KeysGenerator generateKeys(String type) throws KeyGenError {
-
-        if (Ed25519Signature2020.isTypeOf(type)) {
-            final LinkedDataSignature lds = new LinkedDataSignature(new Ed25519Signature2020());
-
-            return new KeysGenerator(lds);
+    public static KeysGenerator generateKeysfinal(final SignatureSuite signatureSuite) throws KeyGenError {
+        if (signatureSuite == null) {
+            throw new IllegalArgumentException("The signatureSuite parameter must not be null.");
         }
-        throw new KeyGenError(Code.UnknownCryptoSuite);
+        return new KeysGenerator(new LinkedDataSignature(signatureSuite.getCryptoSuite()));
     }
 }

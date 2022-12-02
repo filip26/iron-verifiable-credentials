@@ -1,9 +1,10 @@
 package com.apicatalog.ld.signature;
 
 import java.net.URI;
+import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.json.EmbeddedProofAdapter;
+import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 
@@ -12,74 +13,82 @@ import jakarta.json.JsonStructure;
 
 public class LinkedDataSignature {
 
-    private final SignatureSuite suite;
+    private final CryptoSuite suite;
 
-    public LinkedDataSignature(SignatureSuite suite) {
+    public LinkedDataSignature(CryptoSuite suite) {
         this.suite = suite;
     }
 
     /**
      * Verifies the given signed VC/VP document.
      *
-     * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification Algorithm</a>
+     * @see <a href=
+     *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification
+     *      Algorithm</a>
      *
-     * @param document expanded unsigned VC/VP document
-     * @param proof expanded proof with no proofValue
+     * @param document        expanded unsigned VC/VP document
+     * @param unsignedProof   expanded proof with no proofValue
      * @param verificationKey
      * @param signature
      *
      * @throws VerificationError
      * @throws DocumentError
      */
-    public void verify(final JsonObject document, final JsonObject proof, final VerificationKey verificationKey, final byte[] signature) throws VerificationError, DocumentError {
+    public void verify(
+            final JsonObject document,
+            final JsonObject unsignedProof,
+            final VerificationKey verificationKey,
+            final byte[] signature) throws VerificationError {
 
-        if (verificationKey == null || verificationKey.publicKey() == null) {
-            throw new VerificationError(VerificationError.Code.MissingVerificationKey);
+        Objects.requireNonNull(verificationKey);
+        Objects.requireNonNull(verificationKey.publicKey());
+        Objects.requireNonNull(signature);
+
+        try {
+            final byte[] computeSignature = hashCode(document, unsignedProof);
+
+            suite.verify(verificationKey.publicKey(), signature, computeSignature);
+
+        } catch (LinkedDataSuiteError e) {
+            throw new VerificationError(Code.InvalidSignature, e);
         }
-
-       final JsonObject proofObject = EmbeddedProofAdapter.removeProofValue(proof);
-
-       try {
-           final byte[] computeSignature = hashCode(document, proofObject);
-
-           suite.verify(verificationKey.publicKey(), signature, computeSignature);
-
-       } catch (LinkedDataSuiteError e) {
-           throw new VerificationError(e);
-       }
     }
 
     /**
      * Issues the given VC/VP document and returns the document signature.
      *
-     * @see <A href="https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm">Proof Algorithm</a>
+     * @see <A href=
+     *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm">Proof
+     *      Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
      * @param keyPair
-     * @param options
+     * @param proof
      *
      * @return computed signature
      *
      * @throws SigningError
      * @throws DocumentError
      */
-    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject options) throws SigningError {
+    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject proof) throws SigningError {
 
-    try {
-        final byte[] documentHashCode = hashCode(document, options);
+        try {
+            final byte[] documentHashCode = hashCode(document, proof);
 
-        return suite.sign(keyPair.privateKey(), documentHashCode);
+            return suite.sign(keyPair.privateKey(), documentHashCode);
 
-    } catch (LinkedDataSuiteError e) {
-        throw new SigningError(e);
-    }
+        } catch (LinkedDataSuiteError e) {
+            throw new SigningError(SigningError.Code.LinkedDataSignature, e);
+        }
     }
 
     /**
-     * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm">Hash Algorithm</a>
+     * @see <a href=
+     *      "https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm">Hash
+     *      Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
-     * @param proof expanded proof with no proofValue
+     * @param proof    expanded proof with no proofValue
      *
      * @return computed hash code
      *

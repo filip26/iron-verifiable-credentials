@@ -22,7 +22,7 @@
     "https://w3id.org/security#proof": [
         {
             "@type": [
-                "https://w3id.org/security#Ed25519Signature2020"
+                "https://w3id.org/security#TestSignatureSuite2022"
             ],
             "https://w3id.org/security#verificationMethod": [
                 {
@@ -42,7 +42,7 @@
             ],
             "https://w3id.org/security#proofValue": [
                 {
-                    "@value": "z45tvtua7AVYDWHEhHciKBbxFGgVZQ8PKsW4pCkCaqQrAFf5BGDquvchPu7LRTdFxXYvQZsyxufCq7D6QXjdhFJgP",
+                    "@value": "z7Lic7iCR8VVqNSqacJqmwyg2vEZVKhBhTxvX3zQ6fncR",
                     "@type": "https://w3id.org/security#multibase"
                 }
             ]

@@ -17,17 +17,7 @@
             ],
             "name": "unknown proof type",
             "input": "verifier/0001-in.jsonld",
-            "expectErrorCode": "UnknownCryptoSuite"
-        },
-        {
-            "@id": "#t0002",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "unknown proof value encoding",
-            "input": "verifier/0002-in.jsonld",
-            "expectErrorCode": "InvalidProofValue"
+            "expectErrorCode": "UnsupportedCryptoSuite"
         },
         {
             "@id": "#t0003",
@@ -38,16 +28,6 @@
             "name": "missing proof",
             "input": "verifier/0003-in.jsonld",
             "expectErrorCode": "MissingProof"
-        },
-        {
-            "@id": "#t0004",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "invalid proof value length",
-            "input": "verifier/0004-in.jsonld",
-            "expectErrorCode": "InvalidProofValueLength"
         },
         {
             "@id": "#t0005",
@@ -173,9 +153,9 @@
                 "NegativeEvaluationTest",
                 "VeriferTest"
             ],
-            "name": "unsupported proofValue codec",
+            "name": "missing credentialStatus @id",
             "input": "verifier/0017-in.jsonld",
-            "expectErrorCode": "InvalidProofValue"
+            "expectErrorCode": "MissingCredentialStatusId"
         },
         {
             "@id": "#t0018",
@@ -183,8 +163,18 @@
                 "NegativeEvaluationTest",
                 "VeriferTest"
             ],
-            "name": "invalid document using embededed credentials",
+            "name": "missing credentialStatus @type",
             "input": "verifier/0018-in.jsonld",
+            "expectErrorCode": "MissingCredentialStatusType"
+        },        
+        {
+            "@id": "#t0019",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid document using embededed credentials",
+            "input": "verifier/0019-in.jsonld",
             "expectErrorCode": "InvalidDocument"
         },
         {
@@ -238,7 +228,7 @@
             "options": {
                 "domain": "4jt"
             },
-            "expectErrorCode": "InvalidProofDomain"
+            "expectErrorCode": "InvalidDomain"
         },
         {
             "@id": "#t0025",
@@ -246,7 +236,7 @@
                 "NegativeEvaluationTest",
                 "VeriferTest"
             ],
-            "name": "did:key verification method",
+            "name": "expired certificate",
             "input": "verifier/0025-in.jsonld",
             "expectErrorCode": "Expired"
         },

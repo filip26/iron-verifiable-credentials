@@ -6,7 +6,7 @@ import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.key.KeyPair;
 
-public final class KeysGenerator extends Processor<KeysGenerator> {
+public final class KeysGenerator {
 
     private final LinkedDataSignature lds;
 
@@ -16,6 +16,7 @@ public final class KeysGenerator extends Processor<KeysGenerator> {
 
     /**
      * Get generated keys
+     * 
      * @param id
      * @param keyLength
      *
@@ -23,6 +24,6 @@ public final class KeysGenerator extends Processor<KeysGenerator> {
      * @throws KeyGenError
      */
     public KeyPair get(URI id, int keyLength) throws KeyGenError {
-      return lds.keygen(id, keyLength);
+        return lds.keygen(id, keyLength);
     }
 }

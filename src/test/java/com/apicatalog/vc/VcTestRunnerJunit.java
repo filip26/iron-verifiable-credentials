@@ -1,5 +1,11 @@
 package com.apicatalog.vc;
 
+import static com.apicatalog.ld.schema.LdSchema.id;
+import static com.apicatalog.ld.schema.LdSchema.link;
+import static com.apicatalog.ld.schema.LdSchema.multibase;
+import static com.apicatalog.ld.schema.LdSchema.object;
+import static com.apicatalog.ld.schema.LdSchema.property;
+import static com.apicatalog.ld.schema.LdSchema.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -8,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -22,12 +27,17 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020Adapter;
-import com.apicatalog.ld.signature.ed25519.Ed25519Proof2020Adapter;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.multibase.Multibase.Algorithm;
+import com.apicatalog.multicodec.Multicodec.Codec;
+import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
+import com.apicatalog.vc.integrity.DataIntegrity;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -43,15 +53,11 @@ public class VcTestRunnerJunit {
 
     private final VcTestCase testCase;
 
-    public final static DocumentLoader LOADER =
-            new UriBaseRewriter(
-                    "https://github.com/filip26/iron-verifiable-credentials/",
-                    "classpath:",
-                    new SchemeRouter()
+    public final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
+            new SchemeRouter()
                     .set("http", HttpLoader.defaultInstance())
                     .set("https", HttpLoader.defaultInstance())
-                    .set("classpath", new ClasspathLoader())
-                );
+                    .set("classpath", new ClasspathLoader()));
 
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
@@ -63,36 +69,37 @@ public class VcTestRunnerJunit {
         assertNotNull(testCase.input);
 
         try {
-            if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#VeriferTest")) {
+            if (testCase.type.contains(VcTestCase.vocab("VeriferTest"))) {
 
-                Vc.verify(testCase.input).loader(LOADER).domain(testCase.domain).isValid();
+                Vc.verify(testCase.input, new TestSignatureSuite())
+                        .loader(LOADER)
+                        .param(DataIntegrity.DOMAIN.name(), testCase.domain)
+                        .isValid();
+
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 
-            } else if (testCase.type.contains("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#IssuerTest")) {
+            } else if (testCase.type.contains(VcTestCase.vocab("IssuerTest"))) {
 
                 assertNotNull(testCase.result);
-
-                ProofOptions options =
-                        ProofOptions
-                            .create(
-                                Ed25519Proof2020Adapter.TYPE,
-                                testCase.verificationMethod,
-                                URI.create("https://w3id.org/security#assertionMethod")
-                                )
-                                .created(testCase.created)
-                                .domain(testCase.domain);
 
                 URI keyPairLocation = testCase.keyPair;
 
                 if (keyPairLocation == null) {
                     // set dummy key pair
-                    keyPairLocation = URI.create("https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json");
+                    keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                Issuer issuer = Vc
-                                    .sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
-                                    .loader(LOADER)
-                                    ;
+                final TestSignatureSuite suite = new TestSignatureSuite();
+
+                final ProofOptions options = suite.createOptions()
+                        // proof options
+                        .verificationMethod(testCase.verificationMethod)
+                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
+                        .created(testCase.created)
+                        .domain(testCase.domain);
+
+                final Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
+                        .loader(LOADER);
 
                 JsonObject signed = null;
 
@@ -108,28 +115,28 @@ public class VcTestRunnerJunit {
 
                 assertNotNull(signed);
 
-                final Document expected = LOADER.loadDocument(URI.create((String)testCase.result), new DocumentLoaderOptions());
+                final Document expected = LOADER.loadDocument(URI.create((String) testCase.result),
+                        new DocumentLoaderOptions());
 
-                boolean match = JsonLdComparison.equals(signed, expected.getJsonContent().orElse(null));
+                boolean match = JsonLdComparison.equals(signed,
+                        expected.getJsonContent().orElse(null));
 
                 if (!match) {
 
                     write(testCase, signed, expected.getJsonContent().orElse(null));
 
-
                     fail("Expected result does not match");
                 }
-
 
             } else {
                 fail("Unknown test execution method: " + testCase.type);
                 return;
             }
 
-             if (testCase.type.stream().noneMatch(o -> o.endsWith("PositiveEvaluationTest"))) {
-                 fail();
-                 return;
-             }
+            if (testCase.type.stream().noneMatch(o -> o.endsWith("PositiveEvaluationTest"))) {
+                fail();
+                return;
+            }
 
         } catch (VerificationError e) {
             assertException(e.getCode() != null ? e.getCode().name() : null, e);
@@ -138,7 +145,7 @@ public class VcTestRunnerJunit {
             assertException(e.getCode() != null ? e.getCode().name() : null, e);
 
         } catch (DocumentError e) {
-            assertException(toCode(e), e);
+            assertException(e.getCode(), e);
 
         } catch (JsonLdError e) {
             e.printStackTrace();
@@ -146,36 +153,11 @@ public class VcTestRunnerJunit {
         }
     }
 
-    final static String toCode(DocumentError e) {
-        final StringBuilder sb = new StringBuilder();
-        if (e.getType() != null) {
-            sb.append(e.getType().name());
-        }
-        if (e.getSubject() != null) {
-
-            int index = (e.getSubject().startsWith("@")) ? 1 : 0;
-
-            sb.append(Character.toUpperCase(e.getSubject().charAt(index)));
-            sb.append(e.getSubject().substring(index + 1));
-        }
-        if (e.getAttibutes() != null) {
-
-            Arrays.stream(e.getAttibutes())
-                .forEach(attribute -> {
-                    int index = (attribute.startsWith("@")) ? 1 : 0;
-
-                    sb.append(Character.toUpperCase(attribute.charAt(index)));
-                    sb.append(attribute.substring(index + 1));
-                });
-        }
-        return sb.toString();
-    }
-
     final void assertException(final String code, Throwable e) {
 
         if (!isNegative()) {
             e.printStackTrace();
-            fail(e);
+            fail(e.getMessage(), e);
             return;
         }
 
@@ -191,13 +173,15 @@ public class VcTestRunnerJunit {
         return testCase.type.stream().anyMatch(o -> o.endsWith("NegativeEvaluationTest"));
     }
 
-    public static void write(final VcTestCase testCase, final JsonStructure result, final JsonStructure expected) {
+    public static void write(final VcTestCase testCase, final JsonStructure result,
+            final JsonStructure expected) {
         final StringWriter stringWriter = new StringWriter();
 
         try (final PrintWriter writer = new PrintWriter(stringWriter)) {
             writer.println("Test " + testCase.id + ": " + testCase.name);
 
-            final JsonWriterFactory writerFactory = Json.createWriterFactory(Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
+            final JsonWriterFactory writerFactory = Json.createWriterFactory(
+                    Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
 
             if (expected != null) {
                 write(writer, writerFactory, "Expected", expected);
@@ -213,7 +197,8 @@ public class VcTestRunnerJunit {
         System.out.println(stringWriter.toString());
     }
 
-    static final void write(final PrintWriter writer, final JsonWriterFactory writerFactory, final String name, final JsonValue result) {
+    static final void write(final PrintWriter writer, final JsonWriterFactory writerFactory,
+            final String name, final JsonValue result) {
 
         writer.println(name + ":");
 
@@ -227,7 +212,8 @@ public class VcTestRunnerJunit {
         writer.println();
     }
 
-    static final KeyPair getKeys(URI keyPairLocation, DocumentLoader loader) throws DocumentError, JsonLdError {
+    static final KeyPair getKeys(URI keyPairLocation, DocumentLoader loader)
+            throws DocumentError, JsonLdError {
 
         final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
 
@@ -237,7 +223,17 @@ public class VcTestRunnerJunit {
                 continue;
             }
 
-            return (KeyPair)(new Ed25519KeyPair2020Adapter()).deserialize(key.asJsonObject());
+            LdValueAdapter<JsonValue, VerificationMethod> adapter = 
+                    object(
+                        id(),
+                        type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
+                        property(DataIntegrity.CONTROLLER, link()),
+                        property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
+                        property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))
+                    ).map(new DataIntegrityKeysAdapter());
+
+            return (KeyPair) adapter.read(key);
+
         }
         throw new IllegalStateException();
     }

@@ -1,26 +1,36 @@
 package com.apicatalog.vc;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static com.apicatalog.ld.schema.LdSchema.id;
+import static com.apicatalog.ld.schema.LdSchema.link;
+import static com.apicatalog.ld.schema.LdSchema.multibase;
+import static com.apicatalog.ld.schema.LdSchema.object;
+import static com.apicatalog.ld.schema.LdSchema.property;
+import static com.apicatalog.ld.schema.LdSchema.type;
 
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.apicatalog.jsonld.JsonLdUtils;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020Adapter;
-import com.apicatalog.ld.signature.proof.VerificationMethod;
+import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.ld.schema.adapter.LdValueAdapter;
+import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.multibase.Multibase.Algorithm;
+import com.apicatalog.multicodec.Multicodec.Codec;
+import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
+import com.apicatalog.vc.integrity.DataIntegrity;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
 public class VcTestCase {
+
+    static final String BASE = "https://github.com/filip26/iron-verifiable-credentials/";
 
     public URI id;
 
@@ -48,24 +58,27 @@ public class VcTestCase {
 
         testCase.id = URI.create(test.getString(Keywords.ID));
 
-        testCase.type = test.getJsonArray(Keywords.TYPE).stream().map(JsonString.class::cast).map(JsonString::getString)
+        testCase.type = test.getJsonArray(Keywords.TYPE)
+                .stream()
+                .map(JsonString.class::cast)
+                .map(JsonString::getString)
                 .collect(Collectors.toSet());
 
-        testCase.name = test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#name")
-                .getJsonObject(0).getString(Keywords.VALUE);
+        testCase.name = test.getJsonArray(da("name")).getJsonObject(0).getString(Keywords.VALUE);
 
-        testCase.input = URI.create(test.getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action")
-                .getJsonObject(0).getString(Keywords.ID));
+        testCase.input = URI.create(test.getJsonArray(da("action"))
+                .getJsonObject(0)
+                .getString(Keywords.ID));
 
-        if (test.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#context")) {
-            testCase.context = URI.create(
-                    test.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#context")
-                            .getJsonObject(0).getString(Keywords.ID));
+        if (test.containsKey(vocab("context"))) {
+            testCase.context = URI.create(test
+                    .getJsonArray(vocab("context"))
+                    .getJsonObject(0)
+                    .getString(Keywords.ID));
         }
 
-        if (test.containsKey("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result")) {
-            final JsonObject result = test
-                    .getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result").getJsonObject(0);
+        if (test.containsKey(da("result"))) {
+            final JsonObject result = test.getJsonArray(da("result")).getJsonObject(0);
 
             JsonValue resultValue = result.getOrDefault(Keywords.ID, result.getOrDefault(Keywords.VALUE, null));
 
@@ -77,51 +90,43 @@ public class VcTestCase {
             }
         }
 
-        if (test.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#options")) {
+        if (test.containsKey(vocab("options"))) {
 
-            JsonObject options = test
-                    .getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#options")
-                    .getJsonObject(0);
+            final JsonObject options = test.getJsonArray(vocab("options")).getJsonObject(0);
 
-
-            if (options.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#keyPair")) {
-                testCase.keyPair = URI.create(
-                        options.getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#keyPair")
-                                .getJsonObject(0).getString(Keywords.ID));
+            if (options.containsKey(vocab("keyPair"))) {
+                testCase.keyPair = URI.create(options.getJsonArray(vocab("keyPair"))
+                        .getJsonObject(0).getString(Keywords.ID));
             }
 
-            if (options.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#verificationMethod")) {
+            if (options.containsKey(vocab("verificationMethod"))) {
 
-                JsonObject method = options
-                        .getJsonArray(
-                                "https://github.com/filip26/iron-verifiable-credentials/tests/vocab#verificationMethod")
+                final JsonObject method = options.getJsonArray(vocab("verificationMethod"))
                         .getJsonObject(0);
 
-                if (JsonLdUtils.isTypeOf("https://w3id.org/security#Ed25519VerificationKey2020", method)) {
+                LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
+                            id(),
+                            type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
+                            property(DataIntegrity.CONTROLLER, link()),
+                            property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
+                            property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))
+                        ).map(new DataIntegrityKeysAdapter());
 
-                    try {
-                        testCase.verificationMethod = (new Ed25519VerificationKey2020Adapter()).deserialize(method);
-
-                    } catch (DocumentError e) {
-                        fail(e);
-                    }
-
-                } else {
-                    JsonLdUtils.getId(method)
-                            .ifPresent(id -> testCase.verificationMethod = new Ed25519VerificationKey2020(id, null, null, null));
+                try {
+                    testCase.verificationMethod = adapter.read(method);
+                } catch (DocumentError e) {
+                    throw new IllegalStateException(e);
                 }
             }
 
-            if (options.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#created")) {
-                testCase.created = Instant.parse(options
-                        .getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#created")
+            if (options.containsKey(vocab("created"))) {
+                testCase.created = Instant.parse(options.getJsonArray(vocab("created"))
                         .getJsonObject(0).getString(Keywords.VALUE));
             }
 
-            if (options.containsKey("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#domain")) {
-                testCase.domain= options
-                        .getJsonArray("https://github.com/filip26/iron-verifiable-credentials/tests/vocab#domain")
-                        .getJsonObject(0).getString(Keywords.VALUE);
+            if (options.containsKey(vocab("domain"))) {
+                testCase.domain = options.getJsonArray(vocab("domain")).getJsonObject(0)
+                        .getString(Keywords.VALUE);
             }
         }
 
@@ -131,5 +136,17 @@ public class VcTestCase {
     @Override
     public String toString() {
         return id.getFragment() + ": " + name;
+    }
+
+    static String base(String url) {
+        return BASE.concat(url);
+    }
+
+    static String da(String term) {
+        return "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#".concat(term);
+    }
+
+    static String vocab(String term) {
+        return base("tests/vocab#").concat(term);
     }
 }

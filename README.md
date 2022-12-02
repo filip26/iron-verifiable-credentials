@@ -12,7 +12,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 ## Features
 
-* Verifying VC/VP
+* Verifying VC/VP   
 * Issuing VC/VP
 * Signature
   * Ed25519 Signature 2020

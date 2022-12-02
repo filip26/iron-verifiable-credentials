@@ -6,13 +6,9 @@ public class VerificationError extends Throwable {
 
     public enum Code {
         Expired,
+        NotValidYet,
         InvalidSignature,
-        InvalidProofDomain,
-        UnknownCryptoSuite,
-        MissingVerificationKey,
-        UnknownVerificationKey,
-        UnknownVerificationMethod,
-        Internal, 
+        UnsupportedCryptoSuite,
     }
 
     private Code code;
@@ -20,10 +16,6 @@ public class VerificationError extends Throwable {
     public VerificationError(Code code) {
         super(code.name());
         this.code = code;
-    }
-
-    public VerificationError(Throwable e) {
-    this(Code.Internal, e);
     }
 
     public VerificationError(Code code, Throwable e) {

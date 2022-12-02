@@ -1,6 +1,5 @@
 package com.apicatalog.vc;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

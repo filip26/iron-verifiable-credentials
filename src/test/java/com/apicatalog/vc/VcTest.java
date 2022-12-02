@@ -37,9 +37,8 @@ class VcTest {
     @MethodSource({ "issuerManifest" })
     @Order(3)
     void sign(VcTestCase testCase) {
-
-        assumeFalse("t0005".equals(testCase.id.getFragment()));       // skip require issuanceDate when issuing
-
+        assumeFalse("t0005".equals(testCase.id.getFragment())); // skip require issuanceDate when issuing
+        
         new VcTestRunnerJunit(testCase).execute();
     }
 
@@ -56,16 +55,16 @@ class VcTest {
         try (final InputStream is = VcTest.class.getResourceAsStream(name)) {
 
             final JsonObject manifest = JsonLd.expand(JsonDocument.of(is))
-                        .base("https://github.com/filip26/iron-verifiable-credentials/")
-                        .loader(VcTestRunnerJunit.LOADER)
-                        .get()
-                        .getJsonObject(0);
+                    .base("https://github.com/filip26/iron-verifiable-credentials/")
+                    .loader(VcTestRunnerJunit.LOADER)
+                    .get()
+                    .getJsonObject(0);
 
             return manifest
-                .asJsonObject().getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#entries")
-                .stream()
-                .map(JsonValue::asJsonObject)
-                .map(test -> VcTestCase.of(test, manifest, VcTestRunnerJunit.LOADER));
+                    .asJsonObject().getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#entries")
+                    .stream()
+                    .map(JsonValue::asJsonObject)
+                    .map(test -> VcTestCase.of(test, manifest, VcTestRunnerJunit.LOADER));
         }
     }
 }
