@@ -21,8 +21,6 @@ import com.apicatalog.multicodec.Multicodec.Codec;
 
 public final class DataIntegrity {
 
-    private DataIntegrity() { /* protected */ }
-    
     public static final String SEC_VOCAB = "https://w3id.org/security#";
 
     public static final LdTerm TYPE = LdTerm.create("DataIntegrityProof", SEC_VOCAB);
@@ -37,6 +35,8 @@ public final class DataIntegrity {
     public static final LdTerm CONTROLLER = LdTerm.create("controller", SEC_VOCAB);
     public static final LdTerm MULTIBASE_PUB_KEY = LdTerm.create("publicKeyMultibase", SEC_VOCAB);
     public static final LdTerm MULTIBASE_PRIV_KEY = LdTerm.create("privateKeyMultibase", SEC_VOCAB);
+    
+    private DataIntegrity() { /* protected */ }
     
     public static final LdSchema getProofSchema(LdTerm proofType, LdTerm verificationType, int proofValueLength) {
         return proof(

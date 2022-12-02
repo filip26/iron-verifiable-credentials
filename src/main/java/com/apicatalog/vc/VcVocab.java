@@ -4,8 +4,6 @@ import com.apicatalog.ld.schema.LdTerm;
 
 public final class VcVocab {
 
-    private VcVocab() { /* protected */ }
-    
     public static final String CREDENTIALS_VOCAB = "https://www.w3.org/2018/credentials#";
 
     public static final String SECURITY_VOCAB = "https://w3id.org/security#";
@@ -43,4 +41,6 @@ public final class VcVocab {
     public static final LdTerm HOLDER = LdTerm.create("holder", CREDENTIALS_VOCAB);
 
     public static final LdTerm PROOF = LdTerm.create("proof", SECURITY_VOCAB);
+    
+    private VcVocab() { /* protected */ }
 }
