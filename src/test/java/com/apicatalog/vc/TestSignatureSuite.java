@@ -15,7 +15,7 @@ class TestSignatureSuite extends DataIntegritySuite {
     static final CryptoSuite CRYPTO = new CryptoSuite(
             TYPE.id(),
             new Urdna2015(),
-            new MessageDigest("MD5"),
+            new MessageDigest("SHA-256"),
             new TestAlgorithm());
 
     public TestSignatureSuite() {

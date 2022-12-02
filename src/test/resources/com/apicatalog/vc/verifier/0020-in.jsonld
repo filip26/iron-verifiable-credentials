@@ -10,7 +10,7 @@
             "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
             "created": "2022-06-04T20:33:01Z",
             "proofPurpose": "assertionMethod",
-            "proofValue": "zAve8nRHWPjVwzQBna5BHLEXYYQfiesRyLHVy6PNkY3W"
+            "proofValue": "z5M944Quv8z2muFjNH9sGwT7jHvNzVxEnuZt9vCBiUF6K"
         },
         {
             "type": "TestSignatureSuite2022",
@@ -21,7 +21,7 @@
             },
             "created": "2022-06-07T21:06:15Z",
             "proofPurpose": "assertionMethod",
-            "proofValue": "zYsHzTk6wfcxY59JhJzvqNHRiUmGuGLMEDNja3yN71fS"
+            "proofValue": "zADTbo8JowoXnrK4VeTDYFxCs8w5wGigxaeKvCHo83XCS"
         }
     ],
     "@context": [

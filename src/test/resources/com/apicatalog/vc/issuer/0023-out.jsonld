@@ -9,7 +9,7 @@
 		"verificationMethod": "did:key:z6Mkk6zjH7D7jcsWaRUvZxyLKXSUbTKHLaMLkWaJGNafWYuq",
 		"created": "2022-05-28T17:02:05Z",
 		"proofPurpose": "assertionMethod",
-		"proofValue": "z8GNNetbQ3T7KMDfvAUoPS23sqrMmFXHZsxiXTgRULpXY"
+		"proofValue": "z5VGS6fbuSqRsZQSUnfUkevWuAfgj55BDMefK4ojm71BL"
 	},
 	"@context": [
 		"https://www.w3.org/2018/credentials/v1",
