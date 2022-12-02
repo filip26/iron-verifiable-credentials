@@ -9,15 +9,15 @@ public class TestKeyPair implements KeyPair {
     URI id;
     URI type;
     URI controller;
-    
+
     byte[] publicKey;
     byte[] privateKey;
-    
+
     public TestKeyPair(byte[] publicKey, byte[] privateKey) {
         this.publicKey = publicKey;
         this.privateKey = privateKey;
     }
-    
+
     @Override
     public byte[] publicKey() {
         return publicKey;

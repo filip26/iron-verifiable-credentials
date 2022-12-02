@@ -103,7 +103,7 @@ class Presentation implements Verifiable {
     public Collection<JsonObject> getCredentials() {
         return credentials;
     }
-    
+
     /**
      * @see <a href="https://www.w3.org/TR/vc-data-model/#dfn-holders">Holder</a>
      * @return {@link URI} identifying the holder

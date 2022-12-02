@@ -11,19 +11,19 @@ import com.apicatalog.ld.signature.proof.ProofType;
 public interface SignatureSuite {
 
     LdSchema getSchema();
-    
-	ProofType getProofType();
+
+    ProofType getProofType();
 
 //	ProofValueAdapter getProofValueAdapter();
 
 //	MethodAdapter getMethodAdapter(String type);
-	
-	CryptoSuite getCryptoSuite();
 
-    ProofOptions  createOptions();
+    CryptoSuite getCryptoSuite();
 
-    //TODO proof assertions!!!!!
-    
+    ProofOptions createOptions();
+
+    // TODO proof assertions!!!!!
+
 //    /**
 //     * A JSON-LD context used to expand the proof
 //     * 
@@ -32,6 +32,6 @@ public interface SignatureSuite {
 //    public URI contexs() {
 //        return context;
 //    }
-    
-    //TODO URI getBase(URI id);
+
+    // TODO URI getBase(URI id);
 }

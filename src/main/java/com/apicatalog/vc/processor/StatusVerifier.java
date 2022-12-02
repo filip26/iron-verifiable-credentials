@@ -13,7 +13,7 @@ public interface StatusVerifier {
     /**
      * Verify the given credential status in an expanded JSON-LD form
      * 
-     * @param status in an expanded JSON-LD form 
+     * @param status in an expanded JSON-LD form
      * @throws DocumentError
      * @throws VerifyError
      */

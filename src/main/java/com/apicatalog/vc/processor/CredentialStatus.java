@@ -17,11 +17,12 @@ import jakarta.json.JsonValue;
  *
  */
 class CredentialStatus {
-    
+
     private URI id;
     private Collection<String> type;
 
-    protected CredentialStatus() { /* protected */ }
+    protected CredentialStatus() {
+        /* protected */ }
 
     public static CredentialStatus from(final JsonValue document) throws DocumentError {
 
@@ -34,7 +35,7 @@ class CredentialStatus {
         try {
             status.type = JsonLdReader.getType(document.asJsonObject());
             status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, VcSchema.STATUS, LdTerm.ID));
-            
+
         } catch (InvalidJsonLdValue e) {
             throw new DocumentError(ErrorType.Invalid, VcSchema.STATUS, LdTerm.ID);
         }

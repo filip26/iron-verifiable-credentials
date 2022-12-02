@@ -22,26 +22,25 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
     protected final Map<String, LdProperty<Object>> terms;
     protected final Map<String, LdProperty<Object>> tags;
-    
+
     protected LdObjectAdapter(Map<String, LdProperty<Object>> terms, Map<String, LdProperty<Object>> tags) {
         this.terms = terms;
         this.tags = tags;
     }
-    
+
     @Override
     public LdObject read(JsonValue json) throws DocumentError {
 
         if (JsonUtils.isNotObject(json)) {
             throw new IllegalArgumentException();
         }
-        
+
         JsonObject object = json.asJsonObject();
-        
 
         final Map<String, Object> values = new LinkedHashMap<>(object.size());
-        
+
         for (final Map.Entry<String, JsonValue> entry : object.entrySet()) {
-            
+
             // ignore if undefined
             if (!terms.containsKey(entry.getKey())) {
                 continue;
@@ -49,75 +48,74 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
             JsonValue jsonValue = entry.getValue();
 
-            // unwrap 
+            // unwrap
             if (JsonUtils.isArray(jsonValue) && jsonValue.asJsonArray().size() == 1) {
                 jsonValue = jsonValue.asJsonArray().get(0);
             }
-            
+
             LdProperty<Object> property = terms.get(entry.getKey());
-            
+
             if (JsonUtils.isNull(jsonValue)) {
                 continue;
             }
-            
+
             try {
                 values.put(entry.getKey(), property.read(jsonValue));
             } catch (IllegalArgumentException e) {
                 throw new DocumentError(e, ErrorType.Invalid, property.term());
             }
         }
-        
+
         return new LdObject(Collections.unmodifiableMap(values));
     }
 
     @Override
     public JsonObject write(LdObject object) throws DocumentError {
-        
+
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
         for (final Map.Entry<String, Object> entry : object.entrySet()) {
 
-            //TODO defaultValue?
+            // TODO defaultValue?
             if (entry.getValue() == null) {
                 continue;
             }
-            
+
             // ignore if undefined
             if (!terms.containsKey(entry.getKey())) {
                 continue;
             }
 
             LdProperty<Object> property = (LdProperty<Object>) terms.get(entry.getKey());
-            
-            JsonValue value =  property.write(entry.getValue());
-            
+
+            JsonValue value = property.write(entry.getValue());
+
             // wrap
             if (!Keywords.ID.equalsIgnoreCase(entry.getKey())) {
                 value = Json.createArrayBuilder().add(value).build();
             }
 
             builder.add(entry.getKey(), value);
-        }        
-        
+        }
+
         return builder.build();
     }
 
     public static LdObjectAdapter create(LdProperty<?>[] properties) {
-        
+
         final Map<String, LdProperty<Object>> terms = new LinkedHashMap<>(properties.length);
         final Map<String, LdProperty<Object>> tags = new LinkedHashMap<>(5);
-        
+
         for (LdProperty<?> property : properties) {
             if (property.tag() != null) {
                 tags.put(property.tag(), (LdProperty<Object>) property);
             }
             terms.put(property.term().id(), (LdProperty<Object>) property);
         }
-        
+
         return new LdObjectAdapter(
-                        Collections.unmodifiableMap(terms),
-                        Collections.unmodifiableMap(tags)
-                        );
+                Collections.unmodifiableMap(terms),
+                Collections.unmodifiableMap(tags));
     }
 
     @SuppressWarnings("unchecked")
@@ -134,14 +132,13 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
         for (final LdProperty<Object> property : terms.values()) {
 
             Object value = null;
-            
+
             if (object.contains(property.term())) {
                 value = object.value(property.term());
             }
-            
 
-                property.validate(value, params);
+            property.validate(value, params);
         }
     }
-     
+
 }

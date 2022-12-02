@@ -12,15 +12,15 @@ public interface MethodResolver {
     /**
      * Resolves the given {@link URI} into {@link VerificationMethod}
      *
-     * @param id an {@link URI} To resolve as a verification method
-     * @param loader 
-     * @param suite a suite (a proof type) context
+     * @param id     an {@link URI} To resolve as a verification method
+     * @param loader
+     * @param suite  a suite (a proof type) context
      * @return The new {@link DidDocument}
      * 
      * @throws DocumentError
      */
     VerificationMethod resolve(URI id, DocumentLoader loader, SignatureSuite suite) throws DocumentError;
-    
+
     boolean isAccepted(URI id);
-    
+
 }

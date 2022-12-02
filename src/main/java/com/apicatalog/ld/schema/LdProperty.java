@@ -16,9 +16,9 @@ public class LdProperty<T> {
     protected final LdValueAdapter<JsonValue, T> adapter;
     protected final String tag;
     protected boolean mandatory;
-    
+
     protected Collection<ParametrizedPredicate<T>> predicates;
-    
+
     public LdProperty(LdTerm term, LdValueAdapter<JsonValue, T> adapter) {
         this(term, adapter, null);
     }
@@ -34,12 +34,12 @@ public class LdProperty<T> {
         this.mandatory = true;
         return this;
     }
-    
+
     public LdProperty<T> optional() {
         this.mandatory = false;
         return this;
     }
-    
+
     public LdProperty<T> test(Predicate<T> fnc) {
         return test((v, p) -> fnc.test(v));
     }
@@ -57,7 +57,7 @@ public class LdProperty<T> {
     }
 
     public JsonValue write(T value) throws DocumentError {
-        return adapter.write(value);        
+        return adapter.write(value);
     }
 
     public T read(JsonValue value) throws DocumentError {
@@ -76,11 +76,11 @@ public class LdProperty<T> {
             }
             return true;
         }
-        
+
         if (predicates == null) {
             return true;
         }
-        
+
         for (final ParametrizedPredicate<T> predicate : predicates) {
             if (!predicate.test(value, params)) {
                 throw new DocumentError(ErrorType.Invalid, term);

@@ -9,10 +9,6 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Codec;
 
 class TestAlgorithm implements SignatureAlgorithm {
 
@@ -24,7 +20,7 @@ class TestAlgorithm implements SignatureAlgorithm {
         for (int i = 0; i < Math.min(publicKey.length, data.length); i++) {
             result[i] = (byte) (data[i] ^ publicKey[i]);
         }
-        
+
         if (!Arrays.equals(result, signature)) {
             throw new VerificationError(Code.InvalidSignature);
         }
@@ -44,20 +40,11 @@ class TestAlgorithm implements SignatureAlgorithm {
 
     @Override
     public KeyPair keygen(int length) throws KeyGenError {
-        
+
         byte[] key = new byte[length];
-        
+
         new Random().nextBytes(key);
-        
+
         return new TestKeyPair(key, key);
-    }
-    
-    public static void main(String[] args) throws KeyGenError {
-        
-        KeyPair pair = new TestAlgorithm().keygen(32);
-        
-        String enc = Multibase.encode(Algorithm.Base58Btc, Multicodec.encode(Codec.Ed25519PublicKey, pair.publicKey()));
-                
-        enc = Multibase.encode(Algorithm.Base58Btc, Multicodec.encode(Codec.Ed25519PrivateKey, pair.privateKey()));
     }
 }

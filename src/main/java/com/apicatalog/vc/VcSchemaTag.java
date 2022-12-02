@@ -1,8 +1,8 @@
 package com.apicatalog.vc;
 
-public enum VcSchemaTag  {
+public enum VcSchemaTag {
 
-    ProofValue, 
+    ProofValue,
     VerificationMethod,
 
 }

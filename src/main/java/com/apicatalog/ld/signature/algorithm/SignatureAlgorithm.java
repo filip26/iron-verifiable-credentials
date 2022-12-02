@@ -6,9 +6,10 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 
 /**
- * An algorithm that takes an input message and produces an output value
- * where the receiver of the message can mathematically verify that the message
- * has not been modified in transit and came from someone possessing a particular secret.
+ * An algorithm that takes an input message and produces an output value where
+ * the receiver of the message can mathematically verify that the message has
+ * not been modified in transit and came from someone possessing a particular
+ * secret.
  */
 public interface SignatureAlgorithm {
 

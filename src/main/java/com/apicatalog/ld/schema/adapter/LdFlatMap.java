@@ -10,7 +10,7 @@ public class LdFlatMap implements LdValueAdapter<JsonValue, JsonValue> {
     public JsonValue read(JsonValue value) {
 
 //        if ()
-        
+
         return null;
     }
 
@@ -19,7 +19,5 @@ public class LdFlatMap implements LdValueAdapter<JsonValue, JsonValue> {
         // TODO Auto-generated method stub
         return null;
     }
-
-
 
 }

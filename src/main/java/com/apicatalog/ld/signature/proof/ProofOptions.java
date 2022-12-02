@@ -7,5 +7,5 @@ public interface ProofOptions {
 
     SignatureSuite getSuite();
 
-    LdObject toUnsignedProof();    
+    LdObject toUnsignedProof();
 }

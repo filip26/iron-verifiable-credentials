@@ -14,10 +14,10 @@ public interface SubjectVerifier {
     /**
      * Verify the given subject claims in an expanded JSON-LD form
      * 
-     * @param subject in an expanded JSON-LD form 
+     * @param subject in an expanded JSON-LD form
      * @throws DocumentError
      * @throws VerifyError
      */
-    void verify(JsonValue subject) throws DocumentError, VerifyError;    
-    
+    void verify(JsonValue subject) throws DocumentError, VerifyError;
+
 }

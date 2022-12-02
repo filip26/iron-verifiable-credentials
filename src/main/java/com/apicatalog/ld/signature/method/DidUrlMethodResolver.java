@@ -18,13 +18,13 @@ public class DidUrlMethodResolver implements MethodResolver {
     final DidResolver resolver;
 
     public DidUrlMethodResolver() {
-        //TODO
+        // TODO
         resolver = new DidKeyResolver();
     }
-    
+
     @Override
     public VerificationMethod resolve(URI uri, DocumentLoader loader, SignatureSuite suite) throws DocumentError {
-        
+
         final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));
 
         return didDocument
@@ -33,7 +33,7 @@ public class DidUrlMethodResolver implements MethodResolver {
                 .map(did -> DataIntegrityKeyPair.createVerificationKey(
                         did.id().toUri(),
                         did.controller().toUri(),
-                        URI.create(did.type()), //TODO did.type should return URI
+                        URI.create(did.type()), // TODO did.type should return URI
                         did.publicKey()))
                 .findFirst()
                 .orElseThrow(() -> new DocumentError(ErrorType.Unknown, suite.getSchema().property(VcSchemaTag.VerificationMethod.name()).term()));

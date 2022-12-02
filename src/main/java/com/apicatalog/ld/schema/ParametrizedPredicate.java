@@ -2,7 +2,6 @@ package com.apicatalog.ld.schema;
 
 import java.util.Map;
 
-
 @FunctionalInterface
 public interface ParametrizedPredicate<T> {
 

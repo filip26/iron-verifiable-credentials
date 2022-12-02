@@ -43,7 +43,7 @@ public class LinkedDataSignature {
         Objects.nonNull(verificationKey);
         Objects.nonNull(verificationKey.publicKey());
         Objects.nonNull(signature);
-        
+
         try {
             final byte[] computeSignature = hashCode(document, unsignedProof);
 

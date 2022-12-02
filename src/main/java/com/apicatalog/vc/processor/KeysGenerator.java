@@ -16,6 +16,7 @@ public final class KeysGenerator {
 
     /**
      * Get generated keys
+     * 
      * @param id
      * @param keyLength
      *
@@ -23,6 +24,6 @@ public final class KeysGenerator {
      * @throws KeyGenError
      */
     public KeyPair get(URI id, int keyLength) throws KeyGenError {
-      return lds.keygen(id, keyLength);
+        return lds.keygen(id, keyLength);
     }
 }

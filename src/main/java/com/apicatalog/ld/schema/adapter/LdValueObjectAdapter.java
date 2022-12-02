@@ -12,24 +12,24 @@ import jakarta.json.JsonValue;
 public class LdValueObjectAdapter implements LdValueAdapter<JsonValue, JsonValue> {
 
     protected final LdTerm type;
-    
+
     public LdValueObjectAdapter() {
         this(null);
     }
-    
+
     public LdValueObjectAdapter(LdTerm type) {
         this.type = type;
     }
-    
+
     @Override
     public JsonValue read(JsonValue value) {
-        
+
         if (!ValueObject.isValueObject(value)) {
             throw new IllegalArgumentException();
         }
-        
-        //TODO check type
-        
+
+        // TODO check type
+
         return value.asJsonObject().get(Keywords.VALUE);
     }
 
@@ -37,13 +37,13 @@ public class LdValueObjectAdapter implements LdValueAdapter<JsonValue, JsonValue
     public JsonValue write(JsonValue value) {
 
         final JsonObjectBuilder builder = Json.createObjectBuilder();
-        
+
         if (type != null) {
             builder.add(Keywords.TYPE, type.id());
         }
-        
+
         builder.add(Keywords.VALUE, value);
-        
+
         return builder.build();
     }
 

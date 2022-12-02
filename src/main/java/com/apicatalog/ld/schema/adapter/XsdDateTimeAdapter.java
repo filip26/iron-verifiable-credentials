@@ -15,10 +15,10 @@ public class XsdDateTimeAdapter implements LdValueAdapter<String, Instant> {
         if (StringUtils.isBlank(value)) {
             throw new IllegalArgumentException("Cannot convert null into an instant.");
         }
-        
+
         try {
             OffsetDateTime createdOffset = OffsetDateTime.parse(value);
-            
+
             return createdOffset.toInstant();
 
         } catch (DateTimeParseException e) {

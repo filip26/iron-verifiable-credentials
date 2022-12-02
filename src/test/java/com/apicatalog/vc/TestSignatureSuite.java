@@ -9,40 +9,19 @@ import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
-    
+
     static final ProofType TYPE = new TestProofType();
-	
-	static final CryptoSuite CRYPTO = new CryptoSuite(
-	            TYPE.id(),
-	            new Urdna2015(),
-	            new MessageDigest("MD5"),
-	            new TestAlgorithm()
-            );
-	
-//	static final MultibaseProofValueAdapter ADAPTER = new MultibaseProofValueAdapter(URI.create("https://example.org/security#multibase"));
-//	
-//	static final Map<String, MethodAdapter> METHOD_ADAPTERS;
-//	
-//	static {
-//	    
-//	    Map<String, MethodAdapter> methods = new LinkedHashMap<>();
-//	    
-//	    MultibaseKeyAdapter multibase = new MultibaseKeyAdapter(
-//	            URI.create("https://example.org/security#TestVerificationKey2022"),
-//	            Codec.Ed25519PublicKey,
-//	            LdTerm.create("publicKeyMultibase", "https://example.org/security#")
-//	            );
-//	    
-//	    methods.put("https://example.org/security#TestVerificationKey2022", multibase);
-//	    
-//	    METHOD_ADAPTERS = Collections.unmodifiableMap(methods);
-//	    
-//	}
-	
-	public TestSignatureSuite() {
-	    super(TYPE, CRYPTO, DataIntegritySchema.getSchema(
-	            LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
-	            LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")
-	            ));
-	}	
+
+    static final CryptoSuite CRYPTO = new CryptoSuite(
+            TYPE.id(),
+            new Urdna2015(),
+            new MessageDigest("MD5"),
+            new TestAlgorithm());
+
+    public TestSignatureSuite() {
+        super(TYPE, CRYPTO, DataIntegritySchema.getSchema(
+                LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
+                LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
+                32));
+    }
 }

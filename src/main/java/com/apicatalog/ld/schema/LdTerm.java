@@ -8,11 +8,11 @@ public class LdTerm {
 
     public static final LdTerm ID = new LdTerm(Keywords.ID);
     public static final LdTerm TYPE = new LdTerm(Keywords.TYPE);
-    
+
     final String name;
     final String vocabulary;
     final String id;
-    
+
     LdTerm(String name) {
         this.name = name;
         this.vocabulary = null;
@@ -24,7 +24,7 @@ public class LdTerm {
         this.vocabulary = vocabulary;
         this.id = vocabulary + name;
     }
-    
+
     public static final LdTerm create(String name, String vocabulary) {
         return new LdTerm(name, vocabulary);
     }

@@ -16,51 +16,53 @@ import jakarta.json.JsonValue;
  * An embedded proof is included in the data, such as a Linked Data Signature.
  */
 public final class EmbeddedProof {
-	
-    protected EmbeddedProof() { /* protected */ }
 
-	/**
-	 * Appends the proof to the given VC/VP document. If the document has been
-	 * signed already then the proof is added into a proof set.
-	 *
-	 * @param document VC/VP document
-	 * @param proof
-	 *
-	 * @return the given VC/VP with the proof attached
-	 *
-	 * @throws DocumentError
-	 */
-	public static final JsonObject addProof(final JsonObject document, final JsonObject proof) {
-		
-		final JsonValue propertyValue = document.get(VcSchema.PROOF.id());
+    protected EmbeddedProof() {
+        /* protected */ }
 
-		return Json.createObjectBuilder(document)
-				.add(VcSchema.PROOF.id(),
-						((propertyValue != null)
-								? Json.createArrayBuilder(JsonUtils.toJsonArray(propertyValue))
-								: Json.createArrayBuilder()).add(proof))
-				.build();
-	}
+    /**
+     * Appends the proof to the given VC/VP document. If the document has been
+     * signed already then the proof is added into a proof set.
+     *
+     * @param document VC/VP document
+     * @param proof
+     *
+     * @return the given VC/VP with the proof attached
+     *
+     * @throws DocumentError
+     */
+    public static final JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
-	/**
-	 * Returns a proof set or throws an error if there is no proof.
-	 * 
-	 * @param document a {@link JsonObject} representing an serialized verifiable credential in an expanded form 
-	 * @return non-empty collection of proofs attached to the given verifiable credentials. 
-	 *                   never <code>null</code> nor an empty collection 
-	 * @throws DocumentError if there is no single proof
-	 */
-	public static Collection<JsonValue> assertProof(final JsonObject document) throws DocumentError {
-		
-		final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, VcSchema.PROOF.id());
-		
-		if (proofs == null || proofs.size() == 0) {
-			throw new DocumentError(ErrorType.Missing, VcSchema.PROOF);
-		}
-		return proofs;
-	}
+        final JsonValue propertyValue = document.get(VcSchema.PROOF.id());
 
-	public static JsonObject removeProof(final JsonObject document) {
-		return Json.createObjectBuilder(document).remove(VcSchema.PROOF.id()).build();
-	}
+        return Json.createObjectBuilder(document)
+                .add(VcSchema.PROOF.id(),
+                        ((propertyValue != null)
+                                ? Json.createArrayBuilder(JsonUtils.toJsonArray(propertyValue))
+                                : Json.createArrayBuilder()).add(proof))
+                .build();
+    }
+
+    /**
+     * Returns a proof set or throws an error if there is no proof.
+     * 
+     * @param document a {@link JsonObject} representing an serialized verifiable
+     *                 credential in an expanded form
+     * @return non-empty collection of proofs attached to the given verifiable
+     *         credentials. never <code>null</code> nor an empty collection
+     * @throws DocumentError if there is no single proof
+     */
+    public static Collection<JsonValue> assertProof(final JsonObject document) throws DocumentError {
+
+        final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, VcSchema.PROOF.id());
+
+        if (proofs == null || proofs.size() == 0) {
+            throw new DocumentError(ErrorType.Missing, VcSchema.PROOF);
+        }
+        return proofs;
+    }
+
+    public static JsonObject removeProof(final JsonObject document) {
+        return Json.createObjectBuilder(document).remove(VcSchema.PROOF.id()).build();
+    }
 }

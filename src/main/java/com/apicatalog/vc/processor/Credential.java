@@ -31,8 +31,6 @@ class Credential implements Verifiable {
     public static final String SUBJECT = "credentialSubject";
     public static final String ISSUER = "issuer";
 
-
-
     public static final String VALID_FROM = "validFrom";
     public static final String VALID_UNTIL = "validUntil";
     public static final String ISSUED = "issued";
@@ -43,15 +41,15 @@ class Credential implements Verifiable {
     public static final String REFRESH_SERVICE = "refreshService";
     public static final String TERMS_OF_USE = "termsOfUse";
     public static final String EVIDENCE = "evidence";
-    
+
     protected URI id;
 
     protected URI issuer;
 
     protected Instant issuance; // issuanceDate
     protected Instant issued;
-    protected Instant expiration;   // expirationDate
-    
+    protected Instant expiration; // expirationDate
+
     protected Instant validUntil;
     protected Instant validFrom;
 
@@ -60,7 +58,8 @@ class Credential implements Verifiable {
 
     protected Map<String, JsonValue> extensions;
 
-    protected Credential() { /* protected */ }
+    protected Credential() {
+        /* protected */ }
 
     public static boolean isCredential(final JsonValue document) {
         if (document == null) {
@@ -86,13 +85,13 @@ class Credential implements Verifiable {
 
             throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
         }
-        
+
         // subject - mandatory
-        if (!JsonLdReader.hasPredicate(document, VOCAB + SUBJECT)) { //FIXME use terms as constants everywhere
+        if (!JsonLdReader.hasPredicate(document, VOCAB + SUBJECT)) { // FIXME use terms as constants everywhere
             throw new DocumentError(ErrorType.Missing, LdTerm.create(SUBJECT, VOCAB));
         }
 
-        try {            
+        try {
             // @id - optional
             credential.id = JsonLdReader.getId(document).orElse(null);
 
@@ -104,11 +103,11 @@ class Credential implements Verifiable {
             if (!JsonLdReader.hasPredicate(document, VOCAB + ISSUER)) {
                 throw new DocumentError(ErrorType.Missing, LdTerm.create(ISSUER, VOCAB));
             }
-            
+
             // issuer - mandatory
             credential.issuer = JsonLdReader
-                                    .getId(document, VOCAB + ISSUER)
-                                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, LdTerm.create(ISSUER, VOCAB)));
+                    .getId(document, VOCAB + ISSUER)
+                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, LdTerm.create(ISSUER, VOCAB)));
 
             // issuance date - mandatory for verification
             credential.issuance = JsonLdReader.getXsdDateTime(document, VcSchema.ISSUANCE_DATE.id()).orElse(null);
@@ -133,13 +132,12 @@ class Credential implements Verifiable {
         }
 
         // subject
-        
-        
+
         // status
         JsonLdReader
-            .getObjects(document, VcSchema.STATUS.id()).stream()
-            .findFirst()
-            .ifPresent(s -> credential.status = s);
+                .getObjects(document, VcSchema.STATUS.id()).stream()
+                .findFirst()
+                .ifPresent(s -> credential.status = s);
 
         return credential;
     }
@@ -207,7 +205,7 @@ class Credential implements Verifiable {
     public Instant getValidUntil() {
         return validUntil;
     }
-    
+
     /**
      * Checks if the credential is expired.
      *
@@ -226,16 +224,18 @@ class Credential implements Verifiable {
     public JsonValue getStatus() {
         return status;
     }
-    
+
     /**
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#credential-subject">Credential Subject</a>
+     * @see <a href=
+     *      "https://www.w3.org/TR/vc-data-model/#credential-subject">Credential
+     *      Subject</a>
      * 
      * @return
      */
     public JsonValue getSubject() {
         return subject;
     }
-    
+
     @Override
     public boolean isCredential() {
         return true;

@@ -23,7 +23,7 @@ public class HttpMethodResolver implements MethodResolver {
     public VerificationMethod resolve(URI id, DocumentLoader loader, SignatureSuite suite) throws DocumentError {
 
         final LdProperty<VerificationMethod> property = suite.getSchema().property(VcSchemaTag.VerificationMethod.name());
-        
+
         try {
             final JsonArray document = JsonLd.expand(id)
                     .loader(loader)
@@ -35,13 +35,13 @@ public class HttpMethodResolver implements MethodResolver {
                 if (JsonUtils.isNotObject(method)) {
                     continue;
                 }
-                
+
                 final Collection<String> types = JsonLdReader.getType(method.asJsonObject());
-                
+
                 if (types == null || types.isEmpty()) {
                     continue;
                 }
-                
+
                 return property.read(method);
             }
 
@@ -49,7 +49,7 @@ public class HttpMethodResolver implements MethodResolver {
             throw new DocumentError(e, ErrorType.Invalid, property.term());
         }
 
-        throw new DocumentError(ErrorType.Unknown, property.term());        
+        throw new DocumentError(ErrorType.Unknown, property.term());
     }
 
     @Override

@@ -15,11 +15,11 @@ public class StringAdapter implements LdValueAdapter<JsonValue, String> {
         if (JsonUtils.isNull(value)) {
             return null;
         }
-        
+
         if (JsonUtils.isString(value)) {
-            return ((JsonString)value).getString();
+            return ((JsonString) value).getString();
         }
-        
+
         throw new IllegalArgumentException("Expected JsonString but have [" + value.getValueType() + "]");
     }
 
@@ -27,6 +27,5 @@ public class StringAdapter implements LdValueAdapter<JsonValue, String> {
     public JsonValue write(String value) {
         return Json.createValue(value);
     }
-
 
 }

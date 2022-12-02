@@ -12,7 +12,7 @@ public class DataIntegrityKeyPair implements KeyPair {
 
     final byte[] publicKey;
     final byte[] privateKey;
-    
+
     protected DataIntegrityKeyPair(URI id, URI type, URI controller, byte[] publicKey, byte[] privateKey) {
         this.id = id;
         this.type = type;
@@ -20,11 +20,11 @@ public class DataIntegrityKeyPair implements KeyPair {
         this.publicKey = publicKey;
         this.privateKey = privateKey;
     }
-    
+
     public static DataIntegrityKeyPair createVerificationKey(URI id, URI type, URI controller, byte[] publicKey) {
         return new DataIntegrityKeyPair(id, type, controller, publicKey, null);
     }
-    
+
     @Override
     public byte[] publicKey() {
         return publicKey;

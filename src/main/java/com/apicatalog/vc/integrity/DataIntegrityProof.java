@@ -13,24 +13,25 @@ import com.apicatalog.ld.signature.proof.Proof;
  *
  */
 public class DataIntegrityProof implements Proof {
-    
+
     /* required */
     protected URI type;
-    
+
     protected URI purpose;
-    
+
     protected VerificationMethod method;
-    
+
     protected Instant created;
-    
+
     protected byte[] value;
 
     /* optional */
     protected String domain;
-    
+
     protected String challenge;
-        
-    protected DataIntegrityProof() { /* protected */ }
+
+    protected DataIntegrityProof() {
+        /* protected */ }
 
     public DataIntegrityProof(URI type, URI purpose, VerificationMethod method, Instant created, byte[] value) {
         this.type = type;
@@ -41,17 +42,19 @@ public class DataIntegrityProof implements Proof {
         this.domain = null;
         this.challenge = null;
     }
-    
+
     @Override
     public URI getType() {
         return type;
     }
 
     /**
-     * The intent for the proof, the reason why an entity created it. Mandatory
-     * e.g. assertion or authentication
+     * The intent for the proof, the reason why an entity created it. Mandatory e.g.
+     * assertion or authentication
      *
-     * @see <a href="https://w3c-ccg.github.io/data-integrity-spec/#proof-purposes">Proof Purposes</a>
+     * @see <a href=
+     *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-purposes">Proof
+     *      Purposes</a>
      *
      * @return {@link URI} identifying the purpose
      */
@@ -81,21 +84,21 @@ public class DataIntegrityProof implements Proof {
     public String getDomain() {
         return domain;
     }
-    
+
     public void setDomain(String domain) {
         this.domain = domain;
     }
 
     /**
-     * A string value used once for a particular domain and/or time.
-     * Used to mitigate replay attacks.
-     *  
+     * A string value used once for a particular domain and/or time. Used to
+     * mitigate replay attacks.
+     * 
      * @return the challenge or <code>null</code>
      */
     public String getChallenge() {
         return challenge;
     }
-    
+
     public void setChallenge(String challenge) {
         this.challenge = challenge;
     }

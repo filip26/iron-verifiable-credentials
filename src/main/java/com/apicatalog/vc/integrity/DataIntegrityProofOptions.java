@@ -29,14 +29,14 @@ public class DataIntegrityProofOptions extends DataIntegrityProof implements Pro
     public LdObject toUnsignedProof() {
 
         Map<String, Object> proof = new LinkedHashMap<>();
-        
+
         proof.put(LdTerm.TYPE.id(), type);
         proof.put(DataIntegritySchema.CREATED.id(), created);
         proof.put(DataIntegritySchema.PURPOSE.id(), purpose);
         proof.put(DataIntegritySchema.VERIFICATION_METHOD.id(), method);
         proof.put(DataIntegritySchema.DOMAIN.id(), domain);
         proof.put(DataIntegritySchema.CHALLENGE.id(), challenge);
-        
+
         return new LdObject(proof);
     }
 
@@ -54,16 +54,15 @@ public class DataIntegrityProofOptions extends DataIntegrityProof implements Pro
         this.created = created;
         return this;
     }
-    
+
     public DataIntegrityProofOptions domain(String domain) {
         this.domain = domain;
         return this;
     }
-    
+
     public DataIntegrityProofOptions challenge(String challenge) {
         this.challenge = challenge;
         return this;
     }
-    
 
 }

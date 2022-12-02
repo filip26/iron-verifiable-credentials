@@ -27,7 +27,8 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param location a location of the document to verify
-     * @return {@link Verifier} allowing to set options and assert document's validity
+     * @return {@link Verifier} allowing to set options and assert document's
+     *         validity
      *
      * @throws DocumentError
      * @throws VerificationError
@@ -39,13 +40,14 @@ public final class Vc {
     public static Verifier verify(final URI location, final SignatureSuite suite) throws DocumentError, VerificationError {
         return new Verifier(location, new SignatureSuiteMapper().add(suite));
     }
-    
+
     /**
      * Verifies VC/VP document data integrity and signature.
      *
      * @param document the document to verify
      *
-     * @return {@link Verifier} allowing to set options and assert document's validity
+     * @return {@link Verifier} allowing to set options and assert document's
+     *         validity
      *
      * @throws DocumentError
      * @throws VerificationError
@@ -55,9 +57,9 @@ public final class Vc {
     }
 
     public static Verifier verify(final JsonObject document, final SignatureSuite suite) throws DocumentError, VerificationError {
-    	return new Verifier(document, new SignatureSuiteMapper().add(suite));
+        return new Verifier(document, new SignatureSuiteMapper().add(suite));
     }
-    
+
     /**
      * Signs VC/VP document. Returns the provided VC/VP with an new proof
      *
@@ -100,9 +102,9 @@ public final class Vc {
      * @throws KeyGenError
      */
     public static KeysGenerator generateKeysfinal(final SignatureSuite signatureSuite) throws KeyGenError {
-    	if (signatureSuite == null) {
-    		throw new IllegalArgumentException("The signatureSuite parameter must not be null.");
-    	}
-    	return new KeysGenerator(new LinkedDataSignature(signatureSuite.getCryptoSuite()));
+        if (signatureSuite == null) {
+            throw new IllegalArgumentException("The signatureSuite parameter must not be null.");
+        }
+        return new KeysGenerator(new LinkedDataSignature(signatureSuite.getCryptoSuite()));
     }
 }

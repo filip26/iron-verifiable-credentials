@@ -35,7 +35,7 @@ public class StaticContextLoader implements DocumentLoader {
         } catch (IOException | JsonLdError e) {
             e.printStackTrace();
         }
-        return  null;
+        return null;
     }
 
     public StaticContextLoader(DocumentLoader defaultLoader) {
