@@ -8,7 +8,7 @@ import java.util.List;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 
-class LdPipe<A, B> implements LdValueAdapter<A, B> {
+public class LdPipe<A, B> implements LdValueAdapter<A, B> {
 
     private final Collection<LdValueAdapter<Object, Object>> adapters;
 

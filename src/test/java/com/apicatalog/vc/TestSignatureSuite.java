@@ -19,7 +19,7 @@ class TestSignatureSuite extends DataIntegritySuite {
             new TestAlgorithm());
 
     public TestSignatureSuite() {
-        super(TYPE, CRYPTO, DataIntegrity.getSchema(
+        super(TYPE, CRYPTO, DataIntegrity.getProofSchema(
                 LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
                 LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
                 32));

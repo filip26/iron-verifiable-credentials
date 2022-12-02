@@ -59,10 +59,6 @@ public class LdSchema {
         return ObjectAdapter.create(properties);
     }
 
-    public static final <X> LdValueAdapter<JsonValue, X> object(LdValueAdapter<LdObject, X> adapter, LdProperty<?>... properties) {
-        return LdPipe.create(ObjectAdapter.create(properties)).map(adapter);
-    }
-
     public static final LdProperty<URI> id() {
         return property(LdTerm.ID, LdPipe.create(new StringAdapter()).map(new UriAdapter()));
     }

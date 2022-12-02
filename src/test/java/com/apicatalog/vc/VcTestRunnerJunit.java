@@ -1,9 +1,11 @@
 package com.apicatalog.vc;
 
 import static com.apicatalog.ld.schema.LdSchema.id;
+import static com.apicatalog.ld.schema.LdSchema.link;
 import static com.apicatalog.ld.schema.LdSchema.multibase;
 import static com.apicatalog.ld.schema.LdSchema.object;
 import static com.apicatalog.ld.schema.LdSchema.property;
+import static com.apicatalog.ld.schema.LdSchema.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,6 +27,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
@@ -220,11 +223,14 @@ public class VcTestRunnerJunit {
                 continue;
             }
 
-            LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
-                    new DataIntegrityKeysAdapter(),
-                    id(),
-                    property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
-                    property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey)));
+            LdValueAdapter<JsonValue, VerificationMethod> adapter = 
+                    object(
+                        id(),
+                        type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
+                        property(DataIntegrity.CONTROLLER, link()),
+                        property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
+                        property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))
+                    ).map(new DataIntegrityKeysAdapter());
 
             return (KeyPair) adapter.read(key);
 

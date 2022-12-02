@@ -19,7 +19,10 @@ public class VcSchema extends LdSchema {
         return property(id, adapter, VcTag.ProofValue.name());
     }
 
-    public static final LdProperty<VerificationMethod> verificationMethod(LdTerm id, LdValueAdapter<JsonValue, VerificationMethod> adapter) {
+    public static final LdProperty<VerificationMethod> verificationMethod(
+            LdTerm id, 
+            LdValueAdapter<JsonValue, VerificationMethod> adapter) {
+        
         return property(id, adapter, VcTag.VerificationMethod.name());
     }
 

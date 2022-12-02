@@ -9,6 +9,7 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdObject;
+import com.apicatalog.ld.schema.LdPipe;
 import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.schema.LdTerm;
 
@@ -138,6 +139,10 @@ public class ObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
             property.validate(value, params);
         }
+    }
+
+    public <T> LdValueAdapter<JsonValue, T> map(LdValueAdapter<LdObject, T> adapter) {
+        return LdPipe.create(this).map(adapter);
     }
 
 }

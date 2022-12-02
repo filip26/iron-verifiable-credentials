@@ -35,8 +35,8 @@ public class DataIntegrity {
     public static final LdTerm CONTROLLER = LdTerm.create("controller", SEC_VOCAB);
     public static final LdTerm MULTIBASE_PUB_KEY = LdTerm.create("publicKeyMultibase", SEC_VOCAB);
     public static final LdTerm MULTIBASE_PRIV_KEY = LdTerm.create("privateKeyMultibase", SEC_VOCAB);
-
-    public static final LdSchema getSchema(LdTerm proofType, LdTerm verificationType, int proofValueLength) {
+    
+    public static final LdSchema getProofSchema(LdTerm proofType, LdTerm verificationType, int proofValueLength) {
         return proof(
                 type(proofType).required(),
 
@@ -49,12 +49,11 @@ public class DataIntegrity {
 
                 verificationMethod(VERIFICATION_METHOD, 
                         object(
-                            new DataIntegrityKeysAdapter(),
                             id().required(),
                             type(verificationType),
                             property(CONTROLLER, link()),
                             property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey))
-                            ) //TODO .map(new DataIntegrityKeysAdapter())
+                            ).map(new DataIntegrityKeysAdapter())
                         ).required(),
 
                 property(DOMAIN, string())
