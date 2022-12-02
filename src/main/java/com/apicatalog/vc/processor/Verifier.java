@@ -42,7 +42,7 @@ import jakarta.json.JsonValue;
 
 public final class Verifier extends Processor<Verifier> {
 
-    protected final SignatureSuiteProvider suiteProvider;
+    final SignatureSuiteProvider suiteProvider;
 
     private final URI location;
     private final JsonObject document;
@@ -118,7 +118,7 @@ public final class Verifier extends Processor<Verifier> {
      * Custom verifier parameters that can be consumed during validation.
      * 
      * @param name
-     * @param value
+     *
      * @return
      */
     public Verifier param(final String name, final Object value) {
