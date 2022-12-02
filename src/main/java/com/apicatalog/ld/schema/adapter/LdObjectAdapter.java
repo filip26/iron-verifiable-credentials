@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.schema.LdTerm;
@@ -18,10 +19,10 @@ import jakarta.json.JsonValue;
 
 public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
-    protected final Map<String, LdProperty<?>> terms;
-    protected final Map<String, LdProperty<?>> tags;
+    protected final Map<String, LdProperty<Object>> terms;
+    protected final Map<String, LdProperty<Object>> tags;
     
-    protected LdObjectAdapter(Map<String, LdProperty<?>> terms, Map<String, LdProperty<?>> tags) {
+    protected LdObjectAdapter(Map<String, LdProperty<Object>> terms, Map<String, LdProperty<Object>> tags) {
         this.terms = terms;
         this.tags = tags;
     }
@@ -42,26 +43,23 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
             
             // ignore if undefined
             if (!terms.containsKey(entry.getKey())) {
-
                 continue;
             }
 
-            
-            JsonValue value = entry.getValue();
+            JsonValue jsonValue = entry.getValue();
 
             // unwrap 
-            if (JsonUtils.isArray(value) && value.asJsonArray().size() == 1) {
-                value = value.asJsonArray().get(0);
+            if (JsonUtils.isArray(jsonValue) && jsonValue.asJsonArray().size() == 1) {
+                jsonValue = jsonValue.asJsonArray().get(0);
             }
             
-            LdProperty<?> property = terms.get(entry.getKey());
+            LdProperty<Object> property = terms.get(entry.getKey());
             
-            if (JsonUtils.isNull(value)) {
-                //FIXME !!!
+            if (JsonUtils.isNull(jsonValue)) {
                 continue;
             }
             
-            values.put(entry.getKey(), property.read(value));
+            values.put(entry.getKey(), property.read(jsonValue));
         }
         
         return new LdObject(Collections.unmodifiableMap(values));
@@ -71,7 +69,6 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
     public JsonObject write(LdObject object) {
         
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        
 
         for (final Map.Entry<String, Object> entry : object.entrySet()) {
 
@@ -103,14 +100,14 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
     public static LdObjectAdapter create(LdProperty<?>[] properties) {
         
-        final Map<String, LdProperty<?>> terms = new LinkedHashMap<>(properties.length);
-        final Map<String, LdProperty<?>> tags = new LinkedHashMap<>(5);
+        final Map<String, LdProperty<Object>> terms = new LinkedHashMap<>(properties.length);
+        final Map<String, LdProperty<Object>> tags = new LinkedHashMap<>(5);
         
         for (LdProperty<?> property : properties) {
             if (property.tag() != null) {
-                tags.put(property.tag(), property);
+                tags.put(property.tag(), (LdProperty<Object>) property);
             }
-            terms.put(property.term().id(), property);
+            terms.put(property.term().id(), (LdProperty<Object>) property);
         }
         
         return new LdObjectAdapter(
@@ -126,6 +123,21 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
     public boolean contains(LdTerm term) {
         return terms.containsKey(term.id());
+    }
+
+    public void validate(LdObject object, Map<String, Object> params) throws DocumentError {
+
+        for (final LdProperty<Object> property : terms.values()) {
+
+            Object value = null;
+            
+            if (object.contains(property.term())) {
+                value = object.value(property.term());
+            }
+            
+
+                property.validate(value, params);
+        }
     }
      
 }

@@ -26,36 +26,36 @@ public class DataIntegritySchema {
     public static final LdTerm MULTIBASE_PRIV_KEY = LdTerm.create("privateKeyMultibase", SEC_VOCAB);
     
     public static final LdSchema getSchema(LdTerm proofType, LdTerm verificationType) {
-        return new LdSchema(
-                proof(
-                        type(proofType).required(),
+        return proof(
+                type(proofType).required(),
 
-                        property(CREATED, xsdDateTime())
-                                .test(created -> Instant.now().isAfter(created))
+                property(CREATED, xsdDateTime())
+                        .test(created -> Instant.now().isAfter(created))
 //                        .defaultValue(Instant.now())
-                                .required(),
+                        .required(),
 
-                        property(PURPOSE, link()).required(),
+                property(PURPOSE, link()).required(),
 
-                        verificationMethod(VERIFICATION_METHOD, object(
-                                new DataIntegrityKeysAdapter(),
-                                id().required(),
-                                type(verificationType),
-                                property(CONTROLLER, link()),
-                                property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey))
-                                
-                                )).required(),
+                verificationMethod(VERIFICATION_METHOD, object(
+                        new DataIntegrityKeysAdapter(),
+                        id().required(),
+                        type(verificationType),
+                        property(CONTROLLER, link()),
+                        property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey))
+                        
+                        )).required(),
 
-                        property(DOMAIN, string())
-                            .test((domain, params) -> !params.containsKey("domain")
-                                        || params.get("domain").equals(domain)),
+                property(DOMAIN, string())
+                    .test((domain, params) -> !params.containsKey("domain")
+                                || params.get("domain").equals(domain)),
 
-                        property(CHALLENGE, string()),
+                property(CHALLENGE, string()),
 
-                        proofValue(PROOF_VALUE, multibase(Algorithm.Base58Btc))
-                                .test(key -> key.length == 64)
-                                .required()
-                ));
+                //FIXME does not belong here but to custom suite
+                proofValue(PROOF_VALUE, multibase(Algorithm.Base58Btc))
+                        .test(key -> key.length == 32)
+                        .required()
+        );
     }
 
 }

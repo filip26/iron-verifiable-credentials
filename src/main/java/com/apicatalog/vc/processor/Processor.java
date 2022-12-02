@@ -5,10 +5,10 @@ import java.net.URI;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
 import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.LdTerm;
 
 import jakarta.json.JsonObject;
 
@@ -73,19 +73,19 @@ abstract class Processor<T extends Processor<?>> {
 
 		// is not expanded JSON-LD object
 		if (!JsonLdReader.hasType(expanded)) {
-			throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
+			throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
 		}
 
-		throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
+		throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
 	}
 
 	protected void failWithJsonLd(JsonLdError e) throws DocumentError {
 		if (JsonLdErrorCode.LOADING_DOCUMENT_FAILED == e.getCode()) {
-			throw new DocumentError(ErrorType.Invalid, "RemoteDocument", e);
+			throw new DocumentError(e, ErrorType.Invalid);
 		}
 
 		if (JsonLdErrorCode.LOADING_REMOTE_CONTEXT_FAILED == e.getCode()) {
-			throw new DocumentError(ErrorType.Invalid, "RemoteContext", e);
+			throw new DocumentError(e, ErrorType.Invalid);
 		}
 	}
 }

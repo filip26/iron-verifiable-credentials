@@ -1,9 +1,9 @@
 package com.apicatalog.ld.signature;
 
 import java.net.URI;
+import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
@@ -38,15 +38,12 @@ public class LinkedDataSignature {
             final JsonObject document,
             final JsonObject unsignedProof,
             final VerificationKey verificationKey,
-            final byte[] signature) throws VerificationError, DocumentError {
+            final byte[] signature) throws VerificationError {
 
-        if (verificationKey == null || verificationKey.publicKey() == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofVerificationKey");
-        }
-        if (signature == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofValue");
-        }
-
+        Objects.nonNull(verificationKey);
+        Objects.nonNull(verificationKey.publicKey());
+        Objects.nonNull(signature);
+        
         try {
             final byte[] computeSignature = hashCode(document, unsignedProof);
 

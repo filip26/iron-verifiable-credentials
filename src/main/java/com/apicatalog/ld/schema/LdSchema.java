@@ -2,7 +2,9 @@ package com.apicatalog.ld.schema;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.adapter.LdFlatMap;
 import com.apicatalog.ld.schema.adapter.LdObjectAdapter;
 import com.apicatalog.ld.schema.adapter.LdValueObjectAdapter;
@@ -35,14 +37,18 @@ public class LdSchema {
         return schema.property(tag);
     }
 
+    public LdObject read(JsonObject value) {
+        return schema.read(value);
+    }
+    
+    public void validate(LdObject value, Map<String, Object> params) throws DocumentError {
+        schema.validate(value, params);
+    }
+
     public JsonObject write(LdObject value) {
         return schema.write(value);
     }
     
-    public LdObject read(JsonObject value) {
-        return schema.read(value);
-    }
-
     public static LdSchema create(LdProperty<?>... properties) {
         return new LdSchema(object(properties));
     }

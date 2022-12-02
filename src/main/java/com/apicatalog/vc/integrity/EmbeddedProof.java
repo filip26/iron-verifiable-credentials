@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.proof;
+package com.apicatalog.vc.integrity;
 
 import java.util.Collection;
 
@@ -6,6 +6,7 @@ import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.vc.VcSchema;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -15,8 +16,6 @@ import jakarta.json.JsonValue;
  * An embedded proof is included in the data, such as a Linked Data Signature.
  */
 public final class EmbeddedProof {
-
-	public static final String PROPERTY_NAME = "https://w3id.org/security#proof";
 	
     protected EmbeddedProof() { /* protected */ }
 
@@ -33,10 +32,10 @@ public final class EmbeddedProof {
 	 */
 	public static final JsonObject addProof(final JsonObject document, final JsonObject proof) {
 		
-		final JsonValue propertyValue = document.get(PROPERTY_NAME);
+		final JsonValue propertyValue = document.get(VcSchema.PROOF.id());
 
 		return Json.createObjectBuilder(document)
-				.add(PROPERTY_NAME,
+				.add(VcSchema.PROOF.id(),
 						((propertyValue != null)
 								? Json.createArrayBuilder(JsonUtils.toJsonArray(propertyValue))
 								: Json.createArrayBuilder()).add(proof))
@@ -53,15 +52,15 @@ public final class EmbeddedProof {
 	 */
 	public static Collection<JsonValue> assertProof(final JsonObject document) throws DocumentError {
 		
-		final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, PROPERTY_NAME);
+		final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, VcSchema.PROOF.id());
 		
 		if (proofs == null || proofs.size() == 0) {
-			throw new DocumentError(ErrorType.Missing, "proof");
+			throw new DocumentError(ErrorType.Missing, VcSchema.PROOF);
 		}
 		return proofs;
 	}
 
 	public static JsonObject removeProof(final JsonObject document) {
-		return Json.createObjectBuilder(document).remove(PROPERTY_NAME).build();
+		return Json.createObjectBuilder(document).remove(VcSchema.PROOF.id()).build();
 	}
 }

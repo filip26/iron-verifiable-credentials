@@ -16,9 +16,10 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.proof.EmbeddedProof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
+import com.apicatalog.vc.VcSchema;
 import com.apicatalog.vc.VcSchemaTag;
+import com.apicatalog.vc.integrity.EmbeddedProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.Json;
@@ -105,7 +106,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-			throw new DocumentError(ErrorType.Invalid, "Document", e);
+			throw new DocumentError(e, ErrorType.Invalid);
 		}
 	}
 
@@ -146,7 +147,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-            throw new DocumentError(ErrorType.Invalid, "Document", e);
+            throw new DocumentError(e, ErrorType.Invalid);
 		}
 	}
 
@@ -161,7 +162,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-            throw new DocumentError(ErrorType.Invalid, "Document", e);
+            throw new DocumentError(e, ErrorType.Invalid);
 		}
 	}
 
@@ -176,7 +177,7 @@ public final class Issuer extends Processor<Issuer> {
 
 		} catch (JsonLdError e) {
 			failWithJsonLd(e);
-            throw new DocumentError(ErrorType.Invalid, "Document", e);
+            throw new DocumentError(e, ErrorType.Invalid);
 		}
 	}
 
@@ -186,7 +187,7 @@ public final class Issuer extends Processor<Issuer> {
 		JsonObject object = 
 		        JsonLdReader
 		            .findFirstObject(expanded)
-		            .orElseThrow(() -> new DocumentError(ErrorType.Invalid, "document")); // malformed input, not single object to sign has been found
+		            .orElseThrow(() -> new DocumentError(ErrorType.Invalid)); // malformed input, not single object to sign has been found
 		            
 		final Verifiable verifiable = get(object);
 
@@ -202,7 +203,7 @@ public final class Issuer extends Processor<Issuer> {
 			final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
 			object = Json.createObjectBuilder(object)
-					    .add(Credential.BASE + Credential.ISSUANCE_DATE, issuanceDate.toString())
+					    .add(VcSchema.ISSUANCE_DATE.id(), issuanceDate.toString())
 					    .build();
 		}
 

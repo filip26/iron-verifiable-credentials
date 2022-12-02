@@ -14,7 +14,8 @@ public class VerificationError extends Throwable {
         //UnknownVerificationKey, 
         //UnknownVerificationMethod,
         
-        LinkedDataSignature,
+        LinkedDataSignature, 
+        UnsupportedCryptoSuite,
     }
 
     private Code code;

@@ -70,7 +70,7 @@ public class VcTestRunnerJunit {
 
 				Vc.verify(testCase.input, new TestSignatureSuite())
 					.loader(LOADER)
-					.domain(testCase.domain)
+                    .param("domain", testCase.domain)
 					.isValid();
 				
 				assertFalse(isNegative(), "Expected error " + testCase.result);
@@ -143,27 +143,12 @@ public class VcTestRunnerJunit {
 			assertException(e.getCode() != null ? e.getCode().name() : null, e);
 
 		} catch (DocumentError e) {
-			assertException(toCode(e), e);
+			assertException(e.getCode(), e);
 
 		} catch (JsonLdError e) {
 			e.printStackTrace();
 			fail(e);
 		}
-	}
-
-	final static String toCode(DocumentError e) {
-		final StringBuilder sb = new StringBuilder();
-		if (e.getType() != null) {
-			sb.append(e.getType().name());
-		}
-		if (e.getSubject() != null) {
-
-			int index = (e.getSubject().startsWith("@")) ? 1 : 0;
-
-			sb.append(Character.toUpperCase(e.getSubject().charAt(index)));
-			sb.append(e.getSubject().substring(index + 1));
-		}
-		return sb.toString();
 	}
 
 	final void assertException(final String code, Throwable e) {

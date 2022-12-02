@@ -11,6 +11,19 @@ import jakarta.json.JsonValue;
 
 public class VcSchema extends LdSchema {
     
+    public static final String CRED_VOCAB = "https://www.w3.org/2018/credentials#";
+    public static final String SEC_VOCAB = "https://w3id.org/security#";
+
+    public static final LdTerm STATUS = LdTerm.create("credentialStatus", CRED_VOCAB);
+    
+    public static final LdTerm ISSUANCE_DATE = LdTerm.create("issuanceDate", CRED_VOCAB);
+    
+    public static final LdTerm VERIFIABLE_CREDENTIALS = LdTerm.create("verifiableCredential", CRED_VOCAB);
+    
+    public static final LdTerm HOLDER = LdTerm.create("holder", CRED_VOCAB);
+
+    public static final LdTerm PROOF = LdTerm.create("proof", SEC_VOCAB);
+    
     public VcSchema(LdObjectAdapter schema) {
         super(schema);
     }
@@ -23,8 +36,8 @@ public class VcSchema extends LdSchema {
         return property(id, adapter, VcSchemaTag.VerificationMethod.name());
     }
     
-    public static final LdObjectAdapter proof(LdProperty<?>... properties) {
-        return object(properties);
+    public static final LdSchema proof(LdProperty<?>... properties) {
+        return new LdSchema(object(properties));
     }
 
         

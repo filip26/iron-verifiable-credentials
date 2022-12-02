@@ -7,6 +7,8 @@ import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.vc.VcSchema;
 
 import jakarta.json.JsonValue;
 
@@ -15,7 +17,7 @@ import jakarta.json.JsonValue;
  *
  */
 class CredentialStatus {
-
+    
     private URI id;
     private Collection<String> type;
 
@@ -26,15 +28,15 @@ class CredentialStatus {
         final CredentialStatus status = new CredentialStatus();
 
         if (!JsonLdReader.hasType(document)) {
-            throw new DocumentError(ErrorType.Missing, "StatusType");
+            throw new DocumentError(ErrorType.Missing, VcSchema.STATUS, LdTerm.TYPE);
         }
 
         try {
             status.type = JsonLdReader.getType(document.asJsonObject());
-            status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, "StatusId"));
+            status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, VcSchema.STATUS, LdTerm.ID));
             
         } catch (InvalidJsonLdValue e) {
-            throw new DocumentError(ErrorType.Invalid, "StatusId");
+            throw new DocumentError(ErrorType.Invalid, VcSchema.STATUS, LdTerm.ID);
         }
 
         return status;

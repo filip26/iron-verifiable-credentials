@@ -3,17 +3,17 @@ package com.apicatalog.vc.processor;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -30,10 +30,9 @@ import com.apicatalog.ld.signature.method.DidUrlMethodResolver;
 import com.apicatalog.ld.signature.method.HttpMethodResolver;
 import com.apicatalog.ld.signature.method.MethodResolver;
 import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.EmbeddedProof;
-import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.vc.VcSchema;
 import com.apicatalog.vc.VcSchemaTag;
-import com.apicatalog.vc.integrity.DataIntegrityProof;
+import com.apicatalog.vc.integrity.EmbeddedProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.Json;
@@ -48,10 +47,10 @@ public final class Verifier extends Processor<Verifier> {
     private final URI location;
     private final JsonObject document;
 
-    private String domain = null;
-    
     private StatusVerifier statusVerifier = null;
     private SubjectVerifier subjectVerifier = null;
+    
+    private final Map<String, Object> params;
     
 //    @Deprecated
 //    private DidResolver didResolver = null;
@@ -63,6 +62,7 @@ public final class Verifier extends Processor<Verifier> {
         this.document = null;
         this.suiteProvider = suiteProvider;
         this.methodResolvers = defaultResolvers();
+        this.params = new LinkedHashMap<>(10); 
     }
 
     public Verifier(JsonObject document, final SignatureSuiteProvider suiteProvider) {
@@ -70,6 +70,7 @@ public final class Verifier extends Processor<Verifier> {
         this.location = null;
         this.suiteProvider = suiteProvider;
         this.methodResolvers = defaultResolvers();
+        this.params = new LinkedHashMap<>(10);
     }
     
     public static final Collection<MethodResolver>  defaultResolvers() {
@@ -113,8 +114,15 @@ public final class Verifier extends Processor<Verifier> {
 //        return this;
 //    }
 
-    public Verifier domain(final String domain) {
-        this.domain = domain;
+    /**
+     * Custom verifier parameters that can be consumed during validation.
+     * 
+     * @param name
+     * @param value
+     * @return
+     */
+    public Verifier param(final String name, final Object value) {
+        params.put(name, value);
         return this;
     }
 
@@ -158,7 +166,7 @@ public final class Verifier extends Processor<Verifier> {
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
-            throw new DocumentError(ErrorType.Invalid, "document", e);
+            throw new DocumentError(e, ErrorType.Invalid);
         }
     }
 
@@ -172,19 +180,19 @@ public final class Verifier extends Processor<Verifier> {
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
-            throw new DocumentError(ErrorType.Invalid, "document", e);
+            throw new DocumentError(e, ErrorType.Invalid);
         }
     }
 
     private void verifyExpanded(JsonArray expanded) throws VerificationError, DocumentError {
 
         if (expanded == null || expanded.isEmpty()) {
-            throw new DocumentError(ErrorType.Invalid, "document");
+            throw new DocumentError(ErrorType.Invalid);
         }
 
         for (final JsonValue item : expanded) {
             if (JsonUtils.isNotObject(item)) {
-                throw new DocumentError(ErrorType.Invalid, "document");
+                throw new DocumentError(ErrorType.Invalid);
             }
             verifyExpanded(item.asJsonObject());
         }
@@ -210,7 +218,7 @@ public final class Verifier extends Processor<Verifier> {
                 final Verifiable credential = get(expandedCredential);
                 
                 if (!credential.isCredential()) {
-                    throw new DocumentError(ErrorType.Invalid, "CredentialType");
+                    throw new DocumentError(ErrorType.Invalid, VcSchema.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
                 }
 
                 // data integrity and metadata validation
@@ -222,7 +230,7 @@ public final class Verifier extends Processor<Verifier> {
             verifyProofs(expanded);
 
         } else {
-            throw new DocumentError(ErrorType.Unknown, Keywords.TYPE);
+            throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
         }
     }
 
@@ -239,7 +247,7 @@ public final class Verifier extends Processor<Verifier> {
         for (final JsonValue embeddedProof : proofs) {
 
             if (JsonUtils.isNotObject(embeddedProof)) {
-                throw new DocumentError(ErrorType.Invalid, "Proof");
+                throw new DocumentError(ErrorType.Invalid, VcSchema.PROOF);
             }
             
             final JsonObject proofObject = embeddedProof.asJsonObject();
@@ -247,13 +255,13 @@ public final class Verifier extends Processor<Verifier> {
             final Collection<String> proofType = JsonLdReader.getType(proofObject);
 
             if (proofType == null || proofType.isEmpty()) {
-                throw new DocumentError(ErrorType.Missing, "ProofType");
+                throw new DocumentError(ErrorType.Missing,  VcSchema.PROOF, LdTerm.TYPE);
             }
 
             final SignatureSuite signatureSuite = proofType.stream()
                     .filter(suiteProvider::isSupported).findFirst()
                     .map(suiteProvider::getSignatureSuite)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "CryptoSuite"));
+                    .orElseThrow(() -> new VerificationError(Code.UnsupportedCryptoSuite));
 
             if (signatureSuite.getSchema() == null) {
                 throw new IllegalStateException("The suite [" + signatureSuite.getProofType().id() + "] does not provide proof schema.");
@@ -269,12 +277,14 @@ public final class Verifier extends Processor<Verifier> {
             
             final LdObject proof = signatureSuite.getSchema().read(proofObject);
 
+            signatureSuite.getSchema().validate(proof, params);
+            
 //            final LdTerm proofValueName = signatureSuite.getProofType().proofValue();
 //            System.out.println(">>> " + proofValueName.id());
 //            System.out.println(">>> " + proofObject);
             
             if (!proof.contains(proofValueProperty.term())) {
-                throw new DocumentError(ErrorType.Missing, "ProofValue");
+                throw new DocumentError(ErrorType.Missing, proofValueProperty.term());
             }
             
 //            JsonArray jsonValue = proofObject.getJsonArray(proofValueName.id());
@@ -302,21 +312,19 @@ public final class Verifier extends Processor<Verifier> {
             final byte[] proofValue = (byte[]) proof.value(proofValueProperty.term());
             
             if (proofValue == null || proofValue.length == 0) {
-                throw new DocumentError(ErrorType.Missing, "ProofValue");
+                throw new DocumentError(ErrorType.Missing, proofValueProperty.term());
             }
             
             //final Proof proof = signatureSuite.getProofAdapter().deserialize(proofValue.asJsonObject());
             
-            final LdProperty<byte[]> methodProperty = signatureSuite.getSchema().property(VcSchemaTag.VerificationMethod.name());
+            final LdProperty<VerificationMethod> methodProperty = signatureSuite.getSchema().property(VcSchemaTag.VerificationMethod.name());
             
             if (methodProperty == null) {
                 throw new IllegalStateException("The proof schema does not define a verification method.");
             }
-
-            final LdTerm proofMethodName = methodProperty.term();
             
-            VerificationMethod verificationMethod = getMethod(proofMethodName, proofObject, signatureSuite)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, "ProofVerificationMethod"));
+            VerificationMethod verificationMethod = getMethod(methodProperty, proofObject, signatureSuite)
+                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, methodProperty.term()));
             
 //            // if the verification is not a verification key
 //            if ((!(proof.getMethod() instanceof VerificationKey)
@@ -345,7 +353,7 @@ public final class Verifier extends Processor<Verifier> {
 //                        );
 
             if (!(verificationMethod instanceof VerificationKey)) {
-                throw new DocumentError(ErrorType.Unknown, "VerificationMethod");
+                throw new DocumentError(ErrorType.Unknown, methodProperty.term());
             }
 
 
@@ -368,9 +376,9 @@ public final class Verifier extends Processor<Verifier> {
         // all good
     }
 
-    Optional<VerificationMethod> getMethod(final LdTerm proofMethodName, final JsonObject proofObject, final SignatureSuite suite) throws VerificationError, DocumentError {
+    Optional<VerificationMethod> getMethod(final LdProperty<VerificationMethod> property, final JsonObject proofObject, final SignatureSuite suite) throws VerificationError, DocumentError {
         
-        final JsonArray expanded = proofObject.getJsonArray(proofMethodName.id());
+        final JsonArray expanded = proofObject.getJsonArray(property.term().id());
         
         if (JsonUtils.isNull(expanded) || expanded.isEmpty()) {
             return Optional.empty();
@@ -387,7 +395,7 @@ public final class Verifier extends Processor<Verifier> {
             final Collection<String> types = JsonLdReader.getType(methodObject);
             
             if (types == null || types.isEmpty()) {
-                return resolve(methodObject, suite);
+                return resolve(methodObject, suite, property);
             }
             
 //            final MethodAdapter adapter = types.stream()
@@ -398,35 +406,33 @@ public final class Verifier extends Processor<Verifier> {
 //            
 //            final VerificationMethod method = adapter.deserialize(methodObject);
 
-            final LdProperty<VerificationMethod> property = suite.getSchema().property(VcSchemaTag.VerificationMethod.name());
-
             final VerificationMethod method = property.read(methodObject);
 
             if (method != null && method instanceof VerificationKey && (((VerificationKey)method).publicKey() != null)) {
                 return Optional.of(method);
             }
             
-            return resolve(method.id(), suite);
+            return resolve(method.id(), suite, property);
         }
         
         return Optional.empty();
     }
     
-    Optional<VerificationMethod> resolve(JsonObject method, SignatureSuite suite) throws DocumentError, VerificationError {
+    Optional<VerificationMethod> resolve(JsonObject method, SignatureSuite suite, LdProperty<VerificationMethod> property) throws DocumentError, VerificationError {
         try {
             URI id = JsonLdReader
                         .getId(method)
-                        .orElseThrow(() -> new DocumentError(ErrorType.Missing, "VerificationMethodId"));
+                        .orElseThrow(() -> new DocumentError(ErrorType.Missing, property.term()));
             
-            return resolve(id, suite);
+            return resolve(id, suite, property);
             
         } catch (InvalidJsonLdValue e) {
-            throw new DocumentError(ErrorType.Invalid, "VerificationMethodId", e);
+            throw new DocumentError(e, ErrorType.Invalid, property.term());
         }
 
     }
 
-    Optional<VerificationMethod> resolve(URI id, SignatureSuite suite) throws DocumentError {
+    Optional<VerificationMethod> resolve(URI id, SignatureSuite suite, LdProperty<VerificationMethod> property) throws DocumentError {
 
         // find the method id resolver
         final Optional<MethodResolver> resolver = 
@@ -439,7 +445,7 @@ public final class Verifier extends Processor<Verifier> {
             return Optional.ofNullable(resolver.get().resolve(id, loader, suite));
         }
 
-        throw new DocumentError(ErrorType.Unknown, "VerificationMethod");        
+        throw new DocumentError(ErrorType.Unknown, property.term());
     }
     
     // refresh/fetch verification method
@@ -502,7 +508,7 @@ public final class Verifier extends Processor<Verifier> {
         if (credential.getIssuanceDate() == null
                 && credential.getValidFrom() == null 
                 && credential.getIssued() == null) {
-            throw new DocumentError(ErrorType.Missing, Credential.ISSUANCE_DATE);
+            throw new DocumentError(ErrorType.Missing, VcSchema.ISSUANCE_DATE);
         }
 
         // validation
@@ -532,44 +538,44 @@ public final class Verifier extends Processor<Verifier> {
             subjectVerifier.verify(credential.getSubject());
         }
     }
-
-    private final void validate(final Proof proof) throws VerificationError, DocumentError {
-
-        // verification method
-        if (proof.getMethod() == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");
-        }
-
-        // value
-        if (proof.getValue() == null || proof.getValue().length == 0) {
-            throw new DocumentError(ErrorType.Missing, "ProofValue");
-        }
-
-        if (proof instanceof DataIntegrityProof) {
-            validate((DataIntegrityProof)proof);
-        }
-    }
+//
+//    private final void validate(final Proof proof) throws VerificationError, DocumentError {
+//
+//        // verification method
+//        if (proof.getMethod() == null) {
+//            throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");
+//        }
+//
+//        // value
+//        if (proof.getValue() == null || proof.getValue().length == 0) {
+//            throw new DocumentError(ErrorType.Missing, "ProofValue");
+//        }
+//
+//        if (proof instanceof DataIntegrityProof) {
+//            validate((DataIntegrityProof)proof);
+//        }
+//    }
     
-    private final void validate(final DataIntegrityProof proof) throws VerificationError, DocumentError {
-        // purpose
-        if (proof.getPurpose() == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
-        }
-
-        // created
-        if (proof.getCreated() == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofCreated");
-        }
-        
-        if (proof.getCreated().isBefore(Instant.now())) {
-            throw new VerificationError(Code.NotValidYet);
-        }
-
-        // domain
-        if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
-            throw new VerificationError(Code.InvalidProofDomain);
-        }
-    }
+//    private final void validate(final DataIntegrityProof proof) throws VerificationError, DocumentError {
+//        // purpose
+//        if (proof.getPurpose() == null) {
+//            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
+//        }
+//
+//        // created
+//        if (proof.getCreated() == null) {
+//            throw new DocumentError(ErrorType.Missing, "ProofCreated");
+//        }
+//        
+//        if (proof.getCreated().isBefore(Instant.now())) {
+//            throw new VerificationError(Code.NotValidYet);
+//        }
+//
+////        // domain
+////        if (StringUtils.isNotBlank(domain) && !domain.equals(proof.getDomain())) {
+////            throw new VerificationError(Code.InvalidProofDomain);
+////        }
+//    }
 
 //    class VerificationKeyImpl implements VerificationKey {
 //
