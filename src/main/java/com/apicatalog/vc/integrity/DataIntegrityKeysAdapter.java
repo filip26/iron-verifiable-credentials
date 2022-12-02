@@ -28,11 +28,11 @@ public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, Verifi
     @Override
     public LdObject write(VerificationMethod method) {
 
-        Map<String, Object> result = new LinkedHashMap<>();
+        final Map<String, Object> result = new LinkedHashMap<>();
 
         if (method.id() != null) {
             result.put(LdTerm.ID.uri(), method.id());
-        }
+        }        
         if (method.type() != null) {
             result.put(LdTerm.TYPE.uri(), method.type());
         }

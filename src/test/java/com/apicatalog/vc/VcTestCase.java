@@ -107,7 +107,7 @@ public class VcTestCase {
                 LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
                         new DataIntegrityKeysAdapter(),
                         id(),
-                        type(LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#")),
+                        type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
                         property(DataIntegrity.CONTROLLER, link()),
                         property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
                         property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey)));

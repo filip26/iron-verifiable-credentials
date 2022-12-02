@@ -4,7 +4,6 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.ParametrizedPredicate;
 
-import jakarta.json.Json;
 import jakarta.json.JsonValue;
 
 public class ArrayFilter<T> implements LdValueAdapter<JsonValue, T> {
@@ -42,6 +41,6 @@ public class ArrayFilter<T> implements LdValueAdapter<JsonValue, T> {
             return JsonValue.NULL;
         }
         
-        return Json.createArrayBuilder().add(adapter.write(value)).build();       
+        return adapter.write(value);       
     }
 }

@@ -67,7 +67,7 @@ public class LdSchema {
         return property(LdTerm.ID, LdPipe.create(new StringAdapter()).map(new UriAdapter()));
     }
 
-    public static final LdProperty<URI> type(LdTerm id) {
+    public static final LdProperty<URI> type(final LdTerm id) {
         return property(LdTerm.TYPE,  
                     array(LdPipe.create(new StringAdapter())
                                 .map(new UriAdapter()))
