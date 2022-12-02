@@ -9,7 +9,7 @@ import jakarta.json.JsonValue;
  * 
  * @since 0.8.1
  */
-public interface SubjectVerifier {
+public interface SubjectValidator {
 
     /**
      * Verify the given subject claims in an expanded JSON-LD form

@@ -14,24 +14,7 @@ public interface SignatureSuite {
 
     ProofType getProofType();
 
-//	ProofValueAdapter getProofValueAdapter();
-
-//	MethodAdapter getMethodAdapter(String type);
-
     CryptoSuite getCryptoSuite();
 
     ProofOptions createOptions();
-
-    // TODO proof assertions!!!!!
-
-//    /**
-//     * A JSON-LD context used to expand the proof
-//     * 
-//     * @return an {@link URI} referencing a JSON-LD context or <code>null</code> if a context is embedded or not needed
-//     */
-//    public URI contexs() {
-//        return context;
-//    }
-
-    // TODO URI getBase(URI id);
 }

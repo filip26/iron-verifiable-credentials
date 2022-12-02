@@ -40,9 +40,9 @@ public class LinkedDataSignature {
             final VerificationKey verificationKey,
             final byte[] signature) throws VerificationError {
 
-        Objects.nonNull(verificationKey);
-        Objects.nonNull(verificationKey.publicKey());
-        Objects.nonNull(signature);
+        Objects.requireNonNull(verificationKey);
+        Objects.requireNonNull(verificationKey.publicKey());
+        Objects.requireNonNull(signature);
 
         try {
             final byte[] computeSignature = hashCode(document, unsignedProof);

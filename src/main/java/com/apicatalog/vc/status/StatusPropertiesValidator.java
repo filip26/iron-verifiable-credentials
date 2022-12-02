@@ -1,4 +1,4 @@
-package com.apicatalog.vc.processor;
+package com.apicatalog.vc.status;
 
 import java.net.URI;
 import java.util.Collection;
@@ -13,20 +13,19 @@ import com.apicatalog.vc.VcVocab;
 import jakarta.json.JsonValue;
 
 /**
+ * Validates verifiable credential status required properties. 
+ * 
  * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>
- *
+ * 
  */
-class CredentialStatus {
+public class StatusPropertiesValidator implements StatusValidator {
 
-    private URI id;
-    private Collection<String> type;
+    protected URI id;
+    protected Collection<String> type;
 
-    protected CredentialStatus() {
-        /* protected */ }
+    public static StatusPropertiesValidator from(final JsonValue document) throws DocumentError {
 
-    public static CredentialStatus from(final JsonValue document) throws DocumentError {
-
-        final CredentialStatus status = new CredentialStatus();
+        final StatusPropertiesValidator status = new StatusPropertiesValidator();
 
         if (!JsonLdReader.hasType(document)) {
             throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.TYPE);
@@ -49,5 +48,10 @@ class CredentialStatus {
 
     public Collection<String> getType() {
         return type;
+    }
+
+    @Override
+    public void verify(JsonValue status) throws DocumentError, VerifyError {
+        from(status);
     }
 }

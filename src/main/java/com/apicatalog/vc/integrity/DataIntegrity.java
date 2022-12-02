@@ -19,8 +19,10 @@ import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 
-public class DataIntegrity {
+public final class DataIntegrity {
 
+    private DataIntegrity() { /* protected */ }
+    
     public static final String SEC_VOCAB = "https://w3id.org/security#";
 
     public static final LdTerm TYPE = LdTerm.create("DataIntegrityProof", SEC_VOCAB);
@@ -57,8 +59,8 @@ public class DataIntegrity {
                         ).required(),
 
                 property(DOMAIN, string())
-                        .test((domain, params) -> !params.containsKey("domain")
-                                || params.get("domain").equals(domain)),
+                        .test((domain, params) -> !params.containsKey(DataIntegrity.DOMAIN.name())
+                                || params.get(DataIntegrity.DOMAIN.name()).equals(domain)),
 
                 property(CHALLENGE, string()),
 

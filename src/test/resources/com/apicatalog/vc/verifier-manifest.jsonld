@@ -148,13 +148,33 @@
             "expectErrorCode": "InvalidProofValue"
         },
         {
+            "@id": "#t0017",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "missing credentialStatus @id",
+            "input": "verifier/0017-in.jsonld",
+            "expectErrorCode": "MissingCredentialStatusId"
+        },
+        {
             "@id": "#t0018",
             "@type": [
                 "NegativeEvaluationTest",
                 "VeriferTest"
             ],
-            "name": "invalid document using embededed credentials",
+            "name": "missing credentialStatus @type",
             "input": "verifier/0018-in.jsonld",
+            "expectErrorCode": "MissingCredentialStatusType"
+        },        
+        {
+            "@id": "#t0019",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid document using embededed credentials",
+            "input": "verifier/0019-in.jsonld",
             "expectErrorCode": "InvalidDocument"
         },
         {

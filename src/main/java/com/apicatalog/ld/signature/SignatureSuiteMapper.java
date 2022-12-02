@@ -12,7 +12,7 @@ public final class SignatureSuiteMapper extends LinkedHashMap<String, SignatureS
     }
 
     @Override
-    public SignatureSuite getSignatureSuite(String suiteType) {
+    public SignatureSuite find(String suiteType) {
         return get(suiteType);
     }
 

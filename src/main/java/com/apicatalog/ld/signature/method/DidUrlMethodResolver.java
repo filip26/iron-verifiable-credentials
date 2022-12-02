@@ -18,7 +18,6 @@ public class DidUrlMethodResolver implements MethodResolver {
     final DidResolver resolver;
 
     public DidUrlMethodResolver() {
-        // TODO
         resolver = new DidKeyResolver();
     }
 

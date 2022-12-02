@@ -2,8 +2,10 @@ package com.apicatalog.vc;
 
 import com.apicatalog.ld.schema.LdTerm;
 
-public class VcVocab {
+public final class VcVocab {
 
+    private VcVocab() { /* protected */ }
+    
     public static final String CREDENTIALS_VOCAB = "https://www.w3.org/2018/credentials#";
 
     public static final String SECURITY_VOCAB = "https://w3id.org/security#";

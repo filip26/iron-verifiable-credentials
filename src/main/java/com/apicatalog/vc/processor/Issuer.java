@@ -136,7 +136,7 @@ public final class Issuer extends Processor<Issuer> {
      * @throws SigningError
      * @throws DocumentError
      */
-    public JsonObject getCompacted(final JsonStructure context) throws SigningError, DocumentError {
+    JsonObject getCompacted(final JsonStructure context) throws SigningError, DocumentError {
 
         final JsonObject signed = getExpanded();
 
@@ -150,7 +150,7 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    private final JsonObject sign(final URI documentLocation, final KeyPair keyPair,
+    final JsonObject sign(final URI documentLocation, final KeyPair keyPair,
             final ProofOptions options) throws DocumentError, SigningError {
         try {
             // load the document
@@ -165,7 +165,7 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    private final JsonObject sign(final JsonObject document, final KeyPair keyPair,
+    final JsonObject sign(final JsonObject document, final KeyPair keyPair,
             final ProofOptions options) throws DocumentError, SigningError {
         try {
             // load the document
@@ -180,7 +180,7 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    private final JsonObject sign(final JsonArray expanded, final KeyPair keyPair,
+    final JsonObject sign(final JsonArray expanded, final KeyPair keyPair,
             final ProofOptions options) throws SigningError, DocumentError {
 
         JsonObject object = JsonLdReader
@@ -211,19 +211,11 @@ public final class Issuer extends Processor<Issuer> {
 
         JsonObject proof = options.getSuite().getSchema().write(options.toUnsignedProof());
 
-        // options.toUnsignedProof();
-        // options.getSuite().getProofAdapter().serialize(options.toUnsignedProof());
-
         final LdProperty<byte[]> proofValueProperty = options.getSuite().getSchema().tagged(VcTag.ProofValue.name());
 
         final byte[] signature = ldSignature.sign(data, keyPair, proof);
 
         final JsonValue proofValue = proofValueProperty.write(signature);
-
-//		final JsonObjectBuilder proofValueObject = Json.createObjectBuilder()
-//		      .add(Keywords.VALUE, proofValue)
-//		      .add(Keywords.TYPE, options.getSuite().getProofValueAdapter().id().toString())
-//		      ;
 
         proof = Json.createObjectBuilder(proof)
                 .add(proofValueProperty.term().uri(),
@@ -233,10 +225,13 @@ public final class Issuer extends Processor<Issuer> {
         return EmbeddedProof.addProof(object, proof);
     }
 
-    private final void validate(Verifiable verifiable) throws SigningError {
+    final void validate(Verifiable verifiable) throws SigningError, DocumentError {
         // is expired?
-        if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
-            throw new SigningError(Code.Expired);
+        if (verifiable.isCredential()) {
+            if (verifiable.asCredential().isExpired()) {
+                throw new SigningError(Code.Expired);
+            }
+            super.validateData(verifiable.asCredential());            
         }
     }
 }

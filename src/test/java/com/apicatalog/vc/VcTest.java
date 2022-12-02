@@ -37,13 +37,8 @@ class VcTest {
     @MethodSource({ "issuerManifest" })
     @Order(3)
     void sign(VcTestCase testCase) {
-
         assumeFalse("t0005".equals(testCase.id.getFragment())); // skip require issuanceDate when issuing
         
-        //FIXME
-        assumeFalse("t0011".equals(testCase.id.getFragment()));
-        assumeFalse("t0012".equals(testCase.id.getFragment()));
-
         new VcTestRunnerJunit(testCase).execute();
     }
 

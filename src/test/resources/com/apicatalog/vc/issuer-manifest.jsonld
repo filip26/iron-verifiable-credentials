@@ -117,7 +117,7 @@
             ],
             "name": "missing credentialStatus @id",
             "input": "issuer/0011-in.jsonld",
-            "expectErrorCode": "MissingStatusId"
+            "expectErrorCode": "MissingCredentialStatusId"
         },
         {
             "@id": "#t0012",
@@ -127,7 +127,7 @@
             ],
             "name": "missing credentialStatus @type",
             "input": "issuer/0012-in.jsonld",
-            "expectErrorCode": "MissingStatusType"
+            "expectErrorCode": "MissingCredentialStatusType"
         },
         {
             "@id": "#t0020",

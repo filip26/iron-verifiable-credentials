@@ -5,10 +5,14 @@ import java.net.URI;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
 import com.apicatalog.jsonld.JsonLdReader;
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.status.StatusPropertiesValidator;
+import com.apicatalog.vc.status.StatusValidator;
 
 import jakarta.json.JsonObject;
 
@@ -18,11 +22,17 @@ abstract class Processor<T extends Processor<?>> {
     protected boolean bundledContexts;
     protected URI base;
 
+    protected StatusValidator statusValidator;
+    protected SubjectValidator subjectValidator;
+    
     protected Processor() {
         // default values
         this.loader = null;
         this.bundledContexts = true;
         this.base = null;
+
+        this.statusValidator = new StatusPropertiesValidator();
+        this.subjectValidator = null;
     }
 
     @SuppressWarnings("unchecked")
@@ -57,6 +67,33 @@ abstract class Processor<T extends Processor<?>> {
         return (T) this;
     }
 
+    /**
+     * Set a credential status verifier. If not set then
+     * <code>credentialStatus</code> is ignored if present.
+     *
+     * @param statusValidator a custom status verifier instance
+     * @return the verifier instance
+     */
+    @SuppressWarnings("unchecked")
+    public T statusValidator(StatusValidator statusValidator) {
+        this.statusValidator = statusValidator;
+        return (T) this;
+    }
+
+    
+
+    /**
+     * Set a credential subject verifier. If not set then
+     * <code>credentialStatus</code> is not verified.
+     *
+     * @param subjectValidator a custom subject verifier instance
+     * @return the verifier instance
+     */
+    @SuppressWarnings("unchecked")    
+    public T subjectValidator(SubjectValidator subjectValidator) {
+        this.subjectValidator = subjectValidator;
+        return (T) this;
+    }
     protected static Verifiable get(final JsonObject expanded) throws DocumentError {
 
         // is a credential?
@@ -86,6 +123,26 @@ abstract class Processor<T extends Processor<?>> {
 
         if (JsonLdErrorCode.LOADING_REMOTE_CONTEXT_FAILED == e.getCode()) {
             throw new DocumentError(e, ErrorType.Invalid);
+        }
+    }
+    
+    protected void validateData(final Credential credential) throws DocumentError {
+
+        // data integrity - issuance date is a mandatory property
+        if (credential.getIssuanceDate() == null
+                && credential.getValidFrom() == null
+                && credential.getIssued() == null) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
+        }
+
+        // status check
+        if (statusValidator != null && JsonUtils.isNotNull(credential.getStatus())) {
+            statusValidator.verify(credential.getStatus());
+        }
+
+        // subject check
+        if (statusValidator != null && JsonUtils.isNotNull(credential.getSubject())) {
+            statusValidator.verify(credential.getSubject());
         }
     }
 }
