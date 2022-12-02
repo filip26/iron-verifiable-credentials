@@ -312,7 +312,7 @@ public final class Verifier extends Processor<Verifier> {
 
             final VerificationMethod method = property.read(methodObject);
 
-            if (method != null && method instanceof VerificationKey && (((VerificationKey) method).publicKey() != null)) {
+            if (method instanceof VerificationKey && (((VerificationKey) method).publicKey() != null)) {
                 return Optional.of(method);
             }
 

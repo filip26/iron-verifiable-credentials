@@ -31,18 +31,9 @@ public class HttpMethodResolver implements MethodResolver {
                     .get();
 
             for (final JsonValue method : document) {
-
-                if (JsonUtils.isNotObject(method)) {
-                    continue;
+                if (JsonUtils.isObject(method)) {
+                    return property.read(method);
                 }
-
-                final Collection<String> types = JsonLdReader.getType(method.asJsonObject());
-
-                if (types == null || types.isEmpty()) {
-                    continue;
-                }
-
-                return property.read(method);
             }
 
         } catch (JsonLdError e) {
