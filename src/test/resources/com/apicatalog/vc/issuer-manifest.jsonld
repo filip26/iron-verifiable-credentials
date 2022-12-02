@@ -77,7 +77,7 @@
             ],
             "name": "invalid issuanceDate @value",
             "input": "issuer/0007-in.jsonld",
-            "expectErrorCode": "InvalidIssuanceDateValue"
+            "expectErrorCode": "InvalidIssuanceDate"
         },
         {
             "@id": "#t0008",
@@ -97,7 +97,7 @@
             ],
             "name": "invalid expirationDate @value",
             "input": "issuer/0009-in.jsonld",
-            "expectErrorCode": "InvalidExpirationDateValue"
+            "expectErrorCode": "InvalidExpirationDate"
         },
         {
             "@id": "#t0010",

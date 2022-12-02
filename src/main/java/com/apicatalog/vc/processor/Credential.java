@@ -101,10 +101,14 @@ class Credential implements Verifiable {
                     .getId(document, VOCAB + SUBJECT)
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, LdTerm.create(SUBJECT, VOCAB)));
 
+            if (!JsonLdReader.hasPredicate(document, VOCAB + ISSUER)) {
+                throw new DocumentError(ErrorType.Missing, LdTerm.create(ISSUER, VOCAB));
+            }
+            
             // issuer - mandatory
             credential.issuer = JsonLdReader
                                     .getId(document, VOCAB + ISSUER)
-                                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, LdTerm.create(ISSUER, VOCAB)));
+                                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, LdTerm.create(ISSUER, VOCAB)));
 
             // issuance date - mandatory for verification
             credential.issuance = JsonLdReader.getXsdDateTime(document, VcSchema.ISSUANCE_DATE.id()).orElse(null);
@@ -125,7 +129,7 @@ class Credential implements Verifiable {
             if (Keywords.ID.equals(e.getProperty())) {
                 throw new DocumentError(ErrorType.Invalid, LdTerm.ID);
             }
-            throw new DocumentError(ErrorType.Invalid, LdTerm.create(e.getProperty().substring(0, VOCAB.length()), VOCAB));
+            throw new DocumentError(ErrorType.Invalid, LdTerm.create(e.getProperty().substring(VOCAB.length()), VOCAB));
         }
 
         // subject

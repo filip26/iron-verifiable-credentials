@@ -131,7 +131,7 @@ public class JsonLdReader {
         if (JsonUtils.isString(value)) {
             final String id = ((JsonString) value).getString();
 
-            if (UriUtils.isURI(id)) {
+            if (UriUtils.isAbsoluteUri(id, true)) {
                 return Optional.of(URI.create(id));
             }
             throw new InvalidJsonLdValue(property, value,
