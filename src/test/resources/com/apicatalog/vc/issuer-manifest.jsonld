@@ -67,7 +67,7 @@
             ],
             "name": "issuanceDate @type must be xsd:DateTime",
             "input": "issuer/0006-in.jsonld",
-            "expectErrorCode": "InvalidIssuanceDateType"
+            "expectErrorCode": "InvalidIssuanceDate"
         },
         {
             "@id": "#t0007",
@@ -87,7 +87,7 @@
             ],
             "name": "expirationDate @type must be xsd:DateTime",
             "input": "issuer/0008-in.jsonld",
-            "expectErrorCode": "InvalidExpirationDateType"
+            "expectErrorCode": "InvalidExpirationDate"
         },
         {
             "@id": "#t0009",
