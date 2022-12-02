@@ -29,7 +29,7 @@ public final class EmbeddedProof {
      *
      * @return the given VC/VP with the proof attached
      *
-     * @throws DocumentError
+     *
      */
     public static final JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
