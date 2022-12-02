@@ -53,7 +53,7 @@ class LdPipe<A, B> implements LdValueAdapter<A, B> {
 
     @SuppressWarnings("unchecked")
     public static <A, B> LdPipe<A, B> create(LdValueAdapter<A, B> adapter) {
-        if (adapter instanceof LdPipe<A, B>) {
+        if (adapter instanceof LdPipe) {
             return (LdPipe<A, B>)adapter;
         }
         return new LdPipe<A, B>((LdValueAdapter<Object, Object>) adapter);
