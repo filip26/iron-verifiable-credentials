@@ -354,7 +354,7 @@ public final class Verifier extends Processor<Verifier> {
 
             // remote a proof value
             final JsonObject unsignedProof = Json.createObjectBuilder(proofObject)
-                    .remove(proofValueProperty.term().id())
+                    .remove(proofValueProperty.term().uri())
                     .build();
 
             final LinkedDataSignature signature = new LinkedDataSignature(signatureSuite.getCryptoSuite());
@@ -371,7 +371,7 @@ public final class Verifier extends Processor<Verifier> {
 
     Optional<VerificationMethod> getMethod(final LdProperty<VerificationMethod> property, final JsonObject proofObject, final SignatureSuite suite) throws VerificationError, DocumentError {
 
-        final JsonArray expanded = proofObject.getJsonArray(property.term().id());
+        final JsonArray expanded = proofObject.getJsonArray(property.term().uri());
 
         if (JsonUtils.isNull(expanded) || expanded.isEmpty()) {
             return Optional.empty();

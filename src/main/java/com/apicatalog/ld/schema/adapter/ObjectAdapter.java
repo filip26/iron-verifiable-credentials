@@ -11,19 +11,18 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.schema.LdValueAdapter;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonValue;
 
-public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
+public class ObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
     protected final Map<String, LdProperty<Object>> terms;
     protected final Map<String, LdProperty<Object>> tags;
 
-    protected LdObjectAdapter(Map<String, LdProperty<Object>> terms, Map<String, LdProperty<Object>> tags) {
+    protected ObjectAdapter(Map<String, LdProperty<Object>> terms, Map<String, LdProperty<Object>> tags) {
         this.terms = terms;
         this.tags = tags;
     }
@@ -101,7 +100,7 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
         return builder.build();
     }
 
-    public static LdObjectAdapter create(LdProperty<?>[] properties) {
+    public static ObjectAdapter create(LdProperty<?>[] properties) {
 
         final Map<String, LdProperty<Object>> terms = new LinkedHashMap<>(properties.length);
         final Map<String, LdProperty<Object>> tags = new LinkedHashMap<>(5);
@@ -110,10 +109,10 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
             if (property.tag() != null) {
                 tags.put(property.tag(), (LdProperty<Object>) property);
             }
-            terms.put(property.term().id(), (LdProperty<Object>) property);
+            terms.put(property.term().uri(), (LdProperty<Object>) property);
         }
 
-        return new LdObjectAdapter(
+        return new ObjectAdapter(
                 Collections.unmodifiableMap(terms),
                 Collections.unmodifiableMap(tags));
     }
@@ -124,7 +123,7 @@ public class LdObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
     }
 
     public boolean contains(LdTerm term) {
-        return terms.containsKey(term.id());
+        return terms.containsKey(term.uri());
     }
 
     public void validate(LdObject object, Map<String, Object> params) throws DocumentError {

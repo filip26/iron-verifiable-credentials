@@ -25,7 +25,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.schema.LdValueAdapter;
+import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
@@ -34,7 +34,7 @@ import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
-import com.apicatalog.vc.integrity.DataIntegritySchema;
+import com.apicatalog.vc.integrity.DataIntegrity;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -223,8 +223,8 @@ public class VcTestRunnerJunit {
             LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
                     new DataIntegrityKeysAdapter(),
                     id(),
-                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
-                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey)));
+                    property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
+                    property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey)));
 
             return (KeyPair) adapter.read(key);
 

@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 
 import jakarta.json.JsonValue;
 
@@ -86,8 +87,6 @@ public class LdProperty<T> {
                 throw new DocumentError(ErrorType.Invalid, term);
             }
         }
-
         return true;
     }
-
 }

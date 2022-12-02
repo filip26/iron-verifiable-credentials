@@ -33,10 +33,10 @@ public final class EmbeddedProof {
      */
     public static final JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
-        final JsonValue propertyValue = document.get(VcVocab.PROOF.id());
+        final JsonValue propertyValue = document.get(VcVocab.PROOF.uri());
 
         return Json.createObjectBuilder(document)
-                .add(VcVocab.PROOF.id(),
+                .add(VcVocab.PROOF.uri(),
                         ((propertyValue != null)
                                 ? Json.createArrayBuilder(JsonUtils.toJsonArray(propertyValue))
                                 : Json.createArrayBuilder()).add(proof))
@@ -54,7 +54,7 @@ public final class EmbeddedProof {
      */
     public static Collection<JsonValue> assertProof(final JsonObject document) throws DocumentError {
 
-        final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, VcVocab.PROOF.id());
+        final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, VcVocab.PROOF.uri());
 
         if (proofs == null || proofs.size() == 0) {
             throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
@@ -63,6 +63,6 @@ public final class EmbeddedProof {
     }
 
     public static JsonObject removeProof(final JsonObject document) {
-        return Json.createObjectBuilder(document).remove(VcVocab.PROOF.id()).build();
+        return Json.createObjectBuilder(document).remove(VcVocab.PROOF.uri()).build();
     }
 }

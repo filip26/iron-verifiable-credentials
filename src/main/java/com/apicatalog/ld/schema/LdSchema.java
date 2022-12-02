@@ -2,12 +2,14 @@ package com.apicatalog.ld.schema;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.schema.adapter.LdFlatMap;
-import com.apicatalog.ld.schema.adapter.LdObjectAdapter;
-import com.apicatalog.ld.schema.adapter.LdValueObjectAdapter;
+import com.apicatalog.ld.schema.adapter.ArrayAdapter;
+import com.apicatalog.ld.schema.adapter.ObjectAdapter;
+import com.apicatalog.ld.schema.adapter.LdValueAdapter;
+import com.apicatalog.ld.schema.adapter.ValueObjectAdapter;
 import com.apicatalog.ld.schema.adapter.LinkAdapter;
 import com.apicatalog.ld.schema.adapter.MultibaseAdapter;
 import com.apicatalog.ld.schema.adapter.StringAdapter;
@@ -27,9 +29,9 @@ public class LdSchema {
 
     protected static final LdTerm XSD_DATETIME = LdTerm.create("dateTime", XSD_VOCAB);
 
-    final LdObjectAdapter schema;
+    final ObjectAdapter schema;
 
-    public LdSchema(LdObjectAdapter schema) {
+    public LdSchema(ObjectAdapter schema) {
         this.schema = schema;
     }
 
@@ -53,20 +55,28 @@ public class LdSchema {
         return new LdSchema(object(properties));
     }
 
-    public static final LdObjectAdapter object(LdProperty<?>... properties) {
-        return LdObjectAdapter.create(properties);
+    public static final ObjectAdapter object(LdProperty<?>... properties) {
+        return ObjectAdapter.create(properties);
     }
 
     public static final <X> LdValueAdapter<JsonValue, X> object(LdValueAdapter<LdObject, X> adapter, LdProperty<?>... properties) {
-        return LdPipe.map(LdObjectAdapter.create(properties), adapter);
+        return LdPipe.create(ObjectAdapter.create(properties)).map(adapter);
     }
 
     public static final LdProperty<URI> id() {
-        return property(LdTerm.ID, LdPipe.map(new StringAdapter(), new UriAdapter()));
+        return property(LdTerm.ID, LdPipe.create(new StringAdapter()).map(new UriAdapter()));
     }
 
-    public static final LdProperty<?> type(LdTerm id) {
-        return property(LdTerm.TYPE, LdPipe.map(new StringAdapter(), new UriAdapter()));
+    public static final LdProperty<URI> type(LdTerm id) {
+        return property(LdTerm.TYPE,  
+                    array(LdPipe.create(new StringAdapter())
+                                .map(new UriAdapter()))
+                                .find(uri -> id.uri().equals(uri.toString()))
+                );
+    }
+
+    public static final LdProperty<Collection<URI>> type() {
+        return property(LdTerm.TYPE, array(LdPipe.create(new StringAdapter()).map(new UriAdapter())));
     }
 
     public static final <X> LdProperty<X> property(LdTerm id, LdValueAdapter<JsonValue, X> adapter) {
@@ -78,15 +88,15 @@ public class LdSchema {
     }
 
     public static final LdValueAdapter<JsonValue, Instant> xsdDateTime() {
-        return LdPipe.map(value(XSD_DATETIME, new StringAdapter()), new XsdDateTimeAdapter());
+        return LdPipe.create(value(XSD_DATETIME, new StringAdapter())).map(new XsdDateTimeAdapter());
     }
 
     public static final <X> LdValueAdapter<JsonValue, X> value(LdTerm type, LdValueAdapter<JsonValue, X> adapter) {
-        return LdPipe.map(new LdValueObjectAdapter(type), adapter);
+        return LdPipe.create(new ValueObjectAdapter(type)).map(adapter);
     }
 
     public static final <X> LdValueAdapter<JsonValue, X> value(LdValueAdapter<JsonValue, X> adapter) {
-        return LdPipe.map(new LdValueObjectAdapter(), adapter);
+        return LdPipe.create(new ValueObjectAdapter()).map(adapter);
     }
 
     public static final LdValueAdapter<JsonValue, String> string() {
@@ -94,7 +104,7 @@ public class LdSchema {
     }
 
     public static final <X> LdValueAdapter<JsonValue, X> string(LdValueAdapter<String, X> adapter) {
-        return LdPipe.map(value(new StringAdapter()), adapter);
+        return LdPipe.create(value(new StringAdapter())).map(adapter);
     }
 
     public static final LdValueAdapter<JsonValue, URI> link() {
@@ -102,18 +112,18 @@ public class LdSchema {
     }
 
     public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm) {
-        return LdPipe.map(value(MULTIBASE_TYPE, (new StringAdapter())), new MultibaseAdapter(algorithm));
+        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm));
     }
 
     public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm, Multicodec.Codec codec) {
-        return LdPipe.map(value(MULTIBASE_TYPE, (new StringAdapter())), new MultibaseAdapter(algorithm, codec));
+        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm, codec));
     }
 
     public static final LdValueAdapter<JsonValue, URI> uri() {
         return string(new UriAdapter());
     }
 
-    public static final <X> LdValueAdapter<JsonValue, X> array(LdValueAdapter<JsonValue, X> adapter) {
-        return LdPipe.map(new LdFlatMap(), adapter);
+    public static final <X> ArrayAdapter<X> array(LdValueAdapter<JsonValue, X> adapter) {
+        return new ArrayAdapter<X>(adapter);
     }
 }

@@ -19,7 +19,7 @@ import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 
-public class DataIntegritySchema {
+public class DataIntegrity {
 
     public static final String SEC_VOCAB = "https://w3id.org/security#";
 
@@ -47,14 +47,15 @@ public class DataIntegritySchema {
 
                 property(PURPOSE, link()).required(),
 
-                verificationMethod(VERIFICATION_METHOD, object(
-                        new DataIntegrityKeysAdapter(),
-                        id().required(),
-                        type(verificationType),
-                        property(CONTROLLER, link()),
-                        property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey))
-
-                )).required(),
+                verificationMethod(VERIFICATION_METHOD, 
+                        object(
+                            new DataIntegrityKeysAdapter(),
+                            id().required(),
+                            type(verificationType),
+                            property(CONTROLLER, link()),
+                            property(MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey))
+                            ) //TODO .map(new DataIntegrityKeysAdapter())
+                        ).required(),
 
                 property(DOMAIN, string())
                         .test((domain, params) -> !params.containsKey("domain")
@@ -62,10 +63,8 @@ public class DataIntegritySchema {
 
                 property(CHALLENGE, string()),
 
-                // FIXME does not belong here but to custom suite
                 proofValue(PROOF_VALUE, multibase(Algorithm.Base58Btc))
                         .test(key -> key.length == proofValueLength)
                         .required());
     }
-
 }

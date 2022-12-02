@@ -5,7 +5,6 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 
 import com.apicatalog.jsonld.StringUtils;
-import com.apicatalog.ld.schema.LdValueAdapter;
 
 public class XsdDateTimeAdapter implements LdValueAdapter<String, Instant> {
 

@@ -11,10 +11,23 @@ import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 
-public class DataIntegrityProofOptions extends DataIntegrityProof implements ProofOptions {
+public class DataIntegrityProofOptions implements ProofOptions {
 
     protected final SignatureSuite suite;
 
+    protected URI type;
+
+    protected URI purpose;
+
+    protected VerificationMethod method;
+
+    protected Instant created;
+
+    /* optional */
+    protected String domain;
+
+    protected String challenge;
+    
     public DataIntegrityProofOptions(final SignatureSuite suite) {
         this.suite = suite;
         this.type = suite.getProofType().id();
@@ -30,12 +43,12 @@ public class DataIntegrityProofOptions extends DataIntegrityProof implements Pro
 
         Map<String, Object> proof = new LinkedHashMap<>();
 
-        proof.put(LdTerm.TYPE.id(), type);
-        proof.put(DataIntegritySchema.CREATED.id(), created);
-        proof.put(DataIntegritySchema.PURPOSE.id(), purpose);
-        proof.put(DataIntegritySchema.VERIFICATION_METHOD.id(), method);
-        proof.put(DataIntegritySchema.DOMAIN.id(), domain);
-        proof.put(DataIntegritySchema.CHALLENGE.id(), challenge);
+        proof.put(LdTerm.TYPE.uri(), type);
+        proof.put(DataIntegrity.CREATED.uri(), created);
+        proof.put(DataIntegrity.PURPOSE.uri(), purpose);
+        proof.put(DataIntegrity.VERIFICATION_METHOD.uri(), method);
+        proof.put(DataIntegrity.DOMAIN.uri(), domain);
+        proof.put(DataIntegrity.CHALLENGE.uri(), challenge);
 
         return new LdObject(proof);
     }

@@ -1,7 +1,6 @@
 package com.apicatalog.ld.schema.adapter;
 
 import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.ld.schema.LdValueAdapter;
 
 import jakarta.json.Json;
 import jakarta.json.JsonString;

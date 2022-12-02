@@ -3,15 +3,15 @@ package com.apicatalog.vc;
 import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.schema.LdSchema;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.schema.LdValueAdapter;
-import com.apicatalog.ld.schema.adapter.LdObjectAdapter;
+import com.apicatalog.ld.schema.adapter.ObjectAdapter;
+import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 
 import jakarta.json.JsonValue;
 
 public class VcSchema extends LdSchema {
 
-    public VcSchema(LdObjectAdapter schema) {
+    public VcSchema(ObjectAdapter schema) {
         super(schema);
     }
 

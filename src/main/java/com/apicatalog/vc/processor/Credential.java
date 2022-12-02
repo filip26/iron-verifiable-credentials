@@ -46,7 +46,7 @@ class Credential implements Verifiable {
         if (document == null) {
             throw new IllegalArgumentException("The 'expanded' parameter must not be null.");
         }
-        return JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.id(), document);
+        return JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document);
     }
 
     public static Credential from(final JsonObject document) throws DocumentError {
@@ -58,7 +58,7 @@ class Credential implements Verifiable {
         final Credential credential = new Credential();
 
         // @type
-        if (!JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.id(), document)) {
+        if (!JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document)) {
 
             if (!JsonLdReader.hasType(document)) {
                 throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
@@ -68,7 +68,7 @@ class Credential implements Verifiable {
         }
 
         // subject - mandatory
-        if (!JsonLdReader.hasPredicate(document, VcVocab.SUBJECT.id())) {
+        if (!JsonLdReader.hasPredicate(document, VcVocab.SUBJECT.uri())) {
             throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
         }
 
@@ -78,32 +78,32 @@ class Credential implements Verifiable {
 
             // subject @id - mandatory
             JsonLdReader
-                    .getId(document, VcVocab.SUBJECT.id())
+                    .getId(document, VcVocab.SUBJECT.uri())
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.SUBJECT));
 
-            if (!JsonLdReader.hasPredicate(document, VcVocab.ISSUER.id())) {
+            if (!JsonLdReader.hasPredicate(document, VcVocab.ISSUER.uri())) {
                 throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
             }
 
             // issuer - mandatory
             credential.issuer = JsonLdReader
-                    .getId(document, VcVocab.ISSUER.id())
+                    .getId(document, VcVocab.ISSUER.uri())
                     .orElseThrow(() -> new DocumentError(ErrorType.Invalid, VcVocab.ISSUER));
 
             // issuance date - mandatory for verification
-            credential.issuance = JsonLdReader.getXsdDateTime(document, VcVocab.ISSUANCE_DATE.id()).orElse(null);
+            credential.issuance = JsonLdReader.getXsdDateTime(document, VcVocab.ISSUANCE_DATE.uri()).orElse(null);
 
             // validFrom - optional
-            credential.validFrom = JsonLdReader.getXsdDateTime(document, VcVocab.VALID_FROM.id()).orElse(null);
+            credential.validFrom = JsonLdReader.getXsdDateTime(document, VcVocab.VALID_FROM.uri()).orElse(null);
 
             // validFrom - optional
-            credential.validUntil = JsonLdReader.getXsdDateTime(document, VcVocab.VALID_UNTIL.id()).orElse(null);
+            credential.validUntil = JsonLdReader.getXsdDateTime(document, VcVocab.VALID_UNTIL.uri()).orElse(null);
 
             // issued - optional
-            credential.issued = JsonLdReader.getXsdDateTime(document, VcVocab.ISSUED.id()).orElse(null);
+            credential.issued = JsonLdReader.getXsdDateTime(document, VcVocab.ISSUED.uri()).orElse(null);
 
             // expiration date - optional
-            credential.expiration = JsonLdReader.getXsdDateTime(document, VcVocab.EXPIRATION_DATE.id()).orElse(null);
+            credential.expiration = JsonLdReader.getXsdDateTime(document, VcVocab.EXPIRATION_DATE.uri()).orElse(null);
 
         } catch (InvalidJsonLdValue e) {
             if (Keywords.ID.equals(e.getProperty())) {
@@ -114,7 +114,7 @@ class Credential implements Verifiable {
 
         // status
         JsonLdReader
-                .getObjects(document, VcVocab.STATUS.id()).stream()
+                .getObjects(document, VcVocab.STATUS.uri()).stream()
                 .findFirst()
                 .ifPresent(s -> credential.status = s);
 

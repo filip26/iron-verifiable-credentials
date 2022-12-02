@@ -6,15 +6,15 @@ import java.util.Collections;
 import java.util.List;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 
-public class LdPipe<A, B> implements LdValueAdapter<A, B> {
+class LdPipe<A, B> implements LdValueAdapter<A, B> {
 
     private final Collection<LdValueAdapter<Object, Object>> adapters;
 
-    @SuppressWarnings("unchecked")
-    public LdPipe(LdValueAdapter<A, B> adapter) {
-        this.adapters = new ArrayList<>(5);
-        this.adapters.add((LdValueAdapter<Object, Object>) adapter);
+    protected LdPipe(LdValueAdapter<Object, Object> adapter) {
+        this.adapters = new ArrayList<>(10);
+        this.adapters.add(adapter);
     }
 
     @Override
@@ -51,12 +51,11 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
         return (LdPipe<A, C>) this;
     }
 
-    public static <A, B, C> LdPipe<A, C> map(LdValueAdapter<A, B> adapter1, LdValueAdapter<B, C> adapter2) {
-
-        if (adapter1 instanceof LdPipe) {
-            return ((LdPipe<A, B>) adapter1).map(adapter2);
+    @SuppressWarnings("unchecked")
+    public static <A, B> LdPipe<A, B> create(LdValueAdapter<A, B> adapter) {
+        if (adapter instanceof LdPipe<A, B>) {
+            return (LdPipe<A, B>)adapter;
         }
-
-        return new LdPipe<A, B>(adapter1).map(adapter2);
+        return new LdPipe<A, B>((LdValueAdapter<Object, Object>) adapter);
     }
 }

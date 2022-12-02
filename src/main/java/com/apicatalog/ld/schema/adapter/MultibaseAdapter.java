@@ -1,6 +1,5 @@
 package com.apicatalog.ld.schema.adapter;
 
-import com.apicatalog.ld.schema.LdValueAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;

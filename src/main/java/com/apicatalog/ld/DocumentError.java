@@ -46,7 +46,7 @@ public class DocumentError extends Throwable {
         return code;
     }
 
-    final static String toCode(ErrorType type, LdTerm... terms) {
+    static final String toCode(ErrorType type, LdTerm... terms) {
 
         final StringBuilder sb = new StringBuilder();
 

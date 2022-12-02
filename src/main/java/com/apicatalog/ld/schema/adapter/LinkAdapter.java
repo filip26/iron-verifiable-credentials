@@ -4,7 +4,6 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.ld.schema.LdValueAdapter;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;

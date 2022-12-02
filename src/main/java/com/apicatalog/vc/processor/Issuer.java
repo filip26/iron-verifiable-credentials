@@ -201,7 +201,7 @@ public final class Issuer extends Processor<Issuer> {
             final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
             object = Json.createObjectBuilder(object)
-                    .add(VcVocab.ISSUANCE_DATE.id(), issuanceDate.toString())
+                    .add(VcVocab.ISSUANCE_DATE.uri(), issuanceDate.toString())
                     .build();
         }
 
@@ -226,7 +226,7 @@ public final class Issuer extends Processor<Issuer> {
 //		      ;
 
         proof = Json.createObjectBuilder(proof)
-                .add(proofValueProperty.term().id(),
+                .add(proofValueProperty.term().uri(),
                         Json.createArrayBuilder().add(proofValue))
                 .build();
 

@@ -5,7 +5,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.ld.signature.proof.ProofType;
-import com.apicatalog.vc.integrity.DataIntegritySchema;
+import com.apicatalog.vc.integrity.DataIntegrity;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
@@ -19,7 +19,7 @@ class TestSignatureSuite extends DataIntegritySuite {
             new TestAlgorithm());
 
     public TestSignatureSuite() {
-        super(TYPE, CRYPTO, DataIntegritySchema.getSchema(
+        super(TYPE, CRYPTO, DataIntegrity.getSchema(
                 LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
                 LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
                 32));

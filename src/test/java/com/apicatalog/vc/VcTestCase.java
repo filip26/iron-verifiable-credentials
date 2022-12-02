@@ -17,12 +17,12 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.schema.LdValueAdapter;
+import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
-import com.apicatalog.vc.integrity.DataIntegritySchema;
+import com.apicatalog.vc.integrity.DataIntegrity;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -108,9 +108,9 @@ public class VcTestCase {
                         new DataIntegrityKeysAdapter(),
                         id(),
                         type(LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#")),
-                        property(DataIntegritySchema.CONTROLLER, link()),
-                        property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
-                        property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey)));
+                        property(DataIntegrity.CONTROLLER, link()),
+                        property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
+                        property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey)));
 
                 try {
                     testCase.verificationMethod = adapter.read(method);

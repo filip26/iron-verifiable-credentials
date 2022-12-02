@@ -3,21 +3,20 @@ package com.apicatalog.ld.schema.adapter;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.schema.LdValueAdapter;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonValue;
 
-public class LdValueObjectAdapter implements LdValueAdapter<JsonValue, JsonValue> {
+public class ValueObjectAdapter implements LdValueAdapter<JsonValue, JsonValue> {
 
     protected final LdTerm type;
 
-    public LdValueObjectAdapter() {
+    public ValueObjectAdapter() {
         this(null);
     }
 
-    public LdValueObjectAdapter(LdTerm type) {
+    public ValueObjectAdapter(LdTerm type) {
         this.type = type;
     }
 
@@ -39,7 +38,7 @@ public class LdValueObjectAdapter implements LdValueAdapter<JsonValue, JsonValue
         final JsonObjectBuilder builder = Json.createObjectBuilder();
 
         if (type != null) {
-            builder.add(Keywords.TYPE, type.id());
+            builder.add(Keywords.TYPE, type.uri());
         }
 
         builder.add(Keywords.VALUE, value);

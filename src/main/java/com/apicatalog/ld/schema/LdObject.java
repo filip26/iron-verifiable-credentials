@@ -14,12 +14,12 @@ public class LdObject {
 
     public boolean contains(LdTerm term) {
 
-        return values.containsKey(term.id);
+        return values.containsKey(term.uri);
     }
 
     @SuppressWarnings("unchecked")
     public <X> X value(LdTerm term) {
-        return (X) values.get(term.id);
+        return (X) values.get(term.uri);
     }
 
     public Set<Entry<String, Object>> entrySet() {

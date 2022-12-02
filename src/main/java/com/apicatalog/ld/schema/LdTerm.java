@@ -1,36 +1,39 @@
 package com.apicatalog.ld.schema;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.lang.Keywords;
 
-public class LdTerm {
+public final class LdTerm implements Serializable {
+
+    private static final long serialVersionUID = -6633084683490148231L;
 
     public static final LdTerm ID = new LdTerm(Keywords.ID);
     public static final LdTerm TYPE = new LdTerm(Keywords.TYPE);
 
     final String name;
     final String vocabulary;
-    final String id;
+    final String uri;
 
     LdTerm(String name) {
         this.name = name;
         this.vocabulary = null;
-        this.id = name;
+        this.uri = name;
     }
 
     LdTerm(String name, String vocabulary) {
         this.name = name;
         this.vocabulary = vocabulary;
-        this.id = vocabulary + name;
+        this.uri = vocabulary + name;
     }
 
     public static final LdTerm create(String name, String vocabulary) {
         return new LdTerm(name, vocabulary);
     }
 
-    public String id() {
-        return id;
+    public String uri() {
+        return uri;
     }
 
     public String name() {
@@ -39,7 +42,7 @@ public class LdTerm {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(uri);
     }
 
     @Override
@@ -51,6 +54,11 @@ public class LdTerm {
         if (getClass() != obj.getClass())
             return false;
         LdTerm other = (LdTerm) obj;
-        return Objects.equals(id, other.id);
+        return Objects.equals(uri, other.uri);
+    }
+
+    @Override
+    public String toString() {
+        return uri;
     }
 }
