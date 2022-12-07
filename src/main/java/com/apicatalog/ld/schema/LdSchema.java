@@ -7,13 +7,13 @@ import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.adapter.ArrayAdapter;
-import com.apicatalog.ld.schema.adapter.ObjectAdapter;
 import com.apicatalog.ld.schema.adapter.LdValueAdapter;
-import com.apicatalog.ld.schema.adapter.ValueObjectAdapter;
 import com.apicatalog.ld.schema.adapter.LinkAdapter;
 import com.apicatalog.ld.schema.adapter.MultibaseAdapter;
+import com.apicatalog.ld.schema.adapter.ObjectAdapter;
 import com.apicatalog.ld.schema.adapter.StringAdapter;
 import com.apicatalog.ld.schema.adapter.UriAdapter;
+import com.apicatalog.ld.schema.adapter.ValueObjectAdapter;
 import com.apicatalog.ld.schema.adapter.XsdDateTimeAdapter;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
@@ -49,6 +49,10 @@ public class LdSchema {
 
     public JsonObject write(LdObject value) throws DocumentError {
         return schema.write(value);
+    }
+    
+    public <X> LdValueAdapter<JsonValue, X> map(LdValueAdapter<LdObject, X> adapter) {
+        return schema.map(adapter);
     }
 
     public static LdSchema create(LdProperty<?>... properties) {

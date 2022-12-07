@@ -27,7 +27,7 @@ public final class SignatureSuiteMapper extends LinkedHashMap<String, SignatureS
             throw new IllegalArgumentException("The 'suite' paramenter must not be null.");
         }
 
-        put(suite.getProofType().id().toString(), suite);
+        put(suite.getId().uri(), suite);
         return this;
     }
 }

@@ -30,6 +30,16 @@
             "expectErrorCode": "MissingProof"
         },
         {
+            "@id": "#t0004",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid proof value encoding",
+            "input": "verifier/0004-in.jsonld",
+            "expectErrorCode": "InvalidProofValue"
+        },        
+        {
             "@id": "#t0005",
             "@type": [
                 "PositiveEvaluationTest",

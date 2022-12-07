@@ -61,7 +61,8 @@ public class ObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
 
             try {
                 values.put(entry.getKey(), property.read(jsonValue));
-            } catch (IllegalArgumentException e) {
+                
+            } catch (IllegalArgumentException | IllegalStateException e) {
                 throw new DocumentError(e, ErrorType.Invalid, property.term());
             }
         }
@@ -101,6 +102,7 @@ public class ObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
         return builder.build();
     }
 
+    @SuppressWarnings("unchecked")
     public static ObjectAdapter create(LdProperty<?>[] properties) {
 
         final Map<String, LdProperty<Object>> terms = new LinkedHashMap<>(properties.length);

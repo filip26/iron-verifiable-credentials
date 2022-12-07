@@ -17,6 +17,7 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
         this.adapters.add(adapter);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public B read(A value) throws DocumentError {
 
@@ -29,6 +30,7 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
         return (B) result;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public A write(B value) throws DocumentError {
 

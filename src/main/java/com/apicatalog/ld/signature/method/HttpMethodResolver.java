@@ -25,7 +25,7 @@ public class HttpMethodResolver implements MethodResolver {
         try {
             final JsonArray document = JsonLd.expand(id)
                     .loader(loader)
-                    .context(suite.getProofType().context()) // an optional expansion context
+                    .context(suite.getContext()) // an optional expansion context
                     .get();
 
             for (final JsonValue method : document) {

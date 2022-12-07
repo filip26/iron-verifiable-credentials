@@ -30,7 +30,7 @@ public class DataIntegrityProofOptions implements ProofOptions {
     
     public DataIntegrityProofOptions(final SignatureSuite suite) {
         this.suite = suite;
-        this.type = suite.getProofType().id();
+        this.type = URI.create(suite.getId().uri());
     }
 
     @Override

@@ -78,7 +78,7 @@ public class LinkedDataSignature {
             return suite.sign(keyPair.privateKey(), documentHashCode);
 
         } catch (LinkedDataSuiteError e) {
-            throw new SigningError(SigningError.Code.LinkedDataSignature, e);
+            throw new SigningError(SigningError.Code.Internal, e);
         }
     }
 

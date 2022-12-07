@@ -1,8 +1,10 @@
 package com.apicatalog.ld.signature;
 
+import java.net.URI;
+
 import com.apicatalog.ld.schema.LdSchema;
+import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.proof.ProofOptions;
-import com.apicatalog.ld.signature.proof.ProofType;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
@@ -10,9 +12,13 @@ import com.apicatalog.ld.signature.proof.ProofType;
  */
 public interface SignatureSuite {
 
-    LdSchema getSchema();
+    // proof type id
+    LdTerm getId();
 
-    ProofType getProofType();
+    // JSON-LD context defining the type
+    URI getContext();
+
+    LdSchema getSchema();
 
     CryptoSuite getCryptoSuite();
 
