@@ -33,12 +33,14 @@ public class ValueObjectAdapter implements LdValueAdapter<JsonValue, JsonValue> 
             return value.asJsonObject().get(Keywords.VALUE);            
         }
 
-        for (final JsonValue valueType : JsonUtils.toCollection( value.asJsonObject().get(Keywords.TYPE))) {
+        JsonValue valueType = value.asJsonObject().get(Keywords.TYPE);
+        
+        if (JsonUtils.isNotString(valueType)) {
+            throw new IllegalArgumentException("The value object @type is not JSON string but [" + value.asJsonObject().get(Keywords.TYPE) + "].");            
+        }
 
-            if (JsonUtils.isString(valueType) 
-                    && type.uri().equalsIgnoreCase(((JsonString)valueType).getString())) {
-                return value.asJsonObject().get(Keywords.VALUE);
-            }
+        if (type.uri().equalsIgnoreCase(((JsonString)valueType).getString())) {
+          return value.asJsonObject().get(Keywords.VALUE);
         }
         
         throw new IllegalArgumentException("The value object @type is not [" + type.uri() +  "] but [" + value.asJsonObject().get(Keywords.TYPE) + "].");
