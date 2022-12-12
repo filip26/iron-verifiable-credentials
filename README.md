@@ -14,8 +14,8 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 * Verifying VC/VP   
 * Issuing VC/VP
-* Cryptosuites
-  * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
+* Signature Suites
+  * [Ed25519Signature2020](https://w3c-ccg.github.io/di-eddsa-2020/#ed25519signature2020)
 * [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
 
 ## Installation
@@ -35,11 +35,11 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 or
 
 ```xml
-<!-- Android (Java 8, Tink) -->
+<!-- Android (Java 8) -->
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials-jre8</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.1</version>
 </dependency>
 ```
 
@@ -62,7 +62,7 @@ Please use together with a cryptosuite(s) of your choice, e.g. [Ed25519Signature
 ```java
 
 try {
-  Vc.verify(credential|presentation, suite)
+  Vc.verify(credential|presentation, suites)
       
     // optional
     .base(...)
@@ -127,7 +127,6 @@ Fork and clone the project repository.
 * [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
 * [Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
 * [Data Integrity 1.0](https://w3c-ccg.github.io/data-integrity-spec/)
-* [Ed25519 Signature 2020](https://w3c-ccg.github.io/lds-ed25519-2020/)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
 * [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
 
