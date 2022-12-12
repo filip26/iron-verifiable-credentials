@@ -14,8 +14,8 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 * Verifying VC/VP   
 * Issuing VC/VP
-* Signature
-  * Ed25519 Signature 2020
+* Cryptosuites
+  * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
 * [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
 
 ## Installation
@@ -27,7 +27,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.1</version>
 </dependency>
 
 ```
@@ -46,7 +46,7 @@ or
 ### Gradle
 
 ```gradle
-compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.7.0'
+compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.8.1'
 ```
 
 ## Documentation
@@ -55,46 +55,50 @@ compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', versi
 
 ## Usage
 
+Please use together with a cryptosuite(s) of your choice, e.g. [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020).
+
 ### Verifying 
 
 ```java
 
 try {
-  Vc.verify(credential|presentation)
-  
-    // optional options
-    .domain(...)
+  Vc.verify(credential|presentation, suite)
+      
+    // optional
     .base(...)
     .loader(documentLoader) 
     .statusVerifier(...)
-    .didResolver(...)  
     .useBundledContexts(true|false)
 
-    // assert valid document
+    // custom | suite specific | parameters
+    .param(..., ....)
+
+    // assert document validity
     .isValid();
     
 } catch (VerificationError | DataError e) {
   ...
 }
+
 ```
 
 ### Issuing
 
 ```java
-signed = Vc.sign(credential|presentation, keys, proofOptions)
 
-           // optional options
-           .base(...)
-           .loader(documentLoader) 
-           .useBundledContexts(true|false)
-           
-           // returns signed document in expanded form
-           .getExpanded(); 
+// proof options
+var options = suite.createOptions()...;
 
-signed = Vc.sign(credential|presentation, keys, proofOptions)
+Vc.sign(credential|presentation, keys, options)
 
-           // returns signed document in compacted form
-           .getCompacted(context);
+   // optional
+   .base(...)
+   .loader(documentLoader) 
+   .statusVerifier(...)
+   .useBundledContexts(true|false)
+
+   // return signed document in a compacted form
+   .getCompacted(context);
 
 ```
 
