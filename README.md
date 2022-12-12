@@ -57,7 +57,7 @@ compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', versi
 
 ## Usage
 
-Please use together with a cryptosuite(s) of your choice, e.g. [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020).
+Please use together with a cryptosuite(s) of your choice, e.g. [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020). Read the suite(s) documentation for specifics.
 
 ### Verifying 
 
