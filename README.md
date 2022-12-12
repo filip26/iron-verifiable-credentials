@@ -15,7 +15,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 * Verifying VC/VP   
 * Issuing VC/VP
 * Signature Suites
-  * [Ed25519Signature2020](https://w3c-ccg.github.io/di-eddsa-2020/#ed25519signature2020)
+  * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
 * [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
 
 ## Installation
