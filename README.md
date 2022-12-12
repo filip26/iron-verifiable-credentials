@@ -1,6 +1,6 @@
 # Iron Verifiable Credentials Processor
 
-An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) in Java.
+An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) model and processing in Java.
 
 [![Java 17 CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml)
 [![Android (Java 8) CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java8-build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java8-build.yml)
