@@ -7,7 +7,7 @@
  * <pre>
  * e.g.
  * {@code
- * Vc.verify(document).isValid();
+ * Vc.verify(document, suite).isValid();
  * }</pre>
  *
  */
