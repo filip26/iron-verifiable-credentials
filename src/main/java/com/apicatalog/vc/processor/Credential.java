@@ -76,10 +76,10 @@ class Credential implements Verifiable {
             // @id - optional
             credential.id = JsonLdReader.getId(document).orElse(null);
 
-            // subject @id - mandatory
-            JsonLdReader
-                    .getId(document, VcVocab.SUBJECT.uri())
-                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.SUBJECT));
+            // subject @id - mandatory 
+//            JsonLdReader
+//                    .getId(document, VcVocab.SUBJECT.uri())
+//                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.SUBJECT));
 
             if (!JsonLdReader.hasPredicate(document, VcVocab.ISSUER.uri())) {
                 throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
