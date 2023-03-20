@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -95,7 +96,7 @@ public class VcTestRunnerJunit {
                         // proof options
                         .verificationMethod(testCase.verificationMethod)
                         .purpose(URI.create("https://w3id.org/security#assertionMethod"))
-                        .created(testCase.created)
+                        .created(testCase.created != null ? Date.from(testCase.created) : null)
                         .domain(testCase.domain);
 
                 final Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), options)

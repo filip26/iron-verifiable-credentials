@@ -1,8 +1,8 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -364,13 +364,13 @@ public final class Verifier extends Processor<Verifier> {
         }
 
         if ((credential.getIssuanceDate() != null
-                && credential.getIssuanceDate().isAfter(Instant.now()))
+                && (credential.getIssuanceDate().getTime() > (new Date()).getTime()))
 
                 || (credential.getIssued() != null
-                        && credential.getIssued().isAfter(Instant.now()))
+                        && credential.getIssued().getTime() > (new Date()).getTime())
 
                 || (credential.getValidFrom() != null
-                        && credential.getValidFrom().isAfter(Instant.now()))) {
+                        && credential.getValidFrom().getTime() > (new Date()).getTime())) {
 
             throw new VerificationError(Code.NotValidYet);
         }

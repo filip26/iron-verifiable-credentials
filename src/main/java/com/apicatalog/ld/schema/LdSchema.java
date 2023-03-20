@@ -1,8 +1,8 @@
 package com.apicatalog.ld.schema;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
@@ -87,7 +87,7 @@ public class LdSchema {
         return new LdProperty<X>(id, adapter, tag);
     }
 
-    public static final LdValueAdapter<JsonValue, Instant> xsdDateTime() {
+    public static final LdValueAdapter<JsonValue, Date> xsdDateTime() {
         return LdPipe.create(value(XSD_DATETIME, new StringAdapter())).map(new XsdDateTimeAdapter());
     }
 

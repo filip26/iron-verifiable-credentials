@@ -1,7 +1,7 @@
 package com.apicatalog.vc.integrity;
 
 import java.net.URI;
-import java.time.Instant;
+import java.util.Date;
 
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.Proof;
@@ -21,7 +21,7 @@ public class DataIntegrityProof implements Proof {
 
     protected VerificationMethod method;
 
-    protected Instant created;
+    protected Date created;
 
     protected byte[] value;
 
@@ -33,7 +33,7 @@ public class DataIntegrityProof implements Proof {
     protected DataIntegrityProof() {
         /* protected */ }
 
-    public DataIntegrityProof(URI type, URI purpose, VerificationMethod method, Instant created, byte[] value) {
+    public DataIntegrityProof(URI type, URI purpose, VerificationMethod method, Date created, byte[] value) {
         this.type = type;
         this.purpose = purpose;
         this.method = method;
@@ -72,7 +72,7 @@ public class DataIntegrityProof implements Proof {
      *
      * @return the date time when the proof has been created
      */
-    public Instant getCreated() {
+    public Date getCreated() {
         return created;
     }
 

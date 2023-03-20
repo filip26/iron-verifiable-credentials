@@ -12,7 +12,7 @@ import static com.apicatalog.vc.VcSchema.proof;
 import static com.apicatalog.vc.VcSchema.proofValue;
 import static com.apicatalog.vc.VcSchema.verificationMethod;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.function.Predicate;
 
 import com.apicatalog.ld.schema.LdProperty;
@@ -74,7 +74,7 @@ public final class DataIntegrity {
                 type(proofType).required(),
 
                 property(CREATED, xsdDateTime())
-                        .test(created -> Instant.now().isAfter(created))
+                        .test(created -> (new Date()).getTime() > created.getTime())
 //                        .defaultValue(Instant.now())
                         .required(),
 

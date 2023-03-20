@@ -1,8 +1,10 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -198,10 +200,14 @@ public final class Issuer extends Processor<Issuer> {
         // add issuance date if missing
         if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
 
-            final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            final Date issuanceDate = new Date(); //Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+            
             object = Json.createObjectBuilder(object)
-                    .add(VcVocab.ISSUANCE_DATE.uri(), issuanceDate.toString())
+                    .add(VcVocab.ISSUANCE_DATE.uri(), formatter.format(issuanceDate))
                     .build();
         }
 

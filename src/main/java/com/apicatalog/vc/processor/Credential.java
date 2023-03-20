@@ -1,7 +1,7 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
-import java.time.Instant;
+import java.util.Date;
 import java.util.Map;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
@@ -27,12 +27,12 @@ class Credential implements Verifiable {
 
     protected URI issuer;
 
-    protected Instant issuance; // issuanceDate
-    protected Instant issued;
-    protected Instant expiration; // expirationDate
+    protected Date issuance; // issuanceDate
+    protected Date issued;
+    protected Date expiration; // expirationDate
 
-    protected Instant validUntil;
-    protected Instant validFrom;
+    protected Date validUntil;
+    protected Date validFrom;
 
     protected JsonValue status;
     protected JsonValue subject;
@@ -77,9 +77,9 @@ class Credential implements Verifiable {
             credential.id = JsonLdReader.getId(document).orElse(null);
 
             // subject @id - mandatory
-            JsonLdReader
-                    .getId(document, VcVocab.SUBJECT.uri())
-                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.SUBJECT));
+//            JsonLdReader
+//                    .getId(document, VcVocab.SUBJECT.uri())
+//                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.SUBJECT));
 
             if (!JsonLdReader.hasPredicate(document, VcVocab.ISSUER.uri())) {
                 throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
@@ -141,7 +141,7 @@ class Credential implements Verifiable {
      *      Date</a>
      * @return the issuance date
      */
-    public Instant getIssuanceDate() {
+    public Date getIssuanceDate() {
         return issuance;
     }
 
@@ -149,7 +149,7 @@ class Credential implements Verifiable {
      * @see <a href="https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>
      * @return the expiration date or <code>null</code> if not set
      */
-    public Instant getExpiration() {
+    public Date getExpiration() {
         return expiration;
     }
 
@@ -163,7 +163,7 @@ class Credential implements Verifiable {
      * 
      * @return a date time
      */
-    public Instant getIssued() {
+    public Date getIssued() {
         return issued;
     }
 
@@ -177,11 +177,11 @@ class Credential implements Verifiable {
      * 
      * @return a date time
      */
-    public Instant getValidFrom() {
+    public Date getValidFrom() {
         return validFrom;
     }
 
-    public Instant getValidUntil() {
+    public Date getValidUntil() {
         return validUntil;
     }
 
@@ -191,8 +191,8 @@ class Credential implements Verifiable {
      * @return <code>true</code> if the credential is expired
      */
     public boolean isExpired() {
-        return (expiration != null && expiration.isBefore(Instant.now()))
-                || (validUntil != null && validUntil.isBefore(Instant.now()));
+        return (expiration != null &&  expiration.getTime() < (new Date()).getTime())
+                || (validUntil != null && validUntil.getTime() < (new Date()).getTime());
     }
 
     /**

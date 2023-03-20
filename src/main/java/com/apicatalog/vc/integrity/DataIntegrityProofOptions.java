@@ -1,7 +1,7 @@
 package com.apicatalog.vc.integrity;
 
 import java.net.URI;
-import java.time.Instant;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -21,7 +21,7 @@ public class DataIntegrityProofOptions implements ProofOptions {
 
     protected VerificationMethod method;
 
-    protected Instant created;
+    protected Date created;
 
     /* optional */
     protected String domain;
@@ -63,7 +63,7 @@ public class DataIntegrityProofOptions implements ProofOptions {
         return this;
     }
 
-    public DataIntegrityProofOptions created(Instant created) {
+    public DataIntegrityProofOptions created(Date created) {
         this.created = created;
         return this;
     }

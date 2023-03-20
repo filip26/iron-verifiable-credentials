@@ -1,34 +1,53 @@
 package com.apicatalog.ld.schema.adapter;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeParseException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import com.apicatalog.jsonld.StringUtils;
 
-public class XsdDateTimeAdapter implements LdValueAdapter<String, Instant> {
+public class XsdDateTimeAdapter implements LdValueAdapter<String, Date> {
 
     @Override
-    public Instant read(String value) {
+    public Date read(String value) {
 
         if (StringUtils.isBlank(value)) {
             throw new IllegalArgumentException("Cannot convert null into an instant.");
         }
 
+        
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+        
         try {
-            OffsetDateTime createdOffset = OffsetDateTime.parse(value);
+            Date date = formatter.parse(value);
 
-            return createdOffset.toInstant();
-
-        } catch (DateTimeParseException e) {
+            return date;
+            
+        } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
+        
+        
+//        try {
+//            OffsetDateTime createdOffset = OffsetDateTime.parse(value);
+//
+//            return createdOffset.toInstant();
+//
+//        } catch (DateTimeParseException e) {
+//            throw new IllegalArgumentException(e);
+//        }
 
     }
 
     @Override
-    public String write(Instant value) {
-        return value.toString();
+    public String write(Date value) {
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return formatter.format(value);            
+
     }
 
 }

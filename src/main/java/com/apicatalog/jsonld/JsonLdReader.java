@@ -1,11 +1,14 @@
 package com.apicatalog.jsonld;
 
 import java.net.URI;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -142,7 +145,7 @@ public class JsonLdReader {
                 + value + "] is not JSON string but [" + value.getValueType() + "].");
     }
 
-    public static Optional<Instant> getXsdDateTime(final JsonValue subject, final String property)
+    public static Optional<Date> getXsdDateTime(final JsonValue subject, final String property)
             throws InvalidJsonLdValue {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), property)) {
@@ -167,13 +170,27 @@ public class JsonLdReader {
                     .orElseThrow(() -> new InvalidJsonLdValue(property, value, "The property ["
                             + property + "] value is not valid XsdDateTime but [" + value + "]."));
 
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+            
             try {
-                return Optional.of(Instant.parse(datetime));
+                Date date = formatter.parse(datetime);
 
-            } catch (DateTimeParseException e) {
+                return Optional.of(date);
+                
+            } catch (ParseException e) {
                 throw new InvalidJsonLdValue(property, value,
                         "The property [" + property + "] is not valid XsdDateTime.", e);
             }
+
+            
+//            try {
+//                return Optional.of(Instant.parse(datetime));
+//
+//            } catch (DateTimeParseException e) {
+//                throw new InvalidJsonLdValue(property, value,
+//                        "The property [" + property + "] is not valid XsdDateTime.", e);
+//            }
         }
         throw new InvalidJsonLdValue(property, value,
                 "The property [" + property + "] @type is not XsdDateTime.");
