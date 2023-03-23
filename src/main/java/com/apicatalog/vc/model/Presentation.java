@@ -1,4 +1,4 @@
-package com.apicatalog.vc.processor;
+package com.apicatalog.vc.model;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -16,13 +16,13 @@ import com.apicatalog.vc.VcVocab;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-class Presentation implements Verifiable {
+public class Presentation implements Verifiable {
 
     protected URI id;
 
     protected URI holder;
 
-    protected Collection<JsonObject> credentials;
+    protected Collection<Credential> credentials;
 
     protected Presentation() {
     }
@@ -75,7 +75,7 @@ class Presentation implements Verifiable {
                 throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS);
             }
 
-            presentation.credentials.add(credential.asJsonObject());
+            presentation.credentials.add(Credential.from(credential.asJsonObject()));
         }
 
         return presentation;
@@ -96,7 +96,7 @@ class Presentation implements Verifiable {
         return id;
     }
 
-    public Collection<JsonObject> getCredentials() {
+    public Collection<Credential> getCredentials() {
         return credentials;
     }
 

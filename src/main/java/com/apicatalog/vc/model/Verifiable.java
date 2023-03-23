@@ -1,8 +1,14 @@
-package com.apicatalog.vc.processor;
+package com.apicatalog.vc.model;
 
 import java.net.URI;
 
-interface Verifiable {
+/**
+ * Represents a common ancestor for verifiable data.
+ *  
+ * @since 0.9.0
+ *
+ */
+public interface Verifiable {
 
     URI getId();
 

@@ -50,13 +50,13 @@ public class JsonLdReader {
                         .anyMatch(type::equals);
     }
 
-    public static Collection<String> getType(final JsonObject value) {
+    public static Collection<String> getType(final JsonObject object) {
 
-        if (value == null) {
+        if (object == null) {
             throw new IllegalArgumentException("The 'object' parameter must not be null.");
         }
 
-        return JsonUtils.toStream(value.get(Keywords.TYPE)).filter(JsonUtils::isString)
+        return JsonUtils.toStream(object.get(Keywords.TYPE)).filter(JsonUtils::isString)
                 .map(JsonString.class::cast).map(JsonString::getString)
                 .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
     }
@@ -104,7 +104,7 @@ public class JsonLdReader {
         return JsonUtils.toCollection(value);
     }
 
-    public static Optional<URI> getId(JsonValue subject, String property)
+    public static Optional<URI> getId(final JsonValue subject, final String property)
             throws InvalidJsonLdValue {
 
         if (JsonUtils.isNotObject(subject) || !hasPredicate(subject.asJsonObject(), property)) {

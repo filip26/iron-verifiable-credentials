@@ -11,6 +11,9 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.model.Credential;
+import com.apicatalog.vc.model.Presentation;
+import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.status.StatusPropertiesValidator;
 import com.apicatalog.vc.status.StatusValidator;
 
@@ -138,11 +141,6 @@ abstract class Processor<T extends Processor<?>> {
         // status check
         if (statusValidator != null && JsonUtils.isNotNull(credential.getStatus())) {
             statusValidator.verify(credential.getStatus());
-        }
-
-        // subject check
-        if (statusValidator != null && JsonUtils.isNotNull(credential.getSubject())) {
-            statusValidator.verify(credential.getSubject());
         }
     }
 }

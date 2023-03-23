@@ -27,13 +27,14 @@ public class StatusPropertiesValidator implements StatusValidator {
 
         final StatusPropertiesValidator status = new StatusPropertiesValidator();
 
-        if (!JsonLdReader.hasType(document)) {
-            throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.TYPE);
-        }
-
         try {
-            status.type = JsonLdReader.getType(document.asJsonObject());
             status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.ID));
+            
+            if (!JsonLdReader.hasType(document)) {
+                throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.TYPE);
+            }
+            
+            status.type = JsonLdReader.getType(document.asJsonObject());
 
         } catch (InvalidJsonLdValue e) {
             throw new DocumentError(ErrorType.Invalid, VcVocab.STATUS, LdTerm.ID);

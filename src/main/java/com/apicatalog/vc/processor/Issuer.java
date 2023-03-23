@@ -21,6 +21,7 @@ import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.VcTag;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.model.Verifiable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -121,6 +122,7 @@ public final class Issuer extends Processor<Issuer> {
 
         final JsonArray context = Json.createArrayBuilder()
                 .add("https://www.w3.org/2018/credentials/v1")
+                //FIXME use provided crypto suite contexts
                 .add("https://w3id.org/security/suites/ed25519-2020/v1").build();
 
         return getCompacted(context);
@@ -231,7 +233,7 @@ public final class Issuer extends Processor<Issuer> {
             if (verifiable.asCredential().isExpired()) {
                 throw new SigningError(Code.Expired);
             }
-            super.validateData(verifiable.asCredential());            
+            super.validateData(verifiable.asCredential());
         }
     }
 }
