@@ -1,8 +1,6 @@
 package com.apicatalog.vc.model;
 
-import java.net.URI;
 import java.time.Instant;
-import java.util.Collection;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdReader;
@@ -10,7 +8,6 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.JsonObject;
@@ -22,16 +19,10 @@ import jakarta.json.JsonValue;
  * @see <a href=
  *      "https://www.w3.org/TR/vc-data-model/#credentials">Credentials</a>
  */
-public class Credential implements Verifiable {
+public class Credential extends Verifiable {
 
     protected final JsonObject expanded;
-    
-    protected URI id;
-    
-    protected Collection<String> type;
-    
-    protected Collection<Proof> proof; 
-
+        
     /** issuanceDate */
     protected Instant issuance; 
     protected Instant issued;
@@ -116,11 +107,6 @@ public class Credential implements Verifiable {
         }
 
         return credential;
-    }
-
-    @Override
-    public URI getId() {
-        return id;
     }
 
     /**
@@ -227,7 +213,7 @@ public class Credential implements Verifiable {
      * 
      * @return the verifiable credentials in an expanded form
      */
-    public JsonObject asExpandedJsonLd() {
+    public JsonObject toJsonLd() {
         return expanded;
     }
 }

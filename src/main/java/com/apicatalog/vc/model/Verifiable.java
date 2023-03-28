@@ -1,6 +1,9 @@
 package com.apicatalog.vc.model;
 
 import java.net.URI;
+import java.util.Collection;
+
+import com.apicatalog.ld.signature.proof.Proof;
 
 /**
  * Represents a common ancestor for verifiable data.
@@ -8,23 +11,46 @@ import java.net.URI;
  * @since 0.9.0
  *
  */
-public interface Verifiable {
+public class Verifiable {
 
-    URI getId();
+    protected URI id;
+    
+    protected Collection<Proof> proofs;
+    protected Collection<String> type;
 
-    default boolean isCredential() {
+    public URI getId() {
+        return id;
+    }
+    
+    public void setId(URI id) {
+        this.id = id;
+    }
+    
+    public Collection<String> getType() {
+        return type;
+    }
+    
+    public Collection<Proof> getProofs() {
+        return proofs;
+    }
+    
+    public void setProofs(Collection<Proof> proofs) {
+        this.proofs = proofs;
+    }
+
+    public boolean isCredential() {
         return false;
     }
 
-    default boolean isPresentation() {
+    public boolean isPresentation() {
         return false;
     }
 
-    default Credential asCredential() {
+    public Credential asCredential() {
         throw new ClassCastException();
     }
 
-    default Presentation asPresentation() {
+    public Presentation asPresentation() {
         throw new ClassCastException();
     }
 }

@@ -14,6 +14,7 @@ import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
 import com.apicatalog.vc.model.Presentation;
 import com.apicatalog.vc.model.Verifiable;
+import com.apicatalog.vc.model.io.PresentationReader;
 import com.apicatalog.vc.status.StatusPropertiesValidator;
 import com.apicatalog.vc.status.StatusValidator;
 
@@ -107,9 +108,9 @@ abstract class Processor<T extends Processor<?>> {
         }
 
         // is a presentation?
-        if (Presentation.isPresentation(expanded)) {
+        if (PresentationReader.isPresentation(expanded)) {
             // validate the presentation object
-            return Presentation.from(expanded);
+            return PresentationReader.read(expanded);
         }
 
         // is not expanded JSON-LD object

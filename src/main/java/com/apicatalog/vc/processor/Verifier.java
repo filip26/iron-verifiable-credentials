@@ -35,6 +35,7 @@ import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.model.Credential;
 import com.apicatalog.vc.model.Verifiable;
+import com.apicatalog.vc.model.io.PresentationReader;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -168,7 +169,7 @@ public final class Verifier extends Processor<Verifier> {
 
         return verifyExpanded(verifiable.asJsonObject());
     }
-
+    
     private Verifiable verifyExpanded(final JsonObject expanded) throws VerificationError, DocumentError {
 
         // get a verifiable representation
@@ -179,27 +180,44 @@ public final class Verifier extends Processor<Verifier> {
             // data integrity and metadata validation
             validate(verifiable.asCredential());
 
-            verifyProofs(expanded);
+            verifiable.setProofs(verifyProofs(expanded));
             
             return verifiable;
 
         } else if (verifiable.isPresentation()) {
 
             // verify presentation proofs
-            verifyProofs(expanded);
+            verifiable.setProofs(verifyProofs(expanded));
             
-            // verify embedded credentials
-            for (final Credential credential : verifiable.asPresentation().getCredentials()) {
+            final Collection<Credential> credentials = new ArrayList<>();
+            
+            for (final JsonValue presentedCredentials : PresentationReader.getCredentials(expanded)) {
+                
+                if (JsonUtils.isNotObject(presentedCredentials)) {
+                    throw new DocumentError(ErrorType.Invalid);
+                }
 
-                if (!credential.isCredential()) {
+                if (!Credential.isCredential(presentedCredentials)) {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
                 }
 
-                // data integrity and metadata validation
-                validate(credential);
-
-                verifyProofs(credential.asExpandedJsonLd());
+                credentials.add(verifyExpanded(presentedCredentials.asJsonObject()).asCredential());
             }
+
+            verifiable.asPresentation().setCredentials(credentials);
+            
+//            // verify embedded credentials
+//            for (final Credential credential : verifiable.asPresentation().getCredentials()) {
+//
+//                if (!credential.isCredential()) {
+//                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
+//                }
+//
+//                // data integrity and metadata validation
+//                validate(credential);
+//
+//                credential.setProofs(verifyProofs(credential.toJsonLd()));
+//            }
             
             return verifiable;
         } 
