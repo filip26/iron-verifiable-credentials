@@ -6,7 +6,6 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.Proof;
-import com.apicatalog.ld.signature.proof.ProofOptions;
 
 import jakarta.json.JsonObject;
 

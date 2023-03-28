@@ -35,6 +35,7 @@ import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.model.Credential;
 import com.apicatalog.vc.model.Verifiable;
+import com.apicatalog.vc.model.io.CredentialReader;
 import com.apicatalog.vc.model.io.PresentationReader;
 
 import jakarta.json.JsonArray;
@@ -197,7 +198,7 @@ public final class Verifier extends Processor<Verifier> {
                     throw new DocumentError(ErrorType.Invalid);
                 }
 
-                if (!Credential.isCredential(presentedCredentials)) {
+                if (!CredentialReader.isCredential(presentedCredentials)) {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
                 }
 

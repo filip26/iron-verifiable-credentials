@@ -12,8 +12,8 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
-import com.apicatalog.vc.model.Presentation;
 import com.apicatalog.vc.model.Verifiable;
+import com.apicatalog.vc.model.io.CredentialReader;
 import com.apicatalog.vc.model.io.PresentationReader;
 import com.apicatalog.vc.status.StatusPropertiesValidator;
 import com.apicatalog.vc.status.StatusValidator;
@@ -102,9 +102,9 @@ abstract class Processor<T extends Processor<?>> {
     protected static Verifiable get(final JsonObject expanded) throws DocumentError {
 
         // is a credential?
-        if (Credential.isCredential(expanded)) {
+        if (CredentialReader.isCredential(expanded)) {
             // validate the credential object
-            return Credential.from(expanded);
+            return CredentialReader.read(expanded);
         }
 
         // is a presentation?

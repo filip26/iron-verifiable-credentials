@@ -30,6 +30,10 @@ public class Verifiable {
         return type;
     }
     
+    public void setType(Collection<String> type) {
+        this.type = type;
+    }
+    
     public Collection<Proof> getProofs() {
         return proofs;
     }

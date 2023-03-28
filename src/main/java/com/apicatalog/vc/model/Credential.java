@@ -2,14 +2,6 @@ package com.apicatalog.vc.model;
 
 import java.time.Instant;
 
-import com.apicatalog.jsonld.InvalidJsonLdValue;
-import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.vc.VcVocab;
-
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
@@ -20,8 +12,6 @@ import jakarta.json.JsonValue;
  *      "https://www.w3.org/TR/vc-data-model/#credentials">Credentials</a>
  */
 public class Credential extends Verifiable {
-
-    protected final JsonObject expanded;
         
     /** issuanceDate */
     protected Instant issuance; 
@@ -31,84 +21,11 @@ public class Credential extends Verifiable {
 
     protected Instant validUntil;
     protected Instant validFrom;
+
+    protected JsonValue subject;
+    protected JsonValue issuer;
+    protected JsonValue status;
     
-    protected Credential(JsonObject expanded) {
-        this.expanded = expanded;
-    }
-
-    public static boolean isCredential(final JsonValue expandedDocument) {
-        if (expandedDocument == null) {
-            throw new IllegalArgumentException("The 'expandedDocument' parameter must not be null.");
-        }
-        return JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), expandedDocument);
-    }
-
-    public static Credential from(final JsonObject expandedDocument) throws DocumentError {
-
-        if (expandedDocument == null) {
-            throw new IllegalArgumentException("The 'expandedDocument' parameter must not be null.");
-        }
-
-        final Credential credential = new Credential(expandedDocument);
-
-        // @type
-        credential.type = JsonLdReader.getType(expandedDocument);
-        
-        if (credential.type == null 
-                || credential.type.isEmpty()
-                || !credential.type.contains(VcVocab.CREDENTIAL_TYPE.uri())
-                ) {
-
-            if (!JsonLdReader.hasType(expandedDocument)) {
-                throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
-            }
-
-            throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
-        }
-
-        // subject - mandatory
-        if (!JsonLdReader.hasPredicate(expandedDocument, VcVocab.SUBJECT.uri())) {
-            throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
-        }
-
-        try {
-            // @id - optional
-            credential.id = JsonLdReader.getId(expandedDocument).orElse(null);
-
-            if (!JsonLdReader.hasPredicate(expandedDocument, VcVocab.ISSUER.uri())) {
-                throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
-            }
-
-            // issuer @id - mandatory
-            JsonLdReader
-                    .getId(expandedDocument, VcVocab.ISSUER.uri())
-                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid, VcVocab.ISSUER));
-            
-            // issuance date - mandatory for verification
-            credential.issuance = JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.ISSUANCE_DATE.uri()).orElse(null);
-
-            // validFrom - optional
-            credential.validFrom = JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.VALID_FROM.uri()).orElse(null);
-
-            // validFrom - optional
-            credential.validUntil = JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.VALID_UNTIL.uri()).orElse(null);
-
-            // issued - optional
-            credential.issued = JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.ISSUED.uri()).orElse(null);
-
-            // expiration date - optional
-            credential.expiration = JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.EXPIRATION_DATE.uri()).orElse(null);
-
-        } catch (InvalidJsonLdValue e) {
-            if (Keywords.ID.equals(e.getProperty())) {
-                throw new DocumentError(ErrorType.Invalid, LdTerm.ID);
-            }
-            throw new DocumentError(ErrorType.Invalid, LdTerm.create(e.getProperty().substring(VcVocab.CREDENTIALS_VOCAB.length()), VcVocab.CREDENTIALS_VOCAB));
-        }
-
-        return credential;
-    }
-
     /**
      *
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
@@ -118,6 +35,10 @@ public class Credential extends Verifiable {
     public Instant getIssuanceDate() {
         return issuance;
     }
+    
+    public void setIssuanceDate(Instant issuance) {
+        this.issuance = issuance;
+    }
 
     /**
      * @see <a href="https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>
@@ -125,6 +46,10 @@ public class Credential extends Verifiable {
      */
     public Instant getExpiration() {
         return expiration;
+    }
+    
+    public void setExpiration(Instant expiration) {
+        this.expiration = expiration;
     }
 
     /**
@@ -140,6 +65,10 @@ public class Credential extends Verifiable {
     public Instant getIssued() {
         return issued;
     }
+    
+    public void setIssued(Instant issued) {
+        this.issued = issued;
+    }
 
     /**
      * A date time from the credential is valid.
@@ -154,11 +83,19 @@ public class Credential extends Verifiable {
     public Instant getValidFrom() {
         return validFrom;
     }
+    
+    public void setValidFrom(Instant validFrom) {
+        this.validFrom = validFrom;
+    }
 
     public Instant getValidUntil() {
         return validUntil;
     }
 
+    public void setValidUntil(Instant validUntil) {
+        this.validUntil = validUntil;
+    }
+    
     /**
      * Checks if the credential is expired.
      *
@@ -175,16 +112,24 @@ public class Credential extends Verifiable {
      * @return {@link JsonObject} representing the issuer in an expanded form
      */
     public JsonValue getIssuer() {
-        return expanded.get(VcVocab.ISSUER.uri());
+        return issuer;
     }
 
+    public void setIssuer(JsonValue issuer) {
+        this.issuer = issuer;
+    }
+    
     /**
      * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>
      * 
      * @return
      */
     public JsonValue getStatus() {
-        return expanded.get(VcVocab.STATUS.uri());
+        return status;
+    }
+    
+    public void setStatus(JsonValue status) {
+        this.status = status;
     }
 
     /**
@@ -195,7 +140,11 @@ public class Credential extends Verifiable {
      * @return
      */
     public JsonValue getSubject() {
-        return expanded.get(VcVocab.SUBJECT.uri());
+        return subject;
+    }
+    
+    public void setSubject(JsonValue subject) {
+        this.subject = subject;
     }
 
     @Override
@@ -206,14 +155,5 @@ public class Credential extends Verifiable {
     @Override
     public Credential asCredential() {
         return this;
-    }
-
-    /**
-     * Returns an expanded JSON-LD representation of the verifiable credentials.
-     * 
-     * @return the verifiable credentials in an expanded form
-     */
-    public JsonObject toJsonLd() {
-        return expanded;
     }
 }

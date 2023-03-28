@@ -9,9 +9,9 @@ import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.ProofOptions;
 
-public class DataIntegrityProofOptions implements ProofOptions {
+@Deprecated
+public class DataIntegrityProofOptions  {
 
     protected final SignatureSuite suite;
 
@@ -33,12 +33,10 @@ public class DataIntegrityProofOptions implements ProofOptions {
         this.type = URI.create(suite.id().uri());
     }
 
-    @Override
     public SignatureSuite getSuite() {
         return suite;
     }
 
-    @Override
     public LdObject toUnsignedProof() {
 
         Map<String, Object> proof = new LinkedHashMap<>();
