@@ -35,7 +35,7 @@ public class DidUrlMethodResolver implements MethodResolver {
                         URI.create(did.type()), // TODO did.type should return URI
                         did.publicKey()))
                 .findFirst()
-                .orElseThrow(() -> new DocumentError(ErrorType.Unknown, suite.getSchema().tagged(VcTag.VerificationMethod.name()).term()));
+                .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "ProofVerificationMethod"));
     }
 
     @Override

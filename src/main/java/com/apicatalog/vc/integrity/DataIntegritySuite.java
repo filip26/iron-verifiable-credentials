@@ -2,10 +2,15 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.LdSchema;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.ld.signature.proof.Proof;
+
+import jakarta.json.JsonObject;
 
 public class DataIntegritySuite implements SignatureSuite {
 
@@ -26,28 +31,31 @@ public class DataIntegritySuite implements SignatureSuite {
         this.schema = schema;
     }
 
+//    @Override
+//    public DataIntegrityProofOptions createOptions() {
+//        return new DataIntegrityProofOptions(this);
+//    }
+  
     @Override
-    public DataIntegrityProofOptions createOptions() {
-        return new DataIntegrityProofOptions(this);
-    }
-
-    @Override
-    public CryptoSuite getCryptoSuite() {
-        return crypto;
-    }
-
-    @Override
-    public LdSchema getSchema() {
-        return schema;
-    }
-    
-    @Override
-    public LdTerm getId() {
+    public LdTerm id() {
         return id;
     }
 
     @Override
-    public URI getContext() {
+    public URI context() {
         return context;
+    }
+
+    @Override
+    public Proof readProof(JsonObject expanded) {
+        // TODO Auto-generated method stub
+        
+        return null;
+    }
+
+    @Override
+    public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

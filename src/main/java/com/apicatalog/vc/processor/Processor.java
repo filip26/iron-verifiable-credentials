@@ -97,6 +97,7 @@ abstract class Processor<T extends Processor<?>> {
         this.subjectValidator = subjectValidator;
         return (T) this;
     }
+
     protected static Verifiable get(final JsonObject expanded) throws DocumentError {
 
         // is a credential?

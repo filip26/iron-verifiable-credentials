@@ -10,6 +10,7 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.JsonObject;
@@ -28,6 +29,8 @@ public class Credential implements Verifiable {
     protected URI id;
     
     protected Collection<String> type;
+    
+    protected Collection<Proof> proof; 
 
     /** issuanceDate */
     protected Instant issuance; 

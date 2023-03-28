@@ -17,20 +17,29 @@ public class DocumentError extends Throwable {
     }
 
     private final ErrorType type;
-    private final LdTerm[] terms;
     private final String code;
+
+    public DocumentError(ErrorType type, String code) {
+        super();
+        this.type = type;
+        this.code = type.name().concat(code);
+    }
+
+    public DocumentError(Throwable e, ErrorType type, String code) {
+        super(e);
+        this.type = type;
+        this.code = type.name().concat(code);
+    }
 
     public DocumentError(ErrorType type, LdTerm... terms) {
         super();
         this.type = type;
-        this.terms = terms;
         this.code = toCode(type, terms);
     }
 
     public DocumentError(Throwable e, ErrorType type, LdTerm... terms) {
         super(e);
         this.type = type;
-        this.terms = terms;
         this.code = toCode(type, terms);
     }
 
@@ -38,9 +47,9 @@ public class DocumentError extends Throwable {
         return type;
     }
 
-    public LdTerm[] getTerms() {
-        return terms;
-    }
+//    public LdTerm[] getTerms() {
+//        return terms;
+//    }
 
     public String getCode() {
         return code;

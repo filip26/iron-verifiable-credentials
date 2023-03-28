@@ -2,9 +2,17 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Map;
 
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.proof.Proof;
+
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
 
 /**
  * Represents data integrity proof.
@@ -19,21 +27,33 @@ public class DataIntegrityProof implements Proof {
 
     protected URI purpose;
 
-    protected VerificationMethod method;
+    /** verificationMethod */
+    protected Collection<VerificationMethod> method;
 
     protected Instant created;
 
     protected byte[] value;
 
     /* optional */
+    protected URI id;   //TODO
+    
     protected String domain;
 
     protected String challenge;
+    
+    /** previousProof */
+    protected URI previous; //TODO
 
     protected DataIntegrityProof() {
         /* protected */ }
 
-    public DataIntegrityProof(URI type, URI purpose, VerificationMethod method, Instant created, byte[] value) {
+    public DataIntegrityProof(
+            URI type, 
+            URI purpose, 
+            Collection<VerificationMethod> method, 
+            Instant created, 
+            byte[] value
+            ) {
         this.type = type;
         this.purpose = purpose;
         this.method = method;
@@ -63,7 +83,7 @@ public class DataIntegrityProof implements Proof {
     }
 
     @Override
-    public VerificationMethod getMethod() {
+    public Collection<VerificationMethod> getMethod() {
         return method;
     }
 
@@ -106,5 +126,45 @@ public class DataIntegrityProof implements Proof {
     @Override
     public byte[] getValue() {
         return value;
+    }
+
+    @Override
+    public void setValue(byte[] value) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public URI id() {
+        return id;
+    }
+
+    @Override
+    public URI previousProof() {
+        return previousProof();
+    }
+
+    @Override
+    public CryptoSuite getCryptoSuite() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public JsonObject toJsonLd() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void validate(Map<String, Object> params) throws DocumentError {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public SignatureSuite getSignatureSuite() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -33,11 +33,10 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegrity;
+import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -91,14 +90,17 @@ public class VcTestRunnerJunit {
 
                 final TestSignatureSuite suite = new TestSignatureSuite();
 
-                final ProofOptions options = suite.createOptions()
+                final TestSignatureProof draft = new TestSignatureProof(
                         // proof options
-                        .verificationMethod(testCase.verificationMethod)
-                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
-                        .created(testCase.created)
-                        .domain(testCase.domain);
+                        testCase.verificationMethod,
+                        URI.create("https://w3id.org/security#assertionMethod"),
+                        testCase.created,
+                        testCase.domain);
 
-                final Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
+                final Issuer issuer = Vc.sign(
+                        testCase.input,
+                        getKeys(keyPairLocation, LOADER),
+                        draft)
                         .loader(LOADER);
 
                 JsonObject signed = null;
@@ -223,14 +225,12 @@ public class VcTestRunnerJunit {
                 continue;
             }
 
-            LdValueAdapter<JsonValue, VerificationMethod> adapter = 
-                    object(
-                        id(),
-                        type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
-                        property(DataIntegrity.CONTROLLER, link()),
-                        property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
-                        property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))
-                    ).map(new DataIntegrityKeysAdapter());
+            LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
+                    id(),
+                    type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
+                    property(DataIntegrity.CONTROLLER, link()),
+                    property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
+                    property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))).map(new DataIntegrityKeysAdapter());
 
             return (KeyPair) adapter.read(key);
 

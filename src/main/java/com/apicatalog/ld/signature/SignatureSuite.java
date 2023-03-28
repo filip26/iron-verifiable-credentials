@@ -2,9 +2,13 @@ package com.apicatalog.ld.signature;
 
 import java.net.URI;
 
-import com.apicatalog.ld.schema.LdSchema;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.ld.signature.proof.ProofOptions;
+
+import jakarta.json.JsonObject;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
@@ -13,14 +17,19 @@ import com.apicatalog.ld.signature.proof.ProofOptions;
 public interface SignatureSuite {
 
     // proof type id
-    LdTerm getId();
+    LdTerm id();
 
     // JSON-LD context defining the type
-    URI getContext();
+    URI context();
 
-    LdSchema getSchema();
-
-    CryptoSuite getCryptoSuite();
-
-    ProofOptions createOptions();
+    /**
+     * Deserializes the given expanded JSON-LD object into a {@link Proof}.
+     *  
+     * @param expanded
+     * @return {@link Proof} instance
+     * @throws DocumentError
+     */
+    Proof readProof(JsonObject expanded) throws DocumentError;
+    
+    VerificationMethod readMethod(JsonObject expanded) throws DocumentError;
 }

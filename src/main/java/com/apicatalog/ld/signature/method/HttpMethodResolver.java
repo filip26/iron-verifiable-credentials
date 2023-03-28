@@ -20,25 +20,25 @@ public class HttpMethodResolver implements MethodResolver {
     @Override
     public VerificationMethod resolve(URI id, DocumentLoader loader, SignatureSuite suite) throws DocumentError {
 
-        final LdProperty<VerificationMethod> property = suite.getSchema().tagged(VcTag.VerificationMethod.name());
+//        final LdProperty<VerificationMethod> property = suite.getSchema().tagged(VcTag.VerificationMethod.name());
 
         try {
             final JsonArray document = JsonLd.expand(id)
                     .loader(loader)
-                    .context(suite.getContext()) // an optional expansion context
+                    .context(suite.context()) // an optional expansion context
                     .get();
 
             for (final JsonValue method : document) {
                 if (JsonUtils.isObject(method)) {
-                    return property.read(method);
+                    return suite.readMethod(method.asJsonObject());
                 }
             }
 
         } catch (JsonLdError e) {
-            throw new DocumentError(e, ErrorType.Invalid, property.term());
+            throw new DocumentError(e, ErrorType.Invalid, "ProofVerificationMethod");
         }
 
-        throw new DocumentError(ErrorType.Unknown, property.term());
+        throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
     }
 
     @Override
