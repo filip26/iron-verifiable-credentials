@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature;
+package com.apicatalog.vc.suite;
 
 import java.util.LinkedHashMap;
 

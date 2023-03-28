@@ -1,11 +1,11 @@
-package com.apicatalog.ld.signature.method;
+package com.apicatalog.vc.method;
 
 import java.net.URI;
 
 import com.apicatalog.did.document.DidDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.SignatureSuite;
+import com.apicatalog.vc.suite.SignatureSuite;
 
 public interface MethodResolver {
 

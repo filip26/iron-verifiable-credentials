@@ -5,7 +5,6 @@ import java.time.Instant;
 
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase.Algorithm;
@@ -13,6 +12,7 @@ import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.vc.integrity.DataIntegrity;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
+import com.apicatalog.vc.method.VerificationMethod;
 
 class TestSignatureProof extends DataIntegrityProof {
 

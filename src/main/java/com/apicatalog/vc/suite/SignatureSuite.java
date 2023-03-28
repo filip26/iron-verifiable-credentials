@@ -1,11 +1,11 @@
-package com.apicatalog.ld.signature;
+package com.apicatalog.vc.suite;
 
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.vc.method.VerificationMethod;
+import com.apicatalog.vc.model.Proof;
 
 import jakarta.json.JsonObject;
 

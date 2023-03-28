@@ -15,10 +15,10 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.proof.EmbeddedProof;
-import com.apicatalog.ld.signature.proof.Proof;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.model.EmbeddedProof;
+import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.Verifiable;
 
 import jakarta.json.Json;

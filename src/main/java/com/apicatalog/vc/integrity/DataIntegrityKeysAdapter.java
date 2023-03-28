@@ -8,7 +8,7 @@ import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.vc.method.VerificationMethod;
 
 public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, VerificationMethod> {
 

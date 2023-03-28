@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.method;
+package com.apicatalog.vc.method;
 
 import java.net.URI;
 

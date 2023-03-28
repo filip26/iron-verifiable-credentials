@@ -18,10 +18,10 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.adapter.LdValueAdapter;
-import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
+import com.apicatalog.vc.method.VerificationMethod;
 import com.apicatalog.vc.integrity.DataIntegrity;
 
 import jakarta.json.JsonObject;

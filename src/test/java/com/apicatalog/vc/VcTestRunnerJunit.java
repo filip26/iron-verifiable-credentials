@@ -32,11 +32,11 @@ import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.vc.integrity.DataIntegrity;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
+import com.apicatalog.vc.method.VerificationMethod;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;

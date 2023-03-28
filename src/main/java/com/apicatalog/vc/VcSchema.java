@@ -4,8 +4,8 @@ import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.schema.LdSchema;
 import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.ld.schema.adapter.ObjectAdapter;
+import com.apicatalog.vc.method.VerificationMethod;
 import com.apicatalog.ld.schema.adapter.LdValueAdapter;
-import com.apicatalog.ld.signature.method.VerificationMethod;
 
 import jakarta.json.JsonValue;
 

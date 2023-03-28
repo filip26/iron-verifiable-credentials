@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.method;
+package com.apicatalog.vc.method;
 
 import java.net.URI;
 
@@ -9,9 +9,9 @@ import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.vc.VcTag;
 import com.apicatalog.vc.integrity.DataIntegrityKeyPair;
+import com.apicatalog.vc.suite.SignatureSuite;
 
 public class DidUrlMethodResolver implements MethodResolver {
 

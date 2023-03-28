@@ -6,16 +6,16 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.LinkedDataSignature;
-import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.ld.signature.SignatureSuiteMapper;
-import com.apicatalog.ld.signature.SignatureSuiteProvider;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.processor.Issuer;
 import com.apicatalog.vc.processor.KeysGenerator;
 import com.apicatalog.vc.processor.Verifier;
+import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vc.suite.SignatureSuiteMapper;
+import com.apicatalog.vc.suite.SignatureSuiteProvider;
 
 import jakarta.json.JsonObject;
 

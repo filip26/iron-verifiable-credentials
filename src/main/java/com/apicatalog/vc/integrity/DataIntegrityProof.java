@@ -7,9 +7,9 @@ import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.vc.method.VerificationMethod;
+import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;

@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.proof.Proof;
+import com.apicatalog.vc.model.Proof;
 
 class ProofQueue {
 

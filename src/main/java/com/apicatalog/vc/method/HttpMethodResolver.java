@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.method;
+package com.apicatalog.vc.method;
 
 import java.net.URI;
 
@@ -9,8 +9,8 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.schema.LdProperty;
-import com.apicatalog.ld.signature.SignatureSuite;
 import com.apicatalog.vc.VcTag;
+import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonValue;

@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.proof;
+package com.apicatalog.vc.model;
 
 import java.net.URI;
 import java.util.Collection;
@@ -6,9 +6,9 @@ import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.ld.signature.method.VerificationMethod;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
+import com.apicatalog.vc.method.VerificationMethod;
+import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
 

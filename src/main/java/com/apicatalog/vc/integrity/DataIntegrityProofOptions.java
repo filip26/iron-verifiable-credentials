@@ -7,8 +7,8 @@ import java.util.Map;
 
 import com.apicatalog.ld.schema.LdObject;
 import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.signature.SignatureSuite;
-import com.apicatalog.ld.signature.method.VerificationMethod;
+import com.apicatalog.vc.method.VerificationMethod;
+import com.apicatalog.vc.suite.SignatureSuite;
 
 @Deprecated
 public class DataIntegrityProofOptions  {
