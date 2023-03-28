@@ -1,6 +1,6 @@
 package com.apicatalog.ld.signature;
 
-import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;

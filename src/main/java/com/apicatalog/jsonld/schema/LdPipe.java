@@ -1,12 +1,12 @@
-package com.apicatalog.ld.schema;
+package com.apicatalog.jsonld.schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 
 public class LdPipe<A, B> implements LdValueAdapter<A, B> {
 

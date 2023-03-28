@@ -2,7 +2,7 @@ package com.apicatalog.ld;
 
 import java.util.Arrays;
 
-import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.LdTerm;
 
 public class DocumentError extends Throwable {
 

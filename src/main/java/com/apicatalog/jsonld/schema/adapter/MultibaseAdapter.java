@@ -1,4 +1,4 @@
-package com.apicatalog.ld.schema.adapter;
+package com.apicatalog.jsonld.schema.adapter;
 
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;

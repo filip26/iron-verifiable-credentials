@@ -1,11 +1,11 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.ld.schema.LdSchema.id;
-import static com.apicatalog.ld.schema.LdSchema.link;
-import static com.apicatalog.ld.schema.LdSchema.multibase;
-import static com.apicatalog.ld.schema.LdSchema.object;
-import static com.apicatalog.ld.schema.LdSchema.property;
-import static com.apicatalog.ld.schema.LdSchema.type;
+import static com.apicatalog.jsonld.schema.LdSchema.id;
+import static com.apicatalog.jsonld.schema.LdSchema.link;
+import static com.apicatalog.jsonld.schema.LdSchema.multibase;
+import static com.apicatalog.jsonld.schema.LdSchema.object;
+import static com.apicatalog.jsonld.schema.LdSchema.property;
+import static com.apicatalog.jsonld.schema.LdSchema.type;
 
 import java.net.URI;
 import java.time.Instant;
@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;

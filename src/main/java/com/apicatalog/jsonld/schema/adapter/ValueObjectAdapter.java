@@ -1,9 +1,9 @@
-package com.apicatalog.ld.schema.adapter;
+package com.apicatalog.jsonld.schema.adapter;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
-import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.LdTerm;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObjectBuilder;

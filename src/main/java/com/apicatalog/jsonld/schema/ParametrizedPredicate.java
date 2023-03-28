@@ -1,4 +1,4 @@
-package com.apicatalog.ld.schema;
+package com.apicatalog.jsonld.schema;
 
 import java.util.Map;
 

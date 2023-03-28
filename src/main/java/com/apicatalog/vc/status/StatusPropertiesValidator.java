@@ -5,9 +5,9 @@ import java.util.Collection;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdReader;
+import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.JsonValue;

@@ -1,13 +1,13 @@
 package com.apicatalog.vc.integrity;
 
-import static com.apicatalog.ld.schema.LdSchema.id;
-import static com.apicatalog.ld.schema.LdSchema.link;
-import static com.apicatalog.ld.schema.LdSchema.multibase;
-import static com.apicatalog.ld.schema.LdSchema.object;
-import static com.apicatalog.ld.schema.LdSchema.property;
-import static com.apicatalog.ld.schema.LdSchema.string;
-import static com.apicatalog.ld.schema.LdSchema.type;
-import static com.apicatalog.ld.schema.LdSchema.xsdDateTime;
+import static com.apicatalog.jsonld.schema.LdSchema.id;
+import static com.apicatalog.jsonld.schema.LdSchema.link;
+import static com.apicatalog.jsonld.schema.LdSchema.multibase;
+import static com.apicatalog.jsonld.schema.LdSchema.object;
+import static com.apicatalog.jsonld.schema.LdSchema.property;
+import static com.apicatalog.jsonld.schema.LdSchema.string;
+import static com.apicatalog.jsonld.schema.LdSchema.type;
+import static com.apicatalog.jsonld.schema.LdSchema.xsdDateTime;
 import static com.apicatalog.vc.VcSchema.proof;
 import static com.apicatalog.vc.VcSchema.proofValue;
 import static com.apicatalog.vc.VcSchema.verificationMethod;
@@ -15,9 +15,9 @@ import static com.apicatalog.vc.VcSchema.verificationMethod;
 import java.time.Instant;
 import java.util.function.Predicate;
 
-import com.apicatalog.ld.schema.LdProperty;
-import com.apicatalog.ld.schema.LdSchema;
-import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.LdProperty;
+import com.apicatalog.jsonld.schema.LdSchema;
+import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 

@@ -3,7 +3,7 @@ package com.apicatalog.vc;
 import java.net.URI;
 import java.time.Instant;
 
-import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;

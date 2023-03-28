@@ -1,11 +1,11 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.ld.schema.LdProperty;
-import com.apicatalog.ld.schema.LdSchema;
-import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.schema.adapter.ObjectAdapter;
 import com.apicatalog.vc.method.VerificationMethod;
-import com.apicatalog.ld.schema.adapter.LdValueAdapter;
+import com.apicatalog.jsonld.schema.LdProperty;
+import com.apicatalog.jsonld.schema.LdSchema;
+import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
+import com.apicatalog.jsonld.schema.adapter.ObjectAdapter;
 
 import jakarta.json.JsonValue;
 

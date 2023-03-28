@@ -4,9 +4,9 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.apicatalog.ld.schema.LdObject;
-import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.schema.adapter.LdValueAdapter;
+import com.apicatalog.jsonld.schema.LdObject;
+import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.vc.method.VerificationMethod;
 

@@ -1,20 +1,20 @@
-package com.apicatalog.ld.schema;
+package com.apicatalog.jsonld.schema;
 
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 
+import com.apicatalog.jsonld.schema.adapter.ArrayAdapter;
+import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
+import com.apicatalog.jsonld.schema.adapter.LinkAdapter;
+import com.apicatalog.jsonld.schema.adapter.MultibaseAdapter;
+import com.apicatalog.jsonld.schema.adapter.ObjectAdapter;
+import com.apicatalog.jsonld.schema.adapter.StringAdapter;
+import com.apicatalog.jsonld.schema.adapter.UriAdapter;
+import com.apicatalog.jsonld.schema.adapter.ValueObjectAdapter;
+import com.apicatalog.jsonld.schema.adapter.XsdDateTimeAdapter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.schema.adapter.ArrayAdapter;
-import com.apicatalog.ld.schema.adapter.LdValueAdapter;
-import com.apicatalog.ld.schema.adapter.LinkAdapter;
-import com.apicatalog.ld.schema.adapter.MultibaseAdapter;
-import com.apicatalog.ld.schema.adapter.ObjectAdapter;
-import com.apicatalog.ld.schema.adapter.StringAdapter;
-import com.apicatalog.ld.schema.adapter.UriAdapter;
-import com.apicatalog.ld.schema.adapter.ValueObjectAdapter;
-import com.apicatalog.ld.schema.adapter.XsdDateTimeAdapter;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
 

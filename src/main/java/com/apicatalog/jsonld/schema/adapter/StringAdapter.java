@@ -1,4 +1,4 @@
-package com.apicatalog.ld.schema.adapter;
+package com.apicatalog.jsonld.schema.adapter;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 

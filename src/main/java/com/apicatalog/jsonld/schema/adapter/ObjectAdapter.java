@@ -1,4 +1,4 @@
-package com.apicatalog.ld.schema.adapter;
+package com.apicatalog.jsonld.schema.adapter;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -6,12 +6,12 @@ import java.util.Map;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
+import com.apicatalog.jsonld.schema.LdObject;
+import com.apicatalog.jsonld.schema.LdPipe;
+import com.apicatalog.jsonld.schema.LdProperty;
+import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.schema.LdObject;
-import com.apicatalog.ld.schema.LdPipe;
-import com.apicatalog.ld.schema.LdProperty;
-import com.apicatalog.ld.schema.LdTerm;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
