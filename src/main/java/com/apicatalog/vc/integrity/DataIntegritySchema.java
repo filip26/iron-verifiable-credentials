@@ -21,7 +21,7 @@ import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 
-public final class DataIntegrity {
+public final class DataIntegritySchema {
 
     public static final String SEC_VOCAB = "https://w3id.org/security#";
 
@@ -38,7 +38,7 @@ public final class DataIntegrity {
     public static final LdTerm MULTIBASE_PUB_KEY = LdTerm.create("publicKeyMultibase", SEC_VOCAB);
     public static final LdTerm MULTIBASE_PRIV_KEY = LdTerm.create("privateKeyMultibase", SEC_VOCAB);
 
-    private DataIntegrity() { /* protected */ }
+    private DataIntegritySchema() { /* protected */ }
 
     public static final LdProperty<byte[]> getPublicKey(Algorithm encoding, Codec codec, Predicate<byte[]> predicate) {
         return property(MULTIBASE_PUB_KEY, multibase(encoding, codec)).test(predicate);
@@ -84,8 +84,8 @@ public final class DataIntegrity {
                         method.map(new DataIntegrityKeysAdapter())).required(),
 
                 property(DOMAIN, string())
-                        .test((domain, params) -> !params.containsKey(DataIntegrity.DOMAIN.name())
-                                || params.get(DataIntegrity.DOMAIN.name()).equals(domain)),
+                        .test((domain, params) -> !params.containsKey(DataIntegritySchema.DOMAIN.name())
+                                || params.get(DataIntegritySchema.DOMAIN.name()).equals(domain)),
 
                 property(CHALLENGE, string()),
 

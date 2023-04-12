@@ -15,6 +15,9 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 * Verifying VC/VP   
 * Issuing VC/VP
 * Signature Suites
+  * DataIntegrityProof
+    * [ECDSA-2019](https://github.com/filip26/iron-ecdsa-cryptosuite-2019)
+    * [EdDSA-2022](https://github.com/filip26/iron-eddsa-cryptosuite-2022)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature provider? List it here, open PR.
 * [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)

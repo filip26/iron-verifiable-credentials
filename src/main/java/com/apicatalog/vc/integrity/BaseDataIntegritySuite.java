@@ -2,7 +2,6 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 
-import com.apicatalog.jsonld.schema.LdObject;
 import com.apicatalog.jsonld.schema.LdSchema;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
@@ -12,14 +11,14 @@ import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
 
-public class DataIntegritySuite implements SignatureSuite {
+public class BaseDataIntegritySuite implements SignatureSuite {
 
     protected final URI id;
     protected final URI context;
     protected final CryptoSuite crypto;
     protected final LdSchema schema;
 
-    protected DataIntegritySuite(
+    protected BaseDataIntegritySuite(
             URI id,
             URI context,
             CryptoSuite crypto,
@@ -42,12 +41,8 @@ public class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public Proof readProof(JsonObject expanded) throws DocumentError {
+    public Proof readProof(JsonObject expanded) {
         // TODO Auto-generated method stub
-        
-        LdObject o = schema.read(expanded);
-        
-        System.out.println(o.entrySet());
         
         return null;
     }

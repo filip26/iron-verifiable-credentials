@@ -8,7 +8,7 @@ import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.vc.integrity.DataIntegrity;
+import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
@@ -24,13 +24,13 @@ class TestSignatureSuite extends DataIntegritySuite {
             new TestAlgorithm());
 
     public TestSignatureSuite() {
-        super(ID, CONTEXT, CRYPTO, DataIntegrity.getProof(
+        super(ID, CONTEXT, CRYPTO, DataIntegritySchema.getProof(
                 LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
                 Algorithm.Base58Btc,
                 key -> key.length == 32,
-                DataIntegrity.getVerificationKey(
+                DataIntegritySchema.getVerificationKey(
                         LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
-                        DataIntegrity.getPublicKey(
+                        DataIntegritySchema.getPublicKey(
                                 Algorithm.Base58Btc,
                                 Codec.Ed25519PublicKey,
                                 (key) -> key == null || key.length > 0

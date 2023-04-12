@@ -7,8 +7,8 @@ import java.util.Map;
 import com.apicatalog.jsonld.schema.LdObject;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.vc.method.VerificationMethod;
 
 public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, VerificationMethod> {
 
@@ -17,10 +17,10 @@ public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, Verifi
 
         URI id = object.value(LdTerm.ID);
         URI type = object.value(LdTerm.TYPE);
-        URI controller = object.value(DataIntegrity.CONTROLLER);
+        URI controller = object.value(DataIntegritySchema.CONTROLLER);
 
-        byte[] publicKey = object.value(DataIntegrity.MULTIBASE_PUB_KEY);
-        byte[] privateKey = object.value(DataIntegrity.MULTIBASE_PRIV_KEY);
+        byte[] publicKey = object.value(DataIntegritySchema.MULTIBASE_PUB_KEY);
+        byte[] privateKey = object.value(DataIntegritySchema.MULTIBASE_PRIV_KEY);
 
         return new DataIntegrityKeyPair(id, type, controller, publicKey, privateKey);
     }
@@ -37,14 +37,14 @@ public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, Verifi
             result.put(LdTerm.TYPE.uri(), method.type());
         }
         if (method.controller() != null) {
-            result.put(DataIntegrity.CONTROLLER.uri(), method.controller());
+            result.put(DataIntegritySchema.CONTROLLER.uri(), method.controller());
         }
 
         if (method instanceof VerificationKey) {
             VerificationKey key = (VerificationKey) method;
 
             if (key.publicKey() != null) {
-                result.put(DataIntegrity.MULTIBASE_PUB_KEY.uri(), key.publicKey());
+                result.put(DataIntegritySchema.MULTIBASE_PUB_KEY.uri(), key.publicKey());
             }
         }
 

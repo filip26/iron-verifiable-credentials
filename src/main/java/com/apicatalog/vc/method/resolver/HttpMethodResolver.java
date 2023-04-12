@@ -1,4 +1,4 @@
-package com.apicatalog.vc.method;
+package com.apicatalog.vc.method.resolver;
 
 import java.net.URI;
 
@@ -9,6 +9,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.schema.LdProperty;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.VcTag;
 import com.apicatalog.vc.suite.SignatureSuite;
 

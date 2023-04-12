@@ -31,12 +31,12 @@ import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.vc.integrity.DataIntegrity;
+import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
-import com.apicatalog.vc.method.VerificationMethod;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -72,7 +72,7 @@ public class VcTestRunnerJunit {
 
                 Vc.verify(testCase.input, new TestSignatureSuite())
                         .loader(LOADER)
-                        .param(DataIntegrity.DOMAIN.name(), testCase.domain)
+                        .param(DataIntegritySchema.DOMAIN.name(), testCase.domain)
                         .isValid();
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
@@ -228,9 +228,9 @@ public class VcTestRunnerJunit {
             LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
                     id(),
                     type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
-                    property(DataIntegrity.CONTROLLER, link()),
-                    property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
-                    property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))).map(new DataIntegrityKeysAdapter());
+                    property(DataIntegritySchema.CONTROLLER, link()),
+                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
+                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))).map(new DataIntegrityKeysAdapter());
 
             return (KeyPair) adapter.read(key);
 

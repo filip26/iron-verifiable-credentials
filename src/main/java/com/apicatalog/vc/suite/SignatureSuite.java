@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.method.VerificationMethod;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.model.Proof;
 
 import jakarta.json.JsonObject;
@@ -16,7 +16,7 @@ import jakarta.json.JsonObject;
 public interface SignatureSuite {
 
     // proof type id
-    LdTerm id();
+    URI id();
 
     // JSON-LD context defining the type
     URI context();

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.apicatalog.jsonld.schema.LdObject;
 import com.apicatalog.jsonld.schema.LdTerm;
-import com.apicatalog.vc.method.VerificationMethod;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 @Deprecated
@@ -30,7 +30,7 @@ public class DataIntegrityProofOptions  {
     
     public DataIntegrityProofOptions(final SignatureSuite suite) {
         this.suite = suite;
-        this.type = URI.create(suite.id().uri());
+        this.type = suite.id();
     }
 
     public SignatureSuite getSuite() {
@@ -42,11 +42,11 @@ public class DataIntegrityProofOptions  {
         Map<String, Object> proof = new LinkedHashMap<>();
 
         proof.put(LdTerm.TYPE.uri(), type);
-        proof.put(DataIntegrity.CREATED.uri(), created);
-        proof.put(DataIntegrity.PURPOSE.uri(), purpose);
-        proof.put(DataIntegrity.VERIFICATION_METHOD.uri(), method);
-        proof.put(DataIntegrity.DOMAIN.uri(), domain);
-        proof.put(DataIntegrity.CHALLENGE.uri(), challenge);
+        proof.put(DataIntegritySchema.CREATED.uri(), created);
+        proof.put(DataIntegritySchema.PURPOSE.uri(), purpose);
+        proof.put(DataIntegritySchema.VERIFICATION_METHOD.uri(), method);
+        proof.put(DataIntegritySchema.DOMAIN.uri(), domain);
+        proof.put(DataIntegritySchema.CHALLENGE.uri(), challenge);
 
         return new LdObject(proof);
     }

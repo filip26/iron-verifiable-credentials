@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 
 public final class SignatureSuiteMapper extends LinkedHashMap<String, SignatureSuite> implements SignatureSuiteProvider {
 
-    private static final long serialVersionUID = -8895021841340234772L;
+    private static final long serialVersionUID = -5966318177536751280L;
 
     @Override
     public boolean isSupported(String suiteType) {
@@ -27,7 +27,7 @@ public final class SignatureSuiteMapper extends LinkedHashMap<String, SignatureS
             throw new IllegalArgumentException("The 'suite' paramenter must not be null.");
         }
 
-        put(suite.id().uri(), suite);
+        put(suite.id().toString(), suite);
         return this;
     }
 }

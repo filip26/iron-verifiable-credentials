@@ -6,8 +6,8 @@ import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
-import com.apicatalog.vc.method.VerificationMethod;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
@@ -24,11 +24,14 @@ public interface Proof {
      * The proof type used.
      *
      * For example, an Ed25519Signature2020 type indicates that the proof includes a
-     * digital signature produced by an ed25519 cryptographic key.
+     * digital signature produced by an ed25519 cryptographic key. DataIntegrityProof 
+     * type indicates generic data integrity proof type.
      *
      * @return the proof type
      */
-    URI getType();
+    default URI getType() {
+        return getSignatureSuite() != null ? getSignatureSuite().id() : null;
+    }
 
     /**
      * A set of parameters required to independently verify the proof, such as an
@@ -48,12 +51,35 @@ public interface Proof {
     byte[] getValue();
         
     void setValue(byte[] value);
-        
+    
+    /**
+     * The proof unique identifier. Optional.
+     * 
+     * @return {@link URI} representing the proof id
+     */
     URI id();
+    
+    /**
+     * Must be processed after the previous proof. Allow to
+     * create a chain of proofs. Optional.
+     * 
+     * @return {@link URI} uniquely identifying the previous proof
+     */
     URI previousProof();
 
+    /**
+     * Returns a {@link CryptoSuite} used to create and to verify
+     * the proof value.
+     * 
+     * @return {@link CryptoSuite} attached to the proof.
+     */
     CryptoSuite getCryptoSuite();
     
+    /**
+     * Returns a signature suite this proof implementation belongs to.
+     * 
+     * @return {@link SignatureSuite} implementing the proof type.
+     */
     SignatureSuite getSignatureSuite();
 
     /**
@@ -64,5 +90,4 @@ public interface Proof {
     JsonObject toJsonLd();
 
     void validate(Map<String, Object> params) throws DocumentError;
-
 }

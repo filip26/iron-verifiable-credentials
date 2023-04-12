@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.vc.method.VerificationMethod;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
@@ -23,7 +23,7 @@ import jakarta.json.JsonObject;
 public class DataIntegrityProof implements Proof {
 
     /* required */
-    protected URI type;
+//    protected final URI type;
 
     protected URI purpose;
 
@@ -44,29 +44,16 @@ public class DataIntegrityProof implements Proof {
     /** previousProof */
     protected URI previous; //TODO
 
-    protected DataIntegrityProof() {
-        /* protected */ }
-
-    public DataIntegrityProof(
-            URI type, 
-            URI purpose, 
-            Collection<VerificationMethod> method, 
-            Instant created, 
-            byte[] value
-            ) {
-        this.type = type;
-        this.purpose = purpose;
-        this.method = method;
-        this.created = created;
-        this.value = value;
-        this.domain = null;
-        this.challenge = null;
-    }
-
-    @Override
-    public URI getType() {
-        return type;
-    }
+//    public DataIntegrityProof(
+//            URI type
+//            ) {
+//        this.type = type;
+//    }
+//
+//    @Override
+//    public URI getType() {
+//        return type;
+//    }
 
     /**
      * The intent for the proof, the reason why an entity created it. Mandatory e.g.
