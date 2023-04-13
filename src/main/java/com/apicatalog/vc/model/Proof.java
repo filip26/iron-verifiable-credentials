@@ -15,8 +15,7 @@ import jakarta.json.JsonObject;
 /**
  * Represents generic VC/VP proof.
  *
- * see {@link DataIntegrityProof}
- *
+ * @see {@link DataIntegrityProof} for an example implementation
  */
 public interface Proof {
 
@@ -83,15 +82,38 @@ public interface Proof {
     SignatureSuite getSignatureSuite();
 
     /**
+     * Validates the proof data, not a signature. 
+     *  
+     * @param params custom, suite specific parameters to validate against
+     * 
+     * @throws DocumentError if the proof is not valid, e.g. is created in the future
+     */
+    void validate(Map<String, Object> params) throws DocumentError;
+
+    /**
      * Returns JSON-LD expanded form of the proof. 
      *  
      * @return the proof in an expanded JSON-LD form
      */
     JsonObject toJsonLd();
 
-    void validate(Map<String, Object> params) throws DocumentError;
-    
+    /**
+     * Removes a proof value from the given expanded JSON-LD object and
+     * returns a new object without a proof value. i.e. an unsigned proof. 
+     * 
+     * @param expanded a proof in an expanded JSON-LD form
+     * @return an unsigned proof
+     */
     JsonObject removeProofValue(JsonObject expanded);
     
+    /**
+     * Sets a proof value to the given expanded JSON-LD object and
+     * returns a new object, i.e. a signed proof. Overrides an existing value.
+     *  
+     * @param expanded
+     * @param proofValue to set
+     * 
+     * @return a signed proof
+     */
     JsonObject setProofValue(JsonObject expanded, byte[] proofValue);
 }

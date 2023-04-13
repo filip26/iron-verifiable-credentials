@@ -3,8 +3,14 @@ package com.apicatalog.vc.model;
 import java.net.URI;
 import java.util.Collection;
 
-import jakarta.json.JsonObject;
-
+/**
+ * Represents a verifiable presentations (VP).
+ *
+ * @see <a href=
+ *      "https://www.w3.org/TR/vc-data-model/#presentations">Presentations</a>
+ *      
+ * @since 0.9.0
+ */
 public class Presentation extends Verifiable {
 
     protected URI holder;
@@ -39,11 +45,5 @@ public class Presentation extends Verifiable {
 
     public void setCredentials(Collection<Credential> credentials) {
         this.credentials = credentials;
-    }
-
-    @Override
-    public JsonObject toJsonLd() {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

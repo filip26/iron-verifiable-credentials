@@ -182,10 +182,6 @@ public final class Issuer extends Processor<Issuer> {
     final JsonObject sign(final JsonArray expanded, final KeyPair keyPair,
             final Proof draft) throws SigningError, DocumentError {
 
-        if (draft.getValue() != null) {
-            throw new IllegalArgumentException("The proof draft is signed already, includes proofValue.");
-        }
-        
         JsonObject object = JsonLdReader
                 .findFirstObject(expanded)
                 .orElseThrow(() -> new DocumentError(ErrorType.Invalid)); // malformed input, not single object to sign has been found
@@ -212,13 +208,17 @@ public final class Issuer extends Processor<Issuer> {
 
         final LinkedDataSignature ldSignature = new LinkedDataSignature(draft.getCryptoSuite());
 
-        JsonObject draftJson = draft.toJsonLd();
-                
-        final byte[] signature = ldSignature.sign(data, keyPair, draft.toJsonLd());
-
-        draftJson = draft.setProofValue(draftJson, signature);
+        JsonObject unsignedDraft = draft.toJsonLd();
         
-        return EmbeddedProof.addProof(object, draftJson);
+        if (draft.getValue() != null) {
+            unsignedDraft = draft.removeProofValue(unsignedDraft);
+        }
+                
+        final byte[] signature = ldSignature.sign(data, keyPair, unsignedDraft);
+
+        final JsonObject signedProof = draft.setProofValue(unsignedDraft, signature);
+        
+        return EmbeddedProof.addProof(object, signedProof);
     }
 
     final void validate(Verifiable verifiable) throws SigningError, DocumentError {

@@ -2,13 +2,7 @@ package com.apicatalog.vc.model;
 
 import java.time.Instant;
 
-import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.vc.VcVocab;
-
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonValue;
 
 /**
@@ -16,6 +10,8 @@ import jakarta.json.JsonValue;
  *
  * @see <a href=
  *      "https://www.w3.org/TR/vc-data-model/#credentials">Credentials</a>
+ *      
+ * @since 0.9.0
  */
 public class Credential extends Verifiable {
         
@@ -161,44 +157,5 @@ public class Credential extends Verifiable {
     @Override
     public Credential asCredential() {
         return this;
-    }
-
-    @Override
-    public JsonObject toJsonLd() {
-
-        final JsonObjectBuilder builder = Json.createObjectBuilder();
-        
-        if (id != null) {
-            builder.add(Keywords.ID, id.toString());
-        }
-        
-        if (type != null && !type.isEmpty()) {
-            builder.add(Keywords.TYPE, Json.createArrayBuilder(type));
-        }
-
-        if (issuer != null) {
-            builder.add(VcVocab.ISSUER.uri(), JsonUtils.toJsonArray(issuer));
-        }
-        
-        if (issuance != null) {
-            builder.add(VcVocab.ISSUANCE_DATE.uri(), Json.createArrayBuilder(
-                    ).add(Json.createValue(issuance.toString())
-                    ));
-        }
-
-        if (subject != null) {
-            builder.add(VcVocab.SUBJECT.uri(), JsonUtils.toJsonArray(subject));
-        }
-        
-        if (status != null) {
-            builder.add(VcVocab.STATUS.uri(), JsonUtils.toJsonArray(status));
-        }
-
-        return builder.build();
-    }
-    
-    @Override
-    public String toString() {
-        return toJsonLd().toString();
     }
 }

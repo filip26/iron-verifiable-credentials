@@ -3,10 +3,6 @@ package com.apicatalog.vc.model;
 import java.net.URI;
 import java.util.Collection;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
-
 /**
  * Represents a common ancestor for verifiable data.
  *  
@@ -59,6 +55,4 @@ public abstract class Verifiable {
     public Presentation asPresentation() {
         throw new ClassCastException();
     }
-    
-    public abstract JsonObject toJsonLd();
 }
