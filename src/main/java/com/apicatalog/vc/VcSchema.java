@@ -9,6 +9,7 @@ import com.apicatalog.ld.signature.VerificationMethod;
 
 import jakarta.json.JsonValue;
 
+@Deprecated
 public class VcSchema extends LdSchema {
 
     public VcSchema(ObjectAdapter schema) {

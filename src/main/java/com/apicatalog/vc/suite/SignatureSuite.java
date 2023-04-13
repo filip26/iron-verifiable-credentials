@@ -8,6 +8,7 @@ import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.model.Proof;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
@@ -29,6 +30,6 @@ public interface SignatureSuite {
      * @throws DocumentError
      */
     Proof readProof(JsonObject expanded) throws DocumentError;
-    
+        
     VerificationMethod readMethod(JsonObject expanded) throws DocumentError;
 }

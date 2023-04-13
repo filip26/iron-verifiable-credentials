@@ -8,6 +8,9 @@ import static com.apicatalog.jsonld.schema.LdSchema.property;
 import static com.apicatalog.jsonld.schema.LdSchema.string;
 import static com.apicatalog.jsonld.schema.LdSchema.type;
 import static com.apicatalog.jsonld.schema.LdSchema.xsdDateTime;
+import static com.apicatalog.vc.VcSchema.proof;
+import static com.apicatalog.vc.VcSchema.proofValue;
+import static com.apicatalog.vc.VcSchema.verificationMethod;
 
 import java.time.Instant;
 import java.util.function.Predicate;
@@ -18,7 +21,7 @@ import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 
-public final class DataIntegritySchema {
+public final class DataIntegritySchema2 {
 
     public static final String SEC_VOCAB = "https://w3id.org/security#";
 
@@ -35,7 +38,7 @@ public final class DataIntegritySchema {
     public static final LdTerm MULTIBASE_PUB_KEY = LdTerm.create("publicKeyMultibase", SEC_VOCAB);
     public static final LdTerm MULTIBASE_PRIV_KEY = LdTerm.create("privateKeyMultibase", SEC_VOCAB);
 
-    private DataIntegritySchema() { /* protected */ }
+    private DataIntegritySchema2() { /* protected */ }
 
     public static final LdProperty<byte[]> getPublicKey(Algorithm encoding, Codec codec, Predicate<byte[]> predicate) {
         return property(MULTIBASE_PUB_KEY, multibase(encoding, codec)).test(predicate);
@@ -66,8 +69,8 @@ public final class DataIntegritySchema {
                         ));
     }
 
-    public static final LdSchema getProof(LdTerm proofType, Algorithm proofValueEncoding, Predicate<byte[]> proofValuePredicate) {
-        return new LdSchema(object(
+    public static final LdSchema getProof(LdTerm proofType, Algorithm proofValueEncoding, Predicate<byte[]> proofValuePredicate, LdSchema method) {
+        return proof(
                 type(proofType).required(),
 
                 property(CREATED, xsdDateTime())
@@ -77,17 +80,17 @@ public final class DataIntegritySchema {
 
                 property(PURPOSE, link()).required(),
 
-                property(VERIFICATION_METHOD, link()).required(),
+                verificationMethod(VERIFICATION_METHOD,
+                        method.map(new DataIntegrityKeysAdapter())).required(),
 
                 property(DOMAIN, string())
-                        .test((domain, params) -> !params.containsKey(DataIntegritySchema.DOMAIN.name())
-                                || params.get(DataIntegritySchema.DOMAIN.name()).equals(domain)),
+                        .test((domain, params) -> !params.containsKey(DataIntegritySchema2.DOMAIN.name())
+                                || params.get(DataIntegritySchema2.DOMAIN.name()).equals(domain)),
 
                 property(CHALLENGE, string()),
 
-                property(PROOF_VALUE, multibase(proofValueEncoding))
+                proofValue(PROOF_VALUE, multibase(proofValueEncoding))
                         .test(proofValuePredicate)
-                        .required())
-                );
+                        .required());
     }
 }

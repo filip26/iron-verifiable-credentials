@@ -20,10 +20,10 @@ import jakarta.json.JsonObject;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof implements Proof {
+public class DataIntegrityProof2 implements Proof {
 
-    protected final SignatureSuite suite;
-    protected final CryptoSuite crypto;
+    protected  SignatureSuite suite;
+    protected  CryptoSuite crypto;
     
     /* required */
 //    protected final URI type;
@@ -57,11 +57,6 @@ public class DataIntegrityProof implements Proof {
 //    public URI getType() {
 //        return type;
 //    }
-    
-    public DataIntegrityProof(SignatureSuite suite, CryptoSuite crypto) {
-        this.suite = suite;
-        this.crypto = crypto;
-    }
 
     /**
      * The intent for the proof, the reason why an entity created it. Mandatory e.g.

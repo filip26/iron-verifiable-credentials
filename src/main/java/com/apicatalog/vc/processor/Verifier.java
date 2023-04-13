@@ -316,8 +316,10 @@ public final class Verifier extends Processor<Verifier> {
             }
             
             // remote a proof value
-            proof.setValue(null);
-            final JsonObject unsignedProof = proof.toJsonLd();
+
+            final JsonObject signedProof = proof.toJsonLd();
+            
+            final JsonObject unsignedProof = proof.removeProofValue(signedProof);
             
             // remote a proof value
 //            final JsonObject unsignedProof = Json.createObjectBuilder(proofObject)

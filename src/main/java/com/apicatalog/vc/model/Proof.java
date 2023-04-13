@@ -50,7 +50,7 @@ public interface Proof {
      */
     byte[] getValue();
         
-    void setValue(byte[] value);
+//    void setValue(byte[] value);
     
     /**
      * The proof unique identifier. Optional.
@@ -90,4 +90,8 @@ public interface Proof {
     JsonObject toJsonLd();
 
     void validate(Map<String, Object> params) throws DocumentError;
+    
+    JsonObject removeProofValue(JsonObject expanded);
+    
+    JsonObject setProofValue(JsonObject expanded, byte[] proofValue);
 }

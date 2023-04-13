@@ -8,12 +8,11 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
-import com.apicatalog.vc.model.Verifiable;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class CredentialReader extends Verifiable {
+public class CredentialReader {
         
     public static boolean isCredential(final JsonValue expandedDocument) {
         if (expandedDocument == null) {

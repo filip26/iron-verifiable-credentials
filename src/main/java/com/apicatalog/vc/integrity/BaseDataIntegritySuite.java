@@ -1,6 +1,7 @@
 package com.apicatalog.vc.integrity;
 
 import java.net.URI;
+import java.util.Map;
 
 import com.apicatalog.jsonld.schema.LdSchema;
 import com.apicatalog.ld.DocumentError;
@@ -11,17 +12,18 @@ import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
 
+@Deprecated
 public class BaseDataIntegritySuite implements SignatureSuite {
 
     protected final URI id;
     protected final URI context;
-    protected final CryptoSuite crypto;
+    protected final Map<String, CryptoSuite> crypto;
     protected final LdSchema schema;
 
     protected BaseDataIntegritySuite(
             URI id,
             URI context,
-            CryptoSuite crypto,
+            Map<String, CryptoSuite> crypto,
             LdSchema schema) {
 
         this.id = id;

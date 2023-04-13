@@ -3,6 +3,8 @@ package com.apicatalog.vc.model;
 import java.net.URI;
 import java.util.Collection;
 
+import jakarta.json.JsonObject;
+
 public class Presentation extends Verifiable {
 
     protected URI holder;
@@ -37,5 +39,11 @@ public class Presentation extends Verifiable {
 
     public void setCredentials(Collection<Credential> credentials) {
         this.credentials = credentials;
+    }
+
+    @Override
+    public JsonObject toJsonLd() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
