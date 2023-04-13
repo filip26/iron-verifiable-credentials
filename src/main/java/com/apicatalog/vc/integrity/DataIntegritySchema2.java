@@ -8,9 +8,6 @@ import static com.apicatalog.jsonld.schema.LdSchema.property;
 import static com.apicatalog.jsonld.schema.LdSchema.string;
 import static com.apicatalog.jsonld.schema.LdSchema.type;
 import static com.apicatalog.jsonld.schema.LdSchema.xsdDateTime;
-import static com.apicatalog.vc.VcSchema.proof;
-import static com.apicatalog.vc.VcSchema.proofValue;
-import static com.apicatalog.vc.VcSchema.verificationMethod;
 
 import java.time.Instant;
 import java.util.function.Predicate;
@@ -70,7 +67,7 @@ public final class DataIntegritySchema2 {
     }
 
     public static final LdSchema getProof(LdTerm proofType, Algorithm proofValueEncoding, Predicate<byte[]> proofValuePredicate, LdSchema method) {
-        return proof(
+        return new LdSchema(object(
                 type(proofType).required(),
 
                 property(CREATED, xsdDateTime())
@@ -79,18 +76,20 @@ public final class DataIntegritySchema2 {
                         .required(),
 
                 property(PURPOSE, link()).required(),
-
-                verificationMethod(VERIFICATION_METHOD,
-                        method.map(new DataIntegrityKeysAdapter())).required(),
+//
+//                verificationMethod(VERIFICATION_METHOD,
+//                        method.map(new DataIntegrityKeysAdapter())).required(),
 
                 property(DOMAIN, string())
                         .test((domain, params) -> !params.containsKey(DataIntegritySchema2.DOMAIN.name())
                                 || params.get(DataIntegritySchema2.DOMAIN.name()).equals(domain)),
 
-                property(CHALLENGE, string()),
-
-                proofValue(PROOF_VALUE, multibase(proofValueEncoding))
-                        .test(proofValuePredicate)
-                        .required());
+                property(CHALLENGE, string())
+//
+//                proofValue(PROOF_VALUE, multibase(proofValueEncoding))
+//                        .test(proofValuePredicate)
+//                        .required()
+                        )
+                );
     }
 }

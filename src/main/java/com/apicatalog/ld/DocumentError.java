@@ -50,6 +50,11 @@ public class DocumentError extends Throwable {
 //    public LdTerm[] getTerms() {
 //        return terms;
 //    }
+    
+    @Override
+    public String toString() {
+        return super.toString() + ": " + getCode();
+    }
 
     public String getCode() {
         return code;

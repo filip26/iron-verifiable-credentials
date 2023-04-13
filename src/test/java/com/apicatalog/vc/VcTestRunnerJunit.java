@@ -91,11 +91,16 @@ public class VcTestRunnerJunit {
                 final TestSignatureSuite suite = new TestSignatureSuite();
 
                 final TestSignatureProof draft = new TestSignatureProof(
-                        // proof options
-                        testCase.verificationMethod,
-                        URI.create("https://w3id.org/security#assertionMethod"),
-                        testCase.created,
-                        testCase.domain);
+                        suite,
+                        null,   //FIXME
+                        null,
+                        null
+//                        // proof options
+//                        testCase.verificationMethod,
+//                        URI.create("https://w3id.org/security#assertionMethod"),
+//                        testCase.created,
+//                        testCase.domain
+                        );
 
                 final Issuer issuer = Vc.sign(
                         testCase.input,

@@ -42,7 +42,10 @@ public class LdProperty<T> {
     }
 
     public LdProperty<T> test(Predicate<T> fnc) {
-        return test((v, p) -> fnc.test(v));
+        if (fnc != null) {
+            return test((v, p) -> fnc.test(v));
+        }
+        return this;
     }
 
     public LdProperty<T> test(ParametrizedPredicate<T> fnc) {

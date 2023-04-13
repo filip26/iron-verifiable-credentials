@@ -21,8 +21,8 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
@@ -349,7 +349,13 @@ public final class Verifier extends Processor<Verifier> {
 
     Optional<VerificationMethod> getMethod(final Proof proof) throws VerificationError, DocumentError {
 
-        for (final VerificationMethod method : proof.getMethod()) {
+        final Collection<VerificationMethod> methods = proof.getMethod();
+        
+        if (methods == null || methods.isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");            
+        }
+        
+        for (final VerificationMethod method : methods) {
 
             if (method == null) {
                 throw new IllegalStateException(); // should never happen

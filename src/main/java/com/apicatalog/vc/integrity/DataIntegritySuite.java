@@ -5,12 +5,9 @@ import java.util.Map;
 
 import com.apicatalog.jsonld.schema.LdObject;
 import com.apicatalog.jsonld.schema.LdSchema;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
@@ -22,9 +19,9 @@ public final class DataIntegritySuite implements SignatureSuite {
     protected static final URI CONTEXT = URI.create("");
     
     protected static final LdSchema SCHEMA = DataIntegritySchema.getProof(
-                DataIntegritySchema.TYPE,
-                Algorithm.Base58Btc,
-                key -> key.length == 32
+                DataIntegritySchema.TYPE
+//                Algorithm.Base58Btc,
+//                key -> key.length == 32
             );
     
     protected final Map<String, CryptoSuite> crypto;

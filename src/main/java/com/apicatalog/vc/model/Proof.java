@@ -48,8 +48,6 @@ public interface Proof {
      * @return the proof value as byte array
      */
     byte[] getValue();
-        
-//    void setValue(byte[] value);
     
     /**
      * The proof unique identifier. Optional.
@@ -114,6 +112,7 @@ public interface Proof {
      * @param proofValue to set
      * 
      * @return a signed proof
+     * @throws DocumentError 
      */
-    JsonObject setProofValue(JsonObject expanded, byte[] proofValue);
+    JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError;
 }

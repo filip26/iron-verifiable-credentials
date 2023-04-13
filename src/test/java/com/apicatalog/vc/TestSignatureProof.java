@@ -1,10 +1,12 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 
+import com.apicatalog.jsonld.schema.LdObject;
+import com.apicatalog.jsonld.schema.LdProperty;
+import com.apicatalog.jsonld.schema.LdSchema;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
@@ -13,33 +15,80 @@ import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
+import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
-import com.apicatalog.vc.integrity.DataIntegrityProof;
-import com.apicatalog.vc.integrity.DataIntegritySuite;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
 class TestSignatureProof implements Proof {
 
-    static final LdTerm ID = LdTerm.create("TestSignatureSuite2022", VcVocab.SECURITY_VOCAB);
+    static final CryptoSuite CRYPTO = new CryptoSuite(
+            "test-signature",
+            new Urdna2015(),
+            new MessageDigest("SHA-256"),
+            new TestAlgorithm());
 
-    static final URI CONTEXT = URI.create("classpath:data-integrity-test-signature-2022.jsonld");
+    static final LdSchema PROOF_SCHEMA = DataIntegritySchema.getProof(
+            LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#")
+//            DataIntegritySchema.getVerificationKey(
+//                    LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
+//                    DataIntegritySchema.getPublicKey(
+//                            Algorithm.Base58Btc,
+//                            Codec.Ed25519PublicKey,
+//                            (key) -> key == null || key.length > 0))
+    );
 
-//    static final CryptoSuite CRYPTO = new CryptoSuite(
-//            ID,
-//            new Urdna2015(),
-//            new MessageDigest("SHA-256"),
-//            new TestAlgorithm());
+    static final LdProperty<byte[]> PROOF_VALUE_PROPERTY = DataIntegritySchema.getProofValue(
+            Algorithm.Base58Btc,
+            key -> key.length == 32);
 
-    public TestSignatureProof(VerificationMethod verificationMethod, 
-            URI purpose, 
-            Instant created, 
-            String domain) {
-        
+    static final LdSchema METHOD_SCHEMA = DataIntegritySchema.getVerificationKey(
+            LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
+            DataIntegritySchema.getPublicKey(
+                    Algorithm.Base58Btc,
+                    Codec.Ed25519PublicKey,
+                    (key) -> key == null || key.length > 0));
+
+    final SignatureSuite suite;
+    final CryptoSuite crypto;
+    final LdObject ldProof;
+    final JsonObject expanded;
+
+    TestSignatureProof(SignatureSuite suite,
+            CryptoSuite crypto,
+            LdObject ldProof,
+            JsonObject expanded
+
+    ) {
+        this.suite = suite;
+        this.crypto = crypto;
+        this.ldProof = ldProof;
+        this.expanded = expanded;
+    }
+
+    public static final TestSignatureProof read(SignatureSuite suite, JsonObject expanded) throws DocumentError {
+
+        LdObject ldProof = PROOF_SCHEMA.read(expanded);
+
+//        METHOD_SCHEMA.read(ldProof.value(DataIntegritySchema.VERIFICATION_METHOD))
+//        .map(new DataIntegrityKeysAdapter());
+
+        TestSignatureProof proof = new TestSignatureProof(suite, CRYPTO, ldProof, expanded);
+
+        return proof;
+    }
+
+//    public TestSignatureProof(VerificationMethod verificationMethod, 
+//            URI purpose, 
+//            Instant created, 
+//            String domain) {
+
 //        super(ID.uri());
-        
+
 //        super(ID, CONTEXT, CRYPTO, DataIntegrity.getProof(
 //                LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
 //                Algorithm.Base58Btc,
@@ -52,7 +101,7 @@ class TestSignatureProof implements Proof {
 //                                (key) -> key == null || key.length > 0
 //                        )
 //                )));
-    }
+//    }
 
     @Override
     public Collection<VerificationMethod> getMethod() {
@@ -62,55 +111,53 @@ class TestSignatureProof implements Proof {
 
     @Override
     public byte[] getValue() {
-        // TODO Auto-generated method stub
-        return null;
+        return ldProof.value(DataIntegritySchema.PROOF_VALUE);
     }
 
     @Override
     public URI id() {
-        // TODO Auto-generated method stub
-        return null;
+        return ldProof.value(LdTerm.ID);
     }
 
     @Override
     public URI previousProof() {
-        // TODO Auto-generated method stub
-        return null;
+        return ldProof.value(DataIntegritySchema.PREVIOUS_PROOF);
     }
 
     @Override
     public CryptoSuite getCryptoSuite() {
-        // TODO Auto-generated method stub
-        return null;
+        return crypto;
     }
 
     @Override
     public SignatureSuite getSignatureSuite() {
-        // TODO Auto-generated method stub
-        return null;
+        return suite;
     }
 
     @Override
     public JsonObject toJsonLd() {
-        // TODO Auto-generated method stub
-        return null;
+        return expanded;
     }
 
     @Override
     public void validate(Map<String, Object> params) throws DocumentError {
-        // TODO Auto-generated method stub
-        
+        PROOF_SCHEMA.validate(ldProof, params);
+        PROOF_VALUE_PROPERTY.validate(getValue(), params);
     }
 
     @Override
     public JsonObject removeProofValue(JsonObject expanded) {
-        // TODO Auto-generated method stub
-        return null;
+        return Json.createObjectBuilder(expanded).remove(DataIntegritySchema.PROOF_VALUE.uri()).build();
     }
 
     @Override
-    public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) {
-        // TODO Auto-generated method stub
-        return null;
+    public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
+        
+        final JsonValue value = PROOF_VALUE_PROPERTY.write(proofValue);
+        
+        return Json.createObjectBuilder(expanded).add(
+                DataIntegritySchema.PROOF_VALUE.uri(),
+                value
+                ).build();
     }
 }

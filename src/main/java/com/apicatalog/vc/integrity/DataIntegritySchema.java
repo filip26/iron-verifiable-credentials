@@ -31,11 +31,14 @@ public final class DataIntegritySchema {
     public static final LdTerm DOMAIN = LdTerm.create("domain", SEC_VOCAB);
     public static final LdTerm CHALLENGE = LdTerm.create("challenge", SEC_VOCAB);
 
+    public static final LdTerm PREVIOUS_PROOF = LdTerm.create("previousProof", SEC_VOCAB);
+
     public static final LdTerm CONTROLLER = LdTerm.create("controller", SEC_VOCAB);
     public static final LdTerm MULTIBASE_PUB_KEY = LdTerm.create("publicKeyMultibase", SEC_VOCAB);
     public static final LdTerm MULTIBASE_PRIV_KEY = LdTerm.create("privateKeyMultibase", SEC_VOCAB);
 
-    private DataIntegritySchema() { /* protected */ }
+    private DataIntegritySchema() {
+        /* protected */ }
 
     public static final LdProperty<byte[]> getPublicKey(Algorithm encoding, Codec codec, Predicate<byte[]> predicate) {
         return property(MULTIBASE_PUB_KEY, multibase(encoding, codec)).test(predicate);
@@ -45,28 +48,30 @@ public final class DataIntegritySchema {
         return property(MULTIBASE_PRIV_KEY, multibase(encoding, codec)).test(predicate);
     }
 
+    public static final LdProperty<byte[]> getProofValue(Algorithm encoding, Predicate<byte[]> predicate) {
+        return property(PROOF_VALUE, multibase(encoding)).test(predicate).required();
+    }
+
     public static final LdSchema getKeyPair(LdTerm verificationType, LdProperty<byte[]> publicKey, LdProperty<byte[]> privateKey) {
         return new LdSchema(
-                    object(
+                object(
                         id().required(),
                         type(verificationType),
                         property(CONTROLLER, link()),
                         publicKey,
-                        privateKey
-                        ));
+                        privateKey));
     }
 
     public static final LdSchema getVerificationKey(LdTerm verificationType, LdProperty<byte[]> publicKey) {
         return new LdSchema(
-                    object(
+                object(
                         id().required(),
                         type(verificationType),
                         property(CONTROLLER, link()),
-                        publicKey
-                        ));
+                        publicKey));
     }
 
-    public static final LdSchema getProof(LdTerm proofType, Algorithm proofValueEncoding, Predicate<byte[]> proofValuePredicate) {
+    public static final LdSchema getProof(LdTerm proofType) {
         return new LdSchema(object(
                 type(proofType).required(),
 
@@ -77,17 +82,13 @@ public final class DataIntegritySchema {
 
                 property(PURPOSE, link()).required(),
 
-                property(VERIFICATION_METHOD, link()).required(),
+//                property(VERIFICATION_METHOD, ).required(),
 
                 property(DOMAIN, string())
                         .test((domain, params) -> !params.containsKey(DataIntegritySchema.DOMAIN.name())
                                 || params.get(DataIntegritySchema.DOMAIN.name()).equals(domain)),
 
-                property(CHALLENGE, string()),
-
-                property(PROOF_VALUE, multibase(proofValueEncoding))
-                        .test(proofValuePredicate)
-                        .required())
-                );
+                property(CHALLENGE, string())
+        ));
     }
 }
