@@ -74,6 +74,8 @@ class TestSignatureProof implements Proof {
 
         LdObject ldProof = PROOF_SCHEMA.read(expanded);
 
+//        JsonValue method = expanded.
+        
 //        METHOD_SCHEMA.read(ldProof.value(DataIntegritySchema.VERIFICATION_METHOD))
 //        .map(new DataIntegrityKeysAdapter());
 

@@ -160,4 +160,10 @@ public class DataIntegrityProof2 implements Proof {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public URI getType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

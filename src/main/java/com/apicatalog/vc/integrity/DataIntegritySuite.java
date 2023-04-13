@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.apicatalog.jsonld.schema.LdObject;
 import com.apicatalog.jsonld.schema.LdSchema;
+import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
@@ -18,8 +19,16 @@ public final class DataIntegritySuite implements SignatureSuite {
     protected static final URI ID = URI.create("");
     protected static final URI CONTEXT = URI.create("");
     
+    public static final String SEC_VOCAB = "https://w3id.org/security#";
+
+    
+    public static final LdTerm TYPE = LdTerm.create("DataIntegrityProof", 
+            
+            SEC_VOCAB);
+
+    
     protected static final LdSchema SCHEMA = DataIntegritySchema.getProof(
-                DataIntegritySchema.TYPE
+                TYPE
 //                Algorithm.Base58Btc,
 //                key -> key.length == 32
             );

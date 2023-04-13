@@ -22,14 +22,14 @@ public final class DataIntegritySchema {
 
     public static final String SEC_VOCAB = "https://w3id.org/security#";
 
-    public static final LdTerm TYPE = LdTerm.create("DataIntegrityProof", SEC_VOCAB);
-
     public static final LdTerm CREATED = LdTerm.create("created", "http://purl.org/dc/terms/");
     public static final LdTerm PURPOSE = LdTerm.create("proofPurpose", SEC_VOCAB);
     public static final LdTerm VERIFICATION_METHOD = LdTerm.create("verificationMethod", SEC_VOCAB);
     public static final LdTerm PROOF_VALUE = LdTerm.create("proofValue", SEC_VOCAB);
     public static final LdTerm DOMAIN = LdTerm.create("domain", SEC_VOCAB);
     public static final LdTerm CHALLENGE = LdTerm.create("challenge", SEC_VOCAB);
+    
+    public static final LdTerm CRYPTO_SUITE = LdTerm.create("cryptosuite", SEC_VOCAB);
 
     public static final LdTerm PREVIOUS_PROOF = LdTerm.create("previousProof", SEC_VOCAB);
 
