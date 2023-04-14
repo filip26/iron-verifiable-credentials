@@ -28,7 +28,9 @@ public final class DataIntegritySuite implements SignatureSuite {
 
     
     protected static final LdSchema SCHEMA = DataIntegritySchema.getProof(
-                TYPE
+                TYPE,
+                null,
+                null
 //                Algorithm.Base58Btc,
 //                key -> key.length == 32
             );

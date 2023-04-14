@@ -9,12 +9,14 @@ import static com.apicatalog.jsonld.schema.LdSchema.string;
 import static com.apicatalog.jsonld.schema.LdSchema.type;
 import static com.apicatalog.jsonld.schema.LdSchema.xsdDateTime;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.function.Predicate;
 
 import com.apicatalog.jsonld.schema.LdProperty;
 import com.apicatalog.jsonld.schema.LdSchema;
 import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 
@@ -49,7 +51,15 @@ public final class DataIntegritySchema {
     }
 
     public static final LdProperty<byte[]> getProofValue(Algorithm encoding, Predicate<byte[]> predicate) {
-        return property(PROOF_VALUE, multibase(encoding)).test(predicate).required();
+        return property(PROOF_VALUE, multibase(encoding)).test(predicate);
+    }
+    
+    public static final LdProperty<URI> getMethod() {
+        return property(PROOF_VALUE, link());
+    }
+
+    public static final LdProperty<VerificationMethod> getEmbeddedMethod(LdSchema method) {
+        return property(VERIFICATION_METHOD, method.map(new DataIntegrityKeysAdapter()));
     }
 
     public static final LdSchema getKeyPair(LdTerm verificationType, LdProperty<byte[]> publicKey, LdProperty<byte[]> privateKey) {
@@ -71,7 +81,7 @@ public final class DataIntegritySchema {
                         publicKey));
     }
 
-    public static final LdSchema getProof(LdTerm proofType) {
+    public static final LdSchema getProof(LdTerm proofType, LdProperty<?> method, LdProperty<byte[]> proofValue) {
         return new LdSchema(object(
                 type(proofType).required(),
 
@@ -88,7 +98,10 @@ public final class DataIntegritySchema {
                         .test((domain, params) -> !params.containsKey(DataIntegritySchema.DOMAIN.name())
                                 || params.get(DataIntegritySchema.DOMAIN.name()).equals(domain)),
 
-                property(CHALLENGE, string())
+                property(CHALLENGE, string()),
+
+                method.required(),
+                proofValue.required()
         ));
     }
 }

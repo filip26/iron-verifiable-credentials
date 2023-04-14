@@ -1,7 +1,6 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.jsonld.schema.LdObject;
@@ -15,7 +14,6 @@ import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -32,8 +30,22 @@ class TestSignatureProof implements Proof {
             new MessageDigest("SHA-256"),
             new TestAlgorithm());
 
+    static final LdSchema METHOD_SCHEMA = DataIntegritySchema.getVerificationKey(
+            LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
+            DataIntegritySchema.getPublicKey(
+                    Algorithm.Base58Btc,
+                    Codec.Ed25519PublicKey,
+                    (key) -> key == null || key.length > 0));
+        
+    static final LdProperty<byte[]> PROOF_VALUE_PROPERTY = DataIntegritySchema.getProofValue(
+            Algorithm.Base58Btc,
+            key -> key.length == 32);
+
     static final LdSchema PROOF_SCHEMA = DataIntegritySchema.getProof(
-            LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#")
+            LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
+            DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA),
+            PROOF_VALUE_PROPERTY
+            
 //            DataIntegritySchema.getVerificationKey(
 //                    LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
 //                    DataIntegritySchema.getPublicKey(
@@ -42,22 +54,11 @@ class TestSignatureProof implements Proof {
 //                            (key) -> key == null || key.length > 0))
     );
 
-    static final LdProperty<byte[]> PROOF_VALUE_PROPERTY = DataIntegritySchema.getProofValue(
-            Algorithm.Base58Btc,
-            key -> key.length == 32);
-
-    static final LdSchema METHOD_SCHEMA = DataIntegritySchema.getVerificationKey(
-            LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
-            DataIntegritySchema.getPublicKey(
-                    Algorithm.Base58Btc,
-                    Codec.Ed25519PublicKey,
-                    (key) -> key == null || key.length > 0));
-
     final SignatureSuite suite;
     final CryptoSuite crypto;
     final LdObject ldProof;
     final JsonObject expanded;
-
+    
     TestSignatureProof(SignatureSuite suite,
             CryptoSuite crypto,
             LdObject ldProof,
@@ -75,12 +76,12 @@ class TestSignatureProof implements Proof {
         LdObject ldProof = PROOF_SCHEMA.read(expanded);
 
 //        JsonValue method = expanded.
-        
+
 //        METHOD_SCHEMA.read(ldProof.value(DataIntegritySchema.VERIFICATION_METHOD))
 //        .map(new DataIntegrityKeysAdapter());
 
         TestSignatureProof proof = new TestSignatureProof(suite, CRYPTO, ldProof, expanded);
-
+        
         return proof;
     }
 
@@ -106,9 +107,8 @@ class TestSignatureProof implements Proof {
 //    }
 
     @Override
-    public Collection<VerificationMethod> getMethod() {
-        // TODO Auto-generated method stub
-        return null;
+    public VerificationMethod getMethod() {
+        return ldProof.value(DataIntegritySchema.VERIFICATION_METHOD);
     }
 
     @Override
@@ -144,7 +144,6 @@ class TestSignatureProof implements Proof {
     @Override
     public void validate(Map<String, Object> params) throws DocumentError {
         PROOF_SCHEMA.validate(ldProof, params);
-        PROOF_VALUE_PROPERTY.validate(getValue(), params);
     }
 
     @Override
@@ -154,12 +153,13 @@ class TestSignatureProof implements Proof {
 
     @Override
     public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
-        
+
         final JsonValue value = PROOF_VALUE_PROPERTY.write(proofValue);
-        
+
         return Json.createObjectBuilder(expanded).add(
                 DataIntegritySchema.PROOF_VALUE.uri(),
-                value
-                ).build();
+                Json.createArrayBuilder().add(
+                        value))
+                .build();
     }
 }

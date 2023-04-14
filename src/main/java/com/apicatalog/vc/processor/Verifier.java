@@ -56,9 +56,9 @@ public final class Verifier extends Processor<Verifier> {
     public Verifier(URI location, final SignatureSuiteProvider suiteProvider) {
         this.location = location;
         this.document = null;
-        
+
         this.suiteProvider = suiteProvider;
-        
+
         this.methodResolvers = defaultResolvers();
         this.params = new LinkedHashMap<>(10);
     }
@@ -66,7 +66,7 @@ public final class Verifier extends Processor<Verifier> {
     public Verifier(JsonObject document, final SignatureSuiteProvider suiteProvider) {
         this.document = document;
         this.location = null;
-        
+
         this.suiteProvider = suiteProvider;
 
         this.methodResolvers = defaultResolvers();
@@ -88,7 +88,7 @@ public final class Verifier extends Processor<Verifier> {
     /**
      * Custom verifier parameters that can be consumed during validation.
      * 
-     * @param name a name of the parameter
+     * @param name  a name of the parameter
      * @param value a value of the parameter
      *
      * @return the verifier instance
@@ -102,7 +102,8 @@ public final class Verifier extends Processor<Verifier> {
      * Verifies VC/VP document. Throws VerificationError if the document is not
      * valid or cannot be verified.
      *
-     * @return {@link Verifiable} object representing the verified credentials or a presentation
+     * @return {@link Verifiable} object representing the verified credentials or a
+     *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
@@ -161,7 +162,7 @@ public final class Verifier extends Processor<Verifier> {
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
             throw new DocumentError(ErrorType.Invalid);
         }
-        
+
         final JsonValue verifiable = expanded.iterator().next();
 
         if (JsonUtils.isNotObject(verifiable)) {
@@ -170,7 +171,7 @@ public final class Verifier extends Processor<Verifier> {
 
         return verifyExpanded(verifiable.asJsonObject());
     }
-    
+
     private Verifiable verifyExpanded(final JsonObject expanded) throws VerificationError, DocumentError {
 
         // get a verifiable representation
@@ -182,18 +183,18 @@ public final class Verifier extends Processor<Verifier> {
             validate(verifiable.asCredential());
 
             verifiable.setProofs(verifyProofs(expanded));
-            
+
             return verifiable;
 
         } else if (verifiable.isPresentation()) {
 
             // verify presentation proofs
             verifiable.setProofs(verifyProofs(expanded));
-            
+
             final Collection<Credential> credentials = new ArrayList<>();
-            
+
             for (final JsonValue presentedCredentials : PresentationReader.getCredentials(expanded)) {
-                
+
                 if (JsonUtils.isNotObject(presentedCredentials)) {
                     throw new DocumentError(ErrorType.Invalid);
                 }
@@ -206,7 +207,7 @@ public final class Verifier extends Processor<Verifier> {
             }
 
             verifiable.asPresentation().setCredentials(credentials);
-            
+
 //            // verify embedded credentials
 //            for (final Credential credential : verifiable.asPresentation().getCredentials()) {
 //
@@ -219,9 +220,9 @@ public final class Verifier extends Processor<Verifier> {
 //
 //                credential.setProofs(verifyProofs(credential.toJsonLd()));
 //            }
-            
+
             return verifiable;
-        } 
+        }
         throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
     }
 
@@ -234,8 +235,8 @@ public final class Verifier extends Processor<Verifier> {
         // a data before issuance - no proof attached
         final JsonObject data = EmbeddedProof.removeProof(expanded);
 
-        final Collection<Proof> proofs = new ArrayList<>(expandedProofs.size()); 
-        
+        final Collection<Proof> proofs = new ArrayList<>(expandedProofs.size());
+
         // read attached proofs
         for (final JsonValue expandedProof : expandedProofs) {
 
@@ -254,30 +255,29 @@ public final class Verifier extends Processor<Verifier> {
             final SignatureSuite signatureSuite = proofType.stream()
                     .filter(suiteProvider::isSupported)
                     .findFirst()
-                    .map(suiteProvider::find)   //TODO ?!?
+                    .map(suiteProvider::find) // TODO ?!?
                     .orElseThrow(() -> new VerificationError(Code.UnsupportedCryptoSuite));
 
             final Proof proof = signatureSuite.readProof(proofObject);
-            
-            if (proof  == null) {
+
+            if (proof == null) {
                 throw new IllegalStateException("The suite [" + signatureSuite.id() + "] returns null as a proof.");
             }
             proofs.add(proof);
         }
-        
+
         // sort the proofs in the verification order
         final ProofQueue queue = ProofQueue.create(proofs);
-        
+
         // verify the proofs' signatures
         Proof proof = queue.pop();
-        
+
         while (proof != null) {
-        
+
             proof.validate(params);
 
             final byte[] proofValue = proof.getValue();
 
-            
 //            if (signatureSuite.getSchema() == null) {
 //                throw new IllegalStateException("The suite [" + signatureSuite.getId() + "] does not provide proof schema.");
 //            }
@@ -291,11 +291,11 @@ public final class Verifier extends Processor<Verifier> {
 //            final LdObject proof = signatureSuite.getSchema().read(proofObject);
 
 //            signatureSuite.getSchema().validate(proof, params);
-                        
+
 //            if (!proof.contains(proofValueProperty.term())) {
 //                throw new DocumentError(ErrorType.Missing, proofValueProperty.term());
 //            }
-            
+
 //            final byte[] proofValue = (byte[]) proof.value(proofValueProperty.term());
 
             if (proofValue == null || proofValue.length == 0) {
@@ -314,24 +314,24 @@ public final class Verifier extends Processor<Verifier> {
             if (!(verificationMethod instanceof VerificationKey)) {
                 throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
             }
-            
+
             // remote a proof value
 
             final JsonObject signedProof = proof.toJsonLd();
-            
+
             final JsonObject unsignedProof = proof.removeProofValue(signedProof);
-            
+
             // remote a proof value
 //            final JsonObject unsignedProof = Json.createObjectBuilder(proofObject)
 //                    .remove(proofValueProperty.term().uri())
 //                    .build();
 
             final CryptoSuite cryptoSuite = proof.getCryptoSuite();
-            
+
             if (cryptoSuite == null) {
                 throw new VerificationError(Code.UnsupportedCryptoSuite);
             }
-            
+
             final LinkedDataSignature signature = new LinkedDataSignature(cryptoSuite);
 
             // verify signature
@@ -340,7 +340,7 @@ public final class Verifier extends Processor<Verifier> {
                     unsignedProof,
                     (VerificationKey) verificationMethod,
                     proofValue);
-            
+
             proof = queue.pop();
         }
         // all good
@@ -349,31 +349,21 @@ public final class Verifier extends Processor<Verifier> {
 
     Optional<VerificationMethod> getMethod(final Proof proof) throws VerificationError, DocumentError {
 
-        final Collection<VerificationMethod> methods = proof.getMethod();
-        
-        if (methods == null || methods.isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");            
-        }
-        
-        for (final VerificationMethod method : methods) {
+        final VerificationMethod method = proof.getMethod();
 
-            if (method == null) {
-                throw new IllegalStateException(); // should never happen
-            }
-
-            final URI methodType = method.type();
-            
-            if (methodType != null 
-                    && method instanceof VerificationKey 
-                    && (((VerificationKey) method).publicKey() != null)
-                    ) {
-                return Optional.of(method);
-            }
-
-            return resolveMethod(method.id(), proof);
+        if (method == null) {
+            throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");
         }
 
-        return Optional.empty();
+        final URI methodType = method.type();
+
+        if (methodType != null
+                && method instanceof VerificationKey
+                && (((VerificationKey) method).publicKey() != null)) {
+            return Optional.of(method);
+        }
+System.out.println(">>> " + method.id());
+        return resolveMethod(method.id(), proof);
     }
 //
 //    Optional<VerificationMethod> resolve(JsonObject method, SignatureSuite suite, LdProperty<VerificationMethod> property) throws DocumentError, VerificationError {
@@ -390,9 +380,8 @@ public final class Verifier extends Processor<Verifier> {
 //    }
 
     Optional<VerificationMethod> resolveMethod(
-            URI id, 
-            Proof proof
-            ) throws DocumentError {
+            URI id,
+            Proof proof) throws DocumentError {
 
         if (id == null) {
             throw new DocumentError(ErrorType.Missing, "ProofVerificationId");
@@ -410,14 +399,13 @@ public final class Verifier extends Processor<Verifier> {
 
         throw new DocumentError(ErrorType.Unknown, "ProofVerificationId");
     }
-    
+
     final void validate(final Credential credential) throws DocumentError, VerificationError {
 
         // validation
         if (credential.isExpired()
                 || (credential.getValidUntil() != null
-                        && credential.getValidUntil().isBefore(Instant.now()))
-                ) {
+                        && credential.getValidUntil().isBefore(Instant.now()))) {
             throw new VerificationError(Code.Expired);
         }
 

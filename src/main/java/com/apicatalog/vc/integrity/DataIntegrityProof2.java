@@ -30,7 +30,7 @@ public class DataIntegrityProof2 implements Proof {
     protected URI purpose;
 
     /** verificationMethod */
-    protected Collection<VerificationMethod> method;
+    protected VerificationMethod method;
 
     protected Instant created;
 
@@ -72,7 +72,7 @@ public class DataIntegrityProof2 implements Proof {
     }
 
     @Override
-    public Collection<VerificationMethod> getMethod() {
+    public VerificationMethod getMethod() {
         return method;
     }
 
@@ -157,12 +157,6 @@ public class DataIntegrityProof2 implements Proof {
 
     @Override
     public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public URI getType() {
         // TODO Auto-generated method stub
         return null;
     }
