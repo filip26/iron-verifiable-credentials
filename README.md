@@ -39,7 +39,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 or
 
 ```xml
-<!-- Android (Java 8) -->
+<!-- Android 12 or higher (API Level >=31) -->
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials-jre8</artifactId>
