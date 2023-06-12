@@ -319,7 +319,7 @@ public final class Verifier extends Processor<Verifier> {
 
             final JsonObject signedProof = proof.toJsonLd();
 
-            final JsonObject unsignedProof = proof.removeProofValue(signedProof);
+            final JsonObject unsignedProof = proof.valueProcessor().removeProofValue(signedProof);
 
             // remote a proof value
 //            final JsonObject unsignedProof = Json.createObjectBuilder(proofObject)

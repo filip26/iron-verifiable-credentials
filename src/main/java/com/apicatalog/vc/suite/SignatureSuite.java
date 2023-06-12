@@ -5,6 +5,7 @@ import java.net.URI;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.model.ProofValueProcessor;
 
 import jakarta.json.JsonObject;
 
@@ -15,11 +16,11 @@ import jakarta.json.JsonObject;
 public interface SignatureSuite {
 
     // proof type id
-    URI id();
+    String id();
 
     // JSON-LD context defining the type
-    URI context();
-
+    String context();
+    
     /**
      * Deserializes the given expanded JSON-LD object into a {@link Proof}.
      *  
@@ -28,6 +29,6 @@ public interface SignatureSuite {
      * @throws DocumentError
      */
     Proof readProof(JsonObject expanded) throws DocumentError;
-        
+    
     VerificationMethod readMethod(JsonObject expanded) throws DocumentError;
 }

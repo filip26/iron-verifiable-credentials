@@ -1,7 +1,6 @@
 package com.apicatalog.vc.model;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
@@ -28,9 +27,7 @@ public interface Proof {
      *
      * @return the proof type
      */
-    default String getType() {
-        return getSignatureSuite() != null ? getSignatureSuite().id().toString() : null;
-    }
+    String getType();
 
     /**
      * A set of parameters required to independently verify the proof, such as an
@@ -94,25 +91,6 @@ public interface Proof {
      * @return the proof in an expanded JSON-LD form
      */
     JsonObject toJsonLd();
-
-    /**
-     * Removes a proof value from the given expanded JSON-LD object and
-     * returns a new object without a proof value. i.e. an unsigned proof. 
-     * 
-     * @param expanded a proof in an expanded JSON-LD form
-     * @return an unsigned proof
-     */
-    JsonObject removeProofValue(JsonObject expanded);
     
-    /**
-     * Sets a proof value to the given expanded JSON-LD object and
-     * returns a new object, i.e. a signed proof. Overrides an existing value.
-     *  
-     * @param expanded
-     * @param proofValue to set
-     * 
-     * @return a signed proof
-     * @throws DocumentError 
-     */
-    JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError;
+    ProofValueProcessor valueProcessor();
 }

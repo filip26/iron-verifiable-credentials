@@ -211,12 +211,12 @@ public final class Issuer extends Processor<Issuer> {
         JsonObject unsignedDraft = draft.toJsonLd();
         
         if (draft.getValue() != null) {
-            unsignedDraft = draft.removeProofValue(unsignedDraft);
+            unsignedDraft = draft.valueProcessor().removeProofValue(unsignedDraft);
         }
                 
         final byte[] signature = ldSignature.sign(data, keyPair, unsignedDraft);
 
-        final JsonObject signedProof = draft.setProofValue(unsignedDraft, signature);
+        final JsonObject signedProof = draft.valueProcessor().setProofValue(unsignedDraft, signature);
         
         return EmbeddedProof.addProof(object, signedProof);
     }

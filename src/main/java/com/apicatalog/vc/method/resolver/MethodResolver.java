@@ -15,7 +15,7 @@ public interface MethodResolver {
      *
      * @param id     an {@link URI} To resolve as a verification method
      * @param loader
-     * @param suite  a suite (a proof type) context
+     * @param suite a signature suite
      * @return The new {@link DidDocument}
      * 
      * @throws DocumentError

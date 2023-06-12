@@ -16,17 +16,12 @@ import jakarta.json.JsonObject;
 
 public final class DataIntegritySuite implements SignatureSuite {
 
-    protected static final URI ID = URI.create("");
-    protected static final URI CONTEXT = URI.create("");
+    protected static final String ID = "https://w3id.org/security#DataIntegrityProof";
     
     public static final String SEC_VOCAB = "https://w3id.org/security#";
-
     
-    public static final LdTerm TYPE = LdTerm.create("DataIntegrityProof", 
-            
-            SEC_VOCAB);
+    public static final LdTerm TYPE = LdTerm.create("DataIntegrityProof", SEC_VOCAB);
 
-    
     protected static final LdSchema SCHEMA = DataIntegritySchema.getProof(
                 TYPE,
                 null,
@@ -47,23 +42,25 @@ public final class DataIntegritySuite implements SignatureSuite {
     }
   
     @Override
-    public URI id() {
+    public String id() {
         return ID;
     }
 
     @Override
-    public URI context() {
-        return CONTEXT;
+    public String context() {
+        return SEC_VOCAB;
     }
 
     @Override
     public Proof readProof(JsonObject expanded) throws DocumentError {
         // TODO Auto-generated method stub
         
-        LdObject o = SCHEMA.read(expanded);
+        LdObject ldProof = SCHEMA.read(expanded);
+                
         
-        System.out.println(o.entrySet());
         
+//        return new DataIntegrityProof(this, CRYPTO, ldProof, expanded);
+        //FIXME
         return null;
     }
 
@@ -72,4 +69,5 @@ public final class DataIntegritySuite implements SignatureSuite {
         // TODO Auto-generated method stub
         return null;
     }
+
 }

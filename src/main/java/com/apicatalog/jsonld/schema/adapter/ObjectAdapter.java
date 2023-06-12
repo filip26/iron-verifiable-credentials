@@ -87,7 +87,7 @@ public class ObjectAdapter implements LdValueAdapter<JsonValue, LdObject> {
                 continue;
             }
 
-            LdProperty<Object> property = (LdProperty<Object>) terms.get(entry.getKey());
+            final LdProperty<Object> property = terms.get(entry.getKey());
 
             JsonValue value = property.write(entry.getValue());
 
