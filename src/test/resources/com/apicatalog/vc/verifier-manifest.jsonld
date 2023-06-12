@@ -115,7 +115,7 @@
             ],
             "name": "invalid verificationMethod property",
             "input": "verifier/0012-in.jsonld",
-            "expectErrorCode": "InvalidVerificationMethod"
+            "expectErrorCode": "MissingProofVerificationId"
         },
         {
             "@id": "#t0013",

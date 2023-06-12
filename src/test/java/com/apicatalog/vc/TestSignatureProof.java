@@ -48,15 +48,6 @@ class TestSignatureProof implements Proof {
             PROOF_VALUE_PROPERTY            
     );
 
-//    static final LdSchema METHOD_SCHEMA = 
-//  DataIntegritySchema.getVerificationKey(
-//  LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
-//  DataIntegritySchema.getPublicKey(
-//          Algorithm.Base58Btc,
-//          Codec.Ed25519PublicKey,
-//          (key) -> key == null || key.length > 0))
-//);
-
     final SignatureSuite suite;
     final CryptoSuite crypto;
     final LdObject ldProof;
@@ -78,27 +69,13 @@ class TestSignatureProof implements Proof {
 
         LdObject ldProof = PROOF_SCHEMA.read(expanded);
 
-//        JsonValue method = expanded.
-
-//        METHOD_SCHEMA.read(ldProof.value(DataIntegritySchema.VERIFICATION_METHOD))
-//        .map(new DataIntegrityKeysAdapter());
-
         TestSignatureProof proof = new TestSignatureProof(suite, CRYPTO, ldProof, expanded);
         
         return proof;
     }
 
     public static final VerificationMethod readMethod(SignatureSuite suite, JsonObject expanded) throws DocumentError {
-
-        return METHOD_SCHEMA
-                .map(new DataIntegrityKeysAdapter())
-                .read(expanded)
-             ;
-
-//        JsonValue method = expanded.
-
-//        METHOD_SCHEMA.read(ldProof.value(DataIntegritySchema.VERIFICATION_METHOD))
-//        .map(new DataIntegrityKeysAdapter());
+        return DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA).read(expanded);        
     }
 
 //    public TestSignatureProof(VerificationMethod verificationMethod, 
