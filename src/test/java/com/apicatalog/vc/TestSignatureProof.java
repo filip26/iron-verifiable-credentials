@@ -14,6 +14,7 @@ import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
+import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -44,15 +45,17 @@ class TestSignatureProof implements Proof {
     static final LdSchema PROOF_SCHEMA = DataIntegritySchema.getProof(
             LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
             DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA),
-            PROOF_VALUE_PROPERTY
-            
-//            DataIntegritySchema.getVerificationKey(
-//                    LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
-//                    DataIntegritySchema.getPublicKey(
-//                            Algorithm.Base58Btc,
-//                            Codec.Ed25519PublicKey,
-//                            (key) -> key == null || key.length > 0))
+            PROOF_VALUE_PROPERTY            
     );
+
+//    static final LdSchema METHOD_SCHEMA = 
+//  DataIntegritySchema.getVerificationKey(
+//  LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
+//  DataIntegritySchema.getPublicKey(
+//          Algorithm.Base58Btc,
+//          Codec.Ed25519PublicKey,
+//          (key) -> key == null || key.length > 0))
+//);
 
     final SignatureSuite suite;
     final CryptoSuite crypto;
@@ -83,6 +86,19 @@ class TestSignatureProof implements Proof {
         TestSignatureProof proof = new TestSignatureProof(suite, CRYPTO, ldProof, expanded);
         
         return proof;
+    }
+
+    public static final VerificationMethod readMethod(SignatureSuite suite, JsonObject expanded) throws DocumentError {
+
+        return METHOD_SCHEMA
+                .map(new DataIntegrityKeysAdapter())
+                .read(expanded)
+             ;
+
+//        JsonValue method = expanded.
+
+//        METHOD_SCHEMA.read(ldProof.value(DataIntegritySchema.VERIFICATION_METHOD))
+//        .map(new DataIntegrityKeysAdapter());
     }
 
 //    public TestSignatureProof(VerificationMethod verificationMethod, 

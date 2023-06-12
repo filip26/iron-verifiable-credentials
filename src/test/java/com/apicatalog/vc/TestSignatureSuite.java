@@ -47,7 +47,6 @@ class TestSignatureSuite implements SignatureSuite  {
 
     @Override
     public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
-        // TODO Auto-generated method stub
-        return null;
+        return TestSignatureProof.readMethod(this, expanded);
     }
 }

@@ -362,7 +362,7 @@ public final class Verifier extends Processor<Verifier> {
                 && (((VerificationKey) method).publicKey() != null)) {
             return Optional.of(method);
         }
-System.out.println(">>> " + method.id());
+
         return resolveMethod(method.id(), proof);
     }
 //
@@ -394,7 +394,10 @@ System.out.println(">>> " + method.id());
 
         // try to resolve the method
         if (resolver.isPresent()) {
+            System.out.println(">>>> " + id);
+            System.out.println(">>>> " + resolver.get());
             return Optional.ofNullable(resolver.get().resolve(id, loader, proof.getSignatureSuite()));
+            
         }
 
         throw new DocumentError(ErrorType.Unknown, "ProofVerificationId");

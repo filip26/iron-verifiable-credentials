@@ -20,7 +20,7 @@ public class HttpMethodResolver implements MethodResolver {
     public VerificationMethod resolve(URI id, DocumentLoader loader, SignatureSuite suite) throws DocumentError {
 
 //        final LdProperty<VerificationMethod> property = suite.getSchema().tagged(VcTag.VerificationMethod.name());
-
+System.out.println("## " + suite);
         try {
             final JsonArray document = JsonLd.expand(id)
                     .loader(loader)
@@ -34,6 +34,7 @@ public class HttpMethodResolver implements MethodResolver {
             }
 
         } catch (JsonLdError e) {
+            e.printStackTrace();
             throw new DocumentError(e, ErrorType.Invalid, "ProofVerificationMethod");
         }
 
