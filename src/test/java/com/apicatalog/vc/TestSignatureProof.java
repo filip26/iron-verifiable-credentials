@@ -121,6 +121,10 @@ class TestSignatureProof implements Proof {
         if (assertionMethod != null) {
             rr.put("https://w3id.org/security#proofPurpose", assertionMethod);
         }
+        if (domain != null) {
+            rr.put("https://w3id.org/security#domain", domain);
+            
+        }
 
         LdObject ldProof = new LdObject(rr);
 
