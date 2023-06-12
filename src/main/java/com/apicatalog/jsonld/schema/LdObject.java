@@ -13,7 +13,6 @@ public class LdObject {
     }
 
     public boolean contains(LdTerm term) {
-
         return values.containsKey(term.uri);
     }
 

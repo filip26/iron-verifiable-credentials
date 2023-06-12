@@ -1,6 +1,8 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.apicatalog.jsonld.schema.LdObject;
@@ -14,13 +16,13 @@ import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonValue;
 
 class TestSignatureProof implements Proof {
@@ -37,7 +39,7 @@ class TestSignatureProof implements Proof {
                     Algorithm.Base58Btc,
                     Codec.Ed25519PublicKey,
                     (key) -> key == null || key.length > 0));
-        
+
     static final LdProperty<byte[]> PROOF_VALUE_PROPERTY = DataIntegritySchema.getProofValue(
             Algorithm.Base58Btc,
             key -> key.length == 32);
@@ -45,14 +47,13 @@ class TestSignatureProof implements Proof {
     static final LdSchema PROOF_SCHEMA = DataIntegritySchema.getProof(
             LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
             DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA),
-            PROOF_VALUE_PROPERTY            
-    );
+            PROOF_VALUE_PROPERTY);
 
     final SignatureSuite suite;
     final CryptoSuite crypto;
     final LdObject ldProof;
     final JsonObject expanded;
-    
+
     TestSignatureProof(SignatureSuite suite,
             CryptoSuite crypto,
             LdObject ldProof,
@@ -70,12 +71,12 @@ class TestSignatureProof implements Proof {
         LdObject ldProof = PROOF_SCHEMA.read(expanded);
 
         TestSignatureProof proof = new TestSignatureProof(suite, CRYPTO, ldProof, expanded);
-        
+
         return proof;
     }
 
     public static final VerificationMethod readMethod(SignatureSuite suite, JsonObject expanded) throws DocumentError {
-        return DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA).read(expanded);        
+        return DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA).read(expanded);
     }
 
 //    public TestSignatureProof(VerificationMethod verificationMethod, 
@@ -98,6 +99,35 @@ class TestSignatureProof implements Proof {
 //                        )
 //                )));
 //    }
+
+    public static TestSignatureProof createDraft(
+            SignatureSuite suite,
+            // proof options
+            VerificationMethod verificationMethod,
+            URI assertionMethod,
+            Instant created,
+            String domain) throws DocumentError {
+
+
+        Map<String, Object> rr = new HashMap<>();
+        rr.put(LdTerm.TYPE.uri(), TestSignatureSuite.ID);
+        
+        if (verificationMethod != null) {
+            rr.put("https://w3id.org/security#verificationMethod", verificationMethod);
+        }
+        if (created != null) {
+            rr.put("http://purl.org/dc/terms/created", created);
+        }
+        if (assertionMethod != null) {
+            rr.put("https://w3id.org/security#proofPurpose", assertionMethod);
+        }
+
+        LdObject ldProof = new LdObject(rr);
+
+        JsonObject expanded = PROOF_SCHEMA.write(ldProof);
+
+        return new TestSignatureProof(suite, CRYPTO, ldProof, expanded);
+    }
 
     @Override
     public VerificationMethod getMethod() {
