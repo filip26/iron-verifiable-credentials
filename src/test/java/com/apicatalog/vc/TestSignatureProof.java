@@ -103,8 +103,8 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
             rr.put("https://w3id.org/security#domain", domain);
         }
 
-        LdObject ldProof = new LdObject(rr);
-System.out.println(ldProof);
+        final LdObject ldProof = new LdObject(rr);
+
         JsonObject expanded = PROOF_SCHEMA.write(ldProof);
 
         return new TestSignatureProof(suite, CRYPTO, ldProof, expanded);

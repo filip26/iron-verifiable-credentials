@@ -39,7 +39,7 @@ public class LdPipe<A, B> implements LdValueAdapter<A, B> {
         Collections.reverse(reversed);
 
         Object result = value;
-System.out.println(result);
+
         for (final LdValueAdapter<Object, Object> adapter : reversed) {
             result = adapter.write(result);
         }

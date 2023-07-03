@@ -26,7 +26,7 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param location a location of the document to verify
-     * @param a suite or suites to verify the VC
+     * @param suite a suite or an array of suites to verify the VC
      *      
      * @return {@link Verifier} allowing to set options and assert document's
      *         validity
@@ -42,7 +42,7 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param document the document to verify
-     * @param a suite or suites to verify the VC
+     * @param suite a suite or an array of suites to verify the VC
      *
      * @return {@link Verifier} allowing to set options and assert document's
      *         validity

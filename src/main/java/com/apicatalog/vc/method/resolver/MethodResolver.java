@@ -16,8 +16,7 @@ public interface MethodResolver {
      *
      * @param id     an {@link URI} To resolve as a verification method
      * @param loader
-     * @param proof a proof to be verified 
-     * @param context external JSON-LD context defying the method, or <code>null</code> 
+     * @param proof a proof to be verified  
      * @return The new {@link DidDocument}
      * 
      * @throws DocumentError

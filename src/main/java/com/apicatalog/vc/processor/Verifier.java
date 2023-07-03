@@ -393,11 +393,7 @@ public final class Verifier extends Processor<Verifier> {
 
         // try to resolve the method
         if (resolver.isPresent()) {
-            System.out.println(">>>> " + id);
-            System.out.println(">>>> " + resolver.get());
-            System.out.println(">>>> " + proof);
-            return Optional.ofNullable(resolver.get().resolve(id, loader, proof));
-            
+            return Optional.ofNullable(resolver.get().resolve(id, loader, proof));            
         }
 
         throw new DocumentError(ErrorType.Unknown, "ProofVerificationId");
