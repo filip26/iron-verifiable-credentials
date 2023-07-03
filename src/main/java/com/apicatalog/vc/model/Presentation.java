@@ -4,11 +4,13 @@ import java.net.URI;
 import java.util.Collection;
 
 /**
- * Represents a verifiable presentations (VP).
+ * Represents a verifiable presentation (VP).
  *
  * @see <a href=
- *      "https://www.w3.org/TR/vc-data-model/#presentations">Presentations</a>
- *      
+ *      "https://www.w3.org/TR/vc-data-model/#presentations">v1.1</a>
+ * @see <a href=
+ *      "https://w3c.github.io/vc-data-model/#presentations">v2.0</a>
+ *            
  * @since 0.9.0
  */
 public class Presentation extends Verifiable {
@@ -17,6 +19,10 @@ public class Presentation extends Verifiable {
 
     protected Collection<Credential> credentials;
 
+    public Presentation(DataModelVersion version) {
+        super(version);
+    }
+    
     @Override
     public boolean isPresentation() {
         return true;

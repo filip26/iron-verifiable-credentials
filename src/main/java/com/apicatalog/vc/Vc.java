@@ -39,7 +39,8 @@ public final class Vc {
     }
 
     public static Verifier verify(final URI location, final SignatureSuite suite) throws DocumentError, VerificationError {
-        return new Verifier(location, new SignatureSuiteMapper().add(suite));
+//FIXME        return new Verifier(location, new SignatureSuiteMapper().add(suite));
+        return null;
     }
 
     /**
@@ -58,7 +59,8 @@ public final class Vc {
     }
 
     public static Verifier verify(final JsonObject document, final SignatureSuite suite) throws DocumentError, VerificationError {
-        return new Verifier(document, new SignatureSuiteMapper().add(suite));
+//FIXME        return new Verifier(document, new SignatureSuiteMapper().add(suite));
+       return null; 
     }
 
     /**

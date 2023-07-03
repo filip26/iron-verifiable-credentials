@@ -92,5 +92,17 @@ public interface Proof {
      */
     JsonObject toJsonLd();
     
+    /**
+     * Provides an external JSON-LD context URI defying the proof type. 
+     * The context URI is used to expand the deferred proof verification method.
+     *  
+     * @return JSON-LD context URI or <code>null</code> (default)
+     */
+    default String context() {
+        //FIXME VerificationMethodProcessor ???
+            // context();
+        return null;
+    }
+    
     ProofValueProcessor valueProcessor();
 }

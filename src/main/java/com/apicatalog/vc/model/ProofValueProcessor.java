@@ -25,5 +25,4 @@ public interface ProofValueProcessor {
      * @return a signed proof
      * @throws DocumentError 
      */
-    JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError;
-}
+    JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError;}

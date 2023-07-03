@@ -253,15 +253,16 @@ public final class Verifier extends Processor<Verifier> {
             }
 
             final SignatureSuite signatureSuite = proofType.stream()
-                    .filter(suiteProvider::isSupported)
+                    .map(type -> suiteProvider.find(type, proofObject))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .findFirst()
-                    .map(suiteProvider::find) // TODO ?!?
                     .orElseThrow(() -> new VerificationError(Code.UnsupportedCryptoSuite));
 
             final Proof proof = signatureSuite.readProof(proofObject);
 
             if (proof == null) {
-                throw new IllegalStateException("The suite [" + signatureSuite.id() + "] returns null as a proof.");
+                throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
             }
             proofs.add(proof);
         }
@@ -396,7 +397,7 @@ public final class Verifier extends Processor<Verifier> {
         if (resolver.isPresent()) {
             System.out.println(">>>> " + id);
             System.out.println(">>>> " + resolver.get());
-            return Optional.ofNullable(resolver.get().resolve(id, loader, proof.getSignatureSuite()));
+            return Optional.ofNullable(resolver.get().resolve(id, loader, proof));
             
         }
 
@@ -415,8 +416,8 @@ public final class Verifier extends Processor<Verifier> {
         if ((credential.getIssuanceDate() != null
                 && credential.getIssuanceDate().isAfter(Instant.now()))
 
-                || (credential.getIssued() != null
-                        && credential.getIssued().isAfter(Instant.now()))
+//                || (credential.getIssued() != null
+//                        && credential.getIssued().isAfter(Instant.now()))
 
                 || (credential.getValidFrom() != null
                         && credential.getValidFrom().isAfter(Instant.now()))) {

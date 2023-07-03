@@ -6,6 +6,7 @@ import com.apicatalog.did.document.DidDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 public interface MethodResolver {
@@ -15,13 +16,13 @@ public interface MethodResolver {
      *
      * @param id     an {@link URI} To resolve as a verification method
      * @param loader
-     * @param suite a signature suite
+     * @param proof a proof to be verified 
+     * @param context external JSON-LD context defying the method, or <code>null</code> 
      * @return The new {@link DidDocument}
      * 
      * @throws DocumentError
      */
-    VerificationMethod resolve(URI id, DocumentLoader loader, SignatureSuite suite) throws DocumentError;
+    VerificationMethod resolve(URI id, DocumentLoader loader, Proof proof) throws DocumentError;
 
     boolean isAccepted(URI id);
-
 }

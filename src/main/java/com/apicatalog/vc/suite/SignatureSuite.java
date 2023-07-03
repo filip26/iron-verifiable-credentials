@@ -1,11 +1,8 @@
 package com.apicatalog.vc.suite;
 
-import java.net.URI;
-
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.model.ProofValueProcessor;
 
 import jakarta.json.JsonObject;
 
@@ -15,20 +12,43 @@ import jakarta.json.JsonObject;
  */
 public interface SignatureSuite {
 
+//FIXME    pridat id() a URI: spec() na specifikaci a name() 
+    
+
     // proof type id
-    String id();
+//    String id();
 
     // JSON-LD context defining the type
-    String context();
+  //  String context();
     
     /**
-     * Deserializes the given expanded JSON-LD object into a {@link Proof}.
+     * Check if the given proof can be processed by the suite.
+     * 
+     * @param proofType an URI representing a proof JSON-LD type
+     * @param expandedProof a proof in an expanded JSON-LD form
+     * 
+     * @return <code>true</code> if the proof is supported, <code>false</code> otherwise
+     */
+    boolean isSupported(String proofType, JsonObject expandedProof);
+
+    /**
+     * Deserialize the given expanded JSON-LD object into a {@link Proof}.
      *  
-     * @param expanded
-     * @return {@link Proof} instance
-     * @throws DocumentError
+     * @param expanded JSON-LD object in an expanded form
+     * 
+     * @return a new {@link Proof} instance
+     * @throws DocumentError if the given object cannot be deserialized
      */
     Proof readProof(JsonObject expanded) throws DocumentError;
     
+    /**
+     * Deserialize the given expanded JSON-LD object into a {@link VerificationMethod}.
+     * 
+     * @param expanded JSON-LD object in an expanded form
+     * 
+     * @return a new {@link VerificationMethod} instance
+     * @throws DocumentError if the given object cannot be deserialized
+     */
+    //TODO move into proof
     VerificationMethod readMethod(JsonObject expanded) throws DocumentError;
 }

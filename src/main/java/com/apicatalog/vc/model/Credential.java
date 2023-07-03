@@ -6,16 +6,16 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
 /**
- * Represents a verifiable credentials (VC).
+ * Represents a verifiable credential (VC).
  *
  * @see <a href=
- *      "https://www.w3.org/TR/vc-data-model/#credentials">Credentials</a>
+ *      "https://www.w3.org/TR/vc-data-model/#credentials">v1.1</a>
+ * @see <a href=
+ *      "https://w3c.github.io/vc-data-model/#credentials">v2.0</a>
  *      
  * @since 0.9.0
  */
 public class Credential extends Verifiable {
-
-    protected CredentialVersion version;
     
     /** issuanceDate - v1.1 */    
     protected Instant issuance;
@@ -31,16 +31,20 @@ public class Credential extends Verifiable {
     protected JsonValue issuer;
     protected JsonValue status;
     
+    public Credential(DataModelVersion version) {
+        super(version);
+    }
+
     /**
      * A date time when the credential has been issued. VC data model v1.1.
-     * Deprecated in favor of {@link Credential#getValidFrom()}.
+     * Deprecated in favor of {@link Credential#getValidFrom()} by VC data model v2.0.
      * 
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
      *      Date - Note</a>
      * 
      * @since 0.8.1
      * 
-     * @return a date time
+     * @return a date time from which the credential claims are valid or <code>null</code>.
      */
     public Instant getIssuanceDate() {
         return issuance;
@@ -51,7 +55,8 @@ public class Credential extends Verifiable {
     }
 
     /**
-     * VC data model 1.1 only. Deprecated in favor of {@link Credential#getValidUntil()}. 
+     * VC data model v1.1 only. Deprecated in favor of {@link Credential#getValidUntil()}
+     * by VC data model v2.0. 
      * 
      * @see <a href="https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
      * 
@@ -159,14 +164,5 @@ public class Credential extends Verifiable {
     @Override
     public Credential asCredential() {
         return this;
-    }
-    
-    /**
-     * Returns a verifiable credential model version
-     * 
-     * @return the credential model version
-     */
-    public CredentialVersion getVersion() {
-        return version;
     }
 }

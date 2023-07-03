@@ -136,7 +136,8 @@ abstract class Processor<T extends Processor<?>> {
         // data integrity - issuance date is a mandatory property
         if (credential.getIssuanceDate() == null
                 && credential.getValidFrom() == null
-                && credential.getIssued() == null) {
+//                && credential.getIssued() == null
+                ) {
             throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
         }
 

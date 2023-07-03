@@ -1,9 +1,11 @@
 package com.apicatalog.vc.suite;
 
+import java.util.Optional;
+
+import jakarta.json.JsonObject;
+
 public interface SignatureSuiteProvider {
 
-    boolean isSupported(String suiteType);
-
-    SignatureSuite find(String suiteType);
+    Optional<SignatureSuite> find(String proofType, JsonObject expandedProof);
 
 }

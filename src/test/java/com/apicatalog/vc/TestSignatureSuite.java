@@ -13,15 +13,15 @@ class TestSignatureSuite implements SignatureSuite  {
 
     static final String CONTEXT = "classpath:data-integrity-test-signature-2022.jsonld";
 
-    @Override
-    public String id() {
-        return ID;
-    }
-
-    @Override
-    public String context() {
-        return CONTEXT;
-    }
+//    @Override
+//    public String id() {
+//        return ID;
+//    }
+//
+//    @Override
+//    public String context() {
+//        return CONTEXT;
+//    }
 
     @Override
     public Proof readProof(JsonObject expanded) throws DocumentError {
@@ -31,5 +31,11 @@ class TestSignatureSuite implements SignatureSuite  {
     @Override
     public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
         return TestSignatureProof.readMethod(this, expanded);
+    }
+
+    @Override
+    public boolean isSupported(String proofType, JsonObject expandedProof) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

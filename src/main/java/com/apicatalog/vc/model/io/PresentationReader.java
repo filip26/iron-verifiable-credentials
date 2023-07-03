@@ -9,6 +9,7 @@ import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.model.DataModelVersion;
 import com.apicatalog.vc.model.Presentation;
 
 import jakarta.json.JsonObject;
@@ -32,7 +33,7 @@ public class PresentationReader {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        final Presentation presentation = new Presentation();
+        final Presentation presentation = new Presentation(DataModelVersion.V11);
 
         // @type
         if (!JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document)) {

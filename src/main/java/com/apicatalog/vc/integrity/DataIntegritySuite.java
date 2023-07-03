@@ -41,15 +41,15 @@ public final class DataIntegritySuite implements SignatureSuite {
         return null;
     }
   
-    @Override
-    public String id() {
-        return ID;
-    }
+//    @Override
+//    public String id() {
+//        return ID;
+//    }
 
-    @Override
-    public String context() {
-        return SEC_VOCAB;
-    }
+//    @Override
+//    public String context() {
+//        return SEC_VOCAB;
+//    }
 
     @Override
     public Proof readProof(JsonObject expanded) throws DocumentError {
@@ -68,6 +68,12 @@ public final class DataIntegritySuite implements SignatureSuite {
     public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public boolean isSupported(String proofType, JsonObject expandedProof) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }
