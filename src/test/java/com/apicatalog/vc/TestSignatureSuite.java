@@ -1,7 +1,6 @@
 package com.apicatalog.vc;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
@@ -17,12 +16,7 @@ class TestSignatureSuite implements SignatureSuite  {
     public Proof readProof(JsonObject expanded) throws DocumentError {
         return TestSignatureProof.read(this, expanded);
     }
-
-    @Override
-    public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
-        return TestSignatureProof.readMethod(this, expanded);
-    }
-
+    
     @Override
     public boolean isSupported(String proofType, JsonObject expandedProof) {
         return ID.equals(proofType);

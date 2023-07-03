@@ -411,9 +411,6 @@ public final class Verifier extends Processor<Verifier> {
         if ((credential.getIssuanceDate() != null
                 && credential.getIssuanceDate().isAfter(Instant.now()))
 
-//                || (credential.getIssued() != null
-//                        && credential.getIssued().isAfter(Instant.now()))
-
                 || (credential.getValidFrom() != null
                         && credential.getValidFrom().isAfter(Instant.now()))) {
 

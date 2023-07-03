@@ -1,7 +1,6 @@
 package com.apicatalog.vc.suite;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.model.Proof;
 
 import jakarta.json.JsonObject;
@@ -12,15 +11,6 @@ import jakarta.json.JsonObject;
  */
 public interface SignatureSuite {
 
-//FIXME    pridat id() a URI: spec() na specifikaci a name() 
-    
-
-    // proof type id
-//    String id();
-
-    // JSON-LD context defining the type
-  //  String context();
-    
     /**
      * Check if the given proof can be processed by the suite.
      * 
@@ -40,15 +30,4 @@ public interface SignatureSuite {
      * @throws DocumentError if the given object cannot be deserialized
      */
     Proof readProof(JsonObject expanded) throws DocumentError;
-    
-    /**
-     * Deserialize the given expanded JSON-LD object into a {@link VerificationMethod}.
-     * 
-     * @param expanded JSON-LD object in an expanded form
-     * 
-     * @return a new {@link VerificationMethod} instance
-     * @throws DocumentError if the given object cannot be deserialized
-     */
-    //TODO move into proof
-    VerificationMethod readMethod(JsonObject expanded) throws DocumentError;
 }

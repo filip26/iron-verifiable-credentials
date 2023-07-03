@@ -17,6 +17,7 @@ import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
+import com.apicatalog.vc.method.VerificationMethodProcessor;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.ProofValueProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -25,7 +26,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-class TestSignatureProof implements Proof, ProofValueProcessor {
+class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMethodProcessor {
 
     static final CryptoSuite CRYPTO = new CryptoSuite(
             "test-signature",
@@ -49,18 +50,16 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
             DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA),
             PROOF_VALUE_PROPERTY);
 
-    final SignatureSuite suite;
     final CryptoSuite crypto;
     final LdObject ldProof;
     final JsonObject expanded;
     
-    TestSignatureProof(SignatureSuite suite,
+    TestSignatureProof(
             CryptoSuite crypto,
             LdObject ldProof,
             JsonObject expanded
 
     ) {
-        this.suite = suite;
         this.crypto = crypto;
         this.ldProof = ldProof;
         this.expanded = expanded;
@@ -70,11 +69,7 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
 
         LdObject ldProof = PROOF_SCHEMA.read(expanded);
 
-        return new TestSignatureProof(suite, CRYPTO, ldProof, expanded);
-    }
-
-    public static final VerificationMethod readMethod(SignatureSuite suite, JsonObject expanded) throws DocumentError {
-        return DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA).read(expanded);
+        return new TestSignatureProof(CRYPTO, ldProof, expanded);
     }
 
     public static TestSignatureProof createDraft(
@@ -86,37 +81,26 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
 
 
         Map<String, Object> rr = new HashMap<>();
-        rr.put(LdTerm.TYPE.uri(), URI.create(TestSignatureSuite.ID));   //TODO
+        rr.put(LdTerm.TYPE.uri(), URI.create(TestSignatureSuite.ID));
         
         if (verificationMethod != null) {
-            rr.put("https://w3id.org/security#verificationMethod", verificationMethod);
+            rr.put(DataIntegritySchema.VERIFICATION_METHOD.uri(), verificationMethod);
         }
         if (created != null) {
-            rr.put("http://purl.org/dc/terms/created", created);
+            rr.put(DataIntegritySchema.CREATED.uri(), created);
         }
         if (assertionMethod != null) {
-            rr.put("https://w3id.org/security#proofPurpose", assertionMethod);
+            rr.put(DataIntegritySchema.PURPOSE.uri(), assertionMethod);
         }
         if (domain != null) {
-            rr.put("https://w3id.org/security#domain", domain);
+            rr.put(DataIntegritySchema.DOMAIN.uri(), domain);
         }
 
         final LdObject ldProof = new LdObject(rr);
 
         JsonObject expanded = PROOF_SCHEMA.write(ldProof);
 
-        return new TestSignatureProof(new TestSignatureSuite(), CRYPTO, ldProof, expanded);
-        
-//        Map<String, Object> proof = new LinkedHashMap<>();
-//
-//        proof.put(LdTerm.TYPE.uri(), type);
-//        proof.put(DataIntegritySchema.CREATED.uri(), created);
-//        proof.put(DataIntegritySchema.PURPOSE.uri(), purpose);
-//        proof.put(DataIntegritySchema.VERIFICATION_METHOD.uri(), method);
-//        proof.put(DataIntegritySchema.DOMAIN.uri(), domain);
-//        proof.put(DataIntegritySchema.CHALLENGE.uri(), challenge);
-//
-//        return new LdObject(proof);        
+        return new TestSignatureProof(CRYPTO, ldProof, expanded);
     }
 
     @Override
@@ -155,11 +139,6 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
     }
 
     @Override
-    public SignatureSuite getSignatureSuite() {
-        return suite;
-    }
-
-    @Override
     public ProofValueProcessor valueProcessor() {
         return this;
     }
@@ -179,5 +158,15 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
               Json.createArrayBuilder().add(
                       value))
               .build();
+    }
+
+    @Override
+    public VerificationMethodProcessor methodProcessor() {
+        return this;
+    }
+
+    @Override
+    public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
+        return DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA).read(expanded);
     }
 }

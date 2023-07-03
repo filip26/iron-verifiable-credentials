@@ -13,7 +13,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     protected static final String ID = VcVocab.SECURITY_VOCAB + "DataIntegrityProof";
 
     protected final String cryptosuite;
-    
+
     protected DataIntegritySuite(String cryptosuite) {
         this.cryptosuite = cryptosuite;
     }
@@ -22,18 +22,17 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     public boolean isSupported(String proofType, JsonObject expandedProof) {
         return ID.equals(proofType) && cryptosuite.equals(getCryptoSuite(expandedProof));
     }
-    
+
     static String getCryptoSuite(JsonObject expandedProof) {
         if (expandedProof == null) {
             throw new IllegalArgumentException("expandedProof property must not be null.");
         }
-        
+
         JsonValue value = expandedProof.get(DataIntegritySchema.CRYPTO_SUITE.uri());
-        
+
         if (JsonUtils.isString(value)) {
-            return ((JsonString)value).getString();
+            return ((JsonString) value).getString();
         }
-        return null;        
+        return null;
     }
-    
 }
