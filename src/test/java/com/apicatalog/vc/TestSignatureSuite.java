@@ -25,6 +25,6 @@ class TestSignatureSuite implements SignatureSuite  {
 
     @Override
     public boolean isSupported(String proofType, JsonObject expandedProof) {
-        return "https://w3id.org/security#TestSignatureSuite2022".equals(proofType);
+        return ID.equals(proofType);
     }
 }

@@ -88,23 +88,13 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                final TestSignatureSuite suite = new TestSignatureSuite();
-                
                 final TestSignatureProof draft = TestSignatureProof.createDraft(
-                        suite,
-//                      // proof options
+                        // proof options
                         testCase.verificationMethod,
                         URI.create("https://w3id.org/security#assertionMethod"),
                         testCase.created,
                         testCase.domain                        
                         ); 
-
-//                        new TestSignatureProof(
-//                        suite,
-//                        TestSignatureProof.CRYPTO,
-//                        null,
-//                        null
-//                        );
 
                 final Issuer issuer = Vc.sign(
                         testCase.input,

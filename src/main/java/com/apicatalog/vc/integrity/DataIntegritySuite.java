@@ -1,77 +1,39 @@
 package com.apicatalog.vc.integrity;
 
-import java.util.Map;
-
-import com.apicatalog.jsonld.schema.LdObject;
-import com.apicatalog.jsonld.schema.LdSchema;
-import com.apicatalog.jsonld.schema.LdTerm;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 
-public final class DataIntegritySuite implements SignatureSuite {
+public abstract class DataIntegritySuite implements SignatureSuite {
 
-    protected static final String ID = "https://w3id.org/security#DataIntegrityProof";
+    protected static final String ID = VcVocab.SECURITY_VOCAB + "DataIntegrityProof";
+
+    protected final String cryptosuite;
     
-    public static final String SEC_VOCAB = "https://w3id.org/security#";
-    
-    public static final LdTerm TYPE = LdTerm.create("DataIntegrityProof", SEC_VOCAB);
-
-    protected static final LdSchema SCHEMA = DataIntegritySchema.getProof(
-                TYPE,
-                null,
-                null
-//                Algorithm.Base58Btc,
-//                key -> key.length == 32
-            );
-    
-    protected final Map<String, CryptoSuite> crypto;
-
-    protected DataIntegritySuite(Map<String, CryptoSuite> crypto) {
-        this.crypto = crypto;
-    }
-    
-    public static final DataIntegritySuite getInstance(CryptoSuite suite) {
-        //TODO
-        return null;
-    }
-  
-//    @Override
-//    public String id() {
-//        return ID;
-//    }
-
-//    @Override
-//    public String context() {
-//        return SEC_VOCAB;
-//    }
-
-    @Override
-    public Proof readProof(JsonObject expanded) throws DocumentError {
-        // TODO Auto-generated method stub
-        
-        LdObject ldProof = SCHEMA.read(expanded);
-                
-        
-        
-//        return new DataIntegrityProof(this, CRYPTO, ldProof, expanded);
-        //FIXME
-        return null;
-    }
-
-    @Override
-    public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
-        // TODO Auto-generated method stub
-        return null;
+    protected DataIntegritySuite(String cryptosuite) {
+        this.cryptosuite = cryptosuite;
     }
 
     @Override
     public boolean isSupported(String proofType, JsonObject expandedProof) {
-        // TODO Auto-generated method stub
-        return false;
+        return ID.equals(proofType) && cryptosuite.equals(getCryptoSuite(expandedProof));
     }
+    
+    static String getCryptoSuite(JsonObject expandedProof) {
+        if (expandedProof == null) {
+            throw new IllegalArgumentException("expandedProof property must not be null.");
+        }
+        
+        JsonValue value = expandedProof.get(DataIntegritySchema.CRYPTO_SUITE.uri());
+        
+        if (JsonUtils.isString(value)) {
+            return ((JsonString)value).getString();
+        }
+        return null;        
+    }
+    
 }

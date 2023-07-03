@@ -54,7 +54,6 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
     final LdObject ldProof;
     final JsonObject expanded;
     
-
     TestSignatureProof(SignatureSuite suite,
             CryptoSuite crypto,
             LdObject ldProof,
@@ -79,7 +78,6 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
     }
 
     public static TestSignatureProof createDraft(
-            SignatureSuite suite,
             // proof options
             VerificationMethod verificationMethod,
             URI assertionMethod,
@@ -107,7 +105,7 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
 
         JsonObject expanded = PROOF_SCHEMA.write(ldProof);
 
-        return new TestSignatureProof(suite, CRYPTO, ldProof, expanded);
+        return new TestSignatureProof(new TestSignatureSuite(), CRYPTO, ldProof, expanded);
         
 //        Map<String, Object> proof = new LinkedHashMap<>();
 //
@@ -155,12 +153,6 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
     public void validate(Map<String, Object> params) throws DocumentError {
         PROOF_SCHEMA.validate(ldProof, params);
     }
-
-//    @Override
-//    public String getType() {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
 
     @Override
     public SignatureSuite getSignatureSuite() {
