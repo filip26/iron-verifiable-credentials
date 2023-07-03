@@ -14,16 +14,17 @@ public interface SignatureSuite {
     /**
      * Check if the given proof can be processed by the suite.
      * 
-     * @param proofType an URI representing a proof JSON-LD type
+     * @param proofType     an URI representing a proof JSON-LD type
      * @param expandedProof a proof in an expanded JSON-LD form
      * 
-     * @return <code>true</code> if the proof is supported, <code>false</code> otherwise
+     * @return <code>true</code> if the proof is supported, <code>false</code>
+     *         otherwise
      */
     boolean isSupported(String proofType, JsonObject expandedProof);
 
     /**
      * Deserialize the given expanded JSON-LD object into a {@link Proof}.
-     *  
+     * 
      * @param expanded JSON-LD object in an expanded form
      * 
      * @return a new {@link Proof} instance

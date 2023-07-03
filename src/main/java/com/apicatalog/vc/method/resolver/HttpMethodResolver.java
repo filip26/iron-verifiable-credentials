@@ -19,12 +19,10 @@ public class HttpMethodResolver implements MethodResolver {
     @Override
     public VerificationMethod resolve(URI id, DocumentLoader loader, Proof proof) throws DocumentError {
 
-//        final LdProperty<VerificationMethod> property = suite.getSchema().tagged(VcTag.VerificationMethod.name());
-
         try {
             final JsonArray document = JsonLd.expand(id)
                     .loader(loader)
-//                    .context(proof.context()) // an optional expansion context
+                    .context(proof.methodProcessor().context()) // an optional expansion context
                     .get();
 
             for (final JsonValue method : document) {

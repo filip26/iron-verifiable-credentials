@@ -7,7 +7,6 @@ import jakarta.json.JsonObject;
 
 public interface VerificationMethodProcessor {
 
-
     /**
      * Provides an external JSON-LD context URI defying the proof type. The context
      * URI is used to expand the deferred proof verification method.
@@ -15,11 +14,9 @@ public interface VerificationMethodProcessor {
      * @return JSON-LD context URI or <code>null</code> (default)
      */
     default String context() {
-        // FIXME VerificationMethodProcessor ???
-        // context();
         return null;
     }
-    
+
     /**
      * Deserialize the given expanded JSON-LD object into a
      * {@link VerificationMethod}.

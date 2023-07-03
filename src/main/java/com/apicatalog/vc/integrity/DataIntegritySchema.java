@@ -30,7 +30,7 @@ public final class DataIntegritySchema {
     public static final LdTerm PROOF_VALUE = LdTerm.create("proofValue", SEC_VOCAB);
     public static final LdTerm DOMAIN = LdTerm.create("domain", SEC_VOCAB);
     public static final LdTerm CHALLENGE = LdTerm.create("challenge", SEC_VOCAB);
-    
+
     public static final LdTerm CRYPTO_SUITE = LdTerm.create("cryptosuite", SEC_VOCAB);
 
     public static final LdTerm PREVIOUS_PROOF = LdTerm.create("previousProof", SEC_VOCAB);
@@ -53,7 +53,7 @@ public final class DataIntegritySchema {
     public static final LdProperty<byte[]> getProofValue(Algorithm encoding, Predicate<byte[]> predicate) {
         return property(PROOF_VALUE, multibase(encoding)).test(predicate);
     }
-    
+
     public static final LdProperty<URI> getMethod() {
         return property(PROOF_VALUE, link());
     }
@@ -101,7 +101,6 @@ public final class DataIntegritySchema {
                 property(CHALLENGE, string()),
 
                 method.required(),
-                proofValue.required()
-        ));
+                proofValue.required()));
     }
 }

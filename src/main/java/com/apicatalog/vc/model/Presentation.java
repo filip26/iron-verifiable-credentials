@@ -6,11 +6,9 @@ import java.util.Collection;
 /**
  * Represents a verifiable presentation (VP).
  *
- * @see <a href=
- *      "https://www.w3.org/TR/vc-data-model/#presentations">v1.1</a>
- * @see <a href=
- *      "https://w3c.github.io/vc-data-model/#presentations">v2.0</a>
- *            
+ * @see <a href= "https://www.w3.org/TR/vc-data-model/#presentations">v1.1</a>
+ * @see <a href= "https://w3c.github.io/vc-data-model/#presentations">v2.0</a>
+ * 
  * @since 0.9.0
  */
 public class Presentation extends Verifiable {
@@ -22,7 +20,7 @@ public class Presentation extends Verifiable {
     public Presentation(DataModelVersion version) {
         super(version);
     }
-    
+
     @Override
     public boolean isPresentation() {
         return true;
@@ -44,7 +42,7 @@ public class Presentation extends Verifiable {
     public URI getHolder() {
         return holder;
     }
-    
+
     public void setHolder(URI holder) {
         this.holder = holder;
     }

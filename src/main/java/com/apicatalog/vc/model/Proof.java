@@ -69,13 +69,6 @@ public interface Proof {
     CryptoSuite getCryptoSuite();
 
     /**
-     * Returns a signature suite this proof implementation belongs to.
-     * 
-     * @return {@link SignatureSuite} implementing the proof type.
-     */
-//    SignatureSuite getSignatureSuite();
-
-    /**
      * Validates the proof data, not a signature.
      * 
      * @param params custom, suite specific parameters to validate against

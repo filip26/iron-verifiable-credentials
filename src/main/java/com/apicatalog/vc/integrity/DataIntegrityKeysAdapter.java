@@ -32,7 +32,7 @@ public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, Verifi
 
         if (method.id() != null) {
             result.put(LdTerm.ID.uri(), method.id());
-        }        
+        }
         if (method.type() != null) {
             result.put(LdTerm.TYPE.uri(), method.type());
         }

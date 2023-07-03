@@ -17,6 +17,7 @@ import com.apicatalog.vc.model.io.CredentialReader;
 import com.apicatalog.vc.model.io.PresentationReader;
 import com.apicatalog.vc.status.StatusPropertiesValidator;
 import com.apicatalog.vc.status.StatusValidator;
+import com.apicatalog.vc.subject.SubjectValidator;
 
 import jakarta.json.JsonObject;
 

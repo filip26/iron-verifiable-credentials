@@ -22,7 +22,7 @@ import jakarta.json.JsonValue;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public abstract  class DataIntegrityProof implements Proof {
+public abstract class DataIntegrityProof implements Proof {
 
     protected final SignatureSuite suite;
     protected final CryptoSuite crypto;
@@ -31,20 +31,19 @@ public abstract  class DataIntegrityProof implements Proof {
     final JsonObject expanded;
 
     final LdProperty<byte[]> proofValueSchema;
-    
+
 //    final LdSchema proofSchema = DataIntegritySchema.getProof(
 //            LdTerm.create("TestSignatureSuite2022", "https://w3id.org/security#"),
 //            DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA),
 //            PROOF_VALUE_PROPERTY);
 //
-    
+
     protected DataIntegrityProof(
-            SignatureSuite suite, 
+            SignatureSuite suite,
             CryptoSuite crypto,
             LdObject ldProof,
             JsonObject expandedProof,
-            LdProperty<byte[]> proofValueSchema
-            ) {
+            LdProperty<byte[]> proofValueSchema) {
         this.suite = suite;
         this.crypto = crypto;
         this.ldProof = ldProof;
@@ -145,6 +144,6 @@ public abstract  class DataIntegrityProof implements Proof {
 //                        value))
 //                .build();
 //    }
-    
+
     protected abstract JsonValue encodeProofValue(byte[] proofValue);
 }

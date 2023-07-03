@@ -52,7 +52,7 @@ public final class Verifier extends Processor<Verifier> {
 
     private Collection<MethodResolver> methodResolvers;
 
-    public Verifier(URI location, final SignatureSuite...suites) {
+    public Verifier(URI location, final SignatureSuite... suites) {
         this.location = location;
         this.document = null;
 
@@ -62,7 +62,7 @@ public final class Verifier extends Processor<Verifier> {
         this.params = new LinkedHashMap<>(10);
     }
 
-    public Verifier(JsonObject document, final SignatureSuite...suites) {
+    public Verifier(JsonObject document, final SignatureSuite... suites) {
         this.document = document;
         this.location = null;
 
@@ -252,11 +252,11 @@ public final class Verifier extends Processor<Verifier> {
             }
 
             final SignatureSuite signatureSuite = findSuite(proofTypes, proofObject);
-            
+
             if (signatureSuite == null) {
                 throw new VerificationError(Code.UnsupportedCryptoSuite);
             }
-                    
+
             final Proof proof = signatureSuite.readProof(proofObject);
 
             if (proof == null) {
@@ -275,37 +275,17 @@ public final class Verifier extends Processor<Verifier> {
 
             proof.validate(params);
 
+            final CryptoSuite cryptoSuite = proof.getCryptoSuite();
+
+            if (cryptoSuite == null) {
+                throw new VerificationError(Code.UnsupportedCryptoSuite);
+            }
+
             final byte[] proofValue = proof.getValue();
-
-//            if (signatureSuite.getSchema() == null) {
-//                throw new IllegalStateException("The suite [" + signatureSuite.getId() + "] does not provide proof schema.");
-//            }
-//
-//            final LdProperty<byte[]> proofValueProperty = signatureSuite.getSchema().tagged(VcTag.ProofValue.name());
-//
-//            if (proofValueProperty == null) {
-//                throw new IllegalStateException("The proof schema does not define the proof value.");
-//            }
-
-//            final LdObject proof = signatureSuite.getSchema().read(proofObject);
-
-//            signatureSuite.getSchema().validate(proof, params);
-
-//            if (!proof.contains(proofValueProperty.term())) {
-//                throw new DocumentError(ErrorType.Missing, proofValueProperty.term());
-//            }
-
-//            final byte[] proofValue = (byte[]) proof.value(proofValueProperty.term());
 
             if (proofValue == null || proofValue.length == 0) {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");
             }
-
-//            final LdProperty<VerificationMethod> methodProperty = signatureSuite.getSchema().tagged(VcTag.VerificationMethod.name());
-//
-//            if (methodProperty == null) {
-//                throw new IllegalStateException("The proof schema does not define a verification method.");
-//            }
 
             VerificationMethod verificationMethod = getMethod(proof)
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, "ProofVerificationMethod"));
@@ -314,22 +294,11 @@ public final class Verifier extends Processor<Verifier> {
                 throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
             }
 
-            // remote a proof value
-
+            // get proof in an expanded form
             final JsonObject signedProof = proof.toJsonLd();
 
-            final JsonObject unsignedProof = proof.valueProcessor().removeProofValue(signedProof);
-
             // remote a proof value
-//            final JsonObject unsignedProof = Json.createObjectBuilder(proofObject)
-//                    .remove(proofValueProperty.term().uri())
-//                    .build();
-
-            final CryptoSuite cryptoSuite = proof.getCryptoSuite();
-
-            if (cryptoSuite == null) {
-                throw new VerificationError(Code.UnsupportedCryptoSuite);
-            }
+            final JsonObject unsignedProof = proof.valueProcessor().removeProofValue(signedProof);
 
             final LinkedDataSignature signature = new LinkedDataSignature(cryptoSuite);
 
@@ -364,19 +333,6 @@ public final class Verifier extends Processor<Verifier> {
 
         return resolveMethod(method.id(), proof);
     }
-//
-//    Optional<VerificationMethod> resolve(JsonObject method, SignatureSuite suite, LdProperty<VerificationMethod> property) throws DocumentError, VerificationError {
-//        try {
-//            URI id = JsonLdReader
-//                    .getId(method)
-//                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, property.term()));
-//
-//            return resolve(id, suite, property);
-//
-//        } catch (InvalidJsonLdValue e) {
-//            throw new DocumentError(e, ErrorType.Invalid, property.term());
-//        }
-//    }
 
     Optional<VerificationMethod> resolveMethod(
             URI id,
@@ -393,7 +349,7 @@ public final class Verifier extends Processor<Verifier> {
 
         // try to resolve the method
         if (resolver.isPresent()) {
-            return Optional.ofNullable(resolver.get().resolve(id, loader, proof));            
+            return Optional.ofNullable(resolver.get().resolve(id, loader, proof));
         }
 
         throw new DocumentError(ErrorType.Unknown, "ProofVerificationId");
@@ -418,9 +374,8 @@ public final class Verifier extends Processor<Verifier> {
         }
         validateData(credential);
     }
-    
+
     SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
-        
         for (final SignatureSuite suite : suites) {
             for (final String proofType : proofTypes) {
                 if (suite.isSupported(proofType, expandedProof)) {
@@ -430,5 +385,4 @@ public final class Verifier extends Processor<Verifier> {
         }
         return null;
     }
-    
 }
