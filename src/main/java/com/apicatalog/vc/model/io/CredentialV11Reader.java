@@ -60,11 +60,14 @@ class CredentialV11Reader {
             // issuance date - mandatory for verification
             credential.setIssuanceDate(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.ISSUANCE_DATE.uri()).orElse(null));
 
+            // issuance date - mandatory for verification
+            credential.setIssuanceDate(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.ISSUANCE_DATE.uri()).orElse(null));
+
             // expiration date - optional
             credential.setExpiration(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.EXPIRATION_DATE.uri()).orElse(null));
             
             credential.setStatus(expandedDocument.get(VcVocab.STATUS.uri()));
-
+            
         } catch (InvalidJsonLdValue e) {
             if (Keywords.ID.equals(e.getProperty())) {
                 throw new DocumentError(ErrorType.Invalid, LdTerm.ID);

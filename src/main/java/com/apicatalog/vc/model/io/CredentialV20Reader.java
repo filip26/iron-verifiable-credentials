@@ -60,17 +60,17 @@ class CredentialV20Reader {
             // issuance date - mandatory for verification
             credential.setIssuanceDate(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.ISSUANCE_DATE.uri()).orElse(null));
 
+            // issued - optional
+//          credential.setIssued(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.ISSUED.uri()).orElse(null));
+
+          // expiration date - optional
+          credential.setExpiration(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.EXPIRATION_DATE.uri()).orElse(null));
+
             // validFrom - optional
             credential.setValidFrom(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.VALID_FROM.uri()).orElse(null));
 
             // validFrom - optional
             credential.setValidUntil(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.VALID_UNTIL.uri()).orElse(null));
-
-            // issued - optional
-//            credential.setIssued(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.ISSUED.uri()).orElse(null));
-
-            // expiration date - optional
-            credential.setExpiration(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.EXPIRATION_DATE.uri()).orElse(null));
             
             credential.setStatus(expandedDocument.get(VcVocab.STATUS.uri()));
 

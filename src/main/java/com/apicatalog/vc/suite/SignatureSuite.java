@@ -21,8 +21,6 @@ public interface SignatureSuite {
     // JSON-LD context defining the type
   //  String context();
     
-    String proofType();
-    
     /**
      * Check if the given proof can be processed by the suite.
      * 

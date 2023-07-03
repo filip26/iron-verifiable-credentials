@@ -21,9 +21,11 @@ import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.ProofValueProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
-class TestSignatureProof implements Proof {
+class TestSignatureProof implements Proof, ProofValueProcessor {
 
     static final CryptoSuite CRYPTO = new CryptoSuite(
             "test-signature",
@@ -47,10 +49,11 @@ class TestSignatureProof implements Proof {
             DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA),
             PROOF_VALUE_PROPERTY);
 
-//    final SignatureSuite suite;
+    final SignatureSuite suite;
     final CryptoSuite crypto;
     final LdObject ldProof;
     final JsonObject expanded;
+    
 
     TestSignatureProof(SignatureSuite suite,
             CryptoSuite crypto,
@@ -58,7 +61,7 @@ class TestSignatureProof implements Proof {
             JsonObject expanded
 
     ) {
-//        this.suite = suite;
+        this.suite = suite;
         this.crypto = crypto;
         this.ldProof = ldProof;
         this.expanded = expanded;
@@ -161,30 +164,28 @@ class TestSignatureProof implements Proof {
 
     @Override
     public SignatureSuite getSignatureSuite() {
-        // TODO Auto-generated method stub
-        return null;
+        return suite;
     }
 
     @Override
     public ProofValueProcessor valueProcessor() {
-        // TODO Auto-generated method stub
-        return null;
+        return this;
     }
 
-//    @Override
-//    public JsonObject removeProofValue(JsonObject expanded) {
-//        return Json.createObjectBuilder(expanded).remove(DataIntegritySchema.PROOF_VALUE.uri()).build();
-//    }
-//
-//    @Override
-//    public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
-//
-//        final JsonValue value = PROOF_VALUE_PROPERTY.write(proofValue);
-//
-//        return Json.createObjectBuilder(expanded).add(
-//                DataIntegritySchema.PROOF_VALUE.uri(),
-//                Json.createArrayBuilder().add(
-//                        value))
-//                .build();
-//    }
+    @Override
+    public JsonObject removeProofValue(JsonObject expanded) {
+        return Json.createObjectBuilder(expanded).remove(DataIntegritySchema.PROOF_VALUE.uri()).build();
+    }
+
+    @Override
+    public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
+        
+      final JsonValue value = PROOF_VALUE_PROPERTY.write(proofValue);
+
+      return Json.createObjectBuilder(expanded).add(
+              DataIntegritySchema.PROOF_VALUE.uri(),
+              Json.createArrayBuilder().add(
+                      value))
+              .build();
+    }
 }

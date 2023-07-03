@@ -69,6 +69,9 @@ public class CredentialReader {
                         
             credential.setStatus(expandedDocument.get(VcVocab.STATUS.uri()));
 
+            //TODO
+            CredentialV11Reader.read(credential, expandedDocument);
+            
             return credential;
             
         } catch (InvalidJsonLdValue e) {

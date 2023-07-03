@@ -1,6 +1,5 @@
 package com.apicatalog.vc.integrity;
 
-import java.net.URI;
 import java.util.Map;
 
 import com.apicatalog.jsonld.schema.LdObject;
@@ -75,11 +74,4 @@ public final class DataIntegritySuite implements SignatureSuite {
         // TODO Auto-generated method stub
         return false;
     }
-
-    @Override
-    public String proofType() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

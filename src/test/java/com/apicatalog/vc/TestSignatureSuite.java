@@ -35,13 +35,6 @@ class TestSignatureSuite implements SignatureSuite  {
 
     @Override
     public boolean isSupported(String proofType, JsonObject expandedProof) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public String proofType() {
-        // TODO Auto-generated method stub
-        return null;
+        return "https://w3id.org/security#TestSignatureSuite2022".equals(proofType);
     }
 }

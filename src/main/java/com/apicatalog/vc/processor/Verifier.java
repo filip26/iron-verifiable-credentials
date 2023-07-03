@@ -395,6 +395,7 @@ public final class Verifier extends Processor<Verifier> {
         if (resolver.isPresent()) {
             System.out.println(">>>> " + id);
             System.out.println(">>>> " + resolver.get());
+            System.out.println(">>>> " + proof);
             return Optional.ofNullable(resolver.get().resolve(id, loader, proof));
             
         }
@@ -426,6 +427,7 @@ public final class Verifier extends Processor<Verifier> {
     }
     
     SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
+        
         for (final SignatureSuite suite : suites) {
             for (final String proofType : proofTypes) {
                 if (suite.isSupported(proofType, expandedProof)) {
