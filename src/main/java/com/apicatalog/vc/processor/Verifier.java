@@ -36,7 +36,6 @@ import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.model.io.CredentialReader;
 import com.apicatalog.vc.model.io.PresentationReader;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vc.suite.SignatureSuiteProvider;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -44,7 +43,7 @@ import jakarta.json.JsonValue;
 
 public final class Verifier extends Processor<Verifier> {
 
-    final SignatureSuiteProvider suiteProvider;
+    private final SignatureSuite[] suites;
 
     private final URI location;
     private final JsonObject document;
@@ -53,21 +52,21 @@ public final class Verifier extends Processor<Verifier> {
 
     private Collection<MethodResolver> methodResolvers;
 
-    public Verifier(URI location, final SignatureSuiteProvider suiteProvider) {
+    public Verifier(URI location, final SignatureSuite...suites) {
         this.location = location;
         this.document = null;
 
-        this.suiteProvider = suiteProvider;
+        this.suites = suites;
 
         this.methodResolvers = defaultResolvers();
         this.params = new LinkedHashMap<>(10);
     }
 
-    public Verifier(JsonObject document, final SignatureSuiteProvider suiteProvider) {
+    public Verifier(JsonObject document, final SignatureSuite...suites) {
         this.document = document;
         this.location = null;
 
-        this.suiteProvider = suiteProvider;
+        this.suites = suites;
 
         this.methodResolvers = defaultResolvers();
         this.params = new LinkedHashMap<>(10);
@@ -246,19 +245,18 @@ public final class Verifier extends Processor<Verifier> {
 
             final JsonObject proofObject = expandedProof.asJsonObject();
 
-            final Collection<String> proofType = JsonLdReader.getType(proofObject);
+            final Collection<String> proofTypes = JsonLdReader.getType(proofObject);
 
-            if (proofType == null || proofType.isEmpty()) {
+            if (proofTypes == null || proofTypes.isEmpty()) {
                 throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, LdTerm.TYPE);
             }
 
-            final SignatureSuite signatureSuite = proofType.stream()
-                    .map(type -> suiteProvider.find(type, proofObject))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst()
-                    .orElseThrow(() -> new VerificationError(Code.UnsupportedCryptoSuite));
-
+            final SignatureSuite signatureSuite = findSuite(proofTypes, proofObject);
+            
+            if (signatureSuite == null) {
+                throw new VerificationError(Code.UnsupportedCryptoSuite);
+            }
+                    
             final Proof proof = signatureSuite.readProof(proofObject);
 
             if (proof == null) {
@@ -426,4 +424,16 @@ public final class Verifier extends Processor<Verifier> {
         }
         validateData(credential);
     }
+    
+    SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
+        for (final SignatureSuite suite : suites) {
+            for (final String proofType : proofTypes) {
+                if (suite.isSupported(proofType, expandedProof)) {
+                    return suite;
+                }
+            }
+        }
+        return null;
+    }
+    
 }

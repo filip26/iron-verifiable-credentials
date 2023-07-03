@@ -76,4 +76,10 @@ public final class DataIntegritySuite implements SignatureSuite {
         return false;
     }
 
+    @Override
+    public String proofType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

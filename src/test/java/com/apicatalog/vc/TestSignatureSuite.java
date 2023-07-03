@@ -38,4 +38,10 @@ class TestSignatureSuite implements SignatureSuite  {
         // TODO Auto-generated method stub
         return false;
     }
+
+    @Override
+    public String proofType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
