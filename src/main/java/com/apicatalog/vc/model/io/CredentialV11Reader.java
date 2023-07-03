@@ -10,7 +10,6 @@ import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
 
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 class CredentialV11Reader {
 

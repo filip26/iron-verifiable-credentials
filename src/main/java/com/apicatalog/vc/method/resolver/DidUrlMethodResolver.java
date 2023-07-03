@@ -12,7 +12,6 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.integrity.DataIntegrityKeyPair;
 import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.suite.SignatureSuite;
 
 public class DidUrlMethodResolver implements MethodResolver {
 

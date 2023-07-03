@@ -7,7 +7,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.suite.SignatureSuite;
 
 public interface MethodResolver {
 

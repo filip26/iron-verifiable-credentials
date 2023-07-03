@@ -2,21 +2,17 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.jsonld.schema.LdObject;
 import com.apicatalog.jsonld.schema.LdProperty;
-import com.apicatalog.jsonld.schema.LdSchema;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
