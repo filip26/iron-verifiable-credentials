@@ -88,7 +88,7 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
 
 
         Map<String, Object> rr = new HashMap<>();
-        rr.put(LdTerm.TYPE.uri(), TestSignatureSuite.ID);
+        rr.put(LdTerm.TYPE.uri(), URI.create(TestSignatureSuite.ID));   //TODO
         
         if (verificationMethod != null) {
             rr.put("https://w3id.org/security#verificationMethod", verificationMethod);
@@ -104,7 +104,7 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
         }
 
         LdObject ldProof = new LdObject(rr);
-
+System.out.println(ldProof);
         JsonObject expanded = PROOF_SCHEMA.write(ldProof);
 
         return new TestSignatureProof(suite, CRYPTO, ldProof, expanded);
@@ -156,11 +156,11 @@ class TestSignatureProof implements Proof, ProofValueProcessor {
         PROOF_SCHEMA.validate(ldProof, params);
     }
 
-    @Override
-    public String getType() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+//    @Override
+//    public String getType() {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 
     @Override
     public SignatureSuite getSignatureSuite() {

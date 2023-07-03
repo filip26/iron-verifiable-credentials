@@ -27,7 +27,7 @@ public interface Proof {
      *
      * @return the proof type
      */
-    String getType();
+//    String getType();
 
     /**
      * A set of parameters required to independently verify the proof, such as an
