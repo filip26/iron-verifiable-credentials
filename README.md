@@ -14,8 +14,11 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 * Verifying VC/VP   
 * Issuing VC/VP
+* Verifiable Credentials Data Models
+  * [v2.0 Draft](https://w3c.github.io/vc-data-model//)
+  * [v1.1](https://www.w3.org/TR/vc-data-model/)
 * Signature Suites
-  * DataIntegrityProof
+  * [Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
     * [ECDSA-2019](https://github.com/filip26/iron-ecdsa-cryptosuite-2019)
     * [EdDSA-2022](https://github.com/filip26/iron-eddsa-cryptosuite-2022)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
