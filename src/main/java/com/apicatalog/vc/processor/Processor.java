@@ -34,9 +34,9 @@ abstract class Processor<T extends Processor<?>> {
 
     protected StatusValidator statusValidator;
     protected SubjectValidator subjectValidator;
-    
+
     protected DataModelVersion modelVersion;
-    
+
     protected Processor() {
         // default values
         this.loader = null;
@@ -93,8 +93,6 @@ abstract class Processor<T extends Processor<?>> {
         return (T) this;
     }
 
-    
-
     /**
      * Set a credential subject verifier. If not set then
      * <code>credentialStatus</code> is not verified.
@@ -102,7 +100,7 @@ abstract class Processor<T extends Processor<?>> {
      * @param subjectValidator a custom subject verifier instance
      * @return the verifier instance
      */
-    @SuppressWarnings("unchecked")    
+    @SuppressWarnings("unchecked")
     public T subjectValidator(SubjectValidator subjectValidator) {
         this.subjectValidator = subjectValidator;
         return (T) this;
@@ -139,15 +137,14 @@ abstract class Processor<T extends Processor<?>> {
             throw new DocumentError(e, ErrorType.Invalid);
         }
     }
-    
+
     protected void validateData(final Credential credential) throws DocumentError {
 
         // v1
-        if (credential.getVersion() == null || DataModelVersion.V11.equals(credential.getVersion())) {
+        if ((credential.getVersion() == null || DataModelVersion.V11.equals(credential.getVersion()))
+                && credential.getIssuanceDate() == null) {
             // issuance date is a mandatory property
-            if (credential.getIssuanceDate() == null) {
-                throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
-            }            
+            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
         }
 
         // status check
@@ -155,9 +152,9 @@ abstract class Processor<T extends Processor<?>> {
             statusValidator.verify(credential.getStatus());
         }
     }
-    
+
     protected DataModelVersion getVersion(final JsonObject object) throws DocumentError {
-        
+
         final JsonValue contexts = object.get(Keywords.CONTEXT);
 
         if (JsonUtils.isNotArray(contexts)) {
@@ -165,10 +162,11 @@ abstract class Processor<T extends Processor<?>> {
         }
 
         for (final JsonValue context : contexts.asJsonArray()) {
-            if (JsonUtils.isScalar(context) 
-                    && UriUtils.isURI(((JsonString)context).getString())) {
-                
-                String contextUri = ((JsonString)context).getString();
+            if (JsonUtils.isScalar(context)
+                    && UriUtils.isURI(((JsonString) context).getString())) {
+
+                final String contextUri = ((JsonString) context).getString();
+
                 if ("https://www.w3.org/2018/credentials/v1".equals(contextUri)) {
                     modelVersion = DataModelVersion.V11;
                     break;

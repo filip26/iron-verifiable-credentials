@@ -89,11 +89,7 @@ try {
 ### Issuing
 
 ```java
-
-// proof options
-var options = suite.createOptions()...;
-
-Vc.sign(credential|presentation, keys, options)
+Vc.sign(credential|presentation, keys, proofDraft)
 
    // optional
    .base(...)
@@ -127,6 +123,7 @@ Fork and clone the project repository.
 ```
 
 ## Resources
+* [Verifiable Credentials Data Model v2.0 Draft](https://w3c.github.io/vc-data-model//)
 * [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
 * [Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)

@@ -173,17 +173,16 @@ public final class Issuer extends Processor<Issuer> {
             final Proof draft) throws DocumentError, SigningError {
         try {
             // load the document
-            // load the document
             final DocumentLoaderOptions options = new DocumentLoaderOptions();
             final Document loadedDocument = loader.loadDocument(location, options);
 
-            final JsonStructure document = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
+            final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
             
-            if (JsonUtils.isNotObject(document)) {
+            if (JsonUtils.isNotObject(json)) {
                 throw new DocumentError(ErrorType.Invalid);
             }
 
-            return sign(document.asJsonObject(), keyPair, draft);
+            return sign(json.asJsonObject(), keyPair, draft);
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);

@@ -18,6 +18,7 @@ import jakarta.json.JsonValue;
 public class PresentationReader {
 
     protected PresentationReader() {
+        // protected
     }
 
     public static boolean isPresentation(final JsonValue document) {
@@ -65,21 +66,4 @@ public class PresentationReader {
     public static Collection<JsonValue> getCredentials(final JsonObject document) throws DocumentError {
         return JsonLdReader.getObjects(document, VcVocab.VERIFIABLE_CREDENTIALS.uri());
     }
-
-//    public Collection<Credential> readCredentials(final JsonObject document) throws DocumentError {
-//        
-//        Collection<Credential> credentials = new ArrayList<>();
-//
-//        // verifiableCredentials
-//        for (final JsonValue credential : JsonLdReader.getObjects(document, VcVocab.VERIFIABLE_CREDENTIALS.uri())) {
-//
-//            if (JsonUtils.isNotObject(credential)) {
-//                throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS);
-//            }
-//
-//            credentials.add(Credential.from(credential.asJsonObject()));
-//        }
-//
-//        return credentials;
-//    }
 }

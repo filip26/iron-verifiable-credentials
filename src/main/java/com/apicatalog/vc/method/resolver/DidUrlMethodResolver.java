@@ -28,7 +28,6 @@ public class DidUrlMethodResolver implements MethodResolver {
 
         return didDocument
                 .verificationMethod().stream()
-//TODO                .filter(vm -> keyAdapter.isSupportedType(vm.type()))                
                 .map(did -> DataIntegrityKeyPair.createVerificationKey(
                         did.id().toUri(),
                         did.controller().toUri(),

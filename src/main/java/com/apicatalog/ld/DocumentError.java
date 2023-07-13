@@ -9,7 +9,6 @@ public class DocumentError extends Throwable {
     private static final long serialVersionUID = -7146533158378348477L;
 
     public enum ErrorType {
-        // TODO merge Unknown and Invalid?
         Missing,
         Unknown,
         Invalid,
@@ -47,10 +46,6 @@ public class DocumentError extends Throwable {
         return type;
     }
 
-//    public LdTerm[] getTerms() {
-//        return terms;
-//    }
-    
     @Override
     public String toString() {
         return super.toString() + ": " + getCode();

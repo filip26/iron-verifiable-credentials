@@ -139,13 +139,13 @@ public final class Verifier extends Processor<Verifier> {
             final DocumentLoaderOptions options = new DocumentLoaderOptions();
             final Document loadedDocument = loader.loadDocument(location, options);
 
-            final JsonStructure document = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
+            final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
             
-            if (JsonUtils.isNotObject(document)) {
+            if (JsonUtils.isNotObject(json)) {
                 throw new DocumentError(ErrorType.Invalid);
             }
             
-            return verify(document.asJsonObject());
+            return verify(json.asJsonObject());
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);

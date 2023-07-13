@@ -15,6 +15,10 @@ import jakarta.json.JsonValue;
 
 public class CredentialReader {
 
+    protected CredentialReader() {
+        // protected
+    }
+    
     public static boolean isCredential(final JsonValue expandedDocument) {
         if (expandedDocument == null) {
             throw new IllegalArgumentException("The 'expandedDocument' parameter must not be null.");
