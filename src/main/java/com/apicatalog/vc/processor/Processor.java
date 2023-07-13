@@ -35,11 +35,14 @@ abstract class Processor<T extends Processor<?>> {
     protected StatusValidator statusValidator;
     protected SubjectValidator subjectValidator;
     
+    protected DataModelVersion modelVersion;
+    
     protected Processor() {
         // default values
         this.loader = null;
         this.bundledContexts = true;
         this.base = null;
+        this.modelVersion = null;
 
         this.statusValidator = new StatusPropertiesValidator();
         this.subjectValidator = null;
@@ -167,14 +170,15 @@ abstract class Processor<T extends Processor<?>> {
                 
                 String contextUri = ((JsonString)context).getString();
                 if ("https://www.w3.org/2018/credentials/v1".equals(contextUri)) {
-                    return DataModelVersion.V11;
+                    modelVersion = DataModelVersion.V11;
+                    break;
                 }
                 if ("https://www.w3.org/ns/credentials/v2".equals(contextUri)) {
-                    return DataModelVersion.V20;
+                    modelVersion = DataModelVersion.V20;
+                    break;
                 }
             }
         }
-        
-        return null;
+        return modelVersion;
     }
 }

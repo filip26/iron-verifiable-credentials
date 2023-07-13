@@ -169,4 +169,9 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
     public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
         return DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA).read(expanded);
     }
+
+    @Override
+    public String getContext() {
+        return "classpath:data-integrity-test-signature-2022.jsonld";
+    }
 }

@@ -51,6 +51,8 @@ public class VcTestCase {
     public String domain;
 
     public URI context;
+    
+    public boolean compacted;
 
     public static VcTestCase of(JsonObject test, JsonObject manifest, DocumentLoader loader) {
 
@@ -76,6 +78,11 @@ public class VcTestCase {
                     .getJsonObject(0)
                     .getString(Keywords.ID));
         }
+
+        testCase.compacted = test.containsKey(vocab("compacted"))
+                && test.getJsonArray(vocab("compacted"))
+                .getJsonObject(0)
+                .getBoolean(Keywords.VALUE, false);
 
         if (test.containsKey(da("result"))) {
             final JsonObject result = test.getJsonArray(da("result")).getJsonObject(0);

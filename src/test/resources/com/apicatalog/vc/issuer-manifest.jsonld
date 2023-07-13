@@ -169,7 +169,7 @@
             "name": "V2 credential to sign",
             "input": "issuer/0201-in.jsonld",
             "expect": "issuer/0201-out.jsonld",
-            "context": "issuer/0201-context.jsonld",            
+            "compacted": true,            
             "options": {
                 "keyPair": "issuer/0001-keys.json",
                 "verificationMethod": "verifier/0005-verification-key.json",

@@ -19,15 +19,11 @@ import jakarta.json.JsonObject;
 public interface Proof {
 
     /**
-     * The proof type used.
+     * The proof JSON-LD context URI to compact the proof
      *
-     * For example, an Ed25519Signature2020 type indicates that the proof includes a
-     * digital signature produced by an ed25519 cryptographic key.
-     * DataIntegrityProof type indicates generic data integrity proof type.
-     *
-     * @return the proof type
+     * @return the proof JSON-LD context
      */
-//    String getType();
+    String getContext();
 
     /**
      * A set of parameters required to independently verify the proof, such as an

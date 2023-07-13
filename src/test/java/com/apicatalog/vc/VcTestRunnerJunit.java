@@ -107,6 +107,10 @@ public class VcTestRunnerJunit {
                 if (testCase.context != null) {
 
                     signed = issuer.getCompacted(testCase.context);
+                    
+                } else if (testCase.compacted) {
+                    
+                    signed = issuer.getCompacted();
 
                 } else {
                     signed = issuer.getExpanded();

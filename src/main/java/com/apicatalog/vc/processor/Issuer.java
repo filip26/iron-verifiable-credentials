@@ -27,6 +27,7 @@ import com.apicatalog.vc.model.Verifiable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
@@ -121,12 +122,22 @@ public final class Issuer extends Processor<Issuer> {
      */
     public JsonObject getCompacted() throws SigningError, DocumentError {
 
-        final JsonArray context = Json.createArrayBuilder()
-                .add("https://www.w3.org/2018/credentials/v1")
-                // FIXME use provided crypto suite contexts
-                .add("https://w3id.org/security/suites/ed25519-2020/v1").build();
+        final JsonObject signed = getExpanded();
+    
+        final JsonArrayBuilder context = Json.createArrayBuilder();
 
-        return getCompacted(context);
+        if (modelVersion == null || DataModelVersion.V11.equals(modelVersion)) {
+            context.add("https://www.w3.org/2018/credentials/v1");
+            
+        } else if (DataModelVersion.V20.equals(modelVersion)) {
+            context.add("https://www.w3.org/ns/credentials/v2");
+        }
+        
+        if (draft.getContext() != null) {
+            context.add(draft.getContext());
+        }
+
+        return getCompacted(signed, context.build());
     }
 
     /**
@@ -142,6 +153,11 @@ public final class Issuer extends Processor<Issuer> {
     JsonObject getCompacted(final JsonStructure context) throws SigningError, DocumentError {
 
         final JsonObject signed = getExpanded();
+        
+        return getCompacted(signed, context);
+    }
+
+    JsonObject getCompacted(final JsonObject signed, final JsonStructure context) throws SigningError, DocumentError {
 
         try {
             return JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(context)).loader(loader)
