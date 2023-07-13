@@ -6,15 +6,25 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
 import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.schema.LdTerm;
 import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.model.Credential;
+import com.apicatalog.vc.model.DataModelVersion;
+import com.apicatalog.vc.model.Verifiable;
+import com.apicatalog.vc.model.io.CredentialReader;
+import com.apicatalog.vc.model.io.PresentationReader;
 import com.apicatalog.vc.status.StatusPropertiesValidator;
 import com.apicatalog.vc.status.StatusValidator;
+import com.apicatalog.vc.subject.SubjectValidator;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 
 abstract class Processor<T extends Processor<?>> {
 
@@ -24,12 +34,15 @@ abstract class Processor<T extends Processor<?>> {
 
     protected StatusValidator statusValidator;
     protected SubjectValidator subjectValidator;
-    
+
+    protected DataModelVersion modelVersion;
+
     protected Processor() {
         // default values
         this.loader = null;
         this.bundledContexts = true;
         this.base = null;
+        this.modelVersion = null;
 
         this.statusValidator = new StatusPropertiesValidator();
         this.subjectValidator = null;
@@ -80,8 +93,6 @@ abstract class Processor<T extends Processor<?>> {
         return (T) this;
     }
 
-    
-
     /**
      * Set a credential subject verifier. If not set then
      * <code>credentialStatus</code> is not verified.
@@ -89,23 +100,24 @@ abstract class Processor<T extends Processor<?>> {
      * @param subjectValidator a custom subject verifier instance
      * @return the verifier instance
      */
-    @SuppressWarnings("unchecked")    
+    @SuppressWarnings("unchecked")
     public T subjectValidator(SubjectValidator subjectValidator) {
         this.subjectValidator = subjectValidator;
         return (T) this;
     }
-    protected static Verifiable get(final JsonObject expanded) throws DocumentError {
+
+    protected static Verifiable get(final DataModelVersion version, final JsonObject expanded) throws DocumentError {
 
         // is a credential?
-        if (Credential.isCredential(expanded)) {
+        if (CredentialReader.isCredential(expanded)) {
             // validate the credential object
-            return Credential.from(expanded);
+            return CredentialReader.read(version, expanded);
         }
 
         // is a presentation?
-        if (Presentation.isPresentation(expanded)) {
+        if (PresentationReader.isPresentation(expanded)) {
             // validate the presentation object
-            return Presentation.from(expanded);
+            return PresentationReader.read(version, expanded);
         }
 
         // is not expanded JSON-LD object
@@ -125,13 +137,13 @@ abstract class Processor<T extends Processor<?>> {
             throw new DocumentError(e, ErrorType.Invalid);
         }
     }
-    
+
     protected void validateData(final Credential credential) throws DocumentError {
 
-        // data integrity - issuance date is a mandatory property
-        if (credential.getIssuanceDate() == null
-                && credential.getValidFrom() == null
-                && credential.getIssued() == null) {
+        // v1
+        if ((credential.getVersion() == null || DataModelVersion.V11.equals(credential.getVersion()))
+                && credential.getIssuanceDate() == null) {
+            // issuance date is a mandatory property
             throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
         }
 
@@ -139,10 +151,32 @@ abstract class Processor<T extends Processor<?>> {
         if (statusValidator != null && JsonUtils.isNotNull(credential.getStatus())) {
             statusValidator.verify(credential.getStatus());
         }
+    }
 
-        // subject check
-        if (statusValidator != null && JsonUtils.isNotNull(credential.getSubject())) {
-            statusValidator.verify(credential.getSubject());
+    protected DataModelVersion getVersion(final JsonObject object) throws DocumentError {
+
+        final JsonValue contexts = object.get(Keywords.CONTEXT);
+
+        if (JsonUtils.isNotArray(contexts)) {
+            throw new DocumentError(ErrorType.Invalid);
         }
+
+        for (final JsonValue context : contexts.asJsonArray()) {
+            if (JsonUtils.isScalar(context)
+                    && UriUtils.isURI(((JsonString) context).getString())) {
+
+                final String contextUri = ((JsonString) context).getString();
+
+                if ("https://www.w3.org/2018/credentials/v1".equals(contextUri)) {
+                    modelVersion = DataModelVersion.V11;
+                    break;
+                }
+                if ("https://www.w3.org/ns/credentials/v2".equals(contextUri)) {
+                    modelVersion = DataModelVersion.V20;
+                    break;
+                }
+            }
+        }
+        return modelVersion;
     }
 }

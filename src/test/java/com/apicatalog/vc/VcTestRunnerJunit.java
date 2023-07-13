@@ -1,11 +1,11 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.ld.schema.LdSchema.id;
-import static com.apicatalog.ld.schema.LdSchema.link;
-import static com.apicatalog.ld.schema.LdSchema.multibase;
-import static com.apicatalog.ld.schema.LdSchema.object;
-import static com.apicatalog.ld.schema.LdSchema.property;
-import static com.apicatalog.ld.schema.LdSchema.type;
+import static com.apicatalog.jsonld.schema.LdSchema.id;
+import static com.apicatalog.jsonld.schema.LdSchema.link;
+import static com.apicatalog.jsonld.schema.LdSchema.multibase;
+import static com.apicatalog.jsonld.schema.LdSchema.object;
+import static com.apicatalog.jsonld.schema.LdSchema.property;
+import static com.apicatalog.jsonld.schema.LdSchema.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,18 +26,17 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
+import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.method.VerificationMethod;
-import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec.Codec;
+import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
-import com.apicatalog.vc.integrity.DataIntegrity;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -73,7 +72,7 @@ public class VcTestRunnerJunit {
 
                 Vc.verify(testCase.input, new TestSignatureSuite())
                         .loader(LOADER)
-                        .param(DataIntegrity.DOMAIN.name(), testCase.domain)
+                        .param(DataIntegritySchema.DOMAIN.name(), testCase.domain)
                         .isValid();
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
@@ -89,16 +88,18 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                final TestSignatureSuite suite = new TestSignatureSuite();
-
-                final ProofOptions options = suite.createOptions()
+                final TestSignatureProof draft = TestSignatureProof.createDraft(
                         // proof options
-                        .verificationMethod(testCase.verificationMethod)
-                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
-                        .created(testCase.created)
-                        .domain(testCase.domain);
+                        testCase.verificationMethod,
+                        URI.create("https://w3id.org/security#assertionMethod"),
+                        testCase.created,
+                        testCase.domain                        
+                        ); 
 
-                final Issuer issuer = Vc.sign(testCase.input, getKeys(keyPairLocation, LOADER), options)
+                final Issuer issuer = Vc.sign(
+                        testCase.input,
+                        getKeys(keyPairLocation, LOADER),
+                        draft)
                         .loader(LOADER);
 
                 JsonObject signed = null;
@@ -106,6 +107,10 @@ public class VcTestRunnerJunit {
                 if (testCase.context != null) {
 
                     signed = issuer.getCompacted(testCase.context);
+                    
+                } else if (testCase.compacted) {
+                    
+                    signed = issuer.getCompacted();
 
                 } else {
                     signed = issuer.getExpanded();
@@ -223,14 +228,12 @@ public class VcTestRunnerJunit {
                 continue;
             }
 
-            LdValueAdapter<JsonValue, VerificationMethod> adapter = 
-                    object(
-                        id(),
-                        type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
-                        property(DataIntegrity.CONTROLLER, link()),
-                        property(DataIntegrity.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
-                        property(DataIntegrity.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))
-                    ).map(new DataIntegrityKeysAdapter());
+            LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
+                    id(),
+                    type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
+                    property(DataIntegritySchema.CONTROLLER, link()),
+                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
+                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))).map(new DataIntegrityKeysAdapter());
 
             return (KeyPair) adapter.read(key);
 

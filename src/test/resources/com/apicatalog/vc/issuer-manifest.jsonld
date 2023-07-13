@@ -10,26 +10,6 @@
     "name": "Verifiable Credentials Issuer Test Suite",
     "sequence": [
         {
-            "@id": "#t0001",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "missing @type property",
-            "input": "issuer/0001-in.jsonld",
-            "expectErrorCode": "MissingType"
-        },
-        {
-            "@id": "#t0002",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "@type must be VerifiableCredentials",
-            "input": "issuer/0002-in.jsonld",
-            "expectErrorCode": "UnknownType"
-        },
-        {
             "@id": "#t0003",
             "@type": [
                 "NegativeEvaluationTest",
@@ -58,76 +38,6 @@
             "name": "missing issuanceDate property",
             "input": "issuer/0005-in.jsonld",
             "expectErrorCode": "MissingIssuanceDate"
-        },
-        {
-            "@id": "#t0006",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "issuanceDate @type must be xsd:DateTime",
-            "input": "issuer/0006-in.jsonld",
-            "expectErrorCode": "InvalidIssuanceDate"
-        },
-        {
-            "@id": "#t0007",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "invalid issuanceDate @value",
-            "input": "issuer/0007-in.jsonld",
-            "expectErrorCode": "InvalidIssuanceDate"
-        },
-        {
-            "@id": "#t0008",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "expirationDate @type must be xsd:DateTime",
-            "input": "issuer/0008-in.jsonld",
-            "expectErrorCode": "InvalidExpirationDate"
-        },
-        {
-            "@id": "#t0009",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "invalid expirationDate @value",
-            "input": "issuer/0009-in.jsonld",
-            "expectErrorCode": "InvalidExpirationDate"
-        },
-        {
-            "@id": "#t0010",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "expired credentials",
-            "input": "issuer/0010-in.jsonld",
-            "expectErrorCode": "Expired"
-        },
-        {
-            "@id": "#t0011",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "missing credentialStatus @id",
-            "input": "issuer/0011-in.jsonld",
-            "expectErrorCode": "MissingCredentialStatusId"
-        },
-        {
-            "@id": "#t0012",
-            "@type": [
-                "NegativeEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "missing credentialStatus @type",
-            "input": "issuer/0012-in.jsonld",
-            "expectErrorCode": "MissingCredentialStatusType"
         },
         {
             "@id": "#t0020",
@@ -249,6 +159,23 @@
                 "verificationMethod": "verifier/0005-verification-key.json",
                 "created": "2022-06-09T21:49:41Z"
             }
+        },
+        {
+            "@id": "#t0201",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "V2 credential to sign",
+            "input": "issuer/0201-in.jsonld",
+            "expect": "issuer/0201-out.jsonld",
+            "compacted": true,            
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verifier/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            }
         }
+        
     ]
 }

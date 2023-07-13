@@ -1,53 +1,38 @@
 package com.apicatalog.vc.integrity;
 
-import java.net.URI;
+import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.suite.SignatureSuite;
 
-import com.apicatalog.ld.schema.LdSchema;
-import com.apicatalog.ld.schema.LdTerm;
-import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.SignatureSuite;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 
-public class DataIntegritySuite implements SignatureSuite {
+public abstract class DataIntegritySuite implements SignatureSuite {
 
-    protected final LdTerm id;
-    protected final URI context;
-    protected final CryptoSuite crypto;
-    protected final LdSchema schema;
+    protected static final String ID = VcVocab.SECURITY_VOCAB + "DataIntegrityProof";
 
-    protected DataIntegritySuite(
-            LdTerm id,
-            URI context,
-            CryptoSuite crypto,
-            LdSchema schema) {
+    protected final String cryptosuite;
 
-        this.id = id;
-        this.context = context;
-        this.crypto = crypto;
-        this.schema = schema;
+    protected DataIntegritySuite(String cryptosuite) {
+        this.cryptosuite = cryptosuite;
     }
 
     @Override
-    public DataIntegrityProofOptions createOptions() {
-        return new DataIntegrityProofOptions(this);
+    public boolean isSupported(String proofType, JsonObject expandedProof) {
+        return ID.equals(proofType) && cryptosuite.equals(getCryptoSuite(expandedProof));
     }
 
-    @Override
-    public CryptoSuite getCryptoSuite() {
-        return crypto;
-    }
+    static String getCryptoSuite(JsonObject expandedProof) {
+        if (expandedProof == null) {
+            throw new IllegalArgumentException("expandedProof property must not be null.");
+        }
 
-    @Override
-    public LdSchema getSchema() {
-        return schema;
-    }
-    
-    @Override
-    public LdTerm getId() {
-        return id;
-    }
+        JsonValue value = expandedProof.get(DataIntegritySchema.CRYPTO_SUITE.uri());
 
-    @Override
-    public URI getContext() {
-        return context;
+        if (JsonUtils.isString(value)) {
+            return ((JsonString) value).getString();
+        }
+        return null;
     }
 }

@@ -47,5 +47,4 @@
       <version>${rdf-urdna.version}</version>
     </dependency>
   </dependencies>
-
 </project>

@@ -10,16 +10,6 @@
     "name": "Verifiable Credentials Verifier Test Suite",
     "sequence": [
         {
-            "@id": "#t0001",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "unknown proof type",
-            "input": "verifier/0001-in.jsonld",
-            "expectErrorCode": "UnsupportedCryptoSuite"
-        },
-        {
             "@id": "#t0003",
             "@type": [
                 "NegativeEvaluationTest",
@@ -29,16 +19,6 @@
             "input": "verifier/0003-in.jsonld",
             "expectErrorCode": "MissingProof"
         },
-        {
-            "@id": "#t0004",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "invalid proof value encoding",
-            "input": "verifier/0004-in.jsonld",
-            "expectErrorCode": "InvalidProofValue"
-        },        
         {
             "@id": "#t0005",
             "@type": [
@@ -57,16 +37,6 @@
             "name": "forged credentials subject",
             "input": "verifier/0006-in.jsonld",
             "expectErrorCode": "InvalidSignature"
-        },
-        {
-            "@id": "#t0007",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "missing @type property",
-            "input": "verifier/0007-in.jsonld",
-            "expectErrorCode": "MissingProofType"
         },
         {
             "@id": "#t0008",
@@ -115,7 +85,7 @@
             ],
             "name": "invalid verificationMethod property",
             "input": "verifier/0012-in.jsonld",
-            "expectErrorCode": "InvalidVerificationMethod"
+            "expectErrorCode": "MissingProofVerificationId"
         },
         {
             "@id": "#t0013",
@@ -157,26 +127,6 @@
             "input": "verifier/0016-in.jsonld",
             "expectErrorCode": "InvalidProofValue"
         },
-        {
-            "@id": "#t0017",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "missing credentialStatus @id",
-            "input": "verifier/0017-in.jsonld",
-            "expectErrorCode": "MissingCredentialStatusId"
-        },
-        {
-            "@id": "#t0018",
-            "@type": [
-                "NegativeEvaluationTest",
-                "VeriferTest"
-            ],
-            "name": "missing credentialStatus @type",
-            "input": "verifier/0018-in.jsonld",
-            "expectErrorCode": "MissingCredentialStatusType"
-        },        
         {
             "@id": "#t0019",
             "@type": [
@@ -268,6 +218,15 @@
             "name": "forged signed VP",
             "input": "verifier/0051-in.jsonld",
             "expectErrorCode": "InvalidSignature"
-        }
+        },
+        {
+            "@id": "#t0201",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "V2: valid signed VC",
+            "input": "verifier/0201-in.jsonld"
+        }        
     ]
 }

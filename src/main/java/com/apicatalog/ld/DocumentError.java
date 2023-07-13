@@ -2,14 +2,13 @@ package com.apicatalog.ld;
 
 import java.util.Arrays;
 
-import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.LdTerm;
 
 public class DocumentError extends Throwable {
 
     private static final long serialVersionUID = -7146533158378348477L;
 
     public enum ErrorType {
-        // TODO merge Unknown and Invalid?
         Missing,
         Unknown,
         Invalid,
@@ -17,20 +16,29 @@ public class DocumentError extends Throwable {
     }
 
     private final ErrorType type;
-    private final LdTerm[] terms;
     private final String code;
+
+    public DocumentError(ErrorType type, String code) {
+        super();
+        this.type = type;
+        this.code = type.name().concat(code);
+    }
+
+    public DocumentError(Throwable e, ErrorType type, String code) {
+        super(e);
+        this.type = type;
+        this.code = type.name().concat(code);
+    }
 
     public DocumentError(ErrorType type, LdTerm... terms) {
         super();
         this.type = type;
-        this.terms = terms;
         this.code = toCode(type, terms);
     }
 
     public DocumentError(Throwable e, ErrorType type, LdTerm... terms) {
         super(e);
         this.type = type;
-        this.terms = terms;
         this.code = toCode(type, terms);
     }
 
@@ -38,8 +46,9 @@ public class DocumentError extends Throwable {
         return type;
     }
 
-    public LdTerm[] getTerms() {
-        return terms;
+    @Override
+    public String toString() {
+        return super.toString() + ": " + getCode();
     }
 
     public String getCode() {

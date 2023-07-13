@@ -14,7 +14,13 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 * Verifying VC/VP   
 * Issuing VC/VP
+* Verifiable Credentials Data Models
+  * [v2.0 Draft](https://w3c.github.io/vc-data-model//)
+  * [v1.1](https://www.w3.org/TR/vc-data-model/)
 * Signature Suites
+  * [Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
+    * [ECDSA-2019](https://github.com/filip26/iron-ecdsa-cryptosuite-2019)
+    * [EdDSA-2022](https://github.com/filip26/iron-eddsa-cryptosuite-2022)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature provider? List it here, open PR.
 * [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
@@ -86,11 +92,7 @@ try {
 ### Issuing
 
 ```java
-
-// proof options
-var options = suite.createOptions()...;
-
-Vc.sign(credential|presentation, keys, options)
+Vc.sign(credential|presentation, keys, proofDraft)
 
    // optional
    .base(...)
@@ -124,6 +126,7 @@ Fork and clone the project repository.
 ```
 
 ## Resources
+* [Verifiable Credentials Data Model v2.0 Draft](https://w3c.github.io/vc-data-model//)
 * [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
 * [Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
@@ -139,3 +142,4 @@ Fork and clone the project repository.
 
 ## Commercial Support
 Commercial support is available at filip26@gmail.com
+,

@@ -1,6 +1,6 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.ld.schema.LdTerm;
+import com.apicatalog.jsonld.schema.LdTerm;
 
 public final class VcVocab {
 

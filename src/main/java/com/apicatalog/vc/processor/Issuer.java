@@ -7,26 +7,29 @@ import java.time.temporal.ChronoUnit;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdReader;
+import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
+import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.schema.LdProperty;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.proof.EmbeddedProof;
-import com.apicatalog.ld.signature.proof.ProofOptions;
-import com.apicatalog.vc.VcTag;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.model.DataModelVersion;
+import com.apicatalog.vc.model.EmbeddedProof;
+import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.model.Verifiable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
-import jakarta.json.JsonValue;
 
 public final class Issuer extends Processor<Issuer> {
 
@@ -36,24 +39,24 @@ public final class Issuer extends Processor<Issuer> {
 
     private final KeyPair keyPair;
 
-    protected final ProofOptions options;
+    protected final Proof draft;
 
-    public Issuer(URI location, KeyPair keyPair, final ProofOptions options) {
+    public Issuer(URI location, KeyPair keyPair, final Proof draft) {
         this.location = location;
         this.document = null;
 
         this.keyPair = keyPair;
 
-        this.options = options;
+        this.draft = draft;
     }
 
-    public Issuer(JsonObject document, KeyPair keyPair, final ProofOptions options) {
+    public Issuer(JsonObject document, KeyPair keyPair, final Proof draft) {
         this.document = document;
         this.location = null;
 
         this.keyPair = keyPair;
 
-        this.options = options;
+        this.draft = draft;
     }
 
     /**
@@ -76,11 +79,11 @@ public final class Issuer extends Processor<Issuer> {
         }
 
         if (document != null && keyPair != null) {
-            return sign(document, keyPair, options);
+            return sign(document, keyPair, draft);
         }
 
         if (location != null && keyPair != null) {
-            return sign(location, keyPair, options);
+            return sign(location, keyPair, draft);
         }
 
         throw new IllegalStateException();
@@ -119,11 +122,22 @@ public final class Issuer extends Processor<Issuer> {
      */
     public JsonObject getCompacted() throws SigningError, DocumentError {
 
-        final JsonArray context = Json.createArrayBuilder()
-                .add("https://www.w3.org/2018/credentials/v1")
-                .add("https://w3id.org/security/suites/ed25519-2020/v1").build();
+        final JsonObject signed = getExpanded();
+    
+        final JsonArrayBuilder context = Json.createArrayBuilder();
 
-        return getCompacted(context);
+        if (modelVersion == null || DataModelVersion.V11.equals(modelVersion)) {
+            context.add("https://www.w3.org/2018/credentials/v1");
+            
+        } else if (DataModelVersion.V20.equals(modelVersion)) {
+            context.add("https://www.w3.org/ns/credentials/v2");
+        }
+        
+        if (draft.getContext() != null) {
+            context.add(draft.getContext());
+        }
+
+        return getCompacted(signed, context.build());
     }
 
     /**
@@ -139,6 +153,11 @@ public final class Issuer extends Processor<Issuer> {
     JsonObject getCompacted(final JsonStructure context) throws SigningError, DocumentError {
 
         final JsonObject signed = getExpanded();
+        
+        return getCompacted(signed, context);
+    }
+
+    JsonObject getCompacted(final JsonObject signed, final JsonStructure context) throws SigningError, DocumentError {
 
         try {
             return JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(context)).loader(loader)
@@ -151,13 +170,19 @@ public final class Issuer extends Processor<Issuer> {
     }
 
     final JsonObject sign(final URI documentLocation, final KeyPair keyPair,
-            final ProofOptions options) throws DocumentError, SigningError {
+            final Proof draft) throws DocumentError, SigningError {
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).base(base)
-                    .get();
+            final DocumentLoaderOptions options = new DocumentLoaderOptions();
+            final Document loadedDocument = loader.loadDocument(location, options);
 
-            return sign(expanded, keyPair, options);
+            final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
+            
+            if (JsonUtils.isNotObject(json)) {
+                throw new DocumentError(ErrorType.Invalid);
+            }
+
+            return sign(json.asJsonObject(), keyPair, draft);
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -166,13 +191,13 @@ public final class Issuer extends Processor<Issuer> {
     }
 
     final JsonObject sign(final JsonObject document, final KeyPair keyPair,
-            final ProofOptions options) throws DocumentError, SigningError {
+            final Proof draft) throws DocumentError, SigningError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
 
-            return sign(expanded, keyPair, options);
+            return sign(getVersion(document), expanded, keyPair, draft);
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -180,23 +205,26 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    final JsonObject sign(final JsonArray expanded, final KeyPair keyPair,
-            final ProofOptions options) throws SigningError, DocumentError {
+    final JsonObject sign(final DataModelVersion version, final JsonArray expanded, final KeyPair keyPair,
+            final Proof draft) throws SigningError, DocumentError {
 
         JsonObject object = JsonLdReader
                 .findFirstObject(expanded)
                 .orElseThrow(() -> new DocumentError(ErrorType.Invalid)); // malformed input, not single object to sign has been found
 
-        final Verifiable verifiable = get(object);
+        final Verifiable verifiable = get(version, object);
 
         validate(verifiable);
 
-        if (options.getSuite() == null) {
+        if (draft.getCryptoSuite() == null) {
             throw new SigningError(Code.UnsupportedCryptoSuite);
         }
 
         // add issuance date if missing
-        if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
+        if (verifiable.isCredential()
+                && (verifiable.getVersion() == null
+                        || DataModelVersion.V11.equals(verifiable.getVersion()))
+                && verifiable.asCredential().getIssuanceDate() == null) {
 
             final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
@@ -207,22 +235,19 @@ public final class Issuer extends Processor<Issuer> {
 
         final JsonObject data = EmbeddedProof.removeProof(object);
 
-        final LinkedDataSignature ldSignature = new LinkedDataSignature(options.getSuite().getCryptoSuite());
+        final LinkedDataSignature ldSignature = new LinkedDataSignature(draft.getCryptoSuite());
 
-        JsonObject proof = options.getSuite().getSchema().write(options.toUnsignedProof());
+        JsonObject unsignedDraft = draft.toJsonLd();
 
-        final LdProperty<byte[]> proofValueProperty = options.getSuite().getSchema().tagged(VcTag.ProofValue.name());
+        if (draft.getValue() != null) {
+            unsignedDraft = draft.valueProcessor().removeProofValue(unsignedDraft);
+        }
 
-        final byte[] signature = ldSignature.sign(data, keyPair, proof);
+        final byte[] signature = ldSignature.sign(data, keyPair, unsignedDraft);
 
-        final JsonValue proofValue = proofValueProperty.write(signature);
+        final JsonObject signedProof = draft.valueProcessor().setProofValue(unsignedDraft, signature);
 
-        proof = Json.createObjectBuilder(proof)
-                .add(proofValueProperty.term().uri(),
-                        Json.createArrayBuilder().add(proofValue))
-                .build();
-
-        return EmbeddedProof.addProof(object, proof);
+        return EmbeddedProof.addProof(object, signedProof);
     }
 
     final void validate(Verifiable verifiable) throws SigningError, DocumentError {
@@ -231,7 +256,7 @@ public final class Issuer extends Processor<Issuer> {
             if (verifiable.asCredential().isExpired()) {
                 throw new SigningError(Code.Expired);
             }
-            super.validateData(verifiable.asCredential());            
+            super.validateData(verifiable.asCredential());
         }
     }
 }
