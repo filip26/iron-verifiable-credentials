@@ -27,13 +27,13 @@ public class PresentationReader {
         return JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document);
     }
 
-    public static Presentation read(final JsonObject document) throws DocumentError {
+    public static Presentation read(final DataModelVersion version, final JsonObject document) throws DocumentError {
 
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        final Presentation presentation = new Presentation(DataModelVersion.V11);
+        final Presentation presentation = new Presentation(version);
 
         // @type
         if (!JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document)) {

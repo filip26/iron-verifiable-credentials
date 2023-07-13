@@ -7,7 +7,10 @@ import java.time.temporal.ChronoUnit;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdReader;
+import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
+import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -17,6 +20,7 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.model.DataModelVersion;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.Verifiable;
@@ -119,7 +123,7 @@ public final class Issuer extends Processor<Issuer> {
 
         final JsonArray context = Json.createArrayBuilder()
                 .add("https://www.w3.org/2018/credentials/v1")
-                //FIXME use provided crypto suite contexts
+                // FIXME use provided crypto suite contexts
                 .add("https://w3id.org/security/suites/ed25519-2020/v1").build();
 
         return getCompacted(context);
@@ -153,10 +157,17 @@ public final class Issuer extends Processor<Issuer> {
             final Proof draft) throws DocumentError, SigningError {
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(documentLocation).loader(loader).base(base)
-                    .get();
+            // load the document
+            final DocumentLoaderOptions options = new DocumentLoaderOptions();
+            final Document loadedDocument = loader.loadDocument(location, options);
 
-            return sign(expanded, keyPair, draft);
+            final JsonStructure document = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
+            
+            if (JsonUtils.isNotObject(document)) {
+                throw new DocumentError(ErrorType.Invalid);
+            }
+
+            return sign(document.asJsonObject(), keyPair, draft);
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -171,7 +182,7 @@ public final class Issuer extends Processor<Issuer> {
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
 
-            return sign(expanded, keyPair, draft);
+            return sign(getVersion(document), expanded, keyPair, draft);
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -179,14 +190,14 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    final JsonObject sign(final JsonArray expanded, final KeyPair keyPair,
+    final JsonObject sign(final DataModelVersion version, final JsonArray expanded, final KeyPair keyPair,
             final Proof draft) throws SigningError, DocumentError {
 
         JsonObject object = JsonLdReader
                 .findFirstObject(expanded)
                 .orElseThrow(() -> new DocumentError(ErrorType.Invalid)); // malformed input, not single object to sign has been found
 
-        final Verifiable verifiable = get(object);
+        final Verifiable verifiable = get(version, object);
 
         validate(verifiable);
 
@@ -195,7 +206,10 @@ public final class Issuer extends Processor<Issuer> {
         }
 
         // add issuance date if missing
-        if (verifiable.isCredential() && verifiable.asCredential().getIssuanceDate() == null) {
+        if (verifiable.isCredential()
+                && (verifiable.getVersion() == null
+                        || DataModelVersion.V11.equals(verifiable.getVersion()))
+                && verifiable.asCredential().getIssuanceDate() == null) {
 
             final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
@@ -209,15 +223,15 @@ public final class Issuer extends Processor<Issuer> {
         final LinkedDataSignature ldSignature = new LinkedDataSignature(draft.getCryptoSuite());
 
         JsonObject unsignedDraft = draft.toJsonLd();
-        
+
         if (draft.getValue() != null) {
             unsignedDraft = draft.valueProcessor().removeProofValue(unsignedDraft);
         }
-                
+
         final byte[] signature = ldSignature.sign(data, keyPair, unsignedDraft);
 
         final JsonObject signedProof = draft.valueProcessor().setProofValue(unsignedDraft, signature);
-        
+
         return EmbeddedProof.addProof(object, signedProof);
     }
 

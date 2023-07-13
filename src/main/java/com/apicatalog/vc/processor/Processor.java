@@ -6,12 +6,15 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
 import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
+import com.apicatalog.vc.model.DataModelVersion;
 import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.model.io.CredentialReader;
 import com.apicatalog.vc.model.io.PresentationReader;
@@ -20,6 +23,8 @@ import com.apicatalog.vc.status.StatusValidator;
 import com.apicatalog.vc.subject.SubjectValidator;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 
 abstract class Processor<T extends Processor<?>> {
 
@@ -100,18 +105,18 @@ abstract class Processor<T extends Processor<?>> {
         return (T) this;
     }
 
-    protected static Verifiable get(final JsonObject expanded) throws DocumentError {
+    protected static Verifiable get(final DataModelVersion version, final JsonObject expanded) throws DocumentError {
 
         // is a credential?
         if (CredentialReader.isCredential(expanded)) {
             // validate the credential object
-            return CredentialReader.read(expanded);
+            return CredentialReader.read(version, expanded);
         }
 
         // is a presentation?
         if (PresentationReader.isPresentation(expanded)) {
             // validate the presentation object
-            return PresentationReader.read(expanded);
+            return PresentationReader.read(version, expanded);
         }
 
         // is not expanded JSON-LD object
@@ -134,17 +139,43 @@ abstract class Processor<T extends Processor<?>> {
     
     protected void validateData(final Credential credential) throws DocumentError {
 
-        // data integrity - issuance date is a mandatory property
-        if (credential.getIssuanceDate() == null
-                && credential.getValidFrom() == null
-//                && credential.getIssued() == null
-                ) {
-            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
+        // v1
+        if (credential.getVersion() == null || DataModelVersion.V11.equals(credential.getVersion())) {
+            // issuance date is a mandatory property
+            if (credential.getIssuanceDate() == null) {
+                throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
+            }            
         }
 
         // status check
         if (statusValidator != null && JsonUtils.isNotNull(credential.getStatus())) {
             statusValidator.verify(credential.getStatus());
         }
+    }
+    
+    protected DataModelVersion getVersion(final JsonObject object) throws DocumentError {
+        
+        final JsonValue contexts = object.get(Keywords.CONTEXT);
+
+        if (JsonUtils.isNotArray(contexts)) {
+            throw new DocumentError(ErrorType.Invalid);
+        }
+
+        for (final JsonValue context : contexts.asJsonArray()) {
+            if (JsonUtils.isScalar(context) 
+                    && UriUtils.isURI(((JsonString)context).getString())) {
+                
+                String contextUri = ((JsonString)context).getString();
+                
+                if ("https://www.w3.org/2018/credentials/v1".equals(contextUri)) {
+                    return DataModelVersion.V11;
+                }
+                if ("https://www.w3.org/ns/credentials/v2".equals(contextUri)) {
+                    return DataModelVersion.V20;
+                }
+            }
+        }
+        
+        return null;
     }
 }

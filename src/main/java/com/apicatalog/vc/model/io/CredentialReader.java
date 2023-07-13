@@ -22,13 +22,13 @@ public class CredentialReader {
         return JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), expandedDocument);
     }
 
-    public static Credential read(final JsonObject expandedDocument) throws DocumentError {
+    public static Credential read(final DataModelVersion version, final JsonObject expandedDocument) throws DocumentError {
 
         if (expandedDocument == null) {
             throw new IllegalArgumentException("The 'expandedDocument' parameter must not be null.");
         }
 
-        final Credential credential = new Credential(DataModelVersion.V11);
+        final Credential credential = new Credential(version);
 
         // @type
         credential.setType(JsonLdReader.getType(expandedDocument));
@@ -77,7 +77,7 @@ public class CredentialReader {
             // validFrom - optional
             credential.setValidFrom(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.VALID_FROM.uri()).orElse(null));
 
-            // validFrom - optional
+            // validUntil - optional
             credential.setValidUntil(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.VALID_UNTIL.uri()).orElse(null));
 
             credential.setStatus(expandedDocument.get(VcVocab.STATUS.uri()));

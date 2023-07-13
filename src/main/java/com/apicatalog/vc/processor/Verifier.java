@@ -12,8 +12,10 @@ import java.util.Optional;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdReader;
+import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
@@ -30,6 +32,7 @@ import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.model.Credential;
+import com.apicatalog.vc.model.DataModelVersion;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.Verifiable;
@@ -39,6 +42,7 @@ import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
 public final class Verifier extends Processor<Verifier> {
@@ -132,9 +136,16 @@ public final class Verifier extends Processor<Verifier> {
     private Verifiable verify(final URI location) throws VerificationError, DocumentError {
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(location).loader(loader).base(base).get();
+            final DocumentLoaderOptions options = new DocumentLoaderOptions();
+            final Document loadedDocument = loader.loadDocument(location, options);
 
-            return verifyExpanded(expanded);
+            final JsonStructure document = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
+            
+            if (JsonUtils.isNotObject(document)) {
+                throw new DocumentError(ErrorType.Invalid);
+            }
+            
+            return verify(document.asJsonObject());
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -143,12 +154,13 @@ public final class Verifier extends Processor<Verifier> {
     }
 
     private Verifiable verify(final JsonObject document) throws VerificationError, DocumentError {
+
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
 
-            return verifyExpanded(expanded);
+            return verifyExpanded(getVersion(document), expanded);
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -156,7 +168,7 @@ public final class Verifier extends Processor<Verifier> {
         }
     }
 
-    private Verifiable verifyExpanded(JsonArray expanded) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final DataModelVersion version, JsonArray expanded) throws VerificationError, DocumentError {
 
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
             throw new DocumentError(ErrorType.Invalid);
@@ -168,13 +180,13 @@ public final class Verifier extends Processor<Verifier> {
             throw new DocumentError(ErrorType.Invalid);
         }
 
-        return verifyExpanded(verifiable.asJsonObject());
+        return verifyExpanded(version, verifiable.asJsonObject());
     }
 
-    private Verifiable verifyExpanded(final JsonObject expanded) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final DataModelVersion version, final JsonObject expanded) throws VerificationError, DocumentError {
 
         // get a verifiable representation
-        final Verifiable verifiable = get(expanded);
+        final Verifiable verifiable = get(version, expanded);
 
         if (verifiable.isCredential()) {
 
@@ -202,23 +214,10 @@ public final class Verifier extends Processor<Verifier> {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
                 }
 
-                credentials.add(verifyExpanded(presentedCredentials.asJsonObject()).asCredential());
+                credentials.add(verifyExpanded(version, presentedCredentials.asJsonObject()).asCredential());
             }
 
             verifiable.asPresentation().setCredentials(credentials);
-
-//            // verify embedded credentials
-//            for (final Credential credential : verifiable.asPresentation().getCredentials()) {
-//
-//                if (!credential.isCredential()) {
-//                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
-//                }
-//
-//                // data integrity and metadata validation
-//                validate(credential);
-//
-//                credential.setProofs(verifyProofs(credential.toJsonLd()));
-//            }
 
             return verifiable;
         }

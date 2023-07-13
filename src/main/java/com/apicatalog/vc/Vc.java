@@ -26,15 +26,15 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param location a location of the document to verify
-     * @param suite a suite or an array of suites to verify the VC
-     *      
+     * @param suite    a suite or an array of suites to verify the VC
+     * 
      * @return {@link Verifier} allowing to set options and assert document's
      *         validity
      *
      * @throws DocumentError
      * @throws VerificationError
      */
-    public static Verifier verify(final URI location, final SignatureSuite suite) throws DocumentError, VerificationError {
+    public static Verifier verify(final URI location, final SignatureSuite... suite) throws DocumentError, VerificationError {
         return new Verifier(location, suite);
     }
 
@@ -42,7 +42,7 @@ public final class Vc {
      * Verifies VC/VP document data integrity and signature.
      *
      * @param document the document to verify
-     * @param suite a suite or an array of suites to verify the VC
+     * @param suite    a suite or an array of suites to verify the VC
      *
      * @return {@link Verifier} allowing to set options and assert document's
      *         validity
@@ -51,7 +51,7 @@ public final class Vc {
      * @throws VerificationError
      */
     public static Verifier verify(final JsonObject document, final SignatureSuite... suite) throws DocumentError, VerificationError {
-        return new Verifier(document, suite); 
+        return new Verifier(document, suite);
     }
 
     /**
@@ -59,7 +59,7 @@ public final class Vc {
      *
      * @param documentLocation
      * @param keyPair
-     * @param draft a draft of the proof to sign and attach
+     * @param draft            a draft of the proof to sign and attach
      *
      * @return {@link Issuer} allowing to set options and to sign the given document
      *
@@ -75,7 +75,7 @@ public final class Vc {
      *
      * @param document
      * @param keyPair
-     * @param draft a draft of the proof to sign and attach
+     * @param draft    a draft of the proof to sign and attach
      *
      * @return {@link Issuer} allowing to set options and to sign the given document
      *
