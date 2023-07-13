@@ -159,6 +159,23 @@
                 "verificationMethod": "verifier/0005-verification-key.json",
                 "created": "2022-06-09T21:49:41Z"
             }
+        },
+        {
+            "@id": "#t0201",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "V2 credential to sign",
+            "input": "issuer/0201-in.jsonld",
+            "expect": "issuer/0201-out.jsonld",
+            "context": "issuer/0201-context.jsonld",            
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verifier/0005-verification-key.json",
+                "created": "2022-05-28T17:02:05Z"
+            }
         }
+        
     ]
 }

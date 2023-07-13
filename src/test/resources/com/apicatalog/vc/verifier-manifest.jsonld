@@ -218,6 +218,15 @@
             "name": "forged signed VP",
             "input": "verifier/0051-in.jsonld",
             "expectErrorCode": "InvalidSignature"
-        }
+        },
+        {
+            "@id": "#t0201",
+            "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "V2: valid signed VC",
+            "input": "verifier/0201-in.jsonld"
+        }        
     ]
 }

@@ -166,7 +166,6 @@ abstract class Processor<T extends Processor<?>> {
                     && UriUtils.isURI(((JsonString)context).getString())) {
                 
                 String contextUri = ((JsonString)context).getString();
-                
                 if ("https://www.w3.org/2018/credentials/v1".equals(contextUri)) {
                     return DataModelVersion.V11;
                 }
