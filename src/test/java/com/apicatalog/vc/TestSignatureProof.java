@@ -79,7 +79,6 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
             Instant created,
             String domain) throws DocumentError {
 
-
         Map<String, Object> rr = new HashMap<>();
         rr.put(LdTerm.TYPE.uri(), URI.create(TestSignatureSuite.ID));
         
