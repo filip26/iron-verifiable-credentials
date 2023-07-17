@@ -98,6 +98,8 @@ public final class DataIntegritySchema {
                         .test((domain, params) -> !params.containsKey(DataIntegritySchema.DOMAIN.name())
                                 || params.get(DataIntegritySchema.DOMAIN.name()).equals(domain)),
 
+                property(CRYPTO_SUITE, string()),
+                        
                 property(CHALLENGE, string()),
 
                 method.required(),

@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.schema.LdObject;
 import com.apicatalog.jsonld.schema.LdProperty;
 import com.apicatalog.jsonld.schema.LdSchema;
@@ -17,6 +18,7 @@ import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
@@ -43,15 +45,22 @@ public class DataIntegritySuite implements SignatureSuite {
         return PROOF_TYPE_ID.equals(proofType) && cryptosuite.getId().equals(getCryptoSuiteName(expandedProof));
     }
 
-    static String getCryptoSuiteName(JsonObject expandedProof) {
+    static String getCryptoSuiteName(final JsonObject expandedProof) {
         if (expandedProof == null) {
             throw new IllegalArgumentException("expandedProof property must not be null.");
         }
 
-        JsonValue value = expandedProof.get(DataIntegritySchema.CRYPTO_SUITE.uri());
+        final JsonArray cryptos = expandedProof.getJsonArray(DataIntegritySchema.CRYPTO_SUITE.uri());
 
-        if (JsonUtils.isString(value)) {
-            return ((JsonString) value).getString();
+        for (final JsonValue valueObject : cryptos) {
+            if (JsonUtils.isObject(valueObject) && valueObject.asJsonObject().containsKey(Keywords.VALUE)) {
+
+                final JsonValue value = valueObject.asJsonObject().get(Keywords.VALUE);
+
+                if (JsonUtils.isString(value)) {
+                    return ((JsonString) value).getString();
+                }
+            }
         }
 
         return null;
@@ -81,17 +90,30 @@ public class DataIntegritySuite implements SignatureSuite {
             VerificationMethod method,
             URI purpose,
             Instant created,
+            String domain) throws DocumentError {
+        return createDraft(method, purpose, created, domain, null);
+    }
+
+    public DataIntegrityProof createDraft(
+            VerificationMethod method,
+            URI purpose,
+            Instant created,
             String domain,
             String challenge) throws DocumentError {
 
         Map<String, Object> proof = new LinkedHashMap<>();
 
         proof.put(LdTerm.TYPE.uri(), URI.create(PROOF_TYPE_ID));
+        proof.put(DataIntegritySchema.CRYPTO_SUITE.uri(), cryptosuite.getId());
         proof.put(DataIntegritySchema.CREATED.uri(), created);
         proof.put(DataIntegritySchema.PURPOSE.uri(), purpose);
         proof.put(DataIntegritySchema.VERIFICATION_METHOD.uri(), method);
-        proof.put(DataIntegritySchema.DOMAIN.uri(), domain);
-        proof.put(DataIntegritySchema.CHALLENGE.uri(), challenge);
+        if (domain != null) {
+            proof.put(DataIntegritySchema.DOMAIN.uri(), domain);
+        }
+        if (challenge != null) {
+            proof.put(DataIntegritySchema.CHALLENGE.uri(), challenge);
+        }
 
         final LdObject ldProof = new LdObject(proof);
 

@@ -123,16 +123,16 @@ public final class Issuer extends Processor<Issuer> {
     public JsonObject getCompacted() throws SigningError, DocumentError {
 
         final JsonObject signed = getExpanded();
-    
+
         final JsonArrayBuilder context = Json.createArrayBuilder();
 
         if (modelVersion == null || DataModelVersion.V11.equals(modelVersion)) {
             context.add("https://www.w3.org/2018/credentials/v1");
-            
+
         } else if (DataModelVersion.V20.equals(modelVersion)) {
             context.add("https://www.w3.org/ns/credentials/v2");
         }
-        
+
         if (draft.getContext() != null) {
             context.add(draft.getContext());
         }
@@ -153,20 +153,39 @@ public final class Issuer extends Processor<Issuer> {
     JsonObject getCompacted(final JsonStructure context) throws SigningError, DocumentError {
 
         final JsonObject signed = getExpanded();
-        
+
         return getCompacted(signed, context);
     }
 
     JsonObject getCompacted(final JsonObject signed, final JsonStructure context) throws SigningError, DocumentError {
 
         try {
-            return JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(context)).loader(loader)
+            final JsonObject compacted = JsonLd
+                    .compact(JsonDocument.of(signed), JsonDocument.of(context))
+                    .loader(loader)
                     .get();
+
+            if (compacted.containsKey("sec:proof")) {
+                return compactionWorkaround(compacted, "sec:proof");
+
+            } else if (compacted.containsKey("https://w3id.org/security#proof")) {
+                return compactionWorkaround(compacted, "https://w3id.org/security#proof");
+            }
+
+            return compacted;
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
         }
+    }
+
+    // Fix proof compaction - workaround
+    final JsonObject compactionWorkaround(final JsonObject source, final String propertyName) {
+        return Json.createObjectBuilder(source)
+                .remove(propertyName)
+                .add("proof", source.get(propertyName))
+                .build();
     }
 
     final JsonObject sign(final URI documentLocation, final KeyPair keyPair,
@@ -177,7 +196,7 @@ public final class Issuer extends Processor<Issuer> {
             final Document loadedDocument = loader.loadDocument(location, options);
 
             final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
-            
+
             if (JsonUtils.isNotObject(json)) {
                 throw new DocumentError(ErrorType.Invalid);
             }
