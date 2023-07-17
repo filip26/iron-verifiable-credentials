@@ -3,7 +3,7 @@
     "type": "VerifiableCredential",
     "issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
     "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-    "sec:proof": {
+    "proof": {
         "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
         "type": "TestSignatureSuite2022",
         "created": "2022-05-28T17:02:05Z",
