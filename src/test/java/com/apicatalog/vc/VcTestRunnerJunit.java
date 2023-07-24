@@ -74,6 +74,7 @@ public class VcTestRunnerJunit {
                         .loader(LOADER)
                         .param(DataIntegritySchema.DOMAIN.name(), testCase.domain)
                         .param(DataIntegritySchema.CHALLENGE.name(), testCase.challenge)
+                        .param(DataIntegritySchema.PURPOSE.name(), testCase.purpose)
                         .isValid();
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);

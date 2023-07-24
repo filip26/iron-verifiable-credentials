@@ -96,13 +96,15 @@ public final class DataIntegritySchema {
 
                 property(DOMAIN, string())
                         .test((domain, params) -> !params.containsKey(DataIntegritySchema.DOMAIN.name())
-                                || params.get(DataIntegritySchema.DOMAIN.name()).equals(domain)),
+                                || domain != null && domain.equals(params.get(DataIntegritySchema.DOMAIN.name()))
+                                ),
 
                 property(CRYPTO_SUITE, string()),
-                        
+
                 property(CHALLENGE, string())
-                .test((domain, params) -> !params.containsKey(DataIntegritySchema.CHALLENGE.name())
-                        || params.get(DataIntegritySchema.CHALLENGE.name()).equals(domain)),
+                        .test((challenge, params) -> !params.containsKey(DataIntegritySchema.CHALLENGE.name())
+                                || (challenge != null && challenge.equals(params.get(DataIntegritySchema.CHALLENGE.name())))
+                                ),
 
                 method.required(),
                 proofValue.required()));

@@ -97,7 +97,12 @@ public final class Verifier extends Processor<Verifier> {
      * @return the verifier instance
      */
     public Verifier param(final String name, final Object value) {
-        params.put(name, value);
+        if (value != null) {
+            params.put(name, value);
+
+        } else if (params.containsKey(name)) {
+            params.remove(name);
+        }
         return this;
     }
 

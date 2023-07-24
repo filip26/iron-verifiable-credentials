@@ -51,6 +51,8 @@ public class VcTestCase {
     public String domain;
     
     public String challenge;
+    
+    public String purpose;
 
     public URI context;
     
@@ -140,6 +142,11 @@ public class VcTestCase {
             
             if (options.containsKey(vocab("challenge"))) {
                 testCase.challenge = options.getJsonArray(vocab("challenge")).getJsonObject(0)
+                        .getString(Keywords.VALUE);
+            }
+            
+            if (options.containsKey(vocab("purpose"))) {
+                testCase.purpose = options.getJsonArray(vocab("purpose")).getJsonObject(0)
                         .getString(Keywords.VALUE);
             }            
         }
