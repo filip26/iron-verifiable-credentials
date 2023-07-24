@@ -234,7 +234,7 @@
 			"name": "assert valid proof purpose",
 			"input": "verifier/0025-in.jsonld",
 			"options": {
-				"purpose": "assertionMethod"
+				"purpose": "https://w3id.org/security#assertionMethod"
 			}
 		},
 		{
@@ -246,9 +246,9 @@
 			"name": "assert invalid proof purpose",
 			"input": "verifier/0025-in.jsonld",
 			"options": {
-				"purpose": "invalidMethod"
+				"purpose": "https://w3id.org/security#invalidMethod"
 			},
-			"expectErrorCode": "InvalidCAssertionMethod"
+			"expectErrorCode": "InvalidProofPurpose"
 		},
 		{
 			"@id": "#t0050",

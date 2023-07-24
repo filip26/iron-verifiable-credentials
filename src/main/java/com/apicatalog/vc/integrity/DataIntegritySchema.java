@@ -90,21 +90,21 @@ public final class DataIntegritySchema {
 //                        .defaultValue(Instant.now())
                         .required(),
 
-                property(PURPOSE, link()).required(),
+                property(PURPOSE, link()).required()
+                        .test((purpose, params) -> !params.containsKey(DataIntegritySchema.PURPOSE.name())
+                                || purpose != null && params.get(DataIntegritySchema.PURPOSE.name()).toString().equals(purpose.toString())),
 
 //                property(VERIFICATION_METHOD, ).required(),
 
                 property(DOMAIN, string())
                         .test((domain, params) -> !params.containsKey(DataIntegritySchema.DOMAIN.name())
-                                || domain != null && domain.equals(params.get(DataIntegritySchema.DOMAIN.name()))
-                                ),
+                                || params.get(DataIntegritySchema.DOMAIN.name()).equals(domain)),
 
                 property(CRYPTO_SUITE, string()),
 
                 property(CHALLENGE, string())
                         .test((challenge, params) -> !params.containsKey(DataIntegritySchema.CHALLENGE.name())
-                                || (challenge != null && challenge.equals(params.get(DataIntegritySchema.CHALLENGE.name())))
-                                ),
+                                || params.get(DataIntegritySchema.CHALLENGE.name()).equals(challenge)),
 
                 method.required(),
                 proofValue.required()));
