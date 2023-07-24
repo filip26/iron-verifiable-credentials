@@ -100,7 +100,9 @@ public final class DataIntegritySchema {
 
                 property(CRYPTO_SUITE, string()),
                         
-                property(CHALLENGE, string()),
+                property(CHALLENGE, string())
+                .test((domain, params) -> !params.containsKey(DataIntegritySchema.CHALLENGE.name())
+                        || params.get(DataIntegritySchema.CHALLENGE.name()).equals(domain)),
 
                 method.required(),
                 proofValue.required()));
