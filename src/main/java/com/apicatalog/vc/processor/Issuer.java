@@ -3,6 +3,7 @@ package com.apicatalog.vc.processor;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -10,6 +11,7 @@ import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
@@ -29,7 +31,9 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
+import jakarta.json.JsonValue;
 
 public final class Issuer extends Processor<Issuer> {
 
@@ -104,7 +108,7 @@ public final class Issuer extends Processor<Issuer> {
         final JsonObject signed = getExpanded();
 
         try {
-            return JsonLd.compact(JsonDocument.of(signed), contextLocation).loader(loader).get();
+            return postCompact(JsonLd.compact(JsonDocument.of(signed), contextLocation).loader(loader).get());
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -160,24 +164,43 @@ public final class Issuer extends Processor<Issuer> {
     JsonObject getCompacted(final JsonObject signed, final JsonStructure context) throws SigningError, DocumentError {
 
         try {
-            final JsonObject compacted = JsonLd
+            return postCompact(JsonLd
                     .compact(JsonDocument.of(signed), JsonDocument.of(context))
                     .loader(loader)
-                    .get();
-
-            if (compacted.containsKey("sec:proof")) {
-                return compactionWorkaround(compacted, "sec:proof");
-
-            } else if (compacted.containsKey("https://w3id.org/security#proof")) {
-                return compactionWorkaround(compacted, "https://w3id.org/security#proof");
-            }
-
-            return compacted;
-
+                    .get());
+            
         } catch (JsonLdError e) {
             failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
         }
+    }
+    
+    JsonObject postCompact(final JsonObject source) {
+        
+        JsonObject compacted = source;
+        
+        // TODO use options
+        // make sure @context is the first key
+        if (!compacted.keySet().iterator().next().equals(Keywords.CONTEXT)) {
+            final JsonObjectBuilder builder = Json.createObjectBuilder()
+                    .add(Keywords.CONTEXT, compacted.get(Keywords.CONTEXT));
+
+            compacted.entrySet().stream()
+                    .filter(entry -> !Keywords.CONTEXT.equals(entry.getKey()))
+                    .forEach(entry -> builder.add(entry.getKey(), entry.getValue()));
+
+            compacted = builder.build();
+        }
+
+        // FIXMe remove v2 model?
+        if (compacted.containsKey("sec:proof")) {
+            return compactionWorkaround(compacted, "sec:proof");
+
+        } else if (compacted.containsKey("https://w3id.org/security#proof")) {
+            return compactionWorkaround(compacted, "https://w3id.org/security#proof");
+        }
+
+        return compacted;
     }
 
     // Fix proof compaction - workaround
