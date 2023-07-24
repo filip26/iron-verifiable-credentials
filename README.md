@@ -28,9 +28,9 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 ## Installation
 
 ### Maven
+Java 17 or higher
 
 ```xml
-<!-- Java 17 -->
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials</artifactId>
@@ -39,18 +39,8 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 
 ```
 
-or
-
-```xml
-<!-- Android 12 or higher (API Level >=31) -->
-<dependency>
-    <groupId>com.apicatalog</groupId>
-    <artifactId>iron-verifiable-credentials-jre8</artifactId>
-    <version>0.8.1</version>
-</dependency>
-```
-
 ### Gradle
+Android 12 or higher (API Level >=31)
 
 ```gradle
 compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.8.1'
