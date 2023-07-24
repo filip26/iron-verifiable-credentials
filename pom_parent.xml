@@ -58,7 +58,7 @@
         <!-- dev resources -->
 
         <!-- test resources -->
-        <junit.version>5.9.3</junit.version>
+        <junit.version>5.10.0</junit.version>
     </properties>
     
     <dependencies>
