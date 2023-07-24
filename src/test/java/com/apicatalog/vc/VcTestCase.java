@@ -49,6 +49,8 @@ public class VcTestCase {
     public Instant created;
 
     public String domain;
+    
+    public String challenge;
 
     public URI context;
     
@@ -135,6 +137,11 @@ public class VcTestCase {
                 testCase.domain = options.getJsonArray(vocab("domain")).getJsonObject(0)
                         .getString(Keywords.VALUE);
             }
+            
+            if (options.containsKey(vocab("challenge"))) {
+                testCase.challenge = options.getJsonArray(vocab("challenge")).getJsonObject(0)
+                        .getString(Keywords.VALUE);
+            }            
         }
 
         return testCase;

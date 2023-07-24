@@ -193,11 +193,36 @@
         {
             "@id": "#t0025",
             "@type": [
+                "PositiveEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "valid proof challenge property",
+            "input": "verifier/0025-in.jsonld",
+            "options": {
+                "challenge": "498798779"
+            }
+        },
+        {
+            "@id": "#t0026",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid proof challenge property",
+            "input": "verifier/0025-in.jsonld",
+            "options": {
+                "challenge": "3546568678678"
+            },
+            "expectErrorCode": "InvalidChallenge"
+        },        
+        {
+            "@id": "#t0027",
+            "@type": [
                 "NegativeEvaluationTest",
                 "VeriferTest"
             ],
             "name": "expired certificate",
-            "input": "verifier/0025-in.jsonld",
+            "input": "verifier/0027-in.jsonld",
             "expectErrorCode": "Expired"
         },
         {

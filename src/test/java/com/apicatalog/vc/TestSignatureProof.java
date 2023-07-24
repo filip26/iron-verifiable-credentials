@@ -77,7 +77,8 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
             VerificationMethod verificationMethod,
             URI assertionMethod,
             Instant created,
-            String domain) throws DocumentError {
+            String domain,
+            String challenge) throws DocumentError {
 
         Map<String, Object> rr = new HashMap<>();
         rr.put(LdTerm.TYPE.uri(), URI.create(TestSignatureSuite.ID));
@@ -93,6 +94,9 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
         }
         if (domain != null) {
             rr.put(DataIntegritySchema.DOMAIN.uri(), domain);
+        }
+        if (challenge != null) {
+            rr.put(DataIntegritySchema.CHALLENGE.uri(), challenge);
         }
 
         final LdObject ldProof = new LdObject(rr);

@@ -1,19 +1,19 @@
 {
+	"@context": [
+		"https://www.w3.org/2018/credentials/v1",
+		"classpath:data-integrity-test-signature-2022.jsonld"
+	],
 	"id": "https://apicatalog/com/vc/test-credentials#0001",
 	"type": "VerifiableCredential",
 	"issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
 	"issuanceDate": "2022-06-18T19:00:44Z",
 	"credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-	"sec:proof": {
-		"verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+	"proof": {
 		"type": "TestSignatureSuite2022",
-		"challenge": "498798779",
+		"verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
 		"created": "2022-06-18T19:00:44Z",
 		"proofPurpose": "assertionMethod",
-		"proofValue": "z8RWrguxcpDKRfUJfnL3f5jVN8eRvksXGftXak6p14xWJ"
-	},
-	"@context": [
-		"https://www.w3.org/2018/credentials/v1",
-		"classpath:data-integrity-test-signature-2022.jsonld"
-	]
+		"proofValue": "zEUq39Dm8MRwR9UP1FyzNEZT6rEcdnmjxNpRYM9FsRQbT",
+		"domain": "4jt78h47fh47"
+	}
 }
