@@ -28,6 +28,16 @@
 			"name": "valid signed VC",
 			"input": "verifier/0005-in.jsonld"
 		},
+        {
+            "@id": "#t0007",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid verificationMethod property",
+            "input": "verifier/0007-in.jsonld",
+            "expectErrorCode": "UnknownProofVerificationId"
+        },		
 		{
 			"@id": "#t0006",
 			"@type": [
