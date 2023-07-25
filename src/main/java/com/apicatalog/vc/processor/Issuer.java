@@ -3,7 +3,6 @@ package com.apicatalog.vc.processor;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -33,7 +32,6 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
-import jakarta.json.JsonValue;
 
 public final class Issuer extends Processor<Issuer> {
 
@@ -168,17 +166,17 @@ public final class Issuer extends Processor<Issuer> {
                     .compact(JsonDocument.of(signed), JsonDocument.of(context))
                     .loader(loader)
                     .get());
-            
+
         } catch (JsonLdError e) {
             failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
         }
     }
-    
+
     JsonObject postCompact(final JsonObject source) {
-        
+
         JsonObject compacted = source;
-        
+
         // TODO use options
         // make sure @context is the first key
         if (!compacted.keySet().iterator().next().equals(Keywords.CONTEXT)) {
@@ -191,24 +189,8 @@ public final class Issuer extends Processor<Issuer> {
 
             compacted = builder.build();
         }
-
-        // FIXMe remove v2 model?
-        if (compacted.containsKey("sec:proof")) {
-            return compactionWorkaround(compacted, "sec:proof");
-
-        } else if (compacted.containsKey("https://w3id.org/security#proof")) {
-            return compactionWorkaround(compacted, "https://w3id.org/security#proof");
-        }
-
+        
         return compacted;
-    }
-
-    // Fix proof compaction - workaround
-    final JsonObject compactionWorkaround(final JsonObject source, final String propertyName) {
-        return Json.createObjectBuilder(source)
-                .remove(propertyName)
-                .add("proof", source.get(propertyName))
-                .build();
     }
 
     final JsonObject sign(final URI documentLocation, final KeyPair keyPair,

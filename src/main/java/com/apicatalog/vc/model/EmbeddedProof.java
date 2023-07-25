@@ -4,11 +4,13 @@ import java.util.Collection;
 
 import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
@@ -35,11 +37,16 @@ public final class EmbeddedProof {
 
         final JsonValue propertyValue = document.get(VcVocab.PROOF.uri());
 
+        final JsonArrayBuilder builder = propertyValue == null
+                ? Json.createArrayBuilder()
+                : Json.createArrayBuilder(JsonUtils.toJsonArray(propertyValue));
+
         return Json.createObjectBuilder(document)
                 .add(VcVocab.PROOF.uri(),
-                        ((propertyValue != null)
-                                ? Json.createArrayBuilder(JsonUtils.toJsonArray(propertyValue))
-                                : Json.createArrayBuilder()).add(proof))
+                        builder.add(
+                                Json.createObjectBuilder()
+                                        .add(Keywords.GRAPH,
+                                                Json.createArrayBuilder().add(proof))))
                 .build();
     }
 

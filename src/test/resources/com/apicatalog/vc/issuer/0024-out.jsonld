@@ -8,7 +8,7 @@
 	"issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
 	"issuanceDate": "2022-06-18T19:00:44Z",
 	"credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-	"sec:proof": {
+	"proof": {
 		"type": "TestSignatureSuite2022",
 		"verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
 		"created": "2022-06-18T19:00:44Z",
