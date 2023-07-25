@@ -125,6 +125,23 @@
             }
         },
         {
+            "@id": "#t0025",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "proof challenge property",
+            "input": "issuer/0025-in.jsonld",
+            "expect": "issuer/0025-out.jsonld",
+            "context": "issuer/0001-context.jsonld",
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verifier/0005-verification-key.json",
+                "created": "2022-06-18T19:00:44Z",
+                "challenge": "498798779"
+            }
+        },        
+        {
             "@id": "#t0030",
             "@type": [
                 "PositiveEvaluationTest",

@@ -19,8 +19,8 @@
             "@id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
         }
     ],
-    "https://w3id.org/security#proof": [
-        {
+    "https://w3id.org/security#proof": [{
+        "@graph": [{
             "@type": [
                 "https://w3id.org/security#TestSignatureSuite2022"
             ],
@@ -46,6 +46,7 @@
                     "@type": "https://w3id.org/security#multibase"
                 }
             ]
+        }]
         }
     ]
 }

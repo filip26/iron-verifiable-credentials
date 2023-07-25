@@ -73,6 +73,8 @@ public class VcTestRunnerJunit {
                 Vc.verify(testCase.input, new TestSignatureSuite())
                         .loader(LOADER)
                         .param(DataIntegritySchema.DOMAIN.name(), testCase.domain)
+                        .param(DataIntegritySchema.CHALLENGE.name(), testCase.challenge)
+                        .param(DataIntegritySchema.PURPOSE.name(), testCase.purpose)
                         .isValid();
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
@@ -93,7 +95,8 @@ public class VcTestRunnerJunit {
                         testCase.verificationMethod,
                         URI.create("https://w3id.org/security#assertionMethod"),
                         testCase.created,
-                        testCase.domain                        
+                        testCase.domain,
+                        testCase.challenge
                         ); 
 
                 final Issuer issuer = Vc.sign(

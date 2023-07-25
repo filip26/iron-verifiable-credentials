@@ -73,11 +73,6 @@
             <version>${jakarta.json.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>copper-multicodec</artifactId>
-            <version>${copper.version}</version>
-        </dependency>        
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>

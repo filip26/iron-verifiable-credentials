@@ -10,6 +10,7 @@ import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
@@ -29,6 +30,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
 
 public final class Issuer extends Processor<Issuer> {
@@ -104,7 +106,7 @@ public final class Issuer extends Processor<Issuer> {
         final JsonObject signed = getExpanded();
 
         try {
-            return JsonLd.compact(JsonDocument.of(signed), contextLocation).loader(loader).get();
+            return postCompact(JsonLd.compact(JsonDocument.of(signed), contextLocation).loader(loader).get());
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -123,16 +125,16 @@ public final class Issuer extends Processor<Issuer> {
     public JsonObject getCompacted() throws SigningError, DocumentError {
 
         final JsonObject signed = getExpanded();
-    
+
         final JsonArrayBuilder context = Json.createArrayBuilder();
 
         if (modelVersion == null || DataModelVersion.V11.equals(modelVersion)) {
             context.add("https://www.w3.org/2018/credentials/v1");
-            
+
         } else if (DataModelVersion.V20.equals(modelVersion)) {
             context.add("https://www.w3.org/ns/credentials/v2");
         }
-        
+
         if (draft.getContext() != null) {
             context.add(draft.getContext());
         }
@@ -153,20 +155,42 @@ public final class Issuer extends Processor<Issuer> {
     JsonObject getCompacted(final JsonStructure context) throws SigningError, DocumentError {
 
         final JsonObject signed = getExpanded();
-        
+
         return getCompacted(signed, context);
     }
 
     JsonObject getCompacted(final JsonObject signed, final JsonStructure context) throws SigningError, DocumentError {
 
         try {
-            return JsonLd.compact(JsonDocument.of(signed), JsonDocument.of(context)).loader(loader)
-                    .get();
+            return postCompact(JsonLd
+                    .compact(JsonDocument.of(signed), JsonDocument.of(context))
+                    .loader(loader)
+                    .get());
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
         }
+    }
+
+    JsonObject postCompact(final JsonObject source) {
+
+        JsonObject compacted = source;
+
+        // TODO use options
+        // make sure @context is the first key
+        if (!compacted.keySet().iterator().next().equals(Keywords.CONTEXT)) {
+            final JsonObjectBuilder builder = Json.createObjectBuilder()
+                    .add(Keywords.CONTEXT, compacted.get(Keywords.CONTEXT));
+
+            compacted.entrySet().stream()
+                    .filter(entry -> !Keywords.CONTEXT.equals(entry.getKey()))
+                    .forEach(entry -> builder.add(entry.getKey(), entry.getValue()));
+
+            compacted = builder.build();
+        }
+        
+        return compacted;
     }
 
     final JsonObject sign(final URI documentLocation, final KeyPair keyPair,
@@ -177,7 +201,7 @@ public final class Issuer extends Processor<Issuer> {
             final Document loadedDocument = loader.loadDocument(location, options);
 
             final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
-            
+
             if (JsonUtils.isNotObject(json)) {
                 throw new DocumentError(ErrorType.Invalid);
             }
