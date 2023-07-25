@@ -1,8 +1,8 @@
 package com.apicatalog.vc.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
-import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
@@ -10,6 +10,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -59,14 +60,42 @@ public final class EmbeddedProof {
      *         credentials. never <code>null</code> nor an empty collection
      * @throws DocumentError if there is no single proof
      */
-    public static Collection<JsonValue> assertProof(final JsonObject document) throws DocumentError {
+    public static Collection<JsonObject> assertProof(final JsonObject document) throws DocumentError {
 
-        final Collection<JsonValue> proofs = JsonLdReader.getObjects(document, VcVocab.PROOF.uri());
-
-        if (proofs == null || proofs.size() == 0) {
-            throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
+        final JsonArray proofValue = document.getJsonArray(VcVocab.PROOF.uri());
+        
+        if (proofValue != null && proofValue.size() > 0) {
+            
+            final Collection<JsonObject> proofs = new ArrayList<>(proofValue.size());
+            
+            for (JsonValue proofGraph : proofValue) {
+                
+                if (JsonUtils.isNull(proofGraph)) {
+                    throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
+                }
+                if (JsonUtils.isNotObject(proofGraph)) {
+                    throw new DocumentError(ErrorType.Invalid, VcVocab.PROOF);
+                }
+                final JsonValue proof = proofGraph.asJsonObject().get(Keywords.GRAPH);
+                
+                if (JsonUtils.isNull(proof)) {
+                    throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
+                }
+                
+                if (JsonUtils.isNotArray(proof) 
+                        || proof.asJsonArray().size() != 1
+                        || JsonUtils.isNotObject(proof.asJsonArray().get(0))
+                        ) {
+                    throw new DocumentError(ErrorType.Invalid, VcVocab.PROOF);
+                }
+                proofs.add(proof.asJsonArray().getJsonObject(0));
+            }
+            if (proofs.size() > 0) {
+                return proofs;
+            }
         }
-        return proofs;
+        
+        throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
     }
 
     public static JsonObject removeProof(final JsonObject document) {

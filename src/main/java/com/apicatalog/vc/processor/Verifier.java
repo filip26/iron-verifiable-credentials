@@ -233,7 +233,7 @@ public final class Verifier extends Processor<Verifier> {
 
         // get proofs - throws an exception if there is no proof, never null nor an
         // empty collection
-        final Collection<JsonValue> expandedProofs = EmbeddedProof.assertProof(expanded);
+        final Collection<JsonObject> expandedProofs = EmbeddedProof.assertProof(expanded);
 
         // a data before issuance - no proof attached
         final JsonObject data = EmbeddedProof.removeProof(expanded);
@@ -241,27 +241,27 @@ public final class Verifier extends Processor<Verifier> {
         final Collection<Proof> proofs = new ArrayList<>(expandedProofs.size());
 
         // read attached proofs
-        for (final JsonValue expandedProof : expandedProofs) {
+        for (final JsonObject expandedProof : expandedProofs) {
 
-            if (JsonUtils.isNotObject(expandedProof)) {
-                throw new DocumentError(ErrorType.Invalid, VcVocab.PROOF);
-            }
+//            if (JsonUtils.isNotObject(expandedProof)) {
+//                throw new DocumentError(ErrorType.Invalid, VcVocab.PROOF);
+//            }
+//
+//            final JsonObject proofObject = expandedProof.asJsonObject();
 
-            final JsonObject proofObject = expandedProof.asJsonObject();
-
-            final Collection<String> proofTypes = JsonLdReader.getType(proofObject);
+            final Collection<String> proofTypes = JsonLdReader.getType(expandedProof);
 
             if (proofTypes == null || proofTypes.isEmpty()) {
                 throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, LdTerm.TYPE);
             }
 
-            final SignatureSuite signatureSuite = findSuite(proofTypes, proofObject);
+            final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
 
             if (signatureSuite == null) {
                 throw new VerificationError(Code.UnsupportedCryptoSuite);
             }
 
-            final Proof proof = signatureSuite.readProof(proofObject);
+            final Proof proof = signatureSuite.readProof(expandedProof);
 
             if (proof == null) {
                 throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
