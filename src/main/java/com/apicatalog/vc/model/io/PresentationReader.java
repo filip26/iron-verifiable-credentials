@@ -1,9 +1,12 @@
 package com.apicatalog.vc.model.io;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdReader;
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
@@ -63,7 +66,31 @@ public class PresentationReader {
         return presentation;
     }
 
-    public static Collection<JsonValue> getCredentials(final JsonObject document) throws DocumentError {
-        return JsonLdReader.getObjects(document, VcVocab.VERIFIABLE_CREDENTIALS.uri());
+    public static Collection<JsonObject> getCredentials(final JsonObject document) throws DocumentError {
+        
+        JsonValue credentials = document.get(VcVocab.VERIFIABLE_CREDENTIALS.uri());
+  
+        if (JsonUtils.isNotArray(credentials)
+                || credentials.asJsonArray().size() == 0
+                ) {
+            return Collections.emptyList();
+        }
+        
+        final Collection<JsonObject> result = new ArrayList<>(credentials.asJsonArray().size());
+        
+        for (final JsonValue cred : credentials.asJsonArray()) {
+            if (JsonUtils.isNotObject(cred)
+                    || JsonUtils.isNotArray(cred.asJsonObject().get(Keywords.GRAPH))
+                    || cred.asJsonObject().getJsonArray(Keywords.GRAPH).size() != 1
+                    || JsonUtils.isNotObject(cred.asJsonObject().getJsonArray(Keywords.GRAPH).get(0))
+                    ) {
+                throw new DocumentError(ErrorType.Invalid, VcVocab.CREDENTIALS_VOCAB);
+            }
+
+            result.add(cred.asJsonObject().getJsonArray(Keywords.GRAPH).getJsonObject(0));
+        }
+        
+        return result;        
+//        return JsonLdReader.getObjects(document, VcVocab.VERIFIABLE_CREDENTIALS.uri());
     }
 }

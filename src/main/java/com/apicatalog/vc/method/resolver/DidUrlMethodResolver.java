@@ -24,17 +24,22 @@ public class DidUrlMethodResolver implements MethodResolver {
     @Override
     public VerificationMethod resolve(URI uri, DocumentLoader loader, Proof proof) throws DocumentError {
 
-        final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));
-
-        return didDocument
-                .verificationMethod().stream()
-                .map(did -> DataIntegrityKeyPair.createVerificationKey(
-                        did.id().toUri(),
-                        did.controller().toUri(),
-                        URI.create(did.type()), // TODO did.type should return URI
-                        did.publicKey()))
-                .findFirst()
-                .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "ProofVerificationMethod"));
+        try {
+            final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));
+//System.out.println("DID " + uri);
+            return didDocument
+                    .verificationMethod().stream()
+                    .map(did -> DataIntegrityKeyPair.createVerificationKey(
+                            did.id().toUri(),
+                            did.controller().toUri(),
+//FIXME                        URI.create(did.type()), // TODO did.type should return URI
+                            null,
+                            did.publicKey()))
+                    .findFirst()
+                    .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "ProofVerificationMethod"));
+        } catch (IllegalArgumentException e) {
+            throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
+        }
     }
 
     @Override

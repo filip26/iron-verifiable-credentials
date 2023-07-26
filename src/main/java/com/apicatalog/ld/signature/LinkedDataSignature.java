@@ -70,12 +70,12 @@ public class LinkedDataSignature {
      * @throws SigningError
      * @throws DocumentError
      */
-    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject proof) throws SigningError {
+    public byte[] sign(JsonObject document, byte [] privateKey, JsonObject proof) throws SigningError {
 
         try {
             final byte[] documentHashCode = hashCode(document, proof);
 
-            return suite.sign(keyPair.privateKey(), documentHashCode);
+            return suite.sign(privateKey, documentHashCode);
 
         } catch (LinkedDataSuiteError e) {
             throw new SigningError(SigningError.Code.Internal, e);

@@ -260,6 +260,16 @@
 			},
 			"expectErrorCode": "InvalidProofPurpose"
 		},
+    {
+            "@id": "#t0030",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid did method",
+            "input": "verifier/0030-in.jsonld",
+            "expectErrorCode": "UnknownProofVerificationMethod"
+        },		
 		{
 			"@id": "#t0050",
 			"@type": [

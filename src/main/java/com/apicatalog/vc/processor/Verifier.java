@@ -209,17 +209,17 @@ public final class Verifier extends Processor<Verifier> {
 
             final Collection<Credential> credentials = new ArrayList<>();
 
-            for (final JsonValue presentedCredentials : PresentationReader.getCredentials(expanded)) {
+            for (final JsonObject presentedCredentials : PresentationReader.getCredentials(expanded)) {
 
-                if (JsonUtils.isNotObject(presentedCredentials)) {
-                    throw new DocumentError(ErrorType.Invalid);
-                }
+//                if (JsonUtils.isNotObject(presentedCredentials)) {
+//                    throw new DocumentError(ErrorType.Invalid);
+//                }
 
                 if (!CredentialReader.isCredential(presentedCredentials)) {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
                 }
 
-                credentials.add(verifyExpanded(version, presentedCredentials.asJsonObject()).asCredential());
+                credentials.add(verifyExpanded(version, presentedCredentials).asCredential());
             }
 
             verifiable.asPresentation().setCredentials(credentials);

@@ -81,11 +81,11 @@ public final class Issuer extends Processor<Issuer> {
         }
 
         if (document != null && keyPair != null) {
-            return sign(document, keyPair, draft);
+            return sign(document, keyPair.privateKey(), draft);
         }
 
         if (location != null && keyPair != null) {
-            return sign(location, keyPair, draft);
+            return sign(location, keyPair.privateKey(), draft);
         }
 
         throw new IllegalStateException();
@@ -193,7 +193,7 @@ public final class Issuer extends Processor<Issuer> {
         return compacted;
     }
 
-    final JsonObject sign(final URI documentLocation, final KeyPair keyPair,
+    final JsonObject sign(final URI documentLocation, final byte[] privateKey,
             final Proof draft) throws DocumentError, SigningError {
         try {
             // load the document
@@ -206,7 +206,7 @@ public final class Issuer extends Processor<Issuer> {
                 throw new DocumentError(ErrorType.Invalid);
             }
 
-            return sign(json.asJsonObject(), keyPair, draft);
+            return sign(json.asJsonObject(), privateKey, draft);
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -214,14 +214,14 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    final JsonObject sign(final JsonObject document, final KeyPair keyPair,
+    final JsonObject sign(final JsonObject document, final byte[] privateKey,
             final Proof draft) throws DocumentError, SigningError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
 
-            return sign(getVersion(document), expanded, keyPair, draft);
+            return sign(getVersion(document), expanded, privateKey, draft);
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -229,7 +229,7 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    final JsonObject sign(final DataModelVersion version, final JsonArray expanded, final KeyPair keyPair,
+    final JsonObject sign(final DataModelVersion version, final JsonArray expanded, final byte[] privateKey,
             final Proof draft) throws SigningError, DocumentError {
 
         JsonObject object = JsonLdReader
@@ -267,7 +267,7 @@ public final class Issuer extends Processor<Issuer> {
             unsignedDraft = draft.valueProcessor().removeProofValue(unsignedDraft);
         }
 
-        final byte[] signature = ldSignature.sign(data, keyPair, unsignedDraft);
+        final byte[] signature = ldSignature.sign(data, privateKey, unsignedDraft);
 
         final JsonObject signedProof = draft.valueProcessor().setProofValue(unsignedDraft, signature);
 
