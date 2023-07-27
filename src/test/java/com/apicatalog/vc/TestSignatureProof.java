@@ -28,7 +28,6 @@ import jakarta.json.JsonValue;
 class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMethodProcessor {
 
     static final CryptoSuite CRYPTO = new CryptoSuite(
-            "test-signature",
             new Urdna2015(),
             new MessageDigest("SHA-256"),
             new TestAlgorithm());

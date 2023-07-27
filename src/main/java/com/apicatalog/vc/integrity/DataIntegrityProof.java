@@ -27,6 +27,7 @@ import jakarta.json.JsonValue;
 public class DataIntegrityProof implements Proof, ProofValueProcessor, VerificationMethodProcessor {
 
     protected final DataIntegritySuite suite;
+    protected final CryptoSuite crypto;
 
     final LdSchema proofSchema;
 
@@ -35,10 +36,12 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, Verificat
 
     protected DataIntegrityProof(
             DataIntegritySuite suite,
+            CryptoSuite crypto,
             LdSchema proofSchema,
             LdObject ldProof,
             JsonObject expandedProof) {
         this.suite = suite;
+        this.crypto = crypto;
         this.proofSchema = proofSchema;
         this.ldProof = ldProof;
         this.expanded = expandedProof;
@@ -108,7 +111,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, Verificat
 
     @Override
     public CryptoSuite getCryptoSuite() {
-        return suite.cryptosuite;
+        return crypto;
     }
 
     @Override

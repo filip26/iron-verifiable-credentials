@@ -23,7 +23,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
-public class DataIntegritySuite implements SignatureSuite {
+public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected static final String PROOF_TYPE_NAME = "DataIntegrityProof";
 
@@ -32,9 +32,9 @@ public class DataIntegritySuite implements SignatureSuite {
     protected final LdSchema methodSchema;
     protected final LdProperty<byte[]> proofValueSchema;
 
-    protected final CryptoSuite cryptosuite;
+    protected final String cryptosuite;
 
-    protected DataIntegritySuite(CryptoSuite cryptosuite, final LdSchema methodSchema, final LdProperty<byte[]> proofValueSchema) {
+    protected DataIntegritySuite(String cryptosuite, final LdSchema methodSchema, final LdProperty<byte[]> proofValueSchema) {
         this.cryptosuite = cryptosuite;
         this.methodSchema = methodSchema;
         this.proofValueSchema = proofValueSchema;
@@ -42,7 +42,7 @@ public class DataIntegritySuite implements SignatureSuite {
 
     @Override
     public boolean isSupported(String proofType, JsonObject expandedProof) {
-        return PROOF_TYPE_ID.equals(proofType) && cryptosuite.getId().equals(getCryptoSuiteName(expandedProof));
+        return PROOF_TYPE_ID.equals(proofType) && cryptosuite.equals(getCryptoSuiteName(expandedProof));
     }
 
     static String getCryptoSuiteName(final JsonObject expandedProof) {
@@ -74,27 +74,15 @@ public class DataIntegritySuite implements SignatureSuite {
                 DataIntegritySchema.getEmbeddedMethod(methodSchema),
                 proofValueSchema);
 
-        LdObject ldProof = proofSchema.read(expanded);
+        final LdObject ldProof = proofSchema.read(expanded);
 
-        return new DataIntegrityProof(this, proofSchema, ldProof, expanded);
+        return new DataIntegrityProof(this, getCryptoSuite(ldProof),  proofSchema, ldProof, expanded);
     }
 
-    public DataIntegrityProof createDraft(
-            VerificationMethod method,
-            URI purpose,
-            Instant created) throws DocumentError {
-        return createDraft(method, purpose, created, null, null);
-    }
-
-    public DataIntegrityProof createDraft(
-            VerificationMethod method,
-            URI purpose,
-            Instant created,
-            String domain) throws DocumentError {
-        return createDraft(method, purpose, created, domain, null);
-    }
-
-    public DataIntegrityProof createDraft(
+    protected abstract CryptoSuite getCryptoSuite(LdObject ldProof) throws DocumentError;
+    
+    protected DataIntegrityProof createDraft(
+            CryptoSuite crypto,
             VerificationMethod method,
             URI purpose,
             Instant created,
@@ -104,7 +92,7 @@ public class DataIntegritySuite implements SignatureSuite {
         Map<String, Object> proof = new LinkedHashMap<>();
 
         proof.put(LdTerm.TYPE.uri(), URI.create(PROOF_TYPE_ID));
-        proof.put(DataIntegritySchema.CRYPTO_SUITE.uri(), cryptosuite.getId());
+        proof.put(DataIntegritySchema.CRYPTO_SUITE.uri(), cryptosuite);
         proof.put(DataIntegritySchema.CREATED.uri(), created);
         proof.put(DataIntegritySchema.PURPOSE.uri(), purpose);
         proof.put(DataIntegritySchema.VERIFICATION_METHOD.uri(), method);
@@ -124,6 +112,6 @@ public class DataIntegritySuite implements SignatureSuite {
 
         final JsonObject expanded = proofSchema.write(ldProof);
 
-        return new DataIntegrityProof(this, proofSchema, ldProof, expanded);
+        return new DataIntegrityProof(this, crypto, proofSchema, ldProof, expanded);
     }
 }
