@@ -14,7 +14,7 @@ class TestSignatureSuite implements SignatureSuite  {
 
     @Override
     public Proof readProof(JsonObject expanded) throws DocumentError {
-        return TestSignatureProof.read(this, expanded);
+        return TestSignatureProof.read(expanded);
     }
     
     @Override

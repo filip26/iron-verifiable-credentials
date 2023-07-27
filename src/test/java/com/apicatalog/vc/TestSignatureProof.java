@@ -20,7 +20,6 @@ import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.method.VerificationMethodProcessor;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.ProofValueProcessor;
-import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -65,7 +64,7 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
         this.expanded = expanded;
     }
 
-    public static final TestSignatureProof read(SignatureSuite suite, JsonObject expanded) throws DocumentError {
+    public static final TestSignatureProof read(JsonObject expanded) throws DocumentError {
 
         LdObject ldProof = PROOF_SCHEMA.read(expanded);
 

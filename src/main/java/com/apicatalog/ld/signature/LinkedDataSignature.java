@@ -1,11 +1,9 @@
 package com.apicatalog.ld.signature;
 
-import java.net.URI;
 import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationError.Code;
-import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 
 import jakarta.json.JsonObject;
@@ -107,9 +105,5 @@ public class LinkedDataSignature {
         System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
 
         return result;
-    }
-
-    public KeyPair keygen(URI id, int length) throws KeyGenError {
-        return suite.keygen(length);
     }
 }

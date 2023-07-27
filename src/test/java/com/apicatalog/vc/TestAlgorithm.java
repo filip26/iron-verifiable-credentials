@@ -39,9 +39,9 @@ class TestAlgorithm implements SignatureAlgorithm {
     }
 
     @Override
-    public KeyPair keygen(int length) throws KeyGenError {
+    public KeyPair keygen() throws KeyGenError {
 
-        byte[] key = new byte[length];
+        byte[] key = new byte[32];
 
         new Random().nextBytes(key);
 

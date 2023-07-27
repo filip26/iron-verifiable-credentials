@@ -243,12 +243,6 @@ public final class Verifier extends Processor<Verifier> {
         // read attached proofs
         for (final JsonObject expandedProof : expandedProofs) {
 
-//            if (JsonUtils.isNotObject(expandedProof)) {
-//                throw new DocumentError(ErrorType.Invalid, VcVocab.PROOF);
-//            }
-//
-//            final JsonObject proofObject = expandedProof.asJsonObject();
-
             final Collection<String> proofTypes = JsonLdReader.getType(expandedProof);
 
             if (proofTypes == null || proofTypes.isEmpty()) {

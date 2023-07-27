@@ -14,7 +14,6 @@ import jakarta.json.JsonStructure;
 public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
     protected final String id;
-
     protected final CanonicalizationAlgorithm canonicalization;
     protected final DigestAlgorithm digester;
     protected final SignatureAlgorithm signer;
@@ -56,10 +55,14 @@ public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, 
     }
 
     @Override
-    public KeyPair keygen(int length) throws KeyGenError {
-        return signer.keygen(length);
+    public KeyPair keygen() throws KeyGenError {
+        return signer.keygen();
     }
-
+    
+    /**
+     * An unique cryptographic suite id
+     * @return
+     */
     public String getId() {
         return id;
     }
