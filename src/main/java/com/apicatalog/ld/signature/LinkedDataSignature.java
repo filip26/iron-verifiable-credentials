@@ -60,7 +60,7 @@ public class LinkedDataSignature {
      *      Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
-     * @param keyPair
+     * @param privateKey
      * @param proof
      *
      * @return computed signature
