@@ -116,6 +116,19 @@ public class Credential extends Verifiable {
     }
 
     /**
+     * Checks if the credential is active, i.e. does not define validFrom property
+     * or the property datetime is before now.
+     * 
+     * @since 0.90.0
+     * 
+     * @return <code>true</code> if the credential is active
+     */
+    public boolean isNotValidYet() {
+        return (issuance != null && issuance.isBefore(Instant.now()))
+                || (validFrom != null && validFrom.isBefore(Instant.now()));
+    }
+
+    /**
      *
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
      * @return {@link JsonObject} representing the issuer in an expanded form

@@ -1,7 +1,6 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -145,11 +144,11 @@ public final class Verifier extends Processor<Verifier> {
             final Document loadedDocument = loader.loadDocument(location, options);
 
             final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
-            
+
             if (JsonUtils.isNotObject(json)) {
                 throw new DocumentError(ErrorType.Invalid);
             }
-            
+
             return verify(json.asJsonObject());
 
         } catch (JsonLdError e) {
@@ -356,20 +355,14 @@ public final class Verifier extends Processor<Verifier> {
     final void validate(final Credential credential) throws DocumentError, VerificationError {
 
         // validation
-        if (credential.isExpired()
-                || (credential.getValidUntil() != null
-                        && credential.getValidUntil().isBefore(Instant.now()))) {
+        if (credential.isExpired()) {
             throw new VerificationError(Code.Expired);
         }
 
-        if ((credential.getIssuanceDate() != null
-                && credential.getIssuanceDate().isAfter(Instant.now()))
-
-                || (credential.getValidFrom() != null
-                        && credential.getValidFrom().isAfter(Instant.now()))) {
-
+        if (credential.isNotValidYet()) {
             throw new VerificationError(Code.NotValidYet);
         }
+
         validateData(credential);
     }
 

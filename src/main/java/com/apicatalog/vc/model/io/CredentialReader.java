@@ -18,7 +18,7 @@ public class CredentialReader {
     protected CredentialReader() {
         // protected
     }
-    
+
     public static boolean isCredential(final JsonValue expandedDocument) {
         if (expandedDocument == null) {
             throw new IllegalArgumentException("The 'expandedDocument' parameter must not be null.");
@@ -86,6 +86,8 @@ public class CredentialReader {
 
             credential.setStatus(expandedDocument.get(VcVocab.STATUS.uri()));
 
+            assertValidyPeriod(credential);
+            
             return credential;
 
         } catch (InvalidJsonLdValue e) {
@@ -93,6 +95,19 @@ public class CredentialReader {
                 throw new DocumentError(ErrorType.Invalid, LdTerm.ID);
             }
             throw new DocumentError(ErrorType.Invalid, LdTerm.create(e.getProperty().substring(VcVocab.CREDENTIALS_VOCAB.length()), VcVocab.CREDENTIALS_VOCAB));
+        }
+    }
+
+    private static void assertValidyPeriod(Credential credential) throws DocumentError {
+        // model v1
+        if ((credential.getIssuanceDate() != null
+                && credential.getExpiration() != null
+                && credential.getIssuanceDate().isAfter(credential.getExpiration()))
+                // model v2
+                || (credential.getValidFrom() != null
+                        && credential.getValidUntil() != null
+                        && credential.getValidFrom().isAfter(credential.getValidUntil()))) {
+            throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }
     }
 }
