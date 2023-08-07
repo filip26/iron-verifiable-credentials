@@ -2,6 +2,7 @@ package com.apicatalog.vc;
 
 import java.net.URI;
 
+import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.ld.signature.key.KeyPair;
 
 public class TestKeyPair implements KeyPair {
@@ -10,16 +11,16 @@ public class TestKeyPair implements KeyPair {
     URI type;
     URI controller;
 
-    byte[] publicKey;
-    byte[] privateKey;
+    MulticodecKey publicKey;
+    MulticodecKey privateKey;
 
-    public TestKeyPair(byte[] publicKey, byte[] privateKey) {
+    public TestKeyPair(MulticodecKey publicKey, MulticodecKey privateKey) {
         this.publicKey = publicKey;
         this.privateKey = privateKey;
     }
 
     @Override
-    public byte[] publicKey() {
+    public MulticodecKey publicKey() {
         return publicKey;
     }
 
@@ -39,7 +40,7 @@ public class TestKeyPair implements KeyPair {
     }
 
     @Override
-    public byte[] privateKey() {
+    public MulticodecKey privateKey() {
         return privateKey;
     }
 

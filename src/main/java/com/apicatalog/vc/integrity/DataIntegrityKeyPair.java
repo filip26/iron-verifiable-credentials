@@ -2,6 +2,7 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 
+import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.ld.signature.key.KeyPair;
 
 public class DataIntegrityKeyPair implements KeyPair {
@@ -10,10 +11,10 @@ public class DataIntegrityKeyPair implements KeyPair {
     final URI type;
     final URI controller;
 
-    final byte[] publicKey;
-    final byte[] privateKey;
+    final MulticodecKey publicKey;
+    final MulticodecKey privateKey;
 
-    protected DataIntegrityKeyPair(URI id, URI type, URI controller, byte[] publicKey, byte[] privateKey) {
+    protected DataIntegrityKeyPair(URI id, URI type, URI controller, MulticodecKey publicKey, MulticodecKey privateKey) {
         this.id = id;
         this.type = type;
         this.controller = controller;
@@ -21,12 +22,17 @@ public class DataIntegrityKeyPair implements KeyPair {
         this.privateKey = privateKey;
     }
 
-    public static DataIntegrityKeyPair createVerificationKey(URI id, URI type, URI controller, byte[] publicKey) {
+    /*
+     * Use MiltiKey
+     * 
+     */
+    @Deprecated
+    public static DataIntegrityKeyPair createVerificationKey(URI id, URI type, URI controller, MulticodecKey publicKey) {
         return new DataIntegrityKeyPair(id, type, controller, publicKey, null);
     }
 
     @Override
-    public byte[] publicKey() {
+    public MulticodecKey publicKey() {
         return publicKey;
     }
 
@@ -46,7 +52,7 @@ public class DataIntegrityKeyPair implements KeyPair {
     }
 
     @Override
-    public byte[] privateKey() {
+    public MulticodecKey privateKey() {
         return privateKey;
     }
 

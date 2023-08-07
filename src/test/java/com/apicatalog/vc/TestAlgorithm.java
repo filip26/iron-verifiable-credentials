@@ -9,16 +9,20 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.key.MulticodecKey;
+import com.apicatalog.multicodec.Multicodec;
 
 class TestAlgorithm implements SignatureAlgorithm {
 
     @Override
-    public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
+    public void verify(MulticodecKey publicKey, byte[] signature, byte[] data) throws VerificationError {
 
-        byte[] result = new byte[Math.min(publicKey.length, data.length)];
+        final byte[] keyBytes = publicKey.bytes();
 
-        for (int i = 0; i < Math.min(publicKey.length, data.length); i++) {
-            result[i] = (byte) (data[i] ^ publicKey[i]);
+        final byte[] result = new byte[Math.min(keyBytes.length, data.length)];
+
+        for (int i = 0; i < Math.min(keyBytes.length, data.length); i++) {
+            result[i] = (byte) (data[i] ^ keyBytes[i]);
         }
 
         if (!Arrays.equals(result, signature)) {
@@ -27,12 +31,14 @@ class TestAlgorithm implements SignatureAlgorithm {
     }
 
     @Override
-    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
+    public byte[] sign(MulticodecKey privateKey, byte[] data) throws SigningError {
 
-        byte[] result = new byte[Math.min(privateKey.length, data.length)];
+        final byte[] keyBytes = privateKey.bytes();
 
-        for (int i = 0; i < Math.min(privateKey.length, data.length); i++) {
-            result[i] = (byte) (data[i] ^ privateKey[i]);
+        final byte[] result = new byte[Math.min(keyBytes.length, data.length)];
+
+        for (int i = 0; i < Math.min(keyBytes.length, data.length); i++) {
+            result[i] = (byte) (data[i] ^ keyBytes[i]);
         }
 
         return result;
@@ -45,6 +51,8 @@ class TestAlgorithm implements SignatureAlgorithm {
 
         new Random().nextBytes(key);
 
-        return new TestKeyPair(key, key);
+        return new TestKeyPair(
+                MulticodecKey.getInstance(Multicodec.Ed25519_PUBLIC_KEY, key),
+                MulticodecKey.getInstance(Multicodec.Ed25519_PUBLIC_KEY, key));
     }
 }

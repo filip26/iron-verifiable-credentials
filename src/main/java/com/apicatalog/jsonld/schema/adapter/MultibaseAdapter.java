@@ -3,18 +3,17 @@ package com.apicatalog.jsonld.schema.adapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Codec;
 
 public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
 
     protected final Algorithm algorithm;
-    protected final Codec codec;
+    protected final Multicodec codec;
 
     public MultibaseAdapter(Algorithm algorithm) {
         this(algorithm, null);
     }
 
-    public MultibaseAdapter(Algorithm algorithm, Codec codec) {
+    public MultibaseAdapter(Algorithm algorithm, Multicodec codec) {
         this.algorithm = algorithm;
         this.codec = codec;
     }
@@ -28,7 +27,7 @@ public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
             return debased;
         }
 
-        return Multicodec.decode(codec, debased);
+        return codec.decode(debased);
     }
 
     @Override
@@ -38,6 +37,6 @@ public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
             return Multibase.encode(algorithm, value);
         }
 
-        return Multibase.encode(algorithm, Multicodec.encode(codec, value));
+        return Multibase.encode(algorithm, codec.encode(value));
     }
 }

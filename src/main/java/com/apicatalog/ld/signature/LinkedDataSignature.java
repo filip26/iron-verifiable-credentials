@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.ld.signature.key.VerificationKey;
 
 import jakarta.json.JsonObject;
@@ -68,7 +69,7 @@ public class LinkedDataSignature {
      * @throws SigningError
      * @throws DocumentError
      */
-    public byte[] sign(JsonObject document, byte [] privateKey, JsonObject proof) throws SigningError {
+    public byte[] sign(JsonObject document, MulticodecKey privateKey, JsonObject proof) throws SigningError {
 
         try {
             final byte[] documentHashCode = hashCode(document, proof);

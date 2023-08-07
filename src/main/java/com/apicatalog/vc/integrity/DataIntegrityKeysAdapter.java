@@ -10,6 +10,7 @@ import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 
+@Deprecated
 public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, VerificationMethod> {
 
     @Override
@@ -22,7 +23,10 @@ public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, Verifi
         byte[] publicKey = object.value(DataIntegritySchema.MULTIBASE_PUB_KEY);
         byte[] privateKey = object.value(DataIntegritySchema.MULTIBASE_PRIV_KEY);
 
-        return new DataIntegrityKeyPair(id, type, controller, publicKey, privateKey);
+        return new DataIntegrityKeyPair(id, type, controller,
+                null, null //FIXME
+                //publicKey, privateKe
+                );
     }
 
     @Override

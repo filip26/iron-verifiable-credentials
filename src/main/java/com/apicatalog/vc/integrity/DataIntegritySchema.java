@@ -18,7 +18,7 @@ import com.apicatalog.jsonld.schema.LdSchema;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec.Codec;
+import com.apicatalog.multicodec.Multicodec;
 
 public final class DataIntegritySchema {
 
@@ -42,11 +42,11 @@ public final class DataIntegritySchema {
     private DataIntegritySchema() {
         /* protected */ }
 
-    public static final LdProperty<byte[]> getPublicKey(Algorithm encoding, Codec codec, Predicate<byte[]> predicate) {
+    public static final LdProperty<byte[]> getPublicKey(Algorithm encoding, Multicodec codec, Predicate<byte[]> predicate) {
         return property(MULTIBASE_PUB_KEY, multibase(encoding, codec)).test(predicate);
     }
 
-    public static final LdProperty<byte[]> getPrivateKey(Algorithm encoding, Codec codec, Predicate<byte[]> predicate) {
+    public static final LdProperty<byte[]> getPrivateKey(Algorithm encoding, Multicodec codec, Predicate<byte[]> predicate) {
         return property(MULTIBASE_PRIV_KEY, multibase(encoding, codec)).test(predicate);
     }
 

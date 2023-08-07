@@ -115,7 +115,7 @@ public class LdSchema {
         return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm));
     }
 
-    public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm, Multicodec.Codec codec) {
+    public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm, Multicodec codec) {
         return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm, codec));
     }
 

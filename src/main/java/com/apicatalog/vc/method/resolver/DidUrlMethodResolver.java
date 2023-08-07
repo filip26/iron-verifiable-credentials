@@ -10,6 +10,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.vc.integrity.DataIntegrityKeyPair;
 import com.apicatalog.vc.model.Proof;
 
@@ -23,10 +24,9 @@ public class DidUrlMethodResolver implements MethodResolver {
 
     @Override
     public VerificationMethod resolve(URI uri, DocumentLoader loader, Proof proof) throws DocumentError {
-
         try {
             final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));
-//System.out.println("DID " + uri);
+
             return didDocument
                     .verificationMethod().stream()
                     .map(did -> DataIntegrityKeyPair.createVerificationKey(
@@ -34,7 +34,8 @@ public class DidUrlMethodResolver implements MethodResolver {
                             did.controller().toUri(),
 //FIXME                        URI.create(did.type()), // TODO did.type should return URI
                             null,
-                            did.publicKey()))
+                            MulticodecKey.getInstance(did.codec(), did.publicKey())
+                            ))
                     .findFirst()
                     .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "ProofVerificationMethod"));
         } catch (IllegalArgumentException e) {

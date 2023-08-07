@@ -3,6 +3,7 @@ package com.apicatalog.ld.signature.algorithm;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.ld.signature.key.KeyPair;
 
 /**
@@ -13,9 +14,9 @@ import com.apicatalog.ld.signature.key.KeyPair;
  */
 public interface SignatureAlgorithm {
 
-    void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError;
+    void verify(MulticodecKey publicKey, byte[] signature, byte[] data) throws VerificationError;
 
-    byte[] sign(byte[] privateKey, byte[] data) throws SigningError;
+    byte[] sign(MulticodecKey privateKey, byte[] data) throws SigningError;
 
     KeyPair keygen() throws KeyGenError;
 }

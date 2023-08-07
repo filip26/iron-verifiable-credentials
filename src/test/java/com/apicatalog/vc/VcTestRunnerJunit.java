@@ -34,9 +34,9 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.vc.integrity.DataIntegritySchema;
+import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
+import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -220,7 +220,7 @@ public class VcTestRunnerJunit {
         writer.println();
     }
 
-    static final KeyPair getKeys(URI keyPairLocation, DocumentLoader loader)
+    static final KeyPair getKeys(final URI keyPairLocation, final DocumentLoader loader)
             throws DocumentError, JsonLdError {
 
         final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
@@ -235,8 +235,8 @@ public class VcTestRunnerJunit {
                     id(),
                     type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
                     property(DataIntegritySchema.CONTROLLER, link()),
-                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
-                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))).map(new DataIntegrityKeysAdapter());
+                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Multicodec.Ed25519_PUBLIC_KEY)),
+                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Multicodec.Ed25519_PRIVATE_KEY))).map(new DataIntegrityKeysAdapter());
 
             return (KeyPair) adapter.read(key);
 
