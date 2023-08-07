@@ -124,8 +124,8 @@ public class Credential extends Verifiable {
      * @return <code>true</code> if the credential is active
      */
     public boolean isNotValidYet() {
-        return (issuance != null && issuance.isBefore(Instant.now()))
-                || (validFrom != null && validFrom.isBefore(Instant.now()));
+        return (issuance != null && issuance.isAfter(Instant.now()))
+                || (validFrom != null && validFrom.isAfter(Instant.now()));
     }
 
     /**
