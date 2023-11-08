@@ -14,7 +14,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
-import com.apicatalog.vc.model.DataModelVersion;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.model.io.CredentialReader;
 import com.apicatalog.vc.model.io.PresentationReader;
@@ -35,7 +35,7 @@ abstract class Processor<T extends Processor<?>> {
     protected StatusValidator statusValidator;
     protected SubjectValidator subjectValidator;
 
-    protected DataModelVersion modelVersion;
+    protected ModelVersion modelVersion;
 
     protected Processor() {
         // default values
@@ -106,7 +106,7 @@ abstract class Processor<T extends Processor<?>> {
         return (T) this;
     }
 
-    protected static Verifiable get(final DataModelVersion version, final JsonObject expanded) throws DocumentError {
+    protected static Verifiable get(final ModelVersion version, final JsonObject expanded) throws DocumentError {
 
         // is a credential?
         if (CredentialReader.isCredential(expanded)) {
@@ -141,7 +141,7 @@ abstract class Processor<T extends Processor<?>> {
     protected void validateData(final Credential credential) throws DocumentError {
 
         // v1
-        if ((credential.getVersion() == null || DataModelVersion.V11.equals(credential.getVersion()))
+        if ((credential.getVersion() == null || ModelVersion.V11.equals(credential.getVersion()))
                 && credential.getIssuanceDate() == null) {
             // issuance date is a mandatory property
             throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
@@ -153,7 +153,7 @@ abstract class Processor<T extends Processor<?>> {
         }
     }
 
-    protected DataModelVersion getVersion(final JsonObject object) throws DocumentError {
+    protected ModelVersion getVersion(final JsonObject object) throws DocumentError {
 
         final JsonValue contexts = object.get(Keywords.CONTEXT);
 
@@ -168,11 +168,11 @@ abstract class Processor<T extends Processor<?>> {
                 final String contextUri = ((JsonString) context).getString();
 
                 if ("https://www.w3.org/2018/credentials/v1".equals(contextUri)) {
-                    modelVersion = DataModelVersion.V11;
+                    modelVersion = ModelVersion.V11;
                     break;
                 }
                 if ("https://www.w3.org/ns/credentials/v2".equals(contextUri)) {
-                    modelVersion = DataModelVersion.V20;
+                    modelVersion = ModelVersion.V20;
                     break;
                 }
             }

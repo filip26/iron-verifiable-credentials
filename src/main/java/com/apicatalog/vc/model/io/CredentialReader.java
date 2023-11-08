@@ -8,7 +8,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
-import com.apicatalog.vc.model.DataModelVersion;
+import com.apicatalog.vc.model.ModelVersion;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -19,72 +19,72 @@ public class CredentialReader {
         // protected
     }
 
-    public static boolean isCredential(final JsonValue expandedDocument) {
-        if (expandedDocument == null) {
-            throw new IllegalArgumentException("The 'expandedDocument' parameter must not be null.");
+    public static boolean isCredential(final JsonValue document) {
+        if (document == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
-        return JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), expandedDocument);
+        return JsonLdReader.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document);
     }
 
-    public static Credential read(final DataModelVersion version, final JsonObject expandedDocument) throws DocumentError {
+    public static Credential read(final ModelVersion version, final JsonObject document) throws DocumentError {
 
-        if (expandedDocument == null) {
-            throw new IllegalArgumentException("The 'expandedDocument' parameter must not be null.");
+        if (document == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
         final Credential credential = new Credential(version);
 
         // @type
-        credential.setType(JsonLdReader.getType(expandedDocument));
+        credential.setType(JsonLdReader.getType(document));
 
         if (credential.getType() == null
                 || credential.getType().isEmpty()
                 || !credential.getType().contains(VcVocab.CREDENTIAL_TYPE.uri())) {
 
-            if (!JsonLdReader.hasType(expandedDocument)) {
-                throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
+            if (JsonLdReader.hasType(document)) {
+                throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
             }
 
-            throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
+            throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
         }
 
         // subject - mandatory
-        if (!JsonLdReader.hasPredicate(expandedDocument, VcVocab.SUBJECT.uri())) {
+        if (!JsonLdReader.hasPredicate(document, VcVocab.SUBJECT.uri())) {
             throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
         }
 
-        credential.setSubject(expandedDocument.get(VcVocab.SUBJECT.uri()));
+        credential.setSubject(document.get(VcVocab.SUBJECT.uri()));
 
         try {
             // @id - optional
-            credential.setId(JsonLdReader.getId(expandedDocument).orElse(null));
+            credential.setId(JsonLdReader.getId(document).orElse(null));
 
-            if (!JsonLdReader.hasPredicate(expandedDocument, VcVocab.ISSUER.uri())) {
+            if (!JsonLdReader.hasPredicate(document, VcVocab.ISSUER.uri())) {
                 throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
             }
 
-            credential.setIssuer(expandedDocument.get(VcVocab.ISSUER.uri()));
+            credential.setIssuer(document.get(VcVocab.ISSUER.uri()));
 
             // issuer @id - mandatory
             JsonLdReader
-                    .getId(expandedDocument, VcVocab.ISSUER.uri())
+                    .getId(document, VcVocab.ISSUER.uri())
                     .orElseThrow(() -> new DocumentError(ErrorType.Invalid, VcVocab.ISSUER));
 
-            credential.setStatus(expandedDocument.get(VcVocab.STATUS.uri()));
+            credential.setStatus(document.get(VcVocab.STATUS.uri()));
 
             // issuance date - mandatory for verification
-            credential.setIssuanceDate(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.ISSUANCE_DATE.uri()).orElse(null));
+            credential.setIssuanceDate(JsonLdReader.getXsdDateTime(document, VcVocab.ISSUANCE_DATE.uri()).orElse(null));
 
             // expiration date - optional
-            credential.setExpiration(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.EXPIRATION_DATE.uri()).orElse(null));
+            credential.setExpiration(JsonLdReader.getXsdDateTime(document, VcVocab.EXPIRATION_DATE.uri()).orElse(null));
 
             // validFrom - optional
-            credential.setValidFrom(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.VALID_FROM.uri()).orElse(null));
+            credential.setValidFrom(JsonLdReader.getXsdDateTime(document, VcVocab.VALID_FROM.uri()).orElse(null));
 
             // validUntil - optional
-            credential.setValidUntil(JsonLdReader.getXsdDateTime(expandedDocument, VcVocab.VALID_UNTIL.uri()).orElse(null));
+            credential.setValidUntil(JsonLdReader.getXsdDateTime(document, VcVocab.VALID_UNTIL.uri()).orElse(null));
 
-            credential.setStatus(expandedDocument.get(VcVocab.STATUS.uri()));
+            credential.setStatus(document.get(VcVocab.STATUS.uri()));
 
             assertValidyPeriod(credential);
             

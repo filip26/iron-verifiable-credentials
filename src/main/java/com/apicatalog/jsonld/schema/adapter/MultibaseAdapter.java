@@ -1,42 +1,36 @@
 package com.apicatalog.jsonld.schema.adapter;
 
+import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.Multicoder;
 
-public class MultibaseAdapter implements LdValueAdapter<String, byte[]> {
+public class MultibaseAdapter implements LdValueAdapter<String, MulticodecKey> {
 
     protected final Algorithm algorithm;
-    protected final Multicodec codec;
+    protected final Multicoder multicoder;
 
-    public MultibaseAdapter(Algorithm algorithm) {
-        this(algorithm, null);
-    }
-
-    public MultibaseAdapter(Algorithm algorithm, Multicodec codec) {
+    public MultibaseAdapter(Algorithm algorithm, Multicoder multicoder) {
         this.algorithm = algorithm;
-        this.codec = codec;
+        this.multicoder = multicoder;
     }
 
     @Override
-    public byte[] read(String value) {
+    public MulticodecKey read(String value) {
 
-        final byte[] debased = Multibase.decode(value); // ;)
+        final byte[] debased = Multibase.decode(value);
 
-        if (codec == null) {
-            return debased;
-        }
-
-        return codec.decode(debased);
+        final Multicodec code = multicoder.getCodec(debased)
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported multicodec "));
+        
+        final byte[] raw  = code.decode(debased);
+        
+        return MulticodecKey.getInstance(code, raw);
     }
 
     @Override
-    public String write(byte[] value) {
-
-        if (codec == null) {
-            return Multibase.encode(algorithm, value);
-        }
-
-        return Multibase.encode(algorithm, codec.encode(value));
+    public String write(MulticodecKey value) {
+        return Multibase.encode(algorithm, value.getEbcided());
     }
 }

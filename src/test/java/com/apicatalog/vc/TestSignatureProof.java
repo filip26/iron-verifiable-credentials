@@ -16,6 +16,7 @@ import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.MulticodecRegistry;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.method.VerificationMethodProcessor;
 import com.apicatalog.vc.model.Proof;
@@ -36,8 +37,9 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
             LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
             DataIntegritySchema.getPublicKey(
                     Algorithm.Base58Btc,
-                    Multicodec.Ed25519_PUBLIC_KEY,
-                    (key) -> key == null || key.length > 0));
+                  //FIXME                        MulticodecRegistry.ED25519_PUBLIC_KEY
+                (key) -> key == null || key.length > 0)
+            );
 
     static final LdProperty<byte[]> PROOF_VALUE_PROPERTY = DataIntegritySchema.getProofValue(
             Algorithm.Base58Btc,

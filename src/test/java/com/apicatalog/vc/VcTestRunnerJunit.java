@@ -34,7 +34,7 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.MulticodecRegistry;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.processor.Issuer;
@@ -96,8 +96,7 @@ public class VcTestRunnerJunit {
                         URI.create("https://w3id.org/security#assertionMethod"),
                         testCase.created,
                         testCase.domain,
-                        testCase.challenge
-                        ); 
+                        testCase.challenge);
 
                 final Issuer issuer = Vc.sign(
                         testCase.input,
@@ -110,9 +109,9 @@ public class VcTestRunnerJunit {
                 if (testCase.context != null) {
 
                     signed = issuer.getCompacted(testCase.context);
-                    
+
                 } else if (testCase.compacted) {
-                    
+
                     signed = issuer.getCompacted();
 
                 } else {
@@ -235,8 +234,8 @@ public class VcTestRunnerJunit {
                     id(),
                     type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
                     property(DataIntegritySchema.CONTROLLER, link()),
-                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Multicodec.Ed25519_PUBLIC_KEY)),
-                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Multicodec.Ed25519_PRIVATE_KEY))).map(new DataIntegrityKeysAdapter());
+                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PUBLIC_KEY)),
+                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PRIVATE_KEY))).map(new DataIntegrityKeysAdapter());
 
             return (KeyPair) adapter.read(key);
 

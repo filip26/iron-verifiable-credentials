@@ -10,7 +10,7 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.MulticodecKey;
-import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.MulticodecRegistry;
 
 class TestAlgorithm implements SignatureAlgorithm {
 
@@ -52,7 +52,7 @@ class TestAlgorithm implements SignatureAlgorithm {
         new Random().nextBytes(key);
 
         return new TestKeyPair(
-                MulticodecKey.getInstance(Multicodec.Ed25519_PUBLIC_KEY, key),
-                MulticodecKey.getInstance(Multicodec.Ed25519_PUBLIC_KEY, key));
+                MulticodecKey.getInstance(MulticodecRegistry.ED25519_PUBLIC_KEY, key),
+                MulticodecKey.getInstance(MulticodecRegistry.ED25519_PUBLIC_KEY, key));
     }
 }

@@ -18,20 +18,20 @@ public interface ProofValueProcessor {
      * Removes a proof value from the given expanded JSON-LD object and returns a
      * new object without a proof value. i.e. an unsigned proof.
      * 
-     * @param expanded a proof in an expanded JSON-LD form
+     * @param proof a proof in an expanded JSON-LD form
      * @return an unsigned proof
      */
-    JsonObject removeProofValue(JsonObject expanded);
+    JsonObject removeProofValue(JsonObject proof);
 
     /**
-     * Sets a proof value to the given expanded JSON-LD object and returns a new
+     * Encodes and sets a proof value to the given expanded JSON-LD object and returns a new
      * object, i.e. a signed proof. Overrides an existing value.
      * 
-     * @param expanded
+     * @param proof a proof in an expanded form
      * @param proofValue to set
      * 
      * @return a signed proof
      * @throws DocumentError
      */
-    JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError;
+    JsonObject setProofValue(JsonObject proof, byte[] proofValue) throws DocumentError;
 }

@@ -16,6 +16,10 @@ public final class MulticodecKey {
         return new MulticodecKey(codec, raw);
     }
     
+    public final byte[] getEbcided() {
+        return codec.encode(raw);
+    }
+    
     /**
      * A codec describing the key
      * 

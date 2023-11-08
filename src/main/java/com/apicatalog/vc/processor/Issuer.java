@@ -21,7 +21,7 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.model.DataModelVersion;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.Verifiable;
@@ -128,10 +128,10 @@ public final class Issuer extends Processor<Issuer> {
 
         final JsonArrayBuilder context = Json.createArrayBuilder();
 
-        if (modelVersion == null || DataModelVersion.V11.equals(modelVersion)) {
+        if (modelVersion == null || ModelVersion.V11.equals(modelVersion)) {
             context.add("https://www.w3.org/2018/credentials/v1");
 
-        } else if (DataModelVersion.V20.equals(modelVersion)) {
+        } else if (ModelVersion.V20.equals(modelVersion)) {
             context.add("https://www.w3.org/ns/credentials/v2");
         }
 
@@ -189,7 +189,7 @@ public final class Issuer extends Processor<Issuer> {
 
             compacted = builder.build();
         }
-        
+
         return compacted;
     }
 
@@ -229,7 +229,7 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    final JsonObject sign(final DataModelVersion version, final JsonArray expanded, final KeyPair keyPair,
+    final JsonObject sign(final ModelVersion version, final JsonArray expanded, final KeyPair keyPair,
             final Proof draft) throws SigningError, DocumentError {
 
         JsonObject object = JsonLdReader
@@ -247,7 +247,7 @@ public final class Issuer extends Processor<Issuer> {
         // add issuance date if missing
         if (verifiable.isCredential()
                 && (verifiable.getVersion() == null
-                        || DataModelVersion.V11.equals(verifiable.getVersion()))
+                        || ModelVersion.V11.equals(verifiable.getVersion()))
                 && verifiable.asCredential().getIssuanceDate() == null) {
 
             final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
@@ -264,7 +264,7 @@ public final class Issuer extends Processor<Issuer> {
         if (draft.getValue() != null) {
             unsignedDraft = draft.valueProcessor().removeProofValue(unsignedDraft);
         }
-        
+
         final LinkedDataSignature ldSignature = new LinkedDataSignature(draft.getCryptoSuite());
 
         final byte[] signature = ldSignature.sign(data, keyPair.privateKey(), unsignedDraft);

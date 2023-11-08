@@ -12,7 +12,7 @@ import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
-import com.apicatalog.vc.model.DataModelVersion;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Presentation;
 
 import jakarta.json.JsonObject;
@@ -31,7 +31,7 @@ public class PresentationReader {
         return JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document);
     }
 
-    public static Presentation read(final DataModelVersion version, final JsonObject document) throws DocumentError {
+    public static Presentation read(final ModelVersion version, final JsonObject document) throws DocumentError {
 
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
@@ -42,10 +42,10 @@ public class PresentationReader {
         // @type
         if (!JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document)) {
 
-            if (!JsonLdReader.hasType(document)) {
-                throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
+            if (JsonLdReader.hasType(document)) {
+                throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
             }
-            throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
+            throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
         }
 
         try {
@@ -67,30 +67,27 @@ public class PresentationReader {
     }
 
     public static Collection<JsonObject> getCredentials(final JsonObject document) throws DocumentError {
-        
+
         JsonValue credentials = document.get(VcVocab.VERIFIABLE_CREDENTIALS.uri());
-  
+
         if (JsonUtils.isNotArray(credentials)
-                || credentials.asJsonArray().size() == 0
-                ) {
+                || credentials.asJsonArray().size() == 0) {
             return Collections.emptyList();
         }
-        
+
         final Collection<JsonObject> result = new ArrayList<>(credentials.asJsonArray().size());
-        
+
         for (final JsonValue cred : credentials.asJsonArray()) {
             if (JsonUtils.isNotObject(cred)
                     || JsonUtils.isNotArray(cred.asJsonObject().get(Keywords.GRAPH))
                     || cred.asJsonObject().getJsonArray(Keywords.GRAPH).size() != 1
-                    || JsonUtils.isNotObject(cred.asJsonObject().getJsonArray(Keywords.GRAPH).get(0))
-                    ) {
+                    || JsonUtils.isNotObject(cred.asJsonObject().getJsonArray(Keywords.GRAPH).get(0))) {
                 throw new DocumentError(ErrorType.Invalid, VcVocab.CREDENTIALS_VOCAB);
             }
 
             result.add(cred.asJsonObject().getJsonArray(Keywords.GRAPH).getJsonObject(0));
         }
-        
-        return result;        
-//        return JsonLdReader.getObjects(document, VcVocab.VERIFIABLE_CREDENTIALS.uri());
+
+        return result;
     }
 }

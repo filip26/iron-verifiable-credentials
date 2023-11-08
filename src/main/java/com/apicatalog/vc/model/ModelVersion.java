@@ -3,7 +3,7 @@ package com.apicatalog.vc.model;
 /**
  * Verifiable Credentials Data Model Version
  */
-public enum DataModelVersion {
+public enum ModelVersion {
 
     /**
      * Data Model Version 1.1

@@ -29,7 +29,7 @@ public class Credential extends Verifiable {
     protected JsonValue issuer;
     protected JsonValue status;
 
-    public Credential(DataModelVersion version) {
+    public Credential(ModelVersion version) {
         super(version);
     }
 

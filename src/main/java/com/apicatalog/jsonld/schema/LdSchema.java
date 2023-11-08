@@ -112,11 +112,13 @@ public class LdSchema {
     }
 
     public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm) {
-        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm));
+        throw new UnsupportedOperationException();
+//        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm));
     }
 
     public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm, Multicodec codec) {
-        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm, codec));
+        throw new UnsupportedOperationException();
+//        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm, codec));
     }
 
     public static final LdValueAdapter<JsonValue, URI> uri() {

@@ -31,7 +31,7 @@ import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.model.Credential;
-import com.apicatalog.vc.model.DataModelVersion;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.Verifiable;
@@ -172,7 +172,7 @@ public final class Verifier extends Processor<Verifier> {
         }
     }
 
-    private Verifiable verifyExpanded(final DataModelVersion version, JsonArray expanded) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, JsonArray expanded) throws VerificationError, DocumentError {
 
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
             throw new DocumentError(ErrorType.Invalid);
@@ -187,7 +187,7 @@ public final class Verifier extends Processor<Verifier> {
         return verifyExpanded(version, verifiable.asJsonObject());
     }
 
-    private Verifiable verifyExpanded(final DataModelVersion version, final JsonObject expanded) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, final JsonObject expanded) throws VerificationError, DocumentError {
 
         // get a verifiable representation
         final Verifiable verifiable = get(version, expanded);

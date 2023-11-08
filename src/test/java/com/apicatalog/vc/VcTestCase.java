@@ -20,7 +20,7 @@ import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.MulticodecRegistry;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 
@@ -119,8 +119,8 @@ public class VcTestCase {
                             id(),
                             type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
                             property(DataIntegritySchema.CONTROLLER, link()),
-                            property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Multicodec.Ed25519_PUBLIC_KEY)),
-                            property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Multicodec.Ed25519_PRIVATE_KEY))
+                            property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PUBLIC_KEY)),
+                            property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PRIVATE_KEY))
                         ).map(new DataIntegrityKeysAdapter());
 
                 try {

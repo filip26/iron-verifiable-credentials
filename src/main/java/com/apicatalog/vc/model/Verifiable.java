@@ -10,14 +10,14 @@ import java.util.Collection;
  */
 public abstract class Verifiable {
 
-    protected final DataModelVersion version;
+    protected final ModelVersion version;
 
     protected URI id;
 
     protected Collection<Proof> proofs;
     protected Collection<String> type;
 
-    protected Verifiable(DataModelVersion version) {
+    protected Verifiable(ModelVersion version) {
         this.version = version;
     }
 
@@ -66,7 +66,7 @@ public abstract class Verifiable {
      * 
      * @return the data model version, never <code>null</code>
      */
-    public DataModelVersion getVersion() {
+    public ModelVersion getVersion() {
         return version;
     }
 }

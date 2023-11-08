@@ -17,6 +17,7 @@ import com.apicatalog.jsonld.schema.LdProperty;
 import com.apicatalog.jsonld.schema.LdSchema;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
 
@@ -42,12 +43,14 @@ public final class DataIntegritySchema {
     private DataIntegritySchema() {
         /* protected */ }
 
-    public static final LdProperty<byte[]> getPublicKey(Algorithm encoding, Multicodec codec, Predicate<byte[]> predicate) {
-        return property(MULTIBASE_PUB_KEY, multibase(encoding, codec)).test(predicate);
+    public static final LdProperty<MulticodecKey> getPublicKey(Algorithm encoding, Predicate<byte[]> predicate) {
+//        return property(MULTIBASE_PUB_KEY, multibase(encoding)).test(predicate);
+        throw new UnsupportedOperationException();
     }
 
-    public static final LdProperty<byte[]> getPrivateKey(Algorithm encoding, Multicodec codec, Predicate<byte[]> predicate) {
-        return property(MULTIBASE_PRIV_KEY, multibase(encoding, codec)).test(predicate);
+    public static final LdProperty<MulticodecKey> getPrivateKey(Algorithm encoding, Predicate<byte[]> predicate) {
+//        return property(MULTIBASE_PRIV_KEY, multibase(encoding)).test(predicate);
+        throw new UnsupportedOperationException();
     }
 
     public static final LdProperty<byte[]> getProofValue(Algorithm encoding, Predicate<byte[]> predicate) {
@@ -62,7 +65,7 @@ public final class DataIntegritySchema {
         return property(VERIFICATION_METHOD, method.map(new DataIntegrityKeysAdapter()));
     }
 
-    public static final LdSchema getKeyPair(LdTerm verificationType, LdProperty<byte[]> publicKey, LdProperty<byte[]> privateKey) {
+    public static final LdSchema getKeyPair(LdTerm verificationType, LdProperty<MulticodecKey> publicKey, LdProperty<MulticodecKey> privateKey) {
         return new LdSchema(
                 object(
                         id().required(),
@@ -72,7 +75,7 @@ public final class DataIntegritySchema {
                         privateKey));
     }
 
-    public static final LdSchema getVerificationKey(LdTerm verificationType, LdProperty<byte[]> publicKey) {
+    public static final LdSchema getVerificationKey(LdTerm verificationType, LdProperty<MulticodecKey> publicKey) {
         return new LdSchema(
                 object(
                         id().required(),
