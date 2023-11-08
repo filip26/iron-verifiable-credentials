@@ -25,6 +25,9 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
   * Have you implemented a signature provider? List it here, open PR.
 * [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
 
+## Extensions
+* [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
+
 ## Installation
 
 ### Maven
