@@ -42,5 +42,11 @@ public final class VcVocab {
 
     public static final LdTerm PROOF = LdTerm.create("proof", SECURITY_VOCAB);
     
+    public static final LdTerm MULTIBASE_TYPE = LdTerm.create("multibase", "https://w3id.org/security#");
+
+    public static final String XSD_VOCAB = "http://www.w3.org/2001/XMLSchema#";
+
+    public static final LdTerm XSD_DATETIME = LdTerm.create("dateTime", XSD_VOCAB);
+
     private VcVocab() { /* protected */ }
 }

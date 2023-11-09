@@ -18,7 +18,7 @@ import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecRegistry;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
-import com.apicatalog.vc.method.VerificationMethodProcessor;
+import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.ProofValueProcessor;
 
@@ -26,7 +26,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMethodProcessor {
+class TestSignatureProof implements Proof, ProofValueProcessor, MethodAdapter {
 
     static final CryptoSuite CRYPTO = new CryptoSuite(
             new Urdna2015(),
@@ -37,9 +37,8 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
             LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#"),
             DataIntegritySchema.getPublicKey(
                     Algorithm.Base58Btc,
-                  //FIXME                        MulticodecRegistry.ED25519_PUBLIC_KEY
-                (key) -> key == null || key.length > 0)
-            );
+                    // FIXME MulticodecRegistry.ED25519_PUBLIC_KEY
+                    (key) -> key == null || key.length > 0));
 
     static final LdProperty<byte[]> PROOF_VALUE_PROPERTY = DataIntegritySchema.getProofValue(
             Algorithm.Base58Btc,
@@ -53,7 +52,7 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
     final CryptoSuite crypto;
     final LdObject ldProof;
     final JsonObject expanded;
-    
+
     TestSignatureProof(
             CryptoSuite crypto,
             LdObject ldProof,
@@ -65,7 +64,7 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
         this.expanded = expanded;
     }
 
-    public static final TestSignatureProof read(JsonObject expanded) throws DocumentError {
+    public static final TestSignatureProof readProof(JsonObject expanded) throws DocumentError {
 
         LdObject ldProof = PROOF_SCHEMA.read(expanded);
 
@@ -82,7 +81,7 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
 
         Map<String, Object> rr = new HashMap<>();
         rr.put(LdTerm.TYPE.uri(), URI.create(TestSignatureSuite.ID));
-        
+
         if (verificationMethod != null) {
             rr.put(DataIntegritySchema.VERIFICATION_METHOD.uri(), verificationMethod);
         }
@@ -153,28 +152,40 @@ class TestSignatureProof implements Proof, ProofValueProcessor, VerificationMeth
 
     @Override
     public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
-        
-      final JsonValue value = PROOF_VALUE_PROPERTY.write(proofValue);
 
-      return Json.createObjectBuilder(expanded).add(
-              DataIntegritySchema.PROOF_VALUE.uri(),
-              Json.createArrayBuilder().add(
-                      value))
-              .build();
+        final JsonValue value = PROOF_VALUE_PROPERTY.write(proofValue);
+
+        return Json.createObjectBuilder(expanded).add(
+                DataIntegritySchema.PROOF_VALUE.uri(),
+                Json.createArrayBuilder().add(
+                        value))
+                .build();
     }
 
     @Override
-    public VerificationMethodProcessor methodProcessor() {
+    public MethodAdapter methodProcessor() {
         return this;
     }
 
-    @Override
-    public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
-        return DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA).read(expanded);
-    }
+//    @Override
+//    public VerificationMethod read(JsonObject expanded) throws DocumentError {
+//        return DataIntegritySchema.getEmbeddedMethod(METHOD_SCHEMA).read(expanded);
+//    }
 
     @Override
     public String getContext() {
         return "classpath:data-integrity-test-signature-2022.jsonld";
+    }
+
+    @Override
+    public JsonObject write(VerificationMethod value) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public VerificationMethod read(JsonObject expanded) throws DocumentError {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

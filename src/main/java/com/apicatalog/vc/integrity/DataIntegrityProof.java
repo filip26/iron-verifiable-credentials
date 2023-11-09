@@ -1,16 +1,13 @@
-package com.apicatalog.vc.integrity;    
+package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
 
-import com.apicatalog.jsonld.schema.LdObject;
-import com.apicatalog.jsonld.schema.LdSchema;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.vc.method.VerificationMethodProcessor;
+import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.ProofValueProcessor;
 
@@ -24,26 +21,27 @@ import jakarta.json.JsonValue;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof implements Proof, ProofValueProcessor, VerificationMethodProcessor {
+public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAdapter {
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
 
-    final LdSchema proofSchema;
+    protected URI id;
+    protected URI purpose;
+    protected VerificationMethod method;
+    protected Instant created;
+    protected String domain;
+    protected String challenge;
+    protected byte[] value;
 
-    final LdObject ldProof;
     final JsonObject expanded;
 
     protected DataIntegrityProof(
             DataIntegritySuite suite,
             CryptoSuite crypto,
-            LdSchema proofSchema,
-            LdObject ldProof,
             JsonObject expandedProof) {
         this.suite = suite;
         this.crypto = crypto;
-        this.proofSchema = proofSchema;
-        this.ldProof = ldProof;
         this.expanded = expandedProof;
     }
 
@@ -58,12 +56,12 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, Verificat
      * @return {@link URI} identifying the purpose
      */
     public URI getPurpose() {
-        return ldProof.value(DataIntegritySchema.PURPOSE);
+        return purpose;
     }
 
     @Override
     public VerificationMethod getMethod() {
-        return ldProof.value(DataIntegritySchema.VERIFICATION_METHOD);
+        return method;
     }
 
     /**
@@ -72,7 +70,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, Verificat
      * @return the date time when the proof has been created
      */
     public Instant getCreated() {
-        return ldProof.value(DataIntegritySchema.CREATED);
+        return created;
     }
 
     /**
@@ -81,7 +79,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, Verificat
      * @return the domain or <code>null</code>
      */
     public String getDomain() {
-        return ldProof.value(DataIntegritySchema.DOMAIN);
+        return domain;
     }
 
     /**
@@ -91,22 +89,23 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, Verificat
      * @return the challenge or <code>null</code>
      */
     public String getChallenge() {
-        return ldProof.value(DataIntegritySchema.CHALLENGE);
+        return challenge;
     }
 
     @Override
     public byte[] getValue() {
-        return ldProof.value(DataIntegritySchema.PROOF_VALUE);
+        return value;
     }
 
     @Override
     public URI id() {
-        return ldProof.value(LdTerm.ID);
+        return id;
     }
 
     @Override
     public URI previousProof() {
-        return ldProof.value(DataIntegritySchema.PREVIOUS_PROOF);
+//        return ldProof.value(DataIntegritySchema.PREVIOUS_PROOF);
+        return null;
     }
 
     @Override
@@ -121,35 +120,35 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, Verificat
 
     @Override
     public void validate(Map<String, Object> params) throws DocumentError {
-        proofSchema.validate(ldProof, params);
+//        proofSchema.validate(ldProof, params);
     }
 
     @Override
     public JsonObject removeProofValue(JsonObject expanded) {
-        return Json.createObjectBuilder(expanded).remove(DataIntegritySchema.PROOF_VALUE.uri()).build();
+        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
     }
 
     @Override
     public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
-        final JsonValue value = suite.proofValueSchema.write(proofValue);
+        final JsonValue value = suite.proofValue.write(proofValue);
 
         return Json.createObjectBuilder(expanded).add(
-                DataIntegritySchema.PROOF_VALUE.uri(),
+                DataIntegrityVocab.PROOF_VALUE.uri(),
                 Json.createArrayBuilder().add(
                         value))
                 .build();
     }
 
     @Override
-    public VerificationMethodProcessor methodProcessor() {
+    public MethodAdapter methodProcessor() {
         return this;
     }
 
     @Override
-    public VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
-        return DataIntegritySchema.getEmbeddedMethod(suite.methodSchema).read(expanded);
+    public VerificationMethod read(JsonObject expanded) throws DocumentError {
+        return suite.method.read(expanded);
     }
-
+    
     @Override
     public String getContext() {
         return "https://w3id.org/security/data-integrity/v1";
@@ -158,5 +157,11 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, Verificat
     @Override
     public ProofValueProcessor valueProcessor() {
         return this;
+    }
+
+    @Override
+    public JsonObject write(VerificationMethod value) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

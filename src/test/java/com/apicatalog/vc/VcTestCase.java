@@ -115,16 +115,8 @@ public class VcTestCase {
                 final JsonObject method = options.getJsonArray(vocab("verificationMethod"))
                         .getJsonObject(0);
 
-                LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
-                            id(),
-                            type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
-                            property(DataIntegritySchema.CONTROLLER, link()),
-                            property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PUBLIC_KEY)),
-                            property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PRIVATE_KEY))
-                        ).map(new DataIntegrityKeysAdapter());
-
                 try {
-                    testCase.verificationMethod = adapter.read(method);
+                    testCase.verificationMethod = TestMethodReader.read(method);
                 } catch (DocumentError e) {
                     throw new IllegalStateException(e);
                 }

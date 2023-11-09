@@ -21,6 +21,7 @@ import com.apicatalog.multicodec.Multicodec;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
+@Deprecated
 public class LdSchema {
 
     protected static final LdTerm MULTIBASE_TYPE = LdTerm.create("multibase", "https://w3id.org/security#");

@@ -1,11 +1,12 @@
 package com.apicatalog.vc.method;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.node.LdAdapter;
 import com.apicatalog.ld.signature.VerificationMethod;
 
 import jakarta.json.JsonObject;
 
-public interface VerificationMethodProcessor {
+public interface MethodAdapter extends LdAdapter<VerificationMethod> {
 
     /**
      * Provides an external JSON-LD context URI defying the proof type. The context
@@ -26,5 +27,6 @@ public interface VerificationMethodProcessor {
      * @return a new {@link VerificationMethod} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    VerificationMethod readMethod(JsonObject expanded) throws DocumentError;
+    @Override
+    VerificationMethod read(JsonObject expanded) throws DocumentError;
 }

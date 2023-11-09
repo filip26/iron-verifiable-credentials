@@ -21,6 +21,7 @@ import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
 
+@Deprecated
 public final class DataIntegritySchema {
 
     public static final String SEC_VOCAB = "https://w3id.org/security#";
