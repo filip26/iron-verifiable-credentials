@@ -42,8 +42,9 @@ public class LdGetter {
             if (values.size() > 1) {
                 throw new DocumentError(ErrorType.Invalid, term);
             }
-
-            object = values.get(0);
+            if (values.size() > 0) {
+                object = values.get(0);
+            }
         }
 
         if (JsonUtils.isObject(object)) {

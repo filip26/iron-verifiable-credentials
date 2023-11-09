@@ -11,7 +11,7 @@ public interface LdAdapter<T> {
 
     T read(JsonObject value) throws DocumentError;
     
-    JsonObject write(T value);
+    JsonObject write(T value);  //??
 //        boolean test(T value, Map<String, Object> params);
     
 }

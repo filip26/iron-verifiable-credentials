@@ -130,7 +130,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
 
     @Override
     public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
-        final JsonValue value = suite.proofValue.write(proofValue);
+        final JsonValue value = suite.proofValueAdapter.write(proofValue);
 
         return Json.createObjectBuilder(expanded).add(
                 DataIntegrityVocab.PROOF_VALUE.uri(),
@@ -146,7 +146,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
 
     @Override
     public VerificationMethod read(JsonObject expanded) throws DocumentError {
-        return suite.method.read(expanded);
+        return suite.methodAdapter.read(expanded);
     }
     
     @Override

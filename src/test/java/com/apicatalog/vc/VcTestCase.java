@@ -1,12 +1,5 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.jsonld.schema.LdSchema.id;
-import static com.apicatalog.jsonld.schema.LdSchema.link;
-import static com.apicatalog.jsonld.schema.LdSchema.multibase;
-import static com.apicatalog.jsonld.schema.LdSchema.object;
-import static com.apicatalog.jsonld.schema.LdSchema.property;
-import static com.apicatalog.jsonld.schema.LdSchema.type;
-
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
@@ -15,14 +8,9 @@ import java.util.stream.Collectors;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.jsonld.schema.LdTerm;
-import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.MulticodecRegistry;
-import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
-import com.apicatalog.vc.integrity.DataIntegritySchema;
+import com.apicatalog.vc.integrity.DataIntegrityMethodReader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -116,7 +104,7 @@ public class VcTestCase {
                         .getJsonObject(0);
 
                 try {
-                    testCase.verificationMethod = TestMethodReader.read(method);
+                    testCase.verificationMethod = (new DataIntegrityMethodReader()).read(method);
                 } catch (DocumentError e) {
                     throw new IllegalStateException(e);
                 }

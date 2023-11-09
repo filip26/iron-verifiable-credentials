@@ -16,11 +16,26 @@ import com.apicatalog.multicodec.MulticodecRegistry;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegrityMethodReader;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
+import com.apicatalog.vc.method.MethodAdapter;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class TestMethodReader {
+public class TestMethodAdapter implements MethodAdapter {
+
+
+    @Override
+    public JsonObject write(VerificationMethod value) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public VerificationMethod read(JsonObject expanded) throws DocumentError {
+
+//        return DataIntegrityMethodReader.read(expanded);
+        return null;
+    }
 
 //    LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
 //            id(),
@@ -30,9 +45,9 @@ public class TestMethodReader {
 //            property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PRIVATE_KEY))
 //        ).map(new DataIntegrityKeysAdapter());
 
-    
-    static VerificationMethod read(JsonObject document) throws DocumentError {
-        return DataIntegrityMethodReader.read(document);
-    }
+//    
+//    static VerificationMethod read(JsonObject document) throws DocumentError {
+//        return DataIntegrityMethodReader.read(document);
+//    }
     
 }

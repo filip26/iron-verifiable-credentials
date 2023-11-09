@@ -25,7 +25,7 @@ public class DataIntegrityProofReader {
 
         LdNode node = new LdNode(document);
 
-        String cryptoSuiteName = node.get(DataIntegrityVocab.DOMAIN)
+        String cryptoSuiteName = node.get(DataIntegrityVocab.CRYPTO_SUITE)
                 .scalar().string();
 
         CryptoSuite crypto = suite.getCryptoSuite(cryptoSuiteName);

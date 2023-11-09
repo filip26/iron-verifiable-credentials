@@ -52,6 +52,10 @@ public class LdSetter {
         builder.add(term.uri(), setOrAdd(value));
     }
 
+    public <T> void map(LdAdapter<T> adapter, T value) {
+        value(adapter.write(value));
+    }
+
     JsonArray setOrAdd(JsonValue value) {
         if (content != null) {
             return Json.createArrayBuilder(content).add(value).build();

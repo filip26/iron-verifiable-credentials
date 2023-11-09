@@ -2,13 +2,7 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
-import com.apicatalog.jsonld.schema.LdObject;
-import com.apicatalog.jsonld.schema.LdProperty;
-import com.apicatalog.jsonld.schema.LdSchema;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdAdapter;
 import com.apicatalog.ld.node.LdNode;
@@ -20,10 +14,7 @@ import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonValue;
 
 public abstract class DataIntegritySuite implements SignatureSuite {
 
@@ -32,16 +23,16 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     protected static final String PROOF_TYPE_ID = VcVocab.SECURITY_VOCAB + PROOF_TYPE_NAME;
 
 //    protected final LdSchema methodSchema;
-    protected final MethodAdapter method;
+    protected final MethodAdapter methodAdapter;
 //    protected final LdProperty<byte[]> proofValueSchema;
-    protected final LdAdapter<byte[]> proofValue;
+    protected final LdAdapter<byte[]> proofValueAdapter;
 
     protected final String cryptosuite;
 
     protected DataIntegritySuite(String cryptosuite, final MethodAdapter method, final LdAdapter<byte[]> proofValue) {
         this.cryptosuite = cryptosuite;
-        this.method = method;
-        this.proofValue = proofValue;
+        this.methodAdapter = method;
+        this.proofValueAdapter = proofValue;
     }
 
     @Override
@@ -90,7 +81,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //
 //        final LdObject ldProof = proofSchema.read(expanded);
 
-        return DataIntegrityProofReader.read(proof, this, method, proofValue);
+        return DataIntegrityProofReader.read(proof, this, methodAdapter, proofValueAdapter);
     }
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName) throws DocumentError;
@@ -103,21 +94,12 @@ public abstract class DataIntegritySuite implements SignatureSuite {
             String domain,
             String challenge) throws DocumentError {
 
-//        Map<String, Object> proof = new LinkedHashMap<>();
-////
-//        final LdObject ldProof = new LdObject(proof);
-//
-//        final LdSchema proofSchema = DataIntegritySchema.getProof(
-//                LdTerm.create(PROOF_TYPE_NAME, VcVocab.SECURITY_VOCAB),
-//                DataIntegritySchema.getEmbeddedMethod(methodSchema),
-//                proofValueSchema);
-
         final LdNodeBuilder builder = new LdNodeBuilder();
  
         builder.type(PROOF_TYPE_ID);
         builder.set(DataIntegrityVocab.CRYPTO_SUITE).string(cryptosuite);
-        
-        builder.set(DataIntegrityVocab.CREATED).xsdDateTime(created);
+        builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(methodAdapter, method);
+        builder.set(DataIntegrityVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
         builder.set(DataIntegrityVocab.PURPOSE).link(purpose);
 
         if (domain != null) {
@@ -133,13 +115,6 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         proof.method = method;
         proof.domain = domain;
         proof.challenge = challenge;
-
-//      proof.put(DataIntegritySchema.VERIFICATION_METHOD.uri(), method);
-      
-        
-//        return DataIntegrityProofReader.read(proof, this, getCryptoSuite(proof));
-//        return new DataIntegrityProof(this, crypto, proofSchema, ldProof, expanded);
-        //FIXME
         return proof;
     }
 }

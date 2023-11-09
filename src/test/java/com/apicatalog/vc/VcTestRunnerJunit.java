@@ -36,6 +36,7 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.MulticodecRegistry;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
+import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.processor.Issuer;
 
@@ -90,7 +91,7 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                final TestSignatureProof draft = TestSignatureProof.createDraft(
+                final DataIntegrityProof draft = (new TestSignatureSuite()).createDraft(
                         // proof options
                         testCase.verificationMethod,
                         URI.create("https://w3id.org/security#assertionMethod"),
