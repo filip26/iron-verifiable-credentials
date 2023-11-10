@@ -3,6 +3,7 @@ package com.apicatalog.multikey;
 import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLdReader;
+import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
@@ -15,6 +16,10 @@ public class MultiKey implements KeyPair {
     protected static final URI TYPE = URI.create("https://w3id.org/security#Multikey");
     
     protected static final URI CONTEXT = URI.create("https://w3id.org/security/multikey/v1");
+    
+    protected static final String MULTIKEY_VOCAB = "";  //FIXME
+    
+    protected static final LdTerm PUBLIC_KEY = LdTerm.create("", MULTIKEY_VOCAB);
     
     protected URI id;
     protected URI controller;

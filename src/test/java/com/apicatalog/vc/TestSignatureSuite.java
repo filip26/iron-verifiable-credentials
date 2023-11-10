@@ -9,7 +9,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
-import com.apicatalog.vc.integrity.DataIntegrityMethodReader;
+import com.apicatalog.multikey.MultiKeyAdapter;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -47,7 +47,7 @@ class TestSignatureSuite extends DataIntegritySuite {
     };
 
     protected TestSignatureSuite() {
-        super(TEST_CRYPTO_NAME, new DataIntegrityMethodReader(), proofValueAdapter);
+        super(TEST_CRYPTO_NAME, new MultiKeyAdapter(), proofValueAdapter);
     }
 
     @Override

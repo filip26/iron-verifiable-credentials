@@ -13,8 +13,8 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.MulticodecRegistry;
+import com.apicatalog.multikey.MultiKeyAdapter;
 import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
-import com.apicatalog.vc.integrity.DataIntegrityMethodReader;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.method.MethodAdapter;
 

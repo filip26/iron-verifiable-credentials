@@ -72,8 +72,9 @@ public class LdGetter {
             if (values.size() > 1) {
                 throw new DocumentError(ErrorType.Invalid, term);
             }
-
-            scalar = values.get(0);
+            if (values.size() > 0) {
+                scalar = values.get(0);   
+            }
         }
 
         if (ValueObject.isValueObject(scalar)) {

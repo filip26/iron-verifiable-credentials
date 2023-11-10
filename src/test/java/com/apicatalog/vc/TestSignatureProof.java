@@ -21,7 +21,7 @@ import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase.Algorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecRegistry;
-import com.apicatalog.vc.integrity.DataIntegrityMethodReader;
+import com.apicatalog.multikey.MultiKeyAdapter;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegrityProofReader;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
