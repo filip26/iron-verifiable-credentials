@@ -25,10 +25,10 @@ public final class MulticodecKey {
      * 
      * @return a codec
      */
-    public Multicodec codec() {
-        return codec;
-    }
-    
+//    public Multicodec codec() {
+//        return codec;
+//    }
+//    
     /**
      * A raw byte array representing the key.
      * 

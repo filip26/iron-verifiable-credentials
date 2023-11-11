@@ -9,6 +9,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.model.ProofValue;
 import com.apicatalog.vc.model.ProofValueProcessor;
 
 import jakarta.json.Json;
@@ -32,7 +33,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     protected Instant created;
     protected String domain;
     protected String challenge;
-    protected byte[] value;
+    protected ProofValue value;
 
     final JsonObject expanded;
 
@@ -93,7 +94,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     }
 
     @Override
-    public byte[] getValue() {
+    public ProofValue getValue() {
         return value;
     }
 

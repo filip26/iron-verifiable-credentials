@@ -21,12 +21,12 @@ public class MultibaseAdapter implements LdValueAdapter<String, MulticodecKey> {
 
         final byte[] debased = Multibase.decode(value);
 
-        final Multicodec code = multicoder.getCodec(debased)
+        final Multicodec codec = multicoder.getCodec(debased)
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported multicodec "));
         
-        final byte[] raw  = code.decode(debased);
+        final byte[] raw  = codec.decode(debased);
         
-        return MulticodecKey.getInstance(code, raw);
+        return MulticodecKey.getInstance(codec, raw);
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.signature.key.MulticodecKey;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -76,6 +77,11 @@ public class LdScalar {
         }
         
         return jsonValue;
+    }
+
+    public byte[] multibase() {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }

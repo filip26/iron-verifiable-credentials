@@ -71,6 +71,10 @@ public class LinkedDataSignature {
      */
     public byte[] sign(JsonObject document, MulticodecKey privateKey, JsonObject proof) throws SigningError {
 
+        if (privateKey == null) {
+            throw new IllegalArgumentException("The privateKey must not be null.");
+        }
+        
         try {
             final byte[] documentHashCode = hashCode(document, proof);
 

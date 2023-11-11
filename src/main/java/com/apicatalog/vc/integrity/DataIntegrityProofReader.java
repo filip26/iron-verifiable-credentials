@@ -49,8 +49,8 @@ public class DataIntegrityProofReader {
         proof.method = node.get(DataIntegrityVocab.VERIFICATION_METHOD)
                 .required().node().map(methodAdapter);
         
-        proof.value = node.get(DataIntegrityVocab.PROOF_VALUE)
-                .required().node().map(valueAdapter);
+//FIXME        proof.value = node.get(DataIntegrityVocab.PROOF_VALUE)
+//                .required().node().map(valueAdapter);
         
         return proof;
     }

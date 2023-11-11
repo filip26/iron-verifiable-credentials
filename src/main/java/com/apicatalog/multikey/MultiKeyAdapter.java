@@ -28,9 +28,12 @@ public class MultiKeyAdapter implements MethodAdapter {
 
         MultiKey multikey = new MultiKey();
         multikey.id = node.id();
-//        multikey.publicKey = node.get(MultiKey.PUBLIC_KEY).scalar().multibase()
+//        multikey.publicKey = node.get(MultiKey.PUBLIC_KEY).scalar().multibase();
 //        MultiKey.type = node.type().link();
         
+//                Algorithm.Base58Btc,
+///MulticodecRegistry.ED25519_PUBLIC_KEY
+//                
         return multikey;
         
 //        return new DataIntegrityKeyPair(id, type, null,
