@@ -7,39 +7,39 @@ import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.key.MulticodecKey;
 
 import jakarta.json.JsonObject;
 
 public class MultiKey implements KeyPair {
 
     protected static final URI TYPE = URI.create("https://w3id.org/security#Multikey");
-    
+
     protected static final URI CONTEXT = URI.create("https://w3id.org/security/multikey/v1");
-    
-    protected static final String MULTIKEY_VOCAB = "";  //FIXME
-    
+
+    protected static final String MULTIKEY_VOCAB = ""; // FIXME
+
     protected static final LdTerm PUBLIC_KEY = LdTerm.create("", MULTIKEY_VOCAB);
-    
+
     protected URI id;
     protected URI controller;
-    protected MulticodecKey publicKey;
-    protected MulticodecKey privateKey;
-    
+    protected String curve;
+    protected byte[] publicKey;
+    protected byte[] privateKey;
+
     @Override
-    public MulticodecKey publicKey() {
+    public byte[] publicKey() {
         return publicKey();
     }
-    
-    public void setPublicKey(MulticodecKey publicKey) {
+
+    public void setPublicKey(byte[] publicKey) {
         this.publicKey = publicKey;
     }
-    
+
     @Override
     public URI id() {
         return id;
     }
-    
+
     public void setId(URI id) {
         this.id = id;
     }
@@ -53,32 +53,37 @@ public class MultiKey implements KeyPair {
     public URI controller() {
         return controller;
     }
-    
+
     public void setController(URI controller) {
         this.controller = controller;
     }
 
     @Override
-    public MulticodecKey privateKey() {
+    public byte[] privateKey() {
         return privateKey;
     }
-    
-    public void setPrivateKey(MulticodecKey privateKey) {
+
+    public void setPrivateKey(byte[] privateKey) {
         this.privateKey = privateKey;
     }
-    
+
     public static VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
-        
+
         if (expanded == null) {
             throw new IllegalArgumentException("Verification method cannot be null.");
         }
-        
+
         if (!JsonLdReader.isTypeOf(TYPE.toString(), expanded)) {
 //            throw new DocumentError(ErrorType.Invalid, ");
         }
-        //TODO
+        // TODO
         return null;
     }
-    
-    //TODO revoked
+
+    @Override
+    public String curve() {
+        return curve;
+    }
+
+    // TODO revoked
 }

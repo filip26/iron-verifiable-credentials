@@ -3,6 +3,7 @@ package com.apicatalog.vc.method;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdAdapter;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.vc.model.Proof;
 
 import jakarta.json.JsonObject;
 
@@ -22,11 +23,11 @@ public interface MethodAdapter extends LdAdapter<VerificationMethod> {
      * Deserialize the given expanded JSON-LD object into a
      * {@link VerificationMethod}.
      * 
-     * @param expanded JSON-LD object in an expanded form
+     * @param document JSON-LD object in an expanded form
      * 
      * @return a new {@link VerificationMethod} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
     @Override
-    VerificationMethod read(JsonObject expanded) throws DocumentError;
+    VerificationMethod read(JsonObject document) throws DocumentError;
 }

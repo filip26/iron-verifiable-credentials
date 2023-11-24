@@ -4,6 +4,8 @@ import com.apicatalog.ld.signature.VerificationMethod;
 
 public interface VerificationKey extends VerificationMethod {
 
-    MulticodecKey publicKey();
+    String curve();
+    
+    byte[] publicKey();
 
 }

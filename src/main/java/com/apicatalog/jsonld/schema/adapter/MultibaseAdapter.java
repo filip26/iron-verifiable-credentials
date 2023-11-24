@@ -1,36 +1,45 @@
 package com.apicatalog.jsonld.schema.adapter;
 
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.key.MulticodecKey;
-import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicoder;
 
 public class MultibaseAdapter implements LdValueAdapter<String, MulticodecKey> {
 
-    protected final Algorithm algorithm;
-    protected final Multicoder multicoder;
-
-    public MultibaseAdapter(Algorithm algorithm, Multicoder multicoder) {
-        this.algorithm = algorithm;
-        this.multicoder = multicoder;
+    @Override
+    public MulticodecKey read(String value) throws DocumentError {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
-    public MulticodecKey read(String value) {
-
-        final byte[] debased = Multibase.decode(value);
-
-        final Multicodec codec = multicoder.getCodec(debased)
-                .orElseThrow(() -> new IllegalArgumentException("Unsupported multicodec "));
-        
-        final byte[] raw  = codec.decode(debased);
-        
-        return MulticodecKey.getInstance(codec, raw);
+    public String write(MulticodecKey value) throws DocumentError {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    @Override
-    public String write(MulticodecKey value) {
-        return Multibase.encode(algorithm, value.getEbcided());
-    }
+//    protected final Algorithm algorithm;
+//    protected final Multicoder multicoder;
+//
+//    public MultibaseAdapter(Algorithm algorithm, Multicoder multicoder) {
+//        this.algorithm = algorithm;
+//        this.multicoder = multicoder;
+//    }
+//
+//    @Override
+//    public MulticodecKey read(String value) {
+//
+//        final byte[] debased = Multibase.decode(value);
+//
+//        final Multicodec codec = multicoder.getCodec(debased)
+//                .orElseThrow(() -> new IllegalArgumentException("Unsupported multicodec "));
+//        
+//        final byte[] raw  = codec.decode(debased);
+//        
+//        return MulticodecKey.getInstance(codec, raw);
+//    }
+//
+//    @Override
+//    public String write(MulticodecKey value) {
+//        return Multibase.encode(algorithm, value.getEbcided());
+//    }
 }

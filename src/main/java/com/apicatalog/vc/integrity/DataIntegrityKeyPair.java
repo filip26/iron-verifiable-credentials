@@ -2,7 +2,6 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 
-import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.ld.signature.key.KeyPair;
 
 public class DataIntegrityKeyPair implements KeyPair {
@@ -11,13 +10,16 @@ public class DataIntegrityKeyPair implements KeyPair {
     final URI type;
     final URI controller;
 
-    final MulticodecKey publicKey;
-    final MulticodecKey privateKey;
+    final String curve;
 
-    protected DataIntegrityKeyPair(URI id, URI type, URI controller, MulticodecKey publicKey, MulticodecKey privateKey) {
+    final byte[] publicKey;
+    final byte[] privateKey;
+
+    protected DataIntegrityKeyPair(URI id, URI type, URI controller, String curve, byte[] publicKey, byte[] privateKey) {
         this.id = id;
         this.type = type;
         this.controller = controller;
+        this.curve = curve;
         this.publicKey = publicKey;
         this.privateKey = privateKey;
     }
@@ -27,12 +29,12 @@ public class DataIntegrityKeyPair implements KeyPair {
      * 
      */
     @Deprecated
-    public static DataIntegrityKeyPair createVerificationKey(URI id, URI type, URI controller, MulticodecKey publicKey) {
-        return new DataIntegrityKeyPair(id, type, controller, publicKey, null);
+    public static DataIntegrityKeyPair createVerificationKey(URI id, URI type, URI controller, String curve, byte[] publicKey) {
+        return new DataIntegrityKeyPair(id, type, controller, curve, publicKey, null);
     }
 
     @Override
-    public MulticodecKey publicKey() {
+    public byte[] publicKey() {
         return publicKey;
     }
 
@@ -52,8 +54,12 @@ public class DataIntegrityKeyPair implements KeyPair {
     }
 
     @Override
-    public MulticodecKey privateKey() {
+    public byte[] privateKey() {
         return privateKey;
     }
 
+    @Override
+    public String curve() {
+        return curve;
+    }
 }

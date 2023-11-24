@@ -2,7 +2,6 @@ package com.apicatalog.vc.integrity;
 
 import static com.apicatalog.jsonld.schema.LdSchema.id;
 import static com.apicatalog.jsonld.schema.LdSchema.link;
-import static com.apicatalog.jsonld.schema.LdSchema.multibase;
 import static com.apicatalog.jsonld.schema.LdSchema.object;
 import static com.apicatalog.jsonld.schema.LdSchema.property;
 import static com.apicatalog.jsonld.schema.LdSchema.string;
@@ -11,15 +10,12 @@ import static com.apicatalog.jsonld.schema.LdSchema.xsdDateTime;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.function.Predicate;
 
 import com.apicatalog.jsonld.schema.LdProperty;
 import com.apicatalog.jsonld.schema.LdSchema;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.MulticodecKey;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec;
 
 @Deprecated
 public final class DataIntegritySchema {
@@ -44,19 +40,19 @@ public final class DataIntegritySchema {
     private DataIntegritySchema() {
         /* protected */ }
 
-    public static final LdProperty<MulticodecKey> getPublicKey(Algorithm encoding, Predicate<byte[]> predicate) {
-//        return property(MULTIBASE_PUB_KEY, multibase(encoding)).test(predicate);
-        throw new UnsupportedOperationException();
-    }
+//    public static final LdProperty<MulticodecKey> getPublicKey(Algorithm encoding, Predicate<byte[]> predicate) {
+////        return property(MULTIBASE_PUB_KEY, multibase(encoding)).test(predicate);
+//        throw new UnsupportedOperationException();
+//    }
 
-    public static final LdProperty<MulticodecKey> getPrivateKey(Algorithm encoding, Predicate<byte[]> predicate) {
-//        return property(MULTIBASE_PRIV_KEY, multibase(encoding)).test(predicate);
-        throw new UnsupportedOperationException();
-    }
+//    public static final LdProperty<MulticodecKey> getPrivateKey(Algorithm encoding, Predicate<byte[]> predicate) {
+////        return property(MULTIBASE_PRIV_KEY, multibase(encoding)).test(predicate);
+//        throw new UnsupportedOperationException();
+//    }
 
-    public static final LdProperty<byte[]> getProofValue(Algorithm encoding, Predicate<byte[]> predicate) {
-        return property(PROOF_VALUE, multibase(encoding)).test(predicate);
-    }
+//    public static final LdProperty<byte[]> getProofValue(Algorithm encoding, Predicate<byte[]> predicate) {
+//        return property(PROOF_VALUE, multibase(encoding)).test(predicate);
+//    }
 
     public static final LdProperty<URI> getMethod() {
         return property(PROOF_VALUE, link());

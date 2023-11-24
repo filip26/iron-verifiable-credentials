@@ -1,38 +1,10 @@
 package com.apicatalog.vc;
 
-import java.net.DatagramSocketImpl;
-import java.net.URI;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.management.openmbean.CompositeDataSupport;
-
-import com.apicatalog.jsonld.schema.LdObject;
-import com.apicatalog.jsonld.schema.LdProperty;
-import com.apicatalog.jsonld.schema.LdSchema;
-import com.apicatalog.jsonld.schema.LdTerm;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.node.LdAdapter;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.ld.signature.primitive.MessageDigest;
-import com.apicatalog.ld.signature.primitive.Urdna2015;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.MulticodecRegistry;
-import com.apicatalog.multikey.MultiKeyAdapter;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
-import com.apicatalog.vc.integrity.DataIntegrityProofReader;
-import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
-import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.model.ProofValueProcessor;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 class TestSignatureProof extends DataIntegrityProof {
 

@@ -8,15 +8,12 @@ import java.util.Map;
 import com.apicatalog.jsonld.schema.adapter.ArrayAdapter;
 import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.jsonld.schema.adapter.LinkAdapter;
-import com.apicatalog.jsonld.schema.adapter.MultibaseAdapter;
 import com.apicatalog.jsonld.schema.adapter.ObjectAdapter;
 import com.apicatalog.jsonld.schema.adapter.StringAdapter;
 import com.apicatalog.jsonld.schema.adapter.UriAdapter;
 import com.apicatalog.jsonld.schema.adapter.ValueObjectAdapter;
 import com.apicatalog.jsonld.schema.adapter.XsdDateTimeAdapter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -112,15 +109,15 @@ public class LdSchema {
         return new LinkAdapter();
     }
 
-    public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm) {
-        throw new UnsupportedOperationException();
-//        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm));
-    }
+//    public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm) {
+//        throw new UnsupportedOperationException();
+////        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm));
+//    }
 
-    public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm, Multicodec codec) {
-        throw new UnsupportedOperationException();
-//        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm, codec));
-    }
+//    public static final LdValueAdapter<JsonValue, byte[]> multibase(Algorithm algorithm, Multicodec codec) {
+//        throw new UnsupportedOperationException();
+////        return LdPipe.create(value(MULTIBASE_TYPE, (new StringAdapter()))).map(new MultibaseAdapter(algorithm, codec));
+//    }
 
     public static final LdValueAdapter<JsonValue, URI> uri() {
         return string(new UriAdapter());

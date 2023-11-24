@@ -31,10 +31,13 @@ public class DidUrlMethodResolver implements MethodResolver {
                     .verificationMethod().stream()
                     .map(did -> DataIntegrityKeyPair.createVerificationKey(
                             did.id().toUri(),
+                            null,
                             did.controller().toUri(),
 //FIXME                        URI.create(did.type()), // TODO did.type should return URI
-                            null,
-                            MulticodecKey.getInstance(did.codec(), did.publicKey())
+//                            null,
+                            did.codec().name(),
+//                            MulticodecKey.getInstance(did.codec(), )
+                            did.publicKey()
                             ))
                     .findFirst()
                     .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "ProofVerificationMethod"));

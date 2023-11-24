@@ -3,7 +3,6 @@ package com.apicatalog.ld.signature;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.ld.signature.key.KeyPair;
 
 import jakarta.json.JsonStructure;
@@ -33,12 +32,12 @@ public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, 
     }
 
     @Override
-    public void verify(MulticodecKey publicKey, byte[] signature, byte[] data) throws VerificationError {
+    public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
         signer.verify(publicKey, signature, data);
     }
 
     @Override
-    public byte[] sign(MulticodecKey privateKey, byte[] data) throws SigningError {
+    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
         return signer.sign(privateKey, data);
     }
 

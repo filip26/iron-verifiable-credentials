@@ -24,7 +24,7 @@ public class DataIntegrityKeysAdapter implements LdValueAdapter<LdObject, Verifi
         byte[] privateKey = object.value(DataIntegritySchema.MULTIBASE_PRIV_KEY);
 
         return new DataIntegrityKeyPair(id, type, controller,
-                null, null //FIXME
+                null, null, null //FIXME
                 //publicKey, privateKe
                 );
     }

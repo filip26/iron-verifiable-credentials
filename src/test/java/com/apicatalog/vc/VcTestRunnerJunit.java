@@ -1,11 +1,5 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.jsonld.schema.LdSchema.id;
-import static com.apicatalog.jsonld.schema.LdSchema.link;
-import static com.apicatalog.jsonld.schema.LdSchema.multibase;
-import static com.apicatalog.jsonld.schema.LdSchema.object;
-import static com.apicatalog.jsonld.schema.LdSchema.property;
-import static com.apicatalog.jsonld.schema.LdSchema.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,16 +20,10 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.jsonld.schema.LdTerm;
-import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.MulticodecRegistry;
-import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.method.MethodAdapter;

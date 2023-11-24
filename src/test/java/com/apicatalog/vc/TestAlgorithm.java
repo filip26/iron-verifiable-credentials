@@ -15,14 +15,12 @@ import com.apicatalog.multicodec.MulticodecRegistry;
 class TestAlgorithm implements SignatureAlgorithm {
 
     @Override
-    public void verify(MulticodecKey publicKey, byte[] signature, byte[] data) throws VerificationError {
+    public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
 
-        final byte[] keyBytes = publicKey.bytes();
+        final byte[] result = new byte[Math.min(publicKey.length, data.length)];
 
-        final byte[] result = new byte[Math.min(keyBytes.length, data.length)];
-
-        for (int i = 0; i < Math.min(keyBytes.length, data.length); i++) {
-            result[i] = (byte) (data[i] ^ keyBytes[i]);
+        for (int i = 0; i < Math.min(publicKey.length, data.length); i++) {
+            result[i] = (byte) (data[i] ^ publicKey[i]);
         }
 
         if (!Arrays.equals(result, signature)) {
@@ -31,14 +29,12 @@ class TestAlgorithm implements SignatureAlgorithm {
     }
 
     @Override
-    public byte[] sign(MulticodecKey privateKey, byte[] data) throws SigningError {
+    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
 
-        final byte[] keyBytes = privateKey.bytes();
+        final byte[] result = new byte[Math.min(privateKey.length, data.length)];
 
-        final byte[] result = new byte[Math.min(keyBytes.length, data.length)];
-
-        for (int i = 0; i < Math.min(keyBytes.length, data.length); i++) {
-            result[i] = (byte) (data[i] ^ keyBytes[i]);
+        for (int i = 0; i < Math.min(privateKey.length, data.length); i++) {
+            result[i] = (byte) (data[i] ^ privateKey[i]);
         }
 
         return result;
@@ -51,8 +47,6 @@ class TestAlgorithm implements SignatureAlgorithm {
 
         new Random().nextBytes(key);
 
-        return new TestKeyPair(
-                MulticodecKey.getInstance(MulticodecRegistry.ED25519_PUBLIC_KEY, key),
-                MulticodecKey.getInstance(MulticodecRegistry.ED25519_PUBLIC_KEY, key));
+        return new TestKeyPair(key, key);
     }
 }
