@@ -6,7 +6,6 @@ import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.model.ProofValueProcessor;
 
 import jakarta.json.JsonObject;
 

@@ -10,7 +10,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.ld.signature.key.MulticodecKey;
 import com.apicatalog.vc.integrity.DataIntegrityKeyPair;
 import com.apicatalog.vc.model.Proof;
 

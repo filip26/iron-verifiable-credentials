@@ -3,7 +3,6 @@ package com.apicatalog.vc.method;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdAdapter;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.vc.model.Proof;
 
 import jakarta.json.JsonObject;
 

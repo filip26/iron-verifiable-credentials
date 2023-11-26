@@ -3,18 +3,12 @@ package com.apicatalog.ld.node;
 import java.net.URI;
 import java.time.Instant;
 
-import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.jsonld.schema.LdTerm;
-import com.apicatalog.jsonld.schema.adapter.XsdDateTimeAdapter;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
-import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonValue;
 

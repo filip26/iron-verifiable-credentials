@@ -1,10 +1,7 @@
 package com.apicatalog.ld.node;
 
-import java.net.URI;
-
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.schema.LdTerm;
-import com.apicatalog.ld.DocumentError;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;

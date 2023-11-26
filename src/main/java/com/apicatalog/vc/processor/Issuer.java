@@ -21,8 +21,8 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.EmbeddedProof;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.Verifiable;
 
