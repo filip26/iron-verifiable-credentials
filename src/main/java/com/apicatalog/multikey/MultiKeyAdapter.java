@@ -26,6 +26,9 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         this.decoder = decoder;
     }
 
+    protected abstract Multicodec getPublicKeyCodec(String algo, int keyLength);
+    protected abstract Multicodec getPrivateKeyCodec(String algo, int keyLength);
+
     @Override
     public VerificationMethod read(JsonObject document) throws DocumentError {
         if (document == null) {
@@ -91,7 +94,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
 
         if (value.controller() != null) {
             builder.set(DataIntegrityVocab.CONTROLLER).id(value.controller());
-            embedded = true;            
+            embedded = true;
         }
 
         if (value instanceof VerificationKey) {
@@ -100,13 +103,24 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
                 builder.set(DataIntegrityVocab.MULTIBASE_PUB_KEY)
                         .scalar("https://w3id.org/security#multibase",
                                 Multibase.BASE_58_BTC.encode(
-                                        encodeKey(verificationKey.algorithm(), verificationKey.publicKey(), false)));
+                                        getPublicKeyCodec(verificationKey.algorithm(), verificationKey.publicKey().length)
+                                                .encode(verificationKey.publicKey())));
+                ;
                 embedded = true;
             }
         }
 
         if (value instanceof KeyPair) {
-
+            KeyPair keyPair = (KeyPair) value;
+            if (keyPair.privateKey() != null) {
+                builder.set(DataIntegrityVocab.MULTIBASE_PRIV_KEY)
+                        .scalar("https://w3id.org/security#multibase",
+                                Multibase.BASE_58_BTC.encode(
+                                        getPrivateKeyCodec(keyPair.algorithm(), keyPair.privateKey().length)
+                                                .encode(keyPair.privateKey())));
+                ;
+                embedded = true;
+            }
         }
 
         if (embedded) {
@@ -116,8 +130,6 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
 //TODO    
         return builder.build();
     }
-
-    protected abstract byte[] encodeKey(String algorightm, byte[] key, boolean secret);
 
     public static final String getAlgorithmName(Multicodec codec) {
         if (codec.name().endsWith("-priv")) {

@@ -1,7 +1,7 @@
 {
-	"@context": "classpath:data-integrity-test-signature-2022.jsonld",
-	"id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-	"type": "TestVerificationKey2022",
-	"controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
-	"publicKeyMultibase": "z6Mkk6zjH7D7jcsWaRUvZxyLKXSUbTKHLaMLkWaJGNafWYuq"
+    "@context": "https://w3id.org/security/multikey/v1",
+    "id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+    "type": "Multikey",
+    "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
+    "publicKeyMultibase": "z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA"
 }
