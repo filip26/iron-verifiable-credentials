@@ -1,7 +1,5 @@
 package com.apicatalog.ld.node;
 
-import java.util.Map;
-
 import com.apicatalog.ld.DocumentError;
 
 import jakarta.json.JsonObject;

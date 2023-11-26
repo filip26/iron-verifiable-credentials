@@ -12,10 +12,8 @@ import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multikey.MultiKeyAdapter;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
-import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.suite.SignatureSuite;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
 class TestSignatureSuite extends DataIntegritySuite {
@@ -36,7 +34,7 @@ class TestSignatureSuite extends DataIntegritySuite {
         @Override
         public JsonObject write(byte[] value) {
             // TODO Auto-generated method stub
-            return null;
+            return Json.createObjectBuilder().build();
         }
 
         @Override

@@ -25,7 +25,7 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
-import com.apicatalog.vc.integrity.DataIntegritySchema;
+import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.processor.Issuer;
 
@@ -62,9 +62,9 @@ public class VcTestRunnerJunit {
 
                 Vc.verify(testCase.input, new TestSignatureSuite())
                         .loader(LOADER)
-                        .param(DataIntegritySchema.DOMAIN.name(), testCase.domain)
-                        .param(DataIntegritySchema.CHALLENGE.name(), testCase.challenge)
-                        .param(DataIntegritySchema.PURPOSE.name(), testCase.purpose)
+                        .param(DataIntegrityVocab.DOMAIN.name(), testCase.domain)
+                        .param(DataIntegrityVocab.CHALLENGE.name(), testCase.challenge)
+                        .param(DataIntegrityVocab.PURPOSE.name(), testCase.purpose)
                         .isValid();
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);

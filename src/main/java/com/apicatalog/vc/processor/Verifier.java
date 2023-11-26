@@ -370,6 +370,8 @@ public final class Verifier extends Processor<Verifier> {
     SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
         for (final SignatureSuite suite : suites) {
             for (final String proofType : proofTypes) {
+                System.out.println("> " + expandedProof);
+                System.out.println("> " + proofType);
                 if (suite.isSupported(proofType, expandedProof)) {
                     return suite;
                 }

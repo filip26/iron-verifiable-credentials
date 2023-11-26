@@ -9,7 +9,6 @@ import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.key.MulticodecKey;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -19,7 +18,7 @@ public class LdScalar {
 
     final LdTerm term;
     final JsonObject value;
-    
+
     boolean required;
 
     public LdScalar(LdTerm term, JsonObject value, boolean required) {
@@ -32,7 +31,7 @@ public class LdScalar {
         this.required = true;
         return this;
     }
-    
+
     public <T> T map(LdValueAdapter<String, T> adapter) {
         // TODO Auto-generated method stub
         return null;
@@ -46,36 +45,36 @@ public class LdScalar {
     public URI link() throws DocumentError {
 
         String link = string();
-        
+
         return link != null ? URI.create(link) : null;
     }
 
     public String string() throws DocumentError {
-    
+
         JsonValue string = value();
 
         if (JsonUtils.isString(string)) {
-            return ((JsonString)string).getString();
+            return ((JsonString) string).getString();
         }
-        
+
         throw new DocumentError(ErrorType.Invalid, term);
     }
-    
+
     protected JsonValue value() throws DocumentError {
-        
+
         JsonValue jsonValue = null;
-        
+
         if (value != null) {
-            jsonValue = value.get(Keywords.VALUE);            
+            jsonValue = value.get(Keywords.VALUE);
         }
-        
+
         if (JsonUtils.isNull(jsonValue)) {
             if (required) {
                 throw new DocumentError(ErrorType.Missing, term);
             }
             return null;
         }
-        
+
         return jsonValue;
     }
 
@@ -83,5 +82,12 @@ public class LdScalar {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
+    public boolean exists() {
+        return JsonUtils.isNotNull(value);
+    }
+
+    public LdTypeGetter type() {
+        return new LdTypeGetter(value);
+    }
 }

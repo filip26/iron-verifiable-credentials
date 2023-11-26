@@ -5,8 +5,16 @@ import java.net.URI;
 import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.node.LdNode;
+import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.Multicodec.Tag;
+import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.vc.integrity.DataIntegrityVocab;
 
 import jakarta.json.JsonObject;
 
@@ -20,9 +28,11 @@ public class MultiKey implements KeyPair {
 
     protected static final LdTerm PUBLIC_KEY = LdTerm.create("", MULTIKEY_VOCAB);
 
+    protected static final MulticodecDecoder MULTICODEC = MulticodecDecoder.getInstance();
+
     protected URI id;
     protected URI controller;
-    protected String curve;
+    protected String keyType;
     protected byte[] publicKey;
     protected byte[] privateKey;
 
@@ -67,22 +77,75 @@ public class MultiKey implements KeyPair {
         this.privateKey = privateKey;
     }
 
-    public static VerificationMethod readMethod(JsonObject expanded) throws DocumentError {
+    public static VerificationMethod readMethod(JsonObject document) throws DocumentError {
 
-        if (expanded == null) {
+        if (document == null) {
             throw new IllegalArgumentException("Verification method cannot be null.");
         }
 
-        if (!JsonLdReader.isTypeOf(TYPE.toString(), expanded)) {
+        if (!JsonLdReader.isTypeOf(TYPE.toString(), document)) {
 //            throw new DocumentError(ErrorType.Invalid, ");
         }
-        // TODO
-        return null;
+
+        final LdNode node = new LdNode(document);
+
+        final MultiKey multikey = new MultiKey();
+
+        multikey.id = node.id();
+        multikey.controller = node.get(DataIntegrityVocab.CONTROLLER).id();
+
+        final LdScalar publicKey = node.get(DataIntegrityVocab.MULTIBASE_PUB_KEY).scalar();
+        if (publicKey.exists()) {
+            if (!publicKey.type().hasType("https://w3id.org/security#multibase")) {
+                throw new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PUB_KEY.name());
+            }
+            final String encodedPublicKey = publicKey.string();
+            if (!Multibase.BASE_58_BTC.isEncoded(encodedPublicKey)) {
+                throw new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PUB_KEY.name() + "Type");
+            }
+
+            final byte[] decodedPublicKey = Multibase.BASE_58_BTC.decode(encodedPublicKey);
+
+            final Multicodec codec = MULTICODEC.getCodec(decodedPublicKey).orElseThrow(() -> new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PUB_KEY.name() + "Codec"));
+System.out.println("P " + codec);
+            multikey.keyType = getKeyTypeName(codec);
+            multikey.publicKey = codec.decode(decodedPublicKey);
+        }
+
+
+        final LdScalar privateKey = node.get(DataIntegrityVocab.MULTIBASE_PRIV_KEY).scalar();
+        if (privateKey.exists()) {
+            if (!privateKey.type().hasType("https://w3id.org/security#multibase")) {
+                throw new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PRIV_KEY.name());
+            }
+            final String encodedPrivateKey = privateKey.string();
+            if (!Multibase.BASE_58_BTC.isEncoded(encodedPrivateKey)) {
+                throw new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PRIV_KEY.name() + "Type");
+            }
+
+            final byte[] decodedPrivateKey = Multibase.BASE_58_BTC.decode(encodedPrivateKey);
+
+            final Multicodec codec = MULTICODEC.getCodec(decodedPrivateKey).orElseThrow(() -> new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PUB_KEY.name() + "Codec"));
+            System.out.println("- " + codec);
+            multikey.privateKey = codec.decode(decodedPrivateKey);
+        }
+
+        return multikey;
     }
 
     @Override
-    public String curve() {
-        return curve;
+    public String keyType() {
+        return keyType;
+    }
+
+    protected static final String getKeyTypeName(Multicodec codec) {
+        if (codec.name().endsWith("-priv")) {
+            return codec.name().substring(0, codec.name().length() - "-priv".length()).toUpperCase();
+        }
+        if (codec.name().endsWith("-pub")) {
+            return codec.name().substring(0, codec.name().length() - "-pub".length()).toUpperCase();
+        }
+        return codec.name().toUpperCase();
     }
 
     // TODO revoked
