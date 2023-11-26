@@ -1,5 +1,7 @@
 package com.apicatalog.ld.node;
 
+import java.net.URI;
+
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.schema.LdTerm;
 
@@ -30,5 +32,9 @@ public class LdNodeBuilder {
     
     public JsonObject build() {
         return builder.build();
+    }
+
+    public void id(URI id) {
+        builder.add(Keywords.ID, id.toASCIIString());
     }
 }

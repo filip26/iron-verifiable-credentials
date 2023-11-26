@@ -1,7 +1,6 @@
 package com.apicatalog.vc.integrity;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.node.LdAdapter;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -14,8 +13,7 @@ public class DataIntegrityProofReader {
     public static final Proof read(
             JsonObject document,
             DataIntegritySuite suite,
-            MethodAdapter methodAdapter,
-            LdAdapter<byte[]> valueAdapter
+            MethodAdapter methodAdapter
             ) throws DocumentError {
 
         if (document == null) {

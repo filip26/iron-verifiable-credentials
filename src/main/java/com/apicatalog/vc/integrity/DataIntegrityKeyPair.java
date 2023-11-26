@@ -59,7 +59,7 @@ public class DataIntegrityKeyPair implements KeyPair {
     }
 
     @Override
-    public String keyType() {
+    public String algorithm() {
         return curve;
     }
 }

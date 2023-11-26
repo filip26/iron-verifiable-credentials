@@ -4,7 +4,6 @@ import java.net.URI;
 import java.time.Instant;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.node.LdAdapter;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
@@ -22,17 +21,13 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected static final String PROOF_TYPE_ID = VcVocab.SECURITY_VOCAB + PROOF_TYPE_NAME;
 
-//    protected final LdSchema methodSchema;
     protected final MethodAdapter methodAdapter;
-//    protected final LdProperty<byte[]> proofValueSchema;
-    protected final LdAdapter<byte[]> proofValueAdapter;
 
     protected final String cryptosuite;
 
-    protected DataIntegritySuite(String cryptosuite, final MethodAdapter method, final LdAdapter<byte[]> proofValue) {
+    protected DataIntegritySuite(String cryptosuite, final MethodAdapter method) {
         this.cryptosuite = cryptosuite;
         this.methodAdapter = method;
-        this.proofValueAdapter = proofValue;
     }
 
     @Override
@@ -81,7 +76,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //
 //        final LdObject ldProof = proofSchema.read(expanded);
 
-        return DataIntegrityProofReader.read(proof, this, methodAdapter, proofValueAdapter);
+        return DataIntegrityProofReader.read(proof, this, methodAdapter);
     }
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName) throws DocumentError;
@@ -100,7 +95,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         builder.set(DataIntegrityVocab.CRYPTO_SUITE).string(cryptosuite);
         builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(methodAdapter, method);
         builder.set(DataIntegrityVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
-        builder.set(DataIntegrityVocab.PURPOSE).link(purpose);
+        builder.set(DataIntegrityVocab.PURPOSE).id(purpose);
 
         if (domain != null) {
             builder.set(DataIntegrityVocab.DOMAIN).string(domain);

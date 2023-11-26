@@ -5,8 +5,10 @@ import java.time.Instant;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.ProofValue;
@@ -14,7 +16,6 @@ import com.apicatalog.vc.model.ProofValueProcessor;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 /**
  * Represents data integrity proof base class.
@@ -131,13 +132,22 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
 
     @Override
     public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
-        final JsonValue value = suite.proofValueAdapter.write(proofValue);
 
-        return Json.createObjectBuilder(expanded).add(
-                DataIntegrityVocab.PROOF_VALUE.uri(),
-                Json.createArrayBuilder().add(
-                        value))
-                .build();
+        LdNodeBuilder node = new LdNodeBuilder(Json.createObjectBuilder(expanded));
+
+        node.set(DataIntegrityVocab.PROOF_VALUE)
+                .scalar("https://w3id.org/security#multibase",
+
+                        Multibase.BASE_58_BTC.encode(proofValue));
+
+        return node.build();
+//        return Json.createObjectBuilder(expanded).add(
+//                DataIntegrityVocab.PROOF_VALUE.uri(),
+//                Json.createArrayBuilder().add(
+//                        Json.createObjectBuilder()
+//                                .add(Keywords.TYPE, ))
+//                                .add(Keywords.VALUE, Json.createValue(Multibase.BASE_58_BTC.encode(proofValue)))))
+//                .build();
     }
 
     @Override
@@ -149,7 +159,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     public VerificationMethod read(JsonObject expanded) throws DocumentError {
         return suite.methodAdapter.read(expanded);
     }
-    
+
     @Override
     public String getContext() {
         return "https://w3id.org/security/data-integrity/v1";

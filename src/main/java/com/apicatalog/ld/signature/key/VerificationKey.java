@@ -4,7 +4,7 @@ import com.apicatalog.ld.signature.VerificationMethod;
 
 public interface VerificationKey extends VerificationMethod {
 
-    String keyType();
+    String algorithm();
     
     byte[] publicKey();
 

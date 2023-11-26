@@ -47,7 +47,9 @@ public class LdSetter {
     }
 
     public <T> void map(LdAdapter<T> adapter, T value) {
-        value(adapter.write(value));
+        if (value != null) {
+            value(adapter.write(value));
+        }
     }
 
     JsonArray setOrAdd(JsonValue value) {
@@ -59,5 +61,11 @@ public class LdSetter {
 
     public void xsdDateTime(Instant created) {
         scalar(VcVocab.XSD_DATETIME.uri(), created.toString());
+    }
+
+    public void id(URI id) {
+        JsonObjectBuilder node = Json.createObjectBuilder();
+        node.add(Keywords.ID, id != null ? Json.createValue(id.toASCIIString()) : JsonValue.NULL);
+        value(node.build());
     }
 }

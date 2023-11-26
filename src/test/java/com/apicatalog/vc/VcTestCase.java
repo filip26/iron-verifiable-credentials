@@ -10,7 +10,6 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.multikey.MultiKeyAdapter;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -104,7 +103,7 @@ public class VcTestCase {
                         .getJsonObject(0);
 
                 try {
-                    testCase.verificationMethod = (new MultiKeyAdapter()).read(method);
+                    testCase.verificationMethod = (new TestKeyAdapter()).read(method);
                 } catch (DocumentError e) {
                     throw new IllegalStateException(e);
                 }

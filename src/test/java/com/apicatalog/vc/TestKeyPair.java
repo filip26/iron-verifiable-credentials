@@ -44,7 +44,7 @@ public class TestKeyPair implements KeyPair {
     }
 
     @Override
-    public String keyType() {
+    public String algorithm() {
         return "ED25519";
     }
 }
