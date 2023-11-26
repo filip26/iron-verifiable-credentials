@@ -9,6 +9,7 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.multikey.MultiKey;
 
 class TestAlgorithm implements SignatureAlgorithm {
 
@@ -45,6 +46,10 @@ class TestAlgorithm implements SignatureAlgorithm {
 
         new Random().nextBytes(key);
 
-        return new TestKeyPair(key, key);
+        final MultiKey multikey = new MultiKey();
+        multikey.setAlgorithm("ED2559");
+        multikey.setPublicKey(key);
+        multikey.setPrivateKey(key);
+        return multikey;
     }
 }

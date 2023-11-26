@@ -13,7 +13,7 @@ import com.apicatalog.vc.integrity.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
-    static final String CONTEXT = "classpath:data-integrity-test-signature-2022.jsonld";
+//    static final String CONTEXT = "classpath:data-integrity-test-signature-2022.jsonld";
 
     static final CryptoSuite CRYPTO = new CryptoSuite(
             new Urdna2015(),

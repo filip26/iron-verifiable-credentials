@@ -137,7 +137,6 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
 
         node.set(DataIntegrityVocab.PROOF_VALUE)
                 .scalar("https://w3id.org/security#multibase",
-
                         Multibase.BASE_58_BTC.encode(proofValue));
 
         return node.build();

@@ -66,9 +66,9 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
             final Multicodec codec = decoder.getCodec(decodedKey).orElseThrow(() -> new DocumentError(ErrorType.Invalid, term.name() + "Codec"));
 
             if (multikey.algorithm == null) {
-                multikey.algorithm = getKeyTypeName(codec);
+                multikey.algorithm = getAlgorithmName(codec);
 
-            } else if (!multikey.algorithm.equals(getKeyTypeName(codec))) {
+            } else if (!multikey.algorithm.equals(getAlgorithmName(codec))) {
                 throw new DocumentError(ErrorType.Invalid, "KeyPairCodec");
             }
 
@@ -119,7 +119,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
 
     protected abstract byte[] encodeKey(String algorightm, byte[] key, boolean secret);
 
-    protected static final String getKeyTypeName(Multicodec codec) {
+    public static final String getAlgorithmName(Multicodec codec) {
         if (codec.name().endsWith("-priv")) {
             return codec.name().substring(0, codec.name().length() - "-priv".length()).toUpperCase();
         }

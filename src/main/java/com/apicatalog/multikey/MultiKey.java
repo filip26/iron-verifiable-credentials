@@ -65,4 +65,8 @@ public class MultiKey implements KeyPair {
     public String algorithm() {
         return algorithm;
     }
+    
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
 }
