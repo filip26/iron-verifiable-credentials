@@ -12,7 +12,6 @@ import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 
@@ -22,11 +21,11 @@ public class MultiKey implements KeyPair {
 
     protected static final URI TYPE = URI.create("https://w3id.org/security#Multikey");
 
-    protected static final URI CONTEXT = URI.create("https://w3id.org/security/multikey/v1");
+//    protected static final URI CONTEXT = URI.create("https://w3id.org/security/multikey/v1");
 
-    protected static final String MULTIKEY_VOCAB = ""; // FIXME
+//    protected static final String MULTIKEY_VOCAB = ""; // FIXME
 
-    protected static final LdTerm PUBLIC_KEY = LdTerm.create("", MULTIKEY_VOCAB);
+//    protected static final LdTerm PUBLIC_KEY = LdTerm.create("", MULTIKEY_VOCAB);
 
     protected static final MulticodecDecoder MULTICODEC = MulticodecDecoder.getInstance();
 
@@ -93,46 +92,42 @@ public class MultiKey implements KeyPair {
 
         multikey.id = node.id();
         multikey.controller = node.get(DataIntegrityVocab.CONTROLLER).id();
-
-        final LdScalar publicKey = node.get(DataIntegrityVocab.MULTIBASE_PUB_KEY).scalar();
-        if (publicKey.exists()) {
-            if (!publicKey.type().hasType("https://w3id.org/security#multibase")) {
-                throw new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PUB_KEY.name());
-            }
-            final String encodedPublicKey = publicKey.string();
-            if (!Multibase.BASE_58_BTC.isEncoded(encodedPublicKey)) {
-                throw new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PUB_KEY.name() + "Type");
-            }
-
-            final byte[] decodedPublicKey = Multibase.BASE_58_BTC.decode(encodedPublicKey);
-
-            final Multicodec codec = MULTICODEC.getCodec(decodedPublicKey).orElseThrow(() -> new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PUB_KEY.name() + "Codec"));
-System.out.println("P " + codec);
-            multikey.keyType = getKeyTypeName(codec);
-            multikey.publicKey = codec.decode(decodedPublicKey);
-        }
-
-
-        final LdScalar privateKey = node.get(DataIntegrityVocab.MULTIBASE_PRIV_KEY).scalar();
-        if (privateKey.exists()) {
-            if (!privateKey.type().hasType("https://w3id.org/security#multibase")) {
-                throw new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PRIV_KEY.name());
-            }
-            final String encodedPrivateKey = privateKey.string();
-            if (!Multibase.BASE_58_BTC.isEncoded(encodedPrivateKey)) {
-                throw new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PRIV_KEY.name() + "Type");
-            }
-
-            final byte[] decodedPrivateKey = Multibase.BASE_58_BTC.decode(encodedPrivateKey);
-
-            final Multicodec codec = MULTICODEC.getCodec(decodedPrivateKey).orElseThrow(() -> new DocumentError(ErrorType.Invalid, DataIntegrityVocab.MULTIBASE_PUB_KEY.name() + "Codec"));
-            System.out.println("- " + codec);
-            multikey.privateKey = codec.decode(decodedPrivateKey);
-        }
-
+        multikey.publicKey = updateKey(node, DataIntegrityVocab.MULTIBASE_PUB_KEY, multikey);
+        multikey.privateKey = updateKey(node, DataIntegrityVocab.MULTIBASE_PRIV_KEY, multikey);
+        
         return multikey;
     }
 
+    protected static final byte[] updateKey(final LdNode node, final LdTerm term, final MultiKey multikey) throws DocumentError {
+        
+        final LdScalar key = node.get(term).scalar();
+        
+        if (key.exists()) {
+            if (!key.type().hasType("https://w3id.org/security#multibase")) {
+                throw new DocumentError(ErrorType.Invalid, term.name());
+            }
+            final String encodedKey = key.string();
+            if (!Multibase.BASE_58_BTC.isEncoded(encodedKey)) {
+                throw new DocumentError(ErrorType.Invalid, term.name() + "Type");
+            }
+
+            final byte[] decodedKey = Multibase.BASE_58_BTC.decode(encodedKey);
+
+            final Multicodec codec = MULTICODEC.getCodec(decodedKey).orElseThrow(() -> new DocumentError(ErrorType.Invalid, term.name() + "Codec"));
+
+            if (multikey.keyType == null) {
+                multikey.keyType = getKeyTypeName(codec);
+
+            } else if (!multikey.keyType.equals(getKeyTypeName(codec))) {
+                throw new DocumentError(ErrorType.Invalid, "KeyPairCodec");
+            }
+
+            return codec.decode(decodedKey);
+        }
+        
+        return null;
+    }
+    
     @Override
     public String keyType() {
         return keyType;
