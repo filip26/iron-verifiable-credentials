@@ -9,8 +9,6 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.ld.signature.key.MulticodecKey;
-import com.apicatalog.multicodec.MulticodecRegistry;
 
 class TestAlgorithm implements SignatureAlgorithm {
 

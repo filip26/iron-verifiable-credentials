@@ -37,11 +37,6 @@
       <version>${titanium.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.apicatalog</groupId>
-      <artifactId>carbon-did-jre8</artifactId>
-      <version>${carbon.version}</version>
-    </dependency>
-    <dependency>
       <groupId>io.setl</groupId>
       <artifactId>rdf-urdna</artifactId>
       <version>${rdf-urdna.version}</version>
