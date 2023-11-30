@@ -78,11 +78,6 @@ public class LdScalar {
         return jsonValue;
     }
 
-    public byte[] multibase() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public boolean exists() {
         return JsonUtils.isNotNull(value);
     }

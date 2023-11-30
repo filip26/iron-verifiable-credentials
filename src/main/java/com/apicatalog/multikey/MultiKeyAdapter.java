@@ -43,9 +43,9 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         if (document == null) {
             throw new IllegalArgumentException("Verification method cannot be null.");
         }
-
+//System.out.println(">>>  " + document.get(Keywords.TYPE));
         if (!JsonLdReader.isTypeOf(MultiKey.TYPE.toString(), document)) {
-            throw new DocumentError(ErrorType.Invalid, "Type");
+//            throw new DocumentError(ErrorType.Invalid, "Type");
         }
 
         final LdNode node = new LdNode(document);
@@ -55,8 +55,8 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         multikey.id = node.id();
         multikey.controller = node.get(CONTROLLER).id();
 
-        multikey.publicKey = updateKey(node, PUBLIC_KEY, multikey);
-        multikey.privateKey = updateKey(node, PRIVATE_KEY, multikey);
+        multikey.publicKey = getKey(node, PUBLIC_KEY, multikey);
+        multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
 
         multikey.expiration = node.get(EXPIRATION).scalar().xsdDateTime();
         multikey.revoked = node.get(REVOKED).scalar().xsdDateTime();
@@ -64,7 +64,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         return multikey;
     }
 
-    protected final byte[] updateKey(final LdNode node, final LdTerm term, final MultiKey multikey) throws DocumentError {
+    protected final byte[] getKey(final LdNode node, final LdTerm term, final MultiKey multikey) throws DocumentError {
 
         final LdScalar key = node.get(term).scalar();
 
@@ -114,14 +114,17 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
             MultiKey multikey = (MultiKey) value;
             if (multikey.getExpiration() != null) {
                 builder.set(EXPIRATION).xsdDateTime(multikey.getExpiration());
+                embedded = true;
             }
             if (multikey.getRevoked() != null) {
                 builder.set(REVOKED).xsdDateTime(multikey.getRevoked());
+                embedded = true;
             }
         }
 
         if (value instanceof VerificationKey) {
             VerificationKey verificationKey = (VerificationKey) value;
+
             if (verificationKey.publicKey() != null) {
                 builder.set(PUBLIC_KEY)
                         .scalar("https://w3id.org/security#multibase",
@@ -149,7 +152,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         if (embedded) {
             builder.type(value.type().toASCIIString());
         }
-
+        
         return builder.build();
     }
 
