@@ -41,8 +41,10 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
     @Override
     public VerificationMethod read(JsonObject document) throws DocumentError {
         if (document == null) {
-            throw new IllegalArgumentException("Verification method cannot be null.");
+//            throw new IllegalArgumentException("Verification method cannot be null.");
+            return null;
         }
+        
 //System.out.println(">>>  " + document.get(Keywords.TYPE));
         if (!JsonLdReader.isTypeOf(MultiKey.TYPE.toString(), document)) {
 //            throw new DocumentError(ErrorType.Invalid, "Type");

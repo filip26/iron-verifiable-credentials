@@ -40,7 +40,7 @@ public interface Proof {
      *
      * @return the proof value as byte array
      */
-    ProofValue getValue();
+    byte[] getValue();
 
     /**
      * The proof unique identifier. Optional.

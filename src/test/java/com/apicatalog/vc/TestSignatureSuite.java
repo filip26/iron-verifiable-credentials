@@ -13,8 +13,6 @@ import com.apicatalog.vc.integrity.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
-//    static final String CONTEXT = "classpath:data-integrity-test-signature-2022.jsonld";
-
     static final CryptoSuite CRYPTO = new CryptoSuite(
             new Urdna2015(),
             new MessageDigest("SHA-256"),
@@ -43,14 +41,4 @@ class TestSignatureSuite extends DataIntegritySuite {
             String challenge) throws DocumentError {
         return super.createDraft(CRYPTO, method, purpose, created, domain, challenge);
     }
-
-//    @Override
-//    public Proof readProof(JsonObject proof) throws DocumentError {
-//        return TestSignatureProof.readProof(proof);
-//    }
-//
-//    @Override
-//    public boolean isSupported(String proofType, JsonObject proof) {
-//        return ID.equals(proofType);
-//    }
 }

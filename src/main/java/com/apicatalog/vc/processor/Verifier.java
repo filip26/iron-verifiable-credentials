@@ -34,7 +34,6 @@ import com.apicatalog.vc.model.Credential;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.model.ProofValue;
 import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.model.io.CredentialReader;
 import com.apicatalog.vc.model.io.PresentationReader;
@@ -279,9 +278,9 @@ public final class Verifier extends Processor<Verifier> {
                 throw new VerificationError(Code.UnsupportedCryptoSuite);
             }
 
-            final ProofValue proofValue = proof.getValue();
+            final byte[] proofValue = proof.getValue();
 
-            if (proofValue == null || proofValue.raw() == null || proofValue.raw().length == 0) {
+            if (proofValue == null || proofValue.length == 0) {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");
             }
 
@@ -305,7 +304,7 @@ public final class Verifier extends Processor<Verifier> {
                     data,
                     unsignedProof,
                     (VerificationKey) verificationMethod,
-                    proofValue.raw());
+                    proofValue);
 
             proof = queue.pop();
         }

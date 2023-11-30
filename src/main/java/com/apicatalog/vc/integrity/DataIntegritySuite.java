@@ -42,7 +42,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
         try {
         
-        return LdNode.get(proof, DataIntegrityVocab.CRYPTO_SUITE).required()
+        return LdNode.get(proof, DataIntegrityVocab.CRYPTO_SUITE)
                 .scalar().string();
 
         } catch (DocumentError e) {
@@ -76,7 +76,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //
 //        final LdObject ldProof = proofSchema.read(expanded);
 
-        return DataIntegrityProofReader.read(proof, this, methodAdapter);
+        return DataIntegrityProofReader.read(proof, this);
     }
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName) throws DocumentError;

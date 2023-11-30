@@ -19,16 +19,9 @@ public class LdGetter {
     final LdTerm term;
     final JsonValue value;
 
-    boolean required = false;
-
     protected LdGetter(LdTerm term, JsonValue value) {
         this.term = term;
         this.value = value;
-    }
-
-    public LdGetter required() {
-        this.required = true;
-        return this;
     }
 
     public LdNode node() throws DocumentError {
@@ -55,14 +48,10 @@ public class LdGetter {
             return object.asJsonObject();
         }
 
-        if (JsonUtils.isNull(object)) {
-            if (required) {
-                throw new DocumentError(ErrorType.Missing, term);
-            }
-            return null;
+        if (JsonUtils.isNotNull(object)) {
+            throw new DocumentError(ErrorType.Invalid, term);
         }
-
-        throw new DocumentError(ErrorType.Invalid, term);
+        return null;
     }
 
     public LdScalar scalar() throws DocumentError {
@@ -82,17 +71,14 @@ public class LdGetter {
         }
 
         if (ValueObject.isValueObject(scalar)) {
-            return new LdScalar(term, scalar.asJsonObject(), required);
+            return new LdScalar(term, scalar.asJsonObject());
         }
 
-        if (JsonUtils.isNull(scalar)) {
-            if (required) {
-                throw new DocumentError(ErrorType.Missing, term);
-            }
-            return new LdScalar(term, null, false);
+        if (JsonUtils.isNotNull(scalar)) {
+            throw new DocumentError(ErrorType.Invalid, term);
         }
-
-        throw new DocumentError(ErrorType.Invalid, term);
+        
+        return new LdScalar(term, null);
     }
 
     public URI id() throws DocumentError {
@@ -122,8 +108,8 @@ public class LdGetter {
             }
         }
 
-        if (required) {
-            throw new DocumentError(ErrorType.Missing, term);
+        if (JsonUtils.isNotNull(scalar)) {
+            throw new DocumentError(ErrorType.Invalid, term);
         }
 
         return null;

@@ -16,16 +16,8 @@ public class LdTypeGetter {
 
     final JsonObject object;
 
-    boolean required;
-
     public LdTypeGetter(JsonObject object) {
         this.object = object;
-        this.required = false;
-    }
-
-    public LdTypeGetter required() {
-        this.required = true;
-        return this;
     }
 
     public URI link() throws DocumentError {
@@ -49,9 +41,6 @@ public class LdTypeGetter {
         }
 
         if (JsonUtils.isNull(type)) {
-            if (required) {
-                throw new DocumentError(ErrorType.Missing, Keywords.TYPE);
-            }
             return null;
         }
 
@@ -60,6 +49,10 @@ public class LdTypeGetter {
         }
 
         throw new DocumentError(ErrorType.Invalid, Keywords.TYPE);
+    }
+    
+    public boolean exists() {
+        return (object != null) && JsonUtils.isNotNull(object.get(Keywords.TYPE));
     }
 
     public boolean hasType(final String type) {

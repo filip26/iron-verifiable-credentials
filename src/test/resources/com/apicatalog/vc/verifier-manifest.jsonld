@@ -29,6 +29,16 @@
 			"input": "verifier/0005-in.jsonld"
 		},
         {
+            "@id": "#t0006",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "forged credentials subject",
+            "input": "verifier/0006-in.jsonld",
+            "expectErrorCode": "InvalidSignature"
+        },		
+        {
             "@id": "#t0007",
             "@type": [
                 "NegativeEvaluationTest",
@@ -38,16 +48,6 @@
             "input": "verifier/0007-in.jsonld",
             "expectErrorCode": "UnknownProofVerificationId"
         },		
-		{
-			"@id": "#t0006",
-			"@type": [
-				"NegativeEvaluationTest",
-				"VeriferTest"
-			],
-			"name": "forged credentials subject",
-			"input": "verifier/0006-in.jsonld",
-			"expectErrorCode": "InvalidSignature"
-		},
 		{
 			"@id": "#t0008",
 			"@type": [

@@ -3,7 +3,7 @@ package com.apicatalog.vc.integrity;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.model.Proof;
 
 import jakarta.json.JsonObject;
@@ -12,9 +12,7 @@ public class DataIntegrityProofReader {
 
     public static final Proof read(
             JsonObject document,
-            DataIntegritySuite suite,
-            MethodAdapter methodAdapter
-            ) throws DocumentError {
+            DataIntegritySuite suite) throws DocumentError {
 
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
@@ -30,12 +28,10 @@ public class DataIntegrityProofReader {
         DataIntegrityProof proof = new DataIntegrityProof(suite, crypto, document);
 
         proof.id = node.id();
-        
-        proof.created = node.get(DataIntegrityVocab.CREATED)
-                .required().scalar().xsdDateTime();
 
-        proof.purpose = node.get(DataIntegrityVocab.PURPOSE)
-                .required().scalar().link();
+        proof.created = node.get(DataIntegrityVocab.CREATED).scalar().xsdDateTime();
+
+        proof.purpose = node.get(DataIntegrityVocab.PURPOSE).id();
 
         proof.domain = node.get(DataIntegrityVocab.DOMAIN)
                 .scalar().string();
@@ -43,12 +39,11 @@ public class DataIntegrityProofReader {
         proof.challenge = node.get(DataIntegrityVocab.CHALLENGE)
                 .scalar().string();
 
-        proof.method = node.get(DataIntegrityVocab.VERIFICATION_METHOD)
-                .required().node().map(methodAdapter);
-        
-//FIXME        proof.value = node.get(DataIntegrityVocab.PROOF_VALUE)
-//                .required().node().map(valueAdapter);
-        
+        proof.method = node.get(DataIntegrityVocab.VERIFICATION_METHOD).node().map(suite.methodAdapter);
+
+        proof.value = node.get(DataIntegrityVocab.PROOF_VALUE)
+                .scalar().multibase(Multibase.BASE_58_BTC);
+
         return proof;
     }
 }
