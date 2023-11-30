@@ -5,7 +5,8 @@
     "issuanceDate": "2022-06-03T21:18:40Z",
     "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
     "proof": {
-        "type": "TestSignatureSuite2022",
+        "type": "DataIntegrityProof",
+        "cryptosuite": "test-2022",
         "verificationMethod": {
             "id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
             "type": "TestVerificationKey2022",
@@ -18,6 +19,7 @@
     },
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "classpath:data-integrity-test-signature-2022.jsonld"
+        "https://w3id.org/security/multikey/v1",
+        "https://w3id.org/security/data-integrity/v1"
     ]
 }

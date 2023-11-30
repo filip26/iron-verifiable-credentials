@@ -3,7 +3,6 @@ package com.apicatalog.vc;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.multikey.MultiKeyAdapter;
 import com.apicatalog.uvarint.UVarInt;
 

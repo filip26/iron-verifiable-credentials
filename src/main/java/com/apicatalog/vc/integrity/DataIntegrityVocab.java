@@ -19,11 +19,6 @@ public final class DataIntegrityVocab {
 
     public static final LdTerm PREVIOUS_PROOF = LdTerm.create("previousProof", VcVocab.SECURITY_VOCAB);
 
-    public static final LdTerm CONTROLLER = LdTerm.create("controller", VcVocab.SECURITY_VOCAB);
-    
-    public static final LdTerm MULTIBASE_PUB_KEY = LdTerm.create("publicKeyMultibase", VcVocab.SECURITY_VOCAB);
-    public static final LdTerm MULTIBASE_PRIV_KEY = LdTerm.create("secretKeyMultibase", VcVocab.SECURITY_VOCAB);
-
     private DataIntegrityVocab() {
         /* protected */ }
 }

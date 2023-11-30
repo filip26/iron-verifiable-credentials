@@ -3,7 +3,7 @@ package com.apicatalog.vc.loader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.apicatalog.jsonld.JsonLdError;
@@ -15,7 +15,7 @@ import com.apicatalog.vc.Vc;
 
 public class StaticContextLoader implements DocumentLoader {
 
-    protected static Map<String, Document> staticCache = new HashMap<>();
+    protected static final Map<String, Document> staticCache = new LinkedHashMap<>();
 
     static {
         staticCache.put("https://www.w3.org/2018/credentials/examples/v1", get("2018-credentials-examples-v1.jsonld"));
@@ -30,7 +30,7 @@ public class StaticContextLoader implements DocumentLoader {
 
     protected final DocumentLoader defaultLoader;
 
-    protected static JsonDocument get(String name) {
+    protected static JsonDocument get(final String name) {
         try (final InputStream is = Vc.class.getResourceAsStream(name)) {
 
             return JsonDocument.of(is);
@@ -41,15 +41,15 @@ public class StaticContextLoader implements DocumentLoader {
         return null;
     }
 
-    public StaticContextLoader(DocumentLoader defaultLoader) {
+    public StaticContextLoader(final DocumentLoader defaultLoader) {
         this.defaultLoader = defaultLoader;
     }
 
     @Override
-    public Document loadDocument(URI url, DocumentLoaderOptions options) throws JsonLdError {
+    public Document loadDocument(final URI url, final DocumentLoaderOptions options) throws JsonLdError {
 
         if (staticCache.containsKey(url.toString())) {
-            Document document = staticCache.get(url.toString());
+            final Document document = staticCache.get(url.toString());
             if (document != null) {
                 return document;
             }

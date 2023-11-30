@@ -13,12 +13,20 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.vc.integrity.DataIntegrityVocab;
+import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.method.MethodAdapter;
 
 import jakarta.json.JsonObject;
 
 public abstract class MultiKeyAdapter implements MethodAdapter {
+
+    public static final LdTerm CONTROLLER = LdTerm.create("controller", VcVocab.SECURITY_VOCAB);
+
+    public static final LdTerm PUBLIC_KEY = LdTerm.create("publicKeyMultibase", VcVocab.SECURITY_VOCAB);
+    public static final LdTerm PRIVATE_KEY = LdTerm.create("secretKeyMultibase", VcVocab.SECURITY_VOCAB);
+
+    public static final LdTerm EXPIRATION = LdTerm.create("expiration", VcVocab.SECURITY_VOCAB);
+    public static final LdTerm REVOKED = LdTerm.create("revoked", VcVocab.SECURITY_VOCAB);
 
     protected final MulticodecDecoder decoder;
 
@@ -27,6 +35,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
     }
 
     protected abstract Multicodec getPublicKeyCodec(String algo, int keyLength);
+
     protected abstract Multicodec getPrivateKeyCodec(String algo, int keyLength);
 
     @Override
@@ -36,7 +45,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         }
 
         if (!JsonLdReader.isTypeOf(MultiKey.TYPE.toString(), document)) {
-//FIXME            throw new DocumentError(ErrorType.Invalid, "Type");
+            throw new DocumentError(ErrorType.Invalid, "Type");
         }
 
         final LdNode node = new LdNode(document);
@@ -44,9 +53,13 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         final MultiKey multikey = new MultiKey();
 
         multikey.id = node.id();
-        multikey.controller = node.get(DataIntegrityVocab.CONTROLLER).id();
-        multikey.publicKey = updateKey(node, DataIntegrityVocab.MULTIBASE_PUB_KEY, multikey);
-        multikey.privateKey = updateKey(node, DataIntegrityVocab.MULTIBASE_PRIV_KEY, multikey);
+        multikey.controller = node.get(CONTROLLER).id();
+
+        multikey.publicKey = updateKey(node, PUBLIC_KEY, multikey);
+        multikey.privateKey = updateKey(node, PRIVATE_KEY, multikey);
+
+        multikey.expiration = node.get(EXPIRATION).scalar().xsdDateTime();
+        multikey.revoked = node.get(REVOKED).scalar().xsdDateTime();
 
         return multikey;
     }
@@ -93,14 +106,24 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         boolean embedded = false;
 
         if (value.controller() != null) {
-            builder.set(DataIntegrityVocab.CONTROLLER).id(value.controller());
+            builder.set(CONTROLLER).id(value.controller());
             embedded = true;
+        }
+
+        if (value instanceof MultiKey) {
+            MultiKey multikey = (MultiKey) value;
+            if (multikey.getExpiration() != null) {
+                builder.set(EXPIRATION).xsdDateTime(multikey.getExpiration());
+            }
+            if (multikey.getRevoked() != null) {
+                builder.set(REVOKED).xsdDateTime(multikey.getRevoked());
+            }
         }
 
         if (value instanceof VerificationKey) {
             VerificationKey verificationKey = (VerificationKey) value;
             if (verificationKey.publicKey() != null) {
-                builder.set(DataIntegrityVocab.MULTIBASE_PUB_KEY)
+                builder.set(PUBLIC_KEY)
                         .scalar("https://w3id.org/security#multibase",
                                 Multibase.BASE_58_BTC.encode(
                                         getPublicKeyCodec(verificationKey.algorithm(), verificationKey.publicKey().length)
@@ -113,7 +136,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         if (value instanceof KeyPair) {
             KeyPair keyPair = (KeyPair) value;
             if (keyPair.privateKey() != null) {
-                builder.set(DataIntegrityVocab.MULTIBASE_PRIV_KEY)
+                builder.set(PRIVATE_KEY)
                         .scalar("https://w3id.org/security#multibase",
                                 Multibase.BASE_58_BTC.encode(
                                         getPrivateKeyCodec(keyPair.algorithm(), keyPair.privateKey().length)
@@ -127,7 +150,6 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
             builder.type(value.type().toASCIIString());
         }
 
-//TODO    
         return builder.build();
     }
 

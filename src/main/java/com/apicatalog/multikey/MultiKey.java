@@ -1,6 +1,7 @@
 package com.apicatalog.multikey;
 
 import java.net.URI;
+import java.time.Instant;
 
 import com.apicatalog.ld.signature.key.KeyPair;
 
@@ -12,13 +13,16 @@ public class MultiKey implements KeyPair {
 
 //    protected static final String MULTIKEY_VOCAB = ""; // FIXME
 
-//    protected static final LdTerm PUBLIC_KEY = LdTerm.create("", MULTIKEY_VOCAB);
-
     protected URI id;
     protected URI controller;
+    
     protected String algorithm;
+    
     protected byte[] publicKey;
     protected byte[] privateKey;
+    
+    protected Instant revoked;
+    protected Instant expiration;
 
     @Override
     public byte[] publicKey() {
@@ -69,4 +73,21 @@ public class MultiKey implements KeyPair {
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
     }
+    
+    public void setRevoked(Instant revoked) {
+        this.revoked = revoked;
+    }
+    
+    public Instant getRevoked() {
+        return revoked;
+    }
+    
+    public Instant getExpiration() {
+        return expiration;
+    }
+    
+    public void setExpiration(Instant expiration) {
+        this.expiration = expiration;
+    }
+    
 }
