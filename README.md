@@ -15,7 +15,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 * Verifying VC/VP   
 * Issuing VC/VP
 * Verifiable Credentials Data Models
-  * [v2.0 Draft](https://w3c.github.io/vc-data-model//)
+  * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
 * Signature Suites
   * [Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
@@ -121,7 +121,7 @@ Fork and clone the project repository.
 ```
 
 ## Resources
-* [Verifiable Credentials Data Model v2.0 Draft](https://w3c.github.io/vc-data-model//)
+* [Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
 * [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
 * [Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
