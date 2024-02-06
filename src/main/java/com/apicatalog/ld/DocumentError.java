@@ -2,8 +2,6 @@ package com.apicatalog.ld;
 
 import java.util.Arrays;
 
-import com.apicatalog.jsonld.schema.LdTerm;
-
 public class DocumentError extends Throwable {
 
     private static final long serialVersionUID = -7146533158378348477L;
@@ -30,13 +28,13 @@ public class DocumentError extends Throwable {
         this.code = type.name().concat(code);
     }
 
-    public DocumentError(ErrorType type, LdTerm... terms) {
+    public DocumentError(ErrorType type, Term... terms) {
         super();
         this.type = type;
         this.code = toCode(type, terms);
     }
 
-    public DocumentError(Throwable e, ErrorType type, LdTerm... terms) {
+    public DocumentError(Throwable e, ErrorType type, Term... terms) {
         super(e);
         this.type = type;
         this.code = toCode(type, terms);
@@ -55,7 +53,7 @@ public class DocumentError extends Throwable {
         return code;
     }
 
-    static final String toCode(ErrorType type, LdTerm... terms) {
+    static final String toCode(ErrorType type, Term... terms) {
 
         final StringBuilder sb = new StringBuilder();
 

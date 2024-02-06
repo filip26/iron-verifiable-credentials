@@ -29,7 +29,7 @@ public class Credential extends Verifiable {
     protected JsonValue issuer;
     protected JsonValue status;
 
-    public Credential(DataModelVersion version) {
+    public Credential(ModelVersion version) {
         super(version);
     }
 
@@ -113,6 +113,19 @@ public class Credential extends Verifiable {
     public boolean isExpired() {
         return (expiration != null && expiration.isBefore(Instant.now()))
                 || (validUntil != null && validUntil.isBefore(Instant.now()));
+    }
+
+    /**
+     * Checks if the credential is active, i.e. does not define validFrom property
+     * or the property datetime is before now.
+     * 
+     * @since 0.90.0
+     * 
+     * @return <code>true</code> if the credential is active
+     */
+    public boolean isNotValidYet() {
+        return (issuance != null && issuance.isAfter(Instant.now()))
+                || (validFrom != null && validFrom.isAfter(Instant.now()));
     }
 
     /**

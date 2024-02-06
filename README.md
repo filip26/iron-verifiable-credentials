@@ -33,7 +33,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 ## Installation
 
 ### Maven
-Java 17 or higher
+Java 17+
 
 ```xml
 <dependency>
@@ -45,7 +45,7 @@ Java 17 or higher
 ```
 
 ### Gradle
-Android 12 or higher (API Level >=31)
+Android 12+ (API Level >=31)
 
 ```gradle
 compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.8.1'
@@ -128,6 +128,7 @@ Fork and clone the project repository.
 * [Data Integrity 1.0](https://w3c-ccg.github.io/data-integrity-spec/)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
 * [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
+* [VC v2.0 Interoperability Report](https://digitalbazaar.github.io/vc-data-model-2-test-suite/)
 
 ## Sponsors
 

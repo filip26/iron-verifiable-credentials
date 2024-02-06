@@ -7,7 +7,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
-import com.apicatalog.vc.method.VerificationMethodProcessor;
+import com.apicatalog.vc.method.MethodAdapter;
 
 import jakarta.json.JsonObject;
 
@@ -83,5 +83,5 @@ public interface Proof {
 
     ProofValueProcessor valueProcessor();
 
-    VerificationMethodProcessor methodProcessor();
+    MethodAdapter methodProcessor();
 }

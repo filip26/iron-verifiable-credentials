@@ -3,13 +3,15 @@ package com.apicatalog.vc.status;
 import java.net.URI;
 import java.util.Collection;
 
-import com.apicatalog.jsonld.InvalidJsonLdValue;
-import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
+import com.apicatalog.ld.node.LdNode;
+import com.apicatalog.ld.node.LdType;
 import com.apicatalog.vc.VcVocab;
 
+import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
 /**
@@ -22,22 +24,24 @@ public class StatusPropertiesValidator implements StatusValidator {
     protected URI id;
     protected Collection<String> type;
 
-    public static StatusPropertiesValidator from(final JsonValue document) throws DocumentError {
+    public static StatusPropertiesValidator from(final JsonObject document) throws DocumentError {
 
         final StatusPropertiesValidator status = new StatusPropertiesValidator();
 
-        try {
-            status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.ID));
+        final LdNode node = LdNode.of(document);
 
-            if (!JsonLdReader.hasType(document)) {
-                throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.TYPE);
-            }
-
-            status.type = JsonLdReader.getType(document.asJsonObject());
-
-        } catch (InvalidJsonLdValue e) {
-            throw new DocumentError(ErrorType.Invalid, VcVocab.STATUS, LdTerm.ID);
+        status.id = node.id();
+        if (status.id == null) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, Term.ID);
         }
+        
+        final LdType type = node.type();
+
+        if (!type.exists()) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, Term.TYPE);
+        }
+
+        status.type = type.strings();
 
         return status;
     }
@@ -52,6 +56,21 @@ public class StatusPropertiesValidator implements StatusValidator {
 
     @Override
     public void verify(JsonValue status) throws DocumentError, VerifyError {
-        from(status);
+        if (JsonUtils.isNull(status)) {
+            return;
+
+        } else if (JsonUtils.isObject(status)) {
+            from(status.asJsonObject());
+
+        } else if (JsonUtils.isArray(status)) {
+            for (final JsonValue item : status.asJsonArray()) {
+                if (JsonUtils.isObject(item)) {
+                    from(item.asJsonObject());
+                } else {
+                    throw new DocumentError(ErrorType.Invalid, VcVocab.STATUS);
+                }
+            }
+        }
+        throw new DocumentError(ErrorType.Invalid, VcVocab.STATUS);
     }
 }

@@ -2,7 +2,7 @@
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
         "https://www.w3.org/2018/credentials/examples/v1",
-        "classpath:data-integrity-test-signature-2022.jsonld"
+        "https://w3id.org/security/data-integrity/v1"
     ],
     "id": "http://example.edu/credentials/3732",
     "type": [
@@ -22,9 +22,10 @@
         }
     },
     "proof": {
-        "type": "TestSignatureSuite2022",
+        "type": "DataIntegrityProof",
+        "cryptosuite": "test-2022",
         "created": "2022-02-25T14:58:43Z",
         "proofPurpose": "assertionMethod",
-        "proofValue": "z2Xdmp6YDYz5RPKeRFDcPYorAmnERyr7aRNzv176oLMxwcW7GgKxAQT45jUKwsMA1XvrmFT5Y8WCx7ZnkNTTHJnu9"
+        "proofValue": "z58DAdFfa9SkqZMVPxAQpic7ndSayn1PzZs6ZjWp1CktyGesjuTSwRdoWhAfGFCF5bppETSTojQCrfFPP2oumHKtz"
     }
 }

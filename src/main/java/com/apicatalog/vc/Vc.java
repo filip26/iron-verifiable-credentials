@@ -5,7 +5,6 @@ import java.net.URI;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.KeyGenError;
-import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
@@ -89,16 +88,16 @@ public final class Vc {
     /**
      * Generates public/private key pair.
      *
-     * @param cryptoSuite a crypto suite used to generate a key pair.
+     * @param suite used to generate a key pair.
      *
      * @return {@link KeyGenError} allowing to set options and to generate key pair
      *
      * @throws KeyGenError
      */
-    public static KeysGenerator generateKeysfinal(final CryptoSuite cryptoSuite) throws KeyGenError {
-        if (cryptoSuite == null) {
+    public static KeysGenerator keygen(final CryptoSuite suite) throws KeyGenError {
+        if (suite == null) {
             throw new IllegalArgumentException("The cryptoSuite parameter must not be null.");
         }
-        return new KeysGenerator(new LinkedDataSignature(cryptoSuite));
+        return new KeysGenerator(suite);
     }
 }

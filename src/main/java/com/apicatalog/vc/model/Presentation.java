@@ -17,7 +17,7 @@ public class Presentation extends Verifiable {
 
     protected Collection<Credential> credentials;
 
-    public Presentation(DataModelVersion version) {
+    public Presentation(ModelVersion version) {
         super(version);
     }
 

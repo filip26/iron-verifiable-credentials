@@ -29,6 +29,16 @@
 			"input": "verifier/0005-in.jsonld"
 		},
         {
+            "@id": "#t0006",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "forged credentials subject",
+            "input": "verifier/0006-in.jsonld",
+            "expectErrorCode": "InvalidSignature"
+        },		
+        {
             "@id": "#t0007",
             "@type": [
                 "NegativeEvaluationTest",
@@ -38,16 +48,6 @@
             "input": "verifier/0007-in.jsonld",
             "expectErrorCode": "UnknownProofVerificationId"
         },		
-		{
-			"@id": "#t0006",
-			"@type": [
-				"NegativeEvaluationTest",
-				"VeriferTest"
-			],
-			"name": "forged credentials subject",
-			"input": "verifier/0006-in.jsonld",
-			"expectErrorCode": "InvalidSignature"
-		},
 		{
 			"@id": "#t0008",
 			"@type": [
@@ -95,7 +95,7 @@
 			],
 			"name": "invalid verificationMethod property",
 			"input": "verifier/0012-in.jsonld",
-			"expectErrorCode": "MissingProofVerificationId"
+			"expectErrorCode": "InvalidVerificationMethodType"
 		},
 		{
 			"@id": "#t0013",
@@ -194,7 +194,7 @@
 				"VeriferTest"
 			],
 			"name": "invalid proof domain property",
-			"input": "verifier/0024-in.jsonld",
+			"input": "verifier/0023-in.jsonld",
 			"options": {
 				"domain": "4jt"
 			},
@@ -260,6 +260,16 @@
 			},
 			"expectErrorCode": "InvalidProofPurpose"
 		},
+    {
+            "@id": "#t0030",
+            "@type": [
+                "NegativeEvaluationTest",
+                "VeriferTest"
+            ],
+            "name": "invalid did method",
+            "input": "verifier/0030-in.jsonld",
+            "expectErrorCode": "UnknownProofVerificationMethod"
+        },		
 		{
 			"@id": "#t0050",
 			"@type": [

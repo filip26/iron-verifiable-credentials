@@ -1,7 +1,6 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -11,29 +10,32 @@ import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
+import com.apicatalog.ld.node.LdType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.multibase.MultibaseDecoder;
+import com.apicatalog.multicodec.Multicodec.Tag;
+import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.model.Credential;
-import com.apicatalog.vc.model.DataModelVersion;
 import com.apicatalog.vc.model.EmbeddedProof;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.model.io.CredentialReader;
@@ -78,7 +80,7 @@ public final class Verifier extends Processor<Verifier> {
 
     public static final Collection<MethodResolver> defaultResolvers() {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver());
+        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
         resolvers.add(new HttpMethodResolver());
         return resolvers;
     }
@@ -145,11 +147,11 @@ public final class Verifier extends Processor<Verifier> {
             final Document loadedDocument = loader.loadDocument(location, options);
 
             final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
-            
+
             if (JsonUtils.isNotObject(json)) {
                 throw new DocumentError(ErrorType.Invalid);
             }
-            
+
             return verify(json.asJsonObject());
 
         } catch (JsonLdError e) {
@@ -173,7 +175,7 @@ public final class Verifier extends Processor<Verifier> {
         }
     }
 
-    private Verifiable verifyExpanded(final DataModelVersion version, JsonArray expanded) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, JsonArray expanded) throws VerificationError, DocumentError {
 
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
             throw new DocumentError(ErrorType.Invalid);
@@ -188,7 +190,7 @@ public final class Verifier extends Processor<Verifier> {
         return verifyExpanded(version, verifiable.asJsonObject());
     }
 
-    private Verifiable verifyExpanded(final DataModelVersion version, final JsonObject expanded) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, final JsonObject expanded) throws VerificationError, DocumentError {
 
         // get a verifiable representation
         final Verifiable verifiable = get(version, expanded);
@@ -209,24 +211,24 @@ public final class Verifier extends Processor<Verifier> {
 
             final Collection<Credential> credentials = new ArrayList<>();
 
-            for (final JsonValue presentedCredentials : PresentationReader.getCredentials(expanded)) {
+            for (final JsonObject presentedCredentials : PresentationReader.getCredentials(expanded)) {
 
-                if (JsonUtils.isNotObject(presentedCredentials)) {
-                    throw new DocumentError(ErrorType.Invalid);
-                }
+//                if (JsonUtils.isNotObject(presentedCredentials)) {
+//                    throw new DocumentError(ErrorType.Invalid);
+//                }
 
                 if (!CredentialReader.isCredential(presentedCredentials)) {
-                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
+                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
                 }
 
-                credentials.add(verifyExpanded(version, presentedCredentials.asJsonObject()).asCredential());
+                credentials.add(verifyExpanded(version, presentedCredentials).asCredential());
             }
 
             verifiable.asPresentation().setCredentials(credentials);
 
             return verifiable;
         }
-        throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
+        throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
 
     private Collection<Proof> verifyProofs(JsonObject expanded) throws VerificationError, DocumentError {
@@ -243,16 +245,10 @@ public final class Verifier extends Processor<Verifier> {
         // read attached proofs
         for (final JsonObject expandedProof : expandedProofs) {
 
-//            if (JsonUtils.isNotObject(expandedProof)) {
-//                throw new DocumentError(ErrorType.Invalid, VcVocab.PROOF);
-//            }
-//
-//            final JsonObject proofObject = expandedProof.asJsonObject();
-
-            final Collection<String> proofTypes = JsonLdReader.getType(expandedProof);
+            final Collection<String> proofTypes = LdType.strings(expandedProof);
 
             if (proofTypes == null || proofTypes.isEmpty()) {
-                throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, LdTerm.TYPE);
+                throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, Term.TYPE);
             }
 
             final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
@@ -362,20 +358,14 @@ public final class Verifier extends Processor<Verifier> {
     final void validate(final Credential credential) throws DocumentError, VerificationError {
 
         // validation
-        if (credential.isExpired()
-                || (credential.getValidUntil() != null
-                        && credential.getValidUntil().isBefore(Instant.now()))) {
+        if (credential.isExpired()) {
             throw new VerificationError(Code.Expired);
         }
 
-        if ((credential.getIssuanceDate() != null
-                && credential.getIssuanceDate().isAfter(Instant.now()))
-
-                || (credential.getValidFrom() != null
-                        && credential.getValidFrom().isAfter(Instant.now()))) {
-
+        if (credential.isNotValidYet()) {
             throw new VerificationError(Code.NotValidYet);
         }
+
         validateData(credential);
     }
 

@@ -1,11 +1,9 @@
 package com.apicatalog.ld.signature;
 
-import java.net.URI;
 import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationError.Code;
-import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 
 import jakarta.json.JsonObject;
@@ -62,7 +60,7 @@ public class LinkedDataSignature {
      *      Algorithm</a>
      *
      * @param document expanded unsigned VC/VP document
-     * @param keyPair
+     * @param privateKey
      * @param proof
      *
      * @return computed signature
@@ -70,12 +68,16 @@ public class LinkedDataSignature {
      * @throws SigningError
      * @throws DocumentError
      */
-    public byte[] sign(JsonObject document, KeyPair keyPair, JsonObject proof) throws SigningError {
+    public byte[] sign(JsonObject document, byte[] privateKey, JsonObject proof) throws SigningError {
 
+        if (privateKey == null) {
+            throw new IllegalArgumentException("The privateKey must not be null.");
+        }
+        
         try {
             final byte[] documentHashCode = hashCode(document, proof);
 
-            return suite.sign(keyPair.privateKey(), documentHashCode);
+            return suite.sign(privateKey, documentHashCode);
 
         } catch (LinkedDataSuiteError e) {
             throw new SigningError(SigningError.Code.Internal, e);
@@ -107,9 +109,5 @@ public class LinkedDataSignature {
         System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
 
         return result;
-    }
-
-    public KeyPair keygen(URI id, int length) throws KeyGenError {
-        return suite.keygen(length);
     }
 }

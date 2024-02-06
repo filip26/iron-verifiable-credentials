@@ -17,5 +17,5 @@ public interface SignatureAlgorithm {
 
     byte[] sign(byte[] privateKey, byte[] data) throws SigningError;
 
-    KeyPair keygen(int length) throws KeyGenError;
+    KeyPair keygen() throws KeyGenError;
 }

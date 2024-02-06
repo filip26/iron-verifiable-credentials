@@ -1,11 +1,5 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.jsonld.schema.LdSchema.id;
-import static com.apicatalog.jsonld.schema.LdSchema.link;
-import static com.apicatalog.jsonld.schema.LdSchema.multibase;
-import static com.apicatalog.jsonld.schema.LdSchema.object;
-import static com.apicatalog.jsonld.schema.LdSchema.property;
-import static com.apicatalog.jsonld.schema.LdSchema.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,7 +8,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -26,17 +22,17 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.jsonld.schema.LdTerm;
-import com.apicatalog.jsonld.schema.adapter.LdValueAdapter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.multibase.Multibase.Algorithm;
-import com.apicatalog.multicodec.Multicodec.Codec;
-import com.apicatalog.vc.integrity.DataIntegritySchema;
-import com.apicatalog.vc.integrity.DataIntegrityKeysAdapter;
+import com.apicatalog.multibase.MultibaseDecoder;
+import com.apicatalog.vc.integrity.DataIntegrityProof;
+import com.apicatalog.vc.integrity.DataIntegrityVocab;
+import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
+import com.apicatalog.vc.method.resolver.HttpMethodResolver;
+import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -58,6 +54,8 @@ public class VcTestRunnerJunit {
                     .set("https", HttpLoader.defaultInstance())
                     .set("classpath", new ClasspathLoader()));
 
+    public final static Collection<MethodResolver> RESOLVERS = defaultResolvers();
+    
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
     }
@@ -72,9 +70,10 @@ public class VcTestRunnerJunit {
 
                 Vc.verify(testCase.input, new TestSignatureSuite())
                         .loader(LOADER)
-                        .param(DataIntegritySchema.DOMAIN.name(), testCase.domain)
-                        .param(DataIntegritySchema.CHALLENGE.name(), testCase.challenge)
-                        .param(DataIntegritySchema.PURPOSE.name(), testCase.purpose)
+                        .methodResolvers(RESOLVERS)
+                        .param(DataIntegrityVocab.DOMAIN.name(), testCase.domain)
+                        .param(DataIntegrityVocab.CHALLENGE.name(), testCase.challenge)
+                        .param(DataIntegrityVocab.PURPOSE.name(), testCase.purpose)
                         .isValid();
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
@@ -90,18 +89,17 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                final TestSignatureProof draft = TestSignatureProof.createDraft(
+                final DataIntegrityProof draft = (new TestSignatureSuite()).createDraft(
                         // proof options
                         testCase.verificationMethod,
                         URI.create("https://w3id.org/security#assertionMethod"),
                         testCase.created,
                         testCase.domain,
-                        testCase.challenge
-                        ); 
+                        testCase.challenge);
 
                 final Issuer issuer = Vc.sign(
                         testCase.input,
-                        getKeys(keyPairLocation, LOADER),
+                        getKeys(keyPairLocation, LOADER, draft.methodProcessor()),
                         draft)
                         .loader(LOADER);
 
@@ -110,9 +108,9 @@ public class VcTestRunnerJunit {
                 if (testCase.context != null) {
 
                     signed = issuer.getCompacted(testCase.context);
-                    
+
                 } else if (testCase.compacted) {
-                    
+
                     signed = issuer.getCompacted();
 
                 } else {
@@ -220,7 +218,7 @@ public class VcTestRunnerJunit {
         writer.println();
     }
 
-    static final KeyPair getKeys(URI keyPairLocation, DocumentLoader loader)
+    static final KeyPair getKeys(final URI keyPairLocation, final DocumentLoader loader, MethodAdapter methodAdapter)
             throws DocumentError, JsonLdError {
 
         final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
@@ -231,17 +229,25 @@ public class VcTestRunnerJunit {
                 continue;
             }
 
-            LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
-                    id(),
-                    type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
-                    property(DataIntegritySchema.CONTROLLER, link()),
-                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PublicKey)),
-                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, Codec.Ed25519PrivateKey))).map(new DataIntegrityKeysAdapter());
-
-            return (KeyPair) adapter.read(key);
+            return (KeyPair) methodAdapter.read(key.asJsonObject());
+//            LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
+//                    id(),
+//                    type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
+//                    property(DataIntegritySchema.CONTROLLER, link()),
+//                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PUBLIC_KEY)),
+//                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PRIVATE_KEY))).map(new DataIntegrityKeysAdapter());
+//
+//            return (KeyPair) adapter.read(key);
 
         }
         throw new IllegalStateException();
+    }
+
+    static final Collection<MethodResolver> defaultResolvers() {
+        Collection<MethodResolver> resolvers = new LinkedHashSet<>();
+        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), TestKeyAdapter.DECODER));
+        resolvers.add(new HttpMethodResolver());
+        return resolvers;
     }
 
 }

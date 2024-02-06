@@ -1,15 +1,17 @@
 package com.apicatalog.vc.model.io;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
-import com.apicatalog.jsonld.InvalidJsonLdValue;
-import com.apicatalog.jsonld.JsonLdReader;
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
+import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.vc.VcVocab;
-import com.apicatalog.vc.model.DataModelVersion;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Presentation;
 
 import jakarta.json.JsonObject;
@@ -25,10 +27,10 @@ public class PresentationReader {
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
-        return JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document);
+        return LdNode.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document);
     }
 
-    public static Presentation read(final DataModelVersion version, final JsonObject document) throws DocumentError {
+    public static Presentation read(final ModelVersion version, final JsonObject document) throws DocumentError {
 
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
@@ -37,33 +39,47 @@ public class PresentationReader {
         final Presentation presentation = new Presentation(version);
 
         // @type
-        if (!JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document)) {
+        if (!LdNode.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document)) {
 
-            if (!JsonLdReader.hasType(document)) {
-                throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
+            if (LdNode.hasType(document)) {
+                throw new DocumentError(ErrorType.Unknown, Term.TYPE);
             }
-            throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
+            throw new DocumentError(ErrorType.Missing, Term.TYPE);
         }
 
-        try {
+        final LdNode node = LdNode.of(document);
 
-            // @id - optional
-            presentation.setId(JsonLdReader.getId(document).orElse(null));
+        // @id - optional
+        presentation.setId(node.id());
 
-            // holder - optional
-            presentation.setHolder(JsonLdReader.getId(document, VcVocab.HOLDER.uri()).orElse(null));
-
-        } catch (InvalidJsonLdValue e) {
-            if (Keywords.ID.equals(e.getProperty())) {
-                throw new DocumentError(ErrorType.Invalid, LdTerm.ID);
-            }
-            throw new DocumentError(ErrorType.Invalid, VcVocab.HOLDER);
-        }
+        // holder - optional
+        presentation.setHolder(node.node(VcVocab.HOLDER).id());
 
         return presentation;
     }
 
-    public static Collection<JsonValue> getCredentials(final JsonObject document) throws DocumentError {
-        return JsonLdReader.getObjects(document, VcVocab.VERIFIABLE_CREDENTIALS.uri());
+    public static Collection<JsonObject> getCredentials(final JsonObject document) throws DocumentError {
+
+        JsonValue credentials = document.get(VcVocab.VERIFIABLE_CREDENTIALS.uri());
+
+        if (JsonUtils.isNotArray(credentials)
+                || credentials.asJsonArray().size() == 0) {
+            return Collections.emptyList();
+        }
+
+        final Collection<JsonObject> result = new ArrayList<>(credentials.asJsonArray().size());
+
+        for (final JsonValue cred : credentials.asJsonArray()) {
+            if (JsonUtils.isNotObject(cred)
+                    || JsonUtils.isNotArray(cred.asJsonObject().get(Keywords.GRAPH))
+                    || cred.asJsonObject().getJsonArray(Keywords.GRAPH).size() != 1
+                    || JsonUtils.isNotObject(cred.asJsonObject().getJsonArray(Keywords.GRAPH).get(0))) {
+                throw new DocumentError(ErrorType.Invalid, VcVocab.CREDENTIALS_VOCAB);
+            }
+
+            result.add(cred.asJsonObject().getJsonArray(Keywords.GRAPH).getJsonObject(0));
+        }
+
+        return result;
     }
 }
