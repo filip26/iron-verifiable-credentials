@@ -1,9 +1,8 @@
 package com.apicatalog.multikey;
 
-import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.node.LdScalar;
@@ -41,13 +40,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
     @Override
     public VerificationMethod read(JsonObject document) throws DocumentError {
         if (document == null) {
-//            throw new IllegalArgumentException("Verification method cannot be null.");
-            return null;
-        }
-        
-//System.out.println(">>>  " + document.get(Keywords.TYPE));
-        if (!JsonLdReader.isTypeOf(MultiKey.TYPE.toString(), document)) {
-//            throw new DocumentError(ErrorType.Invalid, "Type");
+            throw new IllegalArgumentException("Verification method cannot be null.");
         }
 
         final LdNode node = LdNode.of(document);
@@ -57,11 +50,17 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         multikey.id = node.id();
         multikey.controller = node.node(CONTROLLER).id();
 
-        multikey.publicKey = getKey(node, PUBLIC_KEY, multikey);
-        multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
+        if (node.type().hasType(MultiKey.TYPE.toString())) {
 
-        multikey.expiration = node.scalar(EXPIRATION).xsdDateTime();
-        multikey.revoked = node.scalar(REVOKED).xsdDateTime();
+            multikey.publicKey = getKey(node, PUBLIC_KEY, multikey);
+            multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
+
+            multikey.expiration = node.scalar(EXPIRATION).xsdDateTime();
+            multikey.revoked = node.scalar(REVOKED).xsdDateTime();
+
+        } else if (node.type().exists()) {
+            throw new DocumentError(ErrorType.Invalid, "VerificationMethodType");
+        }
 
         return multikey;
     }
@@ -71,15 +70,15 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         final LdScalar key = node.scalar(term);
 
         if (key.exists()) {
-            
+
 //FUXME            key.hasType("https://w3id.org/security#multibase");
-            
+
             if (!key.exists()) {
                 throw new DocumentError(ErrorType.Invalid, term.name());
             }
 
             final String encodedKey = key.string();
-            
+
             if (!Multibase.BASE_58_BTC.isEncoded(encodedKey)) {
                 throw new DocumentError(ErrorType.Invalid, term.name() + "Type");
             }
@@ -159,7 +158,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         if (embedded) {
             builder.type(value.type().toASCIIString());
         }
-        
+
         return builder.build();
     }
 

@@ -30,6 +30,7 @@ class LdNodeImpl implements LdNode {
         return new LdNodeImpl(object);
     }
 
+    @Override
     public URI id() throws DocumentError {
 
         JsonValue id = object.get(Keywords.ID);
@@ -47,6 +48,7 @@ class LdNodeImpl implements LdNode {
         return null;
     }
 
+    @Override
     public LdScalar scalar(Term term) throws DocumentError {
 
         JsonValue values = object.get(term.uri());
@@ -78,6 +80,7 @@ class LdNodeImpl implements LdNode {
         return LdScalar.NULL;
     }
 
+    @Override
     public LdNode node(Term term) throws DocumentError {
         final JsonValue values = object.get(term.uri());
 
@@ -108,11 +111,18 @@ class LdNodeImpl implements LdNode {
         return LdNode.NULL;
     }
 
+    @Override
     public <T> T map(LdAdapter<T> adapter) throws DocumentError {
         return adapter.read(object);
     }
 
-    public LdTypeGetter type() {
-        return new LdTypeGetter(object);
+    @Override
+    public LdType type() {
+        return new LdType(object);
+    }
+    
+    @Override
+    public boolean exists() {
+        return true;
     }
 }

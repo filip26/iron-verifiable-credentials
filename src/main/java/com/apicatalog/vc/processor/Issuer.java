@@ -6,7 +6,6 @@ import java.time.temporal.ChronoUnit;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -32,6 +31,7 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
+import jakarta.json.JsonValue;
 
 public final class Issuer extends Processor<Issuer> {
 
@@ -221,7 +221,13 @@ public final class Issuer extends Processor<Issuer> {
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
 
-            return sign(getVersion(document), expanded, keyPair, draft);
+            if (expanded.size() == 1) {
+                final JsonValue object = expanded.iterator().next();
+                if (JsonUtils.isObject(object)) {
+                    return sign(getVersion(document), object.asJsonObject(), keyPair, draft);
+                }
+            }
+            throw new DocumentError(ErrorType.Invalid); // malformed input, not single object to sign has been found
 
         } catch (JsonLdError e) {
             failWithJsonLd(e);
@@ -229,12 +235,10 @@ public final class Issuer extends Processor<Issuer> {
         }
     }
 
-    final JsonObject sign(final ModelVersion version, final JsonArray expanded, final KeyPair keyPair,
+    final JsonObject sign(final ModelVersion version, final JsonObject expanded, final KeyPair keyPair,
             final Proof draft) throws SigningError, DocumentError {
-
-        JsonObject object = JsonLdReader
-                .findFirstObject(expanded)
-                .orElseThrow(() -> new DocumentError(ErrorType.Invalid)); // malformed input, not single object to sign has been found
+        
+        JsonObject object = expanded;
 
         final Verifiable verifiable = get(version, object);
 
@@ -243,7 +247,7 @@ public final class Issuer extends Processor<Issuer> {
         if (draft.getCryptoSuite() == null) {
             throw new SigningError(Code.UnsupportedCryptoSuite);
         }
-
+        
         // add issuance date if missing
         if (verifiable.isCredential()
                 && (verifiable.getVersion() == null

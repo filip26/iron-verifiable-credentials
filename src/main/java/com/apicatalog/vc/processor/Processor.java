@@ -4,14 +4,13 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
-import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
 import com.apicatalog.vc.model.ModelVersion;
@@ -121,7 +120,7 @@ abstract class Processor<T extends Processor<?>> {
         }
 
         // is not expanded JSON-LD object
-        if (!JsonLdReader.hasType(expanded)) {
+        if (JsonUtils.isNull(expanded.get(Keywords.TYPE))) {
             throw new DocumentError(ErrorType.Missing, Term.TYPE);
         }
 

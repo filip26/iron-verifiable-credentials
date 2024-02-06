@@ -10,15 +10,15 @@ import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
+import com.apicatalog.ld.node.LdType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.VerificationError;
@@ -245,7 +245,7 @@ public final class Verifier extends Processor<Verifier> {
         // read attached proofs
         for (final JsonObject expandedProof : expandedProofs) {
 
-            final Collection<String> proofTypes = JsonLdReader.getType(expandedProof);
+            final Collection<String> proofTypes = LdType.strings(expandedProof);
 
             if (proofTypes == null || proofTypes.isEmpty()) {
                 throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, Term.TYPE);
