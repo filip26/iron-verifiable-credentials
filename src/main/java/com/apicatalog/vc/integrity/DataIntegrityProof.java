@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
 
+import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.node.LdNodeBuilder;
@@ -136,7 +137,9 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
             throw new DocumentError(ErrorType.Missing, "ProofValue");
         }
         
-//        proofSchema.validate(ldProof, params);
+        assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString());   //FIXME compare as URI, expect URI in params
+        assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
+        assertEquals(params, DataIntegrityVocab.DOMAIN, domain);        
     }
 
     @Override
@@ -192,4 +195,17 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     public String getNonce() {
         return nonce;
     }
+    
+    protected static void assertEquals(Map<String, Object> params, LdTerm name, String param) throws DocumentError {
+
+        final Object value = params.get(name.name());
+
+        if (value == null) {
+            return;
+        }
+
+        if (!value.equals(param)) {
+            throw new DocumentError(ErrorType.Invalid, name);
+        }        
+    }    
 }

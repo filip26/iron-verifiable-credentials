@@ -8,22 +8,25 @@
         "issuanceDate": "2022-06-03T21:18:40Z",
         "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
         "proof": {
-            "type": "TestSignatureSuite2022",
+            "type": "DataIntegrityProof",
+            "cryptosuite": "test-2022",
             "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-            "created": "2022-06-04T20:33:02Z",
+            "created": "2022-06-04T20:33:01Z",
             "proofPurpose": "assertionMethod",
-            "proofValue": "z5M944Quv8z2muFjNH9sGwT7jHvNzVxEnuZt9vCBiUF6K"
+            "proofValue": "zBaL6g3U2zFWxt6gyV32Jo46VPrhG7AKzeFd2L3APvis"
         }
     },
     "proof": {
-        "type": "TestSignatureSuite2022",
+        "type": "DataIntegrityProof",
+        "cryptosuite": "test-2022",
         "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
         "created": "2022-06-09T21:49:41Z",
         "proofPurpose": "assertionMethod",
-        "proofValue": "zCCXsKDRV2ByGrbDGTpyVXKDu3U3aWpL5Urm5Uq3DKnya"
+        "proofValue": "zHTQiLSi4yNPAE9Be6Jf5k7P45N8Wot2nJK696nCCasjf"
     },
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "classpath:data-integrity-test-signature-2022.jsonld"
+        "https://w3id.org/security/multikey/v1",
+        "https://w3id.org/security/data-integrity/v1"
     ]
 }

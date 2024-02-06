@@ -25,6 +25,9 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.multibase.MultibaseDecoder;
+import com.apicatalog.multicodec.Multicodec.Tag;
+import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
@@ -77,7 +80,7 @@ public final class Verifier extends Processor<Verifier> {
 
     public static final Collection<MethodResolver> defaultResolvers() {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver());
+        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
         resolvers.add(new HttpMethodResolver());
         return resolvers;
     }
@@ -369,8 +372,6 @@ public final class Verifier extends Processor<Verifier> {
     SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
         for (final SignatureSuite suite : suites) {
             for (final String proofType : proofTypes) {
-                System.out.println("> " + expandedProof);
-                System.out.println("> " + proofType);
                 if (suite.isSupported(proofType, expandedProof)) {
                     return suite;
                 }

@@ -41,40 +41,16 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         }
 
         try {
-            System.out.println("SS >>>> " + LdNode.of(proof).scalar(DataIntegrityVocab.CRYPTO_SUITE).string());
             return LdNode.of(proof).scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
 
         } catch (DocumentError e) {
 
         }
         return null;
-//        
-//        final JsonArray cryptos = proof.getJsonArray(DataIntegritySchema.CRYPTO_SUITE.uri());
-//
-//        for (final JsonValue valueObject : cryptos) {
-//            if (JsonUtils.isObject(valueObject) && valueObject.asJsonObject().containsKey(Keywords.VALUE)) {
-//
-//                final JsonValue value = valueObject.asJsonObject().get(Keywords.VALUE);
-//
-//                if (JsonUtils.isString(value)) {
-//                    return ((JsonString) value).getString();
-//                }
-//            }
-//        }
-
-//        return null;
     }
 
     @Override
     public Proof readProof(JsonObject proof) throws DocumentError {
-
-//        final LdSchema proofSchema = DataIntegritySchema.getProof(
-//                LdTerm.create(PROOF_TYPE_NAME, VcVocab.SECURITY_VOCAB),
-//                DataIntegritySchema.getEmbeddedMethod(methodSchema),
-//                proofValueSchema);
-//
-//        final LdObject ldProof = proofSchema.read(expanded);
-
         return DataIntegrityProofReader.read(proof, this);
     }
 

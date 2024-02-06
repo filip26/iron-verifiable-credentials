@@ -1,23 +1,20 @@
- {
-	"proof": {
-		"type": "TestSignatureSuite2022",
-		"created": "2023-07-26T16:25:18Z",
-		"verificationMethod": "did:key:invalidVm",
-		"proofPurpose": "assertionMethod",
-		"proofValue": "z8RWrguxcpDKRfUJfnL3f5jVN8eRvksXGftXak6p14xWJ"
-	},
-	"issuer": "did:key:z6MkpJySvETLnxhQG9DzEdmKJtysBDjuuTeDfUj1uNNCUqcj",
-	"credentialSubject": {
-		"id": "did:key:z6MktKwz7Ge1Yxzr4JHavN33wiwa8y81QdcMRLXQsrH9T53b"
-	},
-	"id": "urn:uuid:86294362-4254-4f36-854f-3952fe42555d",
-	"@context": [
-		"https://www.w3.org/2018/credentials/v1",
-		"classpath:data-integrity-test-signature-2022.jsonld"
-	],
-	"issuanceDate": "2020-03-16T22:37:26.544Z",
-	"type": [
-		"VerifiableCredential"
-	]
+{
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://w3id.org/security/multikey/v1",
+        "https://w3id.org/security/data-integrity/v1"
+    ],
+    "id": "https://apicatalog/com/vc/test-credentials#0023",
+    "type": "VerifiableCredential",
+    "issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/23",
+    "issuanceDate": "2022-06-13T19:54:42Z",
+    "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+    "proof": {
+        "type": "DataIntegrityProof",
+        "cryptosuite": "test-2022",
+        "verificationMethod": "did:key:z5C4Wcei5mqrDmzj93ecfco6CEwqE6t7M9CWjWaLG4BA",
+        "created": "2022-05-28T17:02:05Z",
+        "proofPurpose": "assertionMethod",
+        "proofValue": "z8bJL7Ecz2jKTWpu5XN3zYkSKxv58PGeRfG87HMUY23CJ"
+    }
 }
- 

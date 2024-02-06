@@ -8,7 +8,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -24,9 +26,13 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
+import com.apicatalog.vc.method.resolver.HttpMethodResolver;
+import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
@@ -48,6 +54,8 @@ public class VcTestRunnerJunit {
                     .set("https", HttpLoader.defaultInstance())
                     .set("classpath", new ClasspathLoader()));
 
+    public final static Collection<MethodResolver> RESOLVERS = defaultResolvers();
+    
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
     }
@@ -62,6 +70,7 @@ public class VcTestRunnerJunit {
 
                 Vc.verify(testCase.input, new TestSignatureSuite())
                         .loader(LOADER)
+                        .methodResolvers(RESOLVERS)
                         .param(DataIntegrityVocab.DOMAIN.name(), testCase.domain)
                         .param(DataIntegrityVocab.CHALLENGE.name(), testCase.challenge)
                         .param(DataIntegrityVocab.PURPOSE.name(), testCase.purpose)
@@ -232,6 +241,13 @@ public class VcTestRunnerJunit {
 
         }
         throw new IllegalStateException();
+    }
+
+    static final Collection<MethodResolver> defaultResolvers() {
+        Collection<MethodResolver> resolvers = new LinkedHashSet<>();
+        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), TestKeyAdapter.DECODER));
+        resolvers.add(new HttpMethodResolver());
+        return resolvers;
     }
 
 }

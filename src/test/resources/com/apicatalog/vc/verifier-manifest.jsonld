@@ -194,7 +194,7 @@
 				"VeriferTest"
 			],
 			"name": "invalid proof domain property",
-			"input": "verifier/0024-in.jsonld",
+			"input": "verifier/0023-in.jsonld",
 			"options": {
 				"domain": "4jt"
 			},

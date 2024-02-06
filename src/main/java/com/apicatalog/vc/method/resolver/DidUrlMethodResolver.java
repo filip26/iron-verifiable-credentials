@@ -11,6 +11,8 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.multibase.MultibaseDecoder;
+import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multikey.MultiKey;
 import com.apicatalog.multikey.MultiKeyAdapter;
 import com.apicatalog.vc.model.Proof;
@@ -19,16 +21,16 @@ public class DidUrlMethodResolver implements MethodResolver {
 
     final DidResolver resolver;
 
-    public DidUrlMethodResolver() {
-        resolver = new DidKeyResolver();
+    public DidUrlMethodResolver(MultibaseDecoder bases, MulticodecDecoder codecs) {
+        resolver = new DidKeyResolver(bases, codecs);
     }
 
     @Override
     public VerificationMethod resolve(URI uri, DocumentLoader loader, Proof proof) throws DocumentError {
         try {
-            System.out.println("1 >>> " + uri);
+
             final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));
-            System.out.println("2 >>> " + didDocument.verificationMethod());
+
             return didDocument
                     .verificationMethod().stream()
                     .map(DidUrlMethodResolver::from)
