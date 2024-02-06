@@ -14,6 +14,7 @@ public final class DataIntegrityVocab {
     
     public static final LdTerm DOMAIN = LdTerm.create("domain", VcVocab.SECURITY_VOCAB);
     public static final LdTerm CHALLENGE = LdTerm.create("challenge", VcVocab.SECURITY_VOCAB);
+    public static final LdTerm NONCE = LdTerm.create("nonce", VcVocab.SECURITY_VOCAB);
 
     public static final LdTerm CRYPTO_SUITE = LdTerm.create("cryptosuite", VcVocab.SECURITY_VOCAB);
 

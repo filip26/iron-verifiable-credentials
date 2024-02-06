@@ -18,10 +18,9 @@ public class DataIntegrityProofReader {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        LdNode node = new LdNode(document);
+        final LdNode node = LdNode.of(document);
 
-        String cryptoSuiteName = node.get(DataIntegrityVocab.CRYPTO_SUITE)
-                .scalar().string();
+        String cryptoSuiteName = node.scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
 
         CryptoSuite crypto = suite.getCryptoSuite(cryptoSuiteName);
 
@@ -29,20 +28,19 @@ public class DataIntegrityProofReader {
 
         proof.id = node.id();
 
-        proof.created = node.get(DataIntegrityVocab.CREATED).scalar().xsdDateTime();
+        proof.created = node.scalar(DataIntegrityVocab.CREATED).xsdDateTime();
 
-        proof.purpose = node.get(DataIntegrityVocab.PURPOSE).id();
+        proof.purpose = node.node(DataIntegrityVocab.PURPOSE).id();
 
-        proof.domain = node.get(DataIntegrityVocab.DOMAIN)
-                .scalar().string();
+        proof.domain = node.scalar(DataIntegrityVocab.DOMAIN).string();
 
-        proof.challenge = node.get(DataIntegrityVocab.CHALLENGE)
-                .scalar().string();
+        proof.challenge = node.scalar(DataIntegrityVocab.CHALLENGE).string();
 
-        proof.method = node.get(DataIntegrityVocab.VERIFICATION_METHOD).node().map(suite.methodAdapter);
+        proof.nonce = node.scalar(DataIntegrityVocab.NONCE).string();
 
-        proof.value = node.get(DataIntegrityVocab.PROOF_VALUE)
-                .scalar().multibase(Multibase.BASE_58_BTC);
+        proof.method = node.node(DataIntegrityVocab.VERIFICATION_METHOD).map(suite.methodAdapter);
+
+        proof.value = node.scalar(DataIntegrityVocab.PROOF_VALUE).multibase(Multibase.BASE_58_BTC);
 
         return proof;
     }

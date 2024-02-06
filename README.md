@@ -7,7 +7,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/806688cdb1d248e8b5cc2a67f6c2f0f8)](https://www.codacy.com/gh/filip26/iron-verifiable-credentials/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=filip26/iron-verifiable-credentials&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/806688cdb1d248e8b5cc2a67f6c2f0f8)](https://www.codacy.com/gh/filip26/iron-verifiable-credentials/dashboard?utm_source=github.com&utm_medium=referral&utm_content=filip26/iron-verifiable-credentials&utm_campaign=Badge_Coverage)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=filip26_iron-verifiable-credentials&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=filip26_iron-verifiable-credentials)
-[![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.apicatalog%22%20AND%20a:%22iron-verifiable-credentials%22)
+[![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.apicatalog%20AND%20a:iron-verifiable-credentials)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Features
@@ -15,15 +15,20 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 * Verifying VC/VP   
 * Issuing VC/VP
 * Verifiable Credentials Data Models
-  * [v2.0 Draft](https://w3c.github.io/vc-data-model//)
+  * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
 * Signature Suites
   * [Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
     * [ECDSA-2019](https://github.com/filip26/iron-ecdsa-cryptosuite-2019)
     * [EdDSA-2022](https://github.com/filip26/iron-eddsa-cryptosuite-2022)
+    * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-cryptosuite-2023) (planned)
+    * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature provider? List it here, open PR.
 * [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
+
+## Extensions
+* [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
 
 ## Installation
 
@@ -116,7 +121,7 @@ Fork and clone the project repository.
 ```
 
 ## Resources
-* [Verifiable Credentials Data Model v2.0 Draft](https://w3c.github.io/vc-data-model//)
+* [Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
 * [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
 * [Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)

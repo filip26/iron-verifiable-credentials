@@ -2,47 +2,52 @@ package com.apicatalog.ld.node;
 
 import java.net.URI;
 
-import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
 
 import jakarta.json.JsonObject;
-import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
 
-public class LdNode {
+public interface LdNode {
 
-    final JsonObject object;
-    
-    public LdNode(final JsonObject object) {
-        this.object = object;
+    static LdNode of(JsonObject object) {
+        return LdNodeImpl.of(object);
     }
+
+    URI id() throws DocumentError;
+
+    LdTypeGetter type();
+
+    LdScalar scalar(LdTerm term) throws DocumentError;
+
+    LdNode node(LdTerm term) throws DocumentError;
+
+    <T> T map(LdAdapter<T> adapter) throws DocumentError;
     
-    public URI id() {
-        JsonValue id = object.get(Keywords.ID);
+    static LdNode NULL = new LdNode() {
         
-        if (JsonUtils.isString(id)) {
-            return URI.create(((JsonString)id).getString());
+        @Override
+        public LdTypeGetter type() {
+            return null;
         }
         
-        return null;
-    }
-    
-    public LdGetter get(LdTerm term) {
-        return get(object, term);
-    }    
-    
-    public static LdGetter get(JsonObject object, LdTerm term) {
-        return new LdGetter(term, object.get(term.uri()));
-    }
-
-    public <T> T map(LdAdapter<T> adapter) throws DocumentError {
-        return adapter.read(object);
-    }
-
-    public LdTypeGetter type() {        
-        return new LdTypeGetter(object);
-    }
-
+        @Override
+        public LdScalar scalar(LdTerm term) throws DocumentError {
+            return LdScalar.NULL;
+        }
+        
+        @Override
+        public LdNode node(LdTerm term) throws DocumentError {
+            return LdNode.NULL;
+        }
+        
+        @Override
+        public <T> T map(LdAdapter<T> adapter) throws DocumentError {
+            return null;
+        }
+        
+        @Override
+        public URI id() throws DocumentError {
+            return null;
+        }
+    };
 }

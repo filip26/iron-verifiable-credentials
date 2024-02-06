@@ -26,15 +26,16 @@ public class DidUrlMethodResolver implements MethodResolver {
     @Override
     public VerificationMethod resolve(URI uri, DocumentLoader loader, Proof proof) throws DocumentError {
         try {
+            System.out.println("1 >>> " + uri);
             final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));
-
+            System.out.println("2 >>> " + didDocument.verificationMethod());
             return didDocument
                     .verificationMethod().stream()
                     .map(DidUrlMethodResolver::from)
                     .findFirst()
                     .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "ProofVerificationMethod"));
         } catch (IllegalArgumentException e) {
-            throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
+            throw new DocumentError(e, ErrorType.Unknown, "ProofVerificationMethod");
         }
     }
 

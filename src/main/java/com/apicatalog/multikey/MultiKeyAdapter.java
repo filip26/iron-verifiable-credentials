@@ -50,31 +50,36 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
 //            throw new DocumentError(ErrorType.Invalid, "Type");
         }
 
-        final LdNode node = new LdNode(document);
+        final LdNode node = LdNode.of(document);
 
         final MultiKey multikey = new MultiKey();
 
         multikey.id = node.id();
-        multikey.controller = node.get(CONTROLLER).id();
+        multikey.controller = node.node(CONTROLLER).id();
 
         multikey.publicKey = getKey(node, PUBLIC_KEY, multikey);
         multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
 
-        multikey.expiration = node.get(EXPIRATION).scalar().xsdDateTime();
-        multikey.revoked = node.get(REVOKED).scalar().xsdDateTime();
+        multikey.expiration = node.scalar(EXPIRATION).xsdDateTime();
+        multikey.revoked = node.scalar(REVOKED).xsdDateTime();
 
         return multikey;
     }
 
     protected final byte[] getKey(final LdNode node, final LdTerm term, final MultiKey multikey) throws DocumentError {
 
-        final LdScalar key = node.get(term).scalar();
+        final LdScalar key = node.scalar(term);
 
         if (key.exists()) {
-            if (!key.type().hasType("https://w3id.org/security#multibase")) {
+            
+//FUXME            key.hasType("https://w3id.org/security#multibase");
+            
+            if (!key.exists()) {
                 throw new DocumentError(ErrorType.Invalid, term.name());
             }
+
             final String encodedKey = key.string();
+            
             if (!Multibase.BASE_58_BTC.isEncoded(encodedKey)) {
                 throw new DocumentError(ErrorType.Invalid, term.name() + "Type");
             }

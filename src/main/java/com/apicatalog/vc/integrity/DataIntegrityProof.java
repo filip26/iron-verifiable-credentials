@@ -33,6 +33,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     protected VerificationMethod method;
     protected Instant created;
     protected String domain;
+    protected String nonce;
     protected String challenge;
     protected byte[] value;
 
@@ -186,5 +187,9 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     public JsonObject write(VerificationMethod value) {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    public String getNonce() {
+        return nonce;
     }
 }

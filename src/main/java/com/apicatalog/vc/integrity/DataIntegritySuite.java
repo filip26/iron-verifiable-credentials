@@ -41,12 +41,11 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         }
 
         try {
-        
-        return LdNode.get(proof, DataIntegrityVocab.CRYPTO_SUITE)
-                .scalar().string();
+            System.out.println("SS >>>> " + LdNode.of(proof).scalar(DataIntegrityVocab.CRYPTO_SUITE).string());
+            return LdNode.of(proof).scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
 
         } catch (DocumentError e) {
-            
+
         }
         return null;
 //        
@@ -80,7 +79,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     }
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName) throws DocumentError;
-    
+
     protected DataIntegrityProof createDraft(
             CryptoSuite crypto,
             VerificationMethod method,
@@ -90,7 +89,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
             String challenge) throws DocumentError {
 
         final LdNodeBuilder builder = new LdNodeBuilder();
- 
+
         builder.type(PROOF_TYPE_ID);
         builder.set(DataIntegrityVocab.CRYPTO_SUITE).string(cryptosuite);
         builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(methodAdapter, method);
