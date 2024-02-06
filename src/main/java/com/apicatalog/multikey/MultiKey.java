@@ -9,10 +9,6 @@ public class MultiKey implements KeyPair {
 
     protected static final URI TYPE = URI.create("https://w3id.org/security#Multikey");
 
-//    protected static final URI CONTEXT = URI.create("https://w3id.org/security/multikey/v1");
-
-//    protected static final String MULTIKEY_VOCAB = ""; // FIXME
-
     protected URI id;
     protected URI controller;
     

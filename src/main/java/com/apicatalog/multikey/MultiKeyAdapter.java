@@ -71,10 +71,8 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
 
         if (key.exists()) {
 
-//FUXME            key.hasType("https://w3id.org/security#multibase");
-
-            if (!key.exists()) {
-                throw new DocumentError(ErrorType.Invalid, term.name());
+            if (!"https://w3id.org/security#multibase".equals(key.type())) {
+                throw new DocumentError(ErrorType.Invalid, term.name() + "Type");
             }
 
             final String encodedKey = key.string();

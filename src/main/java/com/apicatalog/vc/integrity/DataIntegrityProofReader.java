@@ -42,6 +42,8 @@ public class DataIntegrityProofReader {
 
         proof.value = node.scalar(DataIntegrityVocab.PROOF_VALUE).multibase(Multibase.BASE_58_BTC);
 
+        proof.previousProof = node.node(DataIntegrityVocab.PREVIOUS_PROOF).id();
+        
         return proof;
     }
 }

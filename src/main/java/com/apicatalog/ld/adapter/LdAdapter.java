@@ -9,5 +9,4 @@ public interface LdAdapter<T> {
     T read(JsonObject value) throws DocumentError;
     
     JsonObject write(T value);
-    
 }

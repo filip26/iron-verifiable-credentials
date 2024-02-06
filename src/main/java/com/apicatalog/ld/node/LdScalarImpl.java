@@ -74,16 +74,6 @@ class LdScalarImpl implements LdScalar {
         return JsonUtils.isNotNull(value);
     }
 
-//    static boolean hasType(JsonObject object, String type) {
-//        JsonValue types = object.get(Keywords.TYPE);
-//        return JsonUtils.isArray(types)
-//                && types.asJsonArray().stream()
-//                        .filter(JsonUtils::isString)
-//                        .map(JsonString.class::cast)
-//                        .map(JsonString::getString)
-//                        .anyMatch(type::equals);
-//    }
-
     public byte[] multibase(Multibase base) throws DocumentError {
 
         if (!MULTIBASE_TYPE.equals(type)) {

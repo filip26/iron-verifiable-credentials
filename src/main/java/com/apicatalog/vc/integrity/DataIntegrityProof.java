@@ -37,6 +37,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     protected String nonce;
     protected String challenge;
     protected byte[] value;
+    protected URI previousProof;
 
     final JsonObject expanded;
 
@@ -108,8 +109,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
 
     @Override
     public URI previousProof() {
-//        return ldProof.value(DataIntegritySchema.PREVIOUS_PROOF);
-        return null;
+        return previousProof;
     }
 
     @Override
@@ -157,13 +157,6 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
                         Multibase.BASE_58_BTC.encode(proofValue));
 
         return node.build();
-//        return Json.createObjectBuilder(expanded).add(
-//                DataIntegrityVocab.PROOF_VALUE.uri(),
-//                Json.createArrayBuilder().add(
-//                        Json.createObjectBuilder()
-//                                .add(Keywords.TYPE, ))
-//                                .add(Keywords.VALUE, Json.createValue(Multibase.BASE_58_BTC.encode(proofValue)))))
-//                .build();
     }
 
     @Override
@@ -188,8 +181,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
 
     @Override
     public JsonObject write(VerificationMethod value) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
     
     public String getNonce() {
