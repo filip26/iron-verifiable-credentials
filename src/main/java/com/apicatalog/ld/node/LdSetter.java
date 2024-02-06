@@ -4,7 +4,8 @@ import java.net.URI;
 import java.time.Instant;
 
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.ld.Term;
+import com.apicatalog.ld.adapter.LdAdapter;
 import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.Json;
@@ -14,11 +15,11 @@ import jakarta.json.JsonValue;
 
 public class LdSetter {
 
-    final LdTerm term;
+    final Term term;
     final JsonObjectBuilder builder;
     final JsonArray content;
 
-    protected LdSetter(LdTerm term, JsonObjectBuilder builder, JsonArray content) {
+    protected LdSetter(Term term, JsonObjectBuilder builder, JsonArray content) {
         this.term = term;
         this.builder = builder;
         this.content = content;

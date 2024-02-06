@@ -8,9 +8,9 @@ import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
@@ -122,10 +122,10 @@ abstract class Processor<T extends Processor<?>> {
 
         // is not expanded JSON-LD object
         if (!JsonLdReader.hasType(expanded)) {
-            throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
+            throw new DocumentError(ErrorType.Missing, Term.TYPE);
         }
 
-        throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
+        throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
 
     protected void failWithJsonLd(JsonLdError e) throws DocumentError {

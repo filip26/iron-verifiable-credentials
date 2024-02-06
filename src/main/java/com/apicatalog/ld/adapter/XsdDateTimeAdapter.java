@@ -1,4 +1,4 @@
-package com.apicatalog.jsonld.schema.adapter;
+package com.apicatalog.ld.adapter;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -6,9 +6,8 @@ import java.time.format.DateTimeParseException;
 
 import com.apicatalog.jsonld.StringUtils;
 
-public class XsdDateTimeAdapter implements LdValueAdapter<String, Instant> {
+public class XsdDateTimeAdapter {
 
-    @Override
     public Instant read(String value) {
 
         if (StringUtils.isBlank(value)) {
@@ -26,7 +25,6 @@ public class XsdDateTimeAdapter implements LdValueAdapter<String, Instant> {
 
     }
 
-    @Override
     public String write(Instant value) {
         return value.toString();
     }

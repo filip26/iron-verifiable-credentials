@@ -16,8 +16,8 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.LinkedDataSignature;
@@ -218,7 +218,7 @@ public final class Verifier extends Processor<Verifier> {
 //                }
 
                 if (!CredentialReader.isCredential(presentedCredentials)) {
-                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, LdTerm.TYPE);
+                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
                 }
 
                 credentials.add(verifyExpanded(version, presentedCredentials).asCredential());
@@ -228,7 +228,7 @@ public final class Verifier extends Processor<Verifier> {
 
             return verifiable;
         }
-        throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
+        throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
 
     private Collection<Proof> verifyProofs(JsonObject expanded) throws VerificationError, DocumentError {
@@ -248,7 +248,7 @@ public final class Verifier extends Processor<Verifier> {
             final Collection<String> proofTypes = JsonLdReader.getType(expandedProof);
 
             if (proofTypes == null || proofTypes.isEmpty()) {
-                throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, LdTerm.TYPE);
+                throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, Term.TYPE);
             }
 
             final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);

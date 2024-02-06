@@ -8,8 +8,8 @@ import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.ModelVersion;
@@ -43,9 +43,9 @@ public class PresentationReader {
         if (!JsonLdReader.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document)) {
 
             if (JsonLdReader.hasType(document)) {
-                throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
+                throw new DocumentError(ErrorType.Unknown, Term.TYPE);
             }
-            throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
+            throw new DocumentError(ErrorType.Missing, Term.TYPE);
         }
 
         try {
@@ -58,7 +58,7 @@ public class PresentationReader {
 
         } catch (InvalidJsonLdValue e) {
             if (Keywords.ID.equals(e.getProperty())) {
-                throw new DocumentError(ErrorType.Invalid, LdTerm.ID);
+                throw new DocumentError(ErrorType.Invalid, Term.ID);
             }
             throw new DocumentError(ErrorType.Invalid, VcVocab.HOLDER);
         }

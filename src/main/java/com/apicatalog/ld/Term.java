@@ -1,35 +1,35 @@
-package com.apicatalog.jsonld.schema;
+package com.apicatalog.ld;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.lang.Keywords;
 
-public final class LdTerm implements Serializable {
+public final class Term implements Serializable {
 
     private static final long serialVersionUID = -6633084683490148231L;
 
-    public static final LdTerm ID = new LdTerm(Keywords.ID);
-    public static final LdTerm TYPE = new LdTerm(Keywords.TYPE);
+    public static final Term ID = new Term(Keywords.ID);
+    public static final Term TYPE = new Term(Keywords.TYPE);
 
     final String name;
     final String vocabulary;
     final String uri;
 
-    LdTerm(String name) {
+    Term(String name) {
         this.name = name;
         this.vocabulary = null;
         this.uri = name;
     }
 
-    LdTerm(String name, String vocabulary) {
+    Term(String name, String vocabulary) {
         this.name = name;
         this.vocabulary = vocabulary;
         this.uri = vocabulary + name;
     }
 
-    public static final LdTerm create(String name, String vocabulary) {
-        return new LdTerm(name, vocabulary);
+    public static final Term create(String name, String vocabulary) {
+        return new Term(name, vocabulary);
     }
 
     public String uri() {
@@ -53,7 +53,7 @@ public final class LdTerm implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        LdTerm other = (LdTerm) obj;
+        Term other = (Term) obj;
         return Objects.equals(uri, other.uri);
     }
 

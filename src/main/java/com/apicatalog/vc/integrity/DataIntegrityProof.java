@@ -4,8 +4,8 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
 
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
@@ -196,7 +196,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
         return nonce;
     }
     
-    protected static void assertEquals(Map<String, Object> params, LdTerm name, String param) throws DocumentError {
+    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
 
         final Object value = params.get(name.name());
 

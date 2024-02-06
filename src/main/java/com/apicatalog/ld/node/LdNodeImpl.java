@@ -5,9 +5,10 @@ import java.net.URI;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.lang.ValueObject;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.adapter.LdAdapter;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -46,7 +47,7 @@ class LdNodeImpl implements LdNode {
         return null;
     }
 
-    public LdScalar scalar(LdTerm term) throws DocumentError {
+    public LdScalar scalar(Term term) throws DocumentError {
 
         JsonValue values = object.get(term.uri());
 
@@ -77,7 +78,7 @@ class LdNodeImpl implements LdNode {
         return LdScalar.NULL;
     }
 
-    public LdNode node(LdTerm term) throws DocumentError {
+    public LdNode node(Term term) throws DocumentError {
         final JsonValue values = object.get(term.uri());
 
         if (JsonUtils.isArray(values)) {

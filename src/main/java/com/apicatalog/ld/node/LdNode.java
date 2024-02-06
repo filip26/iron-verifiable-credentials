@@ -2,8 +2,9 @@ package com.apicatalog.ld.node;
 
 import java.net.URI;
 
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
+import com.apicatalog.ld.adapter.LdAdapter;
 
 import jakarta.json.JsonObject;
 
@@ -17,9 +18,9 @@ public interface LdNode {
 
     LdTypeGetter type();
 
-    LdScalar scalar(LdTerm term) throws DocumentError;
+    LdScalar scalar(Term term) throws DocumentError;
 
-    LdNode node(LdTerm term) throws DocumentError;
+    LdNode node(Term term) throws DocumentError;
 
     <T> T map(LdAdapter<T> adapter) throws DocumentError;
     
@@ -31,12 +32,12 @@ public interface LdNode {
         }
         
         @Override
-        public LdScalar scalar(LdTerm term) throws DocumentError {
+        public LdScalar scalar(Term term) throws DocumentError {
             return LdScalar.NULL;
         }
         
         @Override
-        public LdNode node(LdTerm term) throws DocumentError {
+        public LdNode node(Term term) throws DocumentError {
             return LdNode.NULL;
         }
         

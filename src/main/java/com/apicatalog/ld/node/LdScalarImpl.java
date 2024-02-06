@@ -5,10 +5,10 @@ import java.time.Instant;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.schema.LdTerm;
-import com.apicatalog.jsonld.schema.adapter.XsdDateTimeAdapter;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.adapter.XsdDateTimeAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 
@@ -21,17 +21,17 @@ class LdScalarImpl implements LdScalar {
     static final String XSD_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
     static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
-    final LdTerm term;
+    final Term term;
     final String type;
     final JsonValue value;
 
-    protected LdScalarImpl(LdTerm term, String type, JsonValue value) {
+    protected LdScalarImpl(Term term, String type, JsonValue value) {
         this.term = term;
         this.type = type;
         this.value = value;
     }
 
-    public static LdScalar of(LdTerm term, JsonObject object) throws DocumentError {
+    public static LdScalar of(Term term, JsonObject object) throws DocumentError {
         if (object == null) {
             throw new IllegalArgumentException();
         }

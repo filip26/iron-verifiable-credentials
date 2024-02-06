@@ -5,8 +5,8 @@ import java.util.Collection;
 
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 
@@ -27,16 +27,16 @@ public class StatusPropertiesValidator implements StatusValidator {
         final StatusPropertiesValidator status = new StatusPropertiesValidator();
 
         try {
-            status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.ID));
+            status.id = JsonLdReader.getId(document).orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.STATUS, Term.ID));
 
             if (!JsonLdReader.hasType(document)) {
-                throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, LdTerm.TYPE);
+                throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, Term.TYPE);
             }
 
             status.type = JsonLdReader.getType(document.asJsonObject());
 
         } catch (InvalidJsonLdValue e) {
-            throw new DocumentError(ErrorType.Invalid, VcVocab.STATUS, LdTerm.ID);
+            throw new DocumentError(ErrorType.Invalid, VcVocab.STATUS, Term.ID);
         }
 
         return status;

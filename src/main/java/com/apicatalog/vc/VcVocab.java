@@ -1,6 +1,6 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.ld.Term;
 
 public final class VcVocab {
 
@@ -8,45 +8,45 @@ public final class VcVocab {
 
     public static final String SECURITY_VOCAB = "https://w3id.org/security#";
 
-    public static final LdTerm CREDENTIAL_TYPE = LdTerm.create("VerifiableCredential", CREDENTIALS_VOCAB);
+    public static final Term CREDENTIAL_TYPE = Term.create("VerifiableCredential", CREDENTIALS_VOCAB);
     
-    public static final LdTerm PRESENTATION_TYPE = LdTerm.create("VerifiablePresentation", CREDENTIALS_VOCAB);
+    public static final Term PRESENTATION_TYPE = Term.create("VerifiablePresentation", CREDENTIALS_VOCAB);
 
-    public static final LdTerm STATUS = LdTerm.create("credentialStatus", CREDENTIALS_VOCAB);
+    public static final Term STATUS = Term.create("credentialStatus", CREDENTIALS_VOCAB);
 
-    public static final LdTerm ISSUANCE_DATE = LdTerm.create("issuanceDate", CREDENTIALS_VOCAB);
+    public static final Term ISSUANCE_DATE = Term.create("issuanceDate", CREDENTIALS_VOCAB);
 
-    public static final LdTerm SUBJECT = LdTerm.create( "credentialSubject", CREDENTIALS_VOCAB);
+    public static final Term SUBJECT = Term.create( "credentialSubject", CREDENTIALS_VOCAB);
     
-    public static final LdTerm ISSUER = LdTerm.create("issuer", CREDENTIALS_VOCAB);
+    public static final Term ISSUER = Term.create("issuer", CREDENTIALS_VOCAB);
 
-    public static final LdTerm VALID_FROM = LdTerm.create("validFrom", CREDENTIALS_VOCAB);
+    public static final Term VALID_FROM = Term.create("validFrom", CREDENTIALS_VOCAB);
     
-    public static final LdTerm VALID_UNTIL = LdTerm.create("validUntil", CREDENTIALS_VOCAB);
+    public static final Term VALID_UNTIL = Term.create("validUntil", CREDENTIALS_VOCAB);
     
-    public static final LdTerm ISSUED = LdTerm.create("issued", CREDENTIALS_VOCAB);
+    public static final Term ISSUED = Term.create("issued", CREDENTIALS_VOCAB);
 
-    public static final LdTerm EXPIRATION_DATE = LdTerm.create("expirationDate", CREDENTIALS_VOCAB);
+    public static final Term EXPIRATION_DATE = Term.create("expirationDate", CREDENTIALS_VOCAB);
 
-    public static final LdTerm CREDENTIAL_SCHEMA = LdTerm.create("credentialSchema", CREDENTIALS_VOCAB);
+    public static final Term CREDENTIAL_SCHEMA = Term.create("credentialSchema", CREDENTIALS_VOCAB);
     
-    public static final LdTerm REFRESH_SERVICE = LdTerm.create("refreshService", CREDENTIALS_VOCAB);
+    public static final Term REFRESH_SERVICE = Term.create("refreshService", CREDENTIALS_VOCAB);
     
-    public static final LdTerm TERMS_OF_USE = LdTerm.create("termsOfUse", CREDENTIALS_VOCAB);
+    public static final Term TERMS_OF_USE = Term.create("termsOfUse", CREDENTIALS_VOCAB);
     
-    public static final LdTerm EVIDENCE = LdTerm.create("evidence", CREDENTIALS_VOCAB);
+    public static final Term EVIDENCE = Term.create("evidence", CREDENTIALS_VOCAB);
 
-    public static final LdTerm VERIFIABLE_CREDENTIALS = LdTerm.create("verifiableCredential", CREDENTIALS_VOCAB);
+    public static final Term VERIFIABLE_CREDENTIALS = Term.create("verifiableCredential", CREDENTIALS_VOCAB);
 
-    public static final LdTerm HOLDER = LdTerm.create("holder", CREDENTIALS_VOCAB);
+    public static final Term HOLDER = Term.create("holder", CREDENTIALS_VOCAB);
 
-    public static final LdTerm PROOF = LdTerm.create("proof", SECURITY_VOCAB);
+    public static final Term PROOF = Term.create("proof", SECURITY_VOCAB);
     
-    public static final LdTerm MULTIBASE_TYPE = LdTerm.create("multibase", "https://w3id.org/security#");
+    public static final Term MULTIBASE_TYPE = Term.create("multibase", "https://w3id.org/security#");
 
     public static final String XSD_VOCAB = "http://www.w3.org/2001/XMLSchema#";
 
-    public static final LdTerm XSD_DATETIME = LdTerm.create("dateTime", XSD_VOCAB);
+    public static final Term XSD_DATETIME = Term.create("dateTime", XSD_VOCAB);
 
     private VcVocab() { /* protected */ }
 }

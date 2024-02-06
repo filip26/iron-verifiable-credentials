@@ -3,7 +3,7 @@ package com.apicatalog.ld.node;
 import java.net.URI;
 
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.schema.LdTerm;
+import com.apicatalog.ld.Term;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -26,7 +26,7 @@ public class LdNodeBuilder {
         return this;
     }
     
-    public LdSetter set(LdTerm term) {
+    public LdSetter set(Term term) {
         return new LdSetter(term, builder, null);
     }
     

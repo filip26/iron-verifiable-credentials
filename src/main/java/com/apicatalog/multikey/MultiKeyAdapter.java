@@ -1,8 +1,8 @@
 package com.apicatalog.multikey;
 
 import com.apicatalog.jsonld.JsonLdReader;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.node.LdNodeBuilder;
@@ -20,13 +20,13 @@ import jakarta.json.JsonObject;
 
 public abstract class MultiKeyAdapter implements MethodAdapter {
 
-    public static final LdTerm CONTROLLER = LdTerm.create("controller", VcVocab.SECURITY_VOCAB);
+    public static final Term CONTROLLER = Term.create("controller", VcVocab.SECURITY_VOCAB);
 
-    public static final LdTerm PUBLIC_KEY = LdTerm.create("publicKeyMultibase", VcVocab.SECURITY_VOCAB);
-    public static final LdTerm PRIVATE_KEY = LdTerm.create("secretKeyMultibase", VcVocab.SECURITY_VOCAB);
+    public static final Term PUBLIC_KEY = Term.create("publicKeyMultibase", VcVocab.SECURITY_VOCAB);
+    public static final Term PRIVATE_KEY = Term.create("secretKeyMultibase", VcVocab.SECURITY_VOCAB);
 
-    public static final LdTerm EXPIRATION = LdTerm.create("expiration", VcVocab.SECURITY_VOCAB);
-    public static final LdTerm REVOKED = LdTerm.create("revoked", VcVocab.SECURITY_VOCAB);
+    public static final Term EXPIRATION = Term.create("expiration", VcVocab.SECURITY_VOCAB);
+    public static final Term REVOKED = Term.create("revoked", VcVocab.SECURITY_VOCAB);
 
     protected final MulticodecDecoder decoder;
 
@@ -66,7 +66,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         return multikey;
     }
 
-    protected final byte[] getKey(final LdNode node, final LdTerm term, final MultiKey multikey) throws DocumentError {
+    protected final byte[] getKey(final LdNode node, final Term term, final MultiKey multikey) throws DocumentError {
 
         final LdScalar key = node.scalar(term);
 

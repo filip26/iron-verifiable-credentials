@@ -3,8 +3,8 @@ package com.apicatalog.vc.model.io;
 import com.apicatalog.jsonld.InvalidJsonLdValue;
 import com.apicatalog.jsonld.JsonLdReader;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.schema.LdTerm;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.model.Credential;
@@ -42,10 +42,10 @@ public class CredentialReader {
                 || !credential.getType().contains(VcVocab.CREDENTIAL_TYPE.uri())) {
 
             if (JsonLdReader.hasType(document)) {
-                throw new DocumentError(ErrorType.Unknown, LdTerm.TYPE);
+                throw new DocumentError(ErrorType.Unknown, Term.TYPE);
             }
 
-            throw new DocumentError(ErrorType.Missing, LdTerm.TYPE);
+            throw new DocumentError(ErrorType.Missing, Term.TYPE);
         }
 
         // subject - mandatory
@@ -92,9 +92,9 @@ public class CredentialReader {
 
         } catch (InvalidJsonLdValue e) {
             if (Keywords.ID.equals(e.getProperty())) {
-                throw new DocumentError(ErrorType.Invalid, LdTerm.ID);
+                throw new DocumentError(ErrorType.Invalid, Term.ID);
             }
-            throw new DocumentError(ErrorType.Invalid, LdTerm.create(e.getProperty().substring(VcVocab.CREDENTIALS_VOCAB.length()), VcVocab.CREDENTIALS_VOCAB));
+            throw new DocumentError(ErrorType.Invalid, Term.create(e.getProperty().substring(VcVocab.CREDENTIALS_VOCAB.length()), VcVocab.CREDENTIALS_VOCAB));
         }
     }
 
