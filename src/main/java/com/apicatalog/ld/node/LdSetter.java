@@ -53,20 +53,22 @@ public class LdSetter {
         }
     }
 
-    JsonArray setOrAdd(JsonValue value) {
-        if (content != null) {
-            return Json.createArrayBuilder(content).add(value).build();
-        }
-        return Json.createArrayBuilder().add(value).build();
-    }
-
     public void xsdDateTime(Instant created) {
         scalar(VcVocab.XSD_DATETIME.uri(), created.toString());
     }
 
     public void id(URI id) {
-        JsonObjectBuilder node = Json.createObjectBuilder();
-        node.add(Keywords.ID, id != null ? Json.createValue(id.toASCIIString()) : JsonValue.NULL);
-        value(node.build());
+        if (id != null) {
+            JsonObjectBuilder node = Json.createObjectBuilder();
+            node.add(Keywords.ID, Json.createValue(id.toString()));
+            value(node.build());
+        }
+    }
+    
+    JsonArray setOrAdd(JsonValue value) {
+        if (content != null) {
+            return Json.createArrayBuilder(content).add(value).build();
+        }
+        return Json.createArrayBuilder().add(value).build();
     }
 }

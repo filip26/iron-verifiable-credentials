@@ -35,6 +35,6 @@ public class LdNodeBuilder {
     }
 
     public void id(URI id) {
-        builder.add(Keywords.ID, id.toASCIIString());
+        builder.add(Keywords.ID, id.toString());
     }
 }

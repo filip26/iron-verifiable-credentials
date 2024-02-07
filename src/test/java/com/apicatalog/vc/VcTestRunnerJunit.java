@@ -230,15 +230,6 @@ public class VcTestRunnerJunit {
             }
 
             return (KeyPair) methodAdapter.read(key.asJsonObject());
-//            LdValueAdapter<JsonValue, VerificationMethod> adapter = object(
-//                    id(),
-//                    type(LdTerm.create("TestVerificationKey2022", "https://w3id.org/security#")),
-//                    property(DataIntegritySchema.CONTROLLER, link()),
-//                    property(DataIntegritySchema.MULTIBASE_PUB_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PUBLIC_KEY)),
-//                    property(DataIntegritySchema.MULTIBASE_PRIV_KEY, multibase(Algorithm.Base58Btc, MulticodecRegistry.ED25519_PRIVATE_KEY))).map(new DataIntegrityKeysAdapter());
-//
-//            return (KeyPair) adapter.read(key);
-
         }
         throw new IllegalStateException();
     }

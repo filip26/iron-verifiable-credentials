@@ -98,7 +98,13 @@ public final class EmbeddedProof {
         throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
     }
 
-    public static JsonObject removeProof(final JsonObject document) {
-        return Json.createObjectBuilder(document).remove(VcVocab.PROOF.uri()).build();
+    /**
+     * Creates a new document instance with no proofs attached.
+     *  
+     * @param verifiable with a proof
+     * @return a new document with no proofs
+     */
+    public static JsonObject removeProof(final JsonObject verifiable) {
+        return Json.createObjectBuilder(verifiable).remove(VcVocab.PROOF.uri()).build();
     }
 }

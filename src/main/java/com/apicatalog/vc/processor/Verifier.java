@@ -85,6 +85,7 @@ public final class Verifier extends Processor<Verifier> {
         return resolvers;
     }
 
+    //TODO resolvers should be multilevel, per verifier, per proof type, e.g. DidUrlMethodResolver could be different.
     public Verifier methodResolvers(Collection<MethodResolver> resolvers) {
         this.methodResolvers = resolvers;
         return this;
@@ -212,10 +213,6 @@ public final class Verifier extends Processor<Verifier> {
             final Collection<Credential> credentials = new ArrayList<>();
 
             for (final JsonObject presentedCredentials : PresentationReader.getCredentials(expanded)) {
-
-//                if (JsonUtils.isNotObject(presentedCredentials)) {
-//                    throw new DocumentError(ErrorType.Invalid);
-//                }
 
                 if (!CredentialReader.isCredential(presentedCredentials)) {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);

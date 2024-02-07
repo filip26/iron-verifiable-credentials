@@ -15,7 +15,7 @@ public final class MessageDigest implements DigestAlgorithm {
     }
 
     @Override
-    public byte[] digest(byte[] data) throws LinkedDataSuiteError {
+    public byte[] digest(final byte[] data) throws LinkedDataSuiteError {
 
         try {
             java.security.MessageDigest digest = java.security.MessageDigest.getInstance(type);

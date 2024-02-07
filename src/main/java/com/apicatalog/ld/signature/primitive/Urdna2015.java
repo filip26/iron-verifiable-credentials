@@ -23,20 +23,19 @@ import jakarta.json.JsonStructure;
 public class Urdna2015 implements CanonicalizationAlgorithm {
 
     @Override
-    public byte[] canonicalize(JsonStructure document) throws LinkedDataSuiteError {
+    public byte[] canonicalize(final JsonStructure document) throws LinkedDataSuiteError {
         try {
-            RdfDataset dataset = JsonLd.toRdf(JsonDocument.of(document)).get();
+            final RdfDataset dataset = JsonLd.toRdf(JsonDocument.of(document)).get();
 
-            RdfDataset canonical = RdfNormalize.normalize(dataset);
+            final RdfDataset canonical = RdfNormalize.normalize(dataset);
 
-            StringWriter writer = new StringWriter();
+            final StringWriter writer = new StringWriter();
 
-            RdfWriter rdfWriter = Rdf.createWriter(MediaType.N_QUADS, writer);
+            final RdfWriter rdfWriter = Rdf.createWriter(MediaType.N_QUADS, writer);
 
             rdfWriter.write(canonical);
 
-            return writer.toString()
-                    .getBytes(StandardCharsets.UTF_8);
+            return writer.toString().getBytes(StandardCharsets.UTF_8);
 
         } catch (JsonLdError | UnsupportedContentException | IOException | RdfWriterException e) {
             throw new LinkedDataSuiteError(Code.Canonicalization, e);
