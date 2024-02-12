@@ -20,7 +20,7 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
 * Signature Suites
   * [Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
     * [ECDSA-2019](https://github.com/filip26/iron-ecdsa-cryptosuite-2019)
-    * [EdDSA-2022](https://github.com/filip26/iron-eddsa-cryptosuite-2022)
+    * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-cryptosuite-2022)
     * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-cryptosuite-2023) (planned)
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
