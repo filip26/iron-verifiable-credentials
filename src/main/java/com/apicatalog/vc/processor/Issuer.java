@@ -237,6 +237,10 @@ public final class Issuer extends Processor<Issuer> {
 
     final JsonObject sign(final ModelVersion version, final JsonObject expanded, final KeyPair keyPair,
             final Proof draft) throws SigningError, DocumentError {
+
+        if (keyPair.privateKey() == null || keyPair.privateKey().length == 0) {
+            throw new IllegalArgumentException("The private key is not provided, is null or an empty array.");
+        }
         
         JsonObject object = expanded;
 
