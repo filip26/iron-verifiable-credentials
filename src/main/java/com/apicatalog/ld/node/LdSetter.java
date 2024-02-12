@@ -6,6 +6,7 @@ import java.time.Instant;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.adapter.LdAdapter;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.Json;
@@ -55,6 +56,10 @@ public class LdSetter {
 
     public void xsdDateTime(Instant created) {
         scalar(VcVocab.XSD_DATETIME.uri(), created.toString());
+    }
+    
+    public void multibase(Multibase base, byte[] value) {
+        scalar(VcVocab.MULTIBASE_TYPE.uri(), base.encode(value));
     }
 
     public void id(URI id) {

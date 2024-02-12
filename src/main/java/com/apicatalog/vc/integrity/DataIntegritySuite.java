@@ -25,7 +25,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected final String cryptosuite;
 
-    protected DataIntegritySuite(String cryptosuite, final MethodAdapter method) {
+    protected DataIntegritySuite(final String cryptosuite, final MethodAdapter method) {
         this.cryptosuite = cryptosuite;
         this.methodAdapter = method;
     }
