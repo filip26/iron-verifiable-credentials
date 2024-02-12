@@ -44,6 +44,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
      * @throws DocumentError if there is validation error
      */
     protected void validate(MultiKey method) throws DocumentError {
+        /* implement a custom validation */
     }
 
     @Override
