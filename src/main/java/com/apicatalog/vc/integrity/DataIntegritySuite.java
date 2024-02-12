@@ -25,9 +25,13 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected final String cryptosuite;
 
-    protected DataIntegritySuite(String cryptosuite, final MethodAdapter method) {
+    protected DataIntegritySuite(final String cryptosuite, final MethodAdapter method) {
         this.cryptosuite = cryptosuite;
         this.methodAdapter = method;
+    }
+
+    protected void validateProofValue(byte[] proofValue) throws DocumentError {
+        /* implement custom proof value validation */
     }
 
     @Override
@@ -50,8 +54,8 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public Proof readProof(JsonObject proof) throws DocumentError {
-        return DataIntegrityProofReader.read(proof, this);
+    public Proof readProof(JsonObject expandedProof) throws DocumentError {
+        return DataIntegrityProofReader.read(expandedProof, this);
     }
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName) throws DocumentError;

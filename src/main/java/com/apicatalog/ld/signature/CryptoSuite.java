@@ -13,6 +13,7 @@ import jakarta.json.JsonStructure;
  */
 public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
 
+    protected final String id;
     protected final CanonicalizationAlgorithm canonicalization;
     protected final DigestAlgorithm digester;
     protected final SignatureAlgorithm signer;
@@ -26,11 +27,19 @@ public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, 
             final CanonicalizationAlgorithm canonicalization,
             final DigestAlgorithm digester,
             final SignatureAlgorithm signer) {
+        this(null, canonicalization, digester, signer);
+    }
+
+    public CryptoSuite(
+            final String id,
+            final CanonicalizationAlgorithm canonicalization,
+            final DigestAlgorithm digester,
+            final SignatureAlgorithm signer) {
+        this.id = id;
         this.canonicalization = canonicalization;
         this.digester = digester;
         this.signer = signer;
     }
-
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
         signer.verify(publicKey, signature, data);
@@ -54,5 +63,9 @@ public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, 
     @Override
     public KeyPair keygen() throws KeyGenError {
         return signer.keygen();
+    }
+    
+    public String id() {
+        return id;
     }
 }

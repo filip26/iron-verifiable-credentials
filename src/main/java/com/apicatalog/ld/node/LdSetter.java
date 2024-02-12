@@ -6,6 +6,7 @@ import java.time.Instant;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.adapter.LdAdapter;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.Json;
@@ -53,20 +54,26 @@ public class LdSetter {
         }
     }
 
+    public void xsdDateTime(Instant created) {
+        scalar(VcVocab.XSD_DATETIME.uri(), created.toString());
+    }
+    
+    public void multibase(Multibase base, byte[] value) {
+        scalar(VcVocab.MULTIBASE_TYPE.uri(), base.encode(value));
+    }
+
+    public void id(URI id) {
+        if (id != null) {
+            JsonObjectBuilder node = Json.createObjectBuilder();
+            node.add(Keywords.ID, Json.createValue(id.toString()));
+            value(node.build());
+        }
+    }
+    
     JsonArray setOrAdd(JsonValue value) {
         if (content != null) {
             return Json.createArrayBuilder(content).add(value).build();
         }
         return Json.createArrayBuilder().add(value).build();
-    }
-
-    public void xsdDateTime(Instant created) {
-        scalar(VcVocab.XSD_DATETIME.uri(), created.toString());
-    }
-
-    public void id(URI id) {
-        JsonObjectBuilder node = Json.createObjectBuilder();
-        node.add(Keywords.ID, id != null ? Json.createValue(id.toASCIIString()) : JsonValue.NULL);
-        value(node.build());
     }
 }

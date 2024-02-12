@@ -5,8 +5,8 @@ import java.time.Instant;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
@@ -136,10 +136,12 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
         if (value == null || value.length == 0) {
             throw new DocumentError(ErrorType.Missing, "ProofValue");
         }
-        
-        assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString());   //FIXME compare as URI, expect URI in params
+
+        assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
         assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
-        assertEquals(params, DataIntegrityVocab.DOMAIN, domain);        
+        assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
+
+        suite.validateProofValue(value);
     }
 
     @Override
@@ -183,11 +185,11 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     public JsonObject write(VerificationMethod value) {
         throw new UnsupportedOperationException();
     }
-    
+
     public String getNonce() {
         return nonce;
     }
-    
+
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
 
         final Object value = params.get(name.name());
@@ -198,6 +200,6 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
 
         if (!value.equals(param)) {
             throw new DocumentError(ErrorType.Invalid, name);
-        }        
-    }    
+        }
+    }
 }

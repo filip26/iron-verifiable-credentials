@@ -1,45 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
- <modelVersion>4.0.0</modelVersion>
- 
- <parent>
-    <groupId>com.apicatalog</groupId>
-    <artifactId>iron</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
-    <relativePath>pom_parent.xml</relativePath>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>iron-verifiable-credentials</artifactId>
-  <packaging>jar</packaging>
+    <parent>
+        <groupId>com.apicatalog</groupId>
+        <artifactId>iron</artifactId>
+        <version>0.10.0</version>
+        <relativePath>pom_parent.xml</relativePath>
+    </parent>
 
-  <name>Iron Verifiable Credentials (JRE17)</name>
+    <artifactId>iron-verifiable-credentials</artifactId>
+    <packaging>jar</packaging>
 
-  <url>https://github.com/filip26/iron-verifiable-credentials</url>
+    <name>Iron Verifiable Credentials (JRE17)</name>
 
-  <scm>
-    <connection>scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
-    <developerConnection>scm:git:git://github.com/filip26/iron-verifiable-credentials.git</developerConnection>
-    <url>https://github.com/filip26/iron-verifiable-credentials/tree/main</url>
-  </scm>
+    <url>https://github.com/filip26/iron-verifiable-credentials</url>
 
-  <properties>
-    <maven.compiler.target>17</maven.compiler.target>
-    <maven.compiler.source>17</maven.compiler.source>
-    <envSources>src/main/java17</envSources>
-    <rdf-urdna.version>1.1</rdf-urdna.version>
-  </properties>
+    <scm>
+        <connection>
+            scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
+        <developerConnection>
+            scm:git:git://github.com/filip26/iron-verifiable-credentials.git</developerConnection>
+        <url>https://github.com/filip26/iron-verifiable-credentials/tree/main</url>
+    </scm>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.apicatalog</groupId>
-      <artifactId>titanium-json-ld</artifactId>
-      <version>${titanium.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.setl</groupId>
-      <artifactId>rdf-urdna</artifactId>
-      <version>${rdf-urdna.version}</version>
-    </dependency>
-  </dependencies>
+    <properties>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <envSources>src/main/java17</envSources>
+        <rdf-urdna.version>1.1</rdf-urdna.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>titanium-json-ld</artifactId>
+            <version>${titanium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.setl</groupId>
+            <artifactId>rdf-urdna</artifactId>
+            <version>${rdf-urdna.version}</version>
+        </dependency>
+    </dependencies>
 </project>

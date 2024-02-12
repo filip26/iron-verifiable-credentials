@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.Instant;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
@@ -20,9 +21,15 @@ class TestSignatureSuite extends DataIntegritySuite {
 
     static final String TEST_CRYPTO_NAME = "test-2022";
 
-
     protected TestSignatureSuite() {
         super(TEST_CRYPTO_NAME, new TestKeyAdapter());
+    }
+
+    @Override
+    protected void validateProofValue(byte[] proofValue) throws DocumentError {
+        if (proofValue != null && proofValue.length != 32) {
+            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
+        }
     }
 
     @Override

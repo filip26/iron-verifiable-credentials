@@ -37,6 +37,16 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
 
     protected abstract Multicodec getPrivateKeyCodec(String algo, int keyLength);
 
+    /**
+     * Custom multikey validation.
+     * 
+     * @param method to validate
+     * @throws DocumentError if there is validation error
+     */
+    protected void validate(MultiKey method) throws DocumentError {
+        /* implement a custom validation */
+    }
+
     @Override
     public VerificationMethod read(JsonObject document) throws DocumentError {
         if (document == null) {
@@ -61,6 +71,8 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         } else if (node.type().exists()) {
             throw new DocumentError(ErrorType.Invalid, "VerificationMethodType");
         }
+
+        validate(multikey);
 
         return multikey;
     }

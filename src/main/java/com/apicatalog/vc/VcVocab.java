@@ -42,7 +42,7 @@ public final class VcVocab {
 
     public static final Term PROOF = Term.create("proof", SECURITY_VOCAB);
     
-    public static final Term MULTIBASE_TYPE = Term.create("multibase", "https://w3id.org/security#");
+    public static final Term MULTIBASE_TYPE = Term.create("multibase", SECURITY_VOCAB);
 
     public static final String XSD_VOCAB = "http://www.w3.org/2001/XMLSchema#";
 
