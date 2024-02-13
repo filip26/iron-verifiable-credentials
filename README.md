@@ -25,11 +25,11 @@ An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature provider? List it here, open PR.
-* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
 
 ## Extensions
 * [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
-
+* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
+  
 ## Installation
 
 ### Maven
@@ -48,7 +48,7 @@ Java 17+
 Android 12+ (API Level >=31)
 
 ```gradle
-compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.10.0'
+implementation("com.apicatalog:iron-verifiable-credentials:0.10.0")
 ```
 
 ## Documentation
