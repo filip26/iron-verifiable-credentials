@@ -30,6 +30,10 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         this.methodAdapter = method;
     }
 
+    protected void validateProofValue(byte[] proofValue) throws DocumentError {
+        /* implement custom proof value validation */
+    }
+
     @Override
     public boolean isSupported(String proofType, JsonObject expandedProof) {
         return PROOF_TYPE_ID.equals(proofType) && cryptosuite.equals(getCryptoSuiteName(expandedProof));

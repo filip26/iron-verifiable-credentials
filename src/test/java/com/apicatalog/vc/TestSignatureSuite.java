@@ -26,10 +26,14 @@ class TestSignatureSuite extends DataIntegritySuite {
     }
 
     @Override
-    protected CryptoSuite getCryptoSuite(String cryptoName, byte[] proofValue) throws DocumentError {
+    protected void validateProofValue(byte[] proofValue) throws DocumentError {
         if (proofValue != null && proofValue.length != 32) {
             throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
-        }        
+        }
+    }
+
+    @Override
+    protected CryptoSuite getCryptoSuite(String cryptoName, byte[] proofValue) throws DocumentError {
         if (TEST_CRYPTO_NAME.equals(cryptoName)) {
             return CRYPTO;
         }
