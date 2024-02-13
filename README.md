@@ -39,7 +39,7 @@ Java 17+
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials</artifactId>
-    <version>0.10.0</version>
+    <version>0.11.0</version>
 </dependency>
 
 ```
@@ -48,7 +48,7 @@ Java 17+
 Android 12+ (API Level >=31)
 
 ```gradle
-compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.10.0'
+compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.11.0'
 ```
 
 ## Documentation

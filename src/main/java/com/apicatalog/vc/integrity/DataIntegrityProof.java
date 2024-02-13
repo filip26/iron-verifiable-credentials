@@ -140,8 +140,6 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
         assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
         assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
         assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
-
-        suite.validateProofValue(value);
     }
 
     @Override
