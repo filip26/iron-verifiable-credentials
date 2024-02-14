@@ -121,6 +121,7 @@ Fork and clone the project repository.
 ```
 
 ## Resources
+* [Verifiable Credentials Playground](https://vcplayground.org/)
 * [Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
 * [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
@@ -128,7 +129,6 @@ Fork and clone the project repository.
 * [Data Integrity 1.0](https://w3c-ccg.github.io/data-integrity-spec/)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
 * [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
-* [VC v2.0 Interoperability Report](https://digitalbazaar.github.io/vc-data-model-2-test-suite/)
 
 ## Sponsors
 
