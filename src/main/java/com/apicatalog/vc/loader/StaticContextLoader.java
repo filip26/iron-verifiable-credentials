@@ -42,6 +42,7 @@ public class StaticContextLoader implements DocumentLoader {
 
         staticCache.put("https://www.w3.org/2018/credentials/examples/v1", get("2018-credentials-examples-v1.jsonld"));
         staticCache.put("https://www.w3.org/2018/credentials/v1", get("2018-credentials-v1.jsonld"));
+        staticCache.put("https://www.w3.org/ns/credentials/examples/v2", get("2023-credentials-examples-v2.jsonld"));
         staticCache.put("https://www.w3.org/ns/credentials/v2", get("2023-credentials-v2.jsonld"));
         staticCache.put("https://www.w3.org/ns/odrl.jsonld", get("odrl.jsonld"));
         staticCache.put("https://www.w3.org/ns/did/v1", get("did-v1.jsonld"));
