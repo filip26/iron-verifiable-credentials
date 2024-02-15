@@ -19,17 +19,17 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
 * Signature Suites
   * [Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
-    * [ECDSA-2019](https://github.com/filip26/iron-ecdsa-cryptosuite-2019)
-    * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-cryptosuite-2022)
+    * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019)
+    * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
     * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-cryptosuite-2023) (planned)
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature provider? List it here, open PR.
-* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
 
 ## Extensions
 * [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
-
+* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
+  
 ## Installation
 
 ### Maven
@@ -121,12 +121,14 @@ Fork and clone the project repository.
 ```
 
 ## Resources
+
 * [W3C Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
 * [W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [W3C Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
 * [W3C Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
 * [W3C Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
+
 
 ## Sponsors
 
