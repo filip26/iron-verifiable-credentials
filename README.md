@@ -14,11 +14,11 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 
 * Verifying VC/VP   
 * Issuing VC/VP
-* Verifiable Credentials Data Models
+* Data Models
   * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
 * Signature Suites
-  * [Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
+  * [W3C Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
     * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019)
     * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
     * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-cryptosuite-2023) (planned)
@@ -57,7 +57,7 @@ compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', versi
 
 ## Usage
 
-Please use together with a cryptosuite(s) of your choice, e.g. [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020). Read the suite(s) documentation for specifics.
+Please use together with a cryptosuite(s) of your choice, e.g. [EdDSA RDFC 2022](https://github.com/filip26/iron-eddsa-rdfc-2022). Read the suite(s) documentation for specifics.
 
 ### Verifying 
 
