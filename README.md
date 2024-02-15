@@ -122,13 +122,13 @@ Fork and clone the project repository.
 
 ## Resources
 
+* [VC Playground](https://vcplayground.org/)
 * [W3C Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
 * [W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [W3C Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
 * [W3C Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
 * [W3C Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
-
 
 ## Sponsors
 
