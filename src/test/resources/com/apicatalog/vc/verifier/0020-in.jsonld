@@ -11,7 +11,7 @@
             "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
             "created": "2022-06-04T20:33:01Z",
             "proofPurpose": "assertionMethod",
-            "proofValue": "zBaL6g3U2zFWxt6gyV32JBo46VPrhG7AKzeFd2L3APvis"
+            "proofValue": "zDzvG9arTUkqwTCncUFEkwhYvK9iHefBNAHvhorShoj9M"
         },
         {
             "type": "DataIntegrityProof",
@@ -23,12 +23,12 @@
             },
             "created": "2022-06-07T21:06:15Z",
             "proofPurpose": "assertionMethod",
-            "proofValue": "z24EhJAPV3uHQKhzxsePe8j7nUzReFrbyDwhZwYgHU11R"
+            "proofValue": "zD2ibjyTWD9ghCbtRabFgZn34vWJ9gCE1TDEwHUYqcvSh"
         }
     ],
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
         "https://w3id.org/security/multikey/v1",
-        "https://w3id.org/security/data-integrity/v1"
+        "https://w3id.org/security/data-integrity/v2"
     ]
 }

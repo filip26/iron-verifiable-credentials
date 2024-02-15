@@ -173,7 +173,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
 
     @Override
     public String getContext() {
-        return "https://w3id.org/security/data-integrity/v1";
+        return "https://w3id.org/security/data-integrity/v2";
     }
 
     @Override

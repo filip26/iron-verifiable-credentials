@@ -1,6 +1,8 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
@@ -27,6 +29,8 @@ import jakarta.json.JsonValue;
 
 abstract class Processor<T extends Processor<?>> {
 
+    private static final Logger LOGGER = Logger.getLogger(Processor.class.getName());
+    
     protected DocumentLoader loader;
     protected boolean bundledContexts;
     protected URI base;
@@ -156,11 +160,7 @@ abstract class Processor<T extends Processor<?>> {
 
         final JsonValue contexts = object.get(Keywords.CONTEXT);
 
-        if (JsonUtils.isNotArray(contexts)) {
-            throw new DocumentError(ErrorType.Invalid);
-        }
-
-        for (final JsonValue context : contexts.asJsonArray()) {
+        for (final JsonValue context : JsonUtils.toCollection(contexts)) {
             if (JsonUtils.isScalar(context)
                     && UriUtils.isURI(((JsonString) context).getString())) {
 
@@ -172,10 +172,16 @@ abstract class Processor<T extends Processor<?>> {
                 }
                 if ("https://www.w3.org/ns/credentials/v2".equals(contextUri)) {
                     modelVersion = ModelVersion.V20;
+                    
+                    if (JsonUtils.isNotArray(contexts)) {
+                        LOGGER.log(Level.INFO, "VC model requires @context declaration be an array, it is inconsistent with another requirement on compaction. Therefore this requirement is not enforced by Iron VC");            
+                    }
+
                     break;
                 }
             }
         }
+        
         return modelVersion;
     }
 }

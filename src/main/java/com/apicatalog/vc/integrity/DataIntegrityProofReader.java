@@ -22,7 +22,9 @@ class DataIntegrityProofReader {
 
         String cryptoSuiteName = node.scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
 
-        CryptoSuite crypto = suite.getCryptoSuite(cryptoSuiteName);
+        byte[] proofValue = node.scalar(DataIntegrityVocab.PROOF_VALUE).multibase(Multibase.BASE_58_BTC);
+        
+        CryptoSuite crypto = suite.getCryptoSuite(cryptoSuiteName, proofValue);
 
         DataIntegrityProof proof = new DataIntegrityProof(suite, crypto, document);
 
@@ -40,7 +42,7 @@ class DataIntegrityProofReader {
 
         proof.method = node.node(DataIntegrityVocab.VERIFICATION_METHOD).map(suite.methodAdapter);
 
-        proof.value = node.scalar(DataIntegrityVocab.PROOF_VALUE).multibase(Multibase.BASE_58_BTC);
+        proof.value = proofValue;
 
         proof.previousProof = node.node(DataIntegrityVocab.PREVIOUS_PROOF).id();
 

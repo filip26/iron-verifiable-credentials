@@ -15,11 +15,11 @@
         },
         "created": "2022-06-04T20:33:01Z",
         "proofPurpose": "assertionMethod",
-        "proofValue": "zHNqcpEMDtegXVCVuJKGnsmJ2AaYh1krejDSGhtwkFp34"
+        "proofValue": "zGMUrucWigYShUtBkCmsmQrCSxmsezqQb47hhk5qphREf"
     },
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
         "https://w3id.org/security/multikey/v1",
-        "https://w3id.org/security/data-integrity/v1"
+        "https://w3id.org/security/data-integrity/v2"
     ]
 }

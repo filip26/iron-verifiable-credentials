@@ -303,7 +303,7 @@ public final class Verifier extends Processor<Verifier> {
             signature.verify(
                     data,
                     unsignedProof,
-                    (VerificationKey) verificationMethod,
+                    ((VerificationKey) verificationMethod).publicKey(),
                     proofValue);
 
             proof = queue.pop();

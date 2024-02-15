@@ -1,8 +1,7 @@
 {
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "https://w3id.org/security/multikey/v1",
-        "https://w3id.org/security/data-integrity/v1"
+        "https://w3id.org/security/data-integrity/v2"
     ],
     "id": "https://apicatalog/com/vc/test-credentials#0001",
     "type": "VerifiableCredential",
@@ -15,7 +14,7 @@
         "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
         "created": "2022-06-18T19:00:44Z",
         "proofPurpose": "assertionMethod",
-        "proofValue": "zAnhkmjWELQQRLx9KggojEmtFyD2XN1g8kSA2HoiQEmko",
+        "proofValue": "zD5aDC5tdg13SnxmWu3C6842h5apGw6MNQFswHy14moWi",
         "domain": "4jt78h47fh47"
     }
 }

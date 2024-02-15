@@ -28,6 +28,7 @@
 					],
 					"https://w3id.org/security#cryptosuite": [
 						{
+							"@type": "https://w3id.org/security#cryptosuiteString",
 							"@value": "test-2022"
 						}
 					],
@@ -50,7 +51,7 @@
 					"https://w3id.org/security#proofValue": [
 						{
 							"@type": "https://w3id.org/security#multibase",
-							"@value": "z9UgDmbuy5QFZH43BXjg68yiAbFdHJWSeRYao91bF48hx"
+							"@value": "zFWoV1x5mFXNvStgKWnhqMToRTRn7AQvedB6KYHT6HJMk"
 						}
 					]
 				}

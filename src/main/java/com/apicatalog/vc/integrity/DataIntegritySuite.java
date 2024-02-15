@@ -58,7 +58,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         return DataIntegrityProofReader.read(expandedProof, this);
     }
 
-    protected abstract CryptoSuite getCryptoSuite(String cryptoName) throws DocumentError;
+    protected abstract CryptoSuite getCryptoSuite(String cryptoName, byte[] proofValue) throws DocumentError;
 
     protected DataIntegrityProof createDraft(
             CryptoSuite crypto,
@@ -71,7 +71,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         final LdNodeBuilder builder = new LdNodeBuilder();
 
         builder.type(PROOF_TYPE_ID);
-        builder.set(DataIntegrityVocab.CRYPTO_SUITE).string(cryptosuite);
+        builder.set(DataIntegrityVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", cryptosuite);
         builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(methodAdapter, method);
         builder.set(DataIntegrityVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
         builder.set(DataIntegrityVocab.PURPOSE).id(purpose);

@@ -135,10 +135,6 @@ public final class Issuer extends Processor<Issuer> {
             context.add("https://www.w3.org/ns/credentials/v2");
         }
 
-        if (draft.getContext() != null) {
-            context.add(draft.getContext());
-        }
-
         return getCompacted(signed, context.build());
     }
 
@@ -178,10 +174,10 @@ public final class Issuer extends Processor<Issuer> {
         JsonObject compacted = source;
 
         // TODO use options
-        // make sure @context is the first key
+        // make sure @context is the first key and an array
         if (!compacted.keySet().iterator().next().equals(Keywords.CONTEXT)) {
             final JsonObjectBuilder builder = Json.createObjectBuilder()
-                    .add(Keywords.CONTEXT, compacted.get(Keywords.CONTEXT));
+                    .add(Keywords.CONTEXT, JsonUtils.toJsonArray(compacted.get(Keywords.CONTEXT)));
 
             compacted.entrySet().stream()
                     .filter(entry -> !Keywords.CONTEXT.equals(entry.getKey()))
