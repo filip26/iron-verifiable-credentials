@@ -174,7 +174,7 @@ abstract class Processor<T extends Processor<?>> {
                     modelVersion = ModelVersion.V20;
                     
                     if (JsonUtils.isNotArray(contexts)) {
-                        LOGGER.log(Level.INFO, "VC model v2 requires @context declaration be an array, even it's inconsistent with another requirement on compaction. Therefore this requirement is not enforced by Iron VC.");            
+                        LOGGER.log(Level.INFO, "VC model requires @context declaration be an array, it's inconsistent with another requirement on compaction. Therefore this requirement is not enforced by Iron VC");            
                     }
 
                     break;
