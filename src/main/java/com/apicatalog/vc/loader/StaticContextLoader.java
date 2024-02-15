@@ -46,6 +46,7 @@ public class StaticContextLoader implements DocumentLoader {
         staticCache.put("https://www.w3.org/ns/odrl.jsonld", get("odrl.jsonld"));
         staticCache.put("https://www.w3.org/ns/did/v1", get("did-v1.jsonld"));
         staticCache.put("https://w3id.org/security/data-integrity/v1", get("data-integrity-v1.jsonld"));
+        staticCache.put("https://w3id.org/security/data-integrity/v2", get("data-integrity-v2.jsonld"));
         staticCache.put("https://w3id.org/security/multikey/v1", get("multikey-v1.jsonld"));
 
         return Collections.unmodifiableMap(staticCache);

@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationError.Code;
-import com.apicatalog.ld.signature.key.VerificationKey;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -35,17 +34,16 @@ public class LinkedDataSignature {
     public void verify(
             final JsonObject document,
             final JsonObject unsignedProof,
-            final VerificationKey verificationKey,
+            final byte[] verificationKey,
             final byte[] signature) throws VerificationError {
 
         Objects.requireNonNull(verificationKey);
-        Objects.requireNonNull(verificationKey.publicKey());
         Objects.requireNonNull(signature);
 
         try {
             final byte[] computeSignature = hashCode(document, unsignedProof);
 
-            suite.verify(verificationKey.publicKey(), signature, computeSignature);
+            suite.verify(verificationKey, signature, computeSignature);
 
         } catch (LinkedDataSuiteError e) {
             throw new VerificationError(Code.InvalidSignature, e);
@@ -59,7 +57,7 @@ public class LinkedDataSignature {
      *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm">Proof
      *      Algorithm</a>
      *
-     * @param document expanded unsigned VC/VP document
+     * @param document   expanded unsigned VC/VP document
      * @param privateKey
      * @param proof
      *
@@ -70,10 +68,8 @@ public class LinkedDataSignature {
      */
     public byte[] sign(JsonObject document, byte[] privateKey, JsonObject proof) throws SigningError {
 
-        if (privateKey == null) {
-            throw new IllegalArgumentException("The privateKey must not be null.");
-        }
-        
+        Objects.requireNonNull(privateKey);
+
         try {
             final byte[] documentHashCode = hashCode(document, proof);
 

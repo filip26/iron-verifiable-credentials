@@ -135,10 +135,6 @@ public final class Issuer extends Processor<Issuer> {
             context.add("https://www.w3.org/ns/credentials/v2");
         }
 
-        if (draft.getContext() != null) {
-            context.add(draft.getContext());
-        }
-
         return getCompacted(signed, context.build());
     }
 

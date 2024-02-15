@@ -1,8 +1,7 @@
 {
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "https://w3id.org/security/multikey/v1",
-        "https://w3id.org/security/data-integrity/v1"
+        "https://w3id.org/security/data-integrity/v2"
     ],
     "id": "https://apicatalog/com/vc/test-credentials#0001",
     "type": "VerifiableCredential",
@@ -16,6 +15,6 @@
         "challenge": "498798779",
         "created": "2022-06-18T19:00:44Z",
         "proofPurpose": "assertionMethod",
-        "proofValue": "z3C8LdJarFMLfaq3SGxNj7G3px4Ap4rLQFLQshmV7m8r4"
+        "proofValue": "zEQrrbMQjC3UZWz1qSTGyarDBmeSMma8erC1ANqQ8mHDC"
     }
 }
