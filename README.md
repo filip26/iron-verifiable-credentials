@@ -1,6 +1,6 @@
 # Iron Verifiable Credentials Processor
 
-An implementation of the [Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) model and processing in Java.
+An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) model and processing in Java.
 
 [![Java 17 CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml)
 [![Android (Java 8) CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java8-build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java8-build.yml)
@@ -121,14 +121,12 @@ Fork and clone the project repository.
 ```
 
 ## Resources
-* [Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
-* [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
-* [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
-* [Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
-* [Data Integrity 1.0](https://w3c-ccg.github.io/data-integrity-spec/)
+* [W3C Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
+* [W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
+* [W3C Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
+* [W3C Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
+* [W3C Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
-* [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
-* [VC v2.0 Interoperability Report](https://digitalbazaar.github.io/vc-data-model-2-test-suite/)
 
 ## Sponsors
 
