@@ -63,7 +63,7 @@
 			"name": "compacted signed credential",
 			"input": "issuer/0021-in.jsonld",
 			"expect": "issuer/0021-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
+			"compacted": true,
 			"options": {
 				"keyPair": "issuer/0001-keys.json",
 				"verificationMethod": "verifier/0005-verification-key.json",
@@ -79,7 +79,7 @@
 			"name": "signed embedded verificationMethod",
 			"input": "issuer/0022-in.jsonld",
 			"expect": "issuer/0022-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
+			"compacted": true,
 			"options": {
 				"keyPair": "issuer/0001-keys.json",
 				"verificationMethod": {
@@ -100,7 +100,7 @@
 			"name": "a credential with DID key as a verification method",
 			"input": "issuer/0023-in.jsonld",
 			"expect": "issuer/0023-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
+			"compacted": true,
 			"options": {
 				"keyPair": "issuer/0001-keys.json",
 				"verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
@@ -116,7 +116,7 @@
 			"name": "proof domain property",
 			"input": "issuer/0024-in.jsonld",
 			"expect": "issuer/0024-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
+			"compacted": true,
 			"options": {
 				"keyPair": "issuer/0001-keys.json",
 				"verificationMethod": "verifier/0005-verification-key.json",
@@ -150,7 +150,7 @@
 			"name": "proof set, co-sign",
 			"input": "issuer/0030-in.jsonld",
 			"expect": "issuer/0030-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
+			"compacted": true,
 			"options": {
 				"keyPair": "issuer/0001-keys.json",
 				"verificationMethod": {
@@ -170,7 +170,7 @@
 			"name": "compacted signed presentation",
 			"input": "issuer/0050-in.jsonld",
 			"expect": "issuer/0050-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
+			"compacted": true,
 			"options": {
 				"keyPair": "issuer/0001-keys.json",
 				"verificationMethod": "verifier/0005-verification-key.json",

@@ -2,6 +2,8 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
@@ -12,6 +14,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.ProofValueProcessor;
 
@@ -41,6 +44,15 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
 
     final JsonObject expanded;
 
+    protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
+            "https://w3id.org/security/data-integrity/v2",
+            "https://w3id.org/security/multikey/v1"
+            );
+
+    protected static final Collection<String> V2_CONTEXTS = Arrays.asList(
+            "https://www.w3.org/ns/credentials/v2"
+            );
+    
     protected DataIntegrityProof(
             DataIntegritySuite suite,
             CryptoSuite crypto,
@@ -172,8 +184,11 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     }
 
     @Override
-    public String getContext() {
-        return "https://w3id.org/security/data-integrity/v2";
+    public Collection<String> getContext(ModelVersion model) {
+        if (ModelVersion.V11.equals(model)) {
+            return V1_CONTEXTS;
+        }
+        return V2_CONTEXTS;
     }
 
     @Override

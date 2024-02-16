@@ -4,6 +4,10 @@ import com.apicatalog.ld.Term;
 
 public final class VcVocab {
 
+    public static final String CONTEXT_MODEL_V1 = "https://www.w3.org/2018/credentials/v1";
+    
+    public static final String CONTEXT_MODEL_V2 = "https://www.w3.org/ns/credentials/v2";
+    
     public static final String CREDENTIALS_VOCAB = "https://www.w3.org/2018/credentials#";
 
     public static final String SECURITY_VOCAB = "https://w3id.org/security#";

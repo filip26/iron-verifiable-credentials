@@ -1,6 +1,7 @@
 package com.apicatalog.vc.model;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
@@ -19,11 +20,12 @@ import jakarta.json.JsonObject;
 public interface Proof {
 
     /**
-     * The proof JSON-LD context URI to compact the proof
+     * The proof JSON-LD context URI(s) to compact the proof
      *
-     * @return the proof JSON-LD context
+     * @param model a credential data model version
+     * @return the proof JSON-LD context(s)
      */
-    String getContext();
+    Collection<String> getContext(ModelVersion model);
 
     /**
      * A set of parameters required to independently verify the proof, such as an

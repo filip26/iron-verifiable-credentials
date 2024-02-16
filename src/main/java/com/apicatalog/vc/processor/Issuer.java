@@ -3,6 +3,8 @@ package com.apicatalog.vc.processor;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
+import java.util.HashSet;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -30,6 +32,7 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonString;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
@@ -37,7 +40,7 @@ public final class Issuer extends Processor<Issuer> {
 
     // mandatory properties
     private final URI location;
-    private final JsonObject document;
+    private JsonObject document;
 
     private final KeyPair keyPair;
 
@@ -80,12 +83,12 @@ public final class Issuer extends Processor<Issuer> {
             loader = new StaticContextLoader(loader);
         }
 
-        if (document != null && keyPair != null) {
-            return sign(document, keyPair, draft);
+        if (document == null && location != null) {
+            document = fetchDocument();
         }
 
-        if (location != null && keyPair != null) {
-            return sign(location, keyPair, draft);
+        if (document != null && keyPair != null && draft != null) {
+            return sign();
         }
 
         throw new IllegalStateException();
@@ -126,16 +129,7 @@ public final class Issuer extends Processor<Issuer> {
 
         final JsonObject signed = getExpanded();
 
-        final JsonArrayBuilder context = Json.createArrayBuilder();
-
-        if (modelVersion == null || ModelVersion.V11.equals(modelVersion)) {
-            context.add("https://www.w3.org/2018/credentials/v1");
-
-        } else if (ModelVersion.V20.equals(modelVersion)) {
-            context.add("https://www.w3.org/ns/credentials/v2");
-        }
-
-        return getCompacted(signed, context.build());
+        return getCompacted(signed, getContext());
     }
 
     /**
@@ -189,29 +183,7 @@ public final class Issuer extends Processor<Issuer> {
         return compacted;
     }
 
-    final JsonObject sign(final URI documentLocation, final KeyPair keyPair,
-            final Proof draft) throws DocumentError, SigningError {
-        try {
-            // load the document
-            final DocumentLoaderOptions options = new DocumentLoaderOptions();
-            final Document loadedDocument = loader.loadDocument(location, options);
-
-            final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
-
-            if (JsonUtils.isNotObject(json)) {
-                throw new DocumentError(ErrorType.Invalid);
-            }
-
-            return sign(json.asJsonObject(), keyPair, draft);
-
-        } catch (JsonLdError e) {
-            failWithJsonLd(e);
-            throw new DocumentError(e, ErrorType.Invalid);
-        }
-    }
-
-    final JsonObject sign(final JsonObject document, final KeyPair keyPair,
-            final Proof draft) throws DocumentError, SigningError {
+    final JsonObject sign() throws DocumentError, SigningError {
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
@@ -237,7 +209,7 @@ public final class Issuer extends Processor<Issuer> {
         if (keyPair.privateKey() == null || keyPair.privateKey().length == 0) {
             throw new IllegalArgumentException("The private key is not provided, is null or an empty array.");
         }
-        
+
         JsonObject object = expanded;
 
         final Verifiable verifiable = get(version, object);
@@ -247,7 +219,7 @@ public final class Issuer extends Processor<Issuer> {
         if (draft.getCryptoSuite() == null) {
             throw new SigningError(Code.UnsupportedCryptoSuite);
         }
-        
+
         // add issuance date if missing
         if (verifiable.isCredential()
                 && (verifiable.getVersion() == null
@@ -286,5 +258,65 @@ public final class Issuer extends Processor<Issuer> {
             }
             super.validateData(verifiable.asCredential());
         }
+    }
+
+    final JsonObject fetchDocument() throws DocumentError, SigningError {
+        try {
+            // load the document
+            final DocumentLoaderOptions options = new DocumentLoaderOptions();
+            final Document loadedDocument = loader.loadDocument(location, options);
+
+            final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
+
+            if (JsonUtils.isNotObject(json)) {
+                throw new DocumentError(ErrorType.Invalid);
+            }
+
+            return json.asJsonObject();
+
+        } catch (JsonLdError e) {
+            failWithJsonLd(e);
+            throw new DocumentError(e, ErrorType.Invalid);
+        }
+    }
+
+    final JsonArray getContext() {
+
+        final Collection<String> urls = new HashSet<>();
+        final JsonArrayBuilder contexts = Json.createArrayBuilder();
+
+        // extract origin contexts
+        if (document != null && document.containsKey(Keywords.CONTEXT)) {
+            final JsonValue documentContext = document.get(Keywords.CONTEXT);
+            if (JsonUtils.isString(documentContext)) {
+                urls.add(((JsonString)documentContext).getString());
+                contexts.add(documentContext);
+
+            } else if (JsonUtils.isObject(documentContext)) {
+                contexts.add(documentContext);
+
+            } else if (JsonUtils.isArray(documentContext)) {
+                for (final JsonValue context : documentContext.asJsonArray()) {
+                    if (JsonUtils.isString(context)) {
+                        urls.add(((JsonString)context).getString());
+                    }
+                    contexts.add(context);
+                }
+            }
+        }
+
+        final Collection<String> provided = draft.getContext(modelVersion);
+        
+        if (provided != null) {
+            //use .stream().filter(Predicate.not(urls::contains))
+            for (String url : provided) {
+                if (!urls.contains(url)) {
+                    urls.add(url);
+                    contexts.add(Json.createValue(url));
+                }
+            }
+        }
+        
+        return contexts.build();
     }
 }
