@@ -21,7 +21,7 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * [W3C Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
     * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019)
     * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
-    * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-cryptosuite-2023) (planned)
+    * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023) (planned)
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature provider? List it here, open PR.
