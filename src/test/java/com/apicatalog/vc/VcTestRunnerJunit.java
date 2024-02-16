@@ -55,7 +55,7 @@ public class VcTestRunnerJunit {
                     .set("classpath", new ClasspathLoader()));
 
     public final static Collection<MethodResolver> RESOLVERS = defaultResolvers();
-    
+
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
     }
@@ -240,5 +240,4 @@ public class VcTestRunnerJunit {
         resolvers.add(new HttpMethodResolver());
         return resolvers;
     }
-
 }

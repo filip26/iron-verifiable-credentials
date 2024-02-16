@@ -1,6 +1,5 @@
 {
 	"@context": [
-		"classpath:data-integrity-test-signature-2022.jsonld",
 		"https://w3id.org/security/multikey/v1",
 		{
 			"@vocab": "https://github.com/filip26/iron-verifiable-credentials/tests/vocab#",
