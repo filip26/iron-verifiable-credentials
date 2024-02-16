@@ -39,7 +39,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         return PROOF_TYPE_ID.equals(proofType) && cryptosuite.equals(getCryptoSuiteName(expandedProof));
     }
 
-    static String getCryptoSuiteName(final JsonObject proof) {
+    protected static String getCryptoSuiteName(final JsonObject proof) {
         if (proof == null) {
             throw new IllegalArgumentException("expandedProof property must not be null.");
         }
