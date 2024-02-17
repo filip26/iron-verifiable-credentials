@@ -95,7 +95,9 @@ public class VcTestRunnerJunit {
                         URI.create("https://w3id.org/security#assertionMethod"),
                         testCase.created,
                         testCase.domain,
-                        testCase.challenge);
+                        testCase.challenge,
+                        testCase.nonce
+                        );
 
                 final Issuer issuer = Vc.sign(
                         testCase.input,

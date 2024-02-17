@@ -141,6 +141,23 @@
 				"challenge": "498798779"
 			}
 		},
+        {
+            "@id": "#t0026",
+            "@type": [
+                "PositiveEvaluationTest",
+                "IssuerTest"
+            ],
+            "name": "proof challenge property",
+            "input": "issuer/0026-in.jsonld",
+            "expect": "issuer/0026-out.jsonld",
+            "compacted": true,
+            "options": {
+                "keyPair": "issuer/0001-keys.json",
+                "verificationMethod": "verifier/0005-verification-key.json",
+                "created": "2024-01-18T19:00:44Z",
+                "nonce": "kmcd190e183038djicqe-018i3-33"
+            }
+        },		
 		{
 			"@id": "#t0030",
 			"@type": [
