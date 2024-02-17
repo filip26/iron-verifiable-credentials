@@ -23,7 +23,7 @@ public interface Proof {
      * The proof JSON-LD context URI(s) to compact the proof
      *
      * @param model a credential data model version
-     * @return the proof JSON-LD context(s)
+     * @return the proof JSON-LD context URI(s)
      */
     Collection<String> getContext(ModelVersion model);
 

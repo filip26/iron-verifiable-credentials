@@ -66,7 +66,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
             URI purpose,
             Instant created,
             String domain,
-            String challenge) throws DocumentError {
+            String challenge,
+            String nonce
+            ) throws DocumentError {
 
         final LdNodeBuilder builder = new LdNodeBuilder();
 
@@ -82,6 +84,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         if (challenge != null) {
             builder.set(DataIntegrityVocab.CHALLENGE).string(challenge);
         }
+        if (nonce != null) {
+            builder.set(DataIntegrityVocab.NONCE).string(nonce);
+        }
 
         final DataIntegrityProof proof = new DataIntegrityProof(this, crypto, builder.build());
         proof.created = created;
@@ -89,6 +94,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         proof.method = method;
         proof.domain = domain;
         proof.challenge = challenge;
+        proof.nonce = nonce;
         return proof;
     }
 }

@@ -46,6 +46,6 @@ class TestSignatureSuite extends DataIntegritySuite {
             Instant created,
             String domain,
             String challenge) throws DocumentError {
-        return super.createDraft(CRYPTO, method, purpose, created, domain, challenge);
+        return super.createDraft(CRYPTO, method, purpose, created, domain, challenge, null);
     }
 }
