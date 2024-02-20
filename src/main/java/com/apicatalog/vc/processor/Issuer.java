@@ -69,11 +69,10 @@ public final class Issuer extends Processor<Issuer> {
     }
 
     /**
-     * Set mandatory selectors pointing at nodes and values that are always disclosed.
-     * When set a selective disclosure proof is issued, otherwise a proof allowing 
-     * to verify only whole document.
+     * Set mandatory selectors pointing at nodes/values that are always disclosed, 
+     * effectively enabling a selective disclosure for the rest.
      * 
-     * @param selectors
+     * @param selectors pointing at mandatory/always disclosed nodes/values
      * @return the same issuer's instance
      */
     public Issuer selectors(Collection<JsonPointer> selectors) {
