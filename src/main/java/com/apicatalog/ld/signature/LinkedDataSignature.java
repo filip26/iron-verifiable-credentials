@@ -1,11 +1,13 @@
 package com.apicatalog.ld.signature;
 
+import java.util.Collection;
 import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonPointer;
 import jakarta.json.JsonStructure;
 
 public class LinkedDataSignature {
@@ -60,15 +62,28 @@ public class LinkedDataSignature {
      * @param document   expanded unsigned VC/VP document
      * @param privateKey
      * @param proof
+     * @param mandatory mandatory pointers, if present a selective disclosure proof is produced
      *
      * @return computed signature
      *
      * @throws SigningError
      * @throws DocumentError
      */
-    public byte[] sign(JsonObject document, byte[] privateKey, JsonObject proof) throws SigningError {
+    public byte[] sign(JsonObject document, byte[] privateKey, JsonObject proof, Collection<JsonPointer> mandatory) throws SigningError {
 
+        Objects.requireNonNull(document);
         Objects.requireNonNull(privateKey);
+        Objects.requireNonNull(proof);
+
+        if (mandatory == null || mandatory.isEmpty()) {
+            return sign(document, privateKey, proof);
+        }
+        
+        //TODO
+        throw new UnsupportedOperationException("SD signature is not supported yet");   
+    }
+
+    byte[] sign(JsonObject document, byte[] privateKey, JsonObject proof) throws SigningError {
 
         try {
             final byte[] documentHashCode = hashCode(document, proof);

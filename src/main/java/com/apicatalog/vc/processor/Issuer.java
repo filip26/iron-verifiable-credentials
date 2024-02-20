@@ -32,6 +32,7 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonPointer;
 import jakarta.json.JsonString;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
@@ -45,6 +46,9 @@ public final class Issuer extends Processor<Issuer> {
     private final KeyPair keyPair;
 
     protected final Proof draft;
+
+    // optional
+    protected Collection<JsonPointer> mandatory;
 
     public Issuer(URI location, KeyPair keyPair, final Proof draft) {
         this.location = location;
@@ -64,6 +68,19 @@ public final class Issuer extends Processor<Issuer> {
         this.draft = draft;
     }
 
+    /**
+     * Set mandatory selectors pointing at nodes and values that are always disclosed.
+     * When set a selective disclosure proof is issued, otherwise a proof allowing 
+     * to verify only whole document.
+     * 
+     * @param selectors
+     * @return the same issuer's instance
+     */
+    public Issuer selectors(Collection<JsonPointer> selectors) {
+        this.mandatory = selectors;
+        return this;
+    }
+    
     /**
      * Get signed document in expanded form.
      *
@@ -243,7 +260,7 @@ public final class Issuer extends Processor<Issuer> {
 
         final LinkedDataSignature ldSignature = new LinkedDataSignature(draft.getCryptoSuite());
 
-        final byte[] signature = ldSignature.sign(data, keyPair.privateKey(), unsignedDraft);
+        final byte[] signature = ldSignature.sign(data, keyPair.privateKey(), unsignedDraft, mandatory);
 
         final JsonObject signedProof = draft.valueProcessor().setProofValue(unsignedDraft, signature);
 
@@ -289,7 +306,7 @@ public final class Issuer extends Processor<Issuer> {
         if (document != null && document.containsKey(Keywords.CONTEXT)) {
             final JsonValue documentContext = document.get(Keywords.CONTEXT);
             if (JsonUtils.isString(documentContext)) {
-                urls.add(((JsonString)documentContext).getString());
+                urls.add(((JsonString) documentContext).getString());
                 contexts.add(documentContext);
 
             } else if (JsonUtils.isObject(documentContext)) {
@@ -298,7 +315,7 @@ public final class Issuer extends Processor<Issuer> {
             } else if (JsonUtils.isArray(documentContext)) {
                 for (final JsonValue context : documentContext.asJsonArray()) {
                     if (JsonUtils.isString(context)) {
-                        urls.add(((JsonString)context).getString());
+                        urls.add(((JsonString) context).getString());
                     }
                     contexts.add(context);
                 }
@@ -306,9 +323,9 @@ public final class Issuer extends Processor<Issuer> {
         }
 
         final Collection<String> provided = draft.getContext(modelVersion);
-        
+
         if (provided != null) {
-            //use .stream().filter(Predicate.not(urls::contains))
+            // use .stream().filter(Predicate.not(urls::contains))
             for (String url : provided) {
                 if (!urls.contains(url)) {
                     urls.add(url);
@@ -316,7 +333,7 @@ public final class Issuer extends Processor<Issuer> {
                 }
             }
         }
-        
+
         return contexts.build();
     }
 }
