@@ -9,8 +9,10 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
+import com.apicatalog.vc.model.ProofSignature;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
@@ -22,22 +24,13 @@ class TestSignatureSuite extends DataIntegritySuite {
     static final String TEST_CRYPTO_NAME = "test-2022";
 
     protected TestSignatureSuite() {
-        super(TEST_CRYPTO_NAME, new TestKeyAdapter());
+        super(TEST_CRYPTO_NAME, new TestKeyAdapter(), Multibase.BASE_58_BTC);
     }
 
-    @Override
     protected void validateProofValue(byte[] proofValue) throws DocumentError {
         if (proofValue != null && proofValue.length != 32) {
             throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
         }
-    }
-
-    @Override
-    protected CryptoSuite getCryptoSuite(String cryptoName, byte[] proofValue) throws DocumentError {
-        if (TEST_CRYPTO_NAME.equals(cryptoName)) {
-            return CRYPTO;
-        }
-        return null;
     }
 
     public DataIntegrityProof createDraft(
@@ -49,5 +42,19 @@ class TestSignatureSuite extends DataIntegritySuite {
             String nonce
             ) throws DocumentError {
         return super.createDraft(CRYPTO, method, purpose, created, domain, challenge, nonce);
+    }
+
+    @Override
+    protected ProofSignature getProofValue(byte[] encoded) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected CryptoSuite getCryptoSuite(String cryptoName, ProofSignature proofValue) throws DocumentError {
+        if (TEST_CRYPTO_NAME.equals(cryptoName)) {
+            return CRYPTO;
+        }
+        return null;
     }
 }

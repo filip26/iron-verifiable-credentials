@@ -29,11 +29,13 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
+import com.apicatalog.vc.issuer.SignedCredentials;
+import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.issuer.StandardIssuer;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
-import com.apicatalog.vc.processor.Issuer;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -99,24 +101,23 @@ public class VcTestRunnerJunit {
                         testCase.nonce
                         );
 
-                final Issuer issuer = Vc.sign(
-                        testCase.input,
+                final Issuer issuer = new TestIssuer(
                         getKeys(keyPairLocation, LOADER, draft.methodProcessor()),
-                        draft)
-                        .loader(LOADER);
+                        LOADER
+                        );
+                        
+                final SignedCredentials credentials = issuer.sign(testCase.input, draft);
 
                 JsonObject signed = null;
 
                 if (testCase.context != null) {
-
-                    signed = issuer.getCompacted(testCase.context);
+                    signed = credentials.getCompacted(testCase.context);
 
                 } else if (testCase.compacted) {
-
-                    signed = issuer.getCompacted();
+                    signed = credentials.getCompacted();
 
                 } else {
-                    signed = issuer.getExpanded();
+                    signed = credentials.getExpanded();
                 }
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);

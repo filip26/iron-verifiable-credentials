@@ -5,7 +5,7 @@ public class LinkedDataSuiteError extends Throwable {
     private static final long serialVersionUID = 1850026823047424380L;
 
     public enum Code {
-        Canonicalization, Digest,
+        Canonicalization, Digest, Signature
     }
 
     private Code code;

@@ -8,8 +8,8 @@ import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.vc.issuer.StandardIssuer;
 import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.processor.Issuer;
 import com.apicatalog.vc.processor.KeysGenerator;
 import com.apicatalog.vc.processor.Verifier;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -60,14 +60,14 @@ public final class Vc {
      * @param keyPair
      * @param draft            a draft of the proof to sign and attach
      *
-     * @return {@link Issuer} allowing to set options and to sign the given document
+     * @return {@link StandardIssuer} allowing to set options and to sign the given document
      *
      * @throws DocumentError
      * @throws SigningError
      */
-    public static Issuer sign(URI documentLocation, KeyPair keyPair, final Proof draft) throws DocumentError, SigningError {
-        return new Issuer(documentLocation, keyPair, draft);
-    }
+//    public static StandardIssuer sign(URI documentLocation, KeyPair keyPair, final Proof draft) throws DocumentError, SigningError {
+//        return new StandardIssuer(documentLocation, keyPair, draft);
+//    }
 
     /**
      * Signs VC/VP document. Returns the provided VC/VP with a new proof
@@ -76,14 +76,14 @@ public final class Vc {
      * @param keyPair
      * @param draft    a draft of the proof to sign and attach
      *
-     * @return {@link Issuer} allowing to set options and to sign the given document
+     * @return {@link StandardIssuer} allowing to set options and to sign the given document
      *
      * @throws DocumentError
      * @throws SigningError
      */
-    public static Issuer sign(JsonObject document, KeyPair keyPair, final Proof draft) throws DocumentError, SigningError {
-        return new Issuer(document, keyPair, draft);
-    }
+//    public static StandardIssuer sign(JsonObject document, KeyPair keyPair, final Proof draft) throws DocumentError, SigningError {
+//        return new StandardIssuer(document, keyPair, draft);
+//    }
 
     /**
      * Generates public/private key pair.

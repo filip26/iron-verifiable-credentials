@@ -1,17 +1,15 @@
 package com.apicatalog.ld.signature;
 
-import java.util.Collection;
 import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 
 import jakarta.json.JsonObject;
-import jakarta.json.JsonPointer;
 import jakarta.json.JsonStructure;
 
 public class LinkedDataSignature {
-
+    
     private final CryptoSuite suite;
 
     public LinkedDataSignature(CryptoSuite suite) {
@@ -25,7 +23,7 @@ public class LinkedDataSignature {
      *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification
      *      Algorithm</a>
      *
-     * @param document        expanded unsigned VC/VP document
+     * @param expanded        expanded unsigned VC/VP document
      * @param unsignedProof   expanded proof with no proofValue
      * @param verificationKey
      * @param signature
@@ -34,16 +32,18 @@ public class LinkedDataSignature {
      * @throws DocumentError
      */
     public void verify(
-            final JsonObject document,
+            final JsonObject expanded,
             final JsonObject unsignedProof,
             final byte[] verificationKey,
             final byte[] signature) throws VerificationError {
 
+        Objects.requireNonNull(expanded);
+        Objects.requireNonNull(unsignedProof);
         Objects.requireNonNull(verificationKey);
         Objects.requireNonNull(signature);
 
         try {
-            final byte[] computeSignature = hashCode(document, unsignedProof);
+            final byte[] computeSignature = hashCode(expanded, unsignedProof);
 
             suite.verify(verificationKey, signature, computeSignature);
 
@@ -59,34 +59,25 @@ public class LinkedDataSignature {
      *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm">Proof
      *      Algorithm</a>
      *
-     * @param document   expanded unsigned VC/VP document
+     * @param expanded   expanded unsigned VC/VP document
      * @param privateKey
      * @param proof
-     * @param mandatory mandatory pointers, if present a selective disclosure proof is produced
+     * @param mandatory  mandatory pointers, if present a selective disclosure proof
+     *                   is produced
      *
      * @return computed signature
      *
      * @throws SigningError
      * @throws DocumentError
      */
-    public byte[] sign(JsonObject document, byte[] privateKey, JsonObject proof, Collection<JsonPointer> mandatory) throws SigningError {
+    public byte[] sign(JsonObject expanded, byte[] privateKey, JsonObject proof) throws SigningError {
 
-        Objects.requireNonNull(document);
+        Objects.requireNonNull(expanded);
         Objects.requireNonNull(privateKey);
         Objects.requireNonNull(proof);
 
-        if (mandatory == null || mandatory.isEmpty()) {
-            return sign(document, privateKey, proof);
-        }
-        
-        //TODO
-        throw new UnsupportedOperationException("SD signature is not supported yet");   
-    }
-
-    byte[] sign(JsonObject document, byte[] privateKey, JsonObject proof) throws SigningError {
-
         try {
-            final byte[] documentHashCode = hashCode(document, proof);
+            final byte[] documentHashCode = hashCode(expanded, proof);
 
             return suite.sign(privateKey, documentHashCode);
 

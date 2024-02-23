@@ -6,16 +6,18 @@ import java.time.Instant;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.node.LdNodeBuilder;
+import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.model.ProofSignature;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
 
-public abstract class DataIntegritySuite implements SignatureSuite {
+public abstract class DataIntegritySuite<S extends ProofSignature> implements SignatureSuite {
 
     protected static final String PROOF_TYPE_NAME = "DataIntegrityProof";
 
@@ -25,13 +27,12 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected final String cryptosuite;
 
-    protected DataIntegritySuite(final String cryptosuite, final MethodAdapter method) {
+    protected final Multibase proofValueBase;
+    
+    protected DataIntegritySuite(final String cryptosuite, final MethodAdapter method, final Multibase proofValueBase) {
         this.cryptosuite = cryptosuite;
         this.methodAdapter = method;
-    }
-
-    protected void validateProofValue(byte[] proofValue) throws DocumentError {
-        /* implement custom proof value validation */
+        this.proofValueBase = proofValueBase;
     }
 
     @Override
@@ -54,13 +55,52 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public Proof readProof(JsonObject expandedProof) throws DocumentError {
-        return DataIntegrityProofReader.read(expandedProof, this);
+    public DataIntegrityProof<S> readProof(JsonObject expandedProof) throws DocumentError {
+
+        if (expandedProof == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
+        }
+
+        final LdNode node = LdNode.of(expandedProof);
+
+        String cryptoSuiteName = node.scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
+
+        ProofSignature proofValue = getProofValue(decodeProofValue(node.scalar(DataIntegrityVocab.PROOF_VALUE)));
+        
+        CryptoSuite crypto = getCryptoSuite(cryptoSuiteName, proofValue);
+
+        DataIntegrityProof proof = new DataIntegrityProof(this, crypto, expandedProof);
+
+        proof.value = proofValue;
+
+        proof.id = node.id();
+
+        proof.created = node.scalar(DataIntegrityVocab.CREATED).xsdDateTime();
+
+        proof.purpose = node.node(DataIntegrityVocab.PURPOSE).id();
+
+        proof.domain = node.scalar(DataIntegrityVocab.DOMAIN).string();
+
+        proof.challenge = node.scalar(DataIntegrityVocab.CHALLENGE).string();
+
+        proof.nonce = node.scalar(DataIntegrityVocab.NONCE).string();
+
+        proof.method = node.node(DataIntegrityVocab.VERIFICATION_METHOD).map(methodAdapter);
+
+        proof.previousProof = node.node(DataIntegrityVocab.PREVIOUS_PROOF).id();
+
+        return proof;
     }
 
-    protected abstract CryptoSuite getCryptoSuite(String cryptoName, byte[] proofValue) throws DocumentError;
+    protected byte[] decodeProofValue(LdScalar value) throws DocumentError {
+        return value.multibase(proofValueBase);
+    }
 
-    protected DataIntegrityProof createDraft(
+    protected abstract S getProofValue(byte[] encoded);
+
+    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofSignature proofValue) throws DocumentError;
+
+    protected DataIntegrityProof<S> createDraft(
             CryptoSuite crypto,
             VerificationMethod method,
             URI purpose,

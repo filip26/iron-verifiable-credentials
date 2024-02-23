@@ -16,7 +16,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.model.ProofValueProcessor;
+import com.apicatalog.vc.model.ProofSignature;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -27,7 +27,7 @@ import jakarta.json.JsonObject;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAdapter {
+public class DataIntegrityProof<T extends ProofSignature> implements Proof<T>, MethodAdapter {
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
@@ -39,7 +39,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     protected String domain;
     protected String nonce;
     protected String challenge;
-    protected byte[] value;
+    protected T value;
     protected URI previousProof;
 
     final JsonObject expanded;
@@ -110,7 +110,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     }
 
     @Override
-    public byte[] getValue() {
+    public T getSignature() {
         return value;
     }
 
@@ -134,7 +134,6 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
         return expanded;
     }
 
-    @Override
     public void validate(Map<String, Object> params) throws DocumentError {
         if (created == null) {
             throw new DocumentError(ErrorType.Missing, "Created");
@@ -145,7 +144,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
         if (purpose == null) {
             throw new DocumentError(ErrorType.Missing, "ProofPurpose");
         }
-        if (value == null || value.length == 0) {
+        if (value == null) {
             throw new DocumentError(ErrorType.Missing, "ProofValue");
         }
 
@@ -153,15 +152,13 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
         assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
         assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
 
-        suite.validateProofValue(value);
+        //validateProofValue(value);
     }
 
-    @Override
     public JsonObject removeProofValue(JsonObject expanded) {
         return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
     }
 
-    @Override
     public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
 
         LdNodeBuilder node = new LdNodeBuilder(Json.createObjectBuilder(expanded));
@@ -192,11 +189,6 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     }
 
     @Override
-    public ProofValueProcessor valueProcessor() {
-        return this;
-    }
-
-    @Override
     public JsonObject write(VerificationMethod value) {
         throw new UnsupportedOperationException();
     }
@@ -216,5 +208,17 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
         if (!value.equals(param)) {
             throw new DocumentError(ErrorType.Invalid, name);
         }
+    }
+
+    @Override
+    public JsonObject unsignedCopy() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public JsonObject signedCopy(byte[] signature) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

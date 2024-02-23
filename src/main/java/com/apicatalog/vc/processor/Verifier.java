@@ -19,8 +19,6 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdType;
-import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
@@ -37,6 +35,7 @@ import com.apicatalog.vc.model.Credential;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.model.ProofSignature;
 import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.model.io.CredentialReader;
 import com.apicatalog.vc.model.io.PresentationReader;
@@ -271,16 +270,10 @@ public final class Verifier extends Processor<Verifier> {
         while (proof != null) {
 
             proof.validate(params);
+            
+            final ProofSignature proofValue = proof.getSignature();
 
-            final CryptoSuite cryptoSuite = proof.getCryptoSuite();
-
-            if (cryptoSuite == null) {
-                throw new VerificationError(Code.UnsupportedCryptoSuite);
-            }
-
-            final byte[] proofValue = proof.getValue();
-
-            if (proofValue == null || proofValue.length == 0) {
+            if (proofValue == null) {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");
             }
 
@@ -291,20 +284,7 @@ public final class Verifier extends Processor<Verifier> {
                 throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
             }
 
-            // get proof in an expanded form
-            final JsonObject signedProof = proof.toJsonLd();
-
-            // remote a proof value
-            final JsonObject unsignedProof = proof.valueProcessor().removeProofValue(signedProof);
-
-            final LinkedDataSignature signature = new LinkedDataSignature(cryptoSuite);
-
-            // verify signature
-            signature.verify(
-                    data,
-                    unsignedProof,
-                    ((VerificationKey) verificationMethod).publicKey(),
-                    proofValue);
+            proof.getSignature().verify(data, (VerificationKey) verificationMethod);
 
             proof = queue.pop();
         }
