@@ -12,11 +12,10 @@ import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.model.ModelVersion;
-import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.model.ProofSignature;
+import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.proof.ProofValue;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -27,7 +26,7 @@ import jakarta.json.JsonObject;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof<T extends ProofSignature> implements Proof<T>, MethodAdapter {
+public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, MethodAdapter {
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
@@ -46,13 +45,11 @@ public class DataIntegrityProof<T extends ProofSignature> implements Proof<T>, M
 
     protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
             "https://w3id.org/security/data-integrity/v2",
-            "https://w3id.org/security/multikey/v1"
-            );
+            "https://w3id.org/security/multikey/v1");
 
     protected static final Collection<String> V2_CONTEXTS = Arrays.asList(
-            "https://www.w3.org/ns/credentials/v2"
-            );
-    
+            "https://www.w3.org/ns/credentials/v2");
+
     protected DataIntegrityProof(
             DataIntegritySuite suite,
             CryptoSuite crypto,
@@ -129,11 +126,6 @@ public class DataIntegrityProof<T extends ProofSignature> implements Proof<T>, M
         return crypto;
     }
 
-    @Override
-    public JsonObject toJsonLd() {
-        return expanded;
-    }
-
     public void validate(Map<String, Object> params) throws DocumentError {
         if (created == null) {
             throw new DocumentError(ErrorType.Missing, "Created");
@@ -152,22 +144,7 @@ public class DataIntegrityProof<T extends ProofSignature> implements Proof<T>, M
         assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
         assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
 
-        //validateProofValue(value);
-    }
-
-    public JsonObject removeProofValue(JsonObject expanded) {
-        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
-    }
-
-    public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
-
-        LdNodeBuilder node = new LdNodeBuilder(Json.createObjectBuilder(expanded));
-
-        node.set(DataIntegrityVocab.PROOF_VALUE)
-                .scalar("https://w3id.org/security#multibase",
-                        Multibase.BASE_58_BTC.encode(proofValue));
-
-        return node.build();
+        // validateProofValue(value);
     }
 
     @Override
@@ -212,13 +189,19 @@ public class DataIntegrityProof<T extends ProofSignature> implements Proof<T>, M
 
     @Override
     public JsonObject unsignedCopy() {
-        // TODO Auto-generated method stub
-        return null;
+        if (value == null) {
+            return expanded;
+        }
+        // remove proof value
+        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
     }
 
     @Override
     public JsonObject signedCopy(byte[] signature) {
-        // TODO Auto-generated method stub
-        return null;
+        return new LdNodeBuilder(Json.createObjectBuilder(expanded))
+                .set(DataIntegrityVocab.PROOF_VALUE)
+                .scalar("https://w3id.org/security#multibase",
+                        suite.encodeProofValue(signature))
+                .build();
     }
 }

@@ -23,8 +23,8 @@ import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.ModelVersion;
-import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.Verifiable;
+import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -124,12 +124,6 @@ public abstract class BaseIssuer extends Processor<BaseIssuer> implements Issuer
                 draft);
 
         return new SignedCredentials(EmbeddedProof.addProof(object, signedProof), draft);
-    }
-
-    protected JsonObject unsignedDraft(Proof draft) {
-        return draft.getSignature() != null
-                ? draft.unsignedCopy()
-                : draft.toJsonLd();
     }
 
     final void validate(Verifiable verifiable) throws SigningError, DocumentError {

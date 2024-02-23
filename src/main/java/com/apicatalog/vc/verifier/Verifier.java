@@ -1,4 +1,4 @@
-package com.apicatalog.vc.processor;
+package com.apicatalog.vc.verifier;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -34,11 +34,11 @@ import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.model.Credential;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.ModelVersion;
-import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.model.ProofSignature;
 import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.model.io.CredentialReader;
 import com.apicatalog.vc.model.io.PresentationReader;
+import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
@@ -271,7 +271,7 @@ public final class Verifier extends Processor<Verifier> {
 
             proof.validate(params);
             
-            final ProofSignature proofValue = proof.getSignature();
+            final ProofValue proofValue = proof.getSignature();
 
             if (proofValue == null) {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");

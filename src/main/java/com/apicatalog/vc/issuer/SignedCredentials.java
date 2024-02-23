@@ -12,7 +12,7 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;

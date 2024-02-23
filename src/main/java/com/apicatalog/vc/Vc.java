@@ -9,10 +9,10 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.issuer.StandardIssuer;
-import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.processor.KeysGenerator;
-import com.apicatalog.vc.processor.Verifier;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vc.verifier.Verifier;
 
 import jakarta.json.JsonObject;
 

@@ -1,4 +1,4 @@
-package com.apicatalog.vc.processor;
+package com.apicatalog.vc.verifier;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.proof.Proof;
 
 class ProofQueue {
 

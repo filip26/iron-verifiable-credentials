@@ -16,25 +16,29 @@ import jakarta.json.JsonValue;
 
 public class LdSetter {
 
+    final LdNodeBuilder parent;
     final Term term;
     final JsonObjectBuilder builder;
     final JsonArray content;
 
-    protected LdSetter(Term term, JsonObjectBuilder builder, JsonArray content) {
+    protected LdSetter(LdNodeBuilder parent, Term term, JsonObjectBuilder builder, JsonArray content) {
+        this.parent = parent;
         this.term = term;
         this.builder = builder;
         this.content = content;
     }
 
-    public void link(URI uri) {
+    public LdNodeBuilder link(URI uri) {
         string(uri.toString());
+        return parent;
     }
 
-    public void string(String value) {
+    public LdNodeBuilder string(String value) {
         scalar(null, value);
+        return parent;
     }
 
-    public void scalar(String type, String value) {
+    public LdNodeBuilder scalar(String type, String value) {
         JsonObjectBuilder scalar = Json.createObjectBuilder();
         if (type != null) {
             scalar.add(Keywords.TYPE, type);
@@ -42,32 +46,38 @@ public class LdSetter {
         scalar.add(Keywords.VALUE, value);
 
         value(scalar.build());
+        return parent;
     }
 
-    public void value(JsonValue value) {
+    public LdNodeBuilder value(JsonValue value) {
         builder.add(term.uri(), setOrAdd(value));
+        return parent;
     }
 
-    public <T> void map(LdAdapter<T> adapter, T value) {
+    public <T> LdNodeBuilder map(LdAdapter<T> adapter, T value) {
         if (value != null) {
             value(adapter.write(value));
         }
+        return parent;
     }
 
-    public void xsdDateTime(Instant created) {
+    public LdNodeBuilder xsdDateTime(Instant created) {
         scalar(VcVocab.XSD_DATETIME.uri(), created.toString());
+        return parent;
     }
     
-    public void multibase(Multibase base, byte[] value) {
+    public LdNodeBuilder multibase(Multibase base, byte[] value) {
         scalar(VcVocab.MULTIBASE_TYPE.uri(), base.encode(value));
+        return parent;
     }
 
-    public void id(URI id) {
+    public LdNodeBuilder id(URI id) {
         if (id != null) {
             JsonObjectBuilder node = Json.createObjectBuilder();
             node.add(Keywords.ID, Json.createValue(id.toString()));
             value(node.build());
         }
+        return parent;
     }
     
     JsonArray setOrAdd(JsonValue value) {

@@ -8,7 +8,7 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
@@ -25,7 +25,7 @@ public class StandardIssuer extends BaseIssuer {
         
       final LinkedDataSignature ldSignature = new LinkedDataSignature(draft.getCryptoSuite());
 
-      final JsonObject unsignedDraft = super.unsignedDraft(draft);
+      final JsonObject unsignedDraft = draft.unsignedCopy();
       
       final byte[] signature = ldSignature.sign(data, keyPair.privateKey(), unsignedDraft);
 

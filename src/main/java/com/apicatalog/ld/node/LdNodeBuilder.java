@@ -27,7 +27,7 @@ public class LdNodeBuilder {
     }
     
     public LdSetter set(Term term) {
-        return new LdSetter(term, builder, null);
+        return new LdSetter(this, term, builder, null);
     }
     
     public JsonObject build() {

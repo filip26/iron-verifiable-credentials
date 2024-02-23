@@ -12,7 +12,7 @@ import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
-import com.apicatalog.vc.model.ProofSignature;
+import com.apicatalog.vc.proof.ProofValue;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
@@ -45,13 +45,13 @@ class TestSignatureSuite extends DataIntegritySuite {
     }
 
     @Override
-    protected ProofSignature getProofValue(byte[] encoded) {
+    protected ProofValue getProofValue(byte[] encoded) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected CryptoSuite getCryptoSuite(String cryptoName, ProofSignature proofValue) throws DocumentError {
+    protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError {
         if (TEST_CRYPTO_NAME.equals(cryptoName)) {
             return CRYPTO;
         }

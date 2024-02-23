@@ -12,12 +12,12 @@ import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.model.ProofSignature;
+import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
 
-public abstract class DataIntegritySuite<S extends ProofSignature> implements SignatureSuite {
+public abstract class DataIntegritySuite<S extends ProofValue> implements SignatureSuite {
 
     protected static final String PROOF_TYPE_NAME = "DataIntegrityProof";
 
@@ -65,7 +65,7 @@ public abstract class DataIntegritySuite<S extends ProofSignature> implements Si
 
         String cryptoSuiteName = node.scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
 
-        ProofSignature proofValue = getProofValue(decodeProofValue(node.scalar(DataIntegrityVocab.PROOF_VALUE)));
+        ProofValue proofValue = getProofValue(decodeProofValue(node.scalar(DataIntegrityVocab.PROOF_VALUE)));
         
         CryptoSuite crypto = getCryptoSuite(cryptoSuiteName, proofValue);
 
@@ -95,10 +95,14 @@ public abstract class DataIntegritySuite<S extends ProofSignature> implements Si
     protected byte[] decodeProofValue(LdScalar value) throws DocumentError {
         return value.multibase(proofValueBase);
     }
+    
+    protected String encodeProofValue(byte[] value) {
+        return proofValueBase.encode(value);
+    }
 
     protected abstract S getProofValue(byte[] encoded);
 
-    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofSignature proofValue) throws DocumentError;
+    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
 
     protected DataIntegrityProof<S> createDraft(
             CryptoSuite crypto,

@@ -10,11 +10,10 @@ import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.model.EmbeddedProof;
-import com.apicatalog.vc.model.ProofSignature;
 
 import jakarta.json.JsonObject;
 
-public class StandardProofValue implements ProofSignature {
+public class StandardProofValue implements ProofValue {
 
     protected final DataIntegrityProof proof;
     

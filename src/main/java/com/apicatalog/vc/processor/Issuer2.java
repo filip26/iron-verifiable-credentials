@@ -24,8 +24,8 @@ import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.ModelVersion;
-import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.model.Verifiable;
+import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;

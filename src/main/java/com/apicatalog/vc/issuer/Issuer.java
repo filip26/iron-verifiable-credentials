@@ -8,7 +8,7 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;

@@ -3,6 +3,8 @@ package com.apicatalog.vc.model;
 import java.net.URI;
 import java.util.Collection;
 
+import com.apicatalog.vc.proof.Proof;
+
 /**
  * Represents a common ancestor for verifiable data.
  * 

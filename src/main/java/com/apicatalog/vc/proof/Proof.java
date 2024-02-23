@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc.proof;
 
 import java.net.URI;
 import java.util.Collection;
@@ -9,6 +9,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.model.ModelVersion;
 
 import jakarta.json.JsonObject;
 
@@ -17,7 +18,7 @@ import jakarta.json.JsonObject;
  *
  * @see {@link DataIntegrityProof} for an example implementation
  */
-public interface Proof<T extends ProofSignature> {
+public interface Proof<T extends ProofValue> {
 
     /**
      * The proof JSON-LD context URI(s) to compact the proof
@@ -77,12 +78,12 @@ public interface Proof<T extends ProofSignature> {
      */
     void validate(Map<String, Object> params) throws DocumentError;
 
-    /**
-     * Returns JSON-LD expanded form of the proof.
-     * 
-     * @return the proof in an expanded JSON-LD form
-     */
-    JsonObject toJsonLd();
+//    /**
+//     * Returns JSON-LD expanded form of the proof.
+//     * 
+//     * @return the proof in an expanded JSON-LD form
+//     */
+//    JsonObject toJsonLd();
 
     /**
      * Removes a proof value from the proof returns a
@@ -92,8 +93,9 @@ public interface Proof<T extends ProofSignature> {
      */
     JsonObject unsignedCopy();
 
+    JsonObject signedCopy(byte[] signature);
 
     MethodAdapter methodProcessor();
 
-    JsonObject signedCopy(byte[] signature);
+
 }

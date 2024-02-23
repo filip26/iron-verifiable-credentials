@@ -2,7 +2,7 @@ package com.apicatalog.vc.model;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.issuer.StandardIssuer;
-import com.apicatalog.vc.processor.Verifier;
+import com.apicatalog.vc.verifier.Verifier;
 
 import jakarta.json.JsonObject;
 

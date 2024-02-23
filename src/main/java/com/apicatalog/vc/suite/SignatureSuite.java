@@ -1,7 +1,7 @@
 package com.apicatalog.vc.suite;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonObject;
 

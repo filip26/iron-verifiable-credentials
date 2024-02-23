@@ -1,11 +1,11 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc.proof;
 
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.VerificationKey;
 
 import jakarta.json.JsonObject;
 
-public interface ProofSignature {
+public interface ProofValue {
 
     byte[] toByteArray();
 
