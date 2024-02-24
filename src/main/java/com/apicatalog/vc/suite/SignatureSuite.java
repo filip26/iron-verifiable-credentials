@@ -30,5 +30,5 @@ public interface SignatureSuite {
      * @return a new {@link Proof} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    Proof readProof(JsonObject proof) throws DocumentError;
+    Proof getProof(JsonObject proof) throws DocumentError;
 }

@@ -17,5 +17,5 @@ public enum ModelVersion {
      * 
      * @see <a href="https://w3c.github.io/vc-data-model/">Specification</a>
      */
-    V20
+    V20;    
 }

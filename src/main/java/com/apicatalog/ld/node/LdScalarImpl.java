@@ -69,6 +69,17 @@ class LdScalarImpl implements LdScalar {
 
         return null;
     }
+    
+    @Override
+    public String string(String expectedType) throws DocumentError {
+        if (!type.equals(expectedType)) {
+            throw new DocumentError(ErrorType.Invalid, type);
+        }
+
+        return string();
+    }
+
+
 
     public boolean exists() {
         return JsonUtils.isNotNull(value);
@@ -140,6 +151,15 @@ class LdScalarImpl implements LdScalar {
 
     @Override
     public JsonValue value() throws DocumentError {
+        return value;
+    }
+
+    @Override
+    public JsonValue value(String expectedType) throws DocumentError {
+        if (!type.equals(expectedType)) {
+            throw new DocumentError(ErrorType.Invalid, type);
+        }
+
         return value;
     }
 }

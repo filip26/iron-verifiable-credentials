@@ -5,14 +5,17 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
-import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
@@ -28,7 +31,7 @@ import jakarta.json.JsonObject;
  */
 public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, MethodAdapter {
 
-    protected final DataIntegritySuite suite;
+    protected final DataIntegritySuite<T> suite;
     protected final CryptoSuite crypto;
 
     protected URI id;
@@ -41,7 +44,7 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
     protected T value;
     protected URI previousProof;
 
-    final JsonObject expanded;
+    JsonObject expanded;
 
     protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
             "https://w3id.org/security/data-integrity/v2",
@@ -51,12 +54,52 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
             "https://www.w3.org/ns/credentials/v2");
 
     protected DataIntegrityProof(
-            DataIntegritySuite suite,
+            DataIntegritySuite<T> suite,
             CryptoSuite crypto,
             JsonObject expandedProof) {
         this.suite = suite;
         this.crypto = crypto;
         this.expanded = expandedProof;
+    }
+
+    @Override
+    public void verify(JsonObject data, VerificationKey method) throws VerificationError {
+
+        Objects.requireNonNull(value);
+        Objects.requireNonNull(data);
+        Objects.requireNonNull(method);
+
+        // remove a proof value and a new unsigned copy
+        final JsonObject unsignedProof = EmbeddedProof.removeProof(expanded);
+
+        // verify signature
+        value.verify(
+                crypto,
+                data,
+                unsignedProof,
+                method.publicKey());
+    }
+    
+    @Override
+    public void validate(Map<String, Object> params) throws DocumentError {
+        if (created == null) {
+            throw new DocumentError(ErrorType.Missing, "Created");
+        }
+        if (method == null) {
+            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
+        }
+        if (purpose == null) {
+            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
+        }
+        if (value == null || value.length() == 0) {
+            throw new DocumentError(ErrorType.Missing, "ProofValue");
+        }
+
+        assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
+        assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
+        assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
+
+        value.validate();
     }
 
     /**
@@ -74,7 +117,7 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
     }
 
     @Override
-    public VerificationMethod getMethod() {
+    public VerificationMethod method() {
         return method;
     }
 
@@ -107,7 +150,7 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
     }
 
     @Override
-    public T getSignature() {
+    public T signature() {
         return value;
     }
 
@@ -122,29 +165,8 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
     }
 
     @Override
-    public CryptoSuite getCryptoSuite() {
+    public CryptoSuite cryptoSuite() {
         return crypto;
-    }
-
-    public void validate(Map<String, Object> params) throws DocumentError {
-        if (created == null) {
-            throw new DocumentError(ErrorType.Missing, "Created");
-        }
-        if (method == null) {
-            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
-        }
-        if (purpose == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
-        }
-        if (value == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofValue");
-        }
-
-        assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
-        assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
-        assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
-
-        // validateProofValue(value);
     }
 
     @Override
@@ -158,7 +180,7 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
     }
 
     @Override
-    public Collection<String> getContext(ModelVersion model) {
+    public Collection<String> context(ModelVersion model) {
         if (ModelVersion.V11.equals(model)) {
             return V1_CONTEXTS;
         }
@@ -170,7 +192,8 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
         throw new UnsupportedOperationException();
     }
 
-    public String getNonce() {
+    @Override
+    public String nonce() {
         return nonce;
     }
 
@@ -188,20 +211,21 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
     }
 
     @Override
-    public JsonObject unsignedCopy() {
-        if (value == null) {
-            return expanded;
-        }
-        // remove proof value
-        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
+    public JsonObject expand() {
+        return expanded;        
     }
 
     @Override
-    public JsonObject signedCopy(byte[] signature) {
-        return new LdNodeBuilder(Json.createObjectBuilder(expanded))
-                .set(DataIntegrityVocab.PROOF_VALUE)
-                .scalar("https://w3id.org/security#multibase",
-                        suite.encodeProofValue(signature))
-                .build();
+    public void signature(byte[] signature) {
+        
+        if (value == null) {
+            value = suite.createProofValue();
+        }
+
+        value.set(signature);
+        
+        this.expanded = Json.createObjectBuilder(expanded)
+                .add(DataIntegrityVocab.PROOF_VALUE.uri(), Json.createArrayBuilder().add(value.expand()))
+                .build();        
     }
 }

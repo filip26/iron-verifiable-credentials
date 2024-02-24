@@ -1,4 +1,4 @@
-package com.apicatalog.vc.processor;
+package com.apicatalog.vc.keygen;
 
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.KeyGenError;

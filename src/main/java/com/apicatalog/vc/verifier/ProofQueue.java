@@ -12,15 +12,15 @@ import com.apicatalog.vc.proof.Proof;
 
 class ProofQueue {
 
-    final Collection<Proof> proofs;
+    final Collection<Proof<?>> proofs;
     final Set<URI> ids;
     
-    protected ProofQueue(Collection<Proof> proofs) {
+    protected ProofQueue(Collection<Proof<?>> proofs) {
         this.proofs = new ArrayList<>(proofs);
         this.ids = new HashSet<>(proofs.size());
     }
     
-    public static final ProofQueue create(Collection<Proof> proofs) {
+    public static final ProofQueue create(Collection<Proof<?>> proofs) {
         return new ProofQueue(proofs);
     }
     
@@ -28,12 +28,12 @@ class ProofQueue {
         return !proofs.isEmpty();
     }
 
-    public Proof pop() throws DocumentError {
+    public Proof<?> pop() throws DocumentError {
         if (proofs.isEmpty()) {
             return null;
         }
         
-        for (Proof proof : proofs) {
+        for (Proof<?> proof : proofs) {
             if (proof.previousProof() == null
                     || ids.contains(proof.previousProof())
                     ) {

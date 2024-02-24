@@ -29,13 +29,12 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
-import com.apicatalog.vc.issuer.SignedCredentials;
-import com.apicatalog.vc.issuer.Issuer;
-import com.apicatalog.vc.issuer.StandardIssuer;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
+import com.apicatalog.vc.model.Verifiable;
+import com.apicatalog.vc.proof.SolidSignature;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -47,7 +46,7 @@ import jakarta.json.JsonWriterFactory;
 import jakarta.json.stream.JsonGenerator;
 
 public class VcTestRunnerJunit {
-
+    
     private final VcTestCase testCase;
 
     public final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
@@ -57,6 +56,8 @@ public class VcTestRunnerJunit {
                     .set("classpath", new ClasspathLoader()));
 
     public final static Collection<MethodResolver> RESOLVERS = defaultResolvers();
+    
+    public final static TestSignatureSuite SUITE = (new TestSignatureSuite());
 
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
@@ -91,7 +92,7 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                final DataIntegrityProof draft = (new TestSignatureSuite()).createDraft(
+                final DataIntegrityProof<SolidSignature> draft = SUITE.createDraft(
                         // proof options
                         testCase.verificationMethod,
                         URI.create("https://w3id.org/security#assertionMethod"),
@@ -101,23 +102,21 @@ public class VcTestRunnerJunit {
                         testCase.nonce
                         );
 
-                final Issuer issuer = new TestIssuer(
-                        getKeys(keyPairLocation, LOADER, draft.methodProcessor()),
-                        LOADER
-                        );
+                final TestIssuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, draft.methodProcessor()))
+                        .loader(LOADER);
                         
-                final SignedCredentials credentials = issuer.sign(testCase.input, draft);
+                final Verifiable credentials = issuer.sign(testCase.input, draft);
 
                 JsonObject signed = null;
 
                 if (testCase.context != null) {
-                    signed = credentials.getCompacted(testCase.context);
+                    signed = credentials.compact(testCase.context);
 
                 } else if (testCase.compacted) {
-                    signed = credentials.getCompacted();
+                    signed = credentials.compact();
 
                 } else {
-                    signed = credentials.getExpanded();
+                    signed = credentials.expand();
                 }
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);

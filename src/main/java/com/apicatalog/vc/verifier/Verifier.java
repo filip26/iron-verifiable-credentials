@@ -34,9 +34,8 @@ import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.model.Credential;
 import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.vc.model.Presentation;
 import com.apicatalog.vc.model.Verifiable;
-import com.apicatalog.vc.model.io.CredentialReader;
-import com.apicatalog.vc.model.io.PresentationReader;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -155,7 +154,7 @@ public final class Verifier extends Processor<Verifier> {
             return verify(json.asJsonObject());
 
         } catch (JsonLdError e) {
-            failWithJsonLd(e);
+            DocumentError.failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
         }
     }
@@ -167,10 +166,10 @@ public final class Verifier extends Processor<Verifier> {
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
 
-            return verifyExpanded(getVersion(document), expanded);
+            return verifyExpanded(Verifiable.getVersion(document), expanded);
 
         } catch (JsonLdError e) {
-            failWithJsonLd(e);
+            DocumentError.failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
         }
     }
@@ -193,41 +192,41 @@ public final class Verifier extends Processor<Verifier> {
     private Verifiable verifyExpanded(final ModelVersion version, final JsonObject expanded) throws VerificationError, DocumentError {
 
         // get a verifiable representation
-        final Verifiable verifiable = get(version, expanded);
+        final Verifiable verifiable = Verifiable.of(version, expanded, loader);
 
         if (verifiable.isCredential()) {
 
             // data integrity and metadata validation
             validate(verifiable.asCredential());
 
-            verifiable.setProofs(verifyProofs(expanded));
+            verifiable.proofs(verifyProofs(expanded));
 
             return verifiable;
 
         } else if (verifiable.isPresentation()) {
 
             // verify presentation proofs
-            verifiable.setProofs(verifyProofs(expanded));
+            verifiable.proofs(verifyProofs(expanded));
 
             final Collection<Credential> credentials = new ArrayList<>();
 
-            for (final JsonObject presentedCredentials : PresentationReader.getCredentials(expanded)) {
+            for (final JsonObject presentedCredentials : Presentation.getCredentials(expanded)) {
 
-                if (!CredentialReader.isCredential(presentedCredentials)) {
+                if (!Credential.isCredential(presentedCredentials)) {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
                 }
 
                 credentials.add(verifyExpanded(version, presentedCredentials).asCredential());
             }
 
-            verifiable.asPresentation().setCredentials(credentials);
+            verifiable.asPresentation().credentials(credentials);
 
             return verifiable;
         }
         throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
 
-    private Collection<Proof> verifyProofs(JsonObject expanded) throws VerificationError, DocumentError {
+    private Collection<Proof<?>> verifyProofs(JsonObject expanded) throws VerificationError, DocumentError {
 
         // get proofs - throws an exception if there is no proof, never null nor an
         // empty collection
@@ -236,7 +235,7 @@ public final class Verifier extends Processor<Verifier> {
         // a data before issuance - no proof attached
         final JsonObject data = EmbeddedProof.removeProof(expanded);
 
-        final Collection<Proof> proofs = new ArrayList<>(expandedProofs.size());
+        final Collection<Proof<?>> proofs = new ArrayList<>(expandedProofs.size());
 
         // read attached proofs
         for (final JsonObject expandedProof : expandedProofs) {
@@ -253,7 +252,7 @@ public final class Verifier extends Processor<Verifier> {
                 throw new VerificationError(Code.UnsupportedCryptoSuite);
             }
 
-            final Proof proof = signatureSuite.readProof(expandedProof);
+            final Proof<?> proof = signatureSuite.getProof(expandedProof);
 
             if (proof == null) {
                 throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
@@ -265,13 +264,13 @@ public final class Verifier extends Processor<Verifier> {
         final ProofQueue queue = ProofQueue.create(proofs);
 
         // verify the proofs' signatures
-        Proof proof = queue.pop();
+        Proof<?> proof = queue.pop();
 
         while (proof != null) {
 
             proof.validate(params);
             
-            final ProofValue proofValue = proof.getSignature();
+            final ProofValue proofValue = proof.signature();
 
             if (proofValue == null) {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");
@@ -284,7 +283,7 @@ public final class Verifier extends Processor<Verifier> {
                 throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
             }
 
-            proof.getSignature().verify(data, (VerificationKey) verificationMethod);
+            proof.verify(data, (VerificationKey) verificationMethod);
 
             proof = queue.pop();
         }
@@ -292,9 +291,9 @@ public final class Verifier extends Processor<Verifier> {
         return proofs;
     }
 
-    Optional<VerificationMethod> getMethod(final Proof proof) throws VerificationError, DocumentError {
+    Optional<VerificationMethod> getMethod(final Proof<?> proof) throws VerificationError, DocumentError {
 
-        final VerificationMethod method = proof.getMethod();
+        final VerificationMethod method = proof.method();
 
         if (method == null) {
             throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");
@@ -313,7 +312,7 @@ public final class Verifier extends Processor<Verifier> {
 
     Optional<VerificationMethod> resolveMethod(
             URI id,
-            Proof proof) throws DocumentError {
+            Proof<?> proof) throws DocumentError {
 
         if (id == null) {
             throw new DocumentError(ErrorType.Missing, "ProofVerificationId");

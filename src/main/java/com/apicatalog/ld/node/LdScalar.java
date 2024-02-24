@@ -3,10 +3,13 @@ package com.apicatalog.ld.node;
 import java.net.URI;
 import java.time.Instant;
 
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
 public interface LdScalar {
@@ -15,9 +18,13 @@ public interface LdScalar {
 
     String string() throws DocumentError;
 
+    String string(String type) throws DocumentError;
+
     String type() throws DocumentError;
-    
+
     JsonValue value() throws DocumentError;
+
+    JsonValue value(String type) throws DocumentError;
 
     default boolean exists() {
         return false;
@@ -28,6 +35,13 @@ public interface LdScalar {
     byte[] multiformat(Multibase base, Multicodec codec) throws DocumentError;
 
     Instant xsdDateTime() throws DocumentError;
+
+    static JsonObject encode(String type, String value) {
+        return Json.createObjectBuilder()
+                .add(Keywords.TYPE, type)
+                .add(Keywords.VALUE, value)
+                .build();
+    }
 
     public final static LdScalar NULL = new LdScalar() {
 
@@ -63,6 +77,16 @@ public interface LdScalar {
 
         @Override
         public JsonValue value() throws DocumentError {
+            return null;
+        }
+
+        @Override
+        public String string(String type) throws DocumentError {
+            return null;
+        }
+
+        @Override
+        public JsonValue value(String type) throws DocumentError {
             return null;
         }
     };

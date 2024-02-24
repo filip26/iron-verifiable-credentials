@@ -6,10 +6,8 @@ import java.time.Instant;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.node.LdNodeBuilder;
-import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.ProofValue;
@@ -27,12 +25,9 @@ public abstract class DataIntegritySuite<S extends ProofValue> implements Signat
 
     protected final String cryptosuite;
 
-    protected final Multibase proofValueBase;
-    
-    protected DataIntegritySuite(final String cryptosuite, final MethodAdapter method, final Multibase proofValueBase) {
+    protected DataIntegritySuite(final String cryptosuite, final MethodAdapter method) {
         this.cryptosuite = cryptosuite;
         this.methodAdapter = method;
-        this.proofValueBase = proofValueBase;
     }
 
     @Override
@@ -40,22 +35,8 @@ public abstract class DataIntegritySuite<S extends ProofValue> implements Signat
         return PROOF_TYPE_ID.equals(proofType) && cryptosuite.equals(getCryptoSuiteName(expandedProof));
     }
 
-    protected static String getCryptoSuiteName(final JsonObject proof) {
-        if (proof == null) {
-            throw new IllegalArgumentException("expandedProof property must not be null.");
-        }
-
-        try {
-            return LdNode.of(proof).scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
-
-        } catch (DocumentError e) {
-
-        }
-        return null;
-    }
-
     @Override
-    public DataIntegrityProof<S> readProof(JsonObject expandedProof) throws DocumentError {
+    public DataIntegrityProof<S> getProof(JsonObject expandedProof) throws DocumentError {
 
         if (expandedProof == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
@@ -63,13 +44,15 @@ public abstract class DataIntegritySuite<S extends ProofValue> implements Signat
 
         final LdNode node = LdNode.of(expandedProof);
 
-        String cryptoSuiteName = node.scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
+        final String cryptoSuiteName = node.scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
 
-        ProofValue proofValue = getProofValue(decodeProofValue(node.scalar(DataIntegrityVocab.PROOF_VALUE)));
+        final S proofValue = createProofValue();
         
+        proofValue.set(node.scalar(DataIntegrityVocab.PROOF_VALUE));
+
         CryptoSuite crypto = getCryptoSuite(cryptoSuiteName, proofValue);
 
-        DataIntegrityProof proof = new DataIntegrityProof(this, crypto, expandedProof);
+        final DataIntegrityProof<S> proof = new DataIntegrityProof<>(this, crypto, expandedProof);
 
         proof.value = proofValue;
 
@@ -92,17 +75,23 @@ public abstract class DataIntegritySuite<S extends ProofValue> implements Signat
         return proof;
     }
 
-    protected byte[] decodeProofValue(LdScalar value) throws DocumentError {
-        return value.multibase(proofValueBase);
-    }
-    
-    protected String encodeProofValue(byte[] value) {
-        return proofValueBase.encode(value);
-    }
-
-    protected abstract S getProofValue(byte[] encoded);
+    protected abstract S createProofValue();
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
+
+    protected static String getCryptoSuiteName(final JsonObject proof) {
+        if (proof == null) {
+            throw new IllegalArgumentException("expandedProof property must not be null.");
+        }
+
+        try {
+            return LdNode.of(proof).scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
+
+        } catch (DocumentError e) {
+
+        }
+        return null;
+    }
 
     protected DataIntegrityProof<S> createDraft(
             CryptoSuite crypto,
@@ -132,7 +121,7 @@ public abstract class DataIntegritySuite<S extends ProofValue> implements Signat
             builder.set(DataIntegrityVocab.NONCE).string(nonce);
         }
 
-        final DataIntegrityProof proof = new DataIntegrityProof(this, crypto, builder.build());
+        final DataIntegrityProof<S> proof = new DataIntegrityProof<>(this, crypto, builder.build());
         proof.created = created;
         proof.purpose = purpose;
         proof.method = method;

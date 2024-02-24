@@ -3,6 +3,9 @@ package com.apicatalog.vc.issuer;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -21,54 +24,71 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.model.EmbeddedProof;
 import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.proof.ProofValue;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonString;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
-public abstract class BaseIssuer extends Processor<BaseIssuer> implements Issuer {
+public abstract class BaseIssuer<T extends ProofValue> implements Issuer<T> {
 
     protected final KeyPair keyPair;
-    protected final DocumentLoader loader;
 
-    protected BaseIssuer(KeyPair keyPair, DocumentLoader loader) {
+    protected DocumentLoader loader;
+    protected URI base;
+    protected boolean bundledContexts;
+
+    protected BaseIssuer(KeyPair keyPair) {
         this.keyPair = keyPair;
-        this.loader = loader;
     }
 
-    abstract JsonObject sign(JsonStructure context, JsonObject data, Proof draft) throws SigningError;
+    protected abstract void sign(JsonStructure context, JsonObject data, Proof<T> draft) throws SigningError;
 
     @Override
-    public SignedCredentials sign(URI location, DataIntegrityProof draft) throws SigningError, DocumentError {
+    public Verifiable sign(URI location, DataIntegrityProof<T> draft) throws SigningError, DocumentError {
         return sign(fetchDocument(location), draft);
     }
 
-//    if (loader == null) {
-//        // default loader
-//        loader = SchemeRouter.defaultInstance();
-//    }
-//
-//    if (bundledContexts) {
-//        loader = new StaticContextLoader(loader);
-//    }
+    @SuppressWarnings("unchecked")
+    @Override
+    public <I extends Issuer<T>> I base(URI base) {
+        this.base = base;
+        return (I) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <I extends Issuer<T>> I loader(DocumentLoader loader) {
+        this.loader = loader;
+        return (I) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <I extends Issuer<T>> I useBundledContexts(boolean enable) {
+        this.bundledContexts = enable;
+        return (I) this;
+    }
 
     @Override
-    public SignedCredentials sign(JsonObject document, final Proof draft) throws SigningError, DocumentError {
-//
-//        if (loader == null) {
-//            // default loader
-//            loader = SchemeRouter.defaultInstance();
-//        }
-//
-//        if (bundledContexts) {
-//            loader = new StaticContextLoader(loader);
-//        }
+    public Verifiable sign(JsonObject document, final Proof<T> draft) throws SigningError, DocumentError {
+
+        if (loader == null) {
+            // default loader
+            loader = SchemeRouter.defaultInstance();
+        }
+
+        if (bundledContexts) {
+            loader = new StaticContextLoader(loader);
+        }
+
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
@@ -77,19 +97,22 @@ public abstract class BaseIssuer extends Processor<BaseIssuer> implements Issuer
             if (expanded.size() == 1) {
                 final JsonValue object = expanded.iterator().next();
                 if (JsonUtils.isObject(object)) {
-                    return sign(getVersion(document), document.get(Keywords.CONTEXT), object.asJsonObject(), draft, loader);
+
+                    final ModelVersion version = Verifiable.getVersion(document);
+
+                    return sign(version, getContext(version, document, draft), object.asJsonObject(), draft, loader);
                 }
             }
             throw new DocumentError(ErrorType.Invalid); // malformed input, not single object to sign has been found
 
         } catch (JsonLdError e) {
-            failWithJsonLd(e);
+            DocumentError.failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
         }
     }
 
-    protected SignedCredentials sign(final ModelVersion version, final JsonValue context, final JsonObject expanded,
-            final Proof draft, final DocumentLoader loader) throws SigningError, DocumentError {
+    protected Verifiable sign(final ModelVersion version, final JsonArray context, final JsonObject expanded,
+            final Proof<T> draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         if (keyPair.privateKey() == null || keyPair.privateKey().length == 0) {
             throw new IllegalArgumentException("The private key is not provided, is null or an empty array.");
@@ -97,9 +120,14 @@ public abstract class BaseIssuer extends Processor<BaseIssuer> implements Issuer
 
         JsonObject object = expanded;
 
-        final Verifiable verifiable = get(version, object);
+        final Verifiable verifiable = Verifiable.of(version, object, loader);
 
-        validate(verifiable);
+        // TODO do something with exceptions, unify
+        if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
+            throw new SigningError(Code.Expired);
+        }
+
+        verifiable.validate();
 
         // add issuance date if missing
         if (verifiable.isCredential()
@@ -114,26 +142,64 @@ public abstract class BaseIssuer extends Processor<BaseIssuer> implements Issuer
                     .build();
         }
 
-        final JsonObject data = EmbeddedProof.removeProof(object);
+        // remove proofs
+        Collection<Proof<?>> proofs = verifiable.removeProofs();
 
-        final JsonObject signedProof = sign(
-                JsonUtils.isScalar(context)
-                        ? Json.createArrayBuilder().add(context).build()
-                        : (JsonStructure) context,
-                data,
-                draft);
+        // sign
+        sign(context, verifiable.expand(), draft);
 
-        return new SignedCredentials(EmbeddedProof.addProof(object, signedProof), draft);
+        if (proofs == null) {
+            proofs = new ArrayList<>(1);
+        }
+
+        proofs.add(draft);
+        verifiable.proofs(proofs);
+
+        verifiable.context(context);
+
+        return verifiable;
+
+//        return new IssuedCredentials(EmbeddedProof.addProof(object, signedProof), context, loader);
     }
 
-    final void validate(Verifiable verifiable) throws SigningError, DocumentError {
-        // is expired?
-        if (verifiable.isCredential()) {
-            if (verifiable.asCredential().isExpired()) {
-                throw new SigningError(Code.Expired);
+    final JsonArray getContext(ModelVersion version, JsonObject document, Proof<?> draft) {
+
+        final Collection<String> urls = new HashSet<>();
+        final JsonArrayBuilder contexts = Json.createArrayBuilder();
+
+        // extract origin contexts
+        if (document != null && document.containsKey(Keywords.CONTEXT)) {
+            final JsonValue documentContext = document.get(Keywords.CONTEXT);
+            if (JsonUtils.isString(documentContext)) {
+                urls.add(((JsonString) documentContext).getString());
+                contexts.add(documentContext);
+
+            } else if (JsonUtils.isObject(documentContext)) {
+                contexts.add(documentContext);
+
+            } else if (JsonUtils.isArray(documentContext)) {
+                for (final JsonValue context : documentContext.asJsonArray()) {
+                    if (JsonUtils.isString(context)) {
+                        urls.add(((JsonString) context).getString());
+                    }
+                    contexts.add(context);
+                }
             }
-            super.validateData(verifiable.asCredential());
         }
+
+        final Collection<String> provided = draft.context(version);
+
+        if (provided != null) {
+            // use .stream().filter(Predicate.not(urls::contains))
+            for (String url : provided) {
+                if (!urls.contains(url)) {
+                    urls.add(url);
+                    contexts.add(Json.createValue(url));
+                }
+            }
+        }
+
+        return contexts.build();
     }
 
     final JsonObject fetchDocument(URI location) throws DocumentError, SigningError {
@@ -151,7 +217,7 @@ public abstract class BaseIssuer extends Processor<BaseIssuer> implements Issuer
             return json.asJsonObject();
 
         } catch (JsonLdError e) {
-            failWithJsonLd(e);
+            DocumentError.failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
         }
     }

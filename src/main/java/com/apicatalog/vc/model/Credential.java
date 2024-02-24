@@ -2,6 +2,15 @@ package com.apicatalog.vc.model;
 
 import java.time.Instant;
 
+import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
+import com.apicatalog.ld.node.LdNode;
+import com.apicatalog.ld.node.LdNodeBuilder;
+import com.apicatalog.vc.VcVocab;
+
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
@@ -29,8 +38,8 @@ public class Credential extends Verifiable {
     protected JsonValue issuer;
     protected JsonValue status;
 
-    public Credential(ModelVersion version) {
-        super(version);
+    protected Credential(ModelVersion version, JsonObject expanded, DocumentLoader loader) {
+        super(version, expanded, loader);
     }
 
     /**
@@ -137,10 +146,6 @@ public class Credential extends Verifiable {
         return issuer;
     }
 
-    public void setIssuer(JsonValue issuer) {
-        this.issuer = issuer;
-    }
-
     /**
      * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>
      * 
@@ -148,10 +153,6 @@ public class Credential extends Verifiable {
      */
     public JsonValue getStatus() {
         return status;
-    }
-
-    public void setStatus(JsonValue status) {
-        this.status = status;
     }
 
     /**
@@ -165,10 +166,6 @@ public class Credential extends Verifiable {
         return subject;
     }
 
-    public void setSubject(JsonValue subject) {
-        this.subject = subject;
-    }
-
     @Override
     public boolean isCredential() {
         return true;
@@ -177,5 +174,116 @@ public class Credential extends Verifiable {
     @Override
     public Credential asCredential() {
         return this;
+    }
+
+    @Override
+    public void validate() throws DocumentError {        
+        // v1
+        if ((version == null || ModelVersion.V11.equals(version))
+                && issuance == null) {
+            // issuance date is a mandatory property
+            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
+        }
+        
+        // model v1
+        if ((issuance != null
+                && expiration != null
+                && issuance.isAfter(expiration))
+                // model v2
+                || (validFrom != null
+                        && validUntil != null
+                        && validFrom.isAfter(validUntil))) {
+            throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
+        }
+    }
+    
+    public static boolean isCredential(final JsonValue document) {
+        if (document == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
+        }
+        return LdNode.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document);
+    }
+
+    public static Credential of(final ModelVersion version, final JsonObject document, final DocumentLoader loader) throws DocumentError {
+
+        if (document == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
+        }
+
+        final Credential credential = new Credential(version, document, loader);
+
+        final LdNode node = LdNode.of(document);
+        
+        // @type
+        credential.type = node.type().strings();
+        if (!credential.type().contains(VcVocab.CREDENTIAL_TYPE.uri())) {
+            if (credential.type().isEmpty()) {
+                throw new DocumentError(ErrorType.Missing, Term.TYPE);
+            }
+            throw new DocumentError(ErrorType.Unknown, Term.TYPE);
+        }
+
+        // subject - mandatory
+        if (!node.node(VcVocab.SUBJECT).exists()) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
+        }
+
+        credential.subject = document.get(VcVocab.SUBJECT.uri());
+
+        // @id - optional
+        credential.id = node.id();
+
+        final LdNode issuer = node.node(VcVocab.ISSUER);
+        
+        if (!issuer.exists()) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
+        }
+        
+        // issuer @id - mandatory
+        if (issuer.id() == null) {
+            throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
+        }
+        
+        credential.issuer = (document.get(VcVocab.ISSUER.uri()));
+
+        credential.status = (document.get(VcVocab.STATUS.uri()));
+
+        // issuance date - mandatory for verification
+        credential.setIssuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
+
+        // expiration date - optional
+        credential.setExpiration(node.scalar(VcVocab.EXPIRATION_DATE).xsdDateTime());
+
+        // validFrom - optional
+        credential.setValidFrom(node.scalar(VcVocab.VALID_FROM).xsdDateTime());
+
+        // validUntil - optional
+        credential.setValidUntil(node.scalar(VcVocab.VALID_UNTIL).xsdDateTime());
+        
+        return credential;
+    }
+
+    @Override
+    public JsonObject expand() {
+        
+        final LdNodeBuilder builder = new LdNodeBuilder(Json.createObjectBuilder(expanded));
+        
+        if (issuance != null) {
+            builder.set(VcVocab.ISSUANCE_DATE).xsdDateTime(issuance);
+        }
+        
+        if (expiration != null) {
+            builder.set(VcVocab.EXPIRATION_DATE).xsdDateTime(expiration);
+        }
+        
+        if (validFrom != null) {
+            builder.set(VcVocab.VALID_FROM).xsdDateTime(validFrom);
+        }
+        
+        if (validUntil != null) {
+            builder.set(VcVocab.VALID_UNTIL).xsdDateTime(validUntil);
+        }
+        
+        return builder.build();
     }
 }
