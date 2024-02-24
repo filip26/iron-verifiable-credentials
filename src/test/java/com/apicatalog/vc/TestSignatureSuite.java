@@ -13,10 +13,11 @@ import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
+import com.apicatalog.vc.issuer.SolidIssuer;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.proof.SolidSignature;
 
-class TestSignatureSuite extends DataIntegritySuite<SolidSignature> {
+class TestSignatureSuite extends DataIntegritySuite {
 
     static final CryptoSuite CRYPTO = new CryptoSuite(
             new Urdna2015(),
@@ -26,17 +27,16 @@ class TestSignatureSuite extends DataIntegritySuite<SolidSignature> {
     static final String TEST_CRYPTO_NAME = "test-2022";
 
     protected TestSignatureSuite() {
-        super(TEST_CRYPTO_NAME, new TestKeyAdapter());
+        super(TEST_CRYPTO_NAME, Multibase.BASE_58_BTC, new TestKeyAdapter());
     }
 
-    public DataIntegrityProof<SolidSignature> createDraft(
+    public DataIntegrityProof createDraft(
             VerificationMethod method,
             URI purpose,
             Instant created,
             String domain,
             String challenge,
-            String nonce
-            ) throws DocumentError {
+            String nonce) throws DocumentError {
         return super.createDraft(CRYPTO, method, purpose, created, domain, challenge, nonce);
     }
 
@@ -47,20 +47,16 @@ class TestSignatureSuite extends DataIntegritySuite<SolidSignature> {
         }
         return null;
     }
+ 
+    public SolidIssuer createIssuer(KeyPair pair) {
+        return new SolidIssuer(this, pair, Multibase.BASE_58_BTC);
+    }
 
     @Override
-    protected SolidSignature createProofValue() {
-        return new SolidSignature(Multibase.BASE_58_BTC) {
-            @Override
-            public void validate() throws DocumentError {
-                if (value != null && value.length != 32) {
-                    throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
-                }
-            }
-        };
-    }
-    
-    public TestIssuer createIssuer(KeyPair pair) {
-        return new TestIssuer(this, pair);
+    protected ProofValue getProofValue(byte[] proofValue) throws DocumentError {
+        if (proofValue.length != 32) {
+            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
+        }
+        return new SolidSignature(proofValue);
     }
 }

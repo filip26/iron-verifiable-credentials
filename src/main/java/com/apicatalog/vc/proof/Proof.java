@@ -9,9 +9,9 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.model.ModelVersion;
 
 import jakarta.json.JsonObject;
 
@@ -20,7 +20,7 @@ import jakarta.json.JsonObject;
  *
  * @see {@link DataIntegrityProof} for an example implementation
  */
-public interface Proof<T extends ProofValue> {
+public interface Proof {
 
     /**
      * The proof JSON-LD context URI(s) to compact the proof
@@ -45,7 +45,7 @@ public interface Proof<T extends ProofValue> {
      *
      * @return the proof value
      */
-    T signature();
+    ProofValue signature();
 
     /**
      * The proof unique identifier. Optional.
@@ -62,13 +62,15 @@ public interface Proof<T extends ProofValue> {
      */
     URI previousProof();
 
+    String nonce();
+    
     /**
      * Returns a {@link CryptoSuite} used to create and to verify the proof value.
      * 
      * @return {@link CryptoSuite} attached to the proof.
      */
     CryptoSuite cryptoSuite();
-
+    
     /**
      * Validates the proof data, not a signature.
      * 
@@ -81,13 +83,9 @@ public interface Proof<T extends ProofValue> {
 
     void verify(JsonObject data, VerificationKey method) throws VerificationError;
 
-    JsonObject expand();
-
-    void signature(byte[] signature);
+    JsonObject unsignedCopy();
+    
+    JsonObject signedCopy(JsonObject proofValue);
 
     MethodAdapter methodProcessor();
-
-    String nonce();
-
-
 }

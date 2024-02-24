@@ -18,9 +18,6 @@ import jakarta.json.JsonValue;
 
 class LdScalarImpl implements LdScalar {
 
-    static final String XSD_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
-    static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
-
     final Term term;
     final String type;
     final JsonValue value;

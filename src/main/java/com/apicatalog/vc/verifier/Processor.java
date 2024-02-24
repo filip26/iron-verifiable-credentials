@@ -6,16 +6,16 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
-import com.apicatalog.vc.model.Credential;
-import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.status.StatusPropertiesValidator;
 import com.apicatalog.vc.status.StatusValidator;
 import com.apicatalog.vc.subject.SubjectValidator;
 
 abstract class Processor<T extends Processor<?>> {
 
-    protected DocumentLoader loader;
+    protected DocumentLoader defaultLoader;
     protected boolean bundledContexts;
     protected URI base;
 
@@ -26,7 +26,7 @@ abstract class Processor<T extends Processor<?>> {
 
     protected Processor() {
         // default values
-        this.loader = null;
+        this.defaultLoader = null;
         this.bundledContexts = true;
         this.base = null;
         this.modelVersion = null;
@@ -37,7 +37,7 @@ abstract class Processor<T extends Processor<?>> {
 
     @SuppressWarnings("unchecked")
     public T loader(DocumentLoader loader) {
-        this.loader = loader;
+        this.defaultLoader = loader;
         return (T) this;
     }
 

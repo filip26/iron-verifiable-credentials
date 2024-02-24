@@ -1,14 +1,14 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc.proof;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.issuer.StandardIssuer;
+import com.apicatalog.vc.issuer.SolidIssuer;
 import com.apicatalog.vc.verifier.Verifier;
 
 import jakarta.json.JsonObject;
 
 /**
  * Allows to manage a proof value. Is used by {@link Verifier} and
- * {@link StandardIssuer}.
+ * {@link SolidIssuer}.
  * 
  * @since 0.9.0
  */

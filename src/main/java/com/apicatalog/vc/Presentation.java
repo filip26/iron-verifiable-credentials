@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -7,12 +7,10 @@ import java.util.Collections;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdNode;
-import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
@@ -33,8 +31,8 @@ public class Presentation extends Verifiable {
 
     protected Collection<Credential> credentials;
 
-    protected Presentation(ModelVersion version, JsonObject expanded, DocumentLoader loader) {
-        super(version, expanded, loader);
+    protected Presentation(ModelVersion version, JsonObject expanded) {
+        super(version, expanded);
     }
 
     @Override
@@ -75,13 +73,13 @@ public class Presentation extends Verifiable {
         return LdNode.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document);
     }
 
-    public static Presentation of(final ModelVersion version, final JsonObject document, final DocumentLoader loader) throws DocumentError {
+    public static Presentation of(final ModelVersion version, final JsonObject document) throws DocumentError {
 
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        final Presentation presentation = new Presentation(version, document, loader);
+        final Presentation presentation = new Presentation(version, document);
 
         // @type
         if (!LdNode.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document)) {
@@ -140,14 +138,5 @@ public class Presentation extends Verifiable {
         return Json.createObjectBuilder(document)
                     .add(VcVocab.VERIFIABLE_CREDENTIALS.uri(), builder).build();
         
-    }
-
-    @Override
-    public JsonObject expand() {
-        if (expanded != null) {
-            return expanded;
-        }
-
-        return null;
     }
 }

@@ -14,9 +14,8 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.model.EmbeddedProof;
-import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 
@@ -29,10 +28,11 @@ import jakarta.json.JsonObject;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, MethodAdapter {
+public class DataIntegrityProof implements Proof, MethodAdapter {
 
-    protected final DataIntegritySuite<T> suite;
+    protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
+    protected final JsonObject expanded;
 
     protected URI id;
     protected URI purpose;
@@ -41,10 +41,8 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
     protected String domain;
     protected String nonce;
     protected String challenge;
-    protected T value;
+    protected ProofValue value;
     protected URI previousProof;
-
-    JsonObject expanded;
 
     protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
             "https://w3id.org/security/data-integrity/v2",
@@ -54,9 +52,10 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
             "https://www.w3.org/ns/credentials/v2");
 
     protected DataIntegrityProof(
-            DataIntegritySuite<T> suite,
+            DataIntegritySuite suite,
             CryptoSuite crypto,
-            JsonObject expandedProof) {
+            JsonObject expandedProof
+            ) {
         this.suite = suite;
         this.crypto = crypto;
         this.expanded = expandedProof;
@@ -70,7 +69,7 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
         Objects.requireNonNull(method);
 
         // remove a proof value and a new unsigned copy
-        final JsonObject unsignedProof = EmbeddedProof.removeProof(expanded);
+        final JsonObject unsignedProof = unsignedCopy();
 
         // verify signature
         value.verify(
@@ -79,7 +78,7 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
                 unsignedProof,
                 method.publicKey());
     }
-    
+
     @Override
     public void validate(Map<String, Object> params) throws DocumentError {
         if (created == null) {
@@ -91,15 +90,13 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
         if (purpose == null) {
             throw new DocumentError(ErrorType.Missing, "ProofPurpose");
         }
-        if (value == null || value.length() == 0) {
+        if (value == null) {
             throw new DocumentError(ErrorType.Missing, "ProofValue");
         }
 
         assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
         assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
         assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
-
-        value.validate();
     }
 
     /**
@@ -150,7 +147,7 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
     }
 
     @Override
-    public T signature() {
+    public ProofValue signature() {
         return value;
     }
 
@@ -211,21 +208,25 @@ public class DataIntegrityProof<T extends ProofValue> implements Proof<T>, Metho
     }
 
     @Override
-    public JsonObject expand() {
-        return expanded;        
+    public JsonObject unsignedCopy() {
+        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
     }
 
     @Override
-    public void signature(byte[] signature) {
-        
-        if (value == null) {
-            value = suite.createProofValue();
-        }
-
-        value.set(signature);
-        
-        this.expanded = Json.createObjectBuilder(expanded)
-                .add(DataIntegrityVocab.PROOF_VALUE.uri(), Json.createArrayBuilder().add(value.expand()))
-                .build();        
+    public JsonObject signedCopy(JsonObject proofValue) {
+        return Json.createObjectBuilder(expanded)
+                .add(DataIntegrityVocab.PROOF_VALUE.uri(), Json.createArrayBuilder().add(proofValue))
+                .build();
     }
+
+//    protected JsonObject signedCopy(ProofValue signature) {
+//    final JsonObject proofValue = suite.writeProofValue(value);
+//
+
+//    }
+//
+//    @Override
+//    public JsonObject signedCopy(JsonStructure context, JsonObject data, KeyPair keyPair) throws SigningError {
+//        return suite.;
+//    }
 }

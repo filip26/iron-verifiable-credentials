@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc;
 
 /**
  * Verifiable Credentials Data Model Version

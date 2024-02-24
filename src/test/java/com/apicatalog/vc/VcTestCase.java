@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 
@@ -47,7 +46,7 @@ public class VcTestCase {
     
     public boolean compacted;
 
-    public static VcTestCase of(JsonObject test, JsonObject manifest, DocumentLoader loader) {
+    public static VcTestCase of(JsonObject test, JsonObject manifest) {
 
         final VcTestCase testCase = new VcTestCase();
 

@@ -1,14 +1,12 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc;
 
 import java.time.Instant;
 
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.node.LdNodeBuilder;
-import com.apicatalog.vc.VcVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -38,8 +36,8 @@ public class Credential extends Verifiable {
     protected JsonValue issuer;
     protected JsonValue status;
 
-    protected Credential(ModelVersion version, JsonObject expanded, DocumentLoader loader) {
-        super(version, expanded, loader);
+    protected Credential(ModelVersion version, JsonObject expanded) {
+        super(version, expanded);
     }
 
     /**
@@ -204,13 +202,13 @@ public class Credential extends Verifiable {
         return LdNode.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document);
     }
 
-    public static Credential of(final ModelVersion version, final JsonObject document, final DocumentLoader loader) throws DocumentError {
+    public static Credential of(final ModelVersion version, final JsonObject document) throws DocumentError {
 
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        final Credential credential = new Credential(version, document, loader);
+        final Credential credential = new Credential(version, document);
 
         final LdNode node = LdNode.of(document);
         
@@ -263,7 +261,6 @@ public class Credential extends Verifiable {
         return credential;
     }
 
-    @Override
     public JsonObject expand() {
         
         final LdNodeBuilder builder = new LdNodeBuilder(Json.createObjectBuilder(expanded));

@@ -5,26 +5,38 @@ import java.net.URI;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.vc.integrity.DataIntegrityProof;
-import com.apicatalog.vc.model.Verifiable;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vc.proof.ProofValue;
 
 import jakarta.json.JsonObject;
 
-public interface Issuer<T extends ProofValue> {
+public interface Issuer {
+
 
     /**
-     * Get signed document in expanded form.
+     * Signs VC/VP document. Returns the provided VC/VP with an new proof
      *
-     * @return the signed document in expanded form
+     * @param documentLocation
+     * @param draft            a draft of the proof to sign and attach
      *
-     * @throws SigningError
+     * @return {@link IssuedVerifiable} representing the signed document
+     *
      * @throws DocumentError
+     * @throws SigningError
      */
-    Verifiable sign(URI input, DataIntegrityProof<T> draft) throws SigningError, DocumentError;
+    IssuedVerifiable sign(URI documentLocation, Proof draft) throws SigningError, DocumentError;
 
-    Verifiable sign(JsonObject document, Proof<T> draft) throws SigningError, DocumentError;
+    /**
+     * Signs VC/VP document. Returns the provided VC/VP with a new proof
+     *
+     * @param document
+     * @param draft    a draft of the proof to sign and attach
+     *
+     * @return {@link IssuedVerifiable} representing the signed document
+     *
+     * @throws DocumentError
+     * @throws SigningError
+     */
+    IssuedVerifiable sign(JsonObject document, Proof draft) throws SigningError, DocumentError;
 
     /**
      * If set, this overrides the input document's IRI.
@@ -32,9 +44,9 @@ public interface Issuer<T extends ProofValue> {
      * @param base
      * @return the processor instance
      */
-    <I extends Issuer<T>> I base(URI base);
+    Issuer base(URI base);
     
-    <I extends Issuer<T>> I loader(DocumentLoader loader);
+    Issuer loader(DocumentLoader loader);
     
     /**
      * Use well-known contexts that are bundled with the library instead of fetching
@@ -44,5 +56,5 @@ public interface Issuer<T extends ProofValue> {
      * @param enable
      * @return the processor instance
      */
-    <I extends Issuer<T>> I useBundledContexts(boolean enable);
+    Issuer useBundledContexts(boolean enable);
 }

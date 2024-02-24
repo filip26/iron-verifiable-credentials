@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
+import com.apicatalog.vc.loader.StaticContextLoader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -56,7 +57,7 @@ class VcTest {
 
             final JsonObject manifest = JsonLd.expand(JsonDocument.of(is))
                     .base("https://github.com/filip26/iron-verifiable-credentials/")
-                    .loader(VcTestRunnerJunit.LOADER)
+                    .loader(new StaticContextLoader(VcTestRunnerJunit.LOADER))
                     .get()
                     .getJsonObject(0);
 
@@ -64,7 +65,7 @@ class VcTest {
                     .asJsonObject().getJsonArray("http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#entries")
                     .stream()
                     .map(JsonValue::asJsonObject)
-                    .map(test -> VcTestCase.of(test, manifest, VcTestRunnerJunit.LOADER));
+                    .map(test -> VcTestCase.of(test, manifest));
         }
     }
 }

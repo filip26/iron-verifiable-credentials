@@ -14,6 +14,9 @@ import jakarta.json.JsonValue;
 
 public interface LdScalar {
 
+    static final String XSD_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+    static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
+
     URI link() throws DocumentError;
 
     String string() throws DocumentError;
@@ -41,6 +44,10 @@ public interface LdScalar {
                 .add(Keywords.TYPE, type)
                 .add(Keywords.VALUE, value)
                 .build();
+    }
+    
+    static JsonObject multibase(Multibase base, byte[] value) {
+        return encode(MULTIBASE_TYPE, base.encode(value));
     }
 
     public final static LdScalar NULL = new LdScalar() {

@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc.proof;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +54,7 @@ public final class EmbeddedProof {
     public static final JsonObject setProofs(final JsonObject document, final Collection<JsonObject> proofs) {
 
         final JsonArrayBuilder builder = Json.createArrayBuilder();
-
+proofs.forEach(System.out::println);
         proofs.stream().map(proof -> Json.createObjectBuilder()
                 .add(Keywords.GRAPH,
                         Json.createArrayBuilder().add(proof)))
@@ -117,7 +117,7 @@ public final class EmbeddedProof {
      * @param verifiable with a proof
      * @return a new document with no proofs
      */
-    public static JsonObject removeProof(final JsonObject verifiable) {
+    public static JsonObject removeProofs(final JsonObject verifiable) {
         return Json.createObjectBuilder(verifiable).remove(VcVocab.PROOF.uri()).build();
     }
 }

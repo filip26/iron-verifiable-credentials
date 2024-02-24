@@ -21,4 +21,20 @@ public final class KeysGenerator {
     public KeyPair get() throws KeyGenError {
         return suite.keygen();
     }
+    
+    /**
+     * Generates public/private key pair.
+     *
+     * @param suite used to generate a key pair.
+     *
+     * @return {@link KeyGenError} allowing to set options and to generate key pair
+     *
+     * @throws KeyGenError
+     */
+    public static KeysGenerator with(final CryptoSuite suite) throws KeyGenError {
+        if (suite == null) {
+            throw new IllegalArgumentException("The cryptoSuite parameter must not be null.");
+        }
+        return new KeysGenerator(suite);
+    }
 }

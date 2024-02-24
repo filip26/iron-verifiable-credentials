@@ -3,9 +3,9 @@ package com.apicatalog.vc.verifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -46,23 +46,38 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
-public class Verifier extends Processor<Verifier> {
+public class Verifier2 extends Processor<Verifier2> {
 
     private final SignatureSuite[] suites;
 
+    private final URI location;
+    private final JsonObject document;
+
+    private final Map<String, Object> params;
+
     private Collection<MethodResolver> methodResolvers;
 
-    protected Verifier(final SignatureSuite... suites) {
+    protected Verifier2(URI location, final SignatureSuite... suites) {
+        this.location = location;
+        this.document = null;
+
         this.suites = suites;
 
         this.methodResolvers = defaultResolvers();
+        this.params = new LinkedHashMap<>(10);
     }
 
-    public static Verifier with(final SignatureSuite... suites) {
-        return new Verifier(suites);
+    public Verifier2(JsonObject document, final SignatureSuite... suites) {
+        this.document = document;
+        this.location = null;
+
+        this.suites = suites;
+
+        this.methodResolvers = defaultResolvers();
+        this.params = new LinkedHashMap<>(10);
     }
-    
-    protected static final Collection<MethodResolver> defaultResolvers() {
+
+    public static final Collection<MethodResolver> defaultResolvers() {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
         resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
         resolvers.add(new HttpMethodResolver());
@@ -70,77 +85,52 @@ public class Verifier extends Processor<Verifier> {
     }
 
     //TODO resolvers should be multilevel, per verifier, per proof type, e.g. DidUrlMethodResolver could be different.
-    public Verifier methodResolvers(Collection<MethodResolver> resolvers) {
+    public Verifier2 methodResolvers(Collection<MethodResolver> resolvers) {
         this.methodResolvers = resolvers;
         return this;
     }
-  
+
     /**
-     * Verifies VC/VP document. Throws VerificationError if the document is not
-     * valid or cannot be verified.
-     *
-     * @param document
-     * @return {@link Verifiable} object representing the verified credentials or a
-     *         presentation
+     * Custom verifier parameters that can be consumed during validation.
      * 
-     * @throws VerificationError
-     * @throws DocumentError
+     * @param name  a name of the parameter
+     * @param value a value of the parameter
+     *
+     * @return the verifier instance
      */
-    public Verifiable verify(JsonObject document) throws VerificationError, DocumentError {
-        Objects.requireNonNull(document);
-        return verify(document, null, getLoader());
+    public Verifier2 param(final String name, final Object value) {
+        if (value != null) {
+            params.put(name, value);
+
+        } else if (params.containsKey(name)) {
+            params.remove(name);
+        }
+        return this;
     }
 
     /**
      * Verifies VC/VP document. Throws VerificationError if the document is not
      * valid or cannot be verified.
      *
-     * @param document
-     * @param params
      * @return {@link Verifiable} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(JsonObject document, Map<String, Object> params) throws VerificationError, DocumentError {
-        Objects.requireNonNull(document);
-        return verify(document, params, getLoader());
-    }
-    
-    /**
-     * Verifies VC/VP document. Throws VerificationError if the document is not
-     * valid or cannot be verified.
-     *
-     * @param location
-     * @return {@link Verifiable} object representing the verified credentials or a
-     *         presentation
-     * 
-     * @throws VerificationError
-     * @throws DocumentError
-     */
-    public Verifiable verify(URI location) throws VerificationError, DocumentError {
-        Objects.requireNonNull(location);
-        return verify(location, null, getLoader());
+    public Verifiable isValid() throws VerificationError, DocumentError {
+
+        if (document != null) {
+            return verify(document, getLoader());
+        }
+
+        if (location != null) {
+            return verify(location, getLoader());
+        }
+
+        throw new IllegalStateException();
     }
 
-    /**
-     * Verifies VC/VP document. Throws VerificationError if the document is not
-     * valid or cannot be verified.
-     *
-     * @param location
-     * @param params
-     * @return {@link Verifiable} object representing the verified credentials or a
-     *         presentation
-     * 
-     * @throws VerificationError
-     * @throws DocumentError
-     */
-    public Verifiable verify(URI location, Map<String, Object> params) throws VerificationError, DocumentError {
-        Objects.requireNonNull(location);
-        return verify(location, params, getLoader());
-    }
-    
     protected DocumentLoader getLoader() {
 
         DocumentLoader loader = defaultLoader;
@@ -156,7 +146,7 @@ public class Verifier extends Processor<Verifier> {
         return loader;
     }
     
-    protected Verifiable verify(final URI location, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Verifiable verify(final URI location, DocumentLoader loader) throws VerificationError, DocumentError {
         try {
             // load the document
             final DocumentLoaderOptions options = new DocumentLoaderOptions();
@@ -168,7 +158,7 @@ public class Verifier extends Processor<Verifier> {
                 throw new DocumentError(ErrorType.Invalid);
             }
 
-            return verify(json.asJsonObject(), params, loader);
+            return verify(json.asJsonObject(), loader);
 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
@@ -176,14 +166,14 @@ public class Verifier extends Processor<Verifier> {
         }
     }
 
-    protected Verifiable verify(final JsonObject document, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Verifiable verify(final JsonObject document, DocumentLoader loader) throws VerificationError, DocumentError {
 
         try {
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
 
-            return verifyExpanded(Verifiable.getVersion(document), expanded, params, loader);
+            return verifyExpanded(Verifiable.getVersion(document), expanded, loader);
 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
@@ -191,7 +181,7 @@ public class Verifier extends Processor<Verifier> {
         }
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, JsonArray expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, JsonArray expanded, DocumentLoader loader) throws VerificationError, DocumentError {
 
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
             throw new DocumentError(ErrorType.Invalid);
@@ -203,10 +193,10 @@ public class Verifier extends Processor<Verifier> {
             throw new DocumentError(ErrorType.Invalid);
         }
 
-        return verifyExpanded(version, verifiable.asJsonObject(), params, loader);
+        return verifyExpanded(version, verifiable.asJsonObject(), loader);
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, final JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, final JsonObject expanded, DocumentLoader loader) throws VerificationError, DocumentError {
 
         // get a verifiable representation
         final Verifiable verifiable = Verifiable.of(version, expanded);
@@ -216,14 +206,14 @@ public class Verifier extends Processor<Verifier> {
             // data integrity and metadata validation
             validate(verifiable.asCredential());
 
-            verifiable.proofs(verifyProofs(expanded, params, loader));
+            verifiable.proofs(verifyProofs(expanded, loader));
 
             return verifiable;
 
         } else if (verifiable.isPresentation()) {
 
             // verify presentation proofs
-            verifiable.proofs(verifyProofs(expanded, params, loader));
+            verifiable.proofs(verifyProofs(expanded, loader));
 
             final Collection<Credential> credentials = new ArrayList<>();
 
@@ -233,7 +223,7 @@ public class Verifier extends Processor<Verifier> {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
                 }
 
-                credentials.add(verifyExpanded(version, presentedCredentials, params, loader).asCredential());
+                credentials.add(verifyExpanded(version, presentedCredentials, loader).asCredential());
             }
 
             verifiable.asPresentation().credentials(credentials);
@@ -243,7 +233,7 @@ public class Verifier extends Processor<Verifier> {
         throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
 
-    protected Collection<Proof> verifyProofs(JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Collection<Proof> verifyProofs(JsonObject expanded, DocumentLoader loader) throws VerificationError, DocumentError {
 
         // get proofs - throws an exception if there is no proof, never null nor an
         // empty collection

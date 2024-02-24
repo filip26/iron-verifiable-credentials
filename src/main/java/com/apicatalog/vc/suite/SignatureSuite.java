@@ -1,6 +1,8 @@
 package com.apicatalog.vc.suite;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonObject;
@@ -31,4 +33,6 @@ public interface SignatureSuite {
      * @throws DocumentError if the given object cannot be deserialized
      */
     Proof getProof(JsonObject proof) throws DocumentError;
+
+    Issuer createIssuer(KeyPair keyPair);
 }

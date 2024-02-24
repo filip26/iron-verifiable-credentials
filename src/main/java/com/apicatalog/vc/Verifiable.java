@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc;
 
 import java.net.URI;
 import java.util.Collection;
@@ -16,10 +16,8 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vc.proof.ProofValue;
 
 import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
@@ -39,18 +37,13 @@ public abstract class Verifiable {
 
     protected URI id;
 
-    protected Collection<Proof<?>> proofs;
+    protected Collection<Proof> proofs;
     protected Collection<String> type;
 
-    protected JsonStructure context;
-
-    protected DocumentLoader loader;
-    
     protected JsonObject expanded;
 
-    protected Verifiable(ModelVersion version, JsonObject expanded, DocumentLoader loader) {
+    protected Verifiable(ModelVersion version, JsonObject expanded) {
         this.version = version;
-        this.loader = loader;
         this.expanded = expanded;
     }
 
@@ -62,28 +55,20 @@ public abstract class Verifiable {
         return type;
     }
 
-    public Collection<Proof<? extends ProofValue>> proofs() {
+    public Collection<Proof> proofs() {
         return proofs;
     }
 
-    public void proofs(Collection<Proof<? extends ProofValue>> proofs) {
-
-        this.proofs = proofs;
-        
-        // remove proofs
-        if (proofs == null || proofs.isEmpty()) {
-            this.expanded = EmbeddedProof.removeProof(expanded);
-            return;
-        }
-        
-        // set proofs
-        if (proofs != null && proofs.size() > 0) {
-            JsonArrayBuilder pa = Json.createArrayBuilder();
-            for (Proof<?> p : proofs) {
-                pa.add(p.expand());
-            }
-            this.expanded = EmbeddedProof.setProofs(expanded, proofs.stream().map(Proof::expand).toList());
-        }
+    public void proofs(Collection<Proof> proofs) {
+        this.proofs = proofs;        
+//        // remove proofs
+//        if (proofs == null || proofs.isEmpty()) {
+//            this.expanded = EmbeddedProof.removeProofs(expanded);
+//            return;
+//        }
+//        
+//        // set proofs
+//        this.expanded = EmbeddedProof.setProofs(expanded, proofs.stream().map(Proof::unsignedCopy).toList());
     }
 
     public boolean isCredential() {
@@ -138,18 +123,18 @@ public abstract class Verifiable {
         return ModelVersion.V20;
     }
 
-    public static Verifiable of(final ModelVersion version, final JsonObject expanded, final DocumentLoader loader) throws DocumentError {
+    public static Verifiable of(final ModelVersion version, final JsonObject expanded) throws DocumentError {
 
         // is a credential?
         if (Credential.isCredential(expanded)) {
             // validate the credential object
-            return Credential.of(version, expanded, loader);
+            return Credential.of(version, expanded);
         }
 
         // is a presentation?
         if (Presentation.isPresentation(expanded)) {
             // validate the presentation object
-            return Presentation.of(version, expanded, loader);
+            return Presentation.of(version, expanded);
         }
 
         // is not expanded JSON-LD object
@@ -162,68 +147,11 @@ public abstract class Verifiable {
 
     public abstract void validate() throws DocumentError;
 
-    /**
-     * Get document in an expanded form.
-     *
-     * @return a document in an expanded form
-     *
-     * @throws DocumentError
-     */
-    public abstract JsonObject expand();
-
-    /**
-     * Get document compacted using standard contexts.
-     *
-     * @return the document in compacted form
-     *
-     * @throws DocumentError
-     */
-    public JsonObject compact() throws DocumentError {
-        return compact(expand(), context, loader);
-    }
-
-    /**
-     * Get document in compacted form.
-     *
-     * @param customContext a context or an array of contexts used to compact the
-     *                      document
-     *
-     * @return the document in compacted form
-     *
-     * @throws DocumentError
-     */
-    public JsonObject compact(final JsonStructure customContext) throws DocumentError {
-        return compact(expand(), customContext, loader);
-    }
-
-    /**
-     * Get document in compacted form.
-     *
-     * @param contextLocation a context used to compact the document
-     *
-     * @return the document in compacted form
-     *
-     * @throws DocumentError
-     */
-    public JsonObject compact(final URI contextLocation) throws DocumentError {
-        try {
-            return postCompact(JsonLd.compact(JsonDocument.of(expand()), contextLocation).loader(loader).get());
-
-        } catch (JsonLdError e) {
-            DocumentError.failWithJsonLd(e);
-            throw new DocumentError(e, ErrorType.Invalid);
-        }
-    }
-
-    public Collection<Proof<? extends ProofValue>> removeProofs() {
-        final Collection<Proof<? extends ProofValue>> tmp = proofs;
-        this.proofs = null;
-        return tmp;
-    }
-
-    public void context(JsonStructure context) {
-        this.context = context;
-    }
+//    public Collection<Proof> removeProofs() {
+//        final Collection<Proof> tmp = proofs;
+//        this.proofs = null;
+//        return tmp;
+//    }
 
     static JsonObject compact(final JsonObject signed, final JsonStructure context, final DocumentLoader loader) throws DocumentError {
 
