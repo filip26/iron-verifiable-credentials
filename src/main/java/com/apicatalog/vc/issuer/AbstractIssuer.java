@@ -26,7 +26,6 @@ import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.proof.EmbeddedProof;
-import com.apicatalog.vc.proof.ProofDraft;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.Json;
@@ -159,7 +158,10 @@ public abstract class AbstractIssuer implements Issuer {
         return new IssuedVerifiable(EmbeddedProof.addProof(object, signedProof), context, loader);
     }
 
-    protected abstract JsonObject sign(JsonArray context, JsonObject document, ProofDraft draft) throws SigningError;
+    protected abstract JsonObject sign(
+            JsonArray context,
+            JsonObject document,
+            ProofDraft draft) throws SigningError;
 
     protected JsonArray getContext(ModelVersion version, JsonObject document, ProofDraft draft) {
 

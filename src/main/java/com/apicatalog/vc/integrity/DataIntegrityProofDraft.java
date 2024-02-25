@@ -5,15 +5,12 @@ import java.util.Collection;
 
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.vc.ModelVersion;
-import com.apicatalog.vc.proof.ProofDraft;
+import com.apicatalog.vc.issuer.ProofDraft;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
 public class DataIntegrityProofDraft implements ProofDraft {
-
-    protected final CryptoSuite crypto;
-    protected final JsonObject expanded;
 
     protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
             "https://w3id.org/security/data-integrity/v2",
@@ -21,6 +18,11 @@ public class DataIntegrityProofDraft implements ProofDraft {
 
     protected static final Collection<String> V2_CONTEXTS = Arrays.asList(
             "https://www.w3.org/ns/credentials/v2");
+
+    protected final CryptoSuite crypto;
+    protected final JsonObject expanded;
+
+    protected Collection<String> selectors;
 
     protected DataIntegrityProofDraft(
             CryptoSuite crypto,
@@ -52,5 +54,10 @@ public class DataIntegrityProofDraft implements ProofDraft {
         return Json.createObjectBuilder(expanded)
                 .add(DataIntegrityVocab.PROOF_VALUE.uri(), Json.createArrayBuilder().add(proofValue))
                 .build();
+    }
+
+    @Override
+    public void selectors(Collection<String> selectors) {
+        this.selectors = selectors;
     }
 }

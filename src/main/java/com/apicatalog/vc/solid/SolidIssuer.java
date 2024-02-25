@@ -6,7 +6,7 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.issuer.AbstractIssuer;
-import com.apicatalog.vc.proof.ProofDraft;
+import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
