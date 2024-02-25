@@ -27,13 +27,4 @@ public interface ProofDraft {
     JsonObject unsignedCopy();
 
     JsonObject signedCopy(JsonObject proofValue);
-
-    /**
-     * Sets JSON pointers specifying mandatory claims that are always 
-     * disclosed. Applies only if a suite supports a selective disclosure. 
-     * 
-     * @param selectors 
-     *                  
-     */
-    void selectors(Collection<String> selectors);
 }

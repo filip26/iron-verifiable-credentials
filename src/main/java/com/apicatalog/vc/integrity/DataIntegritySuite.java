@@ -100,7 +100,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         return null;
     }
 
-    protected DataIntegrityProofDraft createDraft(
+    protected JsonObject createDraft(
             CryptoSuite crypto,
             VerificationMethod method,
             URI purpose,
@@ -127,6 +127,6 @@ public abstract class DataIntegritySuite implements SignatureSuite {
             builder.set(DataIntegrityVocab.NONCE).string(nonce);
         }
 
-        return new DataIntegrityProofDraft(crypto, builder.build());
+        return builder.build();
     }
 }

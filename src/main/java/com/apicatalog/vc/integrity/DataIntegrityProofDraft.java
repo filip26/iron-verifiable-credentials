@@ -22,9 +22,7 @@ public class DataIntegrityProofDraft implements ProofDraft {
     protected final CryptoSuite crypto;
     protected final JsonObject expanded;
 
-    protected Collection<String> selectors;
-
-    protected DataIntegrityProofDraft(
+    public DataIntegrityProofDraft(
             CryptoSuite crypto,
             JsonObject expandedProof) {
         this.crypto = crypto;
@@ -54,10 +52,5 @@ public class DataIntegrityProofDraft implements ProofDraft {
         return Json.createObjectBuilder(expanded)
                 .add(DataIntegrityVocab.PROOF_VALUE.uri(), Json.createArrayBuilder().add(proofValue))
                 .build();
-    }
-
-    @Override
-    public void selectors(Collection<String> selectors) {
-        this.selectors = selectors;
     }
 }

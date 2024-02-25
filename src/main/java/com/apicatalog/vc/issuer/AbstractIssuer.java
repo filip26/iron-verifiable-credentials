@@ -161,7 +161,7 @@ public abstract class AbstractIssuer implements Issuer {
     protected abstract JsonObject sign(
             JsonArray context,
             JsonObject document,
-            ProofDraft draft) throws SigningError;
+            ProofDraft draft) throws SigningError, DocumentError;
 
     protected JsonArray getContext(ModelVersion version, JsonObject document, ProofDraft draft) {
 

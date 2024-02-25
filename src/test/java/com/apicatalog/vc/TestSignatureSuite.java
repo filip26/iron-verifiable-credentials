@@ -21,7 +21,7 @@ import com.apicatalog.vc.solid.SolidProofValue;
 class TestSignatureSuite extends DataIntegritySuite {
 
     static final MethodAdapter METHOD_ADAPTER = new TestKeyAdapter();
-    
+
     static final CryptoSuite CRYPTO = new CryptoSuite(
             new Urdna2015(),
             new MessageDigest("SHA-256"),
@@ -40,7 +40,8 @@ class TestSignatureSuite extends DataIntegritySuite {
             String domain,
             String challenge,
             String nonce) throws DocumentError {
-        return super.createDraft(CRYPTO, method, purpose, created, domain, challenge, nonce);
+        return new DataIntegrityProofDraft(CRYPTO,
+                super.createDraft(CRYPTO, method, purpose, created, domain, challenge, nonce));
     }
 
     @Override
@@ -50,7 +51,7 @@ class TestSignatureSuite extends DataIntegritySuite {
         }
         return null;
     }
- 
+
     public SolidIssuer createIssuer(KeyPair pair) {
         return new SolidIssuer(this, pair, Multibase.BASE_58_BTC);
     }
