@@ -22,6 +22,14 @@ public class LdNodeBuilder {
         this.builder = builder;
     }
     
+    public LdNodeBuilder(final JsonObject object) {
+        this.builder = Json.createObjectBuilder(object);
+    }
+    
+    public static LdNodeBuilder of(final JsonObject object) {
+        return new LdNodeBuilder(object);
+    }
+    
     public LdNodeBuilder type(String type) {
         builder.add(Keywords.TYPE, Json.createArrayBuilder().add(type));
         return this;

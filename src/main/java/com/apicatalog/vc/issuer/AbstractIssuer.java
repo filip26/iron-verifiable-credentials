@@ -17,6 +17,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
@@ -24,6 +25,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -144,20 +146,24 @@ public abstract class AbstractIssuer implements Issuer {
         final JsonObject unsigned = EmbeddedProof.removeProofs(object);
 
         // signature
-        final JsonObject signature = sign(context, unsigned, draft);
-
-//        // signature
-//        final byte[] signature = sign(context, unsigned, draft);
-//
-        // signed proof
-        final JsonObject signedProof = draft.signedCopy(signature);
-
-        // signed proof
-//        final JsonObject signedProof = sign(context, unsigned, draft);
+        final JsonObject signedProof = sign(context, unsigned, draft);
 
         return new IssuedVerifiable(EmbeddedProof.addProof(object, signedProof), context, loader);
     }
 
+    protected JsonObject signed1Copy(JsonObject unsigned, JsonObject signature) {
+        return new LdNodeBuilder(unsigned).set(DataIntegrityVocab.PROOF_VALUE).value(signature).build();
+    }
+
+    /**
+     * Returns a signed proof.
+     * @param context
+     * @param document
+     * @param draft
+     * @return
+     * @throws SigningError
+     * @throws DocumentError
+     */
     protected abstract JsonObject sign(
             JsonArray context,
             JsonObject document,

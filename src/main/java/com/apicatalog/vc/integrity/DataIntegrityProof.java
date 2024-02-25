@@ -187,8 +187,8 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
             throw new DocumentError(ErrorType.Invalid, name);
         }
     }
-
+    
     protected JsonObject unsignedCopy() {
         return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
-    }
+    }    
 }

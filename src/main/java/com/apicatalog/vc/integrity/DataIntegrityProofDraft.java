@@ -90,16 +90,7 @@ public class DataIntegrityProofDraft implements ProofDraft {
     }
 
     @Override
-    public JsonObject unsignedCopy() {
-        return copy(null);
-    }
-
-    @Override
-    public JsonObject signedCopy(JsonObject proofValue) {
-        return copy(proofValue);
-    }
-
-    protected JsonObject copy(JsonObject proofValue) {
+    public JsonObject unsigned() {
         final LdNodeBuilder builder = new LdNodeBuilder();
 
         builder.type(DataIntegritySuite.PROOF_TYPE_ID);
@@ -111,8 +102,9 @@ public class DataIntegrityProofDraft implements ProofDraft {
             builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(suite.methodAdapter, method);
         }
 
-        builder.set(DataIntegrityVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
         builder.set(DataIntegrityVocab.PURPOSE).id(purpose);
+        
+        builder.set(DataIntegrityVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
 
         if (domain != null) {
             builder.set(DataIntegrityVocab.DOMAIN).string(domain);
@@ -124,10 +116,17 @@ public class DataIntegrityProofDraft implements ProofDraft {
             builder.set(DataIntegrityVocab.NONCE).string(nonce);
         }
 
-        if (proofValue != null) {
-            builder.set(DataIntegrityVocab.PROOF_VALUE).value(proofValue);
-        }
-
         return builder.build();
+    }
+    
+    /**
+     * Returns an expanded signed proof. i.e. the given proof with proof value attached.
+     * 
+     * @param unsignedProof
+     * @param proofValue
+     * @return
+     */
+    public static final JsonObject signed(JsonObject unsignedProof, JsonObject proofValue) {
+        return LdNodeBuilder.of(unsignedProof).set(DataIntegrityVocab.PROOF_VALUE).value(proofValue).build();
     }
 }

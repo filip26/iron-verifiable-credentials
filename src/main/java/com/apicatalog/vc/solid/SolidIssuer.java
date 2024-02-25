@@ -5,6 +5,7 @@ import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.issuer.AbstractIssuer;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -23,12 +24,15 @@ public class SolidIssuer extends AbstractIssuer {
 
     @Override
     protected JsonObject sign(JsonArray context, JsonObject document, ProofDraft draft) throws SigningError {
-        final JsonObject unsignedDraft = draft.unsignedCopy();
+        final JsonObject unsignedDraft = draft.unsigned();
 
         final LinkedDataSignature ldSignature = new LinkedDataSignature(draft.cryptoSuite());
 
         final byte[] signature = ldSignature.sign(document, keyPair.privateKey(), unsignedDraft);
 
-        return LdScalar.multibase(proofValueBase, signature);
+        final JsonObject proofValue = LdScalar.multibase(proofValueBase, signature);
+
+        // signed proof
+        return DataIntegrityProofDraft.signed(draft.unsigned(), proofValue);
     }
 }

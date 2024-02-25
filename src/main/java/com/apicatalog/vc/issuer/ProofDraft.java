@@ -24,7 +24,6 @@ public interface ProofDraft {
      */
     CryptoSuite cryptoSuite();
 
-    JsonObject unsignedCopy();
+    JsonObject unsigned();
 
-    JsonObject signedCopy(JsonObject proofValue);
 }
