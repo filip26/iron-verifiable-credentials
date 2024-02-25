@@ -21,14 +21,6 @@ import jakarta.json.JsonObject;
 public interface Proof {
 
     /**
-     * The proof JSON-LD context URI(s) to compact the proof
-     *
-     * @param model a credential data model version
-     * @return the proof JSON-LD context URI(s)
-     */
-    //Collection<String> context(ModelVersion model);
-
-    /**
      * A set of parameters required to independently verify the proof, such as an
      * identifier for a public/private key pair that would be used in the proof.
      * Mandatory
