@@ -49,18 +49,18 @@ import jakarta.json.JsonWriterFactory;
 import jakarta.json.stream.JsonGenerator;
 
 public class VcTestRunnerJunit {
-    
+
     final VcTestCase testCase;
 
     final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
             new SchemeRouter().set("classpath", new ClasspathLoader()));
 
     final static Collection<MethodResolver> RESOLVERS = defaultResolvers();
-    
+
     final static TestSignatureSuite SUITE = (new TestSignatureSuite());
 
     final static Verifier VERIFIER = Verifier.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
-    
+
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
     }
@@ -81,7 +81,7 @@ public class VcTestRunnerJunit {
                 final Verifiable verifiable = VERIFIER.verify(testCase.input, params);
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
-                
+
                 assertNotNull(verifiable);
 
             } else if (testCase.type.contains(VcTestCase.vocab("IssuerTest"))) {
@@ -95,19 +95,18 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
+                // proof options
                 final DataIntegrityProofDraft draft = SUITE.createDraft(
-                        // proof options
                         testCase.verificationMethod,
-                        URI.create("https://w3id.org/security#assertionMethod"),
-                        testCase.created,
-                        testCase.domain,
-                        testCase.challenge,
-                        testCase.nonce
-                        );
+                        URI.create("https://w3id.org/security#assertionMethod"));
+                draft.created(testCase.created);
+                draft.domain(testCase.domain);
+                draft.challenge(testCase.challenge);
+                draft.nonce(testCase.nonce);
 
                 final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, TestSignatureSuite.METHOD_ADAPTER))
                         .loader(LOADER);
-                        
+
                 final IssuedVerifiable issued = issuer.sign(testCase.input, draft);
 
                 JsonObject signed = null;

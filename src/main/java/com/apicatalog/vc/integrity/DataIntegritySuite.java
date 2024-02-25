@@ -1,13 +1,8 @@
 package com.apicatalog.vc.integrity;
 
-import java.net.URI;
-import java.time.Instant;
-
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
-import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -98,35 +93,5 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
         }
         return null;
-    }
-
-    protected JsonObject createDraft(
-            CryptoSuite crypto,
-            VerificationMethod method,
-            URI purpose,
-            Instant created,
-            String domain,
-            String challenge,
-            String nonce) throws DocumentError {
-
-        final LdNodeBuilder builder = new LdNodeBuilder();
-
-        builder.type(PROOF_TYPE_ID);
-        builder.set(DataIntegrityVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", cryptosuite);
-        builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(methodAdapter, method);
-        builder.set(DataIntegrityVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
-        builder.set(DataIntegrityVocab.PURPOSE).id(purpose);
-
-        if (domain != null) {
-            builder.set(DataIntegrityVocab.DOMAIN).string(domain);
-        }
-        if (challenge != null) {
-            builder.set(DataIntegrityVocab.CHALLENGE).string(challenge);
-        }
-        if (nonce != null) {
-            builder.set(DataIntegrityVocab.NONCE).string(nonce);
-        }
-
-        return builder.build();
     }
 }

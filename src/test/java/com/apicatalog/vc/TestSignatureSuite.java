@@ -1,7 +1,6 @@
 package com.apicatalog.vc;
 
 import java.net.URI;
-import java.time.Instant;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -35,13 +34,8 @@ class TestSignatureSuite extends DataIntegritySuite {
 
     public DataIntegrityProofDraft createDraft(
             VerificationMethod method,
-            URI purpose,
-            Instant created,
-            String domain,
-            String challenge,
-            String nonce) throws DocumentError {
-        return new DataIntegrityProofDraft(CRYPTO,
-                super.createDraft(CRYPTO, method, purpose, created, domain, challenge, nonce));
+            URI purpose) throws DocumentError {
+        return new DataIntegrityProofDraft(this, CRYPTO, method, purpose);
     }
 
     @Override
