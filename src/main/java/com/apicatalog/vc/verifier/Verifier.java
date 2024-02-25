@@ -13,6 +13,7 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
@@ -253,11 +254,17 @@ public class Verifier {
     protected Verifiable verify(final JsonObject document, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
 
         try {
+            
+            // extract context
+            final JsonStructure context = document.containsKey(Keywords.CONTEXT)
+                    ? JsonUtils.toJsonArray(document.get(Keywords.CONTEXT))
+                    : null;
+            
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
 
-            return verifyExpanded(Verifiable.getVersion(document), expanded, params, loader);
+            return verifyExpanded(Verifiable.getVersion(document), context, expanded, params, loader);
 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
@@ -265,7 +272,7 @@ public class Verifier {
         }
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, JsonArray expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, JsonArray expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
 
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
             throw new DocumentError(ErrorType.Invalid);
@@ -277,10 +284,10 @@ public class Verifier {
             throw new DocumentError(ErrorType.Invalid);
         }
 
-        return verifyExpanded(version, verifiable.asJsonObject(), params, loader);
+        return verifyExpanded(version, context, verifiable.asJsonObject(), params, loader);
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, final JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, final JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
 
         // get a verifiable representation
         final Verifiable verifiable = Verifiable.of(version, expanded);
@@ -290,14 +297,14 @@ public class Verifier {
             // data integrity and metadata validation
             validate(verifiable.asCredential());
 
-            verifiable.proofs(verifyProofs(expanded, params, loader));
+            verifiable.proofs(verifyProofs(context, expanded, params, loader));
 
             return verifiable;
 
         } else if (verifiable.isPresentation()) {
 
             // verify presentation proofs
-            verifiable.proofs(verifyProofs(expanded, params, loader));
+            verifiable.proofs(verifyProofs(context, expanded, params, loader));
 
             final Collection<Credential> credentials = new ArrayList<>();
 
@@ -307,7 +314,7 @@ public class Verifier {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
                 }
 
-                credentials.add(verifyExpanded(version, presentedCredentials, params, loader).asCredential());
+                credentials.add(verifyExpanded(version, context, presentedCredentials, params, loader).asCredential());
             }
 
             verifiable.asPresentation().credentials(credentials);
@@ -317,7 +324,7 @@ public class Verifier {
         throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
 
-    protected Collection<Proof> verifyProofs(JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Collection<Proof> verifyProofs(JsonStructure context, JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
 
         // get proofs - throws an exception if there is no proof, never null nor an
         // empty collection
@@ -374,7 +381,7 @@ public class Verifier {
                 throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
             }
 
-            proof.verify(unsigned, (VerificationKey) verificationMethod);
+            proof.verify(context, unsigned, (VerificationKey) verificationMethod);
 
             proof = queue.pop();
         }

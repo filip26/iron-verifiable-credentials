@@ -12,6 +12,7 @@ import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.method.MethodAdapter;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 
 /**
  * Represents generic VC/VP proof.
@@ -69,7 +70,7 @@ public interface Proof {
      */
     void validate(Map<String, Object> params) throws DocumentError;
 
-    void verify(JsonObject data, VerificationKey method) throws VerificationError;
+    void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError;
 
     MethodAdapter methodProcessor();
 }

@@ -18,6 +18,7 @@ import com.apicatalog.vc.proof.ProofValue;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 
 /**
  * Represents data integrity proof base class.
@@ -51,7 +52,7 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public void verify(JsonObject data, VerificationKey method) throws VerificationError {
+    public void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError {
 
         Objects.requireNonNull(value);
         Objects.requireNonNull(data);
@@ -63,6 +64,7 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
         // verify signature
         value.verify(
                 crypto,
+                context,
                 data,
                 unsignedProof,
                 method.publicKey());

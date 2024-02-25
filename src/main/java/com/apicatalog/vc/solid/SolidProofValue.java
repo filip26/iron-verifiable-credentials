@@ -9,6 +9,7 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.vc.proof.ProofValue;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 
 /**
  * Represent a proof value used together with full disclosure suites. i.e.
@@ -23,7 +24,7 @@ public class SolidProofValue implements ProofValue {
     }
 
     @Override
-    public void verify(CryptoSuite cryptoSuite, JsonObject data, JsonObject unsignedProof, byte[] publicKey) throws VerificationError {
+    public void verify(CryptoSuite cryptoSuite, JsonStructure context, JsonObject data, JsonObject unsignedProof, byte[] publicKey) throws VerificationError {
 
         Objects.requireNonNull(value);
         Objects.requireNonNull(data);
