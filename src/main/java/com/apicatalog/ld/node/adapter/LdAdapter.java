@@ -1,4 +1,4 @@
-package com.apicatalog.ld.adapter;
+package com.apicatalog.ld.node.adapter;
 
 import com.apicatalog.ld.DocumentError;
 

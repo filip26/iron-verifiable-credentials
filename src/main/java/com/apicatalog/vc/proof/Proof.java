@@ -1,7 +1,6 @@
 package com.apicatalog.vc.proof;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
@@ -9,7 +8,6 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.method.MethodAdapter;
 
@@ -28,7 +26,7 @@ public interface Proof {
      * @param model a credential data model version
      * @return the proof JSON-LD context URI(s)
      */
-    Collection<String> context(ModelVersion model);
+    //Collection<String> context(ModelVersion model);
 
     /**
      * A set of parameters required to independently verify the proof, such as an
@@ -61,8 +59,6 @@ public interface Proof {
      * @return {@link URI} uniquely identifying the previous proof
      */
     URI previousProof();
-
-    String nonce();
     
     /**
      * Returns a {@link CryptoSuite} used to create and to verify the proof value.
@@ -82,10 +78,6 @@ public interface Proof {
     void validate(Map<String, Object> params) throws DocumentError;
 
     void verify(JsonObject data, VerificationKey method) throws VerificationError;
-
-    JsonObject unsignedCopy();
-    
-    JsonObject signedCopy(JsonObject proofValue);
 
     MethodAdapter methodProcessor();
 }

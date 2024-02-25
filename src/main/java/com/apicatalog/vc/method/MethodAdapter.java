@@ -1,7 +1,7 @@
 package com.apicatalog.vc.method;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.adapter.LdAdapter;
+import com.apicatalog.ld.node.adapter.LdAdapter;
 import com.apicatalog.ld.signature.VerificationMethod;
 
 import jakarta.json.JsonObject;

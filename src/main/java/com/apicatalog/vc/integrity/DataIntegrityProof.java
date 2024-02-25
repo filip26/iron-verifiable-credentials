@@ -2,8 +2,6 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
@@ -14,7 +12,6 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
@@ -44,18 +41,10 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     protected ProofValue value;
     protected URI previousProof;
 
-    protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
-            "https://w3id.org/security/data-integrity/v2",
-            "https://w3id.org/security/multikey/v1");
-
-    protected static final Collection<String> V2_CONTEXTS = Arrays.asList(
-            "https://www.w3.org/ns/credentials/v2");
-
     protected DataIntegrityProof(
             DataIntegritySuite suite,
             CryptoSuite crypto,
-            JsonObject expandedProof
-            ) {
+            JsonObject expandedProof) {
         this.suite = suite;
         this.crypto = crypto;
         this.expanded = expandedProof;
@@ -146,6 +135,10 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
         return challenge;
     }
 
+    public String nonce() {
+        return nonce;
+    }
+
     @Override
     public ProofValue signature() {
         return value;
@@ -177,21 +170,8 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public Collection<String> context(ModelVersion model) {
-        if (ModelVersion.V11.equals(model)) {
-            return V1_CONTEXTS;
-        }
-        return V2_CONTEXTS;
-    }
-
-    @Override
     public JsonObject write(VerificationMethod value) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String nonce() {
-        return nonce;
     }
 
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
@@ -207,26 +187,7 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
         }
     }
 
-    @Override
-    public JsonObject unsignedCopy() {
+    protected JsonObject unsignedCopy() {
         return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
     }
-
-    @Override
-    public JsonObject signedCopy(JsonObject proofValue) {
-        return Json.createObjectBuilder(expanded)
-                .add(DataIntegrityVocab.PROOF_VALUE.uri(), Json.createArrayBuilder().add(proofValue))
-                .build();
-    }
-
-//    protected JsonObject signedCopy(ProofValue signature) {
-//    final JsonObject proofValue = suite.writeProofValue(value);
-//
-
-//    }
-//
-//    @Override
-//    public JsonObject signedCopy(JsonStructure context, JsonObject data, KeyPair keyPair) throws SigningError {
-//        return suite.;
-//    }
 }

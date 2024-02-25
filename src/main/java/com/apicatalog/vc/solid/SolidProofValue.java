@@ -1,4 +1,4 @@
-package com.apicatalog.vc.proof;
+package com.apicatalog.vc.solid;
 
 import java.util.Objects;
 
@@ -6,6 +6,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.vc.proof.ProofValue;
 
 import jakarta.json.JsonObject;
 
@@ -13,11 +14,11 @@ import jakarta.json.JsonObject;
  * Represent a proof value used together with full disclosure suites. i.e.
  * suites do not allowing a selective disclosure.
  */
-public class SolidSignature implements ProofValue {
+public class SolidProofValue implements ProofValue {
 
     protected final byte[] value;
 
-    public SolidSignature(byte[] value) {
+    public SolidProofValue(byte[] value) {
         this.value = value;
     }
 

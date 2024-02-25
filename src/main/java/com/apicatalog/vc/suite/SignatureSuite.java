@@ -7,10 +7,6 @@ import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonObject;
 
-/**
- * A specified set of cryptographic primitives consisting of a canonicalization
- * algorithm, a message digest algorithm, and a signature algorithm.
- */
 public interface SignatureSuite {
 
     /**
@@ -34,5 +30,11 @@ public interface SignatureSuite {
      */
     Proof getProof(JsonObject proof) throws DocumentError;
 
+    /**
+     * Creates a new issuer instance initialized with provided key pair
+     * 
+     * @param keyPair
+     * @return
+     */
     Issuer createIssuer(KeyPair keyPair);
 }

@@ -28,7 +28,7 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.vc.integrity.DataIntegrityProof;
+import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.issuer.IssuedVerifiable;
 import com.apicatalog.vc.issuer.Issuer;
@@ -95,7 +95,7 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                final DataIntegrityProof draft = SUITE.createDraft(
+                final DataIntegrityProofDraft draft = SUITE.createDraft(
                         // proof options
                         testCase.verificationMethod,
                         URI.create("https://w3id.org/security#assertionMethod"),
@@ -105,7 +105,7 @@ public class VcTestRunnerJunit {
                         testCase.nonce
                         );
 
-                final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, draft.methodProcessor()))
+                final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, TestSignatureSuite.METHOD_ADAPTER))
                         .loader(LOADER);
                         
                 final IssuedVerifiable issued = issuer.sign(testCase.input, draft);

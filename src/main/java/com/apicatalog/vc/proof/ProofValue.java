@@ -8,4 +8,5 @@ import jakarta.json.JsonObject;
 public interface ProofValue {
 
     void verify(CryptoSuite cryptoSuite, JsonObject data, JsonObject unsignedProof, byte[] publicKey) throws VerificationError;
+
 }

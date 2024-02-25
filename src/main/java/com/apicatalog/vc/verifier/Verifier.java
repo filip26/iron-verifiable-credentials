@@ -39,6 +39,9 @@ import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vc.status.StatusPropertiesValidator;
+import com.apicatalog.vc.status.StatusValidator;
+import com.apicatalog.vc.subject.SubjectValidator;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
@@ -46,22 +49,92 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
-public class Verifier extends Processor<Verifier> {
+public class Verifier {
 
-    private final SignatureSuite[] suites;
+    protected final SignatureSuite[] suites;
 
-    private Collection<MethodResolver> methodResolvers;
+    protected DocumentLoader defaultLoader;
+    protected boolean bundledContexts;
+    protected URI base;
+
+    protected StatusValidator statusValidator;
+    protected SubjectValidator subjectValidator;
+
+    protected ModelVersion modelVersion;
+
+    protected Collection<MethodResolver> methodResolvers;
 
     protected Verifier(final SignatureSuite... suites) {
         this.suites = suites;
 
+        // default values
+        this.defaultLoader = null;
+        this.bundledContexts = true;
+        this.base = null;
+        this.modelVersion = null;
+
+        this.statusValidator = new StatusPropertiesValidator();
+        this.subjectValidator = null;
         this.methodResolvers = defaultResolvers();
     }
 
     public static Verifier with(final SignatureSuite... suites) {
         return new Verifier(suites);
     }
-    
+
+    public Verifier loader(DocumentLoader loader) {
+        this.defaultLoader = loader;
+        return this;
+    }
+
+    /**
+     * Use well-known contexts that are bundled with the library instead of fetching
+     * it online. <code>true</code> by default. Disabling might cause slower
+     * processing.
+     *
+     * @param enable
+     * @return the processor instance
+     */
+    public Verifier useBundledContexts(boolean enable) {
+        this.bundledContexts = enable;
+        return this;
+    }
+
+    /**
+     * If set, this overrides the input document's IRI.
+     *
+     * @param base
+     * @return the processor instance
+     */
+    public Verifier base(URI base) {
+        this.base = base;
+        return this;
+    }
+
+    /**
+     * Set a credential status verifier. If not set then
+     * <code>credentialStatus</code> is ignored if present.
+     *
+     * @param statusValidator a custom status verifier instance
+     * @return the verifier instance
+     */
+    public Verifier statusValidator(StatusValidator statusValidator) {
+        this.statusValidator = statusValidator;
+        return this;
+    }
+
+    /**
+     * Set a credential subject verifier. If not set then
+     * <code>credentialStatus</code> is not verified.
+     *
+     * @param subjectValidator a custom subject verifier instance
+     * @return the verifier instance
+     */
+    public Verifier subjectValidator(SubjectValidator subjectValidator) {
+        this.subjectValidator = subjectValidator;
+        return this;
+    }
+
     protected static final Collection<MethodResolver> defaultResolvers() {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
         resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
@@ -69,12 +142,13 @@ public class Verifier extends Processor<Verifier> {
         return resolvers;
     }
 
-    //TODO resolvers should be multilevel, per verifier, per proof type, e.g. DidUrlMethodResolver could be different.
+    // TODO resolvers should be multilevel, per verifier, per proof type, e.g.
+    // DidUrlMethodResolver could be different.
     public Verifier methodResolvers(Collection<MethodResolver> resolvers) {
         this.methodResolvers = resolvers;
         return this;
     }
-  
+
     /**
      * Verifies VC/VP document. Throws VerificationError if the document is not
      * valid or cannot be verified.
@@ -107,7 +181,7 @@ public class Verifier extends Processor<Verifier> {
         Objects.requireNonNull(document);
         return verify(document, params, getLoader());
     }
-    
+
     /**
      * Verifies VC/VP document. Throws VerificationError if the document is not
      * valid or cannot be verified.
@@ -140,11 +214,11 @@ public class Verifier extends Processor<Verifier> {
         Objects.requireNonNull(location);
         return verify(location, params, getLoader());
     }
-    
+
     protected DocumentLoader getLoader() {
 
         DocumentLoader loader = defaultLoader;
-        
+
         if (loader == null) {
             // default loader
             loader = SchemeRouter.defaultInstance();
@@ -152,10 +226,10 @@ public class Verifier extends Processor<Verifier> {
 
         if (bundledContexts) {
             loader = new StaticContextLoader(loader);
-        }        
+        }
         return loader;
     }
-    
+
     protected Verifiable verify(final URI location, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
         try {
             // load the document
@@ -286,7 +360,7 @@ public class Verifier extends Processor<Verifier> {
         while (proof != null) {
 
             proof.validate(params);
-            
+
             final ProofValue proofValue = proof.signature();
 
             if (proofValue == null) {
@@ -299,7 +373,7 @@ public class Verifier extends Processor<Verifier> {
             if (!(verificationMethod instanceof VerificationKey)) {
                 throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
             }
-            
+
             proof.verify(unsigned, (VerificationKey) verificationMethod);
 
             proof = queue.pop();
@@ -372,5 +446,20 @@ public class Verifier extends Processor<Verifier> {
             }
         }
         return null;
+    }
+
+    protected void validateData(final Credential credential) throws DocumentError {
+
+        // v1
+        if ((credential.getVersion() == null || ModelVersion.V11.equals(credential.getVersion()))
+                && credential.getIssuanceDate() == null) {
+            // issuance date is a mandatory property
+            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
+        }
+
+        // status check
+        if (statusValidator != null && JsonUtils.isNotNull(credential.getStatus())) {
+            statusValidator.verify(credential.getStatus());
+        }
     }
 }

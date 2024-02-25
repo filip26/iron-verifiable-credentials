@@ -11,14 +11,17 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.integrity.DataIntegrityProof;
+import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
-import com.apicatalog.vc.issuer.SolidIssuer;
+import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.proof.SolidSignature;
+import com.apicatalog.vc.solid.SolidIssuer;
+import com.apicatalog.vc.solid.SolidProofValue;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
+    static final MethodAdapter METHOD_ADAPTER = new TestKeyAdapter();
+    
     static final CryptoSuite CRYPTO = new CryptoSuite(
             new Urdna2015(),
             new MessageDigest("SHA-256"),
@@ -27,10 +30,10 @@ class TestSignatureSuite extends DataIntegritySuite {
     static final String TEST_CRYPTO_NAME = "test-2022";
 
     protected TestSignatureSuite() {
-        super(TEST_CRYPTO_NAME, Multibase.BASE_58_BTC, new TestKeyAdapter());
+        super(TEST_CRYPTO_NAME, Multibase.BASE_58_BTC, METHOD_ADAPTER);
     }
 
-    public DataIntegrityProof createDraft(
+    public DataIntegrityProofDraft createDraft(
             VerificationMethod method,
             URI purpose,
             Instant created,
@@ -57,6 +60,6 @@ class TestSignatureSuite extends DataIntegritySuite {
         if (proofValue.length != 32) {
             throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
         }
-        return new SolidSignature(proofValue);
+        return new SolidProofValue(proofValue);
     }
 }

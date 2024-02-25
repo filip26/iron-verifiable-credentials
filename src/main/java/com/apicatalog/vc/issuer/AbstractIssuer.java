@@ -26,7 +26,7 @@ import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.proof.EmbeddedProof;
-import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.proof.ProofDraft;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.Json;
@@ -51,20 +51,20 @@ public abstract class AbstractIssuer implements Issuer {
         this.suite = suite;
         this.keyPair = keyPair;
         this.proofValueBase = proofValueBase;
-        
+
         this.defaultLoader = null;
         this.base = null;
         this.bundledContexts = true;
     }
 
     @Override
-    public IssuedVerifiable sign(URI location, Proof draft) throws SigningError, DocumentError {
+    public IssuedVerifiable sign(URI location, ProofDraft draft) throws SigningError, DocumentError {
         final DocumentLoader loader = getLoader();
         return sign(fetchDocument(location, loader), draft, loader);
     }
 
     @Override
-    public IssuedVerifiable sign(JsonObject document, final Proof draft) throws SigningError, DocumentError {
+    public IssuedVerifiable sign(JsonObject document, final ProofDraft draft) throws SigningError, DocumentError {
         return sign(document, draft, getLoader());
     }
 
@@ -86,7 +86,7 @@ public abstract class AbstractIssuer implements Issuer {
         return this;
     }
 
-    protected IssuedVerifiable sign(JsonObject document, final Proof draft, final DocumentLoader loader) throws SigningError, DocumentError {
+    protected IssuedVerifiable sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         try {
             // load the document
@@ -111,7 +111,7 @@ public abstract class AbstractIssuer implements Issuer {
     }
 
     protected IssuedVerifiable sign(final ModelVersion version, final JsonArray context, final JsonObject expanded,
-            final Proof draft, final DocumentLoader loader) throws SigningError, DocumentError {
+            final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         if (keyPair.privateKey() == null || keyPair.privateKey().length == 0) {
             throw new IllegalArgumentException("The private key is not provided, is null or an empty array.");
@@ -145,8 +145,8 @@ public abstract class AbstractIssuer implements Issuer {
         final JsonObject unsigned = EmbeddedProof.removeProofs(object);
 
         // signature
-        final JsonObject signature = sign(context, unsigned, draft); 
-        
+        final JsonObject signature = sign(context, unsigned, draft);
+
 //        // signature
 //        final byte[] signature = sign(context, unsigned, draft);
 //
@@ -155,13 +155,13 @@ public abstract class AbstractIssuer implements Issuer {
 
         // signed proof
 //        final JsonObject signedProof = sign(context, unsigned, draft);
-      
+
         return new IssuedVerifiable(EmbeddedProof.addProof(object, signedProof), context, loader);
     }
 
-    protected abstract JsonObject sign(JsonArray context, JsonObject document, Proof draft) throws SigningError;
+    protected abstract JsonObject sign(JsonArray context, JsonObject document, ProofDraft draft) throws SigningError;
 
-    protected JsonArray getContext(ModelVersion version, JsonObject document, Proof draft) {
+    protected JsonArray getContext(ModelVersion version, JsonObject document, ProofDraft draft) {
 
         final Collection<String> urls = new HashSet<>();
         final JsonArrayBuilder contexts = Json.createArrayBuilder();

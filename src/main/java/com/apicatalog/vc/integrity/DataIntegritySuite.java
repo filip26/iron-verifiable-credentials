@@ -27,12 +27,11 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     protected final String cryptosuite;
 
     protected final Multibase proofValueBase;
-    
+
     protected DataIntegritySuite(
-            String cryptosuite, 
-            Multibase proofValueBase, 
-            final MethodAdapter method
-            ) {
+            String cryptosuite,
+            Multibase proofValueBase,
+            final MethodAdapter method) {
         this.cryptosuite = cryptosuite;
         this.proofValueBase = proofValueBase;
         this.methodAdapter = method;
@@ -59,7 +58,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         final String cryptoSuiteName = node.scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
 
         final byte[] signature = node.scalar(DataIntegrityVocab.PROOF_VALUE).multibase(proofValueBase);
-        
+
         final ProofValue proofValue = signature != null ? getProofValue(signature) : null;
 
         CryptoSuite crypto = getCryptoSuite(cryptoSuiteName, proofValue);
@@ -101,7 +100,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         return null;
     }
 
-    protected DataIntegrityProof createDraft(
+    protected DataIntegrityProofDraft createDraft(
             CryptoSuite crypto,
             VerificationMethod method,
             URI purpose,
@@ -128,13 +127,6 @@ public abstract class DataIntegritySuite implements SignatureSuite {
             builder.set(DataIntegrityVocab.NONCE).string(nonce);
         }
 
-        final DataIntegrityProof proof = new DataIntegrityProof(this, crypto, builder.build());
-        proof.created = created;
-        proof.purpose = purpose;
-        proof.method = method;
-        proof.domain = domain;
-        proof.challenge = challenge;
-        proof.nonce = nonce;
-        return proof;
+        return new DataIntegrityProofDraft(crypto, builder.build());
     }
 }

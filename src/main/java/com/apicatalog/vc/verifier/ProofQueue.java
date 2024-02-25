@@ -14,16 +14,16 @@ class ProofQueue {
 
     final Collection<Proof> proofs;
     final Set<URI> ids;
-    
+
     protected ProofQueue(Collection<Proof> proofs) {
         this.proofs = new ArrayList<>(proofs);
         this.ids = new HashSet<>(proofs.size());
     }
-    
+
     public static final ProofQueue create(Collection<Proof> proofs) {
         return new ProofQueue(proofs);
     }
-    
+
     public boolean isEmpty() {
         return !proofs.isEmpty();
     }
@@ -32,11 +32,10 @@ class ProofQueue {
         if (proofs.isEmpty()) {
             return null;
         }
-        
+
         for (Proof proof : proofs) {
             if (proof.previousProof() == null
-                    || ids.contains(proof.previousProof())
-                    ) {
+                    || ids.contains(proof.previousProof())) {
                 if (proof.id() != null) {
                     if (ids.contains(proof.id())) {
                         throw new DocumentError(ErrorType.Invalid, "ProofId");
