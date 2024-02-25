@@ -83,9 +83,11 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
             throw new DocumentError(ErrorType.Missing, "ProofValue");
         }
 
-        assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
-        assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
-        assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
+        if (params != null) {
+            assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
+            assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
+            assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
+        }
     }
 
     /**
@@ -175,7 +177,6 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
-
         final Object value = params.get(name.name());
 
         if (value == null) {

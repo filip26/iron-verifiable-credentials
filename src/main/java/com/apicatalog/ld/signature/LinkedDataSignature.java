@@ -62,8 +62,6 @@ public class LinkedDataSignature {
      * @param expanded   expanded unsigned VC/VP document
      * @param privateKey
      * @param proof
-     * @param mandatory  mandatory pointers, if present a selective disclosure proof
-     *                   is produced
      *
      * @return computed signature
      *
