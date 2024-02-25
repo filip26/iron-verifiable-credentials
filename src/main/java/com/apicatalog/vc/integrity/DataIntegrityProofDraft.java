@@ -31,8 +31,6 @@ public class DataIntegrityProofDraft extends ProofDraft {
     protected String challenge;
     protected String nonce;
 
-    protected JsonObject expanded;
-
     public DataIntegrityProofDraft(
             DataIntegritySuite suite,
             CryptoSuite crypto,

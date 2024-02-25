@@ -1,5 +1,6 @@
 package com.apicatalog.vc.suite;
 
+import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.issuer.Issuer;
@@ -28,7 +29,7 @@ public interface SignatureSuite {
      * @return a new {@link Proof} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    Proof getProof(JsonObject proof) throws DocumentError;
+    Proof getProof(JsonObject proof, DocumentLoader loader) throws DocumentError;
 
     /**
      * Creates a new issuer instance initialized with provided key pair

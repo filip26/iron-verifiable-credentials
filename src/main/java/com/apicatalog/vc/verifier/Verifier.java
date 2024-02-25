@@ -343,7 +343,7 @@ public class Verifier {
                 throw new VerificationError(Code.UnsupportedCryptoSuite);
             }
 
-            final Proof proof = signatureSuite.getProof(expandedProof);
+            final Proof proof = signatureSuite.getProof(expandedProof, loader);
 
             if (proof == null) {
                 throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");

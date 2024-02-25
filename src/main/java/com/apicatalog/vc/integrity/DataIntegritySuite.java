@@ -1,5 +1,6 @@
 package com.apicatalog.vc.integrity;
 
+import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.signature.CryptoSuite;
@@ -32,7 +33,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         this.methodAdapter = method;
     }
 
-    protected abstract ProofValue getProofValue(byte[] proofValue) throws DocumentError;
+    protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws DocumentError;
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
 
@@ -42,7 +43,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public DataIntegrityProof getProof(JsonObject expandedProof) throws DocumentError {
+    public DataIntegrityProof getProof(JsonObject expandedProof, DocumentLoader loader) throws DocumentError {
 
         if (expandedProof == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
@@ -54,7 +55,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
         final byte[] signature = node.scalar(DataIntegrityVocab.PROOF_VALUE).multibase(proofValueBase);
 
-        final ProofValue proofValue = signature != null ? getProofValue(signature) : null;
+        final ProofValue proofValue = signature != null ? getProofValue(signature, loader) : null;
 
         CryptoSuite crypto = getCryptoSuite(cryptoSuiteName, proofValue);
 

@@ -2,6 +2,7 @@ package com.apicatalog.vc;
 
 import java.net.URI;
 
+import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
@@ -51,7 +52,7 @@ class TestSignatureSuite extends DataIntegritySuite {
     }
 
     @Override
-    protected ProofValue getProofValue(byte[] proofValue) throws DocumentError {
+    protected ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws DocumentError {
         if (proofValue.length != 32) {
             throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
         }
