@@ -16,12 +16,12 @@ public interface Issuer {
      * @param documentLocation
      * @param draft            a draft of the proof to sign and attach
      *
-     * @return {@link IssuedVerifiable} representing the signed document
+     * @return {@link ExpandedVerifiable} representing the signed document
      *
      * @throws DocumentError
      * @throws SigningError
      */
-    IssuedVerifiable sign(URI documentLocation, ProofDraft draft) throws SigningError, DocumentError;
+    ExpandedVerifiable sign(URI documentLocation, ProofDraft draft) throws SigningError, DocumentError;
 
     /**
      * Signs VC/VP document. Returns the provided VC/VP with a new proof
@@ -29,12 +29,12 @@ public interface Issuer {
      * @param document
      * @param draft    a draft of the proof to sign and attach
      *
-     * @return {@link IssuedVerifiable} representing the signed document
+     * @return {@link ExpandedVerifiable} representing the signed document
      *
      * @throws DocumentError
      * @throws SigningError
      */
-    IssuedVerifiable sign(JsonObject document, ProofDraft draft) throws SigningError, DocumentError;
+    ExpandedVerifiable sign(JsonObject document, ProofDraft draft) throws SigningError, DocumentError;
 
     /**
      * If set, this overrides the input document's IRI.

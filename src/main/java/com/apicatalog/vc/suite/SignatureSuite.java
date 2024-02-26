@@ -38,6 +38,4 @@ public interface SignatureSuite {
      * @return
      */
     Issuer createIssuer(KeyPair keyPair);
-    
-//TODO    JsonObject derive(JsonObject document, DocumentLoader loader);
 }

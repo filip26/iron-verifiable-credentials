@@ -16,7 +16,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
 
-public class IssuedVerifiable {
+public class ExpandedVerifiable {
 
     protected JsonStructure context;
 
@@ -24,7 +24,7 @@ public class IssuedVerifiable {
     
     protected JsonObject expanded;
 
-    protected IssuedVerifiable(JsonObject expanded, JsonStructure context, DocumentLoader loader) {
+    protected ExpandedVerifiable(JsonObject expanded, JsonStructure context, DocumentLoader loader) {
         this.expanded = expanded;
         this.loader = loader;
         this.context = context;

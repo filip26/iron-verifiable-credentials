@@ -30,7 +30,7 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
-import com.apicatalog.vc.issuer.IssuedVerifiable;
+import com.apicatalog.vc.issuer.ExpandedVerifiable;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -107,7 +107,7 @@ public class VcTestRunnerJunit {
                 final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, TestSignatureSuite.METHOD_ADAPTER))
                         .loader(LOADER);
 
-                final IssuedVerifiable issued = issuer.sign(testCase.input, draft);
+                final ExpandedVerifiable issued = issuer.sign(testCase.input, draft);
 
                 JsonObject signed = null;
 

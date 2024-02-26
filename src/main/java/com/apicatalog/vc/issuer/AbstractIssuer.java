@@ -59,13 +59,13 @@ public abstract class AbstractIssuer implements Issuer {
     }
 
     @Override
-    public IssuedVerifiable sign(URI location, ProofDraft draft) throws SigningError, DocumentError {
+    public ExpandedVerifiable sign(URI location, ProofDraft draft) throws SigningError, DocumentError {
         final DocumentLoader loader = getLoader();
         return sign(fetchDocument(location, loader), draft, loader);
     }
 
     @Override
-    public IssuedVerifiable sign(JsonObject document, final ProofDraft draft) throws SigningError, DocumentError {
+    public ExpandedVerifiable sign(JsonObject document, final ProofDraft draft) throws SigningError, DocumentError {
         return sign(document, draft, getLoader());
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractIssuer implements Issuer {
         return this;
     }
 
-    protected IssuedVerifiable sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
+    protected ExpandedVerifiable sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         try {
             // load the document
@@ -111,7 +111,7 @@ public abstract class AbstractIssuer implements Issuer {
         }
     }
 
-    protected IssuedVerifiable sign(final ModelVersion version, final JsonArray context, final JsonObject expanded,
+    protected ExpandedVerifiable sign(final ModelVersion version, final JsonArray context, final JsonObject expanded,
             final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         if (keyPair.privateKey() == null || keyPair.privateKey().length == 0) {
@@ -148,7 +148,7 @@ public abstract class AbstractIssuer implements Issuer {
         // signature
         final JsonObject signedProof = sign(context, unsigned, draft);
 
-        return new IssuedVerifiable(EmbeddedProof.addProof(object, signedProof), context, loader);
+        return new ExpandedVerifiable(EmbeddedProof.addProof(object, signedProof), context, loader);
     }
 
     protected JsonObject signed1Copy(JsonObject unsigned, JsonObject signature) {
