@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 
@@ -39,13 +38,15 @@ public class VcTestCase {
     
     public String challenge;
     
+    public String nonce;
+    
     public String purpose;
 
     public URI context;
     
     public boolean compacted;
 
-    public static VcTestCase of(JsonObject test, JsonObject manifest, DocumentLoader loader) {
+    public static VcTestCase of(JsonObject test, JsonObject manifest) {
 
         final VcTestCase testCase = new VcTestCase();
 
@@ -123,7 +124,12 @@ public class VcTestCase {
                 testCase.challenge = options.getJsonArray(vocab("challenge")).getJsonObject(0)
                         .getString(Keywords.VALUE);
             }
-            
+
+            if (options.containsKey(vocab("nonce"))) {
+                testCase.nonce = options.getJsonArray(vocab("nonce")).getJsonObject(0)
+                        .getString(Keywords.VALUE);
+            }
+
             if (options.containsKey(vocab("purpose"))) {
                 testCase.purpose = options.getJsonArray(vocab("purpose")).getJsonObject(0)
                         .getString(Keywords.VALUE);

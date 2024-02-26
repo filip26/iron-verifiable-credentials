@@ -23,6 +23,6 @@
         "cryptosuite": "test-2022",
         "verificationMethod": "https://example.edu/issuers/14#key-1",
         "proofPurpose": "assertionMethod",
-        "proofValue": "z58DAdFfa9SkqZMVPxAQpic7ndSayn1PzZs6ZjWp1CktyGesjuTSwRdoWhAfGFCF5bppETSTojQCrfFPP2oumHKtz"
+        "proofValue": "zGMUrucWigYShUtBkCmsmQrCSxmsezqQb47hhk5qphREf"
     }
 }

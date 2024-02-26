@@ -2,6 +2,9 @@ package com.apicatalog.ld;
 
 import java.util.Arrays;
 
+import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.JsonLdErrorCode;
+
 public class DocumentError extends Throwable {
 
     private static final long serialVersionUID = -7146533158378348477L;
@@ -52,6 +55,17 @@ public class DocumentError extends Throwable {
     public String getCode() {
         return code;
     }
+    
+    public static void failWithJsonLd(JsonLdError e) throws DocumentError {
+        if (JsonLdErrorCode.LOADING_DOCUMENT_FAILED == e.getCode()) {
+            throw new DocumentError(e, ErrorType.Invalid);
+        }
+
+        if (JsonLdErrorCode.LOADING_REMOTE_CONTEXT_FAILED == e.getCode()) {
+            throw new DocumentError(e, ErrorType.Invalid);
+        }
+    }
+
 
     static final String toCode(ErrorType type, Term... terms) {
 

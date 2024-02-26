@@ -10,7 +10,9 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -20,20 +22,22 @@ import com.apicatalog.jsonld.json.JsonLdComparison;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
-import com.apicatalog.jsonld.loader.HttpLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.vc.integrity.DataIntegrityProof;
+import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
+import com.apicatalog.vc.issuer.ExpandedVerifiable;
+import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
-import com.apicatalog.vc.processor.Issuer;
+import com.apicatalog.vc.verifier.Verifier;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -46,16 +50,17 @@ import jakarta.json.stream.JsonGenerator;
 
 public class VcTestRunnerJunit {
 
-    private final VcTestCase testCase;
+    final VcTestCase testCase;
 
-    public final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
-            new SchemeRouter()
-                    .set("http", HttpLoader.defaultInstance())
-                    .set("https", HttpLoader.defaultInstance())
-                    .set("classpath", new ClasspathLoader()));
+    final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
+            new SchemeRouter().set("classpath", new ClasspathLoader()));
 
-    public final static Collection<MethodResolver> RESOLVERS = defaultResolvers();
-    
+    final static Collection<MethodResolver> RESOLVERS = defaultResolvers();
+
+    final static TestSignatureSuite SUITE = (new TestSignatureSuite());
+
+    final static Verifier VERIFIER = Verifier.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
+
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
     }
@@ -68,15 +73,16 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains(VcTestCase.vocab("VeriferTest"))) {
 
-                Vc.verify(testCase.input, new TestSignatureSuite())
-                        .loader(LOADER)
-                        .methodResolvers(RESOLVERS)
-                        .param(DataIntegrityVocab.DOMAIN.name(), testCase.domain)
-                        .param(DataIntegrityVocab.CHALLENGE.name(), testCase.challenge)
-                        .param(DataIntegrityVocab.PURPOSE.name(), testCase.purpose)
-                        .isValid();
+                final Map<String, Object> params = new HashMap<>();
+                params.put(DataIntegrityVocab.DOMAIN.name(), testCase.domain);
+                params.put(DataIntegrityVocab.CHALLENGE.name(), testCase.challenge);
+                params.put(DataIntegrityVocab.PURPOSE.name(), testCase.purpose);
+
+                final Verifiable verifiable = VERIFIER.verify(testCase.input, params);
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
+
+                assertNotNull(verifiable);
 
             } else if (testCase.type.contains(VcTestCase.vocab("IssuerTest"))) {
 
@@ -89,32 +95,30 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                final DataIntegrityProof draft = (new TestSignatureSuite()).createDraft(
-                        // proof options
+                // proof options
+                final DataIntegrityProofDraft draft = SUITE.createDraft(
                         testCase.verificationMethod,
-                        URI.create("https://w3id.org/security#assertionMethod"),
-                        testCase.created,
-                        testCase.domain,
-                        testCase.challenge);
+                        URI.create("https://w3id.org/security#assertionMethod"));
+                draft.created(testCase.created);
+                draft.domain(testCase.domain);
+                draft.challenge(testCase.challenge);
+                draft.nonce(testCase.nonce);
 
-                final Issuer issuer = Vc.sign(
-                        testCase.input,
-                        getKeys(keyPairLocation, LOADER, draft.methodProcessor()),
-                        draft)
+                final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, TestSignatureSuite.METHOD_ADAPTER))
                         .loader(LOADER);
+
+                final ExpandedVerifiable issued = issuer.sign(testCase.input, draft);
 
                 JsonObject signed = null;
 
                 if (testCase.context != null) {
-
-                    signed = issuer.getCompacted(testCase.context);
+                    signed = issued.compacted(testCase.context);
 
                 } else if (testCase.compacted) {
-
-                    signed = issuer.getCompacted();
+                    signed = issued.compacted();
 
                 } else {
-                    signed = issuer.getExpanded();
+                    signed = issued.expanded();
                 }
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
@@ -221,7 +225,7 @@ public class VcTestRunnerJunit {
     static final KeyPair getKeys(final URI keyPairLocation, final DocumentLoader loader, MethodAdapter methodAdapter)
             throws DocumentError, JsonLdError {
 
-        final JsonArray keys = JsonLd.expand(keyPairLocation).loader(loader).get();
+        final JsonArray keys = JsonLd.expand(keyPairLocation).loader(new StaticContextLoader(loader)).get();
 
         for (final JsonValue key : keys) {
 
@@ -240,5 +244,4 @@ public class VcTestRunnerJunit {
         resolvers.add(new HttpMethodResolver());
         return resolvers;
     }
-
 }

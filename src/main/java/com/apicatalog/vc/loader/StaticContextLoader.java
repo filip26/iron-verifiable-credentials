@@ -12,7 +12,7 @@ import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
-import com.apicatalog.vc.Vc;
+import com.apicatalog.vc.VcVocab;
 
 public class StaticContextLoader implements DocumentLoader {
 
@@ -54,7 +54,7 @@ public class StaticContextLoader implements DocumentLoader {
     }
 
     protected static JsonDocument get(final String name) {
-        try (final InputStream is = Vc.class.getResourceAsStream(name)) {
+        try (final InputStream is = VcVocab.class.getResourceAsStream(name)) {
             return JsonDocument.of(is);
 
         } catch (IOException | JsonLdError e) {

@@ -8,7 +8,7 @@ import com.apicatalog.jsonld.lang.ValueObject;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.adapter.LdAdapter;
+import com.apicatalog.ld.node.adapter.LdAdapter;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;

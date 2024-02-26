@@ -8,7 +8,7 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.adapter.XsdDateTimeAdapter;
+import com.apicatalog.ld.node.adapter.XsdDateTimeAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 
@@ -17,9 +17,6 @@ import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
 class LdScalarImpl implements LdScalar {
-
-    static final String XSD_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
-    static final String MULTIBASE_TYPE = "https://w3id.org/security#multibase";
 
     final Term term;
     final String type;
@@ -69,6 +66,17 @@ class LdScalarImpl implements LdScalar {
 
         return null;
     }
+    
+    @Override
+    public String string(String expectedType) throws DocumentError {
+        if (!type.equals(expectedType)) {
+            throw new DocumentError(ErrorType.Invalid, type);
+        }
+
+        return string();
+    }
+
+
 
     public boolean exists() {
         return JsonUtils.isNotNull(value);
@@ -125,7 +133,7 @@ class LdScalarImpl implements LdScalar {
 
         if (string != null) {
             try {
-                return (new XsdDateTimeAdapter()).read(string);
+                return XsdDateTimeAdapter.read(string);
             } catch (IllegalArgumentException e) {
                 throw new DocumentError(e, ErrorType.Invalid, term);
             }
@@ -140,6 +148,15 @@ class LdScalarImpl implements LdScalar {
 
     @Override
     public JsonValue value() throws DocumentError {
+        return value;
+    }
+
+    @Override
+    public JsonValue value(String expectedType) throws DocumentError {
+        if (!type.equals(expectedType)) {
+            throw new DocumentError(ErrorType.Invalid, type);
+        }
+
         return value;
     }
 }

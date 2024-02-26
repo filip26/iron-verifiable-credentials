@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc;
 
 /**
  * Verifiable Credentials Data Model Version
@@ -17,5 +17,5 @@ public enum ModelVersion {
      * 
      * @see <a href="https://w3c.github.io/vc-data-model/">Specification</a>
      */
-    V20
+    V20;    
 }

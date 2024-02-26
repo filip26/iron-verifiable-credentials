@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc.proof;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,6 +51,20 @@ public final class EmbeddedProof {
                 .build();
     }
 
+    public static final JsonObject setProofs(final JsonObject document, final Collection<JsonObject> proofs) {
+
+        final JsonArrayBuilder builder = Json.createArrayBuilder();
+
+        proofs.stream().map(proof -> Json.createObjectBuilder()
+                .add(Keywords.GRAPH,
+                        Json.createArrayBuilder().add(proof)))
+                .forEach(builder::add);
+
+        return Json.createObjectBuilder(document)
+                .add(VcVocab.PROOF.uri(), builder)
+                .build();
+    }
+
     /**
      * Returns a proof set or throws an error if there is no proof.
      * 
@@ -63,13 +77,13 @@ public final class EmbeddedProof {
     public static Collection<JsonObject> assertProof(final JsonObject document) throws DocumentError {
 
         final JsonArray proofValue = document.getJsonArray(VcVocab.PROOF.uri());
-        
+
         if (proofValue != null && proofValue.size() > 0) {
-            
+
             final Collection<JsonObject> proofs = new ArrayList<>(proofValue.size());
-            
+
             for (JsonValue proofGraph : proofValue) {
-                
+
                 if (JsonUtils.isNull(proofGraph)) {
                     throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
                 }
@@ -77,15 +91,14 @@ public final class EmbeddedProof {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.PROOF);
                 }
                 final JsonValue proof = proofGraph.asJsonObject().get(Keywords.GRAPH);
-                
+
                 if (JsonUtils.isNull(proof)) {
                     throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
                 }
-                
-                if (JsonUtils.isNotArray(proof) 
+
+                if (JsonUtils.isNotArray(proof)
                         || proof.asJsonArray().size() != 1
-                        || JsonUtils.isNotObject(proof.asJsonArray().get(0))
-                        ) {
+                        || JsonUtils.isNotObject(proof.asJsonArray().get(0))) {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.PROOF);
                 }
                 proofs.add(proof.asJsonArray().getJsonObject(0));
@@ -94,17 +107,17 @@ public final class EmbeddedProof {
                 return proofs;
             }
         }
-        
+
         throw new DocumentError(ErrorType.Missing, VcVocab.PROOF);
     }
 
     /**
      * Creates a new document instance with no proofs attached.
-     *  
+     * 
      * @param verifiable with a proof
      * @return a new document with no proofs
      */
-    public static JsonObject removeProof(final JsonObject verifiable) {
+    public static JsonObject removeProofs(final JsonObject verifiable) {
         return Json.createObjectBuilder(verifiable).remove(VcVocab.PROOF.uri()).build();
     }
 }

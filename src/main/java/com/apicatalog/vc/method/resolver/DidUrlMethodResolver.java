@@ -15,7 +15,7 @@ import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multikey.MultiKey;
 import com.apicatalog.multikey.MultiKeyAdapter;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.proof.Proof;
 
 public class DidUrlMethodResolver implements MethodResolver {
 

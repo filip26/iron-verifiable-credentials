@@ -1,16 +1,13 @@
 package com.apicatalog.vc.integrity;
 
-import java.net.URI;
-import java.time.Instant;
-
+import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
-import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
@@ -25,21 +22,67 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected final String cryptosuite;
 
-    protected DataIntegritySuite(final String cryptosuite, final MethodAdapter method) {
+    protected final Multibase proofValueBase;
+
+    protected DataIntegritySuite(
+            String cryptosuite,
+            Multibase proofValueBase,
+            final MethodAdapter method) {
         this.cryptosuite = cryptosuite;
+        this.proofValueBase = proofValueBase;
         this.methodAdapter = method;
     }
 
-    protected void validateProofValue(byte[] proofValue) throws DocumentError {
-        /* implement custom proof value validation */
-    }
+    protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws DocumentError;
+
+    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
 
     @Override
     public boolean isSupported(String proofType, JsonObject expandedProof) {
         return PROOF_TYPE_ID.equals(proofType) && cryptosuite.equals(getCryptoSuiteName(expandedProof));
     }
 
-    static String getCryptoSuiteName(final JsonObject proof) {
+    @Override
+    public DataIntegrityProof getProof(JsonObject expandedProof, DocumentLoader loader) throws DocumentError {
+
+        if (expandedProof == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
+        }
+
+        final LdNode node = LdNode.of(expandedProof);
+
+        final String cryptoSuiteName = node.scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
+
+        final byte[] signature = node.scalar(DataIntegrityVocab.PROOF_VALUE).multibase(proofValueBase);
+
+        final ProofValue proofValue = signature != null ? getProofValue(signature, loader) : null;
+
+        CryptoSuite crypto = getCryptoSuite(cryptoSuiteName, proofValue);
+
+        final DataIntegrityProof proof = new DataIntegrityProof(this, crypto, expandedProof);
+
+        proof.value = proofValue;
+
+        proof.id = node.id();
+
+        proof.created = node.scalar(DataIntegrityVocab.CREATED).xsdDateTime();
+
+        proof.purpose = node.node(DataIntegrityVocab.PURPOSE).id();
+
+        proof.domain = node.scalar(DataIntegrityVocab.DOMAIN).string();
+
+        proof.challenge = node.scalar(DataIntegrityVocab.CHALLENGE).string();
+
+        proof.nonce = node.scalar(DataIntegrityVocab.NONCE).string();
+
+        proof.method = node.node(DataIntegrityVocab.VERIFICATION_METHOD).map(methodAdapter);
+
+        proof.previousProof = node.node(DataIntegrityVocab.PREVIOUS_PROOF).id();
+
+        return proof;
+    }
+
+    protected static String getCryptoSuiteName(final JsonObject proof) {
         if (proof == null) {
             throw new IllegalArgumentException("expandedProof property must not be null.");
         }
@@ -51,44 +94,5 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
         }
         return null;
-    }
-
-    @Override
-    public Proof readProof(JsonObject expandedProof) throws DocumentError {
-        return DataIntegrityProofReader.read(expandedProof, this);
-    }
-
-    protected abstract CryptoSuite getCryptoSuite(String cryptoName, byte[] proofValue) throws DocumentError;
-
-    protected DataIntegrityProof createDraft(
-            CryptoSuite crypto,
-            VerificationMethod method,
-            URI purpose,
-            Instant created,
-            String domain,
-            String challenge) throws DocumentError {
-
-        final LdNodeBuilder builder = new LdNodeBuilder();
-
-        builder.type(PROOF_TYPE_ID);
-        builder.set(DataIntegrityVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", cryptosuite);
-        builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(methodAdapter, method);
-        builder.set(DataIntegrityVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
-        builder.set(DataIntegrityVocab.PURPOSE).id(purpose);
-
-        if (domain != null) {
-            builder.set(DataIntegrityVocab.DOMAIN).string(domain);
-        }
-        if (challenge != null) {
-            builder.set(DataIntegrityVocab.CHALLENGE).string(challenge);
-        }
-
-        final DataIntegrityProof proof = new DataIntegrityProof(this, crypto, builder.build());
-        proof.created = created;
-        proof.purpose = purpose;
-        proof.method = method;
-        proof.domain = domain;
-        proof.challenge = challenge;
-        return proof;
     }
 }

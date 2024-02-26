@@ -1,14 +1,13 @@
 package com.apicatalog.vc.suite;
 
+import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonObject;
 
-/**
- * A specified set of cryptographic primitives consisting of a canonicalization
- * algorithm, a message digest algorithm, and a signature algorithm.
- */
 public interface SignatureSuite {
 
     /**
@@ -30,5 +29,13 @@ public interface SignatureSuite {
      * @return a new {@link Proof} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    Proof readProof(JsonObject proof) throws DocumentError;
+    Proof getProof(JsonObject proof, DocumentLoader loader) throws DocumentError;
+
+    /**
+     * Creates a new issuer instance initialized with provided key pair
+     * 
+     * @param keyPair
+     * @return
+     */
+    Issuer createIssuer(KeyPair keyPair);
 }

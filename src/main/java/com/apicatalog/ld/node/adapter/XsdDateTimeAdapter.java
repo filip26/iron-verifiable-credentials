@@ -1,4 +1,4 @@
-package com.apicatalog.ld.adapter;
+package com.apicatalog.ld.node.adapter;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -8,7 +8,10 @@ import com.apicatalog.jsonld.StringUtils;
 
 public class XsdDateTimeAdapter {
 
-    public Instant read(String value) {
+    protected XsdDateTimeAdapter() {
+        /* protected */}
+
+    public static Instant read(String value) {
 
         if (StringUtils.isBlank(value)) {
             throw new IllegalArgumentException("Cannot convert null into an instant.");
@@ -25,7 +28,7 @@ public class XsdDateTimeAdapter {
 
     }
 
-    public String write(Instant value) {
+    public static String write(Instant value) {
         return value.toString();
     }
 

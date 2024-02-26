@@ -3,20 +3,22 @@ package com.apicatalog.vc.integrity;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
-import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.multibase.Multibase;
+import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.model.ProofValueProcessor;
+import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.proof.ProofValue;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 
 /**
  * Represents data integrity proof base class.
@@ -24,10 +26,11 @@ import jakarta.json.JsonObject;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAdapter {
+public class DataIntegrityProof implements Proof, MethodAdapter {
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
+    protected final JsonObject expanded;
 
     protected URI id;
     protected URI purpose;
@@ -36,10 +39,8 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     protected String domain;
     protected String nonce;
     protected String challenge;
-    protected byte[] value;
+    protected ProofValue value;
     protected URI previousProof;
-
-    final JsonObject expanded;
 
     protected DataIntegrityProof(
             DataIntegritySuite suite,
@@ -48,6 +49,47 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
         this.suite = suite;
         this.crypto = crypto;
         this.expanded = expandedProof;
+    }
+
+    @Override
+    public void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError {
+
+        Objects.requireNonNull(value);
+        Objects.requireNonNull(data);
+        Objects.requireNonNull(method);
+
+        // remove a proof value and a new unsigned copy
+        final JsonObject unsignedProof = unsignedCopy();
+
+        // verify signature
+        value.verify(
+                crypto,
+                context,
+                data,
+                unsignedProof,
+                method.publicKey());
+    }
+
+    @Override
+    public void validate(Map<String, Object> params) throws DocumentError {
+        if (created == null) {
+            throw new DocumentError(ErrorType.Missing, "Created");
+        }
+        if (method == null) {
+            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
+        }
+        if (purpose == null) {
+            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
+        }
+        if (value == null) {
+            throw new DocumentError(ErrorType.Missing, "ProofValue");
+        }
+
+        if (params != null) {
+            assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
+            assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
+            assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
+        }
     }
 
     /**
@@ -65,7 +107,7 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     }
 
     @Override
-    public VerificationMethod getMethod() {
+    public VerificationMethod method() {
         return method;
     }
 
@@ -97,8 +139,12 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
         return challenge;
     }
 
+    public String nonce() {
+        return nonce;
+    }
+
     @Override
-    public byte[] getValue() {
+    public ProofValue signature() {
         return value;
     }
 
@@ -113,52 +159,8 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     }
 
     @Override
-    public CryptoSuite getCryptoSuite() {
+    public CryptoSuite cryptoSuite() {
         return crypto;
-    }
-
-    @Override
-    public JsonObject toJsonLd() {
-        return expanded;
-    }
-
-    @Override
-    public void validate(Map<String, Object> params) throws DocumentError {
-        if (created == null) {
-            throw new DocumentError(ErrorType.Missing, "Created");
-        }
-        if (method == null) {
-            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
-        }
-        if (purpose == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
-        }
-        if (value == null || value.length == 0) {
-            throw new DocumentError(ErrorType.Missing, "ProofValue");
-        }
-
-        assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
-        assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
-        assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
-
-        suite.validateProofValue(value);
-    }
-
-    @Override
-    public JsonObject removeProofValue(JsonObject expanded) {
-        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
-    }
-
-    @Override
-    public JsonObject setProofValue(JsonObject expanded, byte[] proofValue) throws DocumentError {
-
-        LdNodeBuilder node = new LdNodeBuilder(Json.createObjectBuilder(expanded));
-
-        node.set(DataIntegrityVocab.PROOF_VALUE)
-                .scalar("https://w3id.org/security#multibase",
-                        Multibase.BASE_58_BTC.encode(proofValue));
-
-        return node.build();
     }
 
     @Override
@@ -172,26 +174,11 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
     }
 
     @Override
-    public String getContext() {
-        return "https://w3id.org/security/data-integrity/v2";
-    }
-
-    @Override
-    public ProofValueProcessor valueProcessor() {
-        return this;
-    }
-
-    @Override
     public JsonObject write(VerificationMethod value) {
         throw new UnsupportedOperationException();
     }
 
-    public String getNonce() {
-        return nonce;
-    }
-
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
-
         final Object value = params.get(name.name());
 
         if (value == null) {
@@ -202,4 +189,8 @@ public class DataIntegrityProof implements Proof, ProofValueProcessor, MethodAda
             throw new DocumentError(ErrorType.Invalid, name);
         }
     }
+    
+    protected JsonObject unsignedCopy() {
+        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
+    }    
 }

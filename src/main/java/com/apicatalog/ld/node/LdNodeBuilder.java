@@ -1,6 +1,7 @@
 package com.apicatalog.ld.node;
 
 import java.net.URI;
+import java.util.Collection;
 
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.Term;
@@ -21,13 +22,21 @@ public class LdNodeBuilder {
         this.builder = builder;
     }
     
+    public LdNodeBuilder(final JsonObject object) {
+        this.builder = Json.createObjectBuilder(object);
+    }
+    
+    public static LdNodeBuilder of(final JsonObject object) {
+        return new LdNodeBuilder(object);
+    }
+    
     public LdNodeBuilder type(String type) {
         builder.add(Keywords.TYPE, Json.createArrayBuilder().add(type));
         return this;
     }
     
     public LdSetter set(Term term) {
-        return new LdSetter(term, builder, null);
+        return new LdSetter(this, term, builder, null);
     }
     
     public JsonObject build() {
@@ -36,5 +45,9 @@ public class LdNodeBuilder {
 
     public void id(URI id) {
         builder.add(Keywords.ID, id.toString());
+    }
+
+    public void type(Collection<String> type) {
+        builder.add(Keywords.TYPE, Json.createArrayBuilder(type));        
     }
 }

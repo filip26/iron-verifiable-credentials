@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.apicatalog</groupId>
 	<artifactId>iron</artifactId>
-	<version>0.11.0</version>
+	<version>0.14.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Iron Verifiable Credentials</name>
@@ -52,7 +52,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<argLine>-Dfile.encoding=UTF-8</argLine>
 
-		<titanium.version>1.3.3</titanium.version>
+		<titanium.version>1.4.0</titanium.version>
 		<carbon.version>0.3.0</carbon.version>
 		<copper.codec.version>0.1.1</copper.codec.version>
 		<copper.base.version>0.5.0</copper.base.version>
@@ -183,9 +183,9 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>flatten-maven-plugin</artifactId>
-				<version>1.6.0</version>
+				<version>1.3.0</version>
 				<configuration>
-					<flattenMode>oss</flattenMode>
+					<flattenMode>ossrh</flattenMode>
 				</configuration>
 				<executions>
 					<!-- enable flattening -->

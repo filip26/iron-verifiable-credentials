@@ -9,7 +9,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonValue;

@@ -34,7 +34,7 @@ public class StatusPropertiesValidator implements StatusValidator {
         if (status.id == null) {
             throw new DocumentError(ErrorType.Missing, VcVocab.STATUS, Term.ID);
         }
-        
+
         final LdType type = node.type();
 
         if (!type.exists()) {
