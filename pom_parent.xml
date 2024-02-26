@@ -52,7 +52,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<argLine>-Dfile.encoding=UTF-8</argLine>
 
-		<titanium.version>1.4.0-SNAPSHOT</titanium.version>
+		<titanium.version>1.4.0</titanium.version>
 		<carbon.version>0.3.0</carbon.version>
 		<copper.codec.version>0.1.1</copper.codec.version>
 		<copper.base.version>0.5.0</copper.base.version>
