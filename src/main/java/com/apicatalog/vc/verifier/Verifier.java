@@ -33,6 +33,7 @@ import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
@@ -375,10 +376,10 @@ public class Verifier {
             }
 
             VerificationMethod verificationMethod = getMethod(proof, loader)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, "ProofVerificationMethod"));
+                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD));
 
             if (!(verificationMethod instanceof VerificationKey)) {
-                throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
+                throw new DocumentError(ErrorType.Unknown, VcVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
             }
 
             proof.verify(context, unsigned, (VerificationKey) verificationMethod);
@@ -394,7 +395,7 @@ public class Verifier {
         final VerificationMethod method = proof.method();
 
         if (method == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");
+            throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
         }
 
         final URI methodType = method.type();

@@ -60,15 +60,7 @@ public abstract class Verifiable {
     }
 
     public void proofs(Collection<Proof> proofs) {
-        this.proofs = proofs;        
-//        // remove proofs
-//        if (proofs == null || proofs.isEmpty()) {
-//            this.expanded = EmbeddedProof.removeProofs(expanded);
-//            return;
-//        }
-//        
-//        // set proofs
-//        this.expanded = EmbeddedProof.setProofs(expanded, proofs.stream().map(Proof::unsignedCopy).toList());
+        this.proofs = proofs;
     }
 
     public boolean isCredential() {

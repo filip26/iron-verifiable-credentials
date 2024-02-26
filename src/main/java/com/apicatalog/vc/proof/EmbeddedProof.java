@@ -54,7 +54,7 @@ public final class EmbeddedProof {
     public static final JsonObject setProofs(final JsonObject document, final Collection<JsonObject> proofs) {
 
         final JsonArrayBuilder builder = Json.createArrayBuilder();
-        proofs.forEach(System.out::println);
+
         proofs.stream().map(proof -> Json.createObjectBuilder()
                 .add(Keywords.GRAPH,
                         Json.createArrayBuilder().add(proof)))

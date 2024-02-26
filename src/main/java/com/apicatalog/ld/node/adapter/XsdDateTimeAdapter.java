@@ -8,6 +8,9 @@ import com.apicatalog.jsonld.StringUtils;
 
 public class XsdDateTimeAdapter {
 
+    protected XsdDateTimeAdapter() {
+        /* protected */}
+
     public static Instant read(String value) {
 
         if (StringUtils.isBlank(value)) {
