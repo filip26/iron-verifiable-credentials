@@ -62,7 +62,7 @@ public class DocumentSelector {
         return pointers.stream()
                 .sorted(Collections.reverseOrder())
                 .map(Json::createPointer)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
     }
 
     private static JsonObject createNode(JsonObject target, JsonObject source, String[] segments, int index) {
