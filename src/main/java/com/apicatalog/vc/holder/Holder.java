@@ -2,6 +2,7 @@ package com.apicatalog.vc.holder;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -143,16 +144,18 @@ public class Holder extends AbstractProcessor<Holder> {
 
         final JsonObject derivedProof = proof.derive(context, unsigned, selectors);
 
-        Collection<String> combinedPointers = Stream.of(
-                ((BaseProofValue) proofValue).pointers(),
-                selectors,
-                Arrays.asList("/" + Keywords.CONTEXT))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+        final Collection<String> combinedPointers = Stream.of(
+                        ((BaseProofValue) proofValue).pointers(),
+                        (selectors != null ? selectors : Collections.<String>emptyList()),
+                        Arrays.asList("/" + Keywords.CONTEXT))
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList());
+
+        final JsonObject reveal = DocumentSelector.of(combinedPointers).getNodes(document);
 
         try {
             return new ExpandedVerifiable(EmbeddedProof.addProof(
-                    JsonLd.expand(JsonDocument.of(DocumentSelector.of(combinedPointers).getNodes(document)))
+                    JsonLd.expand(JsonDocument.of(reveal))
                             .loader(loader)
                             .get().getJsonObject(0),
                     derivedProof), context, loader);
