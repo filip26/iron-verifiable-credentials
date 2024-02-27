@@ -44,6 +44,7 @@ public class SolidProofValue implements ProofValue {
                 value);
     }
 
+    @Override
     public byte[] toByteArray() {
         return value;
     }

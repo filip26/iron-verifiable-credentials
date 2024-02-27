@@ -84,7 +84,7 @@ public abstract class Verifiable {
      * 
      * @return the data model version, never <code>null</code>
      */
-    public ModelVersion getVersion() {
+    public ModelVersion version() {
         return version;
     }
 
@@ -138,12 +138,6 @@ public abstract class Verifiable {
     }
 
     public abstract void validate() throws DocumentError;
-
-//    public Collection<Proof> removeProofs() {
-//        final Collection<Proof> tmp = proofs;
-//        this.proofs = null;
-//        return tmp;
-//    }
 
     static JsonObject compact(final JsonObject signed, final JsonStructure context, final DocumentLoader loader) throws DocumentError {
 

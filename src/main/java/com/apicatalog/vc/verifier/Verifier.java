@@ -3,10 +3,8 @@ package com.apicatalog.vc.verifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -16,7 +14,6 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
-import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
@@ -25,19 +22,13 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.multicodec.Multicodec.Tag;
-import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
-import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
-import com.apicatalog.vc.method.resolver.HttpMethodResolver;
-import com.apicatalog.vc.method.resolver.MethodResolver;
+import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
@@ -51,66 +42,20 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
-public class Verifier {
-
-    protected final SignatureSuite[] suites;
-
-    protected DocumentLoader defaultLoader;
-    protected boolean bundledContexts;
-    protected URI base;
+public class Verifier extends AbstractProcessor<Verifier> {
 
     protected StatusValidator statusValidator;
     protected SubjectValidator subjectValidator;
 
-    protected ModelVersion modelVersion;
-
-    protected Collection<MethodResolver> methodResolvers;
-
     protected Verifier(final SignatureSuite... suites) {
-        this.suites = suites;
-
-        // default values
-        this.defaultLoader = null;
-        this.bundledContexts = true;
-        this.base = null;
-        this.modelVersion = null;
+        super(suites);
 
         this.statusValidator = new StatusPropertiesValidator();
         this.subjectValidator = null;
-        this.methodResolvers = defaultResolvers();
     }
 
     public static Verifier with(final SignatureSuite... suites) {
         return new Verifier(suites);
-    }
-
-    public Verifier loader(DocumentLoader loader) {
-        this.defaultLoader = loader;
-        return this;
-    }
-
-    /**
-     * Use well-known contexts that are bundled with the library instead of fetching
-     * it online. <code>true</code> by default. Disabling might cause slower
-     * processing.
-     *
-     * @param enable
-     * @return the processor instance
-     */
-    public Verifier useBundledContexts(boolean enable) {
-        this.bundledContexts = enable;
-        return this;
-    }
-
-    /**
-     * If set, this overrides the input document's IRI.
-     *
-     * @param base
-     * @return the processor instance
-     */
-    public Verifier base(URI base) {
-        this.base = base;
-        return this;
     }
 
     /**
@@ -134,20 +79,6 @@ public class Verifier {
      */
     public Verifier subjectValidator(SubjectValidator subjectValidator) {
         this.subjectValidator = subjectValidator;
-        return this;
-    }
-
-    protected static final Collection<MethodResolver> defaultResolvers() {
-        Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
-        resolvers.add(new HttpMethodResolver());
-        return resolvers;
-    }
-
-    // TODO resolvers should be multilevel, per verifier, per proof type, e.g.
-    // DidUrlMethodResolver could be different.
-    public Verifier methodResolvers(Collection<MethodResolver> resolvers) {
-        this.methodResolvers = resolvers;
         return this;
     }
 
@@ -215,21 +146,6 @@ public class Verifier {
     public Verifiable verify(URI location, Map<String, Object> params) throws VerificationError, DocumentError {
         Objects.requireNonNull(location);
         return verify(location, params, getLoader());
-    }
-
-    protected DocumentLoader getLoader() {
-
-        DocumentLoader loader = defaultLoader;
-
-        if (loader == null) {
-            // default loader
-            loader = SchemeRouter.defaultInstance();
-        }
-
-        if (bundledContexts) {
-            loader = new StaticContextLoader(loader);
-        }
-        return loader;
     }
 
     protected Verifiable verify(final URI location, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
@@ -390,47 +306,6 @@ public class Verifier {
         return proofs;
     }
 
-    Optional<VerificationMethod> getMethod(final Proof proof, DocumentLoader loader) throws VerificationError, DocumentError {
-
-        final VerificationMethod method = proof.method();
-
-        if (method == null) {
-            throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
-        }
-
-        final URI methodType = method.type();
-
-        if (methodType != null
-                && method instanceof VerificationKey
-                && (((VerificationKey) method).publicKey() != null)) {
-            return Optional.of(method);
-        }
-
-        return resolveMethod(method.id(), proof, loader);
-    }
-
-    Optional<VerificationMethod> resolveMethod(
-            URI id,
-            Proof proof,
-            DocumentLoader loader) throws DocumentError {
-
-        if (id == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofVerificationId");
-        }
-
-        // find the method id resolver
-        final Optional<MethodResolver> resolver = methodResolvers.stream()
-                .filter(r -> r.isAccepted(id))
-                .findFirst();
-
-        // try to resolve the method
-        if (resolver.isPresent()) {
-            return Optional.ofNullable(resolver.get().resolve(id, loader, proof));
-        }
-
-        throw new DocumentError(ErrorType.Unknown, "ProofVerificationId");
-    }
-
     final void validate(final Credential credential) throws DocumentError, VerificationError {
 
         // validation
@@ -445,21 +320,10 @@ public class Verifier {
         validateData(credential);
     }
 
-    SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
-        for (final SignatureSuite suite : suites) {
-            for (final String proofType : proofTypes) {
-                if (suite.isSupported(proofType, expandedProof)) {
-                    return suite;
-                }
-            }
-        }
-        return null;
-    }
-
     protected void validateData(final Credential credential) throws DocumentError {
 
         // v1
-        if ((credential.getVersion() == null || ModelVersion.V11.equals(credential.getVersion()))
+        if ((credential.version() == null || ModelVersion.V11.equals(credential.version()))
                 && credential.getIssuanceDate() == null) {
             // issuance date is a mandatory property
             throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);

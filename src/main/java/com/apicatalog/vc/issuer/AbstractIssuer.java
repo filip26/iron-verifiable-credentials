@@ -18,6 +18,7 @@ import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.node.LdNodeBuilder;
+import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
@@ -25,8 +26,10 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.processor.ExpandedVerifiable;
 import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
@@ -131,8 +134,8 @@ public abstract class AbstractIssuer implements Issuer {
 
         // add issuance date if missing
         if (verifiable.isCredential()
-                && (verifiable.getVersion() == null
-                        || ModelVersion.V11.equals(verifiable.getVersion()))
+                && (verifiable.version() == null
+                        || ModelVersion.V11.equals(verifiable.version()))
                 && verifiable.asCredential().getIssuanceDate() == null) {
 
             final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
@@ -146,7 +149,12 @@ public abstract class AbstractIssuer implements Issuer {
         final JsonObject unsigned = EmbeddedProof.removeProofs(object);
 
         // signature
-        final JsonObject signedProof = sign(context, unsigned, draft);
+        final byte[] signature = sign(context, unsigned, draft);
+        
+        final JsonObject proofValue = LdScalar.multibase(proofValueBase, signature);
+
+        // signed proof
+        final JsonObject signedProof = DataIntegrityProofDraft.signed(draft.unsigned(), proofValue);
 
         return new ExpandedVerifiable(EmbeddedProof.addProof(object, signedProof), context, loader);
     }
@@ -164,7 +172,7 @@ public abstract class AbstractIssuer implements Issuer {
      * @throws SigningError
      * @throws DocumentError
      */
-    protected abstract JsonObject sign(
+    protected abstract byte[] sign(
             JsonArray context,
             JsonObject document,
             ProofDraft draft) throws SigningError, DocumentError;

@@ -5,6 +5,7 @@ import java.net.URI;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
+import com.apicatalog.vc.processor.ExpandedVerifiable;
 
 import jakarta.json.JsonObject;
 
