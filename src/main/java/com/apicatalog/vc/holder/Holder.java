@@ -20,16 +20,14 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.sd.DocumentSelector;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.VcVocab;
-import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.ExpandedVerifiable;
+import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
@@ -63,7 +61,7 @@ public class Holder extends AbstractProcessor<Holder> {
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
 
-            return deriveExpanded(Verifiable.getVersion(document), document, context, expanded, selectors, loader);
+            return deriveExpanded(document, context, expanded, selectors, loader);
 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
@@ -71,7 +69,7 @@ public class Holder extends AbstractProcessor<Holder> {
         }
     }
 
-    private ExpandedVerifiable deriveExpanded(final ModelVersion version, final JsonObject document, JsonStructure context, JsonArray expanded, Collection<String> selectors, DocumentLoader loader)
+    private ExpandedVerifiable deriveExpanded(final JsonObject document, JsonStructure context, JsonArray expanded, Collection<String> selectors, DocumentLoader loader)
             throws SigningError, DocumentError {
 
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
@@ -84,10 +82,10 @@ public class Holder extends AbstractProcessor<Holder> {
             throw new DocumentError(ErrorType.Invalid);
         }
 
-        return deriveExpanded(version, document, context, verifiable.asJsonObject(), selectors, loader);
+        return deriveExpanded(document, context, verifiable.asJsonObject(), selectors, loader);
     }
 
-    private ExpandedVerifiable deriveExpanded(final ModelVersion version, final JsonObject document, JsonStructure context, final JsonObject expanded, Collection<String> selectors,
+    private ExpandedVerifiable deriveExpanded(final JsonObject document, JsonStructure context, final JsonObject expanded, Collection<String> selectors,
             DocumentLoader loader) throws SigningError, DocumentError {
 
         if (Credential.isCredential(expanded)) {

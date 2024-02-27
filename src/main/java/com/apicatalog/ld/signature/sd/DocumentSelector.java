@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.BlankNode;
@@ -61,7 +62,7 @@ public class DocumentSelector {
         return pointers.stream()
                 .sorted(Collections.reverseOrder())
                 .map(Json::createPointer)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private static JsonObject createNode(JsonObject target, JsonObject source, String[] segments, int index) {
@@ -111,7 +112,7 @@ public class DocumentSelector {
 
         JsonArrayBuilder array;
 
-        final int arrayIndex = Integer.valueOf(segments[index]);
+        final int arrayIndex = Integer.parseInt(segments[index]);
 
         if (JsonUtils.isNull(target)) {
 
