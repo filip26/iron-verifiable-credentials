@@ -1,4 +1,4 @@
-package com.apicatalog.vc.issuer;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 
@@ -24,7 +24,7 @@ public class ExpandedVerifiable {
     
     protected JsonObject expanded;
 
-    protected ExpandedVerifiable(JsonObject expanded, JsonStructure context, DocumentLoader loader) {
+    public ExpandedVerifiable(JsonObject expanded, JsonStructure context, DocumentLoader loader) {
         this.expanded = expanded;
         this.loader = loader;
         this.context = context;

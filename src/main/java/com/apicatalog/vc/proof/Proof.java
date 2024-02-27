@@ -1,10 +1,12 @@
 package com.apicatalog.vc.proof;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
@@ -70,7 +72,13 @@ public interface Proof {
      */
     void validate(Map<String, Object> params) throws DocumentError;
 
-    void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError;
+    void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError;
 
+    default JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
+        throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
+    }
+    
     MethodAdapter methodProcessor();
+
+
 }

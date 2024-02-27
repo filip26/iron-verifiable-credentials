@@ -2,19 +2,23 @@ package com.apicatalog.vc.integrity;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
+import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vc.proof.BaseProofValue;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -52,13 +56,13 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError {
+    public void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError {
 
         Objects.requireNonNull(value);
         Objects.requireNonNull(data);
         Objects.requireNonNull(method);
 
-        // remove a proof value and a new unsigned copy
+        // remove a proof value and get a new unsigned copy
         final JsonObject unsignedProof = unsignedCopy();
 
         // verify signature
@@ -192,5 +196,15 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     
     protected JsonObject unsignedCopy() {
         return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
+    }
+
+    @Override
+    public JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
+
+        final ProofValue derivedProofValue = ((BaseProofValue)value).derive(context, data,  selectors);
+        
+        final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
+
+        return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
     }    
 }

@@ -1,4 +1,4 @@
-package com.apicatalog.vc.verifier;
+package com.apicatalog.vc.processor;
 
 import java.net.URI;
 import java.util.Collection;
@@ -33,7 +33,7 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
-public class Processor {
+public abstract class AbstractProcessor<T extends AbstractProcessor<T>> {
 
     protected final SignatureSuite[] suites;
 
@@ -45,7 +45,7 @@ public class Processor {
 
     protected Collection<MethodResolver> methodResolvers;
 
-    protected Processor(final SignatureSuite... suites) {
+    protected AbstractProcessor(final SignatureSuite... suites) {
         this.suites = suites;
 
         // default values
@@ -57,9 +57,10 @@ public class Processor {
         this.methodResolvers = defaultResolvers();
     }
 
-    public Processor loader(DocumentLoader loader) {
+    @SuppressWarnings("unchecked")
+    public T loader(DocumentLoader loader) {
         this.defaultLoader = loader;
-        return this;
+        return (T)this;
     }
 
     /**
@@ -70,9 +71,10 @@ public class Processor {
      * @param enable
      * @return the processor instance
      */
-    public Processor useBundledContexts(boolean enable) {
+    @SuppressWarnings("unchecked")
+    public T useBundledContexts(boolean enable) {
         this.bundledContexts = enable;
-        return this;
+        return (T)this;
     }
 
     /**
@@ -81,9 +83,10 @@ public class Processor {
      * @param base
      * @return the processor instance
      */
-    public Processor base(URI base) {
+    @SuppressWarnings("unchecked")
+    public T base(URI base) {
         this.base = base;
-        return this;
+        return (T)this;
     }
 
     protected static final Collection<MethodResolver> defaultResolvers() {
@@ -95,9 +98,10 @@ public class Processor {
 
     // TODO resolvers should be multilevel, per verifier, per proof type, e.g.
     // DidUrlMethodResolver could be different.
-    public Processor methodResolvers(Collection<MethodResolver> resolvers) {
+    @SuppressWarnings("unchecked")
+    public T methodResolvers(Collection<MethodResolver> resolvers) {
         this.methodResolvers = resolvers;
-        return this;
+        return (T)this;
     }
 
     protected DocumentLoader getLoader() {
