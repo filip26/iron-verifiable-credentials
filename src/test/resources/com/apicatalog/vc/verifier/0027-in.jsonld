@@ -1,21 +1,21 @@
 {
-    "@context": [
-        "https://www.w3.org/2018/credentials/v1",
-        "https://w3id.org/security/multikey/v1",
-        "https://w3id.org/security/data-integrity/v1"
-    ],
-    "id": "https://apicatalog/com/vc/test-credentials#0001",
-    "type": "VerifiableCredential",
-    "issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
-    "expirationDate": "2022-05-31T19:21:25Z",
-    "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-    "proof": {
-        "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-        "type": "DataIntegrityProof",
-        "cryptosuite": "test-2022",
-        "challenge": "498798779",
-        "created": "2022-06-18T19:00:44Z",
-        "proofPurpose": "assertionMethod",
-        "proofValue": "z3C8LdJarFMLfaq3SGxNj7G3px4Ap4rLQFLQshmV7m8r4"
-    }
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://w3id.org/security/multikey/v1",
+    "https://w3id.org/security/data-integrity/v1"
+  ],
+  "id": "https://apicatalog/com/vc/test-credentials#0001",
+  "type": "VerifiableCredential",
+  "issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
+  "expirationDate": "2022-05-31T19:21:25Z",
+  "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+  "proof": {
+    "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+    "type": "DataIntegrityProof",
+    "cryptosuite": "test-2022",
+    "challenge": "498798779",
+    "created": "2022-06-18T19:00:44Z",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "z3C8LdJarFMLfaq3SGxNj7G3px4Ap4rLQFLQshmV7m8r4"
+  }
 }

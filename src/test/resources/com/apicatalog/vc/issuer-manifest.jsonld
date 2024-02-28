@@ -1,214 +1,214 @@
 {
-	"@context": [
-		"context.jsonld",
-		{
-			"@base": "issuer-manifest"
-		}
-	],
-	"@id": "",
-	"@type": "mf:Manifest",
-	"name": "Verifiable Credentials Issuer Test Suite",
-	"sequence": [
-		{
-			"@id": "#t0003",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "missing issuer property",
-			"input": "issuer/0003-in.jsonld",
-			"expectErrorCode": "MissingIssuer"
-		},
-		{
-			"@id": "#t0004",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "issuer @id must be IRI",
-			"input": "issuer/0004-in.jsonld",
-			"expectErrorCode": "InvalidIssuer"
-		},
-		{
-			"@id": "#t0005",
-			"@type": [
-				"NegativeEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "missing issuanceDate property",
-			"input": "issuer/0005-in.jsonld",
-			"expectErrorCode": "MissingIssuanceDate"
-		},
-		{
-			"@id": "#t0020",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "a simple credential to sign",
-			"input": "issuer/0020-in.jsonld",
-			"expect": "issuer/0020-out.jsonld",
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "verifier/0005-verification-key.json",
-				"created": "2022-05-28T17:02:05Z"
-			}
-		},
-		{
-			"@id": "#t0021",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "compacted signed credential",
-			"input": "issuer/0021-in.jsonld",
-			"expect": "issuer/0021-out.jsonld",
-			"compacted": true,
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "verifier/0005-verification-key.json",
-				"created": "2022-06-04T20:33:01Z"
-			}
-		},
-		{
-			"@id": "#t0022",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "signed embedded verificationMethod",
-			"input": "issuer/0022-in.jsonld",
-			"expect": "issuer/0022-out.jsonld",
-			"compacted": true,
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": {
-					"id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-					"type": "Multikey",
-					"controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
-					"publicKeyMultibase": "z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA"
-				},
-				"created": "2022-06-04T20:33:01Z"
-			}
-		},
-		{
-			"@id": "#t0023",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "a credential with DID key as a verification method",
-			"input": "issuer/0023-in.jsonld",
-			"expect": "issuer/0023-out.jsonld",
-			"compacted": true,
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
-				"created": "2022-05-28T17:02:05Z"
-			}
-		},
-		{
-			"@id": "#t0024",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "proof domain property",
-			"input": "issuer/0024-in.jsonld",
-			"expect": "issuer/0024-out.jsonld",
-			"compacted": true,
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "verifier/0005-verification-key.json",
-				"created": "2022-06-18T19:00:44Z",
-				"domain": "4jt78h47fh47"
-			}
-		},
-		{
-			"@id": "#t0025",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "proof challenge property",
-			"input": "issuer/0025-in.jsonld",
-			"expect": "issuer/0025-out.jsonld",
-			"context": "issuer/0001-context.jsonld",
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "verifier/0005-verification-key.json",
-				"created": "2022-06-18T19:00:44Z",
-				"challenge": "498798779"
-			}
-		},
-        {
-            "@id": "#t0026",
-            "@type": [
-                "PositiveEvaluationTest",
-                "IssuerTest"
-            ],
-            "name": "proof challenge property",
-            "input": "issuer/0026-in.jsonld",
-            "expect": "issuer/0026-out.jsonld",
-            "compacted": true,
-            "options": {
-                "keyPair": "issuer/0001-keys.json",
-                "verificationMethod": "verifier/0005-verification-key.json",
-                "created": "2024-01-18T19:00:44Z",
-                "nonce": "kmcd190e183038djicqe-018i3-33"
-            }
-        },		
-		{
-			"@id": "#t0030",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "proof set, co-sign",
-			"input": "issuer/0030-in.jsonld",
-			"expect": "issuer/0030-out.jsonld",
-			"compacted": true,
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": {
-					"@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-					"@type": "Multikey",
-					"controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2"
-				},
-				"created": "2022-06-07T21:06:15Z"
-			}
-		},
-		{
-			"@id": "#t0050",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "compacted signed presentation",
-			"input": "issuer/0050-in.jsonld",
-			"expect": "issuer/0050-out.jsonld",
-			"compacted": true,
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "verifier/0005-verification-key.json",
-				"created": "2022-06-09T21:49:41Z"
-			}
-		},
-		{
-			"@id": "#t0201",
-			"@type": [
-				"PositiveEvaluationTest",
-				"IssuerTest"
-			],
-			"name": "V2 credential to sign",
-			"input": "issuer/0201-in.jsonld",
-			"expect": "issuer/0201-out.jsonld",
-			"compacted": true,
-			"options": {
-				"keyPair": "issuer/0001-keys.json",
-				"verificationMethod": "verifier/0005-verification-key.json",
-				"created": "2022-05-28T17:02:05Z"
-			}
-		}
-	]
+  "@context": [
+    "context.jsonld",
+    {
+      "@base": "issuer-manifest"
+    }
+  ],
+  "@id": "",
+  "@type": "mf:Manifest",
+  "name": "Verifiable Credentials Issuer Test Suite",
+  "sequence": [
+    {
+      "@id": "#t0003",
+      "@type": [
+        "NegativeEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "missing issuer property",
+      "input": "issuer/0003-in.jsonld",
+      "expectErrorCode": "MissingIssuer"
+    },
+    {
+      "@id": "#t0004",
+      "@type": [
+        "NegativeEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "issuer @id must be IRI",
+      "input": "issuer/0004-in.jsonld",
+      "expectErrorCode": "InvalidIssuer"
+    },
+    {
+      "@id": "#t0005",
+      "@type": [
+        "NegativeEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "missing issuanceDate property",
+      "input": "issuer/0005-in.jsonld",
+      "expectErrorCode": "MissingIssuanceDate"
+    },
+    {
+      "@id": "#t0020",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "a simple credential to sign",
+      "input": "issuer/0020-in.jsonld",
+      "expect": "issuer/0020-out.jsonld",
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": "verifier/0005-verification-key.json",
+        "created": "2022-05-28T17:02:05Z"
+      }
+    },
+    {
+      "@id": "#t0021",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "compacted signed credential",
+      "input": "issuer/0021-in.jsonld",
+      "expect": "issuer/0021-out.jsonld",
+      "compacted": true,
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": "verifier/0005-verification-key.json",
+        "created": "2022-06-04T20:33:01Z"
+      }
+    },
+    {
+      "@id": "#t0022",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "signed embedded verificationMethod",
+      "input": "issuer/0022-in.jsonld",
+      "expect": "issuer/0022-out.jsonld",
+      "compacted": true,
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": {
+          "id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+          "type": "Multikey",
+          "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
+          "publicKeyMultibase": "z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA"
+        },
+        "created": "2022-06-04T20:33:01Z"
+      }
+    },
+    {
+      "@id": "#t0023",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "a credential with DID key as a verification method",
+      "input": "issuer/0023-in.jsonld",
+      "expect": "issuer/0023-out.jsonld",
+      "compacted": true,
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
+        "created": "2022-05-28T17:02:05Z"
+      }
+    },
+    {
+      "@id": "#t0024",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "proof domain property",
+      "input": "issuer/0024-in.jsonld",
+      "expect": "issuer/0024-out.jsonld",
+      "compacted": true,
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": "verifier/0005-verification-key.json",
+        "created": "2022-06-18T19:00:44Z",
+        "domain": "4jt78h47fh47"
+      }
+    },
+    {
+      "@id": "#t0025",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "proof challenge property",
+      "input": "issuer/0025-in.jsonld",
+      "expect": "issuer/0025-out.jsonld",
+      "context": "issuer/0001-context.jsonld",
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": "verifier/0005-verification-key.json",
+        "created": "2022-06-18T19:00:44Z",
+        "challenge": "498798779"
+      }
+    },
+    {
+      "@id": "#t0026",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "proof challenge property",
+      "input": "issuer/0026-in.jsonld",
+      "expect": "issuer/0026-out.jsonld",
+      "compacted": true,
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": "verifier/0005-verification-key.json",
+        "created": "2024-01-18T19:00:44Z",
+        "nonce": "kmcd190e183038djicqe-018i3-33"
+      }
+    },
+    {
+      "@id": "#t0030",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "proof set, co-sign",
+      "input": "issuer/0030-in.jsonld",
+      "expect": "issuer/0030-out.jsonld",
+      "compacted": true,
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": {
+          "@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+          "@type": "Multikey",
+          "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2"
+        },
+        "created": "2022-06-07T21:06:15Z"
+      }
+    },
+    {
+      "@id": "#t0050",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "compacted signed presentation",
+      "input": "issuer/0050-in.jsonld",
+      "expect": "issuer/0050-out.jsonld",
+      "compacted": true,
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": "verifier/0005-verification-key.json",
+        "created": "2022-06-09T21:49:41Z"
+      }
+    },
+    {
+      "@id": "#t0201",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "V2 credential to sign",
+      "input": "issuer/0201-in.jsonld",
+      "expect": "issuer/0201-out.jsonld",
+      "compacted": true,
+      "options": {
+        "keyPair": "issuer/0001-keys.json",
+        "verificationMethod": "verifier/0005-verification-key.json",
+        "created": "2022-05-28T17:02:05Z"
+      }
+    }
+  ]
 }

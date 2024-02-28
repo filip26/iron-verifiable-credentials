@@ -136,7 +136,7 @@ public abstract class AbstractIssuer implements Issuer {
         if (verifiable.isCredential()
                 && (verifiable.version() == null
                         || ModelVersion.V11.equals(verifiable.version()))
-                && verifiable.asCredential().getIssuanceDate() == null) {
+                && verifiable.asCredential().issuanceDate() == null) {
 
             final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 

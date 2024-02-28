@@ -1,8 +1,8 @@
 {
-    "@context": "https://w3id.org/security/multikey/v1",
-    "id": "https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json",
-    "type": "Multikey",
-    "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
-    "publicKeyMultibase": "z5C4bRz6fCAGdoB442BZsN2sUrEPBt3KPU4RJhx9c1oYkRpg",
-    "secretKeyMultibase": "z5DNeD4yj8bqsswn58eW2HUm1MZuAJn46k8d7k9Pwq82xGqJ"
+  "@context": "https://w3id.org/security/multikey/v1",
+  "id": "https://github.com/filip26/iron-verifiable-credentials/issuer/0001-keys.json",
+  "type": "Multikey",
+  "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
+  "publicKeyMultibase": "z5C4bRz6fCAGdoB442BZsN2sUrEPBt3KPU4RJhx9c1oYkRpg",
+  "secretKeyMultibase": "z5DNeD4yj8bqsswn58eW2HUm1MZuAJn46k8d7k9Pwq82xGqJ"
 }

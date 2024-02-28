@@ -324,14 +324,14 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
         // v1
         if ((credential.version() == null || ModelVersion.V11.equals(credential.version()))
-                && credential.getIssuanceDate() == null) {
+                && credential.issuanceDate() == null) {
             // issuance date is a mandatory property
             throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
         }
 
         // status check
-        if (statusValidator != null && JsonUtils.isNotNull(credential.getStatus())) {
-            statusValidator.verify(credential.getStatus());
+        if (statusValidator != null && JsonUtils.isNotNull(credential.status())) {
+            statusValidator.verify(credential.status());
         }
     }
 }

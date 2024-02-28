@@ -42,7 +42,7 @@ public class Credential extends Verifiable {
 
     /**
      * A date time when the credential has been issued. VC data model v1.1.
-     * Deprecated in favor of {@link Credential#getValidFrom()} by VC data model
+     * Deprecated in favor of {@link Credential#validFrom()} by VC data model
      * v2.0.
      * 
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
@@ -53,28 +53,28 @@ public class Credential extends Verifiable {
      * @return a date time from which the credential claims are valid or
      *         <code>null</code>.
      */
-    public Instant getIssuanceDate() {
+    public Instant issuanceDate() {
         return issuance;
     }
 
-    public void setIssuanceDate(Instant issuance) {
+    public void issuanceDate(Instant issuance) {
         this.issuance = issuance;
     }
 
     /**
      * VC data model v1.1 only. Deprecated in favor of
-     * {@link Credential#getValidUntil()} by VC data model v2.0.
+     * {@link Credential#validUntil()} by VC data model v2.0.
      * 
      * @see <a href=
      *      "https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
      * 
      * @return the expiration date or <code>null</code> if not set
      */
-    public Instant getExpiration() {
+    public Instant expiration() {
         return expiration;
     }
 
-    public void setExpiration(Instant expiration) {
+    public void expiration(Instant expiration) {
         this.expiration = expiration;
     }
 
@@ -88,11 +88,11 @@ public class Credential extends Verifiable {
      * 
      * @return a date time
      */
-    public Instant getValidFrom() {
+    public Instant validFrom() {
         return validFrom;
     }
 
-    public void setValidFrom(Instant validFrom) {
+    public void validFrom(Instant validFrom) {
         this.validFrom = validFrom;
     }
 
@@ -104,11 +104,11 @@ public class Credential extends Verifiable {
      * 
      * @return the date and time the credential ceases to be valid
      */
-    public Instant getValidUntil() {
+    public Instant validUntil() {
         return validUntil;
     }
 
-    public void setValidUntil(Instant validUntil) {
+    public void validUntil(Instant validUntil) {
         this.validUntil = validUntil;
     }
 
@@ -140,7 +140,7 @@ public class Credential extends Verifiable {
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
      * @return {@link JsonObject} representing the issuer in an expanded form
      */
-    public JsonValue getIssuer() {
+    public JsonValue issuer() {
         return issuer;
     }
 
@@ -149,7 +149,7 @@ public class Credential extends Verifiable {
      * 
      * @return
      */
-    public JsonValue getStatus() {
+    public JsonValue status() {
         return status;
     }
 
@@ -160,7 +160,7 @@ public class Credential extends Verifiable {
      * 
      * @return
      */
-    public JsonValue getSubject() {
+    public JsonValue subject() {
         return subject;
     }
 
@@ -247,16 +247,16 @@ public class Credential extends Verifiable {
         credential.status = (document.get(VcVocab.STATUS.uri()));
 
         // issuance date - mandatory for verification
-        credential.setIssuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
+        credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
 
         // expiration date - optional
-        credential.setExpiration(node.scalar(VcVocab.EXPIRATION_DATE).xsdDateTime());
+        credential.expiration(node.scalar(VcVocab.EXPIRATION_DATE).xsdDateTime());
 
         // validFrom - optional
-        credential.setValidFrom(node.scalar(VcVocab.VALID_FROM).xsdDateTime());
+        credential.validFrom(node.scalar(VcVocab.VALID_FROM).xsdDateTime());
 
         // validUntil - optional
-        credential.setValidUntil(node.scalar(VcVocab.VALID_UNTIL).xsdDateTime());
+        credential.validUntil(node.scalar(VcVocab.VALID_UNTIL).xsdDateTime());
         
         return credential;
     }

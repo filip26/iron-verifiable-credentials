@@ -11,23 +11,18 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 
 ## Features
 
-* Verifying VC/VP   
-* Issuing VC/VP
+* Issuer, Verifier, Holder
+* Signature Suites
+  * [W3C Data Integrity Cryptosuites](https://www.w3.org/TR/vc-data-integrity/)
+    * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023) [selective disclosure]
+    * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
+    * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019) [P-256, P-384]
+    * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
+  * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
+  * Have you implemented a signature suite? List it here, open PR.
 * Data Models
   * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
-* Signature Suites
-  * [W3C Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
-    * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019)
-    * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
-    * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023) (planned)
-    * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
-  * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
-  * Have you implemented a signature provider? List it here, open PR.
-
-## Extensions
-* [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
-* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
   
 ## Installation
 
@@ -38,7 +33,7 @@ Java 17+
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials</artifactId>
-    <version>0.11.0</version>
+    <version>0.14.0</version>
 </dependency>
 
 ```
@@ -47,57 +42,91 @@ Java 17+
 Android 12+ (API Level >=31)
 
 ```gradle
-compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.11.0'
+implementation("com.apicatalog:iron-verifiable-credentials-jre8:0.14.0")
 ```
-
-## Documentation
-
-[![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
 
 ## Usage
 
-Please use together with a cryptosuite(s) of your choice, e.g. [EdDSA RDFC 2022](https://github.com/filip26/iron-eddsa-rdfc-2022). Read the suite(s) documentation for specifics.
+This repository provides common logic and primitives to easily implement a signature suite. It is intended to be used together with a suite, or suites, of your choice, e.g. [ECDSA SD 2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
 
-### Verifying 
+### Verifier
 
-```java
+```javascript
+// create a new verifier instance
+static Verifier VERIFIER = Verifier.with(SUITE1, SUITE2, ...)
+    // options
+    .base(...)
+    .loader(...)
+    .useBundledContexts(true|false)
+    .statusValidator(...)
+    .subjectValidator(...)
+    // ...
+    ; 
 
 try {
-  Vc.verify(credential|presentation, suites)
-      
-    // optional
-    .base(...)
-    .loader(documentLoader) 
-    .statusVerifier(...)
-    .useBundledContexts(true|false)
-
-    // custom | suite specific | parameters
-    .param(..., ....)
-
-    // assert document validity
-    .isValid();
-    
-} catch (VerificationError | DataError e) {
+  // verify the given input proof(s)
+  var verifiable = VERIFIER.verify(credential|presentation);
+  
+  // or with runtime parameters e.g. domain, challenge, etc.
+  var verifiable = VERIFIER.verify(credential|presentation, parameters);
+  
+  // get verified details
+  verifiable.subject()
+  verifiable.id()
+  verifiable.type()
+  // ...
+  
+} catch (VerificationError | DocumentError e) {
   ...
 }
 
 ```
 
-### Issuing
+### Issuer
 
-```java
-Vc.sign(credential|presentation, keys, proofDraft)
+```javascript
+// create a new issuer instance
+Issuer ISSUER = SUITE.createIssuer(keyPairProvider)
+    // options
+    .base(...)
+    .loader(...)
+    .useBundledContexts(true|false)
+    // ...
+    ; 
 
-   // optional
-   .base(...)
-   .loader(documentLoader) 
-   .statusVerifier(...)
-   .useBundledContexts(true|false)
-
-   // return signed document in a compacted form
-   .getCompacted(context);
-
+try {
+  // issue a new verifiable, i.e. sign the input and add a new proof
+  var verifiable = ISSUER.sign(credential|presentation, proofDraft).compacted();
+  
+} catch (SigningError | DocumentError e) {
+  ...
+}
 ```
+
+### Holder
+
+```javascript
+// create a new holder instance
+static Holder HOLDER = Holder.with(SUITE1, SUITE2, ...)
+    // options
+    .base(...)
+    .loader(...)
+    .useBundledContexts(true|false)
+    // ...
+    ; 
+
+try {
+  // derive a new signed credentials disclosing selected claims only
+  var verifiable = HOLDER.derive(credential, selectors).compacted();
+
+} catch (SigningError | DocumentError e) {
+  ...
+}
+```
+
+## Documentation
+
+[![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
 
 ## Contributing
 
@@ -119,6 +148,10 @@ Fork and clone the project repository.
 > mvn -f pom_jre8.xml clean package
 ```
 
+## Extensions
+* [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
+* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
+
 ## Resources
 
 * [VC Playground](https://vcplayground.org/)
@@ -137,4 +170,3 @@ Fork and clone the project repository.
 
 ## Commercial Support
 Commercial support is available at filip26@gmail.com
-,

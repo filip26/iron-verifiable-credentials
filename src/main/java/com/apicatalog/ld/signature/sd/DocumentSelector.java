@@ -42,6 +42,12 @@ public class DocumentSelector {
     }
 
     public JsonObject getNodes(JsonObject document) {
+
+        // no mandatory pointers
+        if (pointers == null || pointers.isEmpty()) {
+            return JsonValue.EMPTY_JSON_OBJECT;
+        }
+
         JsonObject root = null;
 
         for (final JsonPointer pointer : pointers) {
@@ -59,6 +65,9 @@ public class DocumentSelector {
     }
 
     static Collection<JsonPointer> toJsonPointers(Collection<String> pointers) {
+        if (pointers == null) {
+            return Collections.emptyList();
+        }
         return pointers.stream()
                 .sorted(Collections.reverseOrder())
                 .map(Json::createPointer)
@@ -110,7 +119,7 @@ public class DocumentSelector {
             return source;
         }
 
-        JsonArrayBuilder array;
+        final JsonArrayBuilder array;
 
         final int arrayIndex = Integer.parseInt(segments[index]);
 

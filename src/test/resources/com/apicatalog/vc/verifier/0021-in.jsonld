@@ -1,34 +1,34 @@
 {
-    "id": "https://apicatalog/com/vc/test-credentials#0001",
-    "type": "VerifiableCredential",
-    "issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
-    "issuanceDate": "2022-06-03T21:18:40Z",
-    "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-    "proof": [
-        {
-            "type": "DataIntegrityProof",
-            "cryptosuite": "test-2022",
-            "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-            "created": "2022-06-04T20:33:01Z",
-            "proofPurpose": "assertionMethod",
-            "proofValue": "zBaL6g3U2zFWxt6gyV32JBo46VPrhG7AKzeFd2L3APvis"
-        },
-        {
-            "type": "DataIntegrityProof",
-            "cryptosuite": "test-2022",
-            "verificationMethod": {
-                "id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-                "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2",
-                "type": "Multikey"
-            },
-            "created": "2022-06-07T21:06:15Z",
-            "proofPurpose": "assertionMethod",
-            "proofValue": "z24EhJAPV3uHQKhzxseXe8j7nUzReFrbyDwhZwYgHU11R"
-        }
-    ],
-    "@context": [
-        "https://www.w3.org/2018/credentials/v1",
-        "https://w3id.org/security/multikey/v1",
-        "https://w3id.org/security/data-integrity/v1"
-    ]
+  "id": "https://apicatalog/com/vc/test-credentials#0001",
+  "type": "VerifiableCredential",
+  "issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
+  "issuanceDate": "2022-06-03T21:18:40Z",
+  "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+  "proof": [
+    {
+      "type": "DataIntegrityProof",
+      "cryptosuite": "test-2022",
+      "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+      "created": "2022-06-04T20:33:01Z",
+      "proofPurpose": "assertionMethod",
+      "proofValue": "zBaL6g3U2zFWxt6gyV32JBo46VPrhG7AKzeFd2L3APvis"
+    },
+    {
+      "type": "DataIntegrityProof",
+      "cryptosuite": "test-2022",
+      "verificationMethod": {
+        "id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+        "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2",
+        "type": "Multikey"
+      },
+      "created": "2022-06-07T21:06:15Z",
+      "proofPurpose": "assertionMethod",
+      "proofValue": "z24EhJAPV3uHQKhzxseXe8j7nUzReFrbyDwhZwYgHU11R"
+    }
+  ],
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://w3id.org/security/multikey/v1",
+    "https://w3id.org/security/data-integrity/v1"
+  ]
 }
