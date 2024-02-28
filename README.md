@@ -11,23 +11,18 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 
 ## Features
 
-* Verifying VC/VP   
-* Issuing VC/VP
-* Data Models
-  * [v2.0](https://w3c.github.io/vc-data-model/)
-  * [v1.1](https://www.w3.org/TR/vc-data-model/)
+* Issuer, Verifier, Holder
 * Signature Suites
-  * [W3C Data Integrity 1.0 Proofs](https://www.w3.org/TR/vc-data-integrity/)
-    * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019) [P-256, P-384]
-    * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
+  * [W3C Data Integrity Cryptosuites](https://www.w3.org/TR/vc-data-integrity/)
     * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023) [selective disclosure]
+    * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
+    * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019) [P-256, P-384]
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature provider? List it here, open PR.
-
-## Extensions
-* [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
-* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
+* Data Models
+  * [v2.0](https://w3c.github.io/vc-data-model/)
+  * [v1.1](https://www.w3.org/TR/vc-data-model/)
   
 ## Installation
 
@@ -152,6 +147,10 @@ Fork and clone the project repository.
 > cd iron-verfiable-credentials
 > mvn -f pom_jre8.xml clean package
 ```
+
+## Extensions
+* [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
+* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
 
 ## Resources
 
