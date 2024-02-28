@@ -73,9 +73,18 @@ static Verifier VERIFIER = Verifier.with(SIGNATURE_SUITES)
     ; 
 
 try {
-  var verifiable = VERIFIER.verify(credential|presentation).compacted();
+  // verify the given input proof(s)
+  var verifiable = VERIFIER.verify(credential|presentation);
+  
   // or with runtime parameters e.g. domain, challenge, etc.
-  var verifiable = VERIFIER.verify(credential|presentation, parameters).compact();
+  var verifiable = VERIFIER.verify(credential|presentation, parameters);
+  
+  // get verified details
+  verifiable.subject()
+  verifiable.id()
+  verifiable.type()
+  // ...
+  
 } catch (VerificationError | DocumentError e) {
   ...
 }
@@ -93,7 +102,9 @@ Issuer ISSUER = SIGNATURE_SUITE.createIssuer(keyPairProvider)
     // ...
     ; 
 try {
-  var verifiable = ISSUER.sign(credential|presentation, proofDraft);
+  // issue a new verifiable, i.e. sign the input and add a new proof
+  var verifiable = ISSUER.sign(credential|presentation, proofDraft).compacted();
+  
 } catch (SigningError | DocumentError e) {
   ...
 }
@@ -112,6 +123,7 @@ static Holder HOLDER = Holder.with(SIGNATURE_SUITES)
     ; 
 
 try {
+  // derive a new signed credentials disclosing selected claims only
   var verifiable = HOLDER.derive(credential, selectors).compacted();
 
 } catch (SigningError | DocumentError e) {
