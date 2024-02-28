@@ -19,7 +19,7 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
     * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019) [P-256, P-384]
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
-  * Have you implemented a signature provider? List it here, open PR.
+  * Have you implemented a signature suite? List it here, open PR.
 * Data Models
   * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
@@ -45,18 +45,14 @@ Android 12+ (API Level >=31)
 implementation("iron-verifiable-credentials-jre8:0.14.0")
 ```
 
-## Documentation
-
-[![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
-
 ## Usage
 
 This repository provides common logic and primitives to easily implement a signature suite. It is intended to be used together with a suite, or suites, of your choice, e.g. [ECDSA SD 2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
 
 ### Verifier
 
-```java
-
+```javascript
+// create a new verifier instance
 static Verifier VERIFIER = Verifier.with(SUITE1, SUITE2, ...)
     // options
     .base(...)
@@ -88,7 +84,8 @@ try {
 
 ### Issuer
 
-```java
+```javascript
+// create a new issuer instance
 Issuer ISSUER = SUITE.createIssuer(keyPairProvider)
     // options
     .base(...)
@@ -96,6 +93,7 @@ Issuer ISSUER = SUITE.createIssuer(keyPairProvider)
     .useBundledContexts(true|false)
     // ...
     ; 
+
 try {
   // issue a new verifiable, i.e. sign the input and add a new proof
   var verifiable = ISSUER.sign(credential|presentation, proofDraft).compacted();
@@ -107,8 +105,8 @@ try {
 
 ### Holder
 
-```java
-
+```javascript
+// create a new holder instance
 static Holder HOLDER = Holder.with(SUITE1, SUITE2, ...)
     // options
     .base(...)
@@ -124,9 +122,11 @@ try {
 } catch (SigningError | DocumentError e) {
   ...
 }
-
 ```
 
+## Documentation
+
+[![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
 
 ## Contributing
 
