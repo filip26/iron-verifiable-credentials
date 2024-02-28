@@ -42,7 +42,7 @@ Java 17+
 Android 12+ (API Level >=31)
 
 ```gradle
-implementation("iron-verifiable-credentials-jre8:0.14.0")
+implementation("com.apicatalog:iron-verifiable-credentials-jre8:0.14.0")
 ```
 
 ## Usage
