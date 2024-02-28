@@ -56,13 +56,13 @@ implementation("iron-verifiable-credentials-jre8:0.14.0")
 
 ## Usage
 
-This repository provides common logic and primitives to easily implement a signature suite. It is intended to be used together with a cryptosuite(s) of your choice, e.g. [ECDSA SD 2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
+This repository provides common logic and primitives to easily implement a signature suite. It is intended to be used together with a suite, or suites, of your choice, e.g. [ECDSA SD 2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
 
 ### Verifier
 
 ```java
 
-static Verifier VERIFIER = Verifier.with(SIGNATURE_SUITES)
+static Verifier VERIFIER = Verifier.with(SUITE1, SUITE2, ...)
     // options
     .base(...)
     .loader(...)
@@ -94,7 +94,7 @@ try {
 ### Issuer
 
 ```java
-Issuer ISSUER = SIGNATURE_SUITE.createIssuer(keyPairProvider)
+Issuer ISSUER = SUITE.createIssuer(keyPairProvider)
     // options
     .base(...)
     .loader(...)
@@ -114,7 +114,7 @@ try {
 
 ```java
 
-static Holder HOLDER = Holder.with(SIGNATURE_SUITES)
+static Holder HOLDER = Holder.with(SUITE1, SUITE2, ...)
     // options
     .base(...)
     .loader(...)
