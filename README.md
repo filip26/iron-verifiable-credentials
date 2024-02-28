@@ -17,10 +17,10 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
 * Signature Suites
-  * [W3C Data Integrity 1.0 Proofs](https://w3c-ccg.github.io/data-integrity-spec/)
+  * [W3C Data Integrity 1.0 Proofs](https://www.w3.org/TR/vc-data-integrity/)
     * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019)
     * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
-    * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023) (planned)
+    * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023)
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature provider? List it here, open PR.
@@ -38,7 +38,7 @@ Java 17+
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials</artifactId>
-    <version>0.11.0</version>
+    <version>0.14.0</version>
 </dependency>
 
 ```
@@ -47,7 +47,7 @@ Java 17+
 Android 12+ (API Level >=31)
 
 ```gradle
-compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', version: '0.11.0'
+implementation("iron-verifiable-credentials-jre8:0.14.0")
 ```
 
 ## Documentation
@@ -56,48 +56,70 @@ compile group: 'com.apicatalog', name: 'iron-verifiable-credentials-jre8', versi
 
 ## Usage
 
-Please use together with a cryptosuite(s) of your choice, e.g. [EdDSA RDFC 2022](https://github.com/filip26/iron-eddsa-rdfc-2022). Read the suite(s) documentation for specifics.
+Please use together with a cryptosuite(s) of your choice, e.g. [ECDSA SD 2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
 
-### Verifying 
+### Verifier
 
 ```java
 
-try {
-  Vc.verify(credential|presentation, suites)
-      
-    // optional
+static Verifier VERIFIER = Verifier.with(SIGNATURE_SUITES)
+    // options
     .base(...)
-    .loader(documentLoader) 
-    .statusVerifier(...)
+    .loader(...)
     .useBundledContexts(true|false)
+    .statusValidator(...)
+    .subjectValidator(...)
+    // ...
+    ; 
 
-    // custom | suite specific | parameters
-    .param(..., ....)
-
-    // assert document validity
-    .isValid();
-    
-} catch (VerificationError | DataError e) {
+try {
+  var verifiable = VERIFIER.verify(credential|presentation).compact();
+  // or with runtime parameters e.g. domain, challenge, etc.
+  var verifiable = VERIFIER.verify(credential|presentation, parameters).compact();
+} catch (VerificationError | DocumentError e) {
   ...
 }
 
 ```
 
-### Issuing
+### Issuer
 
 ```java
-Vc.sign(credential|presentation, keys, proofDraft)
+static Issuer ISSUER = SIGNATURE_SUITE.createIssuer(keyPair)
+    // options
+    .base(...)
+    .loader(...)
+    .useBundledContexts(true|false)
+    // ...
+    ; 
+try {
+  var verifiable = ISSUER.sign(credential|presentation, proofDraft);
+} catch (SigningError | DocumentError e) {
+  ...
+}
+```
 
-   // optional
-   .base(...)
-   .loader(documentLoader) 
-   .statusVerifier(...)
-   .useBundledContexts(true|false)
+### Holder
 
-   // return signed document in a compacted form
-   .getCompacted(context);
+```java
+
+static Holder HOLDER = Verifier.with(SIGNATURE_SUITES)
+    // options
+    .base(...)
+    .loader(...)
+    .useBundledContexts(true|false)
+    // ...
+    ; 
+
+try {
+  var verifiable = HOLDER.derive(credential|presentation, selectors).compact();
+
+} catch (SigningError | DocumentError e) {
+  ...
+}
 
 ```
+
 
 ## Contributing
 
@@ -137,4 +159,3 @@ Fork and clone the project repository.
 
 ## Commercial Support
 Commercial support is available at filip26@gmail.com
-,
