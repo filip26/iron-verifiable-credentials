@@ -18,9 +18,9 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
 * Signature Suites
   * [W3C Data Integrity 1.0 Proofs](https://www.w3.org/TR/vc-data-integrity/)
-    * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019)
+    * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019) [P-256, P-384]
     * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
-    * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023)
+    * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023) [selective disclosure]
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature provider? List it here, open PR.
@@ -56,7 +56,7 @@ implementation("iron-verifiable-credentials-jre8:0.14.0")
 
 ## Usage
 
-Please use together with a cryptosuite(s) of your choice, e.g. [ECDSA SD 2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
+This repository provides common logic and primitives to easily implement a signature suite. It is intended to be used together with a cryptosuite(s) of your choice, e.g. [ECDSA SD 2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
 
 ### Verifier
 
@@ -73,7 +73,7 @@ static Verifier VERIFIER = Verifier.with(SIGNATURE_SUITES)
     ; 
 
 try {
-  var verifiable = VERIFIER.verify(credential|presentation).compact();
+  var verifiable = VERIFIER.verify(credential|presentation).compacted();
   // or with runtime parameters e.g. domain, challenge, etc.
   var verifiable = VERIFIER.verify(credential|presentation, parameters).compact();
 } catch (VerificationError | DocumentError e) {
@@ -85,7 +85,7 @@ try {
 ### Issuer
 
 ```java
-static Issuer ISSUER = SIGNATURE_SUITE.createIssuer(keyPair)
+Issuer ISSUER = SIGNATURE_SUITE.createIssuer(keyPairProvider)
     // options
     .base(...)
     .loader(...)
@@ -103,7 +103,7 @@ try {
 
 ```java
 
-static Holder HOLDER = Verifier.with(SIGNATURE_SUITES)
+static Holder HOLDER = Holder.with(SIGNATURE_SUITES)
     // options
     .base(...)
     .loader(...)
@@ -112,7 +112,7 @@ static Holder HOLDER = Verifier.with(SIGNATURE_SUITES)
     ; 
 
 try {
-  var verifiable = HOLDER.derive(credential|presentation, selectors).compact();
+  var verifiable = HOLDER.derive(credential, selectors).compacted();
 
 } catch (SigningError | DocumentError e) {
   ...
