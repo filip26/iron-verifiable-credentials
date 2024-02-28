@@ -12,7 +12,7 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
 /**
- * Represent an issuer does not allowing a selective disclosure.
+ * Represent an issuer does not supporting a selective disclosure.
  */
 public class SolidIssuer extends AbstractIssuer {
 

@@ -4,11 +4,11 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.key.KeyPair;
 
-public final class KeysGenerator {
+public class KeysGenerator {
 
-    private final CryptoSuite suite;
+    protected final CryptoSuite suite;
 
-    public KeysGenerator(final CryptoSuite suite) {
+    protected KeysGenerator(final CryptoSuite suite) {
         this.suite = suite;
     }
 
