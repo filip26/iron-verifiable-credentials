@@ -110,6 +110,8 @@ public abstract class Verifiable {
 
                     return ModelVersion.V20;
                 }
+            } else {
+                throw new DocumentError(ErrorType.Invalid, Keywords.CONTEXT);
             }
         }
         return ModelVersion.V20;
