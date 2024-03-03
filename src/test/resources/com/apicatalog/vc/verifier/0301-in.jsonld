@@ -1,0 +1,22 @@
+
+ {
+  "issuanceDate": "2024-03-03T05:08:19Z",
+  "credentialSubject": {
+    "id": "did:key:z6MkhTNL7i2etLerDK8Acz5t528giE5KA4p75T6ka1E1D74r"
+  },
+  "issuer": "did:key:z6MkgLDQSiPPbVJWUQP3y6yZPQcitjNupxCDmsZWFhvMZ8cC",
+  "type": [
+    "VerifiableCredential"
+  ],
+  "@context": [
+    null
+  ],
+  "proof": {
+    "type": "Ed25519Signature2020",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "z2PanhKzFhwDt26dBLcGcuARaGztNKSAFSQKzrpap1wXqzS1SAit5mxsGs8Wc6jE5aiZ7BSUJjurRWMiy1rzTEDX1",
+    "created": "2024-03-03T05:08:19Z",
+    "verificationMethod": "did:key:z6MkgLDQSiPPbVJWUQP3y6yZPQcitjNupxCDmsZWFhvMZ8cC#z6MkgLDQSiPPbVJWUQP3y6yZPQcitjNupxCDmsZWFhvMZ8cC"
+  },
+  "id": "urn:uuid:4f574329-339a-476a-9242-21c68bbb3358"
+}

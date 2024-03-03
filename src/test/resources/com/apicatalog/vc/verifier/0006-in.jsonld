@@ -1,4 +1,5 @@
 {
+
   "id": "https://apicatalog/com/vc/test-credentials#0001",
   "type": "VerifiableCredential",
   "issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
