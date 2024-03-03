@@ -297,6 +297,26 @@
       ],
       "name": "V2: valid signed VC",
       "input": "verifier/0201-in.jsonld"
+    },
+    {
+      "@id": "#t0301",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "NULL @context",
+      "input": "verifier/0301-in.jsonld",
+      "expectErrorCode": "InvalidContext"
+    },
+    {
+      "@id": "#t0302",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "NULL @type",
+      "input": "verifier/0302-in.jsonld",
+      "expectErrorCode": "InvalidDocument"
     }
   ]
 }

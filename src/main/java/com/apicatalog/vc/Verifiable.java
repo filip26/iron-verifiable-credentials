@@ -93,7 +93,7 @@ public abstract class Verifiable {
         final JsonValue contexts = object.get(Keywords.CONTEXT);
 
         for (final JsonValue context : JsonUtils.toCollection(contexts)) {
-            if (JsonUtils.isScalar(context)
+            if (JsonUtils.isString(context)
                     && UriUtils.isURI(((JsonString) context).getString())) {
 
                 final String contextUri = ((JsonString) context).getString();
@@ -110,6 +110,8 @@ public abstract class Verifiable {
 
                     return ModelVersion.V20;
                 }
+            } else {
+                throw new DocumentError(ErrorType.Invalid, Keywords.CONTEXT);
             }
         }
         return ModelVersion.V20;
