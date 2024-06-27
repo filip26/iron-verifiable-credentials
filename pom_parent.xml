@@ -60,7 +60,7 @@
 		<jakarta.json.version>2.0.1</jakarta.json.version>
 
 		<!-- test resources -->
-		<junit.version>5.10.2</junit.version>
+		<junit.version>5.10.3</junit.version>
 	</properties>
 
 	<dependencies>
@@ -95,12 +95,12 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>3.4.2</version>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.5.0</version>
+				<version>3.6.0</version>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -118,7 +118,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>3.3.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -131,7 +131,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.6.3</version>
+				<version>3.7.0</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -155,7 +155,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.11</version>
+				<version>0.8.12</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -174,11 +174,11 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.2.5</version>
+				<version>3.3.0</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>3.2.5</version>
+				<version>3.3.0</version>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -221,7 +221,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>3.1.0</version>
+						<version>3.2.4</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -235,7 +235,7 @@
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.13</version>
+						<version>1.7.0</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>
