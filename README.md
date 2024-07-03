@@ -34,16 +34,16 @@ Java 17+
 <dependency>
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials</artifactId>
-    <version>0.14.0</version>
+    <version>0.15.0</version>
 </dependency>
 
 ```
 
 ### Gradle
-Android 12+ (API Level >=31)
+Android 12+ (API Level >=32)
 
 ```gradle
-implementation("com.apicatalog:iron-verifiable-credentials-jre8:0.14.0")
+implementation("com.apicatalog:iron-verifiable-credentials-jre11:0.15.0")
 ```
 
 ## Usage
