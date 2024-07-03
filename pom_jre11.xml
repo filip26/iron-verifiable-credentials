@@ -8,14 +8,14 @@
 	<parent>
 		<groupId>com.apicatalog</groupId>
 		<artifactId>iron</artifactId>
-		<version>0.14.1-SNAPSHOT</version>
+		<version>0.15.0-SNAPSHOT</version>
 		<relativePath>pom_parent.xml</relativePath>
 	</parent>
 
-	<artifactId>iron-verifiable-credentials-jre8</artifactId>
+	<artifactId>iron-verifiable-credentials-jre11</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Iron Verifiable Credentials (JRE8)</name>
+	<name>Iron Verifiable Credentials (JRE11)</name>
 
 	<url>https://github.com/filip26/iron-verifiable-credentials</url>
 
@@ -26,10 +26,10 @@
 	</scm>
 
 	<properties>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<envSources>src/main/java8</envSources>
-		<rdf-urdna.version>1.2</rdf-urdna.version>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<envSources>src/main/java11</envSources>
+		<rdf-urdna.version>1.3</rdf-urdna.version>
 	</properties>
 
 	<dependencies>
