@@ -3,8 +3,11 @@ package com.apicatalog.vc.verifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -29,6 +32,7 @@ import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.processor.AbstractProcessor;
+import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
@@ -87,15 +91,16 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * valid or cannot be verified.
      *
      * @param document
+     * @param parameters custom parameters, e.g. challenge token
      * @return {@link Verifiable} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(JsonObject document) throws VerificationError, DocumentError {
+    public Verifiable verify(JsonObject document, Parameter<?>... parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(document);
-        return verify(document, null, getLoader());
+        return verify(document, toMap(parameters), getLoader());
     }
 
     /**
@@ -103,16 +108,17 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * valid or cannot be verified.
      *
      * @param document
-     * @param params
+     * @param parameters
      * @return {@link Verifiable} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
+     * 
      */
-    public Verifiable verify(JsonObject document, Map<String, Object> params) throws VerificationError, DocumentError {
+    public Verifiable verify(JsonObject document, Map<String, Object> parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(document);
-        return verify(document, params, getLoader());
+        return verify(document, parameters, getLoader());
     }
 
     /**
@@ -120,15 +126,16 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * valid or cannot be verified.
      *
      * @param location
+     * @param parameters
      * @return {@link Verifiable} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(URI location) throws VerificationError, DocumentError {
+    public Verifiable verify(URI location, Parameter<?>... parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(location);
-        return verify(location, null, getLoader());
+        return verify(location, toMap(parameters), getLoader());
     }
 
     /**
@@ -136,16 +143,16 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * valid or cannot be verified.
      *
      * @param location
-     * @param params
+     * @param parameters
      * @return {@link Verifiable} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(URI location, Map<String, Object> params) throws VerificationError, DocumentError {
+    public Verifiable verify(URI location, Map<String, Object> parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(location);
-        return verify(location, params, getLoader());
+        return verify(location, parameters, getLoader());
     }
 
     protected Verifiable verify(final URI location, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
@@ -171,12 +178,12 @@ public class Verifier extends AbstractProcessor<Verifier> {
     protected Verifiable verify(final JsonObject document, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
 
         try {
-            
+
             // extract context
             final JsonStructure context = document.containsKey(Keywords.CONTEXT)
                     ? JsonUtils.toJsonArray(document.get(Keywords.CONTEXT))
                     : null;
-            
+
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
                     .base(base).get();
@@ -189,7 +196,8 @@ public class Verifier extends AbstractProcessor<Verifier> {
         }
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, JsonArray expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, JsonArray expanded, Map<String, Object> params, DocumentLoader loader)
+            throws VerificationError, DocumentError {
 
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
             throw new DocumentError(ErrorType.Invalid);
@@ -204,7 +212,8 @@ public class Verifier extends AbstractProcessor<Verifier> {
         return verifyExpanded(version, context, verifiable.asJsonObject(), params, loader);
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, final JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, final JsonObject expanded, Map<String, Object> params, DocumentLoader loader)
+            throws VerificationError, DocumentError {
 
         // get a verifiable representation
         final Verifiable verifiable = Verifiable.of(version, expanded);
@@ -330,8 +339,16 @@ public class Verifier extends AbstractProcessor<Verifier> {
         }
 
         // status check
-        if (statusValidator != null && JsonUtils.isNotNull(credential.status())) {
+        if (statusValidator != null) {
             statusValidator.verify(credential.status());
         }
+    }
+
+    protected static final Map<String, Object> toMap(Parameter<?>... parameters) {
+        return parameters != null && parameters.length > 0
+                ? Stream.of(parameters).filter(p -> p.value() != null).collect(Collectors.toMap(
+                        Parameter::name,
+                        Parameter::value))
+                : Collections.emptyMap();
     }
 }

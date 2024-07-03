@@ -60,7 +60,7 @@ public abstract class AbstractProcessor<T extends AbstractProcessor<T>> {
     @SuppressWarnings("unchecked")
     public T loader(DocumentLoader loader) {
         this.defaultLoader = loader;
-        return (T)this;
+        return (T) this;
     }
 
     /**
@@ -74,7 +74,7 @@ public abstract class AbstractProcessor<T extends AbstractProcessor<T>> {
     @SuppressWarnings("unchecked")
     public T useBundledContexts(boolean enable) {
         this.bundledContexts = enable;
-        return (T)this;
+        return (T) this;
     }
 
     /**
@@ -86,7 +86,7 @@ public abstract class AbstractProcessor<T extends AbstractProcessor<T>> {
     @SuppressWarnings("unchecked")
     public T base(URI base) {
         this.base = base;
-        return (T)this;
+        return (T) this;
     }
 
     protected static final Collection<MethodResolver> defaultResolvers() {
@@ -101,7 +101,7 @@ public abstract class AbstractProcessor<T extends AbstractProcessor<T>> {
     @SuppressWarnings("unchecked")
     public T methodResolvers(Collection<MethodResolver> resolvers) {
         this.methodResolvers = resolvers;
-        return (T)this;
+        return (T) this;
     }
 
     protected DocumentLoader getLoader() {
