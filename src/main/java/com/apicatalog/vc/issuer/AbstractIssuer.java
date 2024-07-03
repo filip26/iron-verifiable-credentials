@@ -19,6 +19,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.node.LdScalar;
+import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
@@ -31,7 +32,6 @@ import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.processor.ExpandedVerifiable;
 import com.apicatalog.vc.proof.EmbeddedProof;
-import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -43,7 +43,7 @@ import jakarta.json.JsonValue;
 
 public abstract class AbstractIssuer implements Issuer {
 
-    protected final SignatureSuite suite;
+    protected final CryptoSuite crypto;
     protected final KeyPair keyPair;
     protected final Multibase proofValueBase;
 
@@ -51,14 +51,18 @@ public abstract class AbstractIssuer implements Issuer {
     protected URI base;
     protected boolean bundledContexts;
 
-    protected AbstractIssuer(SignatureSuite suite, KeyPair keyPair, Multibase proofValueBase) {
-        this.suite = suite;
+    protected AbstractIssuer(CryptoSuite crypto, KeyPair keyPair, Multibase proofValueBase) {
+        this.crypto = crypto;
         this.keyPair = keyPair;
         this.proofValueBase = proofValueBase;
 
         this.defaultLoader = null;
         this.base = null;
         this.bundledContexts = true;
+    }
+
+    protected CryptoSuite cryptosuite() {
+        return null;
     }
 
     @Override
@@ -150,7 +154,7 @@ public abstract class AbstractIssuer implements Issuer {
 
         // signature
         final byte[] signature = sign(context, unsigned, draft);
-        
+
         final JsonObject proofValue = LdScalar.multibase(proofValueBase, signature);
 
         // signed proof
@@ -165,6 +169,7 @@ public abstract class AbstractIssuer implements Issuer {
 
     /**
      * Returns a signed proof.
+     * 
      * @param context
      * @param document
      * @param draft

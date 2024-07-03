@@ -33,10 +33,9 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
     public DataIntegrityProofDraft(
             DataIntegritySuite suite,
-            CryptoSuite crypto,
             VerificationMethod method,
             URI purpose) {
-        super(crypto, method);
+        super(method);
         this.suite = suite;
         this.purpose = purpose;
     }
@@ -46,7 +45,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
             CryptoSuite crypto,
             URI method,
             URI purpose) {
-        super(crypto, method);
+        super(method);
         this.suite = suite;
         this.purpose = purpose;
     }

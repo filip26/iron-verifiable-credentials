@@ -1,9 +1,12 @@
 package com.apicatalog.vc.integrity;
 
+import java.net.URI;
+
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -37,6 +40,12 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
 
+    public DataIntegrityProofDraft createDraft(
+            VerificationMethod method,
+            URI purpose) throws DocumentError {
+        return new DataIntegrityProofDraft(this, method, purpose);
+    }
+    
     @Override
     public boolean isSupported(String proofType, JsonObject expandedProof) {
         return PROOF_TYPE_ID.equals(proofType) && cryptosuite.equals(getCryptoSuiteName(expandedProof));

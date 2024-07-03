@@ -41,10 +41,16 @@ public interface Issuer {
      * If set, this overrides the input document's IRI.
      *
      * @param base
-     * @return the processor instance
+     * @return the issuer instance
      */
     Issuer base(URI base);
 
+    /**
+     * Set custom loader.
+     * 
+     * @param loader
+     * @return the issuer instance
+     */
     Issuer loader(DocumentLoader loader);
 
     /**
@@ -53,7 +59,7 @@ public interface Issuer {
      * processing.
      *
      * @param enable
-     * @return the processor instance
+     * @return the issuer instance
      */
     Issuer useBundledContexts(boolean enable);
 }

@@ -1,17 +1,13 @@
 package com.apicatalog.vc;
 
-import java.net.URI;
-
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.ProofValue;
@@ -33,12 +29,6 @@ class TestSignatureSuite extends DataIntegritySuite {
         super(TEST_CRYPTO_NAME, Multibase.BASE_58_BTC, METHOD_ADAPTER);
     }
 
-    public DataIntegrityProofDraft createDraft(
-            VerificationMethod method,
-            URI purpose) throws DocumentError {
-        return new DataIntegrityProofDraft(this, CRYPTO, method, purpose);
-    }
-
     @Override
     protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError {
         if (TEST_CRYPTO_NAME.equals(cryptoName)) {
@@ -47,8 +37,9 @@ class TestSignatureSuite extends DataIntegritySuite {
         return null;
     }
 
+    @Override
     public SolidIssuer createIssuer(KeyPair pair) {
-        return new SolidIssuer(this, pair, Multibase.BASE_58_BTC);
+        return new SolidIssuer(CRYPTO, pair, Multibase.BASE_58_BTC);
     }
 
     @Override

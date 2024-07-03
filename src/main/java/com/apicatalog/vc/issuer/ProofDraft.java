@@ -14,23 +14,20 @@ import jakarta.json.JsonObject;
 
 public abstract class ProofDraft {
     
-    protected final CryptoSuite crypto;
     protected final VerificationMethod method;
     protected final URI verificatonUrl;
 
     protected URI id;
     protected URI previousProof;
 
-    protected ProofDraft(CryptoSuite crypto, VerificationMethod method) {
-        this.crypto = crypto;
+    protected ProofDraft(VerificationMethod method) {
         this.method = method;
         this.verificatonUrl = null;
         this.id = null;
         this.previousProof = null;
     }
 
-    protected ProofDraft(CryptoSuite crypto, URI verificatonUrl) {
-        this.crypto = crypto;
+    protected ProofDraft(URI verificatonUrl) {
         this.method = null;
         this.verificatonUrl = verificatonUrl;
         this.id = null;
@@ -52,9 +49,9 @@ public abstract class ProofDraft {
      * 
      * @return {@link CryptoSuite} attached to the proof.
      */
-    public CryptoSuite cryptoSuite() {
-        return crypto;
-    }
+//    public CryptoSuite cryptoSuite() {
+//        return crypto;
+//    }
     
     public void id(URI id) {
         this.id = id;

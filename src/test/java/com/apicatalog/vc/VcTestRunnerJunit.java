@@ -95,7 +95,10 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                // proof options
+                final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, TestSignatureSuite.METHOD_ADAPTER))
+                        .loader(LOADER);
+
+                // proof draft
                 final DataIntegrityProofDraft draft = SUITE.createDraft(
                         testCase.verificationMethod,
                         URI.create("https://w3id.org/security#assertionMethod"));
@@ -104,10 +107,7 @@ public class VcTestRunnerJunit {
                 draft.domain(testCase.domain);
                 draft.challenge(testCase.challenge);
                 draft.nonce(testCase.nonce);
-
-                final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, TestSignatureSuite.METHOD_ADAPTER))
-                        .loader(LOADER);
-
+                
                 final ExpandedVerifiable issued = issuer.sign(testCase.input, draft);
 
                 JsonObject signed = null;
