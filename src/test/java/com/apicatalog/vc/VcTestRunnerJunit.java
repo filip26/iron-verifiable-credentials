@@ -1,5 +1,9 @@
 package com.apicatalog.vc;
 
+import static com.apicatalog.vc.integrity.DataIntegrityParam.challenge;
+import static com.apicatalog.vc.integrity.DataIntegrityParam.domain;
+import static com.apicatalog.vc.integrity.DataIntegrityParam.purpose;
+import static com.apicatalog.vc.integrity.DataIntegrityParam.nonce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,9 +14,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -29,7 +31,6 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
-import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -73,12 +74,11 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains(VcTestCase.vocab("VeriferTest"))) {
 
-                final Map<String, Object> params = new HashMap<>();
-                params.put(DataIntegrityVocab.DOMAIN.name(), testCase.domain);
-                params.put(DataIntegrityVocab.CHALLENGE.name(), testCase.challenge);
-                params.put(DataIntegrityVocab.PURPOSE.name(), testCase.purpose);
-
-                final Verifiable verifiable = VERIFIER.verify(testCase.input, params);
+                final Verifiable verifiable = VERIFIER.verify(testCase.input,
+                        challenge(testCase.challenge),
+                        purpose(testCase.purpose),
+                        domain(testCase.domain),
+                        nonce(testCase.nonce));
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 
@@ -99,6 +99,7 @@ public class VcTestRunnerJunit {
                 final DataIntegrityProofDraft draft = SUITE.createDraft(
                         testCase.verificationMethod,
                         URI.create("https://w3id.org/security#assertionMethod"));
+
                 draft.created(testCase.created);
                 draft.domain(testCase.domain);
                 draft.challenge(testCase.challenge);

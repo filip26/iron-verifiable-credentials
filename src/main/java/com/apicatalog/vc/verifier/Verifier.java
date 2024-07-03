@@ -3,6 +3,7 @@ package com.apicatalog.vc.verifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -344,11 +345,10 @@ public class Verifier extends AbstractProcessor<Verifier> {
     }
 
     protected static final Map<String, Object> toMap(Parameter<?>... parameters) {
-        return parameters != null
-                ? Stream.of(parameters).collect(Collectors.toMap(
+        return parameters != null && parameters.length > 0
+                ? Stream.of(parameters).filter(p -> p.value() != null).collect(Collectors.toMap(
                         Parameter::name,
                         Parameter::value))
-                : null;
+                : Collections.emptyMap();
     }
-
 }
