@@ -25,7 +25,7 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
 
-[Community compatibility dashboard for Verifiable Credentials](https://canivc.com/).
+[Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
   
 ## Installation
 
