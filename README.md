@@ -24,6 +24,8 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 * Data Models
   * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
+
+[Community compatibility dashboard for Verifiable Credentials](https://canivc.com/).
   
 ## Installation
 
@@ -158,6 +160,7 @@ Fork and clone the project repository.
 ## Resources
 
 * [VC Playground](https://vcplayground.org/)
+* [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
 * [W3C Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
 * [W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [W3C Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
