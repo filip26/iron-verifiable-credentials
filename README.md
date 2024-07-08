@@ -45,6 +45,7 @@ Android 12+ (API Level >=31)
 ```gradle
 implementation("com.apicatalog:iron-verifiable-credentials-jre8:0.14.0")
 ```
+Do you need to support an older Android version? [Contact me](mailto:filip26@gmail.com)
 
 ## Usage
 
