@@ -1,3 +1,9 @@
+> [!IMPORTANT]
+> Please consider a donation to keep the project available and maintained as an open-source.
+> 
+> The common experience with open-source is that no one wants to pay for it, but they will happily use it for free.
+> -- Be different, be proud of it, brag about it, and feel good!
+
 # Iron Verifiable Credentials Processor
 
 An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) model and processing in Java.
