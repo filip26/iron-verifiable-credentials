@@ -340,7 +340,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
         // status check
         if (statusValidator != null) {
-            statusValidator.verify(credential.status());
+//FIXME            statusValidator.verify(credential.status());
         }
     }
 

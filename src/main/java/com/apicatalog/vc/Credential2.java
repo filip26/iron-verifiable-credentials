@@ -23,7 +23,7 @@ import jakarta.json.JsonValue;
  * 
  * @since 0.9.0
  */
-public class Credential extends Verifiable implements Expandable<JsonObject> {
+public class Credential2 extends Verifiable implements Expandable<JsonObject> {
 
     /** issuanceDate - v1.1 */
     protected Instant issuance;
@@ -42,13 +42,13 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
     //TODO termsOfUse
     
 
-    protected Credential(ModelVersion version, JsonObject expanded) {
+    protected Credential2(ModelVersion version, JsonObject expanded) {
         super(version, expanded);
     }
 
     /**
      * A date time when the credential has been issued. VC data model v1.1.
-     * Deprecated in favor of {@link Credential#validFrom()} by VC data model
+     * Deprecated in favor of {@link Credential2#validFrom()} by VC data model
      * v2.0.
      * 
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
@@ -69,7 +69,7 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
 
     /**
      * VC data model v1.1 only. Deprecated in favor of
-     * {@link Credential#validUntil()} by VC data model v2.0.
+     * {@link Credential2#validUntil()} by VC data model v2.0.
      * 
      * @see <a href=
      *      "https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
@@ -155,9 +155,9 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
      * 
      * @return
      */
-    public Collection<Status> status() {
-        return status;
-    }
+//    public Status status() {
+//        return status;
+//    }
 
     /**
      * @see <a href=
@@ -166,47 +166,22 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
      * 
      * @return
      */
-    public Collection<JsonObject> subject() {
-        return subject;
-    }
+//    public JsonValue subject() {
+//        return subject;
+//    }
 
     @Override
     public boolean isCredential() {
         return true;
     }
 
-    @Override
-    public Credential asCredential() {
-        return this;
-    }
+//    @Override
+//    public Credential2 asCredential() {
+//        return this;
+//    }
 
     @Override
-    public void validate() throws DocumentError {
-
-        // @type - mandatory
-//        if (!credential.type().contains(VcVocab.CREDENTIAL_TYPE.uri())) {
-//            if (credential.type().isEmpty()) {
-//                throw new DocumentError(ErrorType.Missing, Term.TYPE);
-//            }
-//            throw new DocumentError(ErrorType.Unknown, Term.TYPE);
-//        }
-
-        // subject - mandatory
-        if (subject == null) {
-            throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
-        }
-
-        // issuer 
-//        if (!issuer.exists()) {
-//            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
-//        }
-        
-        // issuer @id - mandatory
-//        if (issuer.id() == null) {
-//            throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
-//        }
-
-        
+    public void validate() throws DocumentError {        
         // v1
         if ((version == null || ModelVersion.V11.equals(version))
                 && issuance == null) {
@@ -233,44 +208,54 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
         return LdNode.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document);
     }
 
-    public static Credential of(final ModelVersion version, final JsonObject document) throws DocumentError {
+    public static Credential2 of(final ModelVersion version, final JsonObject document) throws DocumentError {
 
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        final Credential credential = new Credential(version, document);
+        final Credential2 credential = new Credential2(version, document);
 
         final LdNode node = LdNode.of(document);
-
-        // @id
-        credential.id = node.id();
-
+        
         // @type
         credential.type = node.type().strings();
+        if (!credential.type().contains(VcVocab.CREDENTIAL_TYPE.uri())) {
+            if (credential.type().isEmpty()) {
+                throw new DocumentError(ErrorType.Missing, Term.TYPE);
+            }
+            throw new DocumentError(ErrorType.Unknown, Term.TYPE);
+        }
 
-        // subject
-//      if (!node.node(VcVocab.SUBJECT).exists()) {
+        // subject - mandatory
+        if (!node.node(VcVocab.SUBJECT).exists()) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
+        }
+
 //        credential.subject = document.get(VcVocab.SUBJECT.uri());
+
+        // @id - optional
+        credential.id = node.id();
 
         final LdNode issuer = node.node(VcVocab.ISSUER);
         
-        if (issuer.exists()) {
-            // issuer @id - mandatory
-            if (issuer.id() == null) {
-                throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
-            }
-
-            credential.issuer = (document.get(VcVocab.ISSUER.uri()));
+        if (!issuer.exists()) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
         }
-            
+        
+        // issuer @id - mandatory
+        if (issuer.id() == null) {
+            throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
+        }
+        
+        credential.issuer = (document.get(VcVocab.ISSUER.uri()));
 
 //        credential.status = (document.get(VcVocab.STATUS.uri()));
 
-        // issuance date
+        // issuance date - mandatory for verification
         credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
 
-        // expiration date 
+        // expiration date - optional
         credential.expiration(node.scalar(VcVocab.EXPIRATION_DATE).xsdDateTime());
 
         // validFrom - optional
