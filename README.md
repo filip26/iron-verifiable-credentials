@@ -1,3 +1,9 @@
+> [!IMPORTANT]
+> Please consider a donation to keep the project available and maintained as an open-source.
+> 
+> The common experience with open-source is that no one wants to pay for it, but they will happily use it for free.
+> -- Be different, be proud of it, brag about it, and feel good!
+
 # Iron Verifiable Credentials Processor
 
 An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) model and processing in Java.
@@ -24,6 +30,8 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 * Data Models
   * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
+
+[Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
   
 ## Installation
 
@@ -45,6 +53,7 @@ Android 12+ (API Level >=31)
 ```gradle
 implementation("com.apicatalog:iron-verifiable-credentials-jre8:0.14.0")
 ```
+Do you need to support an older Android version? [Contact me](mailto:filip26@gmail.com)
 
 ## Usage
 
@@ -157,6 +166,7 @@ Fork and clone the project repository.
 ## Resources
 
 * [VC Playground](https://vcplayground.org/)
+* [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
 * [W3C Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
 * [W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 * [W3C Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)

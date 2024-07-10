@@ -53,8 +53,8 @@
 		<argLine>-Dfile.encoding=UTF-8</argLine>
 
 		<titanium.version>1.4.0</titanium.version>
-		<carbon.version>0.3.0</carbon.version>
-		<copper.codec.version>0.1.1</copper.codec.version>
+		<carbon.version>0.5.0</carbon.version>
+		<copper.codec.version>1.0.0</copper.codec.version>
 		<copper.base.version>0.5.0</copper.base.version>
 
 		<jakarta.json.version>2.0.1</jakarta.json.version>
