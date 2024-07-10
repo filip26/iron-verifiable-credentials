@@ -4,21 +4,18 @@ import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multikey.MultiKeyAdapter;
-import com.apicatalog.uvarint.UVarInt;
 
 public class TestKeyAdapter extends MultiKeyAdapter {
 
-    protected static Multicodec PUBLIC_KEY_CODEC = new Multicodec(
+    protected static Multicodec PUBLIC_KEY_CODEC = Multicodec.of(
             "test-pub",
             Tag.Key,
-            12345l,
-            UVarInt.encode(12345l));
+            12345l);
 
-    protected static Multicodec PRIVATE_KEY_CODEC = new Multicodec(
+    protected static Multicodec PRIVATE_KEY_CODEC = Multicodec.of(
             "test-priv",
             Tag.Key,
-            12346l,
-            UVarInt.encode(12346l));
+            12346l);
 
     protected static MulticodecDecoder DECODER = MulticodecDecoder.getInstance(
             PUBLIC_KEY_CODEC,
