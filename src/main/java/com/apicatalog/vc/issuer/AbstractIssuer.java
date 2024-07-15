@@ -8,6 +8,8 @@ import java.util.HashSet;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.JsonLdOptions;
+import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -98,7 +100,9 @@ public abstract class AbstractIssuer implements Issuer {
 
         try {
             // load the document
-            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
+            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document))
+                    .undefinedTermsPolicy(ProcessingPolicy.Fail)
+                    .loader(loader)
                     .base(base).get();
 
             if (expanded.size() == 1) {

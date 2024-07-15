@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.JsonLdOptions;
+import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.http.media.MediaType;
 import com.apicatalog.ld.signature.LinkedDataSuiteError;
@@ -25,7 +27,13 @@ public class Urdna2015 implements CanonicalizationAlgorithm {
     @Override
     public byte[] canonicalize(final JsonStructure document) throws LinkedDataSuiteError {
         try {
-            final RdfDataset dataset = JsonLd.toRdf(JsonDocument.of(document)).get();
+            final JsonLdOptions options = new JsonLdOptions();
+            options.setUndefinedTermsPolicy(ProcessingPolicy.Fail);
+
+            final RdfDataset dataset = JsonLd
+                    .toRdf(JsonDocument.of(document))
+                    .options(options)
+                    .get();
 
             final RdfDataset canonical = RdfNormalize.normalize(dataset);
 

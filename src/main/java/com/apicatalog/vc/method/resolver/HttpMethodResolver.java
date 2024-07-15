@@ -4,6 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -21,6 +22,7 @@ public class HttpMethodResolver implements MethodResolver {
 
         try {
             final JsonArray document = JsonLd.expand(id)
+                    .undefinedTermsPolicy(ProcessingPolicy.Fail)
                     .loader(loader)
                     .context(proof.methodProcessor().context()) // an optional expansion context
                     .get();

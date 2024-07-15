@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
@@ -59,7 +60,9 @@ public class Holder extends AbstractProcessor<Holder> {
                     : null;
 
             // load the document
-            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document)).loader(loader)
+            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document))
+                    .undefinedTermsPolicy(ProcessingPolicy.Fail)
+                    .loader(loader)
                     .base(base).get();
 
             return deriveExpanded(document, context, expanded, selectors, loader);
@@ -156,6 +159,7 @@ public class Holder extends AbstractProcessor<Holder> {
         try {
             return new ExpandedVerifiable(EmbeddedProof.addProof(
                     JsonLd.expand(JsonDocument.of(reveal))
+                            .undefinedTermsPolicy(ProcessingPolicy.Fail)
                             .loader(loader)
                             .get().getJsonObject(0),
                     derivedProof), context, loader);
