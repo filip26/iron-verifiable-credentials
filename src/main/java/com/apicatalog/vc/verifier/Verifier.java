@@ -28,9 +28,9 @@ import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.ModelVersion;
-import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableReader;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.Parameter;
@@ -191,7 +191,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
                     .loader(loader)
                     .base(base).get();
 
-            return verifyExpanded(Verifiable.getVersion(document), context, expanded, params, loader);
+            return verifyExpanded(VerifiableReader.getVersion(document), context, expanded, params, loader);
 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
@@ -219,7 +219,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throws VerificationError, DocumentError {
 
         // get a verifiable representation
-        final Verifiable verifiable = Verifiable.of(version, expanded);
+        final Verifiable verifiable = reader.read(version, expanded);
 
         if (verifiable.isCredential()) {
 
@@ -237,9 +237,9 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
             final Collection<Credential> credentials = new ArrayList<>();
 
-            for (final JsonObject presentedCredentials : Presentation.getCredentials(expanded)) {
+            for (final JsonObject presentedCredentials : VerifiableReader.getCredentials(expanded)) {
 
-                if (!Credential.isCredential(presentedCredentials)) {
+                if (!VerifiableReader.isCredential(presentedCredentials)) {
                     throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
                 }
 

@@ -8,7 +8,6 @@ import java.util.HashSet;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.JsonLdOptions;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
@@ -29,6 +28,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableReader;
 import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
@@ -48,7 +48,8 @@ public abstract class AbstractIssuer implements Issuer {
     protected final CryptoSuite crypto;
     protected final KeyPair keyPair;
     protected final Multibase proofValueBase;
-
+    protected final VerifiableReader reader;
+    
     protected DocumentLoader defaultLoader;
     protected URI base;
     protected boolean bundledContexts;
@@ -57,6 +58,7 @@ public abstract class AbstractIssuer implements Issuer {
         this.crypto = crypto;
         this.keyPair = keyPair;
         this.proofValueBase = proofValueBase;
+        this.reader = new VerifiableReader();
 
         this.defaultLoader = null;
         this.base = null;
@@ -109,7 +111,7 @@ public abstract class AbstractIssuer implements Issuer {
                 final JsonValue object = expanded.iterator().next();
                 if (JsonUtils.isObject(object)) {
 
-                    final ModelVersion version = Verifiable.getVersion(document);
+                    final ModelVersion version = VerifiableReader.getVersion(document);
 
                     return sign(version, getContext(version, document, draft), object.asJsonObject(), draft, loader);
                 }
@@ -131,7 +133,7 @@ public abstract class AbstractIssuer implements Issuer {
 
         JsonObject object = expanded;
 
-        final Verifiable verifiable = Verifiable.of(version, object);
+        final Verifiable verifiable = reader.read(version, object);
 
         // TODO do something with exceptions, unify
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {

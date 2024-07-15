@@ -6,8 +6,6 @@ import java.util.Collection;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Expandable;
-import com.apicatalog.ld.Term;
-import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.vc.status.Status;
 
@@ -71,8 +69,7 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
      * VC data model v1.1 only. Deprecated in favor of
      * {@link Credential#validUntil()} by VC data model v2.0.
      * 
-     * @see <a href=
-     *      "https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
      * 
      * @return the expiration date or <code>null</code> if not set
      */
@@ -226,62 +223,6 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
         }
     }
     
-    public static boolean isCredential(final JsonValue document) {
-        if (document == null) {
-            throw new IllegalArgumentException("The 'document' parameter must not be null.");
-        }
-        return LdNode.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document);
-    }
-
-    public static Credential of(final ModelVersion version, final JsonObject document) throws DocumentError {
-
-        if (document == null) {
-            throw new IllegalArgumentException("The 'document' parameter must not be null.");
-        }
-
-        final Credential credential = new Credential(version, document);
-
-        final LdNode node = LdNode.of(document);
-
-        // @id
-        credential.id = node.id();
-
-        // @type
-        credential.type = node.type().strings();
-
-        // subject
-//      if (!node.node(VcVocab.SUBJECT).exists()) {
-//        credential.subject = document.get(VcVocab.SUBJECT.uri());
-
-        final LdNode issuer = node.node(VcVocab.ISSUER);
-        
-        if (issuer.exists()) {
-            // issuer @id - mandatory
-            if (issuer.id() == null) {
-                throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
-            }
-
-            credential.issuer = (document.get(VcVocab.ISSUER.uri()));
-        }
-            
-
-//        credential.status = (document.get(VcVocab.STATUS.uri()));
-
-        // issuance date
-        credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
-
-        // expiration date 
-        credential.expiration(node.scalar(VcVocab.EXPIRATION_DATE).xsdDateTime());
-
-        // validFrom - optional
-        credential.validFrom(node.scalar(VcVocab.VALID_FROM).xsdDateTime());
-
-        // validUntil - optional
-        credential.validUntil(node.scalar(VcVocab.VALID_UNTIL).xsdDateTime());
-        
-        return credential;
-    }
-
     @Override
     public JsonObject expand() {
         

@@ -2,8 +2,6 @@ package com.apicatalog.vc;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -11,18 +9,14 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.Term;
 import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonString;
 import jakarta.json.JsonStructure;
-import jakarta.json.JsonValue;
 
 /**
  * Represents a common ancestor for verifiable data.
@@ -30,8 +24,6 @@ import jakarta.json.JsonValue;
  * @since 0.9.0
  */
 public abstract class Verifiable {
-
-    private static final Logger LOGGER = Logger.getLogger(Verifiable.class.getName());
 
     protected final ModelVersion version;
 
@@ -86,57 +78,6 @@ public abstract class Verifiable {
      */
     public ModelVersion version() {
         return version;
-    }
-
-    public static ModelVersion getVersion(final JsonObject object) throws DocumentError {
-
-        final JsonValue contexts = object.get(Keywords.CONTEXT);
-
-        for (final JsonValue context : JsonUtils.toCollection(contexts)) {
-            if (JsonUtils.isString(context)
-                    && UriUtils.isURI(((JsonString) context).getString())) {
-
-                final String contextUri = ((JsonString) context).getString();
-
-                if ("https://www.w3.org/2018/credentials/v1".equals(contextUri)) {
-                    return ModelVersion.V11;
-                }
-                if ("https://www.w3.org/ns/credentials/v2".equals(contextUri)) {
-
-                    if (JsonUtils.isNotArray(contexts)) {
-                        LOGGER.log(Level.INFO,
-                                "VC model requires @context declaration be an array, it is inconsistent with another requirement on compaction. Therefore this requirement is not enforced by Iron VC");
-                    }
-
-                    return ModelVersion.V20;
-                }
-            } else {
-                throw new DocumentError(ErrorType.Invalid, Keywords.CONTEXT);
-            }
-        }
-        return ModelVersion.V20;
-    }
-
-    public static Verifiable of(final ModelVersion version, final JsonObject expanded) throws DocumentError {
-
-        // is a credential?
-        if (Credential.isCredential(expanded)) {
-            // validate the credential object
-            return Credential.of(version, expanded);
-        }
-
-        // is a presentation?
-        if (Presentation.isPresentation(expanded)) {
-            // validate the presentation object
-            return Presentation.of(version, expanded);
-        }
-
-        // is not expanded JSON-LD object
-        if (JsonUtils.isNull(expanded.get(Keywords.TYPE))) {
-            throw new DocumentError(ErrorType.Missing, Term.TYPE);
-        }
-
-        throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
 
     public abstract void validate() throws DocumentError;

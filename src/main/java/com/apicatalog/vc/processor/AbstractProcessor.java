@@ -23,6 +23,7 @@ import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.ModelVersion;
+import com.apicatalog.vc.VerifiableReader;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
@@ -34,9 +35,10 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
-public abstract class AbstractProcessor<T extends AbstractProcessor<T>> {
+public class AbstractProcessor<T extends AbstractProcessor<T>> {
 
     protected final SignatureSuite[] suites;
+    protected final VerifiableReader reader;
 
     protected DocumentLoader defaultLoader;
     protected boolean bundledContexts;
@@ -48,6 +50,7 @@ public abstract class AbstractProcessor<T extends AbstractProcessor<T>> {
 
     protected AbstractProcessor(final SignatureSuite... suites) {
         this.suites = suites;
+        this.reader = new VerifiableReader();
 
         // default values
         this.defaultLoader = null;
@@ -90,19 +93,19 @@ public abstract class AbstractProcessor<T extends AbstractProcessor<T>> {
         return (T) this;
     }
 
-    protected static final Collection<MethodResolver> defaultResolvers() {
-        Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
-        resolvers.add(new HttpMethodResolver());
-        return resolvers;
-    }
-
     // TODO resolvers should be multilevel, per verifier, per proof type, e.g.
     // DidUrlMethodResolver could be different.
     @SuppressWarnings("unchecked")
     public T methodResolvers(Collection<MethodResolver> resolvers) {
         this.methodResolvers = resolvers;
         return (T) this;
+    }
+
+    protected static final Collection<MethodResolver> defaultResolvers() {
+        Collection<MethodResolver> resolvers = new LinkedHashSet<>();
+        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
+        resolvers.add(new HttpMethodResolver());
+        return resolvers;
     }
 
     protected DocumentLoader getLoader() {
@@ -206,5 +209,4 @@ public abstract class AbstractProcessor<T extends AbstractProcessor<T>> {
         }
         return null;
     }
-
 }

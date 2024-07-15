@@ -21,9 +21,8 @@ import com.apicatalog.ld.node.LdType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.sd.DocumentSelector;
-import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.VerifiableReader;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.ExpandedVerifiable;
 import com.apicatalog.vc.proof.BaseProofValue;
@@ -92,10 +91,10 @@ public class Holder extends AbstractProcessor<Holder> {
     private ExpandedVerifiable deriveExpanded(final JsonObject document, JsonStructure context, final JsonObject expanded, Collection<String> selectors,
             DocumentLoader loader) throws SigningError, DocumentError {
 
-        if (Credential.isCredential(expanded)) {
+        if (VerifiableReader.isCredential(expanded)) {
             return deriveProof(context, document, expanded, selectors, loader);
 
-        } else if (Presentation.isPresentation(expanded)) {
+        } else if (VerifiableReader.isPresentation(expanded)) {
             // ?
         }
         throw new DocumentError(ErrorType.Unknown, Term.TYPE);
