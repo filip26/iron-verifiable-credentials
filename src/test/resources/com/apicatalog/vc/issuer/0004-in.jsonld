@@ -1,6 +1,7 @@
 {
   "@context": [
-    "https://www.w3.org/2018/credentials/v1"
+    "https://www.w3.org/2018/credentials/v1",
+    "https://www.w3.org/2018/credentials/examples/v1"
   ],
   "id": "https://apicatalog/com/vc/test-credentials#0001",
   "type": "VerifiableCredential",
@@ -9,6 +10,6 @@
     "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
   },
   "issuer": {
-    
+    "name": "x"
   }
 }

@@ -190,8 +190,12 @@ public class Credential extends Verifiable  {
         }
 
         // issuer 
-        if (issuer == null || issuer.id() == null) {
+        if (issuer == null) {
             throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
+        }
+        // issuer - @id
+        if (issuer.id() == null) {
+            throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
         }
 
         // status @type is required when status is present
