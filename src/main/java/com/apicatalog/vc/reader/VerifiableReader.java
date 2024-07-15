@@ -18,10 +18,10 @@ import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.issuer.reader.ExpandedIssuerDetailsReader;
+import com.apicatalog.vc.issuer.reader.IssuerDetailsReader;
 import com.apicatalog.vc.status.reader.ExpandedStatusReader;
 import com.apicatalog.vc.status.reader.StatusReader;
-import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vc.subject.reader.ExpandedSubjectReader;
 import com.apicatalog.vc.subject.reader.SubjectReader;
 
@@ -40,10 +40,12 @@ public class VerifiableReader {
 
     private static final Logger LOGGER = Logger.getLogger(VerifiableReader.class.getName());
 
+    protected IssuerDetailsReader issuerReader;
     protected SubjectReader subjectReader;
     protected StatusReader statusReader;
 
     public VerifiableReader() {
+        this.issuerReader = new ExpandedIssuerDetailsReader();
         this.subjectReader = new ExpandedSubjectReader();
         this.statusReader = new ExpandedStatusReader();
     }
@@ -129,21 +131,13 @@ public class VerifiableReader {
         credential.type(node.type().strings());
 
         // subject
-        credential.status(readStatus(document.get(VcVocab.SUBJECT.uri())));
+        credential.status(readCollection(document.get(VcVocab.SUBJECT.uri()), statusReader));
 
-        final LdNode issuer = node.node(VcVocab.ISSUER);
-
-        if (issuer.exists()) {
-            // issuer @id - mandatory
-            if (issuer.id() == null) {
-                throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
-            }
-
-//            credential.issuer = (document.get(VcVocab.ISSUER.uri()));
-        }
+        // issuer
+        credential.issuer(readObject(document.get(VcVocab.ISSUER.uri()), issuerReader));
 
         // status
-        credential.status(readStatus(document.get(VcVocab.STATUS.uri())));
+        credential.status(readCollection(document.get(VcVocab.STATUS.uri()), statusReader));
 
         // issuance date
         credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
@@ -227,40 +221,35 @@ public class VerifiableReader {
         return result;
     }
 
-    protected Collection<Status> readStatus(JsonValue value) throws DocumentError {
+    protected static <T> Collection<T> readCollection(JsonValue value, ExpandedReader<T> reader) throws DocumentError {
         if (JsonUtils.isNotArray(value)) {
             return Collections.emptyList();
         }
 
         final JsonArray values = value.asJsonArray();
-        final Collection<Status> status = new ArrayList<>(values.size());
+        final Collection<T> instance = new ArrayList<>(values.size());
 
         for (final JsonValue item : values) {
             if (JsonUtils.isNotObject(item)) {
                 // TODO print warning or error? -> processing policy
                 continue;
             }
-            status.add(statusReader.read(item.asJsonObject()));
+            instance.add(reader.read(item.asJsonObject()));
         }
-        return status;
+        return instance;
     }
 
-    protected Collection<Subject> readSubject(JsonValue value) throws DocumentError {
-        if (JsonUtils.isNotArray(value)) {
-            return Collections.emptyList();
+    protected static <T> T readObject(JsonValue value, ExpandedReader<T> reader) throws DocumentError {
+        if (JsonUtils.isNotArray(value) || value.asJsonArray().size() != 1) { // TODO throw an error if size > 1
+            return null;
         }
 
-        final JsonArray values = value.asJsonArray();
-        final Collection<Subject> status = new ArrayList<>(values.size());
-
-        for (final JsonValue item : values) {
-            if (JsonUtils.isNotObject(item)) {
-                // TODO print warning or error? -> processing policy
-                continue;
-            }
-            status.add(subjectReader.read(item.asJsonObject()));
+        final JsonValue item = value.asJsonArray().get(0);
+        if (JsonUtils.isNotObject(item)) {
+            // TODO print warning or error? -> processing policy
+            return null;
         }
-        return status;
+        return reader.read(item.asJsonObject());
     }
 
 }
