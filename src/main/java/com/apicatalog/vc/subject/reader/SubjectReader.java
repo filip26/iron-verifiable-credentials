@@ -1,7 +1,8 @@
 package com.apicatalog.vc.subject.reader;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.reader.ExpandedReader;
+import com.apicatalog.vc.ModelVersion;
+import com.apicatalog.vc.reader.ExpandedObjectReader;
 import com.apicatalog.vc.subject.Subject;
 
 import jakarta.json.JsonObject;
@@ -12,7 +13,7 @@ import jakarta.json.JsonObject;
  * @since 0.15.0
  */
 
-public interface SubjectReader extends ExpandedReader<Subject> {
+public interface SubjectReader extends ExpandedObjectReader<Subject> {
 
     /**
      * Materializes a subject represented in an expanded JSON-LD form.
@@ -22,5 +23,5 @@ public interface SubjectReader extends ExpandedReader<Subject> {
      * @throws DocumentError 
      */
     @Override
-    Subject read(JsonObject object) throws DocumentError;
+    Subject read(ModelVersion version, JsonObject object) throws DocumentError;
 }

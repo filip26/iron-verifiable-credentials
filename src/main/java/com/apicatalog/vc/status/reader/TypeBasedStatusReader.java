@@ -2,6 +2,7 @@ package com.apicatalog.vc.status.reader;
 
 import java.util.Map;
 
+import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.status.Status;
 
 import jakarta.json.JsonObject;
@@ -15,7 +16,7 @@ public class TypeBasedStatusReader implements StatusReader {
     }
         
     @Override
-    public Status read(JsonObject object) {
+    public Status read(ModelVersion version, JsonObject object) {
     
         //TODO
         

@@ -2,19 +2,20 @@ package com.apicatalog.vc.status.reader;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
+import com.apicatalog.vc.ModelVersion;
 
 import jakarta.json.JsonObject;
 
 public class ExpandedStatusReader implements StatusReader {
 
     @Override
-    public ExpandedStatus read(JsonObject document) throws DocumentError {
+    public ExpandedStatus read(ModelVersion version, JsonObject document) throws DocumentError {
 
         if (document.isEmpty()) {
             return null;
         }
         
-        final ExpandedStatus status = new ExpandedStatus();
+        final ExpandedStatus status = new ExpandedStatus(version);
         final LdNode node = LdNode.of(document);
 
         return read(node, status);

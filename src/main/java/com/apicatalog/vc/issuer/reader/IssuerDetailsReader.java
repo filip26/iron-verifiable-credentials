@@ -1,8 +1,8 @@
 package com.apicatalog.vc.issuer.reader;
 
 import com.apicatalog.vc.issuer.IssuerDetails;
-import com.apicatalog.vc.reader.ExpandedReader;
+import com.apicatalog.vc.reader.ExpandedObjectReader;
 
-public interface IssuerDetailsReader extends ExpandedReader<IssuerDetails> {
+public interface IssuerDetailsReader extends ExpandedObjectReader<IssuerDetails> {
 
 }

@@ -188,23 +188,21 @@ public class Credential extends Verifiable  {
         if (subject == null || subject.isEmpty()) {
             throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
         }
+        for (Subject item : subject) {
+            item.validate();
+        }
 
         // issuer 
         if (issuer == null) {
             throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
         }
-        // issuer - @id
-        if (issuer.id() == null) {
-            throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
-        }
+        issuer.validate();
 
-        // status @type is required when status is present
-        if (ModelVersion.V20.equals(version)
-                && status != null
-                && status.size() > 0
-                && !status.stream().allMatch(s -> s.type() != null && !s.type().isEmpty())
-                ) {
-            throw new DocumentError(ErrorType.Invalid, VcVocab.STATUS);
+        // status
+        if (status != null) {
+            for (final Status item : status) {
+                item.validate();
+            }
         }
         
         // v1

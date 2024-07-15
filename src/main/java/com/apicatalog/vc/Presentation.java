@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 
 /**
  * Represents a verifiable presentation (VP).
@@ -51,6 +52,8 @@ public class Presentation extends Verifiable {
 
     @Override
     public void validate() throws DocumentError {
-        /* TODO validate something, e.g. a presence of credentials */
+        if (credentials == null || credentials.isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, "VerifiableCredentials");
+        }
     }
 }

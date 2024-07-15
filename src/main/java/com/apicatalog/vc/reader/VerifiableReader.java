@@ -66,7 +66,7 @@ public class VerifiableReader {
                 if ("https://www.w3.org/ns/credentials/v2".equals(contextUri)) {
 
                     if (JsonUtils.isNotArray(contexts)) {
-                        LOGGER.log(Level.INFO,
+                        LOGGER.log(Level.FINE,
                                 "VC model requires @context declaration be an array, it is inconsistent with another requirement on compaction. Therefore this requirement is not enforced by Iron VC");
                     }
 
@@ -131,13 +131,13 @@ public class VerifiableReader {
         credential.type(node.type().strings());
 
         // subject
-        credential.subject(readCollection(document.get(VcVocab.SUBJECT.uri()), subjectReader));
+        credential.subject(readCollection(version, document.get(VcVocab.SUBJECT.uri()), subjectReader));
 
         // issuer
-        credential.issuer(readObject(document.get(VcVocab.ISSUER.uri()), issuerReader));
+        credential.issuer(readObject(version, document.get(VcVocab.ISSUER.uri()), issuerReader));
 
         // status
-        credential.status(readCollection(document.get(VcVocab.STATUS.uri()), statusReader));
+        credential.status(readCollection(version, document.get(VcVocab.STATUS.uri()), statusReader));
 
         // issuance date
         credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
@@ -221,7 +221,7 @@ public class VerifiableReader {
         return result;
     }
 
-    protected static <T> Collection<T> readCollection(JsonValue value, ExpandedReader<T> reader) throws DocumentError {
+    protected static <T> Collection<T> readCollection(ModelVersion version, JsonValue value, ExpandedObjectReader<T> reader) throws DocumentError {
         if (JsonUtils.isNotArray(value)) {
             return Collections.emptyList();
         }
@@ -234,12 +234,12 @@ public class VerifiableReader {
                 // TODO print warning or error? -> processing policy
                 continue;
             }
-            instance.add(reader.read(item.asJsonObject()));
+            instance.add(reader.read(version, item.asJsonObject()));
         }
         return instance;
     }
 
-    protected static <T> T readObject(JsonValue value, ExpandedReader<T> reader) throws DocumentError {
+    protected static <T> T readObject(ModelVersion version, JsonValue value, ExpandedObjectReader<T> reader) throws DocumentError {
         if (JsonUtils.isNotArray(value) || value.asJsonArray().size() != 1) { // TODO throw an error if size > 1
             return null;
         }
@@ -249,7 +249,7 @@ public class VerifiableReader {
             // TODO print warning or error? -> processing policy
             return null;
         }
-        return reader.read(item.asJsonObject());
+        return reader.read(version, item.asJsonObject());
     }
 
 }

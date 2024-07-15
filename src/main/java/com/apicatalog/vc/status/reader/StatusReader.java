@@ -1,7 +1,8 @@
 package com.apicatalog.vc.status.reader;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.reader.ExpandedReader;
+import com.apicatalog.vc.ModelVersion;
+import com.apicatalog.vc.reader.ExpandedObjectReader;
 import com.apicatalog.vc.status.Status;
 
 import jakarta.json.JsonObject;
@@ -11,7 +12,7 @@ import jakarta.json.JsonObject;
  * 
  * @since 0.15.0
  */
-public interface StatusReader extends ExpandedReader<Status> {
+public interface StatusReader extends ExpandedObjectReader<Status> {
 
     /**
      * Materializes a status represented in an expanded JSON-LD form.
@@ -21,6 +22,6 @@ public interface StatusReader extends ExpandedReader<Status> {
      * @throws DocumentError 
      */
     @Override
-    Status read(JsonObject object) throws DocumentError;
+    Status read(ModelVersion version, JsonObject object) throws DocumentError;
 
 }

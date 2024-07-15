@@ -25,7 +25,7 @@ public class VerifiableWriter {
 
         JsonArrayBuilder builder = Json.createArrayBuilder();
         
-//        credentials.stream().map(c -> Json.createObjectBuilder()
+//FIXME        credentials.stream().map(c -> Json.createObjectBuilder()
 //                .add(Keywords.GRAPH,
 //                        Json.createArrayBuilder().add(c.expand())))
 //                .forEach(builder::add);
