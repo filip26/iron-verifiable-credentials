@@ -18,7 +18,11 @@ import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.status.reader.ExpandedStatusReader;
+import com.apicatalog.vc.status.reader.StatusReader;
 
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
@@ -33,6 +37,12 @@ public class VerifiableReader {
 
     private static final Logger LOGGER = Logger.getLogger(VerifiableReader.class.getName());
 
+    protected StatusReader statusReader;
+    
+    public VerifiableReader() {
+        this.statusReader = new ExpandedStatusReader();
+    }
+    
     public static ModelVersion getVersion(final JsonObject object) throws DocumentError {
 
         final JsonValue contexts = object.get(Keywords.CONTEXT);
@@ -128,8 +138,7 @@ public class VerifiableReader {
 //            credential.issuer = (document.get(VcVocab.ISSUER.uri()));
         }
             
-
-//        credential.status = (document.get(VcVocab.STATUS.uri()));
+        credential.status(readStatus(document.get(VcVocab.STATUS.uri())));
 
         // issuance date
         credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
@@ -144,6 +153,24 @@ public class VerifiableReader {
         credential.validUntil(node.scalar(VcVocab.VALID_UNTIL).xsdDateTime());
         
         return credential;
+    }
+    
+    protected Collection<Status> readStatus(JsonValue value) throws DocumentError {
+        if (JsonUtils.isNotArray(value)) {
+            return Collections.emptyList();
+        }
+        
+        final JsonArray values = value.asJsonArray();
+        final Collection<Status> status = new ArrayList<>(values.size());
+        
+        for (final JsonValue item : values) {
+            if (JsonUtils.isNotObject(item)) {
+                //TODO print warning or error? -> processing policy
+                continue;
+            }
+            status.add(statusReader.read(item.asJsonObject()));
+        }
+        return status;
     }
     
     public static boolean isCredential(final JsonValue document) {

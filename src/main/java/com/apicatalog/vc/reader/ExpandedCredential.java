@@ -7,6 +7,7 @@ import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.status.Status;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -26,6 +27,10 @@ public class ExpandedCredential extends Credential {
     
     public void type(Collection<String> type) {
         this.type = type;
+    }
+    
+    public void status(Collection<Status> status) {
+        this.status = status;
     }
     
     public JsonObject expand() {

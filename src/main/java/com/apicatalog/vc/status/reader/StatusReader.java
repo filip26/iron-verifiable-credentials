@@ -1,5 +1,6 @@
 package com.apicatalog.vc.status.reader;
 
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.status.Status;
 
 import jakarta.json.JsonObject;
@@ -16,7 +17,8 @@ public interface StatusReader {
      * 
      * @param object an expanded JSON-LD representing the status
      * @return materialized status instance
+     * @throws DocumentError 
      */
-    Status read(JsonObject object);
+    Status read(JsonObject object) throws DocumentError;
 
 }
