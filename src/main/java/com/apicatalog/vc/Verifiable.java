@@ -3,20 +3,8 @@ package com.apicatalog.vc;
 import java.net.URI;
 import java.util.Collection;
 
-import com.apicatalog.jsonld.JsonLd;
-import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.proof.Proof;
-
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonStructure;
 
 /**
  * Represents a common ancestor for verifiable data.
@@ -32,11 +20,8 @@ public abstract class Verifiable {
     protected Collection<Proof> proofs;
     protected Collection<String> type;
 
-    protected JsonObject expanded;
-
-    protected Verifiable(ModelVersion version, JsonObject expanded) {
+    protected Verifiable(ModelVersion version) {
         this.version = version;
-        this.expanded = expanded;
     }
 
     public URI id() {
@@ -81,37 +66,4 @@ public abstract class Verifiable {
     }
 
     public abstract void validate() throws DocumentError;
-
-    static JsonObject compact(final JsonObject signed, final JsonStructure context, final DocumentLoader loader) throws DocumentError {
-
-        try {
-            return postCompact(JsonLd
-                    .compact(JsonDocument.of(signed), JsonDocument.of(context))
-                    .loader(loader)
-                    .get());
-
-        } catch (JsonLdError e) {
-            DocumentError.failWithJsonLd(e);
-            throw new DocumentError(e, ErrorType.Invalid);
-        }
-    }
-
-    static JsonObject postCompact(final JsonObject source) {
-
-        JsonObject compacted = source;
-
-        // TODO use options
-        // make sure @context is the first key and an array
-        if (!compacted.keySet().iterator().next().equals(Keywords.CONTEXT)) {
-            final JsonObjectBuilder builder = Json.createObjectBuilder()
-                    .add(Keywords.CONTEXT, JsonUtils.toJsonArray(compacted.get(Keywords.CONTEXT)));
-
-            compacted.entrySet().stream()
-                    .filter(entry -> !Keywords.CONTEXT.equals(entry.getKey()))
-                    .forEach(entry -> builder.add(entry.getKey(), entry.getValue()));
-
-            compacted = builder.build();
-        }
-        return compacted;
-    }
 }

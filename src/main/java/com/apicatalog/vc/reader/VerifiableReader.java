@@ -1,4 +1,4 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.reader;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,11 +11,14 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.Term;
+import com.apicatalog.ld.node.LdNode;
+import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.ModelVersion;
+import com.apicatalog.vc.Presentation;
+import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.Verifiable;
 
-import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
@@ -100,15 +103,15 @@ public class VerifiableReader {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        final Credential credential = new Credential(version, document);
+        final ExpandedCredential credential = new ExpandedCredential(version, document);
 
         final LdNode node = LdNode.of(document);
 
         // @id
-        credential.id = node.id();
-
+        credential.id(node.id());
+        
         // @type
-        credential.type = node.type().strings();
+        credential.type(node.type().strings());
 
         // subject
 //      if (!node.node(VcVocab.SUBJECT).exists()) {
@@ -122,7 +125,7 @@ public class VerifiableReader {
                 throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
             }
 
-            credential.issuer = (document.get(VcVocab.ISSUER.uri()));
+//            credential.issuer = (document.get(VcVocab.ISSUER.uri()));
         }
             
 
@@ -150,7 +153,6 @@ public class VerifiableReader {
         return LdNode.isTypeOf(VcVocab.CREDENTIAL_TYPE.uri(), document);
     }
 
-
     public static boolean isPresentation(final JsonValue document) {
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
@@ -164,7 +166,7 @@ public class VerifiableReader {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        final Presentation presentation = new Presentation(version, document);
+        final ExpandedPresentation presentation = new ExpandedPresentation(version, document);
 
         // @type
         if (!LdNode.isTypeOf(VcVocab.PRESENTATION_TYPE.uri(), document)) {
@@ -178,10 +180,10 @@ public class VerifiableReader {
         final LdNode node = LdNode.of(document);
 
         // @id - optional
-        presentation.id = node.id();
+        presentation.id(node.id());
 
         // holder - optional
-        presentation.holder = node.node(VcVocab.HOLDER).id();
+        presentation.holder(node.node(VcVocab.HOLDER).id());
 
         return presentation;
     }
@@ -209,19 +211,5 @@ public class VerifiableReader {
         }
 
         return result;
-    }
-    
-    static JsonObject setCredentials(final JsonObject document, final Collection<Credential> credentials) throws DocumentError {
-
-        JsonArrayBuilder builder = Json.createArrayBuilder();
-        
-        credentials.stream().map(c -> Json.createObjectBuilder()
-                .add(Keywords.GRAPH,
-                        Json.createArrayBuilder().add(c.expand())))
-                .forEach(builder::add);
-        
-        return Json.createObjectBuilder(document)
-                    .add(VcVocab.VERIFIABLE_CREDENTIALS.uri(), builder).build();
-        
     }
 }

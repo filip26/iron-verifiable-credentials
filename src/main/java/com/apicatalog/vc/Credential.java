@@ -5,13 +5,9 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.Expandable;
-import com.apicatalog.ld.node.LdNodeBuilder;
+import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.status.Status;
-
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
+import com.apicatalog.vc.subject.Subject;
 
 /**
  * Represents a verifiable credential (VC).
@@ -21,7 +17,7 @@ import jakarta.json.JsonValue;
  * 
  * @since 0.9.0
  */
-public class Credential extends Verifiable implements Expandable<JsonObject> {
+public class Credential extends Verifiable  {
 
     /** issuanceDate - v1.1 */
     protected Instant issuance;
@@ -33,15 +29,17 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
     /** model v2.0 - expirationDate replacement */
     protected Instant validFrom;
 
-    protected Collection<JsonObject> subject;
-    protected JsonValue issuer;
+    /** a verifiable credential contains claims about one or more subjects */
+    protected Collection<Subject> subject;
+    
     protected Collection<Status> status;
+    
+    protected IssuerDetails issuer;
     
     //TODO termsOfUse
     
-
-    protected Credential(ModelVersion version, JsonObject expanded) {
-        super(version, expanded);
+    protected Credential(ModelVersion version) {
+        super(version);
     }
 
     /**
@@ -141,9 +139,9 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
     /**
      *
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
-     * @return {@link JsonObject} representing the issuer in an expanded form
+     * @return {@link IssuerDetails} representing the issuer in an expanded form
      */
-    public JsonValue issuer() {
+    public IssuerDetails issuer() {
         return issuer;
     }
 
@@ -163,7 +161,7 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
      * 
      * @return
      */
-    public Collection<JsonObject> subject() {
+    public Collection<Subject> subject() {
         return subject;
     }
 
@@ -221,29 +219,5 @@ public class Credential extends Verifiable implements Expandable<JsonObject> {
                         && validFrom.isAfter(validUntil))) {
             throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }
-    }
-    
-    @Override
-    public JsonObject expand() {
-        
-        final LdNodeBuilder builder = new LdNodeBuilder(Json.createObjectBuilder(expanded));
-        
-        if (issuance != null) {
-            builder.set(VcVocab.ISSUANCE_DATE).xsdDateTime(issuance);
-        }
-        
-        if (expiration != null) {
-            builder.set(VcVocab.EXPIRATION_DATE).xsdDateTime(expiration);
-        }
-        
-        if (validFrom != null) {
-            builder.set(VcVocab.VALID_FROM).xsdDateTime(validFrom);
-        }
-        
-        if (validUntil != null) {
-            builder.set(VcVocab.VALID_UNTIL).xsdDateTime(validUntil);
-        }
-        
-        return builder.build();
     }
 }

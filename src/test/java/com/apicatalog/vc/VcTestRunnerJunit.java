@@ -37,7 +37,7 @@ import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
-import com.apicatalog.vc.processor.ExpandedVerifiable;
+import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.verifier.Verifier;
 
 import jakarta.json.Json;

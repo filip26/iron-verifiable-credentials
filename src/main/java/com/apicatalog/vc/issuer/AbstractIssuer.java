@@ -28,12 +28,12 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.VerifiableReader;
 import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.processor.ExpandedVerifiable;
 import com.apicatalog.vc.proof.EmbeddedProof;
+import com.apicatalog.vc.reader.ExpandedVerifiable;
+import com.apicatalog.vc.reader.VerifiableReader;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;

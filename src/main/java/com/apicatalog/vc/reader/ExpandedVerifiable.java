@@ -1,4 +1,4 @@
-package com.apicatalog.vc.processor;
+package com.apicatalog.vc.reader;
 
 import java.net.URI;
 

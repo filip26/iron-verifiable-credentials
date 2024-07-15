@@ -5,8 +5,6 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 
-import jakarta.json.JsonObject;
-
 /**
  * Represents a verifiable presentation (VP).
  *
@@ -21,8 +19,8 @@ public class Presentation extends Verifiable {
 
     protected Collection<Credential> credentials;
 
-    protected Presentation(ModelVersion version, JsonObject expanded) {
-        super(version, expanded);
+    protected Presentation(ModelVersion version) {
+        super(version);
     }
 
     @Override
@@ -53,6 +51,6 @@ public class Presentation extends Verifiable {
 
     @Override
     public void validate() throws DocumentError {
-        /*TODO validate something, e.g. a presence of credentials */
+        /* TODO validate something, e.g. a presence of credentials */
     }
 }

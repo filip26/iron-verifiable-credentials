@@ -22,13 +22,13 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.sd.DocumentSelector;
 import com.apicatalog.vc.VcVocab;
-import com.apicatalog.vc.VerifiableReader;
 import com.apicatalog.vc.processor.AbstractProcessor;
-import com.apicatalog.vc.processor.ExpandedVerifiable;
 import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vc.reader.ExpandedVerifiable;
+import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
