@@ -37,9 +37,8 @@ import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.reader.VerifiableReader;
-import com.apicatalog.vc.status.StatusPropertiesValidator;
-import com.apicatalog.vc.status.StatusValidator;
-import com.apicatalog.vc.subject.SubjectValidator;
+import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
@@ -49,14 +48,12 @@ import jakarta.json.JsonValue;
 
 public class Verifier extends AbstractProcessor<Verifier> {
 
-    protected StatusValidator statusValidator;
-    protected SubjectValidator subjectValidator;
+    protected StatusVerifier statusVerifier;
 
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
-        this.statusValidator = new StatusPropertiesValidator();
-        this.subjectValidator = null;
+        this.statusVerifier = null;
     }
 
     public static Verifier with(final SignatureSuite... suites) {
@@ -70,20 +67,8 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * @param statusValidator a custom status verifier instance
      * @return the verifier instance
      */
-    public Verifier statusValidator(StatusValidator statusValidator) {
-        this.statusValidator = statusValidator;
-        return this;
-    }
-
-    /**
-     * Set a credential subject verifier. If not set then
-     * <code>credentialStatus</code> is not verified.
-     *
-     * @param subjectValidator a custom subject verifier instance
-     * @return the verifier instance
-     */
-    public Verifier subjectValidator(SubjectValidator subjectValidator) {
-        this.subjectValidator = subjectValidator;
+    public Verifier statusValidator(StatusVerifier statusValidator) {
+        this.statusVerifier = statusValidator;
         return this;
     }
 
@@ -192,7 +177,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
                     .base(base).get();
 
             return verifyExpanded(VerifiableReader.getVersion(document), context, expanded, params, loader);
- 
+
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
@@ -320,6 +305,8 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
     final void validate(final Credential credential) throws DocumentError, VerificationError {
 
+        credential.validate();
+
         // validation
         if (credential.isExpired()) {
             throw new VerificationError(Code.Expired);
@@ -329,21 +316,11 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throw new VerificationError(Code.NotValidYet);
         }
 
-        validateData(credential);
-    }
-
-    protected void validateData(final Credential credential) throws DocumentError {
-
-        // v1
-        if ((credential.version() == null || ModelVersion.V11.equals(credential.version()))
-                && credential.issuanceDate() == null) {
-            // issuance date is a mandatory property
-            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
-        }
-
         // status check
-        if (statusValidator != null) {
-//FIXME            statusValidator.verify(credential.status());
+        if (statusVerifier != null && credential.status() != null && !credential.status().isEmpty()) {
+            for (final Status status : credential.status()) {
+                statusVerifier.verify(credential, status);   
+            }
         }
     }
 

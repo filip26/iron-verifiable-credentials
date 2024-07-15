@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
