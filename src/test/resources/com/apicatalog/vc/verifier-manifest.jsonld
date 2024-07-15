@@ -306,7 +306,7 @@
       ],
       "name": "NULL @context",
       "input": "verifier/0301-in.jsonld",
-      "expectErrorCode": "InvalidContext"
+      "expectErrorCode": "InvalidDocument"
     },
     {
       "@id": "#t0302",

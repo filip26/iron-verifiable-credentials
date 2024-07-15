@@ -64,6 +64,10 @@ public class DocumentError extends Throwable {
         if (JsonLdErrorCode.LOADING_REMOTE_CONTEXT_FAILED == e.getCode()) {
             throw new DocumentError(e, ErrorType.Invalid);
         }
+
+        if (JsonLdErrorCode.UNDEFINED_TERM == e.getCode()) {
+            throw new DocumentError(e, ErrorType.Invalid);
+        }
     }
 
     static final String toCode(ErrorType type, Term... terms) {

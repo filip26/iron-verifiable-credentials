@@ -192,7 +192,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
                     .base(base).get();
 
             return verifyExpanded(VerifiableReader.getVersion(document), context, expanded, params, loader);
-
+ 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
