@@ -10,6 +10,10 @@ public class ExpandedIssuerDetailsReader implements IssuerDetailsReader {
     @Override
     public ExpandedIssuerDetails read(JsonObject document) throws DocumentError {
 
+        if (document.isEmpty()) {
+            return null;
+        }
+
         final ExpandedIssuerDetails status = new ExpandedIssuerDetails();
         final LdNode node = LdNode.of(document);
 

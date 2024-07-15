@@ -3,10 +3,6 @@ package com.apicatalog.vc.status;
 import java.net.URI;
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
-
-import jakarta.json.JsonValue;
-
 public abstract class Status {
 
     protected URI id;
@@ -14,6 +10,10 @@ public abstract class Status {
     
     protected Status() {
         /* protected */
+    }
+
+    public Collection<String> type() {
+        return type;
     }
     
     /**

@@ -131,7 +131,7 @@ public class VerifiableReader {
         credential.type(node.type().strings());
 
         // subject
-        credential.status(readCollection(document.get(VcVocab.SUBJECT.uri()), statusReader));
+        credential.subject(readCollection(document.get(VcVocab.SUBJECT.uri()), subjectReader));
 
         // issuer
         credential.issuer(readObject(document.get(VcVocab.ISSUER.uri()), issuerReader));

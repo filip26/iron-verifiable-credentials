@@ -10,6 +10,10 @@ public class ExpandedStatusReader implements StatusReader {
     @Override
     public ExpandedStatus read(JsonObject document) throws DocumentError {
 
+        if (document.isEmpty()) {
+            return null;
+        }
+        
         final ExpandedStatus status = new ExpandedStatus();
         final LdNode node = LdNode.of(document);
 

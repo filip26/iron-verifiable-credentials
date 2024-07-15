@@ -12,4 +12,8 @@ public class IssuerDetails {
         /* protected */
     }
 
+    public URI id() {
+        return id;
+    }
+
 }

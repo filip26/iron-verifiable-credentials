@@ -10,9 +10,13 @@ public class ExpandedSubjectReader implements SubjectReader {
     @Override
     public ExpandedSubject read(JsonObject document) throws DocumentError {
 
+        if (document.isEmpty()) {
+            return null;
+        }
+
         final ExpandedSubject status = new ExpandedSubject();
         final LdNode node = LdNode.of(document);
-
+        
         return read(node, status);
     }
 

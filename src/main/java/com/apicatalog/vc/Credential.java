@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.status.Status;
@@ -179,28 +180,28 @@ public class Credential extends Verifiable  {
     public void validate() throws DocumentError {
 
         // @type - mandatory
-//        if (!credential.type().contains(VcVocab.CREDENTIAL_TYPE.uri())) {
-//            if (credential.type().isEmpty()) {
-//                throw new DocumentError(ErrorType.Missing, Term.TYPE);
-//            }
-//            throw new DocumentError(ErrorType.Unknown, Term.TYPE);
-//        }
+        if (type == null || type.isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, Term.TYPE);
+        }
 
         // subject - mandatory
-        if (subject == null) {
+        if (subject == null || subject.isEmpty()) {
             throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
         }
 
         // issuer 
-//        if (!issuer.exists()) {
-//            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
-//        }
-        
-        // issuer @id - mandatory
-//        if (issuer.id() == null) {
-//            throw new DocumentError(ErrorType.Invalid, VcVocab.ISSUER);
-//        }
+        if (issuer == null || issuer.id() == null) {
+            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
+        }
 
+        // status @type is required when status is present
+        if (ModelVersion.V20.equals(version)
+                && status != null
+                && status.size() > 0
+                && !status.stream().allMatch(s -> s.type() != null && !s.type().isEmpty())
+                ) {
+            throw new DocumentError(ErrorType.Invalid, VcVocab.STATUS);
+        }
         
         // v1
         if ((version == null || ModelVersion.V11.equals(version))

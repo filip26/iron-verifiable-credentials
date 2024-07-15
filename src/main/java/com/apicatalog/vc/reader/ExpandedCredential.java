@@ -9,6 +9,7 @@ import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.subject.Subject;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -28,6 +29,10 @@ public class ExpandedCredential extends Credential {
     
     public void type(Collection<String> type) {
         this.type = type;
+    }
+
+    public void subject(Collection<Subject> subject) {
+        this.subject = subject;
     }
     
     public void status(Collection<Status> status) {
