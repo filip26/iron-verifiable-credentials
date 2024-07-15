@@ -49,7 +49,13 @@ public class VerifiableReader {
         this.subjectReader = new ExpandedSubjectReader();
         this.statusReader = new ExpandedStatusReader();
     }
-
+    
+    protected VerifiableReader(IssuerDetailsReader issuerReader, SubjectReader subjectReader, StatusReader statusReader) {
+        this.issuerReader = issuerReader;
+        this.subjectReader = subjectReader;
+        this.statusReader = statusReader;
+    }
+    
     public static ModelVersion getVersion(final JsonObject object) throws DocumentError {
 
         final JsonValue contexts = object.get(Keywords.CONTEXT);
@@ -251,5 +257,4 @@ public class VerifiableReader {
         }
         return reader.read(version, item.asJsonObject());
     }
-
 }

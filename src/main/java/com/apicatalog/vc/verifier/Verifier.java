@@ -64,11 +64,11 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * Set a credential status verifier. If not set then
      * <code>credentialStatus</code> is ignored if present.
      *
-     * @param statusValidator a custom status verifier instance
+     * @param statusVerifier a custom status verifier instance
      * @return the verifier instance
      */
-    public Verifier statusValidator(StatusVerifier statusValidator) {
-        this.statusVerifier = statusValidator;
+    public Verifier statusValidator(StatusVerifier statusVerifier) {
+        this.statusVerifier = statusVerifier;
         return this;
     }
 
