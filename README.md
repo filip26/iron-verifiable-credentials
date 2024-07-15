@@ -2,7 +2,6 @@
 > Please consider a donation to keep the project available and maintained as an open-source.
 > 
 > The common experience with open-source is that no one wants to pay for it, but they will happily use it for free.
-> -- Be different, be proud of it, brag about it, and feel good!
 
 # Iron Verifiable Credentials Processor
 
