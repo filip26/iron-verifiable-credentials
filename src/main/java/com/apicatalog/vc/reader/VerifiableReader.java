@@ -21,6 +21,9 @@ import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.reader.ExpandedStatusReader;
 import com.apicatalog.vc.status.reader.StatusReader;
+import com.apicatalog.vc.subject.Subject;
+import com.apicatalog.vc.subject.reader.ExpandedSubjectReader;
+import com.apicatalog.vc.subject.reader.SubjectReader;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -28,8 +31,8 @@ import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
 /**
- * Materializes an expanded JSON-LD representing a verifiable credential 
- * or presentation.
+ * Materializes an expanded JSON-LD representing a verifiable credential or
+ * presentation.
  * 
  * @since 0.15.0
  */
@@ -37,12 +40,14 @@ public class VerifiableReader {
 
     private static final Logger LOGGER = Logger.getLogger(VerifiableReader.class.getName());
 
+    protected SubjectReader subjectReader;
     protected StatusReader statusReader;
-    
+
     public VerifiableReader() {
+        this.subjectReader = new ExpandedSubjectReader();
         this.statusReader = new ExpandedStatusReader();
     }
-    
+
     public static ModelVersion getVersion(final JsonObject object) throws DocumentError {
 
         final JsonValue contexts = object.get(Keywords.CONTEXT);
@@ -75,7 +80,7 @@ public class VerifiableReader {
     /**
      * Creates a new verifiable instance from the given expanded JSON-LD input.
      * 
-     * @param version model version
+     * @param version  model version
      * @param expanded an expanded JSON-LD representing a verifiable
      * @return materialized verifiable instance
      * 
@@ -119,16 +124,15 @@ public class VerifiableReader {
 
         // @id
         credential.id(node.id());
-        
+
         // @type
         credential.type(node.type().strings());
 
         // subject
-//      if (!node.node(VcVocab.SUBJECT).exists()) {
-//        credential.subject = document.get(VcVocab.SUBJECT.uri());
+        credential.status(readStatus(document.get(VcVocab.SUBJECT.uri())));
 
         final LdNode issuer = node.node(VcVocab.ISSUER);
-        
+
         if (issuer.exists()) {
             // issuer @id - mandatory
             if (issuer.id() == null) {
@@ -137,13 +141,14 @@ public class VerifiableReader {
 
 //            credential.issuer = (document.get(VcVocab.ISSUER.uri()));
         }
-            
+
+        // status
         credential.status(readStatus(document.get(VcVocab.STATUS.uri())));
 
         // issuance date
         credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
 
-        // expiration date 
+        // expiration date
         credential.expiration(node.scalar(VcVocab.EXPIRATION_DATE).xsdDateTime());
 
         // validFrom - optional
@@ -151,28 +156,10 @@ public class VerifiableReader {
 
         // validUntil - optional
         credential.validUntil(node.scalar(VcVocab.VALID_UNTIL).xsdDateTime());
-        
+
         return credential;
     }
-    
-    protected Collection<Status> readStatus(JsonValue value) throws DocumentError {
-        if (JsonUtils.isNotArray(value)) {
-            return Collections.emptyList();
-        }
-        
-        final JsonArray values = value.asJsonArray();
-        final Collection<Status> status = new ArrayList<>(values.size());
-        
-        for (final JsonValue item : values) {
-            if (JsonUtils.isNotObject(item)) {
-                //TODO print warning or error? -> processing policy
-                continue;
-            }
-            status.add(statusReader.read(item.asJsonObject()));
-        }
-        return status;
-    }
-    
+
     public static boolean isCredential(final JsonValue document) {
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
@@ -239,4 +226,41 @@ public class VerifiableReader {
 
         return result;
     }
+
+    protected Collection<Status> readStatus(JsonValue value) throws DocumentError {
+        if (JsonUtils.isNotArray(value)) {
+            return Collections.emptyList();
+        }
+
+        final JsonArray values = value.asJsonArray();
+        final Collection<Status> status = new ArrayList<>(values.size());
+
+        for (final JsonValue item : values) {
+            if (JsonUtils.isNotObject(item)) {
+                // TODO print warning or error? -> processing policy
+                continue;
+            }
+            status.add(statusReader.read(item.asJsonObject()));
+        }
+        return status;
+    }
+
+    protected Collection<Subject> readSubject(JsonValue value) throws DocumentError {
+        if (JsonUtils.isNotArray(value)) {
+            return Collections.emptyList();
+        }
+
+        final JsonArray values = value.asJsonArray();
+        final Collection<Subject> status = new ArrayList<>(values.size());
+
+        for (final JsonValue item : values) {
+            if (JsonUtils.isNotObject(item)) {
+                // TODO print warning or error? -> processing policy
+                continue;
+            }
+            status.add(subjectReader.read(item.asJsonObject()));
+        }
+        return status;
+    }
+
 }
