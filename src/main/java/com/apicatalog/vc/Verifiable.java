@@ -1,35 +1,23 @@
 package com.apicatalog.vc;
 
-import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.proof.Proof;
+
+import jakarta.json.JsonObject;
 
 /**
  * Represents a common ancestor for verifiable data.
  * 
  * @since 0.9.0
  */
-public abstract class Verifiable {
-
-    protected final ModelVersion version;
-
-    protected URI id;
+public abstract class Verifiable extends DataObject {
 
     protected Collection<Proof> proofs;
-    protected Collection<String> type;
 
-    protected Verifiable(ModelVersion version) {
-        this.version = version;
-    }
-
-    public URI id() {
-        return id;
-    }
-
-    public Collection<String> type() {
-        return type;
+    protected Verifiable(ModelVersion version, JsonObject expanded) {
+        super(version, expanded);
     }
 
     public Collection<Proof> proofs() {
@@ -54,15 +42,6 @@ public abstract class Verifiable {
 
     public Presentation asPresentation() {
         throw new ClassCastException();
-    }
-
-    /**
-     * Verifiable credentials data model version.
-     * 
-     * @return the data model version, never <code>null</code>
-     */
-    public ModelVersion version() {
-        return version;
     }
 
     public abstract void validate() throws DocumentError;

@@ -1,23 +1,17 @@
 package com.apicatalog.vc.issuer;
 
-import java.net.URI;
-import java.util.Collection;
-
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.vc.DataObject;
+import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
 
-public class IssuerDetails {
+import jakarta.json.JsonObject;
 
-    protected URI id;
-    protected Collection<String> type;
+public class IssuerDetails extends DataObject {
 
-    protected IssuerDetails() {
-        /* protected */
-    }
-
-    public URI id() {
-        return id;
+    public IssuerDetails(ModelVersion version, JsonObject expanded) {
+        super(version, expanded);
     }
 
     public void validate() throws DocumentError {

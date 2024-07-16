@@ -9,11 +9,8 @@ import jakarta.json.JsonObject;
 
 public class ExpandedPresentation extends Presentation {
 
-    protected JsonObject expanded;
-    
     protected ExpandedPresentation(ModelVersion version, JsonObject expanded) {
-        super(version);
-        this.expanded = expanded;
+        super(version, expanded);
     }
     
     public void id(URI id) {

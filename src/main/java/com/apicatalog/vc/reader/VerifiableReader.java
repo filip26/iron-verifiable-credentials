@@ -18,12 +18,12 @@ import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.issuer.reader.ExpandedIssuerDetailsReader;
-import com.apicatalog.vc.issuer.reader.IssuerDetailsReader;
-import com.apicatalog.vc.status.reader.ExpandedStatusReader;
-import com.apicatalog.vc.status.reader.StatusReader;
-import com.apicatalog.vc.subject.reader.ExpandedSubjectReader;
-import com.apicatalog.vc.subject.reader.SubjectReader;
+import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.status.StatusReader;
+import com.apicatalog.vc.subject.Subject;
+import com.apicatalog.vc.subject.SubjectReader;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -40,17 +40,18 @@ public class VerifiableReader {
 
     private static final Logger LOGGER = Logger.getLogger(VerifiableReader.class.getName());
 
-    protected IssuerDetailsReader issuerReader;
-    protected SubjectReader subjectReader;
-    protected StatusReader statusReader;
+    protected ObjectReader<JsonObject, IssuerDetails> issuerReader;
+    protected ObjectReader<JsonObject, Subject> subjectReader;
+    protected ObjectReader<JsonObject, Status> statusReader;
+    protected ObjectReader<JsonObject, Status> tosReader;
 
     public VerifiableReader() {
         this.issuerReader = new ExpandedIssuerDetailsReader();
-        this.subjectReader = new ExpandedSubjectReader();
-        this.statusReader = new ExpandedStatusReader();
+        this.subjectReader = new SubjectReader();
+        this.statusReader = new StatusReader();
     }
     
-    protected VerifiableReader(IssuerDetailsReader issuerReader, SubjectReader subjectReader, StatusReader statusReader) {
+    protected VerifiableReader(ObjectReader<JsonObject, IssuerDetails> issuerReader, ObjectReader<JsonObject, Subject> subjectReader, ObjectReader<JsonObject, Status> statusReader) {
         this.issuerReader = issuerReader;
         this.subjectReader = subjectReader;
         this.statusReader = statusReader;
@@ -126,7 +127,7 @@ public class VerifiableReader {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        final ExpandedCredential credential = new ExpandedCredential(version, document);
+        final Credential credential = Credential.of(version, document);
 
         final LdNode node = LdNode.of(document);
 
@@ -227,7 +228,7 @@ public class VerifiableReader {
         return result;
     }
 
-    protected static <T> Collection<T> readCollection(ModelVersion version, JsonValue value, ExpandedObjectReader<T> reader) throws DocumentError {
+    protected static <T> Collection<T> readCollection(ModelVersion version, JsonValue value, ObjectReader<JsonObject, T> reader) throws DocumentError {
         if (JsonUtils.isNotArray(value)) {
             return Collections.emptyList();
         }
@@ -245,7 +246,7 @@ public class VerifiableReader {
         return instance;
     }
 
-    protected static <T> T readObject(ModelVersion version, JsonValue value, ExpandedObjectReader<T> reader) throws DocumentError {
+    protected static <T> T readObject(ModelVersion version, JsonValue value, ObjectReader<JsonObject, T> reader) throws DocumentError {
         if (JsonUtils.isNotArray(value) || value.asJsonArray().size() != 1) { // TODO throw an error if size > 1
             return null;
         }

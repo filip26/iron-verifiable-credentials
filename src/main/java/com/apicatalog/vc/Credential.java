@@ -1,14 +1,20 @@
 package com.apicatalog.vc;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
+import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
+
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 
 /**
  * Represents a verifiable credential (VC).
@@ -19,6 +25,20 @@ import com.apicatalog.vc.subject.Subject;
  * @since 0.9.0
  */
 public class Credential extends Verifiable  {
+
+    protected static final Collection<String> TERMS;
+    
+    static {
+        TERMS = new ArrayList<>();
+        TERMS.add(VcVocab.ISSUANCE_DATE.uri());
+        TERMS.add(VcVocab.EXPIRATION_DATE.uri());
+        TERMS.add(VcVocab.VALID_UNTIL.uri());
+        TERMS.add(VcVocab.VALID_FROM.uri());
+        TERMS.add(VcVocab.SUBJECT.uri());
+        TERMS.add(VcVocab.STATUS.uri());
+        TERMS.add(VcVocab.ISSUER.uri());
+        TERMS.add(VcVocab.TERMS_OF_USE.uri());
+    }
 
     /** issuanceDate - v1.1 */
     protected Instant issuance;
@@ -37,10 +57,11 @@ public class Credential extends Verifiable  {
     
     protected IssuerDetails issuer;
     
+    
     //TODO termsOfUse
     
-    protected Credential(ModelVersion version) {
-        super(version);
+    protected Credential(ModelVersion version, JsonObject expanded) {
+        super(version, expanded);
     }
 
     /**
@@ -60,8 +81,9 @@ public class Credential extends Verifiable  {
         return issuance;
     }
 
-    public void issuanceDate(Instant issuance) {
+    public Credential issuanceDate(Instant issuance) {
         this.issuance = issuance;
+        return this;
     }
 
     /**
@@ -222,5 +244,55 @@ public class Credential extends Verifiable  {
                         && validFrom.isAfter(validUntil))) {
             throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }
+    }
+    
+    
+//    public void type(Collection<String> type) {
+//        this.type = type;
+//    }
+
+    public void subject(Collection<Subject> subject) {
+        this.subject = subject;
+    }
+    
+    public void status(Collection<Status> status) {
+        this.status = status;
+    }
+
+    public void issuer(IssuerDetails issuer) {
+        this.issuer = issuer;
+    }
+
+    public JsonObject expand() {
+        
+        final LdNodeBuilder builder = new LdNodeBuilder(Json.createObjectBuilder(expanded));
+        
+        if (issuance != null) {
+            builder.set(VcVocab.ISSUANCE_DATE).xsdDateTime(issuance);
+        }
+        
+        if (expiration != null) {
+            builder.set(VcVocab.EXPIRATION_DATE).xsdDateTime(expiration);
+        }
+        
+        if (validFrom != null) {
+            builder.set(VcVocab.VALID_FROM).xsdDateTime(validFrom);
+        }
+        
+        if (validUntil != null) {
+            builder.set(VcVocab.VALID_UNTIL).xsdDateTime(validUntil);
+        }
+        
+        return builder.build();
+    }
+
+    @Override
+    protected Predicate<String> termsFilter() {
+        return super.termsFilter().and(term -> !TERMS.contains(term));
+    }
+
+    public static Credential of(ModelVersion version, JsonObject document) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

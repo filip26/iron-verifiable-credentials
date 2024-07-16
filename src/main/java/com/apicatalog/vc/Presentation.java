@@ -6,6 +6,8 @@ import java.util.Collection;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 
+import jakarta.json.JsonObject;
+
 /**
  * Represents a verifiable presentation (VP).
  *
@@ -20,8 +22,8 @@ public class Presentation extends Verifiable {
 
     protected Collection<Credential> credentials;
 
-    protected Presentation(ModelVersion version) {
-        super(version);
+    protected Presentation(ModelVersion version, JsonObject expanded) {
+        super(version, expanded);
     }
 
     @Override

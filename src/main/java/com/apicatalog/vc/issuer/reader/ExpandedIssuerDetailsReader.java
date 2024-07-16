@@ -1,35 +1,17 @@
 package com.apicatalog.vc.issuer.reader;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.vc.ModelVersion;
+import com.apicatalog.vc.issuer.IssuerDetails;
+import com.apicatalog.vc.reader.ExpandedObjectReader;
 
 import jakarta.json.JsonObject;
 
-public class ExpandedIssuerDetailsReader implements IssuerDetailsReader {
+public class ExpandedIssuerDetailsReader extends ExpandedObjectReader<IssuerDetails> {
 
     @Override
-    public ExpandedIssuerDetails read(ModelVersion version, JsonObject document) throws DocumentError {
-
-        if (document.isEmpty()) {
-            return null;
-        }
-
-        final ExpandedIssuerDetails status = new ExpandedIssuerDetails(version);
-        final LdNode node = LdNode.of(document);
-
-        return read(node, status);
+    protected IssuerDetails newInstance(ModelVersion version, JsonObject expanded) {
+        return new IssuerDetails(version, expanded);
     }
 
-    protected ExpandedIssuerDetails read(LdNode node, ExpandedIssuerDetails subject) throws DocumentError {
-
-        // @id
-        subject.id(node.id());
-
-        // @type
-        subject.type(node.type().strings());
-        
-        return subject;
-    }
-
+    
 }

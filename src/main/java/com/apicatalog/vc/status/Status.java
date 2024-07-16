@@ -1,26 +1,17 @@
 package com.apicatalog.vc.status;
 
-import java.net.URI;
-import java.util.Collection;
-
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.vc.DataObject;
 import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
 
-public class Status {
+import jakarta.json.JsonObject;
 
-    protected final ModelVersion version;
+public class Status extends DataObject {
 
-    protected URI id;
-    protected Collection<String> type;
-    
-    protected Status(ModelVersion version) {
-        this.version = version;
-    }
-
-    public Collection<String> type() {
-        return type;
+    public Status(ModelVersion version, JsonObject expanded) {
+        super(version, expanded);
     }
     
     public void validate() throws DocumentError {
