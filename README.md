@@ -26,6 +26,8 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature suite? List it here, open PR.
+* Credentail Status Verification
+  * Bitstring Status List (planned) 
 * Data Models
   * [v2.0](https://w3c.github.io/vc-data-model/)
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
