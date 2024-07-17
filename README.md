@@ -151,10 +151,10 @@ Fork and clone the project repository.
 > mvn clean package
 ```
 
-#### Java 8
+#### Java 11
 ```bash
 > cd iron-verfiable-credentials
-> mvn -f pom_jre8.xml clean package
+> mvn -f pom_jre11.xml clean package
 ```
 
 ## Extensions
