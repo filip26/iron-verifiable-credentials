@@ -11,14 +11,14 @@ import com.apicatalog.jsonld.lang.Keywords;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-public class LinkedObject {
+public class ExpandedLinkedObject {
 
     protected URI id;
     protected Collection<String> type;
 
     protected JsonObject expanded;
 
-    protected LinkedObject(JsonObject expanded) {
+    protected ExpandedLinkedObject(JsonObject expanded) {
         this.expanded = expanded;
     }
 
@@ -49,8 +49,8 @@ public class LinkedObject {
         final JsonValue value = expanded.get(name);
         return JsonUtils.isNull(value) ? Optional.empty() : Optional.of(value);
     }
-    
+
     protected Predicate<String> termsFilter() {
-        return term -> !term.equals(Keywords.ID) && !term.equals(Keywords.TYPE);
+        return term -> !Keywords.ID.equals(term) && !Keywords.TYPE.equals(term);
     }
 }

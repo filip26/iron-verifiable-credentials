@@ -1,7 +1,7 @@
 package com.apicatalog.vc.reader;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.ModelVersion;
+import com.apicatalog.vc.model.ModelVersion;
 
 /**
  * 

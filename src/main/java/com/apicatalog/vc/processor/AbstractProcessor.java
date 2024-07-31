@@ -22,13 +22,12 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonArray;
@@ -38,7 +37,6 @@ import jakarta.json.JsonStructure;
 public class AbstractProcessor<T extends AbstractProcessor<T>> {
 
     protected final SignatureSuite[] suites;
-    protected final VerifiableReader reader;
 
     protected DocumentLoader defaultLoader;
     protected boolean bundledContexts;
@@ -50,7 +48,6 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
 
     protected AbstractProcessor(final SignatureSuite... suites) {
         this.suites = suites;
-        this.reader = new VerifiableReader();
 
         // default values
         this.defaultLoader = null;

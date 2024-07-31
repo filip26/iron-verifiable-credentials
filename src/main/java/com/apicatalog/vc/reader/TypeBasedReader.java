@@ -2,7 +2,7 @@ package com.apicatalog.vc.reader;
 
 import java.util.Map;
 
-import com.apicatalog.vc.ModelVersion;
+import com.apicatalog.vc.model.ModelVersion;
 
 import jakarta.json.JsonObject;
 

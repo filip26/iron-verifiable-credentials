@@ -25,12 +25,12 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.reader.VerifiableReader;
@@ -48,7 +48,7 @@ public abstract class AbstractIssuer implements Issuer {
     protected final CryptoSuite crypto;
     protected final KeyPair keyPair;
     protected final Multibase proofValueBase;
-    protected final VerifiableReader reader;
+    protected final VerifiableReader<Verifiable, JsonObject> reader;
     
     protected DocumentLoader defaultLoader;
     protected URI base;

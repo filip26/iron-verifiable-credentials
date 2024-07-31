@@ -3,7 +3,6 @@ package com.apicatalog.vc.reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,23 +36,23 @@ import jakarta.json.JsonValue;
  * 
  * @since 0.15.0
  */
-public class VerifiableReader<C extends Verifiable, I> {
+public class VerifiableReader2 {
 
-    private static final Logger LOGGER = Logger.getLogger(VerifiableReader.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VerifiableReader2.class.getName());
 
-    protected Map<JsonObject, IssuerDetails> issuerReader;
+    protected ObjectReader<JsonObject, IssuerDetails> issuerReader;
     protected ObjectReader<JsonObject, Subject> subjectReader;
     protected ObjectReader<JsonObject, Status> statusReader;
     protected ObjectReader<JsonObject, Status> tosReader;
 
-    public VerifiableReader() {
-//        this.issuerReader = new ExpandedIssuerDetailsReader();
+    public VerifiableReader2() {
+        this.issuerReader = new ExpandedIssuerDetailsReader();
         this.subjectReader = new SubjectReader();
         this.statusReader = new StatusReader();
     }
     
-    protected VerifiableReader(ObjectReader<JsonObject, IssuerDetails> issuerReader, ObjectReader<JsonObject, Subject> subjectReader, ObjectReader<JsonObject, Status> statusReader) {
-//        this.issuerReader = issuerReader;
+    protected VerifiableReader2(ObjectReader<JsonObject, IssuerDetails> issuerReader, ObjectReader<JsonObject, Subject> subjectReader, ObjectReader<JsonObject, Status> statusReader) {
+        this.issuerReader = issuerReader;
         this.subjectReader = subjectReader;
         this.statusReader = statusReader;
     }
@@ -82,26 +81,6 @@ public class VerifiableReader<C extends Verifiable, I> {
         }
 
         return result;
-    }
-
-    public static ModelVersion getVersion(JsonObject document) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public static boolean isCredential(JsonObject expanded) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public static boolean isPresentation(JsonObject expanded) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public Verifiable read(ModelVersion version, JsonObject object) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 

@@ -1,13 +1,13 @@
 package com.apicatalog.vc.reader;
 
-import com.apicatalog.ld.LinkedObject;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
-import com.apicatalog.vc.ModelVersion;
+import com.apicatalog.vc.model.DataObject;
+import com.apicatalog.vc.model.ModelVersion;
 
 import jakarta.json.JsonObject;
 
-public abstract class ExpandedObjectReader<T extends LinkedObject> implements ObjectReader<JsonObject, T> {
+public abstract class DataObjectReader<T extends DataObject> implements ObjectReader<JsonObject, T> {
 
     @Override
     public T read(ModelVersion version, JsonObject document) throws DocumentError {
@@ -26,10 +26,10 @@ public abstract class ExpandedObjectReader<T extends LinkedObject> implements Ob
     protected T read(LdNode node, T status) throws DocumentError {
 
         // @id
-        status.id(node.id());
+//        status.id(node.id());
 
         // @type
-        status.type(node.type().strings());
+//        status.type(node.type().strings());
 
         return status;
     }

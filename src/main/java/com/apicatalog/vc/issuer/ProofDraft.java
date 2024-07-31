@@ -6,9 +6,9 @@ import java.util.Collection;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.model.ModelVersion;
 
 import jakarta.json.JsonObject;
 

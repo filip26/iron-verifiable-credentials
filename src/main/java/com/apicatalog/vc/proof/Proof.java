@@ -54,14 +54,14 @@ public interface Proof {
      * @return {@link URI} uniquely identifying the previous proof
      */
     URI previousProof();
-    
+
     /**
      * Returns a {@link CryptoSuite} used to create and to verify the proof value.
      * 
      * @return {@link CryptoSuite} attached to the proof.
      */
     CryptoSuite cryptoSuite();
-    
+
     /**
      * Validates the proof data, not a signature.
      * 
@@ -77,8 +77,6 @@ public interface Proof {
     default JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
     }
-    
+
     MethodAdapter methodProcessor();
-
-
 }

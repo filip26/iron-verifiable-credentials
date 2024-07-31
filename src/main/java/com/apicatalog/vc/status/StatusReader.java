@@ -1,14 +1,28 @@
 package com.apicatalog.vc.status;
 
-import com.apicatalog.vc.ModelVersion;
-import com.apicatalog.vc.reader.ExpandedObjectReader;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.vc.model.DataObject;
+import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.vc.reader.DataObjectReader;
 
 import jakarta.json.JsonObject;
 
-public class StatusReader extends ExpandedObjectReader<Status> {
+public class StatusReader extends DataObjectReader {
+
+//    @Override
+//    protected Object newInstance(ModelVersion version, Object expanded) {
+//        return new Status(version, expanded);
+//    }
+
+//    @Override
+//    public Object read(ModelVersion version, Object expanded) throws DocumentError {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 
     @Override
-    protected Status newInstance(ModelVersion version, JsonObject expanded) {
-        return new Status(version, expanded);
+    protected DataObject newInstance(ModelVersion version, JsonObject expanded) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

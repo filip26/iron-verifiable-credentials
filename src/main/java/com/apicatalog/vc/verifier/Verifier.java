@@ -27,10 +27,10 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.ModelVersion;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
+import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.EmbeddedProof;
@@ -76,6 +76,24 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * Verifies VC/VP document. Throws VerificationError if the document is not
      * valid or cannot be verified.
      *
+     * @param verifiable
+     * @param parameters custom parameters, e.g. challenge token
+     * @return {@link Verifiable} object representing the verified credentials or a
+     *         presentation
+     * 
+     * @throws VerificationError
+     * @throws DocumentError
+     */
+    public Verifiable verify(Verifiable verifiable, Parameter<?>... parameters) throws VerificationError, DocumentError {
+        Objects.requireNonNull(verifiable);
+        //FIXME
+        return null;
+    }
+    
+    /**
+     * Verifies VC/VP document. Throws VerificationError if the document is not
+     * valid or cannot be verified.
+     *
      * @param document
      * @param parameters custom parameters, e.g. challenge token
      * @return {@link Verifiable} object representing the verified credentials or a
@@ -102,7 +120,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * @throws DocumentError
      * 
      */
-    public Verifiable verify(JsonObject document, Map<String, Object> parameters) throws VerificationError, DocumentError {
+    public Verifiable verify(final JsonObject document, final Map<String, Object> parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(document);
         return verify(document, parameters, getLoader());
     }
@@ -119,7 +137,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(URI location, Parameter<?>... parameters) throws VerificationError, DocumentError {
+    public Verifiable verify(final URI location, final Parameter<?>... parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(location);
         return verify(location, toMap(parameters), getLoader());
     }
@@ -136,12 +154,12 @@ public class Verifier extends AbstractProcessor<Verifier> {
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(URI location, Map<String, Object> parameters) throws VerificationError, DocumentError {
+    public Verifiable verify(final URI location, final Map<String, Object> parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(location);
         return verify(location, parameters, getLoader());
     }
 
-    protected Verifiable verify(final URI location, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Verifiable verify(final URI location, final Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
         try {
             // load the document
             final DocumentLoaderOptions options = new DocumentLoaderOptions();
@@ -204,7 +222,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throws VerificationError, DocumentError {
 
         // get a verifiable representation
-        final Verifiable verifiable = reader.read(version, expanded);
+        final Verifiable verifiable = null; //FIXME reader.read(version, expanded);
 
         if (verifiable.isCredential()) {
 
