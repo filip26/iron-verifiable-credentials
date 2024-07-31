@@ -1,7 +1,7 @@
 package com.apicatalog.vc.subject;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.model.DataObject;
+import com.apicatalog.vc.model.VerifiableObject;
 import com.apicatalog.vc.model.ModelVersion;
 
 import jakarta.json.JsonObject;

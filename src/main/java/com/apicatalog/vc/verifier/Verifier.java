@@ -30,6 +30,8 @@ import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
+import com.apicatalog.vc.jsonld.JsonLdPresentation;
+import com.apicatalog.vc.jsonld.JsonLdVerifiable;
 import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.Parameter;
@@ -222,7 +224,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throws VerificationError, DocumentError {
 
         // get a verifiable representation
-        final Verifiable verifiable = null; //FIXME reader.read(version, expanded);
+        final JsonLdVerifiable verifiable = null; //FIXME reader.read(version, expanded);
 
         if (verifiable.isCredential()) {
 
@@ -249,7 +251,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
                 credentials.add(verifyExpanded(version, context, presentedCredentials, params, loader).asCredential());
             }
 
-            verifiable.asPresentation().credentials(credentials);
+            ((JsonLdPresentation)verifiable.asPresentation()).credentials(credentials);
 
             return verifiable;
         }

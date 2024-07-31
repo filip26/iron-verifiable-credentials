@@ -3,7 +3,7 @@ package com.apicatalog.vc.issuer;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.VcVocab;
-import com.apicatalog.vc.model.DataObject;
+import com.apicatalog.vc.model.VerifiableObject;
 import com.apicatalog.vc.model.ModelVersion;
 
 import jakarta.json.JsonObject;

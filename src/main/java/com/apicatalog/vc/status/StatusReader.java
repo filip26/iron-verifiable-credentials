@@ -1,7 +1,7 @@
 package com.apicatalog.vc.status;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.model.DataObject;
+import com.apicatalog.vc.model.VerifiableObject;
 import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.reader.DataObjectReader;
 
@@ -21,7 +21,7 @@ public class StatusReader extends DataObjectReader {
 //    }
 
     @Override
-    protected DataObject newInstance(ModelVersion version, JsonObject expanded) {
+    protected VerifiableObject newInstance(ModelVersion version, JsonObject expanded) {
         // TODO Auto-generated method stub
         return null;
     }

@@ -2,7 +2,7 @@ package com.apicatalog.vc.issuer.reader;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.issuer.IssuerDetails;
-import com.apicatalog.vc.model.DataObject;
+import com.apicatalog.vc.model.VerifiableObject;
 import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.reader.DataObjectReader;
 
@@ -17,7 +17,7 @@ public class ExpandedIssuerDetailsReader extends DataObjectReader {
 //    }
 
     @Override
-    protected DataObject newInstance(ModelVersion version, JsonObject expanded) {
+    protected VerifiableObject newInstance(ModelVersion version, JsonObject expanded) {
         // TODO Auto-generated method stub
         return null;
     }
