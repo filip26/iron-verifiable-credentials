@@ -30,12 +30,12 @@ import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
+import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.jsonld.JsonLdPresentation;
 import com.apicatalog.vc.jsonld.JsonLdVerifiable;
 import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.Parameter;
-import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.reader.VerifiableReader;
@@ -284,12 +284,12 @@ public class Verifier extends AbstractProcessor<Verifier> {
                 throw new VerificationError(Code.UnsupportedCryptoSuite);
             }
 
-            final Proof proof = signatureSuite.getProof(expandedProof, loader);
-
-            if (proof == null) {
-                throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
-            }
-            proofs.add(proof);
+//            final Proof proof = signatureSuite.getProof(expandedProof, loader);
+//
+//            if (proof == null) {
+//                throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
+//            }
+//            proofs.add(proof);
         }
 
         // sort the proofs in the verification order

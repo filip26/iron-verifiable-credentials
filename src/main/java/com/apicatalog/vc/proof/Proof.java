@@ -10,6 +10,7 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.oxygen.ld.LinkedNode;
 import com.apicatalog.vc.integrity.DataIntegrityProof;
 import com.apicatalog.vc.method.MethodAdapter;
 
@@ -21,7 +22,7 @@ import jakarta.json.JsonStructure;
  *
  * @see {@link DataIntegrityProof} for an example implementation
  */
-public interface Proof {
+public interface Proof extends LinkedNode {
 
     /**
      * A set of parameters required to independently verify the proof, such as an
@@ -45,6 +46,7 @@ public interface Proof {
      * 
      * @return {@link URI} representing the proof id
      */
+    @Override
     URI id();
 
     /**

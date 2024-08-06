@@ -3,7 +3,7 @@ package com.apicatalog.oxygen.ld;
 import java.net.URI;
 import java.util.Collection;
 
-public interface LinkedObject extends LinkedData {
+public interface LinkedNode extends LinkedData {
 
     URI id();
 
@@ -15,7 +15,11 @@ public interface LinkedObject extends LinkedData {
     }
 
     @Override
-    default LinkedObject asObject() {
+    default LinkedNode asObject() {
         return this;
     }
+    
+    Collection<String> terms();
+
+    Collection<LinkedData> values(String term);    
 }

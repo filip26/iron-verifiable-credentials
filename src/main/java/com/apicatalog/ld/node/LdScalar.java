@@ -7,10 +7,10 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.oxygen.ld.LinkedData;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 public interface LdScalar {
 
@@ -25,9 +25,9 @@ public interface LdScalar {
 
     String type() throws DocumentError;
 
-    JsonValue value() throws DocumentError;
+    LinkedData value() throws DocumentError;
 
-    JsonValue value(String type) throws DocumentError;
+    LinkedData value(String type) throws DocumentError;
 
     default boolean exists() {
         return false;
@@ -83,7 +83,7 @@ public interface LdScalar {
         }
 
         @Override
-        public JsonValue value() throws DocumentError {
+        public LinkedData value() throws DocumentError {
             return null;
         }
 
@@ -93,7 +93,7 @@ public interface LdScalar {
         }
 
         @Override
-        public JsonValue value(String type) throws DocumentError {
+        public LinkedData value(String type) throws DocumentError {
             return null;
         }
     };

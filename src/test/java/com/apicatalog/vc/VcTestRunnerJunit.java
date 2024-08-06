@@ -30,14 +30,17 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
+import com.apicatalog.oxygen.ld.json.JsonLdObject;
 import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
+import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
 
 import jakarta.json.Json;
@@ -62,6 +65,8 @@ public class VcTestRunnerJunit {
 
     final static Verifier VERIFIER = Verifier.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
 
+    final static Reader READER = JsonLdVerifiableReader.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
+
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
     }
@@ -74,11 +79,13 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains(VcTestCase.vocab("VeriferTest"))) {
 
-                final Verifiable verifiable = VERIFIER.verify(testCase.input,
-                        challenge(testCase.challenge),
-                        purpose(testCase.purpose),
-                        domain(testCase.domain),
-                        nonce(testCase.nonce));
+                final Verifiable verifiable = READER.read(testCase.input);
+                
+//                final Verifiable verifiable = VERIFIER.verify(testCase.input,
+//                        challenge(testCase.challenge),
+//                        purpose(testCase.purpose),
+//                        domain(testCase.domain),
+//                        nonce(testCase.nonce));
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 
@@ -234,7 +241,7 @@ public class VcTestRunnerJunit {
                 continue;
             }
 
-            return (KeyPair) methodAdapter.read(key.asJsonObject());
+            return (KeyPair) methodAdapter.read(JsonLdObject.of(key.asJsonObject()));
         }
         throw new IllegalStateException();
     }

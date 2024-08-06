@@ -16,9 +16,10 @@ public abstract class DataObjectReader<T extends VerifiableObject> implements Ob
             return null;
         }
 
-        final LdNode node = LdNode.of(document);
-
-        return read(node, newInstance(version, document));
+//        final LdNode node = LdNode.of(document);
+//
+//        return read(node, newInstance(version, document));
+        return null;
     }
 
     protected abstract T newInstance(ModelVersion version, JsonObject expanded);

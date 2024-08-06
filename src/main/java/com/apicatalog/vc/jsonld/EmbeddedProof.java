@@ -1,4 +1,4 @@
-package com.apicatalog.vc.proof;
+package com.apicatalog.vc.jsonld;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,9 +19,6 @@ import jakarta.json.JsonValue;
  * An embedded proof is included in the data, such as a Linked Data Signature.
  */
 public final class EmbeddedProof {
-
-    protected EmbeddedProof() {
-        /* protected */ }
 
     /**
      * Appends the proof to the given VC/VP document. If the document has been

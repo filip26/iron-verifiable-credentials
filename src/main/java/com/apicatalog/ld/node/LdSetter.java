@@ -56,7 +56,7 @@ public class LdSetter {
 
     public <T> LdNodeBuilder map(LdAdapter<T> adapter, T value) {
         if (value != null) {
-            value(adapter.write(value));
+//FIXME            value(adapter.write(value));
         }
         return parent;
     }

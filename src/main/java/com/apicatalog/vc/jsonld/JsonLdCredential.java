@@ -203,7 +203,7 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
 
         final JsonLdCredential credential = JsonLdCredential.of(version, document);
 
-        final LdNode node = LdNode.of(document);
+//        final LdNode node = LdNode.of(document);
 
         // @id
 //        credential.id(node.id());
@@ -221,16 +221,16 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
 //        credential.status(readCollection(version, document.get(VcVocab.STATUS.uri()), statusReader));
 
         // issuance date
-        credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
+//        credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
 
         // expiration date
-        credential.expiration(node.scalar(VcVocab.EXPIRATION_DATE).xsdDateTime());
+//        credential.expiration(node.scalar(VcVocab.EXPIRATION_DATE).xsdDateTime());
 
         // validFrom - optional
-        credential.validFrom(node.scalar(VcVocab.VALID_FROM).xsdDateTime());
+//        credential.validFrom(node.scalar(VcVocab.VALID_FROM).xsdDateTime());
 
         // validUntil - optional
-        credential.validUntil(node.scalar(VcVocab.VALID_UNTIL).xsdDateTime());
+//        credential.validUntil(node.scalar(VcVocab.VALID_UNTIL).xsdDateTime());
 
         return credential;
     }

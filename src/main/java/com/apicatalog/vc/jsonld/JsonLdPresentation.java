@@ -2,6 +2,7 @@ package com.apicatalog.vc.jsonld;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 import com.apicatalog.ld.DocumentError;
@@ -27,16 +28,6 @@ public class JsonLdPresentation extends JsonLdVerifiable implements Presentation
         super(version, expanded);
     }
 
-    @Override
-    public boolean isPresentation() {
-        return true;
-    }
-
-    @Override
-    public JsonLdPresentation asPresentation() {
-        return this;
-    }
-
     public Collection<Credential> credentials() {
         return credentials;
     }
@@ -59,13 +50,6 @@ public class JsonLdPresentation extends JsonLdVerifiable implements Presentation
         return this;
     }
 
-    @Override
-    public void validate() throws DocumentError {
-        if (credentials == null || credentials.isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, "VerifiableCredentials");
-        }
-    }
-
     public static JsonLdPresentation of(final ModelVersion version, final JsonObject document) throws DocumentError {
 
         if (document == null) {
@@ -83,13 +67,13 @@ public class JsonLdPresentation extends JsonLdVerifiable implements Presentation
             throw new DocumentError(ErrorType.Missing, Term.TYPE);
         }
 
-        final LdNode node = LdNode.of(document);
+//        final LdNode node = LdNode.of(document);
 
         // @id - optional
 //        presentation.id(node.id());
 
         // holder - optional
-        presentation.holder(node.node(VcVocab.HOLDER).id());
+//        presentation.holder(node.node(VcVocab.HOLDER).id());
 
         return presentation;
     }
@@ -120,9 +104,9 @@ public class JsonLdPresentation extends JsonLdVerifiable implements Presentation
     }
 
     @Override
-    public Optional<Collection<LinkedData>> term(String name) {
+    public Collection<LinkedData> values(String name) {
         // TODO Auto-generated method stub
-        return Optional.empty();
+        return Collections.emptySet();
     }
 
 }

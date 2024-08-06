@@ -1,5 +1,7 @@
 package com.apicatalog.multikey;
 
+import java.util.Objects;
+
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
@@ -12,6 +14,8 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.oxygen.ld.LinkedData;
+import com.apicatalog.oxygen.ld.LinkedNode;
 import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.method.MethodAdapter;
 
@@ -48,12 +52,10 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
     }
 
     @Override
-    public VerificationMethod read(JsonObject document) throws DocumentError {
-        if (document == null) {
-            throw new IllegalArgumentException("Verification method cannot be null.");
-        }
+    public VerificationMethod read(LinkedData document) throws DocumentError {
+        Objects.requireNonNull(document);
 
-        final LdNode node = LdNode.of(document);
+        final LdNode node = LdNode.of(document.asObject());
 
         final MultiKey multikey = new MultiKey();
 
@@ -111,7 +113,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
     }
 
     @Override
-    public JsonObject write(VerificationMethod value) {
+    public LinkedData write(VerificationMethod value) {
 
         LdNodeBuilder builder = new LdNodeBuilder();
 
@@ -169,7 +171,9 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
             builder.type(value.type().toASCIIString());
         }
 
-        return builder.build();
+//        return builder.build();
+        //FIXME
+        return null;
     }
 
     public static final String getAlgorithmName(Multicodec codec) {

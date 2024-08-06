@@ -22,9 +22,9 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.sd.DocumentSelector;
 import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.proof.BaseProofValue;
-import com.apicatalog.vc.proof.EmbeddedProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
@@ -128,43 +128,45 @@ public class Holder extends AbstractProcessor<Holder> {
             throw new SigningError(Code.UnsupportedCryptoSuite);
         }
 
-        final Proof proof = signatureSuite.getProof(expandedProof, loader);
-
-        if (proof == null) {
-            throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
-        }
-
-        final ProofValue proofValue = proof.signature();
-
-        if (proofValue == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofValue");
-        }
-
-        if (!(proofValue instanceof BaseProofValue)) {
-            throw new DocumentError(ErrorType.Invalid, "ProofValue");
-        }
-
-        final JsonObject derivedProof = proof.derive(context, unsigned, selectors);
-
-        final Collection<String> combinedPointers = Stream.of(
-                        ((BaseProofValue) proofValue).pointers(),
-                        (selectors != null ? selectors : Collections.<String>emptyList()),
-                        Arrays.asList("/" + Keywords.CONTEXT))
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toList());
-
-        final JsonObject reveal = DocumentSelector.of(combinedPointers).getNodes(document);
-
-        try {
-            return new ExpandedVerifiable(EmbeddedProof.addProof(
-                    JsonLd.expand(JsonDocument.of(reveal))
-                            .undefinedTermsPolicy(ProcessingPolicy.Fail)
-                            .loader(loader)
-                            .get().getJsonObject(0),
-                    derivedProof), context, loader);
-        } catch (JsonLdError e) {
-            throw new DocumentError(e, ErrorType.Invalid);
-        }
+        //FIXME
+//        final Proof proof = signatureSuite.getProof(expandedProof, loader);
+//
+//        if (proof == null) {
+//            throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
+//        }
+//
+//        final ProofValue proofValue = proof.signature();
+//
+//        if (proofValue == null) {
+//            throw new DocumentError(ErrorType.Missing, "ProofValue");
+//        }
+//
+//        if (!(proofValue instanceof BaseProofValue)) {
+//            throw new DocumentError(ErrorType.Invalid, "ProofValue");
+//        }
+//
+//        final JsonObject derivedProof = proof.derive(context, unsigned, selectors);
+//
+//        final Collection<String> combinedPointers = Stream.of(
+//                        ((BaseProofValue) proofValue).pointers(),
+//                        (selectors != null ? selectors : Collections.<String>emptyList()),
+//                        Arrays.asList("/" + Keywords.CONTEXT))
+//                        .flatMap(Collection::stream)
+//                        .collect(Collectors.toList());
+//
+//        final JsonObject reveal = DocumentSelector.of(combinedPointers).getNodes(document);
+//
+//        try {
+//            return new ExpandedVerifiable(EmbeddedProof.addProof(
+//                    JsonLd.expand(JsonDocument.of(reveal))
+//                            .undefinedTermsPolicy(ProcessingPolicy.Fail)
+//                            .loader(loader)
+//                            .get().getJsonObject(0),
+//                    derivedProof), context, loader);
+//        } catch (JsonLdError e) {
+//            throw new DocumentError(e, ErrorType.Invalid);
+//        }
+        return null;
     }
 
 }

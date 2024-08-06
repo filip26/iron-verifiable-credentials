@@ -1,6 +1,7 @@
 package com.apicatalog.vc.proof;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
@@ -9,7 +10,8 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.oxygen.ld.LinkedObject;
+import com.apicatalog.oxygen.ld.LinkedData;
+import com.apicatalog.oxygen.ld.LinkedNode;
 import com.apicatalog.vc.method.MethodAdapter;
 
 import jakarta.json.JsonObject;
@@ -66,6 +68,24 @@ implements Proof {
 
     @Override
     public URI id() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<String> type() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<String> terms() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<LinkedData> values(String term) {
         // TODO Auto-generated method stub
         return null;
     }

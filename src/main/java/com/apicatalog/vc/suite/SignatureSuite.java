@@ -3,10 +3,9 @@ package com.apicatalog.vc.suite;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.oxygen.ld.LinkedNode;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.proof.Proof;
-
-import jakarta.json.JsonObject;
 
 public interface SignatureSuite {
 
@@ -19,7 +18,7 @@ public interface SignatureSuite {
      * @return <code>true</code> if the proof is supported, <code>false</code>
      *         otherwise
      */
-    boolean isSupported(String proofType, JsonObject proof);
+    boolean isSupported(String proofType, LinkedNode proof);
 
     /**
      * Deserialize the given expanded JSON-LD object into a {@link Proof}.
@@ -29,7 +28,7 @@ public interface SignatureSuite {
      * @return a new {@link Proof} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    Proof getProof(JsonObject proof, DocumentLoader loader) throws DocumentError;
+    Proof getProof(LinkedNode proof, DocumentLoader loader) throws DocumentError;
 
     /**
      * Creates a new issuer instance initialized with provided key pair

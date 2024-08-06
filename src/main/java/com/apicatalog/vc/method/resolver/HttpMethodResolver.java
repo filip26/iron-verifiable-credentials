@@ -29,7 +29,7 @@ public class HttpMethodResolver implements MethodResolver {
 
             for (final JsonValue method : document) {
                 if (JsonUtils.isObject(method)) {
-                    return proof.methodProcessor().read(method.asJsonObject());
+//FIXME                    return proof.methodProcessor().read(method.asJsonObject());
                 }
             }
 

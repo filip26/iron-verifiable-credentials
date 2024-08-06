@@ -199,9 +199,9 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
     protected SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
         for (final SignatureSuite suite : suites) {
             for (final String proofType : proofTypes) {
-                if (suite.isSupported(proofType, expandedProof)) {
-                    return suite;
-                }
+//                if (suite.isSupported(proofType, expandedProof)) {
+//                    return suite;
+//                }
             }
         }
         return null;

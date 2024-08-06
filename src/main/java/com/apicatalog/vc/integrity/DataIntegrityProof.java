@@ -15,10 +15,12 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.oxygen.ld.LinkedData;
+import com.apicatalog.oxygen.ld.LinkedNode;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.proof.BaseProofValue;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -173,12 +175,12 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public VerificationMethod read(JsonObject expanded) throws DocumentError {
+    public VerificationMethod read(LinkedData expanded) throws DocumentError {
         return suite.methodAdapter.read(expanded);
     }
 
     @Override
-    public JsonObject write(VerificationMethod value) {
+    public LinkedNode write(VerificationMethod value) {
         throw new UnsupportedOperationException();
     }
 
@@ -206,5 +208,23 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
         final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
 
         return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
+    }
+
+    @Override
+    public Collection<String> type() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<String> terms() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<LinkedData> values(String term) {
+        // TODO Auto-generated method stub
+        return null;
     }    
 }

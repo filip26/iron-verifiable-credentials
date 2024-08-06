@@ -69,9 +69,8 @@ public abstract class JsonLdVerifiable implements Verifiable {
     }
 
     @Override
-    public Optional<Collection<LinkedData>> term(String name) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
+    public Collection<LinkedData> values(String name) {
+        return Collections.emptySet();
     }
     
     /**

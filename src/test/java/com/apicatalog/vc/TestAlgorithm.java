@@ -12,8 +12,11 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multikey.MultiKey;
+import com.apicatalog.oxygen.ld.LinkedData;
 
 import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonValue;
 import jakarta.json.JsonWriter;
 import jakarta.json.JsonWriterFactory;
@@ -63,17 +66,20 @@ class TestAlgorithm implements SignatureAlgorithm {
     
     public static void main(String[] args) throws KeyGenError {
         
-        final JsonValue keypair = (new TestKeyAdapter()).write((new TestAlgorithm()).keygen());
-        
-        final StringWriter out = new StringWriter();
+        final LinkedData keypair = (new TestKeyAdapter()).write((new TestAlgorithm()).keygen());
 
-        final JsonWriterFactory writerFactory = Json.createWriterFactory(
-                Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
+        System.out.println(keypair.asObject().id());
+        System.out.println(keypair.asObject().type());
         
-        try (final JsonWriter jsonWriter = writerFactory.createWriter(out)) {
-            jsonWriter.write(keypair);
-        }
+//        final StringWriter out = new StringWriter();
 
-        System.out.println(out.toString());
+//        final JsonWriterFactory writerFactory = Json.createWriterFactory(
+//                Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
+//        
+//        try (final JsonWriter jsonWriter = writerFactory.createWriter(out)) {
+//            jsonWriter.write(keypair);
+//        }
+
+  //      System.out.println(out.toString());
     }
 }

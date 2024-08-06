@@ -1,12 +1,11 @@
 package com.apicatalog.ld.node.adapter;
 
 import com.apicatalog.ld.DocumentError;
-
-import jakarta.json.JsonObject;
+import com.apicatalog.oxygen.ld.LinkedData;
 
 public interface LdAdapter<T> {
 
-    T read(JsonObject value) throws DocumentError;
+    T read(LinkedData value) throws DocumentError;
     
-    JsonObject write(T value);
+    LinkedData write(T value);
 }

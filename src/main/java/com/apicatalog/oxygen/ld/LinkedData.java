@@ -1,13 +1,6 @@
 package com.apicatalog.oxygen.ld;
 
-import java.util.Collection;
-import java.util.Optional;
-
 public interface LinkedData {
-
-    Collection<String> terms();
-
-    Optional<Collection<LinkedData>> term(String name);
 
     default boolean isObject() {
         return false;
@@ -17,7 +10,7 @@ public interface LinkedData {
         return false;
     }
     
-    default LinkedObject asObject() {
+    default LinkedNode asObject() {
         throw new ClassCastException();
     }
     
