@@ -27,22 +27,6 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * [v1.1](https://www.w3.org/TR/vc-data-model/)
 
 [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
-  
-## Installation
-
-### Maven
-Java 17+
-
-```xml
-<dependency>
-    <groupId>com.apicatalog</groupId>
-    <artifactId>iron-verifiable-credentials</artifactId>
-    <version>0.14.0</version>
-</dependency>
-
-```
-
-Iron VC SDK for Android is distributed under a commercial license. [Contact](mailto:filip26@gmail.com)
 
 ## Usage
 
@@ -126,6 +110,24 @@ try {
 ## Documentation
 
 [![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
+
+![Data Model](/iron-vc-data-model-0.15.0.png)
+
+## Installation
+
+### Maven
+Java 17+
+
+```xml
+<dependency>
+    <groupId>com.apicatalog</groupId>
+    <artifactId>iron-verifiable-credentials</artifactId>
+    <version>0.14.0</version>
+</dependency>
+
+```
+
+Iron VC SDK for Android is distributed under a commercial license. [Contact](mailto:filip26@gmail.com)
 
 ## Contributing
 
