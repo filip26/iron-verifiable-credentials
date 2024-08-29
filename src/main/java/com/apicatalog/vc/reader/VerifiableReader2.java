@@ -3,31 +3,18 @@ package com.apicatalog.vc.reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.Term;
-import com.apicatalog.ld.node.LdNode;
-import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.Presentation;
-import com.apicatalog.vc.VcVocab;
-import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.IssuerDetails;
-import com.apicatalog.vc.issuer.reader.ExpandedIssuerDetailsReader;
-import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.status.Status;
-import com.apicatalog.vc.status.StatusReader;
 import com.apicatalog.vc.subject.Subject;
-import com.apicatalog.vc.subject.SubjectReader;
+import com.apicatalog.vcdm.VcdmVocab;
 
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
 /**
@@ -46,9 +33,9 @@ public class VerifiableReader2 {
     protected ObjectReader<JsonObject, Status> tosReader;
 
     public VerifiableReader2() {
-        this.issuerReader = new ExpandedIssuerDetailsReader();
-        this.subjectReader = new SubjectReader();
-        this.statusReader = new StatusReader();
+//        this.issuerReader = new ExpandedIssuerDetailsReader();
+//        this.subjectReader = new SubjectReader();
+//        this.statusReader = new StatusReader();
     }
     
     protected VerifiableReader2(ObjectReader<JsonObject, IssuerDetails> issuerReader, ObjectReader<JsonObject, Subject> subjectReader, ObjectReader<JsonObject, Status> statusReader) {
@@ -60,7 +47,7 @@ public class VerifiableReader2 {
 
     public static Collection<JsonObject> getCredentials(final JsonObject document) throws DocumentError {
 
-        JsonValue credentials = document.get(VcVocab.VERIFIABLE_CREDENTIALS.uri());
+        JsonValue credentials = document.get(VcdmVocab.VERIFIABLE_CREDENTIALS.uri());
 
         if (JsonUtils.isNotArray(credentials)
                 || credentials.asJsonArray().size() == 0) {
@@ -74,7 +61,7 @@ public class VerifiableReader2 {
                     || JsonUtils.isNotArray(cred.asJsonObject().get(Keywords.GRAPH))
                     || cred.asJsonObject().getJsonArray(Keywords.GRAPH).size() != 1
                     || JsonUtils.isNotObject(cred.asJsonObject().getJsonArray(Keywords.GRAPH).get(0))) {
-                throw new DocumentError(ErrorType.Invalid, VcVocab.CREDENTIALS_VOCAB);
+                throw new DocumentError(ErrorType.Invalid, VcdmVocab.CREDENTIALS_VOCAB);
             }
 
             result.add(cred.asJsonObject().getJsonArray(Keywords.GRAPH).getJsonObject(0));

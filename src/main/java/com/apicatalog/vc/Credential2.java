@@ -10,9 +10,10 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.vc.issuer.IssuerDetails;
-import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
+import com.apicatalog.vcdm.VcdmVersion;
+import com.apicatalog.vcdm.VcdmVocab;
 
 /**
  * Represents a verifiable credential (VC).
@@ -22,6 +23,7 @@ import com.apicatalog.vc.subject.Subject;
  * 
  * @since 0.9.0
  */
+@Deprecated
 public abstract class Credential2   {
 
     private static final Logger LOGGER = Logger.getLogger(Credential2.class.getName());
@@ -30,14 +32,14 @@ public abstract class Credential2   {
     
     static {
         TERMS = new ArrayList<>();
-        TERMS.add(VcVocab.ISSUANCE_DATE.uri());
-        TERMS.add(VcVocab.EXPIRATION_DATE.uri());
-        TERMS.add(VcVocab.VALID_UNTIL.uri());
-        TERMS.add(VcVocab.VALID_FROM.uri());
-        TERMS.add(VcVocab.SUBJECT.uri());
-        TERMS.add(VcVocab.STATUS.uri());
-        TERMS.add(VcVocab.ISSUER.uri());
-        TERMS.add(VcVocab.TERMS_OF_USE.uri());
+        TERMS.add(VcdmVocab.ISSUANCE_DATE.uri());
+        TERMS.add(VcdmVocab.EXPIRATION_DATE.uri());
+        TERMS.add(VcdmVocab.VALID_UNTIL.uri());
+        TERMS.add(VcdmVocab.VALID_FROM.uri());
+        TERMS.add(VcdmVocab.SUBJECT.uri());
+        TERMS.add(VcdmVocab.STATUS.uri());
+        TERMS.add(VcdmVocab.ISSUER.uri());
+        TERMS.add(VcdmVocab.TERMS_OF_USE.uri());
     }
 
     /** issuanceDate - v1.1 */
@@ -59,7 +61,7 @@ public abstract class Credential2   {
     
     //TODO termsOfUse
     
-    protected Credential2(ModelVersion version) {
+    protected Credential2(VcdmVersion version) {
 //        super(version);
     }
 

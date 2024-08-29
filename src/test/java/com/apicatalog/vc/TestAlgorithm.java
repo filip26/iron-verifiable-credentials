@@ -1,8 +1,6 @@
 package com.apicatalog.vc;
 
-import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 
 import com.apicatalog.ld.signature.KeyGenError;
@@ -12,15 +10,6 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multikey.MultiKey;
-import com.apicatalog.oxygen.ld.LinkedData;
-
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonValue;
-import jakarta.json.JsonWriter;
-import jakarta.json.JsonWriterFactory;
-import jakarta.json.stream.JsonGenerator;
 
 class TestAlgorithm implements SignatureAlgorithm {
 
@@ -66,10 +55,10 @@ class TestAlgorithm implements SignatureAlgorithm {
     
     public static void main(String[] args) throws KeyGenError {
         
-        final LinkedData keypair = (new TestKeyAdapter()).write((new TestAlgorithm()).keygen());
+//        final LinkedData keypair = (new TestKeyAdapter()).write((new TestAlgorithm()).keygen());
 
-        System.out.println(keypair.asObject().id());
-        System.out.println(keypair.asObject().type());
+//        System.out.println(keypair.asObject().id());
+//        System.out.println(keypair.asObject().type());
         
 //        final StringWriter out = new StringWriter();
 

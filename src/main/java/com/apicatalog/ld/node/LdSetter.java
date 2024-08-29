@@ -5,15 +5,15 @@ import java.time.Instant;
 
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.Term;
-import com.apicatalog.ld.node.adapter.LdAdapter;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonValue;
 
+@Deprecated
 public class LdSetter {
 
     final LdNodeBuilder parent;
@@ -54,20 +54,13 @@ public class LdSetter {
         return parent;
     }
 
-    public <T> LdNodeBuilder map(LdAdapter<T> adapter, T value) {
-        if (value != null) {
-//FIXME            value(adapter.write(value));
-        }
-        return parent;
-    }
-
     public LdNodeBuilder xsdDateTime(Instant created) {
-        scalar(VcVocab.XSD_DATETIME.uri(), created.toString());
+        scalar(VcdmVocab.XSD_DATETIME.uri(), created.toString());
         return parent;
     }
     
     public LdNodeBuilder multibase(Multibase base, byte[] value) {
-        scalar(VcVocab.MULTIBASE_TYPE.uri(), base.encode(value));
+        scalar(VcdmVocab.MULTIBASE_TYPE.uri(), base.encode(value));
         return parent;
     }
 

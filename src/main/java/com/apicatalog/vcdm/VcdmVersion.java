@@ -1,9 +1,9 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vcdm;
 
 /**
- * Verifiable Credentials Data Model Version
+ * W3C Verifiable Credentials Data Model Version (VCDM)
  */
-public enum ModelVersion {
+public enum VcdmVersion {
 
     /**
      * Data Model Version 1.1
@@ -17,5 +17,5 @@ public enum ModelVersion {
      * 
      * @see <a href="https://w3c.github.io/vc-data-model/">Specification</a>
      */
-    V20;    
+    V20;
 }

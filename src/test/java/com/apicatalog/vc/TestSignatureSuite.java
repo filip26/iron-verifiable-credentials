@@ -7,6 +7,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
+import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -48,5 +49,11 @@ class TestSignatureSuite extends DataIntegritySuite {
             throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
         }
         return new SolidProofValue(proofValue);
+    }
+
+    @Override
+    public LinkedFragmentAdapter proofAdapter() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

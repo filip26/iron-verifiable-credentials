@@ -62,6 +62,7 @@
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
         <titanium.version>1.4.1</titanium.version>
+        <linked-tree.version>0.0.4-SNAPSHOT</linked-tree.version>
         <carbon.version>0.6.0</carbon.version>
         <copper.codec.version>1.0.0</copper.codec.version>
         <copper.base.version>0.5.0</copper.base.version>
@@ -77,6 +78,11 @@
             <groupId>com.apicatalog</groupId>
             <artifactId>titanium-json-ld</artifactId>
             <version>${titanium.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>linked-tree</artifactId>
+            <version>${linked-tree.version}</version>
         </dependency>
         <dependency>
             <groupId>io.setl</groupId>

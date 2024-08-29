@@ -1,10 +1,10 @@
 package com.apicatalog.vc;
 
+import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.model.VerifiableObject;
-import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.vc.proof.Proof;
 
 /**
@@ -12,8 +12,12 @@ import com.apicatalog.vc.proof.Proof;
  * 
  * @since 0.9.0
  */
-public interface Verifiable extends VerifiableObject {
-        
+public interface Verifiable extends Linkable {
+
+    URI id();
+
+    Collection<String> type();
+
     Collection<Proof> proofs();
 
     default boolean isCredential() {
@@ -33,11 +37,4 @@ public interface Verifiable extends VerifiableObject {
     }
 
     void validate() throws DocumentError;
-
-    /**
-     * Verifiable credentials data model version.
-     * 
-     * @return the data model version, never <code>null</code>
-     */
-    ModelVersion version();
 }

@@ -27,21 +27,20 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.jsonld.JsonLdPresentation;
 import com.apicatalog.vc.jsonld.JsonLdVerifiable;
-import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.VcdmVersion;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -196,7 +195,8 @@ public class Verifier extends AbstractProcessor<Verifier> {
                     .loader(loader)
                     .base(base).get();
 
-            return verifyExpanded(VerifiableReader.getVersion(document), context, expanded, params, loader);
+//            return verifyExpanded(VerifiableReader.getVersion(document), context, expanded, params, loader);
+            return null;
 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
@@ -204,7 +204,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
         }
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, JsonArray expanded, Map<String, Object> params, DocumentLoader loader)
+    private Verifiable verifyExpanded(final VcdmVersion version, JsonStructure context, JsonArray expanded, Map<String, Object> params, DocumentLoader loader)
             throws VerificationError, DocumentError {
 
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
@@ -220,36 +220,36 @@ public class Verifier extends AbstractProcessor<Verifier> {
         return verifyExpanded(version, context, verifiable.asJsonObject(), params, loader);
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, final JsonObject expanded, Map<String, Object> params, DocumentLoader loader)
+    private Verifiable verifyExpanded(final VcdmVersion version, JsonStructure context, final JsonObject expanded, Map<String, Object> params, DocumentLoader loader)
             throws VerificationError, DocumentError {
 
         // get a verifiable representation
-        final JsonLdVerifiable verifiable = null; //FIXME reader.read(version, expanded);
+        final Verifiable verifiable = null; //FIXME reader.read(version, expanded);
 
         if (verifiable.isCredential()) {
 
             // data integrity and metadata validation
             validate(verifiable.asCredential());
 
-            verifiable.proofs(verifyProofs(context, expanded, params, loader));
+//            verifiable.proofs(verifyProofs(context, expanded, params, loader));
 
             return verifiable;
 
         } else if (verifiable.isPresentation()) {
 
             // verify presentation proofs
-            verifiable.proofs(verifyProofs(context, expanded, params, loader));
+//            verifiable.proofs(verifyProofs(context, expanded, params, loader));
 
             final Collection<Credential> credentials = new ArrayList<>();
 
-            for (final JsonObject presentedCredentials : VerifiableReader.getCredentials(expanded)) {
-
-                if (!VerifiableReader.isCredential(presentedCredentials)) {
-                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
-                }
-
-                credentials.add(verifyExpanded(version, context, presentedCredentials, params, loader).asCredential());
-            }
+//            for (final JsonObject presentedCredentials : VerifiableReader.getCredentials(expanded)) {
+//
+//                if (!VerifiableReader.isCredential(presentedCredentials)) {
+//                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
+//                }
+//
+//                credentials.add(verifyExpanded(version, context, presentedCredentials, params, loader).asCredential());
+//            }
 
             ((JsonLdPresentation)verifiable.asPresentation()).credentials(credentials);
 
@@ -275,7 +275,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
             final Collection<String> proofTypes = LdType.strings(expandedProof);
 
             if (proofTypes == null || proofTypes.isEmpty()) {
-                throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, Term.TYPE);
+                throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
             }
 
             final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
@@ -309,10 +309,10 @@ public class Verifier extends AbstractProcessor<Verifier> {
             }
 
             VerificationMethod verificationMethod = getMethod(proof, loader)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD));
+                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD));
 
             if (!(verificationMethod instanceof VerificationKey)) {
-                throw new DocumentError(ErrorType.Unknown, VcVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
+                throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
             }
 
             proof.verify(context, unsigned, (VerificationKey) verificationMethod);

@@ -8,7 +8,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;
 
@@ -40,7 +40,7 @@ public abstract class ProofDraft {
      * @param model a credential data model version
      * @return the proof JSON-LD context URI(s)
      */
-    public abstract Collection<String> context(ModelVersion model);
+    public abstract Collection<String> context(VcdmVersion model);
 
     public abstract JsonObject unsigned();
 
@@ -74,7 +74,7 @@ public abstract class ProofDraft {
         if (verificatonUrl != null) {
             builder.set(DataIntegrityVocab.VERIFICATION_METHOD).id(verificatonUrl);
         } else if (method != null) {
-            builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(adapter, method);
+//            builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(adapter, method);
         }
         return builder;
     }

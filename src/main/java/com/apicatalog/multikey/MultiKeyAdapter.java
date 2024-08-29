@@ -11,25 +11,22 @@ import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.oxygen.ld.LinkedData;
-import com.apicatalog.oxygen.ld.LinkedNode;
-import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.method.MethodAdapter;
-
-import jakarta.json.JsonObject;
+import com.apicatalog.vcdm.VcdmVocab;
 
 public abstract class MultiKeyAdapter implements MethodAdapter {
 
-    public static final Term CONTROLLER = Term.create("controller", VcVocab.SECURITY_VOCAB);
+    public static final Term CONTROLLER = Term.create("controller", VcdmVocab.SECURITY_VOCAB);
 
-    public static final Term PUBLIC_KEY = Term.create("publicKeyMultibase", VcVocab.SECURITY_VOCAB);
-    public static final Term PRIVATE_KEY = Term.create("secretKeyMultibase", VcVocab.SECURITY_VOCAB);
+    public static final Term PUBLIC_KEY = Term.create("publicKeyMultibase", VcdmVocab.SECURITY_VOCAB);
+    public static final Term PRIVATE_KEY = Term.create("secretKeyMultibase", VcdmVocab.SECURITY_VOCAB);
 
-    public static final Term EXPIRATION = Term.create("expiration", VcVocab.SECURITY_VOCAB);
-    public static final Term REVOKED = Term.create("revoked", VcVocab.SECURITY_VOCAB);
+    public static final Term EXPIRATION = Term.create("expiration", VcdmVocab.SECURITY_VOCAB);
+    public static final Term REVOKED = Term.create("revoked", VcdmVocab.SECURITY_VOCAB);
 
     protected final MulticodecDecoder decoder;
 
@@ -51,30 +48,29 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         /* implement a custom validation */
     }
 
-    @Override
-    public VerificationMethod read(LinkedData document) throws DocumentError {
+    public VerificationMethod read(LinkedNode document) throws DocumentError {
         Objects.requireNonNull(document);
 
-        final LdNode node = LdNode.of(document.asObject());
+//        final LdNode node = LdNode.of(document.asObject());
 
         final MultiKey multikey = new MultiKey();
-
-        multikey.id = node.id();
-        multikey.controller = node.node(CONTROLLER).id();
-
-        if (node.type().hasType(MultiKey.TYPE.toString())) {
-
-            multikey.publicKey = getKey(node, PUBLIC_KEY, multikey);
-            multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
-
-            multikey.expiration = node.scalar(EXPIRATION).xsdDateTime();
-            multikey.revoked = node.scalar(REVOKED).xsdDateTime();
-
-        } else if (node.type().exists()) {
-            throw new DocumentError(ErrorType.Invalid, "VerificationMethodType");
-        }
-
-        validate(multikey);
+//
+//        multikey.id = node.id();
+//        multikey.controller = node.node(CONTROLLER).id();
+//
+//        if (node.type().hasType(MultiKey.TYPE.toString())) {
+//
+//            multikey.publicKey = getKey(node, PUBLIC_KEY, multikey);
+//            multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
+//
+//            multikey.expiration = node.scalar(EXPIRATION).xsdDateTime();
+//            multikey.revoked = node.scalar(REVOKED).xsdDateTime();
+//
+//        } else if (node.type().exists()) {
+//            throw new DocumentError(ErrorType.Invalid, "VerificationMethodType");
+//        }
+//
+//        validate(multikey);
 
         return multikey;
     }
@@ -112,8 +108,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         return null;
     }
 
-    @Override
-    public LinkedData write(VerificationMethod value) {
+    public LinkedNode write(VerificationMethod value) {
 
         LdNodeBuilder builder = new LdNodeBuilder();
 

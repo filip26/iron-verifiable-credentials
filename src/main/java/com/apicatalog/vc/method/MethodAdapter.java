@@ -1,11 +1,10 @@
 package com.apicatalog.vc.method;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.node.adapter.LdAdapter;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.oxygen.ld.LinkedData;
+import com.apicatalog.linkedtree.LinkedNode;
 
-public interface MethodAdapter extends LdAdapter<VerificationMethod> {
+public interface MethodAdapter {
 
     /**
      * Provides an external JSON-LD context URI defying the proof type. The context
@@ -26,6 +25,5 @@ public interface MethodAdapter extends LdAdapter<VerificationMethod> {
      * @return a new {@link VerificationMethod} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    @Override
-    VerificationMethod read(LinkedData document) throws DocumentError;
+    VerificationMethod read(LinkedNode document) throws DocumentError;
 }

@@ -26,9 +26,9 @@ import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
-import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -42,7 +42,7 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
     protected boolean bundledContexts;
     protected URI base;
 
-    protected ModelVersion modelVersion;
+    protected VcdmVersion modelVersion;
 
     protected Collection<MethodResolver> methodResolvers;
 

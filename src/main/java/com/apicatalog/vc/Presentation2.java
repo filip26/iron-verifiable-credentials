@@ -2,17 +2,8 @@ package com.apicatalog.vc;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Optional;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.Term;
-import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.node.LdNode;
-import com.apicatalog.oxygen.ld.LinkedData;
-import com.apicatalog.vc.model.ModelVersion;
-
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
+import com.apicatalog.vcdm.VcdmVersion;
 
 /**
  * Represents a verifiable presentation (VP).
@@ -22,13 +13,14 @@ import jakarta.json.JsonValue;
  * 
  * @since 0.9.0
  */
+@Deprecated
 public class Presentation2  {
 
     protected URI holder;
 
     protected Collection<Credential> credentials;
 
-    protected Presentation2(ModelVersion version) {
+    protected Presentation2(VcdmVersion version) {
 //        super(version);
     }
 //

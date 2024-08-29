@@ -1,20 +1,18 @@
 package com.apicatalog.vc.issuer;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.VcVocab;
-import com.apicatalog.vc.model.VerifiableObject;
-import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;
 
-public class IssuerDetails  {
+public class IssuerDetails implements Linkable {
 
-    protected IssuerDetails(ModelVersion version, JsonObject expanded) {
+    protected IssuerDetails(VcdmVersion version, JsonObject expanded) {
 //        super(version, expanded);
     }
     
-    public static IssuerDetails of(ModelVersion version, JsonObject expanded) {
+    public static IssuerDetails of(VcdmVersion version, JsonObject expanded) {
         return null;
     }
 

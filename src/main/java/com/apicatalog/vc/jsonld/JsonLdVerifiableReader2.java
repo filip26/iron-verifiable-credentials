@@ -1,4 +1,4 @@
-package com.apicatalog.vc.reader;
+package com.apicatalog.vc.jsonld;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -15,73 +15,78 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
+import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdType;
-import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.jsonld.EmbeddedProof;
-import com.apicatalog.vc.jsonld.JsonLdPresentation;
-import com.apicatalog.vc.jsonld.JsonLdVerifiable;
-import com.apicatalog.vc.model.ModelVersion;
-import com.apicatalog.vc.processor.AbstractProcessor;
+import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.VcdmVersion;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
-public class Reader extends AbstractProcessor<Reader> {
+public class JsonLdVerifiableReader2  {
 
-    protected boolean failOnUnsupportedProof = true;
+    protected final SignatureSuite[] suites;
     
-    protected Reader(final SignatureSuite... suites) {
-        super(suites);
+    protected DocumentLoader defaultLoader;
+    protected boolean bundledContexts;
+    protected URI base;
+
+    protected VcdmVersion modelVersion;
+
+    protected JsonLdVerifiableReader2(final SignatureSuite... suites) {
+        this.suites = suites;
+
+        // default values
+        this.defaultLoader = null;
+        this.bundledContexts = true;
+        this.base = null;
+        this.modelVersion = null;
+
+//        this.methodResolvers = defaultResolvers();
     }
 
-    public static Reader with(final SignatureSuite... suites) {
-        return new Reader(suites);
-    }
-
+    
     /**
-     * Verifies VC/VP document. Throws VerificationError if the document is not
-     * valid or cannot be verified.
-     *
+     * Reads VC/VP document. 
+     * 
      * @param document
      * @return {@link Verifiable} object representing the verified credentials or a
      *         presentation
      * 
-     * @throws VerificationError
-     * @throws DocumentError
+     * @throws DocumentError if the document cannot be read or parsed
+     * 
      */
-    public Verifiable read(final JsonObject document) throws VerificationError, DocumentError {
+    public Verifiable read(final JsonObject document) throws DocumentError {
         Objects.requireNonNull(document);
         return read(document, getLoader());
     }
 
     /**
-     * Verifies VC/VP document. Throws VerificationError if the document is not
-     * valid or cannot be verified.
-     *
+     * Reads VC/VP document. 
+     * 
      * @param location
      * @return {@link Verifiable} object representing the verified credentials or a
      *         presentation
      * 
-     * @throws VerificationError
-     * @throws DocumentError
+     * @throws DocumentError if the document cannot be read or parsed
+     * 
      */
-    public Verifiable read(final URI location) throws VerificationError, DocumentError {
+    public Verifiable read(final URI location) throws DocumentError {
         Objects.requireNonNull(location);
         return read(location, getLoader());
     }
 
-    protected Verifiable read(final URI location, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Verifiable read(final URI location, DocumentLoader loader) throws DocumentError {
         try {
             // load the document
             final DocumentLoaderOptions options = new DocumentLoaderOptions();
@@ -101,7 +106,7 @@ public class Reader extends AbstractProcessor<Reader> {
         }
     }
 
-    protected Verifiable read(final JsonObject document, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Verifiable read(final JsonObject document, DocumentLoader loader) throws DocumentError {
 
         try {
 
@@ -117,8 +122,9 @@ public class Reader extends AbstractProcessor<Reader> {
                     .base(base).get();
 
             return verifyExpanded(
-                    VerifiableReader.getVersion(document), 
-                    context, 
+//                    JsonLdVerifiable.getVersion(document),
+                    null,
+                    context,
                     expanded,
                     null,
                     null
@@ -131,8 +137,8 @@ public class Reader extends AbstractProcessor<Reader> {
         }
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, JsonArray expanded, Map<String, Object> params, DocumentLoader loader)
-            throws VerificationError, DocumentError {
+    private Verifiable verifyExpanded(final VcdmVersion version, JsonStructure context, JsonArray expanded, Map<String, Object> params, DocumentLoader loader)
+            throws DocumentError {
 
         if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
             throw new DocumentError(ErrorType.Invalid);
@@ -147,45 +153,45 @@ public class Reader extends AbstractProcessor<Reader> {
         return verifyExpanded(version, context, verifiable.asJsonObject(), loader);
     }
 
-    private Verifiable verifyExpanded(final ModelVersion version, JsonStructure context, final JsonObject expanded, DocumentLoader loader)
-            throws VerificationError, DocumentError {
-
-        // get a verifiable representation
-        final JsonLdVerifiable verifiable = null; //FIXMe reader.read(version, expanded);
-
-        if (verifiable.isCredential()) {
-
-            // data integrity and metadata validation
-//TODO            validate(verifiable.asCredential());
-
-//FIXME            verifiable.proofs(read(context, expanded, loader));
-
-            return verifiable;
-
-        } else if (verifiable.isPresentation()) {
-
-            // verify presentation proofs
-            verifiable.proofs(readProofs(context, expanded, loader));
-
-            final Collection<Credential> credentials = new ArrayList<>();
-
-            for (final JsonObject presentedCredentials : VerifiableReader.getCredentials(expanded)) {
-
-                if (!VerifiableReader.isCredential(presentedCredentials)) {
-                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
-                }
-//var params = new HashMap<>();
-//FIXME                credentials.add(verifyExpanded(version, context, presentedCredentials, params, loader).asCredential());
-            }
-
-            ((JsonLdPresentation)verifiable.asPresentation()).credentials(credentials);
-
-            return verifiable;
-        }
+    private Verifiable verifyExpanded(final VcdmVersion version, JsonStructure context, final JsonObject expanded, DocumentLoader loader)
+            throws DocumentError {
+//
+//        // get a verifiable representation
+//        final JsonLdVerifiable verifiable = null; //FIXMe reader.read(version, expanded);
+//
+//        if (verifiable.isCredential()) {
+//
+//            // data integrity and metadata validation
+////TODO            validate(verifiable.asCredential());
+//
+////FIXME            verifiable.proofs(read(context, expanded, loader));
+//
+//            return verifiable;
+//
+//        } else if (verifiable.isPresentation()) {
+//
+//            // verify presentation proofs
+//            verifiable.proofs(readProofs(context, expanded, loader));
+//
+//            final Collection<Credential> credentials = new ArrayList<>();
+//
+////            for (final JsonObject presentedCredentials : VerifiableReader.getCredentials(expanded)) {
+////
+////                if (!VerifiableReader.isCredential(presentedCredentials)) {
+////                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
+////                }
+//////var params = new HashMap<>();
+//////FIXME                credentials.add(verifyExpanded(version, context, presentedCredentials, params, loader).asCredential());
+////            }
+//
+//            ((JsonLdPresentation)verifiable.asPresentation()).credentials(credentials);
+//
+//            return verifiable;
+//        }
         throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
 
-    protected Collection<Proof> readProofs(JsonStructure context, JsonObject expanded, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Collection<Proof> readProofs(JsonStructure context, JsonObject expanded, DocumentLoader loader) throws DocumentError {
 
         // get proofs - throws an exception if there is no proof, never null nor an
         // empty collection
@@ -202,7 +208,7 @@ public class Reader extends AbstractProcessor<Reader> {
             final Collection<String> proofTypes = LdType.strings(expandedProof);
 
             if (proofTypes == null || proofTypes.isEmpty()) {
-                throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, Term.TYPE);
+                throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
             }
 
             final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
@@ -214,9 +220,9 @@ public class Reader extends AbstractProcessor<Reader> {
             }
 
             if (proof == null) {
-                if (failOnUnsupportedProof) {
-                    throw new VerificationError(Code.UnsupportedCryptoSuite);
-                }
+//                if (failOnUnsupportedProof) {
+//                    throw new VerificationError(Code.UnsupportedCryptoSuite);
+//                }
 //FIXME                proof = new UnknownProof(expandedProof);
             }
 
@@ -226,4 +232,36 @@ public class Reader extends AbstractProcessor<Reader> {
     }
 
 
+    protected DocumentLoader getLoader() {
+
+        DocumentLoader loader = defaultLoader;
+
+        if (loader == null) {
+            // default loader
+            loader = SchemeRouter.defaultInstance();
+        }
+
+        if (bundledContexts) {
+            loader = new StaticContextLoader(loader);
+        }
+        return loader;
+    }
+
+
+    protected SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
+        for (final SignatureSuite suite : suites) {
+            for (final String proofType : proofTypes) {
+//                if (suite.isSupported(proofType, expandedProof)) {
+//                    return suite;
+//                }
+            }
+        }
+        return null;
+    }
+//
+//
+//    public static JsonLdVerifiableReader with(TestSignatureSuite suite) {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 }

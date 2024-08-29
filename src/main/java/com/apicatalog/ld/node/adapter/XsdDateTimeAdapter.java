@@ -6,6 +6,7 @@ import java.time.format.DateTimeParseException;
 
 import com.apicatalog.jsonld.StringUtils;
 
+@Deprecated
 public class XsdDateTimeAdapter {
 
     protected XsdDateTimeAdapter() {

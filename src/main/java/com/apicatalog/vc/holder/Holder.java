@@ -1,11 +1,7 @@
 package com.apicatalog.vc.holder;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -20,16 +16,11 @@ import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
-import com.apicatalog.ld.signature.sd.DocumentSelector;
-import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.processor.AbstractProcessor;
-import com.apicatalog.vc.proof.BaseProofValue;
-import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
-import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -91,12 +82,12 @@ public class Holder extends AbstractProcessor<Holder> {
     private ExpandedVerifiable deriveExpanded(final JsonObject document, JsonStructure context, final JsonObject expanded, Collection<String> selectors,
             DocumentLoader loader) throws SigningError, DocumentError {
 
-        if (VerifiableReader.isCredential(expanded)) {
-            return deriveProof(context, document, expanded, selectors, loader);
-
-        } else if (VerifiableReader.isPresentation(expanded)) {
-            // ?
-        }
+//        if (VerifiableReader.isCredential(expanded)) {
+//            return deriveProof(context, document, expanded, selectors, loader);
+//
+//        } else if (VerifiableReader.isPresentation(expanded)) {
+//            // ?
+//        }
         throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
 
@@ -119,7 +110,7 @@ public class Holder extends AbstractProcessor<Holder> {
         final Collection<String> proofTypes = LdType.strings(expandedProof);
 
         if (proofTypes == null || proofTypes.isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, VcVocab.PROOF, Term.TYPE);
+            throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
         }
 
         final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);

@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.VcVocab;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
@@ -31,7 +31,7 @@ public class VerifiableWriter {
 //                .forEach(builder::add);
         
         return Json.createObjectBuilder(document)
-                    .add(VcVocab.VERIFIABLE_CREDENTIALS.uri(), builder).build();
+                    .add(VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), builder).build();
         
     }
 }

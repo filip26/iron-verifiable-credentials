@@ -16,6 +16,21 @@ import com.apicatalog.ld.DocumentError.ErrorType;
  */
 public interface Presentation extends Verifiable {
 
+    /**
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#dfn-holders">Holder</a>
+     * @return {@link URI} identifying the holder
+     */
+    URI holder();
+    
+    Collection<Credential> credentials();
+
+    @Override
+    default void validate() throws DocumentError {
+        if (credentials() == null || credentials().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, "VerifiableCredentials");
+        }
+    }
+
     @Override
     default boolean isPresentation() {
         return true;
@@ -24,20 +39,5 @@ public interface Presentation extends Verifiable {
     @Override
     default Presentation asPresentation() {
         return this;
-    }
-
-    Collection<Credential> credentials();
-
-    /**
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#dfn-holders">Holder</a>
-     * @return {@link URI} identifying the holder
-     */
-    URI holder();
-
-    @Override
-    default void validate() throws DocumentError {
-        if (credentials() == null || credentials().isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, "VerifiableCredentials");
-        }
     }
 }

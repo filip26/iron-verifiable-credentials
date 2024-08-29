@@ -1,130 +1,94 @@
-package com.apicatalog.vc.jsonld;
+package com.apicatalog.vcdm.v11.jsonld;
 
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
+import com.apicatalog.linkedtree.LinkedContainer;
+import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.link.Link;
-import com.apicatalog.vc.Credential;
+import com.apicatalog.linkedtree.primitive.LinkableObject;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
+import com.apicatalog.vcdm.v11.Vcdm11Credential;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
-/**
- * Represents a verifiable credential (VC).
- *
- * @see <a href= "https://www.w3.org/TR/vc-data-model/#credentials">v1.1</a>
- * @see <a href= "https://w3c.github.io/vc-data-model/#credentials">v2.0</a>
- * 
- * @since 0.9.0
- */
-public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
+public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vcdm11Credential {
 
-    private static final Logger LOGGER = Logger.getLogger(JsonLdCredential.class.getName());
-    
-    /** issuanceDate - v1.1 */
+    private static final Logger LOGGER = Logger.getLogger(JsonLdVcdm11Credential.class.getName());
+
+    /** issuanceDate */
     protected Instant issuance;
-    /** expirationDate - v1.1 */
+    /** expirationDate */
     protected Instant expiration;
-
-    /** model v2.0 - issanceDate replacement */
-    protected Instant validUntil;
-    /** model v2.0 - expirationDate replacement */
-    protected Instant validFrom;
 
     /** a verifiable credential contains claims about one or more subjects */
     protected Collection<Subject> subject;
-    
+
     protected Collection<Status> status;
-    
-    protected IssuerDetails issuer;    
-    
-    //TODO termsOfUse
-    
-    protected JsonLdCredential(VcdmVersion version, JsonObject expanded) {
-        super(version, expanded);
+
+    protected IssuerDetails issuer;
+
+    protected LinkedFragment fragment;
+
+    public static LinkedFragment of(
+            final Link link,
+            final Collection<String> types,
+            final Map<String, LinkedContainer> properties) {
+
+        var fragment = new LinkableObject(link, types, properties);
+        var credential = new JsonLdVcdm11Credential();
+        
+        credential.fragment = fragment;
+        fragment.linkable(credential);
+        
+        return fragment;
+    }
+
+    @Override
+    public LinkedNode ld() {
+        return fragment;
     }
 
     /**
-     * A date time when the credential has been issued. VC data model v1.1.
-     * Deprecated in favor of {@link JsonLdCredential#validFrom()} by VC data model
-     * v2.0.
-     * 
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
      *      Date - Note</a>
-     * 
-     * @since 0.8.1
      * 
      * @return a date time from which the credential claims are valid or
      *         <code>null</code>.
      */
+    @Override
     public Instant issuanceDate() {
         return issuance;
     }
 
-    public JsonLdCredential issuanceDate(Instant issuance) {
+    public JsonLdVcdm11Credential issuanceDate(Instant issuance) {
         this.issuance = issuance;
         return this;
     }
 
     /**
-     * VC data model v1.1 only. Deprecated in favor of
-     * {@link JsonLdCredential#validUntil()} by VC data model v2.0.
-     * 
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
+     * @see <a href=
+     *      "https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
      * 
      * @return the expiration date or <code>null</code> if not set
      */
+    @Override
     public Instant expiration() {
         return expiration;
     }
 
-    public void expiration(Instant expiration) {
-        this.expiration = expiration;
-    }
-
-    /**
-     * A date time from the credential is valid. VC data model v2.0.
-     * 
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
-     *      Date - Note</a>
-     * 
-     * @since 0.8.1
-     * 
-     * @return a date time
-     */
-    public Instant validFrom() {
-        return validFrom;
-    }
-
-    public void validFrom(Instant validFrom) {
-        this.validFrom = validFrom;
-    }
-
-    /**
-     * The date and time the credential ceases to be valid, which could be a date
-     * and time in the past. Note that this value represents the latest point in
-     * time at which the information associated with the credentialSubject property
-     * is valid. VC data model version 2.0.
-     * 
-     * @return the date and time the credential ceases to be valid
-     */
-    public Instant validUntil() {
-        return validUntil;
-    }
-
-    public void validUntil(Instant validUntil) {
-        this.validUntil = validUntil;
-    }
 
     /**
      *
@@ -154,7 +118,7 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
     public Collection<Subject> subject() {
         return subject;
     }
-    
+
 //    public void type(Collection<String> type) {
 //        this.type = type;
 //    }
@@ -162,7 +126,7 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
     public void subject(Collection<Subject> subject) {
         this.subject = subject;
     }
-    
+
     public void status(Collection<Status> status) {
         this.status = status;
     }
@@ -199,12 +163,12 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
 //        return super.termsFilter().and(term -> !TERMS.contains(term));
 //    }
 
-    public static JsonLdCredential of(VcdmVersion version, JsonObject document) throws DocumentError {
+    public static JsonLdVcdm11Credential of(VcdmVersion version, JsonObject document) throws DocumentError {
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
         }
 
-        final JsonLdCredential credential = JsonLdCredential.of(version, document);
+        final JsonLdVcdm11Credential credential = JsonLdVcdm11Credential.of(version, document);
 
 //        final LdNode node = LdNode.of(document);
 
@@ -237,8 +201,7 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
 
         return credential;
     }
-    
-    
+
     public static boolean isCredential(final JsonValue document) {
         if (document == null) {
             throw new IllegalArgumentException("The 'document' parameter must not be null.");
@@ -247,15 +210,14 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
     }
 
     @Override
-    public URI id() {
+    public Collection<Subject> claims() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Collection<String> type() {
-        // TODO Auto-generated method stub
-        return null;
+        return fragment.type();
     }
 
     @Override
@@ -264,27 +226,9 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
         return null;
     }
 
-//    @Override
-//    public VcdmVersion version() {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
-
     @Override
-    public boolean isExpired() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isNotValidYet() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Collection<Subject> claims() {
-        // TODO Auto-generated method stub
+    public URI id() {
         return null;
     }
+
 }

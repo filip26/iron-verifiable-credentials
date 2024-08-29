@@ -7,11 +7,11 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.oxygen.ld.LinkedData;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
+@Deprecated
 public interface LdScalar {
 
     static final String XSD_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
@@ -25,9 +25,6 @@ public interface LdScalar {
 
     String type() throws DocumentError;
 
-    LinkedData value() throws DocumentError;
-
-    LinkedData value(String type) throws DocumentError;
 
     default boolean exists() {
         return false;
@@ -49,53 +46,5 @@ public interface LdScalar {
     static JsonObject multibase(Multibase base, byte[] value) {
         return encode(MULTIBASE_TYPE, base.encode(value));
     }
-
-    public final static LdScalar NULL = new LdScalar() {
-
-        @Override
-        public URI link() throws DocumentError {
-            return null;
-        }
-
-        @Override
-        public String string() throws DocumentError {
-            return null;
-        }
-
-        @Override
-        public byte[] multibase(Multibase base) throws DocumentError {
-            return null;
-        }
-
-        @Override
-        public Instant xsdDateTime() throws DocumentError {
-            return null;
-        }
-
-        @Override
-        public byte[] multiformat(Multibase base, Multicodec codec) throws DocumentError {
-            return null;
-        }
-
-        @Override
-        public String type() throws DocumentError {
-            return null;
-        }
-
-        @Override
-        public LinkedData value() throws DocumentError {
-            return null;
-        }
-
-        @Override
-        public String string(String type) throws DocumentError {
-            return null;
-        }
-
-        @Override
-        public LinkedData value(String type) throws DocumentError {
-            return null;
-        }
-    };
 
 }

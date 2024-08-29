@@ -15,8 +15,7 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.oxygen.ld.LinkedData;
-import com.apicatalog.oxygen.ld.LinkedNode;
+import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.Proof;
@@ -174,15 +173,15 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
         return this;
     }
 
-    @Override
-    public VerificationMethod read(LinkedData expanded) throws DocumentError {
-        return suite.methodAdapter.read(expanded);
-    }
+//    @Override
+//    public VerificationMethod read(LinkedData expanded) throws DocumentError {
+//        return suite.methodAdapter.read(expanded);
+//    }
 
-    @Override
-    public LinkedNode write(VerificationMethod value) {
-        throw new UnsupportedOperationException();
-    }
+//    @Override
+//    public LinkedNode write(VerificationMethod value) {
+//        throw new UnsupportedOperationException();
+//    }
 
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
         final Object value = params.get(name.name());
@@ -211,20 +210,8 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public Collection<String> type() {
+    public VerificationMethod read(LinkedNode document) throws DocumentError {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public Collection<String> terms() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<LinkedData> values(String term) {
-        // TODO Auto-generated method stub
-        return null;
-    }    
+    }  
 }

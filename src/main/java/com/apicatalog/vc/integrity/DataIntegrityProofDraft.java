@@ -9,7 +9,7 @@ import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.issuer.ProofDraft;
-import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;
 
@@ -67,8 +67,8 @@ public class DataIntegrityProofDraft extends ProofDraft {
     }
 
     @Override
-    public Collection<String> context(ModelVersion model) {
-        if (ModelVersion.V11.equals(model)) {
+    public Collection<String> context(VcdmVersion model) {
+        if (VcdmVersion.V11.equals(model)) {
             return V1_CONTEXTS;
         }
         return V2_CONTEXTS;

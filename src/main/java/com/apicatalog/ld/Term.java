@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import com.apicatalog.jsonld.lang.Keywords;
 
+@Deprecated
 public final class Term implements Serializable {
 
     private static final long serialVersionUID = -6633084683490148231L;

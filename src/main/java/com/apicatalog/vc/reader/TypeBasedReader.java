@@ -2,7 +2,7 @@ package com.apicatalog.vc.reader;
 
 import java.util.Map;
 
-import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;
 
@@ -15,7 +15,7 @@ public class TypeBasedReader<T> implements ObjectReader<JsonObject, T> {
     }
         
     @Override
-    public T read(ModelVersion version, JsonObject object) {
+    public T read(VcdmVersion version, JsonObject object) {
     
         //TODO
         

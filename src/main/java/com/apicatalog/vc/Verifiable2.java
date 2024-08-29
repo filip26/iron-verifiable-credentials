@@ -11,11 +11,9 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.uri.UriUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.Term;
-import com.apicatalog.vc.model.VerifiableObject;
-import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.ObjectReader;
+import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -27,14 +25,14 @@ import jakarta.json.JsonValue;
  * 
  * @since 0.9.0
  */
-public abstract class Verifiable2 implements VerifiableObject {
+public abstract class Verifiable2 {
 
     private static final Logger LOGGER = Logger.getLogger(Verifiable2.class.getName());
-        
-    protected Collection<Proof> proofs;
-    protected ModelVersion version;
 
-    protected Verifiable2(ModelVersion version) {
+    protected Collection<Proof> proofs;
+    protected VcdmVersion version;
+
+    protected Verifiable2(VcdmVersion version) {
         this.version = version;
     }
 
@@ -63,7 +61,7 @@ public abstract class Verifiable2 implements VerifiableObject {
     }
 
     public abstract void validate() throws DocumentError;
-    
+
     /**
      * Creates a new verifiable instance from the given expanded JSON-LD input.
      * 
@@ -99,7 +97,7 @@ public abstract class Verifiable2 implements VerifiableObject {
 //        return of(getVersion(expanded), expanded);
 //    }
 //    
-    public static ModelVersion getVersion(final JsonObject object) throws DocumentError {
+    public static VcdmVersion getVersion(final JsonObject object) throws DocumentError {
 
         final JsonValue contexts = object.get(Keywords.CONTEXT);
 
@@ -110,7 +108,7 @@ public abstract class Verifiable2 implements VerifiableObject {
                 final String contextUri = ((JsonString) context).getString();
 
                 if ("https://www.w3.org/2018/credentials/v1".equals(contextUri)) {
-                    return ModelVersion.V11;
+                    return VcdmVersion.V11;
                 }
                 if ("https://www.w3.org/ns/credentials/v2".equals(contextUri)) {
 
@@ -119,17 +117,16 @@ public abstract class Verifiable2 implements VerifiableObject {
                                 "VC model requires @context declaration be an array, it is inconsistent with another requirement on compaction. Therefore this requirement is not enforced by Iron VC");
                     }
 
-                    return ModelVersion.V20;
+                    return VcdmVersion.V20;
                 }
             } else {
                 throw new DocumentError(ErrorType.Invalid, Keywords.CONTEXT);
             }
         }
-        return ModelVersion.V20;
+        return VcdmVersion.V20;
     }
 
-
-    protected static <T> Collection<T> readCollection(ModelVersion version, JsonValue value, ObjectReader<JsonObject, T> reader) throws DocumentError {
+    protected static <T> Collection<T> readCollection(VcdmVersion version, JsonValue value, ObjectReader<JsonObject, T> reader) throws DocumentError {
         if (JsonUtils.isNotArray(value)) {
             return Collections.emptyList();
         }
@@ -147,7 +144,7 @@ public abstract class Verifiable2 implements VerifiableObject {
         return instance;
     }
 
-    protected static <T> T readObject(ModelVersion version, JsonValue value, ObjectReader<JsonObject, T> reader) throws DocumentError {
+    protected static <T> T readObject(VcdmVersion version, JsonValue value, ObjectReader<JsonObject, T> reader) throws DocumentError {
         if (JsonUtils.isNotArray(value) || value.asJsonArray().size() != 1) { // TODO throw an error if size > 1
             return null;
         }
@@ -164,7 +161,7 @@ public abstract class Verifiable2 implements VerifiableObject {
 //    protected Predicate<String> termsFilter() {
 //        return super.termsFilter().and(term -> !VcVocab.PROOF.equals(term));
 //    }
-    
+
 //
 //    /**
 //     * Verifiable credentials data model version.

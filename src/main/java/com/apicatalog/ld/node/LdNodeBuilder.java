@@ -10,6 +10,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 
+@Deprecated
 public class LdNodeBuilder {
 
     final JsonObjectBuilder builder;

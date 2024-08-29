@@ -16,6 +16,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
+@Deprecated
 public class LdType {
 
     final JsonObject object;

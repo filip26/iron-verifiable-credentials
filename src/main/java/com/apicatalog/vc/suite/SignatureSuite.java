@@ -1,13 +1,30 @@
 package com.apicatalog.vc.suite;
 
-import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.oxygen.ld.LinkedNode;
+import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
 import com.apicatalog.vc.issuer.Issuer;
-import com.apicatalog.vc.proof.Proof;
 
+/**
+ * A container providing primitives to process a proof.
+ */
 public interface SignatureSuite {
+
+    /**
+     * Provides an adapter to process a proof type and related types
+     * 
+     * @return a proof adapter, never <code>null</code>
+     */
+    LinkedFragmentAdapter proofAdapter();
+    
+    /**
+     * Creates a new issuer instance initialized with provided key pair.
+     * 
+     * @param keyPair
+     * @return a new issuer instance
+     */
+    default Issuer createIssuer(KeyPair keyPair) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Check if the given proof can be processed by the suite.
@@ -18,7 +35,7 @@ public interface SignatureSuite {
      * @return <code>true</code> if the proof is supported, <code>false</code>
      *         otherwise
      */
-    boolean isSupported(String proofType, LinkedNode proof);
+//    boolean isSupported(String proofType, LinkedNode proof);
 
     /**
      * Deserialize the given expanded JSON-LD object into a {@link Proof}.
@@ -28,13 +45,6 @@ public interface SignatureSuite {
      * @return a new {@link Proof} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    Proof getProof(LinkedNode proof, DocumentLoader loader) throws DocumentError;
+//    Proof getProof(LinkedNode proof, DocumentLoader loader) throws DocumentError;
 
-    /**
-     * Creates a new issuer instance initialized with provided key pair
-     * 
-     * @param keyPair
-     * @return
-     */
-    Issuer createIssuer(KeyPair keyPair);
 }

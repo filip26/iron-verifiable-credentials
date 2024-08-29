@@ -1,11 +1,11 @@
 package com.apicatalog.vc.reader;
 
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.vcdm.VcdmVersion;
 
 public class CredentialReader<C extends Credential, I> {
 
-    public C read(ModelVersion version, I input) {
+    public C read(VcdmVersion version, I input) {
         return null;
     }
 

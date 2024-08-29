@@ -1,8 +1,8 @@
-package com.apicatalog.vc;
+package com.apicatalog.vcdm;
 
 import com.apicatalog.ld.Term;
 
-public final class VcVocab {
+public final class VcdmVocab {
 
     public static final String CONTEXT_MODEL_V1 = "https://www.w3.org/2018/credentials/v1";
     
@@ -52,5 +52,5 @@ public final class VcVocab {
 
     public static final Term XSD_DATETIME = Term.create("dateTime", XSD_VOCAB);
 
-    private VcVocab() { /* protected */ }
+    private VcdmVocab() { /* protected */ }
 }

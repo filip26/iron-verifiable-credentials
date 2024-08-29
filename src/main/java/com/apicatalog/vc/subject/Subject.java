@@ -1,14 +1,14 @@
 package com.apicatalog.vc.subject;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.model.VerifiableObject;
-import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;
 
-public class Subject  {
+public class Subject implements Linkable {
 
-    public Subject(ModelVersion version, JsonObject expanded) {
+    public Subject(VcdmVersion version, JsonObject expanded) {
 //        super(version, expanded);
     }
 

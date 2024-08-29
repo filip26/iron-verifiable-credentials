@@ -1,16 +1,14 @@
 package com.apicatalog.vc.status;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.VcVocab;
-import com.apicatalog.vc.model.VerifiableObject;
-import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;
 
-public class Status  {
+public class Status implements Linkable {
 
-    public Status(ModelVersion version, JsonObject expanded) {
+    public Status(VcdmVersion version, JsonObject expanded) {
 //        super(version, expanded);
     }
     

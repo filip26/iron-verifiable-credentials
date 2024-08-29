@@ -1,7 +1,7 @@
 package com.apicatalog.vc.reader;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.model.ModelVersion;
+import com.apicatalog.vcdm.VcdmVersion;
 
 /**
  * 
@@ -10,5 +10,5 @@ import com.apicatalog.vc.model.ModelVersion;
 
 public interface ObjectReader<P, R> {
 
-    R read(ModelVersion version, P expanded) throws DocumentError;
+    R read(VcdmVersion version, P expanded) throws DocumentError;
 }

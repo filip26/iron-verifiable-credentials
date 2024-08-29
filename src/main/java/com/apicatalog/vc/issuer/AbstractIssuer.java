@@ -25,15 +25,14 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.VcVocab;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.model.ModelVersion;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
-import com.apicatalog.vc.reader.VerifiableReader;
+import com.apicatalog.vcdm.VcdmVersion;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -48,7 +47,6 @@ public abstract class AbstractIssuer implements Issuer {
     protected final CryptoSuite crypto;
     protected final KeyPair keyPair;
     protected final Multibase proofValueBase;
-    protected final VerifiableReader<Verifiable, JsonObject> reader;
     
     protected DocumentLoader defaultLoader;
     protected URI base;
@@ -58,7 +56,7 @@ public abstract class AbstractIssuer implements Issuer {
         this.crypto = crypto;
         this.keyPair = keyPair;
         this.proofValueBase = proofValueBase;
-        this.reader = new VerifiableReader();
+//        this.reader = null; //new VerifiableReader();
 
         this.defaultLoader = null;
         this.base = null;
@@ -111,9 +109,10 @@ public abstract class AbstractIssuer implements Issuer {
                 final JsonValue object = expanded.iterator().next();
                 if (JsonUtils.isObject(object)) {
 
-                    final ModelVersion version = VerifiableReader.getVersion(document);
-
-                    return sign(version, getContext(version, document, draft), object.asJsonObject(), draft, loader);
+//                    final ModelVersion version = VerifiableReader.getVersion(document);
+//
+//                    return sign(version, getContext(version, document, draft), object.asJsonObject(), draft, loader);
+                    return null;
                 }
             }
             throw new DocumentError(ErrorType.Invalid); // malformed input, not single object to sign has been found
@@ -124,7 +123,7 @@ public abstract class AbstractIssuer implements Issuer {
         }
     }
 
-    protected ExpandedVerifiable sign(final ModelVersion version, final JsonArray context, final JsonObject expanded,
+    protected ExpandedVerifiable sign(final VcdmVersion version, final JsonArray context, final JsonObject expanded,
             final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         if (keyPair.privateKey() == null || keyPair.privateKey().length == 0) {
@@ -133,7 +132,7 @@ public abstract class AbstractIssuer implements Issuer {
 
         JsonObject object = expanded;
 
-        final Verifiable verifiable = reader.read(version, object);
+        final Verifiable verifiable = null; //reader.read(version, object);
 
         // TODO do something with exceptions, unify
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
@@ -143,17 +142,17 @@ public abstract class AbstractIssuer implements Issuer {
         verifiable.validate();
 
         // add issuance date if missing
-        if (verifiable.isCredential()
-                && (verifiable.version() == null
-                        || ModelVersion.V11.equals(verifiable.version()))
-                && verifiable.asCredential().issuanceDate() == null) {
-
-            final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-
-            object = Json.createObjectBuilder(object)
-                    .add(VcVocab.ISSUANCE_DATE.uri(), issuanceDate.toString())
-                    .build();
-        }
+//FIXME        if (verifiable.isCredential()
+//                && (verifiable.version() == null
+//                        || VcdmVersion.V11.equals(verifiable.version()))
+//                && verifiable.asCredential().issuanceDate() == null) {
+//
+//            final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+//
+//            object = Json.createObjectBuilder(object)
+//                    .add(VcVocab.ISSUANCE_DATE.uri(), issuanceDate.toString())
+//                    .build();
+//        }
 
         // remove proofs
         final JsonObject unsigned = EmbeddedProof.removeProofs(object);
@@ -188,7 +187,7 @@ public abstract class AbstractIssuer implements Issuer {
             JsonObject document,
             ProofDraft draft) throws SigningError, DocumentError;
 
-    protected JsonArray getContext(ModelVersion version, JsonObject document, ProofDraft draft) {
+    protected JsonArray getContext(VcdmVersion version, JsonObject document, ProofDraft draft) {
 
         final Collection<String> urls = new HashSet<>();
         final JsonArrayBuilder contexts = Json.createArrayBuilder();

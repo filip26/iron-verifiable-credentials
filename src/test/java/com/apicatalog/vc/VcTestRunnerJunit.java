@@ -1,9 +1,5 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.vc.integrity.DataIntegrityParam.challenge;
-import static com.apicatalog.vc.integrity.DataIntegrityParam.domain;
-import static com.apicatalog.vc.integrity.DataIntegrityParam.purpose;
-import static com.apicatalog.vc.integrity.DataIntegrityParam.nonce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,17 +26,15 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.oxygen.ld.json.JsonLdObject;
 import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.issuer.Issuer;
-import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
+import com.apicatalog.vc.jsonld.BaseJsonLdReader;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
-import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
 
 import jakarta.json.Json;
@@ -65,7 +59,14 @@ public class VcTestRunnerJunit {
 
     final static Verifier VERIFIER = Verifier.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
 
-    final static Reader READER = JsonLdVerifiableReader.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
+    final static BaseJsonLdReader READER = BaseJsonLdReader.with(SUITE)
+            .loader(LOADER)
+            ; 
+            //JsonLdVerifiableReader
+//            .with(SUITE)
+//            .loader(LOADER)
+//            .methodResolvers(RESOLVERS)
+            ;
 
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
@@ -241,7 +242,8 @@ public class VcTestRunnerJunit {
                 continue;
             }
 
-            return (KeyPair) methodAdapter.read(JsonLdObject.of(key.asJsonObject()));
+//            return (KeyPair) methodAdapter.read(JsonLdObject.of(key.asJsonObject()));
+            
         }
         throw new IllegalStateException();
     }
