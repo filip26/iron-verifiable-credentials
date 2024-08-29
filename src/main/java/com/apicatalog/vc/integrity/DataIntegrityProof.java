@@ -15,6 +15,7 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.BaseProofValue;
@@ -210,7 +211,7 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public VerificationMethod read(LinkedNode document) throws DocumentError {
+    public VerificationMethod read(LinkedFragment document) throws DocumentError {
         // TODO Auto-generated method stub
         return null;
     }  

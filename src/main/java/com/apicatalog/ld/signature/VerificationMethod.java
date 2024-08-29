@@ -2,6 +2,8 @@ package com.apicatalog.ld.signature;
 
 import java.net.URI;
 
+import com.apicatalog.linkedtree.Linkable;
+
 /**
  * Represents proof verification method declaration.
  *
@@ -10,7 +12,7 @@ import java.net.URI;
  *      Methods</a>
  *
  */
-public interface VerificationMethod {
+public interface VerificationMethod extends Linkable {
 
     URI id();
 

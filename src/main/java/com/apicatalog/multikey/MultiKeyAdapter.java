@@ -11,6 +11,7 @@ import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
@@ -48,7 +49,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         /* implement a custom validation */
     }
 
-    public VerificationMethod read(LinkedNode document) throws DocumentError {
+    public VerificationMethod read(LinkedFragment document) throws DocumentError {
         Objects.requireNonNull(document);
 
 //        final LdNode node = LdNode.of(document.asObject());

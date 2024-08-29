@@ -13,6 +13,7 @@ import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
@@ -38,7 +39,7 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
 
     protected Collection<Status> status;
 
-    protected IssuerDetails issuer;
+    protected LinkedFragment issuer;
 
     protected LinkedFragment fragment;
 
@@ -49,11 +50,33 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
 
         var fragment = new LinkableObject(link, types, properties);
         var credential = new JsonLdVcdm11Credential();
-        
+
         credential.fragment = fragment;
         fragment.linkable(credential);
-        
+
+        setup(credential, properties);
+
         return fragment;
+    }
+
+    protected static void setup(JsonLdVcdm11Credential credential, final Map<String, LinkedContainer> properties) {
+        credential.expiration = properties.containsKey("https://www.w3.org/2018/credentials#expiration")
+                ? properties.get("https://www.w3.org/2018/credentials#expiration")
+                        .single(XsdDateTime.class)
+                        .datetime()
+                : null;
+
+        credential.issuance = properties.containsKey("https://www.w3.org/2018/credentials#issuanceDate")
+                ? properties.get("https://www.w3.org/2018/credentials#issuanceDate")
+                        .single(XsdDateTime.class)
+                        .datetime()
+                : null;
+
+        credential.issuer = properties.containsKey("https://www.w3.org/2018/credentials#issuer")
+                ? properties.get("https://www.w3.org/2018/credentials#issuer")
+                        .singleFragment()
+                : null;
+
     }
 
     @Override
@@ -89,13 +112,13 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
         return expiration;
     }
 
-
     /**
      *
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
      * @return {@link IssuerDetails} representing the issuer in an expanded form
      */
-    public IssuerDetails issuer() {
+    @Override
+    public LinkedFragment issuer() {
         return issuer;
     }
 
@@ -129,10 +152,6 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
 
     public void status(Collection<Status> status) {
         this.status = status;
-    }
-
-    public void issuer(IssuerDetails issuer) {
-        this.issuer = issuer;
     }
 
 //    public JsonObject expand() {

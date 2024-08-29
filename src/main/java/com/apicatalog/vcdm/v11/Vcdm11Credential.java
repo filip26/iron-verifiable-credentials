@@ -81,7 +81,7 @@ public interface Vcdm11Credential extends Credential {
         if (issuer() == null) {
             throw new DocumentError(ErrorType.Missing, VcdmVocab.ISSUER);
         }
-        issuer().validate();
+//FIXME        issuer().validate();
 
         // status
         if (status() != null) {

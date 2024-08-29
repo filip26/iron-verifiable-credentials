@@ -1,5 +1,9 @@
 package com.apicatalog.vc;
 
+import static com.apicatalog.vc.integrity.DataIntegrityParam.challenge;
+import static com.apicatalog.vc.integrity.DataIntegrityParam.domain;
+import static com.apicatalog.vc.integrity.DataIntegrityParam.nonce;
+import static com.apicatalog.vc.integrity.DataIntegrityParam.purpose;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,7 +32,6 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.issuer.Issuer;
-import com.apicatalog.vc.jsonld.BaseJsonLdReader;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
@@ -59,15 +62,6 @@ public class VcTestRunnerJunit {
 
     final static Verifier VERIFIER = Verifier.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
 
-    final static BaseJsonLdReader READER = BaseJsonLdReader.with(SUITE)
-            .loader(LOADER)
-            ; 
-            //JsonLdVerifiableReader
-//            .with(SUITE)
-//            .loader(LOADER)
-//            .methodResolvers(RESOLVERS)
-            ;
-
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
     }
@@ -80,13 +74,11 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains(VcTestCase.vocab("VeriferTest"))) {
 
-                final Verifiable verifiable = READER.read(testCase.input);
-                
-//                final Verifiable verifiable = VERIFIER.verify(testCase.input,
-//                        challenge(testCase.challenge),
-//                        purpose(testCase.purpose),
-//                        domain(testCase.domain),
-//                        nonce(testCase.nonce));
+                final Verifiable verifiable = VERIFIER.verify(testCase.input,
+                        challenge(testCase.challenge),
+                        purpose(testCase.purpose),
+                        domain(testCase.domain),
+                        nonce(testCase.nonce));
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 

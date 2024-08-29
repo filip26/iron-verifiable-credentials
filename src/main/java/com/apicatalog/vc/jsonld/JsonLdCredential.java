@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
+import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.issuer.IssuerDetails;
@@ -131,8 +132,9 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
      * @return {@link IssuerDetails} representing the issuer in an expanded form
      */
-    public IssuerDetails issuer() {
-        return issuer;
+    public LinkedFragment issuer() {
+//        return issuer;
+        return null;
     }
 
     /**

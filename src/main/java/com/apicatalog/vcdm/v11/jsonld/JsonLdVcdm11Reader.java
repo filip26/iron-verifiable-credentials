@@ -14,8 +14,11 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdType;
+import com.apicatalog.ld.node.adapter.XsdDateTimeAdapter;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.linkedtree.xsd.XsdConstants;
+import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
@@ -101,17 +104,12 @@ public class JsonLdVcdm11Reader implements JsonLdVerifiableReader {
         // get a reader
         JsonLdTreeReader reader = JsonLdTreeReader.create()
                 .with(VcdmVocab.CREDENTIAL_TYPE.uri(), JsonLdVcdm11Credential::of)
+                .with(XsdDateTime.TYPE, XsdDateTime::of)
                 .build();
-
-        System.out.println(reader.readExpanded(expanded));
 
         // get a verifiable
         final Verifiable verifiable = reader.readExpanded(expanded)
-                .singleFragment()
-                .id()
-                .target()
-                .cast(Verifiable.class);
-//                .single(Verifiable.class);
+                .single(Verifiable.class);
 
         // FIXMe reader.read(version, expanded);
 

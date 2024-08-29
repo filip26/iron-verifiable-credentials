@@ -2,6 +2,7 @@ package com.apicatalog.vc.method;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 
 public interface MethodAdapter {
@@ -25,5 +26,5 @@ public interface MethodAdapter {
      * @return a new {@link VerificationMethod} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    VerificationMethod read(LinkedNode document) throws DocumentError;
+    VerificationMethod read(LinkedFragment document) throws DocumentError;
 }

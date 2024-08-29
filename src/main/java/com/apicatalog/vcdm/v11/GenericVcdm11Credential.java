@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.linkedtree.LinkedContainer;
+import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.lang.LangStringSelector;
 import com.apicatalog.linkedtree.lang.LanguageMap;
@@ -114,8 +115,7 @@ public class GenericVcdm11Credential implements Vcdm11Credential {
     }
 
     @Override
-    public IssuerDetails issuer() {
-        // TODO Auto-generated method stub
+    public LinkedFragment issuer() {
         return null;
     }
 
