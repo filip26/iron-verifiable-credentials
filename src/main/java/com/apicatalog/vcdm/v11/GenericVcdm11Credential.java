@@ -4,16 +4,17 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Supplier;
 
+import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.lang.LangStringSelector;
 import com.apicatalog.linkedtree.lang.LanguageMap;
-import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.linkedtree.primitive.GenericFragment;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
-import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
@@ -23,24 +24,24 @@ public class GenericVcdm11Credential implements Vcdm11Credential {
 
     static final String TYPE = "https://www.w3.org/2018/credentials#VerifiableCredential";
 
-
     protected Instant issuanceDate;
     protected Instant expiration;
 
     protected LinkedContainer subject;
 
-    protected Link link;
-    protected Collection<String> type;
-    protected Map<String, LinkedContainer> properties;
+    protected LinkedFragment fragment;
+//    protected Link link;
+//    protected Collection<String> type;
+//    protected Map<String, LinkedContainer> properties;
 
-    protected GenericVcdm11Credential(Link id, Collection<String> type, Map<String, LinkedContainer> properties) {
-        this.link = id;
-        this.type = type;
-        this.properties = properties;
+    protected GenericVcdm11Credential(LinkedFragment fragment) {
+        this.fragment = fragment;
     }
 
-    public static GenericVcdm11Credential of(Link id, Collection<String> type, Map<String, LinkedContainer> properties) {
-        return setup(new GenericVcdm11Credential(id, type, properties), properties);
+    public static GenericVcdm11Credential of(Link id, Collection<String> type, Map<String, LinkedContainer> properties, Supplier<LinkedTree> treeSupplier) {
+        return setup(new GenericVcdm11Credential(
+                new GenericFragment(id, type, properties, treeSupplier)),
+                properties);
     }
 
     protected static GenericVcdm11Credential setup(GenericVcdm11Credential credential, Map<String, LinkedContainer> properties) {
@@ -108,10 +109,10 @@ public class GenericVcdm11Credential implements Vcdm11Credential {
     public Instant expiration() {
         return expiration;
     }
-    
+
     @Override
     public LinkedNode ld() {
-        return new GenericFragment(link, type, properties);
+        return fragment;
     }
 
     @Override
@@ -127,6 +128,6 @@ public class GenericVcdm11Credential implements Vcdm11Credential {
 
     @Override
     public Collection<String> type() {
-        return type;
+        return fragment.type();
     }
 }

@@ -48,9 +48,5 @@ public final class VcdmVocab {
     
     public static final Term MULTIBASE_TYPE = Term.create("multibase", SECURITY_VOCAB);
 
-    public static final String XSD_VOCAB = "http://www.w3.org/2001/XMLSchema#";
-
-    public static final Term XSD_DATETIME = Term.create("dateTime", XSD_VOCAB);
-
     private VcdmVocab() { /* protected */ }
 }

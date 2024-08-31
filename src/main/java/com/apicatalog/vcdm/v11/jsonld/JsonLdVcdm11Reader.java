@@ -1,7 +1,10 @@
 package com.apicatalog.vcdm.v11.jsonld;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import com.apicatalog.jsonld.JsonLd;
@@ -14,10 +17,8 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdType;
-import com.apicatalog.ld.node.adapter.XsdDateTimeAdapter;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.linkedtree.primitive.LinkableObject;
-import com.apicatalog.linkedtree.xsd.XsdConstants;
+import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
@@ -39,12 +40,12 @@ import jakarta.json.JsonValue;
  */
 public class JsonLdVcdm11Reader implements JsonLdVerifiableReader {
 
-    protected final SignatureSuite[] suites;
+    protected final Collection<SignatureSuite> suites;
 
     protected URI base;
 
     public JsonLdVcdm11Reader(final SignatureSuite... suites) {
-        this.suites = suites;
+        this.suites = Arrays.asList(suites);
 
         // default values
         this.base = null;
@@ -101,16 +102,28 @@ public class JsonLdVcdm11Reader implements JsonLdVerifiableReader {
             final DocumentLoader loader) throws DocumentError {
 
         // FIXME move, static?
+        final JsonLdTreeReader.Builder readerBuilder = JsonLdTreeReader.create()
+                .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
+                        (id, types, properties, rootSupplier) -> JsonLdVcdm11Credential.of(id, types, properties, rootSupplier))
+                .with(XsdDateTime.TYPE, XsdDateTime::of);
+
+        suites.stream()
+                .forEach(s -> {
+                    readerBuilder.with(s.proofAdapter().proofType(), s.proofAdapter().reader());
+                });
+
         // get a reader
-        JsonLdTreeReader reader = JsonLdTreeReader.create()
-                .with(VcdmVocab.CREDENTIAL_TYPE.uri(), JsonLdVcdm11Credential::of)
-                .with(XsdDateTime.TYPE, XsdDateTime::of)
-                .build();
+        final JsonLdTreeReader reader = readerBuilder.build();
 
         // get a verifiable
         final Verifiable verifiable = reader.readExpanded(expanded)
                 .single(Verifiable.class);
 
+        var debug = new StringWriter();
+        
+        new NodeDebugWriter(new PrintWriter(debug)).print(verifiable.ld());
+        
+        System.out.println(debug);
         // FIXMe reader.read(version, expanded);
 
         if (verifiable.isCredential()) {

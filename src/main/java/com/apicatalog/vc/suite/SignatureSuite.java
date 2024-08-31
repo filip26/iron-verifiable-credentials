@@ -1,8 +1,8 @@
 package com.apicatalog.vc.suite;
 
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
 import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.proof.ProofAdapter;
 
 /**
  * A container providing primitives to process a proof.
@@ -14,7 +14,7 @@ public interface SignatureSuite {
      * 
      * @return a proof adapter, never <code>null</code>
      */
-    LinkedFragmentAdapter proofAdapter();
+    ProofAdapter proofAdapter();
     
     /**
      * Creates a new issuer instance initialized with provided key pair.

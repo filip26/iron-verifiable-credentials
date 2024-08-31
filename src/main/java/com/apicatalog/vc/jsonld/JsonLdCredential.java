@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.proof.Proof;

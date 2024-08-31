@@ -5,7 +5,9 @@ import java.time.Instant;
 
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.Term;
+import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.rdf.lang.XsdConstants;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
@@ -55,7 +57,7 @@ public class LdSetter {
     }
 
     public LdNodeBuilder xsdDateTime(Instant created) {
-        scalar(VcdmVocab.XSD_DATETIME.uri(), created.toString());
+        scalar(XsdDateTime.TYPE, created.toString());
         return parent;
     }
     

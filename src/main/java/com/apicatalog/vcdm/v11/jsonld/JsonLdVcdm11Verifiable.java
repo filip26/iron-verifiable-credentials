@@ -1,5 +1,6 @@
 package com.apicatalog.vcdm.v11.jsonld;
 
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -8,13 +9,16 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;
 
-public abstract class JsonLdVcdm11Verifiable {
+public abstract class JsonLdVcdm11Verifiable implements Verifiable {
 
     private static final Logger LOGGER = Logger.getLogger(JsonLdVcdm11Verifiable.class.getName());
+    
+    protected Collection<Proof> proofs;
     
     /**
      * Creates a new verifiable instance from the given expanded JSON-LD input.
@@ -80,4 +84,11 @@ public abstract class JsonLdVcdm11Verifiable {
 //        }
 //        return reader.read(version, item.asJsonObject());
 //    }
+    
+    @Override
+    public Collection<Proof> proofs() {
+        return proofs;
+    }
+
+
 }

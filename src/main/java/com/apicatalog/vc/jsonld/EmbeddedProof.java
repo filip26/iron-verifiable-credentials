@@ -3,11 +3,17 @@ package com.apicatalog.vc.jsonld;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.vc.proof.GenericProof;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
@@ -155,5 +161,33 @@ public final class EmbeddedProof {
      */
     public static JsonObject removeProofs(final JsonObject verifiable) {
         return Json.createObjectBuilder(verifiable).remove(VcdmVocab.PROOF.uri()).build();
+    }
+    
+    public static Collection<Proof> getProofs(final LinkedTree tree) {
+
+        Objects.requireNonNull(tree);
+        
+        if (tree.nodes().isEmpty()) {
+            return Collections.emptyList();            
+        }
+        
+        var proofs = new ArrayList<Proof>();
+
+        for (final LinkedNode node : tree) {
+            proofs.add(getProof(node.asFragment()));
+        }
+        
+        return proofs;
+    }
+    
+    public static Proof getProof(final LinkedFragment fragment) {
+        
+        Objects.requireNonNull(fragment);
+        
+        if (fragment.cast() instanceof Proof proof) {
+            return proof;
+        }
+        
+        return new GenericProof(fragment);
     }
 }

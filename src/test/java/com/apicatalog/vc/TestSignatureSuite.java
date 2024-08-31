@@ -7,10 +7,12 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
-import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
+import com.apicatalog.linkedtree.adapter.LinkedFragmentReader;
+import com.apicatalog.linkedtree.primitive.GenericFragment;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.integrity.DataIntegritySuite;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.proof.ProofAdapter;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
@@ -52,8 +54,18 @@ class TestSignatureSuite extends DataIntegritySuite {
     }
 
     @Override
-    public LinkedFragmentAdapter proofAdapter() {
-        // TODO Auto-generated method stub
-        return null;
+    public ProofAdapter proofAdapter() {
+        return new ProofAdapter() {
+            
+            @Override
+            public LinkedFragmentReader reader() {
+                return GenericFragment::new;
+            }
+            
+            @Override
+            public String proofType() {
+                return DataIntegritySuite.PROOF_TYPE_ID;
+            }
+        };
     }
 }

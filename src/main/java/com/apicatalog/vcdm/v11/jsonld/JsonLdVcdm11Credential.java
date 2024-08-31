@@ -4,18 +4,20 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
+import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.link.Link;
+import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.issuer.IssuerDetails;
-import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -43,16 +45,16 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
 
     protected LinkedFragment fragment;
 
-    public static LinkedFragment of(
-            final Link link,
+    public static LinkableObject of(
+            final Link id,
             final Collection<String> types,
-            final Map<String, LinkedContainer> properties) {
+            final Map<String, LinkedContainer> properties,
+            final Supplier<LinkedTree> rootSupplier) {
 
-        var fragment = new LinkableObject(link, types, properties);
         var credential = new JsonLdVcdm11Credential();
+        var fragment = new LinkableObject(id, types, properties, credential);
 
         credential.fragment = fragment;
-        fragment.linkable(credential);
 
         setup(credential, properties);
 
@@ -60,23 +62,26 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
     }
 
     protected static void setup(JsonLdVcdm11Credential credential, final Map<String, LinkedContainer> properties) {
-        credential.expiration = properties.containsKey("https://www.w3.org/2018/credentials#expiration")
-                ? properties.get("https://www.w3.org/2018/credentials#expiration")
+        credential.expiration = properties.containsKey(VcdmVocab.EXPIRATION_DATE.uri())
+                ? properties.get(VcdmVocab.EXPIRATION_DATE.uri())
                         .single(XsdDateTime.class)
                         .datetime()
                 : null;
 
-        credential.issuance = properties.containsKey("https://www.w3.org/2018/credentials#issuanceDate")
-                ? properties.get("https://www.w3.org/2018/credentials#issuanceDate")
+        credential.issuance = properties.containsKey(VcdmVocab.ISSUANCE_DATE.uri())
+                ? properties.get(VcdmVocab.ISSUANCE_DATE.uri())
                         .single(XsdDateTime.class)
                         .datetime()
                 : null;
 
-        credential.issuer = properties.containsKey("https://www.w3.org/2018/credentials#issuer")
-                ? properties.get("https://www.w3.org/2018/credentials#issuer")
+        credential.issuer = properties.containsKey(VcdmVocab.ISSUER.uri())
+                ? properties.get(VcdmVocab.ISSUER.uri())
                         .singleFragment()
                 : null;
 
+        if (properties.containsKey(VcdmVocab.PROOF.uri())) {
+            credential.proofs = EmbeddedProof.getProofs(properties.get(VcdmVocab.PROOF.uri()).asTree());
+        }
     }
 
     @Override
@@ -237,12 +242,6 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
     @Override
     public Collection<String> type() {
         return fragment.type();
-    }
-
-    @Override
-    public Collection<Proof> proofs() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
