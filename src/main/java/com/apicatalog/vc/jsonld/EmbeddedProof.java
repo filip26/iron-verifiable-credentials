@@ -12,7 +12,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.vc.proof.GenericProof;
+import com.apicatalog.vc.proof.UnknownProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmVocab;
 
@@ -188,6 +188,6 @@ public final class EmbeddedProof {
             return proof;
         }
         
-        return new GenericProof(fragment);
+        return new UnknownProof(fragment);
     }
 }

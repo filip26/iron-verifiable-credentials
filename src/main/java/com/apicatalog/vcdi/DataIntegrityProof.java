@@ -68,15 +68,16 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
             Map<String, LinkedContainer> properties,
             Supplier<LinkedTree> rootSupplier,
             DataIntegritySuite suite
-            ) {
+            ) throws DocumentError {
 
         var proofValue = properties.containsKey(DataIntegrityVocab.PROOF_VALUE.uri())
-                ? properties.get(DataIntegrityVocab.PROOF_VALUE.uri())
+                ? properties.get(DataIntegrityVocab.PROOF_VALUE.uri()).single(ProofValue.class)
                 : null;
 
         
+        var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
         
-        var proof = new DataIntegrityProof(suite, null, null);
+        var proof = new DataIntegrityProof(suite, cryptosuite, null);
         
         return new LinkableObject(id, types, properties, rootSupplier, proof);
     }

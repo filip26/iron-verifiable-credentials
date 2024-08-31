@@ -15,8 +15,8 @@ import com.apicatalog.vc.method.MethodAdapter;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
-public record GenericProof(LinkedFragment fragment) implements Proof {
-    
+public record UnknownProof(LinkedFragment fragment) implements Proof {
+
     @Override
     public VerificationMethod method() {
         // TODO Auto-generated method stub
@@ -49,7 +49,7 @@ public record GenericProof(LinkedFragment fragment) implements Proof {
 
     @Override
     public void validate(Map<String, Object> params) throws DocumentError {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("An uknown proof cannot be validated.");
     }
 
     @Override
@@ -62,5 +62,4 @@ public record GenericProof(LinkedFragment fragment) implements Proof {
         // TODO Auto-generated method stub
         return null;
     }
-
 }

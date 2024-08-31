@@ -44,7 +44,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
             
             @Override
             public LinkedLiteral read(String value, Supplier<LinkedTree> rootSupplier) {
-                return MultibaseProofValue.of(value, rootSupplier);
+                return new MultibaseProofValue(datatype(), value, rootSupplier, proofValueBase.decode(value));
             }
             
             @Override
