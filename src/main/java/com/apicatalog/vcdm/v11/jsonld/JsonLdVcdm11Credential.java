@@ -52,7 +52,7 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
             final Supplier<LinkedTree> rootSupplier) {
 
         var credential = new JsonLdVcdm11Credential();
-        var fragment = new LinkableObject(id, types, properties, credential);
+        var fragment = new LinkableObject(id, types, properties, rootSupplier, credential);
 
         credential.fragment = fragment;
 

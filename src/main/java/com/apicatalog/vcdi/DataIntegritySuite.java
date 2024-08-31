@@ -1,38 +1,59 @@
-package com.apicatalog.vc.integrity;
+package com.apicatalog.vcdi;
 
 import java.net.URI;
+import java.util.List;
+import java.util.function.Supplier;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.linkedtree.LinkedLiteral;
+import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.linkedtree.adapter.LinkedLiteralAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.proof.MultibaseProofValue;
+import com.apicatalog.vc.proof.ProofAdapter;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.VcdmVocab;
 
 public abstract class DataIntegritySuite implements SignatureSuite {
 
-    protected static final String PROOF_TYPE_NAME = "DataIntegrityProof";
-
-    protected static final String PROOF_TYPE_ID = VcdmVocab.SECURITY_VOCAB + PROOF_TYPE_NAME;
-
     protected final MethodAdapter methodAdapter;
 
-    protected final String cryptosuite;
+    protected final String cryptosuiteName;
 
     protected final Multibase proofValueBase;
+    
+    protected ProofAdapter proofAdapter;
 
     protected DataIntegritySuite(
-            String cryptosuite,
+            String cryptosuiteName,
             Multibase proofValueBase,
-            final MethodAdapter method) {
-        this.cryptosuite = cryptosuite;
+            MethodAdapter method
+            ) {
+        this.cryptosuiteName = cryptosuiteName;
         this.proofValueBase = proofValueBase;
         this.methodAdapter = method;
+        this.proofAdapter = new DataIntegrityProofAdapter(this, List.of(getProofValueAdapter(proofValueBase)));
     }
 
+    protected static LinkedLiteralAdapter getProofValueAdapter(Multibase proofValueBase) {
+        return new LinkedLiteralAdapter() {
+            
+            @Override
+            public LinkedLiteral read(String value, Supplier<LinkedTree> rootSupplier) {
+                return MultibaseProofValue.of(value, rootSupplier);
+            }
+            
+            @Override
+            public String datatype() {
+                return "https://w3id.org/security#multibase";
+            }
+        };
+    }
+    
     protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws DocumentError;
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
@@ -107,4 +128,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 ////        }
 ////        return null;
 //    }
+    
+    @Override
+    public ProofAdapter proofAdapter() {
+        return proofAdapter;
+    }
 }

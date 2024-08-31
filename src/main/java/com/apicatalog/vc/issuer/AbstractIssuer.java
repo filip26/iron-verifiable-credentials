@@ -26,11 +26,11 @@ import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
-import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
+import com.apicatalog.vcdi.DataIntegrityProofDraft;
+import com.apicatalog.vcdi.DataIntegrityVocab;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 

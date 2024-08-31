@@ -109,7 +109,7 @@ public class JsonLdVcdm11Reader implements JsonLdVerifiableReader {
 
         suites.stream()
                 .forEach(s -> {
-                    readerBuilder.with(s.proofAdapter().proofType(), s.proofAdapter().reader());
+                    readerBuilder.with(s.proofAdapter().proofType(), s.proofAdapter());
                 });
 
         // get a reader

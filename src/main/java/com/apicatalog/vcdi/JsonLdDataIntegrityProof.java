@@ -1,4 +1,4 @@
-package com.apicatalog.vc.integrity;
+package com.apicatalog.vcdi;
 
 import java.net.URI;
 import java.time.Instant;
@@ -32,7 +32,7 @@ import jakarta.json.JsonStructure;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof implements Proof, MethodAdapter {
+public class JsonLdDataIntegrityProof implements Proof, MethodAdapter {
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
@@ -48,7 +48,7 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     protected ProofValue value;
     protected URI previousProof;
 
-    protected DataIntegrityProof(
+    protected JsonLdDataIntegrityProof(
             DataIntegritySuite suite,
             CryptoSuite crypto,
             JsonObject expandedProof) {

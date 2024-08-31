@@ -1,9 +1,9 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.vc.integrity.DataIntegrityParam.challenge;
-import static com.apicatalog.vc.integrity.DataIntegrityParam.domain;
-import static com.apicatalog.vc.integrity.DataIntegrityParam.nonce;
-import static com.apicatalog.vc.integrity.DataIntegrityParam.purpose;
+import static com.apicatalog.vcdi.DataIntegrityParam.challenge;
+import static com.apicatalog.vcdi.DataIntegrityParam.domain;
+import static com.apicatalog.vcdi.DataIntegrityParam.nonce;
+import static com.apicatalog.vcdi.DataIntegrityParam.purpose;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,7 +30,6 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -39,6 +38,7 @@ import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.verifier.Verifier;
+import com.apicatalog.vcdi.DataIntegrityProofDraft;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;

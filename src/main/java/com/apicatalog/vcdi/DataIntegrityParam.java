@@ -1,4 +1,4 @@
-package com.apicatalog.vc.integrity;
+package com.apicatalog.vcdi;
 
 import com.apicatalog.vc.processor.Parameter;
 

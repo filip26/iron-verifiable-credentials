@@ -25,7 +25,6 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableAdapter;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
@@ -36,6 +35,7 @@ import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdi.DataIntegrityVocab;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.jsonld.JsonLdVcdmAdapter;
 

@@ -1,4 +1,4 @@
-package com.apicatalog.vc.integrity;
+package com.apicatalog.vcdi;
 
 import java.net.URI;
 import java.time.Instant;
@@ -94,8 +94,8 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
         super.unsigned(builder, suite.methodAdapter);
         
-        builder.type(DataIntegritySuite.PROOF_TYPE_ID);
-        builder.set(DataIntegrityVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", suite.cryptosuite);
+        builder.type(DataIntegrityVocab.TYPE.uri());
+        builder.set(DataIntegrityVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", suite.cryptosuiteName);
         
         builder.set(DataIntegrityVocab.PURPOSE).id(purpose);
         
