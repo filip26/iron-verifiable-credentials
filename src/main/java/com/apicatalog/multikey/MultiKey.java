@@ -59,10 +59,9 @@ public class MultiKey implements KeyPair {
         multikey.controller = selector.id(MultiKeyAdapter.CONTROLLER);
 
         var x = selector.single(MultiKeyAdapter.PUBLIC_KEY, ByteArrayValue.class);
-        System.out.println(x);
 
         multikey.publicKey = getKey(MultiKeyAdapter.PUBLIC_KEY, x.byteArrayValue(), multikey, decoder);
-        System.out.println(multikey.publicKey);
+
 //            multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
 //
 //            multikey.expiration = node.scalar(EXPIRATION).xsdDateTime();

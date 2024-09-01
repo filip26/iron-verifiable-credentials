@@ -112,14 +112,14 @@ public class Holder extends AbstractProcessor<Holder> {
         if (proofTypes == null || proofTypes.isEmpty()) {
             throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
         }
-
-        final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
-
-        if (signatureSuite == null) {
-            throw new SigningError(Code.UnsupportedCryptoSuite);
-        }
-
         //FIXME
+//        final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
+//
+//        if (signatureSuite == null) {
+//            throw new SigningError(Code.UnsupportedCryptoSuite);
+//        }
+
+
 //        final Proof proof = signatureSuite.getProof(expandedProof, loader);
 //
 //        if (proof == null) {

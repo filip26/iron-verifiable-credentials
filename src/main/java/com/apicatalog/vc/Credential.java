@@ -4,8 +4,6 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.vc.status.Status;
-import com.apicatalog.vc.subject.Subject;
 
 /**
  * A generic predecessor.
@@ -28,9 +26,9 @@ public interface Credential extends Verifiable {
 
     LinkedFragment issuer();
 
-    Collection<Status> status();
+    Collection<LinkedFragment> status();
 
-    Collection<Subject> subject();
+    Collection<LinkedFragment> subject();
 
     @Override
     default void validate() throws DocumentError {

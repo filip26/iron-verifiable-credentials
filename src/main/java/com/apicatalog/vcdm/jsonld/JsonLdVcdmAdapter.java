@@ -11,7 +11,7 @@ import com.apicatalog.vc.jsonld.JsonLdVerifiableAdapter;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmVersion;
-import com.apicatalog.vcdm.v11.jsonld.JsonLdVcdm11Reader;
+import com.apicatalog.vcdm.v11.reader.Vcdm11Reader;
 
 public class JsonLdVcdmAdapter implements JsonLdVerifiableAdapter {
 
@@ -34,7 +34,7 @@ public class JsonLdVcdmAdapter implements JsonLdVerifiableAdapter {
         }
 
         return switch (getVersion(contexts)) {
-            case V11 -> new JsonLdVcdm11Reader(suites);
+            case V11 -> new Vcdm11Reader(suites);
             case V20 -> null;
             default -> null;
         };

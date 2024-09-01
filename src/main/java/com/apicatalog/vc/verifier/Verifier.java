@@ -1,7 +1,6 @@
 package com.apicatalog.vc.verifier;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -16,15 +15,12 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.Term;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
-import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
-import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
@@ -48,10 +44,10 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
     protected StatusVerifier statusVerifier;
     
-    protected JsonLdVerifiableAdapter verifiableAdapter;
+    protected final JsonLdVerifiableAdapter verifiableAdapter;
 
     //TODO remove
-    protected JsonLdTreeWriter treeWriter;
+    protected final JsonLdTreeWriter treeWriter;
     
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
@@ -187,7 +183,13 @@ public class Verifier extends AbstractProcessor<Verifier> {
     protected Verifiable verify(final JsonObject document, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
 
         // extract context
-        final Collection<String> context = JsonLdContext.strings(document);
+        final Collection<String> context;
+            
+        try {
+            context = JsonLdContext.strings(document);
+        } catch (IllegalArgumentException e) {
+            throw new DocumentError(ErrorType.Invalid, "document");
+        }
 
         final JsonLdVerifiableReader reader = verifiableAdapter.reader(context);
 
@@ -218,8 +220,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
         Proof proof = queue.pop();
 
         while (proof != null) {
-NodeDebugWriter.printToStdout(proof.ld());
-System.out.println(proof.ld().asFragment().cast());
+
             proof.validate(params);
 
             final ProofValue proofValue = proof.signature();
@@ -323,9 +324,11 @@ System.out.println(proof.ld().asFragment().cast());
 
         // status check
         if (statusVerifier != null && credential.status() != null && !credential.status().isEmpty()) {
-            for (final Status status : credential.status()) {
-                statusVerifier.verify(credential, status);   
-            }
+            //FIXME
+//            for (final Status status : credential.status()) {
+//            for (final Status status : credential.status()) {
+//                statusVerifier.verify(credential, status);   
+//            }
         }
     }
 

@@ -1,4 +1,4 @@
-package com.apicatalog.vcdm.v11.jsonld;
+package com.apicatalog.vcdm.v11;
 
 import java.net.URI;
 import java.util.Collection;
@@ -7,9 +7,9 @@ import java.util.logging.Logger;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.proof.Proof;
 
-public abstract class JsonLdVcdm11Verifiable implements Verifiable {
+public abstract class Vcdm11Verifiable implements Verifiable {
 
-    private static final Logger LOGGER = Logger.getLogger(JsonLdVcdm11Verifiable.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Vcdm11Verifiable.class.getName());
 
     protected URI id;
     protected Collection<Proof> proofs;

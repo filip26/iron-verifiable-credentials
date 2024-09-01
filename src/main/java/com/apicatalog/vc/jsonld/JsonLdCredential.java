@@ -27,7 +27,8 @@ import jakarta.json.JsonValue;
  * 
  * @since 0.9.0
  */
-public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
+@Deprecated
+public class JsonLdCredential   {
 
     private static final Logger LOGGER = Logger.getLogger(JsonLdCredential.class.getName());
     
@@ -50,9 +51,9 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
     
     //TODO termsOfUse
     
-    protected JsonLdCredential(VcdmVersion version, JsonObject expanded) {
-        super(version, expanded);
-    }
+//    protected JsonLdCredential(VcdmVersion version, JsonObject expanded) {
+//        super(version, expanded);
+//    }
 
     /**
      * A date time when the credential has been issued. VC data model v1.1.
@@ -247,39 +248,4 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
         return LdNode.isTypeOf(VcdmVocab.CREDENTIAL_TYPE.uri(), document);
     }
 
-    @Override
-    public URI id() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<String> type() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Proof> proofs() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-//    @Override
-//    public VcdmVersion version() {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
-
-    @Override
-    public boolean isExpired() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isNotValidYet() {
-        // TODO Auto-generated method stub
-        return false;
-    }
 }

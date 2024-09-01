@@ -1,18 +1,16 @@
 package com.apicatalog.vc.subject;
 
+import java.net.URI;
+
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.Linkable;
-import com.apicatalog.vcdm.VcdmVersion;
 
-import jakarta.json.JsonObject;
+public interface Subject extends Linkable {
 
-public class Subject implements Linkable {
-
-    public Subject(VcdmVersion version, JsonObject expanded) {
-//        super(version, expanded);
-    }
-
-    public void validate() throws DocumentError {
+    URI id();
+    
+    default void validate() throws DocumentError {
+        throw new UnsupportedOperationException();
     }
 
 }

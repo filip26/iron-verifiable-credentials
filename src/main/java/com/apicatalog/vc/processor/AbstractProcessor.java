@@ -195,15 +195,4 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
 
         throw new DocumentError(ErrorType.Unknown, "ProofVerificationId");
     }
-
-    protected SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
-        for (final SignatureSuite suite : suites) {
-            for (final String proofType : proofTypes) {
-//                if (suite.isSupported(proofType, expandedProof)) {
-//                    return suite;
-//                }
-            }
-        }
-        return null;
-    }
 }

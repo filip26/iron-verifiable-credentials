@@ -56,29 +56,29 @@ public abstract class JsonLdVerifiable {
      * 
      * @throws DocumentError
      */
-    public static Verifiable of(final VcdmVersion version, final JsonObject expanded) throws DocumentError {
-
-        // is a credential?
-        if (JsonLdCredential.isCredential(expanded)) {
-            // read the credential object
-            return JsonLdCredential.of(version, expanded);
-        }
-
-        // is a presentation?
-        if (JsonLdPresentation.isPresentation(expanded)) {
-            // read the presentation object
-            return JsonLdPresentation.of(version, expanded);
-        }
-
-        // is not expanded JSON-LD object
-        if (JsonUtils.isNull(expanded.get(Keywords.TYPE))) {
-            throw new DocumentError(ErrorType.Missing, Term.TYPE);
-        }
-
-        throw new DocumentError(ErrorType.Unknown, Term.TYPE);
-    }
-    
-
+//    public static Verifiable of(final VcdmVersion version, final JsonObject expanded) throws DocumentError {
+//
+//        // is a credential?
+//        if (JsonLdCredential.isCredential(expanded)) {
+//            // read the credential object
+//            return JsonLdCredential.of(version, expanded);
+//        }
+//
+//        // is a presentation?
+//        if (JsonLdPresentation.isPresentation(expanded)) {
+//            // read the presentation object
+//            return JsonLdPresentation.of(version, expanded);
+//        }
+//
+//        // is not expanded JSON-LD object
+//        if (JsonUtils.isNull(expanded.get(Keywords.TYPE))) {
+//            throw new DocumentError(ErrorType.Missing, Term.TYPE);
+//        }
+//
+//        throw new DocumentError(ErrorType.Unknown, Term.TYPE);
+//    }
+//    
+//
 
 
     protected static <T> Collection<T> readCollection(VcdmVersion version, JsonValue value, ObjectReader<JsonObject, T> reader) throws DocumentError {

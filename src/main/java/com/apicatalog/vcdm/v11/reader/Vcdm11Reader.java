@@ -1,4 +1,4 @@
-package com.apicatalog.vcdm.v11.jsonld;
+package com.apicatalog.vcdm.v11.reader;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -12,6 +12,8 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
@@ -20,6 +22,7 @@ import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
+import com.apicatalog.vcdm.v11.Vcdm11Credential;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -30,13 +33,19 @@ import jakarta.json.JsonValue;
  * <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data
  * Model v1.1</a>
  */
-public class JsonLdVcdm11Reader implements JsonLdVerifiableReader {
+public class Vcdm11Reader implements JsonLdVerifiableReader {
 
     protected final Collection<SignatureSuite> suites;
 
     protected URI base;
 
-    public JsonLdVcdm11Reader(final SignatureSuite... suites) {
+//    protected boolean failOnUnsupportedProof = true;
+//    if (failOnUnsupportedProof) {
+//        throw new VerificationError(Code.UnsupportedCryptoSuite);
+//    }
+
+    
+    public Vcdm11Reader(final SignatureSuite... suites) {
         this.suites = Arrays.asList(suites);
 
         // default values
@@ -96,7 +105,7 @@ public class JsonLdVcdm11Reader implements JsonLdVerifiableReader {
         // FIXME move, static?
         final JsonLdTreeReader.Builder readerBuilder = JsonLdTreeReader.create()
                 .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
-                        (id, types, properties, rootSupplier) -> JsonLdVcdm11Credential.of(id, types, properties, rootSupplier))
+                        (id, types, properties, rootSupplier) -> Vcdm11Credential.of(id, types, properties, rootSupplier))
                 .with(XsdDateTime.TYPE, XsdDateTime::of);
 
         suites.stream()

@@ -1,6 +1,8 @@
 package com.apicatalog.vc.lt;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -12,12 +14,32 @@ import com.apicatalog.ld.Term;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedContainer;
+import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 
 //????
 public record ObjectFragmentMapper(
         Map<String, LinkedContainer> properties) {
 
+    public Collection<LinkedFragment> fragments(Term term) throws DocumentError {
+
+        Objects.requireNonNull(term);
+
+        final LinkedContainer container = properties.get(term.uri());
+
+        if (container != null && container.size() > 0) {
+            for (LinkedNode node : container) {
+                if (!node.isFragment()) {
+                    throw new DocumentError(ErrorType.Invalid, term);
+                }
+            }
+            return container.nodes().stream().map(LinkedNode::asFragment).toList();
+        }
+        return Collections.emptyList();
+    }
+    
+
+    
     public Linkable single(Term term) throws DocumentError {
 
         Objects.requireNonNull(term);
@@ -76,7 +98,7 @@ public record ObjectFragmentMapper(
                         return URI.create(uri);
                     }
                 }
-                return null;
+                throw new IllegalArgumentException();
             });
         } catch (IllegalArgumentException e) {
             throw new DocumentError(ErrorType.Invalid, term);
@@ -148,9 +170,15 @@ public record ObjectFragmentMapper(
 
             T value = null;
 
-            if (node.isFragment()) {
+            if (node.isFragment() 
+                    && clazz.isInstance(node.asFragment().cast())
+                    ) {
                 value = node.asFragment().cast(clazz);
-            } else if (node.isLiteral()) {
+                
+            } else if (node.isLiteral()
+                    && clazz.isInstance(node.asLiteral().cast())
+                    ) {
+                
                 value = node.asLiteral().cast(clazz);
             } else {
                 throw new DocumentError(ErrorType.Invalid, term);
