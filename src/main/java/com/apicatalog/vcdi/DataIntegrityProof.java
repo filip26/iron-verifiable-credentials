@@ -19,6 +19,7 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
@@ -290,5 +291,10 @@ public class DataIntegrityProof implements Proof {
         final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
 
         return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
+    }
+    
+    @Override
+    public LinkedNode ld() {
+        return fragment;
     }
 }

@@ -24,6 +24,7 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
+import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
@@ -217,7 +218,8 @@ public class Verifier extends AbstractProcessor<Verifier> {
         Proof proof = queue.pop();
 
         while (proof != null) {
-
+NodeDebugWriter.printToStdout(proof.ld());
+System.out.println(proof.ld().asFragment().cast());
             proof.validate(params);
 
             final ProofValue proofValue = proof.signature();

@@ -9,11 +9,11 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.vc.proof.UnknownProof;
 import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.proof.UnknownProof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
@@ -163,7 +163,7 @@ public final class EmbeddedProof {
         return Json.createObjectBuilder(verifiable).remove(VcdmVocab.PROOF.uri()).build();
     }
     
-    public static Collection<Proof> getProofs(final LinkedTree tree) {
+    public static Collection<Proof> getProofs(final LinkedContainer tree) {
 
         Objects.requireNonNull(tree);
         
@@ -174,6 +174,10 @@ public final class EmbeddedProof {
         var proofs = new ArrayList<Proof>();
 
         for (final LinkedNode node : tree) {
+            if (node.isTree()) {
+                proofs.add(getProof(node.asTree().single().asFragment())); 
+                continue;
+            }
             proofs.add(getProof(node.asFragment()));
         }
         
@@ -183,7 +187,7 @@ public final class EmbeddedProof {
     public static Proof getProof(final LinkedFragment fragment) {
         
         Objects.requireNonNull(fragment);
-        
+
         if (fragment.cast() instanceof Proof proof) {
             return proof;
         }

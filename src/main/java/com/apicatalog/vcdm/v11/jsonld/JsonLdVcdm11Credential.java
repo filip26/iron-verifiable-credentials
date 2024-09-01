@@ -13,6 +13,7 @@ import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
@@ -87,8 +88,13 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
                 XsdDateTime::datetime);
 
         if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
+//            
+//            var proofs = selector.properties().get(VcdmVocab.PROOF.uri());
+//            
+//            NodeDebugWriter.printToStdout();
+            
             credential.proofs = EmbeddedProof.getProofs(
-                    selector.properties().get(VcdmVocab.PROOF.uri()).asTree());
+                    selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
         }
     }
 
