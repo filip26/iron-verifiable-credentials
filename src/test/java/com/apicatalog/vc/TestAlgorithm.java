@@ -47,9 +47,9 @@ class TestAlgorithm implements SignatureAlgorithm {
         new Random().nextBytes(key);
 
         final MultiKey multikey = new MultiKey();
-        multikey.setAlgorithm("TEST");
-        multikey.setPublicKey(key);
-        multikey.setPrivateKey(key);
+        multikey.algorithm("TEST");
+        multikey.publicKey(key);
+        multikey.privateKey(key);
         return multikey;
     }
     

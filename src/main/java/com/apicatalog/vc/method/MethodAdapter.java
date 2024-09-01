@@ -4,8 +4,10 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
+import com.apicatalog.linkedtree.adapter.resolver.FragmentAdapterResolver;
 
-public interface MethodAdapter {
+public interface MethodAdapter extends FragmentAdapterResolver {
 
     /**
      * Provides an external JSON-LD context URI defying the proof type. The context
@@ -18,7 +20,7 @@ public interface MethodAdapter {
     }
 
     /**
-     * Deserialize the given expanded JSON-LD object into a
+     * Deserialize the given {@link LinkedFragment} into a
      * {@link VerificationMethod}.
      * 
      * @param document
@@ -26,5 +28,6 @@ public interface MethodAdapter {
      * @return a new {@link VerificationMethod} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    VerificationMethod read(LinkedFragment document) throws DocumentError;
+//    VerificationMethod read(LinkedFragment document) throws DocumentError;
+    
 }

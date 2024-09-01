@@ -19,13 +19,17 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.linkedtree.selector.StringValueSelector;
+import com.apicatalog.linkedtree.xsd.XsdDateTime;
+import com.apicatalog.vc.method.GenericVerificationMethod;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vc.reader.ObjectFragmentMapper;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -41,25 +45,25 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
-    protected final JsonObject expanded;
 
     protected URI id;
-    protected URI purpose;
-    protected VerificationMethod method;
+    protected URI previousProof;
+
     protected Instant created;
+    protected URI purpose;
+
     protected String domain;
     protected String nonce;
     protected String challenge;
+
+    protected VerificationMethod method;
     protected ProofValue value;
-    protected URI previousProof;
 
     protected DataIntegrityProof(
             DataIntegritySuite suite,
-            CryptoSuite crypto,
-            JsonObject expandedProof) {
+            CryptoSuite crypto) {
         this.suite = suite;
         this.crypto = crypto;
-        this.expanded = expandedProof;
     }
 
     public static LinkedFragment of(
@@ -67,18 +71,49 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
             Collection<String> types,
             Map<String, LinkedContainer> properties,
             Supplier<LinkedTree> rootSupplier,
-            DataIntegritySuite suite
-            ) throws DocumentError {
+            DataIntegritySuite suite) throws DocumentError {
 
-        var proofValue = properties.containsKey(DataIntegrityVocab.PROOF_VALUE.uri())
-                ? properties.get(DataIntegrityVocab.PROOF_VALUE.uri()).single(ProofValue.class)
-                : null;
+        var selector = new ObjectFragmentMapper(properties);
 
-        
+        var proofValue = selector.single(
+                DataIntegrityVocab.PROOF_VALUE,
+                ProofValue.class);
+
         var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
-        
-        var proof = new DataIntegrityProof(suite, cryptosuite, null);
-        
+
+        var proof = new DataIntegrityProof(suite, cryptosuite);
+
+        proof.created = selector.single(
+                DataIntegrityVocab.CREATED,
+                XsdDateTime.class,
+                XsdDateTime::datetime);
+
+        proof.method = selector.single(
+                DataIntegrityVocab.VERIFICATION_METHOD,
+                method -> {
+                    if (method instanceof VerificationMethod verificationMethod) {
+                        return verificationMethod;
+                    }
+                    if (method instanceof LinkedFragment fragment) {
+                        return new GenericVerificationMethod(
+                                fragment.id() != null
+                                        ? URI.create(fragment.id().uri())
+                                        : null,
+                                null, // TODO read from fragment
+                                null,
+                                fragment);
+                    }
+                    return new GenericVerificationMethod(
+                            null,
+                            null,
+                            null,
+                            method.ld());
+                });
+
+        proof.purpose = selector.id(DataIntegrityVocab.PURPOSE);
+
+        proof.value = proofValue;
+
         return new LinkableObject(id, types, properties, rootSupplier, proof);
     }
 
@@ -222,7 +257,9 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     protected JsonObject unsignedCopy() {
-        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
+//        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
+        // FIXME
+        return Json.createObjectBuilder().build();
     }
 
     @Override
@@ -236,8 +273,9 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public VerificationMethod read(LinkedFragment document) throws DocumentError {
+    public LinkedFragmentAdapter resolve(String id, Collection<String> types, StringValueSelector stringSelector) {
         // TODO Auto-generated method stub
         return null;
     }
+
 }

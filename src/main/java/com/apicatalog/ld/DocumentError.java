@@ -4,10 +4,11 @@ import java.util.Arrays;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
+import com.apicatalog.linkedtree.reader.LinkedReaderError;
 
-public class DocumentError extends Throwable {
+public class DocumentError extends LinkedReaderError {
 
-    private static final long serialVersionUID = -7146533158378348477L;
+    private static final long serialVersionUID = 2846822739681323437L;
 
     public enum ErrorType {
         Missing,

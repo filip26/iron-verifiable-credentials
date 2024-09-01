@@ -1,5 +1,7 @@
 package com.apicatalog.multikey;
 
+import java.net.URI;
+import java.util.Collection;
 import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
@@ -13,6 +15,8 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
+import com.apicatalog.linkedtree.selector.StringValueSelector;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
@@ -49,6 +53,14 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         /* implement a custom validation */
     }
 
+    @Override
+    public LinkedFragmentAdapter resolve(String id, Collection<String> types, StringValueSelector stringSelector) {
+        if (types.contains(MultiKey.TYPE.toString())) {
+            return () ->  MultiKey::of;
+        }
+        return null;
+    }
+    
     public VerificationMethod read(LinkedFragment document) throws DocumentError {
         Objects.requireNonNull(document);
 
@@ -126,12 +138,12 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
 
         if (value instanceof MultiKey) {
             MultiKey multikey = (MultiKey) value;
-            if (multikey.getExpiration() != null) {
-                builder.set(EXPIRATION).xsdDateTime(multikey.getExpiration());
+            if (multikey.expiration() != null) {
+                builder.set(EXPIRATION).xsdDateTime(multikey.expiration());
                 embedded = true;
             }
-            if (multikey.getRevoked() != null) {
-                builder.set(REVOKED).xsdDateTime(multikey.getRevoked());
+            if (multikey.revoked() != null) {
+                builder.set(REVOKED).xsdDateTime(multikey.revoked());
                 embedded = true;
             }
         }

@@ -3,8 +3,8 @@ package com.apicatalog.vcdi;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.adapter.LinkedFragmentReader;
 import com.apicatalog.linkedtree.adapter.LinkedLiteralAdapter;
+import com.apicatalog.linkedtree.reader.LinkedFragmentReader;
 import com.apicatalog.vc.proof.ProofAdapter;
 
 public record DataIntegrityProofAdapter(
@@ -14,12 +14,13 @@ public record DataIntegrityProofAdapter(
     @Override
     public LinkedFragmentReader reader() {
         return (id, types, properties, rootSupplier) -> {
-            try {
+//            try {
                 return DataIntegrityProof.of(id, types, properties, rootSupplier, suite);
-            } catch (DocumentError e) {
-                //FIXME
-                throw new IllegalArgumentException(e);
-            }
+//            } catch (DocumentError e) {
+//                //FIXME
+//                e.printStackTrace();
+//                throw new IllegalArgumentException(e);
+//            }
         };
     }
 

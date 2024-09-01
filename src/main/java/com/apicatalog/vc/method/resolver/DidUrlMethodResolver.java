@@ -51,8 +51,8 @@ public class DidUrlMethodResolver implements MethodResolver {
 
     public static final MultiKey from(DidVerificationMethod did, final MulticodecDecoder codecs) {
         final MultiKey multikey = new MultiKey();
-        multikey.setId(did.id().toUri());
-        multikey.setController(did.controller().toUri());
+        multikey.id(did.id().toUri());
+        multikey.controller(did.controller().toUri());
         
         //TODO improve
         final Multicodec codec = codecs.getCodec(did.publicKey()).orElseThrow(IllegalArgumentException::new);
@@ -61,8 +61,8 @@ public class DidUrlMethodResolver implements MethodResolver {
             throw new IllegalArgumentException("Unsupported key encoding [" + did + "].");
         }
 
-        multikey.setAlgorithm(MultiKeyAdapter.getAlgorithmName(codec));
-        multikey.setPublicKey(codec.decode(did.publicKey()));
+        multikey.algorithm(MultiKeyAdapter.getAlgorithmName(codec));
+        multikey.publicKey(codec.decode(did.publicKey()));
         return multikey;
     }
 }

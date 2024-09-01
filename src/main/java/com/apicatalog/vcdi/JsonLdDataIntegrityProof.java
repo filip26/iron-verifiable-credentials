@@ -17,6 +17,8 @@ import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
+import com.apicatalog.linkedtree.selector.StringValueSelector;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.Proof;
@@ -211,7 +213,7 @@ public class JsonLdDataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public VerificationMethod read(LinkedFragment document) throws DocumentError {
+    public LinkedFragmentAdapter resolve(String id, Collection<String> types, StringValueSelector stringSelector) {
         // TODO Auto-generated method stub
         return null;
     }  

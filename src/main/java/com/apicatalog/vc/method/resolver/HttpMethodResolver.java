@@ -3,17 +3,16 @@ package com.apicatalog.vc.method.resolver;
 import java.net.URI;
 
 import com.apicatalog.jsonld.JsonLd;
-import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
-import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonArray;
-import jakarta.json.JsonValue;
 
 public class HttpMethodResolver implements MethodResolver {
 
@@ -27,14 +26,19 @@ public class HttpMethodResolver implements MethodResolver {
                     .context(proof.methodProcessor().context()) // an optional expansion context
                     .get();
 
-            for (final JsonValue method : document) {
-                if (JsonUtils.isObject(method)) {
-//FIXME                    return proof.methodProcessor().read(method.asJsonObject());
-                }
+            final JsonLdTreeReader reader = JsonLdTreeReader
+                    .with(proof.methodProcessor());
+
+            final Linkable tree = reader.readExpanded(document).cast();
+
+            if (tree instanceof VerificationMethod method) {
+                return method;
             }
 
-        } catch (JsonLdError e) {
-            e.printStackTrace();
+        } catch (DocumentError e) {
+            throw e;
+
+        } catch (Exception e) {
             throw new DocumentError(e, ErrorType.Invalid, "ProofVerificationMethod");
         }
 

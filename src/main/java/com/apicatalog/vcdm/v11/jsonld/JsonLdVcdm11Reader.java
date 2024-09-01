@@ -115,45 +115,54 @@ public class JsonLdVcdm11Reader implements JsonLdVerifiableReader {
         // get a reader
         final JsonLdTreeReader reader = readerBuilder.build();
 
-        // get a verifiable
-        final Verifiable verifiable = reader.readExpanded(expanded)
-                .single(Verifiable.class);
+        try {
+            // get a verifiable
+            final Verifiable verifiable = reader.readExpanded(expanded)
+                    .single(Verifiable.class);
 
-        var debug = new StringWriter();
-        
-        new NodeDebugWriter(new PrintWriter(debug)).print(verifiable.ld());
-        
-        System.out.println(debug);
-        // FIXMe reader.read(version, expanded);
+            var debug = new StringWriter();
 
-        if (verifiable.isCredential()) {
-//
-//            // data integrity and metadata validation
-////TODO            validate(verifiable.asCredential());
-//
-////FIXME            verifiable.proofs(read(context, expanded, loader));
-//
-            return verifiable;
-//
-        } else if (verifiable.isPresentation()) {
-//
-//            // verify presentation proofs
-//            verifiable.proofs(readProofs(context, expanded, loader));
-//
-//            final Collection<Credential> credentials = new ArrayList<>();
-//
-////            for (final JsonObject presentedCredentials : VerifiableReader.getCredentials(expanded)) {
-////
-////                if (!VerifiableReader.isCredential(presentedCredentials)) {
-////                    throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS, Term.TYPE);
-////                }
-//////var params = new HashMap<>();
-//////FIXME                credentials.add(verifyExpanded(version, context, presentedCredentials, params, loader).asCredential());
-////            }
-//
-//            ((JsonLdPresentation)verifiable.asPresentation()).credentials(credentials);
-//
-            return verifiable;
+            new NodeDebugWriter(new PrintWriter(debug)).print(verifiable.ld());
+
+            System.out.println(debug);
+            // FIXMe reader.read(version, expanded);
+
+            if (verifiable.isCredential()) {
+                //
+                // // data integrity and metadata validation
+                //// TODO validate(verifiable.asCredential());
+                //
+                //// FIXME verifiable.proofs(read(context, expanded, loader));
+                //
+                return verifiable;
+                //
+            } else if (verifiable.isPresentation()) {
+                //
+                // // verify presentation proofs
+                // verifiable.proofs(readProofs(context, expanded, loader));
+                //
+                // final Collection<Credential> credentials = new ArrayList<>();
+                //
+                //// for (final JsonObject presentedCredentials :
+                // VerifiableReader.getCredentials(expanded)) {
+                ////
+                //// if (!VerifiableReader.isCredential(presentedCredentials)) {
+                //// throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS,
+                // Term.TYPE);
+                //// }
+                ////// var params = new HashMap<>();
+                ////// FIXME credentials.add(verifyExpanded(version, context,
+                // presentedCredentials, params, loader).asCredential());
+                //// }
+                //
+                // ((JsonLdPresentation)verifiable.asPresentation()).credentials(credentials);
+                //
+                return verifiable;
+            }
+        } catch (DocumentError e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DocumentError(ErrorType.Invalid, "document");
         }
         throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }
