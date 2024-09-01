@@ -7,24 +7,18 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.Term;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.node.LdNode;
-import com.apicatalog.ld.node.LdScalar;
+import com.apicatalog.ld.Term;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.linkedtree.Link;
-import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
-import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
-import com.apicatalog.vcdi.DataIntegrityVocab;
 
 public class MultiKey implements KeyPair {
 
@@ -59,7 +53,6 @@ public class MultiKey implements KeyPair {
         multikey.controller = selector.id(MultiKeyAdapter.CONTROLLER);
 
         var x = selector.single(MultiKeyAdapter.PUBLIC_KEY, ByteArrayValue.class);
-
         multikey.publicKey = getKey(MultiKeyAdapter.PUBLIC_KEY, x.byteArrayValue(), multikey, decoder);
 
 //            multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);

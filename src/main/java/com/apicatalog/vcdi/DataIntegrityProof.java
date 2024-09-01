@@ -19,6 +19,7 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
@@ -60,7 +61,7 @@ public class DataIntegrityProof implements Proof {
 
     protected VerificationMethod method;
     protected ProofValue value;
-    
+
     protected LinkedFragment fragment;
 
     protected DataIntegrityProof(
@@ -82,12 +83,12 @@ public class DataIntegrityProof implements Proof {
         var proofValueLiteral = selector.single(DataIntegrityVocab.PROOF_VALUE, MultibaseLiteral.class);
 
         ProofValue proofValue = null;
-        
+
         if (proofValueLiteral != null) {
-            //TODO document loader???
+            // TODO document loader???
             proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), null);
         }
-        
+
         var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
 
         var proof = new DataIntegrityProof(suite, cryptosuite);
@@ -96,6 +97,21 @@ public class DataIntegrityProof implements Proof {
                 DataIntegrityVocab.CREATED,
                 XsdDateTime.class,
                 XsdDateTime::datetime);
+
+        proof.domain = selector.single(
+                DataIntegrityVocab.DOMAIN,
+                LinkedLiteral.class,
+                LinkedLiteral::lexicalValue);
+
+        proof.challenge = selector.single(
+                DataIntegrityVocab.CHALLENGE,
+                LinkedLiteral.class,
+                LinkedLiteral::lexicalValue);
+
+        proof.nonce = selector.single(
+                DataIntegrityVocab.NONCE,
+                LinkedLiteral.class,
+                LinkedLiteral::lexicalValue);
 
         proof.method = selector.single(
                 DataIntegrityVocab.VERIFICATION_METHOD,
@@ -122,6 +138,8 @@ public class DataIntegrityProof implements Proof {
         proof.purpose = selector.id(DataIntegrityVocab.PURPOSE);
 
         proof.value = proofValue;
+        
+        proof.previousProof = selector.id(DataIntegrityVocab.PREVIOUS_PROOF);
 
         proof.fragment = new LinkableObject(id, types, properties, rootSupplier, proof);
 
@@ -162,7 +180,7 @@ public class DataIntegrityProof implements Proof {
             throw new DocumentError(ErrorType.Missing, "ProofValue");
         }
 
-        //TODO
+        // TODO
 //        if (value.toByteArray() != null &&  value.to.length != 32) {
 //            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
 //        }
@@ -171,7 +189,7 @@ public class DataIntegrityProof implements Proof {
             assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
             assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
             assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
-        }        
+        }
     }
 
     /**
@@ -273,13 +291,13 @@ public class DataIntegrityProof implements Proof {
     }
 
     protected JsonObject unsignedCopy() {
-        
+
         NodeDebugWriter.printToStdout(fragment);
-        
-        //TODO better
+
+        // TODO better
         JsonLdTreeWriter writer = new JsonLdTreeWriter();
         JsonObject expanded = writer.writeFragment(fragment);
-        
+
         return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
     }
 
@@ -292,7 +310,7 @@ public class DataIntegrityProof implements Proof {
 
         return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
     }
-    
+
     @Override
     public LinkedNode ld() {
         return fragment;
