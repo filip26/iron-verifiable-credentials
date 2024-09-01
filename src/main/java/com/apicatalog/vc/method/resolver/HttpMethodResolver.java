@@ -8,7 +8,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.vc.proof.Proof;
 
@@ -29,9 +29,12 @@ public class HttpMethodResolver implements MethodResolver {
             final JsonLdTreeReader reader = JsonLdTreeReader
                     .with(proof.methodProcessor());
 
-            final Linkable tree = reader.readExpanded(document).cast();
+            final LinkedTree tree = reader.readExpanded(document);
 
-            if (tree instanceof VerificationMethod method) {
+            if (tree != null
+                    && tree.nodes().size() == 1
+                    && tree.single().isFragment()
+                    && tree.single().asFragment().cast() instanceof VerificationMethod method) {
                 return method;
             }
 

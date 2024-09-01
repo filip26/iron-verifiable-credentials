@@ -89,7 +89,7 @@ public class GenericVcdm11Credential implements Vcdm11Credential {
     }
 
     @Override
-    public Collection<Subject> claims() {
+    public Collection<Subject> subject() {
         // TODO Auto-generated method stub
         return null;
     }

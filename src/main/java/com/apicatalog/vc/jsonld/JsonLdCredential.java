@@ -282,10 +282,4 @@ public class JsonLdCredential extends JsonLdVerifiable implements Credential  {
         // TODO Auto-generated method stub
         return false;
     }
-
-    @Override
-    public Collection<Subject> claims() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

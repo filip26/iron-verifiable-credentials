@@ -17,12 +17,13 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
-import com.apicatalog.ld.node.LdType;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
+import com.apicatalog.linkedtree.jsonld.JsonLdType;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
@@ -47,11 +48,15 @@ public class Verifier extends AbstractProcessor<Verifier> {
     protected StatusVerifier statusVerifier;
     
     protected JsonLdVerifiableAdapter verifiableAdapter;
+
+    //TODO remove
+    protected JsonLdTreeWriter treeWriter;
     
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
         this.verifiableAdapter = new JsonLdVcdmAdapter(suites, base);
+        this.treeWriter = new JsonLdTreeWriter();
         this.statusVerifier = null;
     }
 
@@ -180,14 +185,13 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
     protected Verifiable verify(final JsonObject document, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
 
-
         // extract context
         final Collection<String> context = JsonLdContext.strings(document);
 
         final JsonLdVerifiableReader reader = verifiableAdapter.reader(context);
 
         if (reader == null) {
-//            LOGGER.log(Level.INFO, "An unknown document model {0}", context);
+            //LOGGER.log(Level.INFO, "An unknown document model {0}", context);
             throw new DocumentError(ErrorType.Unknown, "DocumentModel");
         }
         
@@ -199,6 +203,10 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throw new DocumentError(ErrorType.Missing, "Proof");
         }
 
+        // unsigned JSON-LD version - FIXME temporary
+        var unsigned = treeWriter.writeExpanded(verifiable.ld().root()).iterator().next().asJsonObject();
+        System.out.println(unsigned);
+        
         // sort the proofs in the verification order
         final ProofQueue queue = ProofQueue.create(verifiable.proofs());
 
@@ -222,7 +230,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
                 throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
             }
 
-//            proof.verify(context, unsigned, (VerificationKey) verificationMethod);
+            proof.verify(context, unsigned, (VerificationKey) verificationMethod);
 
             proof = queue.pop();
         }
@@ -230,70 +238,70 @@ public class Verifier extends AbstractProcessor<Verifier> {
         return verifiable;
     }
 
-    protected Collection<Proof> verifyProofs(JsonStructure context, JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
-
-        // get proofs - throws an exception if there is no proof, never null nor an
-        // empty collection
-        final Collection<JsonObject> expandedProofs = EmbeddedProof.assertProof(expanded);
-
-        // a data before issuance - no proof attached
-        final JsonObject unsigned = EmbeddedProof.removeProofs(expanded);
-
-        final Collection<Proof> proofs = new ArrayList<>(expandedProofs.size());
-
-        // read attached proofs
-        for (final JsonObject expandedProof : expandedProofs) {
-
-            final Collection<String> proofTypes = LdType.strings(expandedProof);
-
-            if (proofTypes == null || proofTypes.isEmpty()) {
-                throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
-            }
-
-            final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
-
-            if (signatureSuite == null) {
-                throw new VerificationError(Code.UnsupportedCryptoSuite);
-            }
-
-//            final Proof proof = signatureSuite.getProof(expandedProof, loader);
+//    protected Collection<Proof> verifyProofs(JsonStructure context, JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
 //
-//            if (proof == null) {
-//                throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
+//        // get proofs - throws an exception if there is no proof, never null nor an
+//        // empty collection
+//        final Collection<JsonObject> expandedProofs = EmbeddedProof.assertProof(expanded);
+//
+//        // a data before issuance - no proof attached
+//        final JsonObject unsigned = EmbeddedProof.removeProofs(expanded);
+//
+//        final Collection<Proof> proofs = new ArrayList<>(expandedProofs.size());
+//
+//        // read attached proofs
+//        for (final JsonObject expandedProof : expandedProofs) {
+//
+//            final Collection<String> proofTypes = JsonLdType.strings(expandedProof);
+//
+//            if (proofTypes == null || proofTypes.isEmpty()) {
+//                throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
 //            }
-//            proofs.add(proof);
-        }
-
-        // sort the proofs in the verification order
-        final ProofQueue queue = ProofQueue.create(proofs);
-
-        // verify the proofs' signatures
-        Proof proof = queue.pop();
-
-        while (proof != null) {
-
-            proof.validate(params);
-
-            final ProofValue proofValue = proof.signature();
-
-            if (proofValue == null) {
-                throw new DocumentError(ErrorType.Missing, "ProofValue");
-            }
-
-            VerificationMethod verificationMethod = getMethod(proof, loader)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD));
-
-            if (!(verificationMethod instanceof VerificationKey)) {
-                throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
-            }
-
-//            proof.verify(context, unsigned, (VerificationKey) verificationMethod);
-
-            proof = queue.pop();
-        }
-        // all good
-        return proofs;
-    }
+//
+//            final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
+//
+//            if (signatureSuite == null) {
+//                throw new VerificationError(Code.UnsupportedCryptoSuite);
+//            }
+//
+////            final Proof proof = signatureSuite.getProof(expandedProof, loader);
+////
+////            if (proof == null) {
+////                throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
+////            }
+////            proofs.add(proof);
+//        }
+//
+//        // sort the proofs in the verification order
+//        final ProofQueue queue = ProofQueue.create(proofs);
+//
+//        // verify the proofs' signatures
+//        Proof proof = queue.pop();
+//
+//        while (proof != null) {
+//
+//            proof.validate(params);
+//
+//            final ProofValue proofValue = proof.signature();
+//
+//            if (proofValue == null) {
+//                throw new DocumentError(ErrorType.Missing, "ProofValue");
+//            }
+//
+//            VerificationMethod verificationMethod = getMethod(proof, loader)
+//                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD));
+//
+//            if (!(verificationMethod instanceof VerificationKey)) {
+//                throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
+//            }
+//
+////            proof.verify(context, unsigned, (VerificationKey) verificationMethod);
+//
+//            proof = queue.pop();
+//        }
+//        // all good
+//        return proofs;
+//    }
 
     final void validate(final Credential credential) throws DocumentError, VerificationError {
 

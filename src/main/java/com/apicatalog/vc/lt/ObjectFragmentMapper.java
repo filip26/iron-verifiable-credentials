@@ -1,13 +1,15 @@
-package com.apicatalog.vc.reader;
+package com.apicatalog.vc.lt;
 
 import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
+import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedNode;
@@ -49,17 +51,36 @@ public record ObjectFragmentMapper(
             throw new DocumentError(e, ErrorType.Invalid, term);
         }
     }
-    
+
+    public URI id(Link link) throws DocumentError {
+        if (link == null) {
+            return null;
+        }
+        try {
+            final String uri = link.uri();
+            if (uri != null) {
+                return URI.create(uri);
+            }
+        } catch (IllegalArgumentException e) {
+
+        }
+        throw new DocumentError(ErrorType.Invalid, Keywords.ID);
+    }
+
     public URI id(Term term) throws DocumentError {
-        return single(term, node -> {
-           if (node.ld().isFragment()) {
-               final String uri = node.ld().asFragment().id().uri();
-               if (uri != null) {
-                   return URI.create(uri);
-               }
-           }
-           return null;
-        });
+        try {
+            return single(term, node -> {
+                if (node.ld().isFragment()) {
+                    final String uri = node.ld().asFragment().id().uri();
+                    if (uri != null) {
+                        return URI.create(uri);
+                    }
+                }
+                return null;
+            });
+        } catch (IllegalArgumentException e) {
+            throw new DocumentError(ErrorType.Invalid, term);
+        }
     }
 
     public <R> R single(Term term, Function<Linkable, R> mapper) throws DocumentError {
@@ -96,7 +117,7 @@ public record ObjectFragmentMapper(
             }
 
             return mapper.apply(value);
-            
+
         } catch (DocumentError e) {
             throw e;
         } catch (Exception e) {

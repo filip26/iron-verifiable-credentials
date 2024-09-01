@@ -120,11 +120,11 @@ public class JsonLdVcdm11Reader implements JsonLdVerifiableReader {
             final Verifiable verifiable = reader.readExpanded(expanded)
                     .single(Verifiable.class);
 
-            var debug = new StringWriter();
-
-            new NodeDebugWriter(new PrintWriter(debug)).print(verifiable.ld());
-
-            System.out.println(debug);
+//            var debug = new StringWriter();
+//
+//            new NodeDebugWriter(new PrintWriter(debug)).print(verifiable.ld());
+//
+//            System.out.println(debug);
             // FIXMe reader.read(version, expanded);
 
             if (verifiable.isCredential()) {
@@ -162,7 +162,7 @@ public class JsonLdVcdm11Reader implements JsonLdVerifiableReader {
         } catch (DocumentError e) {
             throw e;
         } catch (Exception e) {
-            throw new DocumentError(ErrorType.Invalid, "document");
+            throw new DocumentError(e, ErrorType.Invalid, "document");
         }
         throw new DocumentError(ErrorType.Unknown, Term.TYPE);
     }

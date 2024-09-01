@@ -1,6 +1,7 @@
 package com.apicatalog.vc.proof;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
@@ -53,13 +54,13 @@ public record UnknownProof(LinkedFragment fragment) implements Proof {
     }
 
     @Override
-    public void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError {
-        throw new VerificationError(Code.UnsupportedCryptoSuite);
-    }
-
-    @Override
     public MethodAdapter methodProcessor() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void verify(Collection<String> context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError {
+        throw new VerificationError(Code.UnsupportedCryptoSuite);   
     }
 }

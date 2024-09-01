@@ -6,13 +6,25 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.Term;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.node.LdNode;
+import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.vc.lt.MultibaseLiteral;
+import com.apicatalog.vc.lt.ObjectFragmentMapper;
+import com.apicatalog.vcdi.DataIntegrityVocab;
 
 public class MultiKey implements KeyPair {
 
@@ -33,21 +45,24 @@ public class MultiKey implements KeyPair {
             Link id,
             Collection<String> types,
             Map<String, LinkedContainer> properties,
-            Supplier<LinkedTree> rootSupplier) {
+            Supplier<LinkedTree> rootSupplier,
+            MulticodecDecoder decoder
+            ) throws DocumentError {
 
         // TODO
 
+        final ObjectFragmentMapper selector = new ObjectFragmentMapper(properties);
+
         final MultiKey multikey = new MultiKey();
 
-//        multikey.id = URI.create(id);
-//        multikey.controller = prop 
-//
-//        multikey.id = node.id();
-//        multikey.controller = node.node(CONTROLLER).id();
-//
-//        if (node.type().hasType(MultiKey.TYPE.toString())) {
-//
-//            multikey.publicKey = getKey(node, PUBLIC_KEY, multikey);
+        multikey.id = selector.id(id);
+        multikey.controller = selector.id(MultiKeyAdapter.CONTROLLER);
+
+        var x = selector.single(MultiKeyAdapter.PUBLIC_KEY, ByteArrayValue.class);
+        System.out.println(x);
+
+        multikey.publicKey = getKey(MultiKeyAdapter.PUBLIC_KEY, x.byteArrayValue(), multikey, decoder);
+        System.out.println(multikey.publicKey);
 //            multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
 //
 //            multikey.expiration = node.scalar(EXPIRATION).xsdDateTime();
@@ -128,4 +143,31 @@ public class MultiKey implements KeyPair {
         this.expiration = expiration;
     }
 
+    protected static final byte[] getKey(Term term, final byte[] decodedKey, MultiKey multikey, MulticodecDecoder decoder) throws DocumentError {
+
+        if (decodedKey == null || decodedKey.length == 0) {
+            return null;
+        }
+        
+        final Multicodec codec = decoder.getCodec(decodedKey).orElseThrow(() -> new DocumentError(ErrorType.Invalid, term.name() + "Codec"));
+
+        if (multikey.algorithm == null) {
+            multikey.algorithm = getAlgorithmName(codec);
+
+        } else if (!multikey.algorithm.equals(getAlgorithmName(codec))) {
+            throw new DocumentError(ErrorType.Invalid, "KeyPairCodec");
+        }
+
+        return codec.decode(decodedKey);
+    }
+    
+    public static final String getAlgorithmName(Multicodec codec) {
+        if (codec.name().endsWith("-priv")) {
+            return codec.name().substring(0, codec.name().length() - "-priv".length()).toUpperCase();
+        }
+        if (codec.name().endsWith("-pub")) {
+            return codec.name().substring(0, codec.name().length() - "-pub".length()).toUpperCase();
+        }
+        return codec.name().toUpperCase();
+    }
 }

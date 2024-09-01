@@ -19,17 +19,17 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
-import com.apicatalog.linkedtree.selector.StringValueSelector;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
+import com.apicatalog.vc.lt.MultibaseLiteral;
+import com.apicatalog.vc.lt.ObjectFragmentMapper;
 import com.apicatalog.vc.method.GenericVerificationMethod;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.reader.ObjectFragmentMapper;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -41,7 +41,7 @@ import jakarta.json.JsonStructure;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof implements Proof, MethodAdapter {
+public class DataIntegrityProof implements Proof {
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
@@ -75,10 +75,15 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
 
         var selector = new ObjectFragmentMapper(properties);
 
-        var proofValue = selector.single(
-                DataIntegrityVocab.PROOF_VALUE,
-                ProofValue.class);
+        var proofValueLiteral = selector.single(DataIntegrityVocab.PROOF_VALUE, MultibaseLiteral.class);
 
+        ProofValue proofValue = null;
+        
+        if (proofValueLiteral != null) {
+            //TODO document loader???
+            proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), null);
+        }
+        
         var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
 
         var proof = new DataIntegrityProof(suite, cryptosuite);
@@ -118,7 +123,7 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError {
+    public void verify(Collection<String> context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError {
 
         Objects.requireNonNull(value);
         Objects.requireNonNull(data);
@@ -151,11 +156,16 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
             throw new DocumentError(ErrorType.Missing, "ProofValue");
         }
 
+        //TODO
+//        if (value.toByteArray() != null &&  value.to.length != 32) {
+//            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
+//        }
+
         if (params != null) {
             assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
             assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
             assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
-        }
+        }        
     }
 
     /**
@@ -231,7 +241,7 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
 
     @Override
     public MethodAdapter methodProcessor() {
-        return this;
+        return suite.methodAdapter;
     }
 
 //    @Override
@@ -271,11 +281,4 @@ public class DataIntegrityProof implements Proof, MethodAdapter {
 
         return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
     }
-
-    @Override
-    public LinkedFragmentAdapter resolve(String id, Collection<String> types, StringValueSelector stringSelector) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

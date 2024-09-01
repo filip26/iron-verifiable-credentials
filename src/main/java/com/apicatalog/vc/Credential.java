@@ -30,7 +30,7 @@ public interface Credential extends Verifiable {
 
     Collection<Status> status();
 
-    Collection<Subject> claims();
+    Collection<Subject> subject();
 
     @Override
     default void validate() throws DocumentError {

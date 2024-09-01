@@ -15,8 +15,6 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
 import com.apicatalog.linkedtree.selector.StringValueSelector;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -60,7 +58,7 @@ public class JsonLdDataIntegrityProof implements Proof, MethodAdapter {
     }
 
     @Override
-    public void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError {
+    public void verify(Collection<String> context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError {
 
         Objects.requireNonNull(value);
         Objects.requireNonNull(data);

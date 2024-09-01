@@ -1,5 +1,6 @@
 package com.apicatalog.vc.solid;
 
+import java.util.Collection;
 import java.util.Objects;
 
 import com.apicatalog.ld.signature.CryptoSuite;
@@ -9,24 +10,21 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.vc.proof.ProofValue;
 
 import jakarta.json.JsonObject;
-import jakarta.json.JsonStructure;
 
 /**
  * Represent a proof value used together with full disclosure suites. i.e.
  * suites do not allowing a selective disclosure.
  */
-public class SolidProofValue implements ProofValue {
+public record SolidProofValue(
+        byte[] toByteArray) implements ProofValue {
 
-    protected final byte[] value;
-
-    public SolidProofValue(byte[] value) {
-        this.value = value;
+    public SolidProofValue {
+        Objects.requireNonNull(toByteArray);
     }
 
     @Override
-    public void verify(CryptoSuite cryptoSuite, JsonStructure context, JsonObject data, JsonObject unsignedProof, byte[] publicKey) throws VerificationError {
+    public void verify(CryptoSuite cryptoSuite, Collection<String> context, JsonObject data, JsonObject unsignedProof, byte[] publicKey) throws VerificationError {
 
-        Objects.requireNonNull(value);
         Objects.requireNonNull(data);
         Objects.requireNonNull(publicKey);
 
@@ -41,11 +39,6 @@ public class SolidProofValue implements ProofValue {
                 data,
                 unsignedProof,
                 publicKey,
-                value);
-    }
-
-    @Override
-    public byte[] toByteArray() {
-        return value;
+                toByteArray);
     }
 }

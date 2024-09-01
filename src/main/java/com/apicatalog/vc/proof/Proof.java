@@ -73,7 +73,7 @@ public interface Proof extends Linkable {
      */
     void validate(Map<String, Object> params) throws DocumentError;
 
-    void verify(JsonStructure context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError;
+    void verify(Collection<String> context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError;
 
     default JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");

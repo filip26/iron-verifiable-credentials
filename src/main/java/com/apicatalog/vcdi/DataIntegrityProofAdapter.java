@@ -2,7 +2,6 @@ package com.apicatalog.vcdi;
 
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.adapter.LinkedLiteralAdapter;
 import com.apicatalog.linkedtree.reader.LinkedFragmentReader;
 import com.apicatalog.vc.proof.ProofAdapter;
@@ -13,15 +12,7 @@ public record DataIntegrityProofAdapter(
 
     @Override
     public LinkedFragmentReader reader() {
-        return (id, types, properties, rootSupplier) -> {
-//            try {
-                return DataIntegrityProof.of(id, types, properties, rootSupplier, suite);
-//            } catch (DocumentError e) {
-//                //FIXME
-//                e.printStackTrace();
-//                throw new IllegalArgumentException(e);
-//            }
-        };
+        return (id, types, properties, rootSupplier) -> DataIntegrityProof.of(id, types, properties, rootSupplier, suite);
     }
 
     @Override

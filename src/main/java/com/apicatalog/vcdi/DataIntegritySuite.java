@@ -12,8 +12,8 @@ import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.LinkedLiteralAdapter;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.proof.MultibaseProofValue;
 import com.apicatalog.vc.proof.ProofAdapter;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -40,16 +40,16 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     }
 
     protected static LinkedLiteralAdapter getProofValueAdapter(Multibase proofValueBase) {
+        //TODO multibase adapter
         return new LinkedLiteralAdapter() {
-            
             @Override
             public LinkedLiteral read(String value, Supplier<LinkedTree> rootSupplier) {
-                return new MultibaseProofValue(datatype(), value, rootSupplier, proofValueBase.decode(value));
+                return new MultibaseLiteral(datatype(), value, rootSupplier, proofValueBase.decode(value));
             }
             
             @Override
             public String datatype() {
-                return "https://w3id.org/security#multibase";
+                return MultibaseLiteral.TYPE;
             }
         };
     }

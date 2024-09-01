@@ -1,4 +1,4 @@
-package com.apicatalog.vcdm.v11.jsonld;
+package com.apicatalog.vcdm.v20;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
@@ -21,10 +22,13 @@ import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Credential;
+import com.apicatalog.vcdm.v11.jsonld.JsonLdVcdm11Verifiable;
 
-public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vcdm11Credential {
+import jakarta.json.JsonValue;
 
-    private static final Logger LOGGER = Logger.getLogger(JsonLdVcdm11Credential.class.getName());
+public class JsonLdVcdm20Credential extends JsonLdVcdm11Verifiable implements Vcdm11Credential {
+
+    private static final Logger LOGGER = Logger.getLogger(JsonLdVcdm20Credential.class.getName());
 
     /** issuanceDate */
     protected Instant issuance;
@@ -46,7 +50,7 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
             final Map<String, LinkedContainer> properties,
             final Supplier<LinkedTree> rootSupplier) throws DocumentError {
 
-        var credential = new JsonLdVcdm11Credential();
+        var credential = new JsonLdVcdm20Credential();
         var fragment = new LinkableObject(id, types, properties, rootSupplier, credential);
 
         credential.fragment = fragment;
@@ -58,7 +62,7 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
         return fragment;
     }
 
-    protected static void setup(final Link id, final Collection<String> types, JsonLdVcdm11Credential credential, final ObjectFragmentMapper selector) throws DocumentError {
+    protected static void setup(final Link id, final Collection<String> types, JsonLdVcdm20Credential credential, final ObjectFragmentMapper selector) throws DocumentError {
         // @id
         credential.id = selector.id(id);
 
@@ -97,11 +101,6 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
         return fragment;
     }
 
-    @Override
-    public Collection<String> type() {
-        return fragment.type();
-    }
-
     /**
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
      *      Date - Note</a>
@@ -114,10 +113,10 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
         return issuance;
     }
 
-//    public JsonLdVcdm11Credential issuanceDate(Instant issuance) {
-//        this.issuance = issuance;
-//        return this;
-//    }
+    public JsonLdVcdm20Credential issuanceDate(Instant issuance) {
+        this.issuance = issuance;
+        return this;
+    }
 
     /**
      * @see <a href=
@@ -156,19 +155,21 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
      * 
      * @return
      */
-    @Override
     public Collection<Subject> subject() {
-        // TODO Auto-generated method stub
-        return null;
+        return subject;
     }
 
-//    public void subject(Collection<Subject> subject) {
-//        this.subject = subject;
+//    public void type(Collection<String> type) {
+//        this.type = type;
 //    }
-//
-//    public void status(Collection<Status> status) {
-//        this.status = status;
-//    }
+
+    public void subject(Collection<Subject> subject) {
+        this.subject = subject;
+    }
+
+    public void status(Collection<Status> status) {
+        this.status = status;
+    }
 
 //    public JsonObject expand() {
 //        
@@ -197,5 +198,57 @@ public class JsonLdVcdm11Credential extends JsonLdVcdm11Verifiable implements Vc
 //    protected Predicate<String> termsFilter() {
 //        return super.termsFilter().and(term -> !TERMS.contains(term));
 //    }
+//
+//    public static JsonLdVcdm11Credential of(VcdmVersion version, JsonObject document) throws DocumentError {
+//        if (document == null) {
+//            throw new IllegalArgumentException("The 'document' parameter must not be null.");
+//        }
+//
+//        final JsonLdVcdm11Credential credential = JsonLdVcdm11Credential.of(version, document);
+//
+////        final LdNode node = LdNode.of(document);
+//
+//        // @id
+////        credential.id(node.id());
+//
+//        // @type
+////        credential.type(node.type().strings());
+//
+//        // subject
+////        credential.subject(readCollection(version, document.get(VcVocab.SUBJECT.uri()), subjectReader));
+//
+//        // issuer
+////        credential.issuer(readObject(version, document.get(VcVocab.ISSUER.uri()), issuerReader));
+//
+//        // status
+////        credential.status(readCollection(version, document.get(VcVocab.STATUS.uri()), statusReader));
+//
+//        // issuance date
+////        credential.issuanceDate(node.scalar(VcVocab.ISSUANCE_DATE).xsdDateTime());
+//
+//        // expiration date
+////        credential.expiration(node.scalar(VcVocab.EXPIRATION_DATE).xsdDateTime());
+//
+//        // validFrom - optional
+////        credential.validFrom(node.scalar(VcVocab.VALID_FROM).xsdDateTime());
+//
+//        // validUntil - optional
+////        credential.validUntil(node.scalar(VcVocab.VALID_UNTIL).xsdDateTime());
+//
+//        return credential;
+//    }
+
+    public static boolean isCredential(final JsonValue document) {
+        if (document == null) {
+            throw new IllegalArgumentException("The 'document' parameter must not be null.");
+        }
+        return LdNode.isTypeOf(VcdmVocab.CREDENTIAL_TYPE.uri(), document);
+    }
+
+    @Override
+    public Collection<String> type() {
+        return fragment.type();
+    }
+
 
 }

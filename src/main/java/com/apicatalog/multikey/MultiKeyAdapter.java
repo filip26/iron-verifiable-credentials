@@ -1,8 +1,9 @@
 package com.apicatalog.multikey;
 
-import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -13,15 +14,22 @@ import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
+import com.apicatalog.linkedtree.adapter.LinkedLiteralAdapter;
+import com.apicatalog.linkedtree.reader.LinkedFragmentReader;
 import com.apicatalog.linkedtree.selector.StringValueSelector;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vcdm.VcdmVocab;
+
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
 public abstract class MultiKeyAdapter implements MethodAdapter {
 
@@ -56,17 +64,39 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
     @Override
     public LinkedFragmentAdapter resolve(String id, Collection<String> types, StringValueSelector stringSelector) {
         if (types.contains(MultiKey.TYPE.toString())) {
-            return () ->  MultiKey::of;
+            return new LinkedFragmentAdapter() {
+
+                @Override
+                public LinkedFragmentReader reader() {
+                    return ((id, types, properties, rootSupplier) -> MultiKey.of(id, types, properties, rootSupplier, decoder));
+                }
+
+                @Override
+                public Collection<LinkedLiteralAdapter> literalAdapters() {
+                    return List.of(new LinkedLiteralAdapter() {
+                        @Override
+                        public LinkedLiteral read(String value, Supplier<LinkedTree> rootSupplier) {
+                            return new MultibaseLiteral(datatype(), value, rootSupplier, Multibase.BASE_58_BTC.decode(value));
+                        }
+
+                        @Override
+                        public String datatype() {
+                            return MultibaseLiteral.TYPE;
+                        }
+                    });
+                }
+
+            };
         }
         return null;
     }
-    
-    public VerificationMethod read(LinkedFragment document) throws DocumentError {
-        Objects.requireNonNull(document);
 
-//        final LdNode node = LdNode.of(document.asObject());
-
-        final MultiKey multikey = new MultiKey();
+//    public VerificationMethod read(JsonObject document) throws DocumentError {
+//        Objects.requireNonNull(document);
+//
+//        final LdNode node = LdNode.of(document);
+//
+//        final MultiKey multikey = new MultiKey();
 //
 //        multikey.id = node.id();
 //        multikey.controller = node.node(CONTROLLER).id();
@@ -85,8 +115,8 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
 //
 //        validate(multikey);
 
-        return multikey;
-    }
+//        return multikey;
+//    }
 
     protected final byte[] getKey(final LdNode node, final Term term, final MultiKey multikey) throws DocumentError {
 
@@ -180,7 +210,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         }
 
 //        return builder.build();
-        //FIXME
+        // FIXME
         return null;
     }
 

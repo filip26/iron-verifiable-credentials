@@ -14,7 +14,7 @@ import jakarta.json.JsonStructure;
 public interface BaseProofValue extends ProofValue {
 
     @Override
-    default void verify(CryptoSuite crypto, JsonStructure context, JsonObject data, JsonObject unsignedProof, byte[] publicKey) throws VerificationError, DocumentError {
+    default void verify(CryptoSuite crypto, Collection<String> context, JsonObject data, JsonObject unsignedProof, byte[] publicKey) throws VerificationError, DocumentError {
         throw new VerificationError(Code.InvalidSignature);
     }
 
