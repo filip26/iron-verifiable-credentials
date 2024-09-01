@@ -19,9 +19,10 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
@@ -58,6 +59,8 @@ public class DataIntegrityProof implements Proof {
 
     protected VerificationMethod method;
     protected ProofValue value;
+    
+    protected LinkedFragment fragment;
 
     protected DataIntegrityProof(
             DataIntegritySuite suite,
@@ -119,7 +122,9 @@ public class DataIntegrityProof implements Proof {
 
         proof.value = proofValue;
 
-        return new LinkableObject(id, types, properties, rootSupplier, proof);
+        proof.fragment = new LinkableObject(id, types, properties, rootSupplier, proof);
+
+        return proof.fragment;
     }
 
     @Override
@@ -267,9 +272,14 @@ public class DataIntegrityProof implements Proof {
     }
 
     protected JsonObject unsignedCopy() {
-//        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
-        // FIXME
-        return Json.createObjectBuilder().build();
+        
+        NodeDebugWriter.printToStdout(fragment);
+        
+        //TODO better
+        JsonLdTreeWriter writer = new JsonLdTreeWriter();
+        JsonObject expanded = writer.writeFragment(fragment);
+        
+        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
     }
 
     @Override

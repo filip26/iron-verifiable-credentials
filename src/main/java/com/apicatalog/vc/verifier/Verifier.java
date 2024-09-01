@@ -203,8 +203,11 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throw new DocumentError(ErrorType.Missing, "Proof");
         }
 
-        // unsigned JSON-LD version - FIXME temporary
-        var unsigned = treeWriter.writeExpanded(verifiable.ld().root()).iterator().next().asJsonObject();
+        // unsigned JSON-LD version - FIXME temporary, remove
+        var signed = treeWriter.writeExpanded(verifiable.ld().root()).iterator().next().asJsonObject();
+        System.out.println(signed);
+        // a data before issuance - no proof attached
+        final JsonObject unsigned = EmbeddedProof.removeProofs(signed);
         System.out.println(unsigned);
         
         // sort the proofs in the verification order
