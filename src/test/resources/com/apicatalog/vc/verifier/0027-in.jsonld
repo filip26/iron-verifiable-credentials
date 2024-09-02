@@ -8,6 +8,7 @@
   "type": "VerifiableCredential",
   "issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
   "expirationDate": "2022-05-31T19:21:25Z",
+  "issuanceDate": "2020-05-31T19:21:25Z",
   "credentialSubject": "did:example:ebfeb1f712ebc6f1c276e12ec21",
   "proof": {
     "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",

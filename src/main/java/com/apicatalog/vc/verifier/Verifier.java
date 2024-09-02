@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,7 +32,6 @@ import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.DataIntegrityVocab;
@@ -42,13 +43,15 @@ import jakarta.json.JsonStructure;
 
 public class Verifier extends AbstractProcessor<Verifier> {
 
+    private static final Logger LOGGER = Logger.getLogger(Verifier.class.getName());
+
     protected StatusVerifier statusVerifier;
-    
+
     protected final JsonLdVerifiableAdapter verifiableAdapter;
 
-    //TODO remove
+    // TODO remove
     protected final JsonLdTreeWriter treeWriter;
-    
+
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
@@ -73,24 +76,24 @@ public class Verifier extends AbstractProcessor<Verifier> {
         return this;
     }
 
-    /**
-     * Verifies VC/VP document. Throws VerificationError if the document is not
-     * valid or cannot be verified.
-     *
-     * @param verifiable
-     * @param parameters custom parameters, e.g. challenge token
-     * @return {@link Verifiable} object representing the verified credentials or a
-     *         presentation
-     * 
-     * @throws VerificationError
-     * @throws DocumentError
-     */
-    public Verifiable verify(Verifiable verifiable, Parameter<?>... parameters) throws VerificationError, DocumentError {
-        Objects.requireNonNull(verifiable);
-        //FIXME
-        return null;
-    }
-    
+//    /**
+//     * Verifies VC/VP document. Throws VerificationError if the document is not
+//     * valid or cannot be verified.
+//     *
+//     * @param verifiable
+//     * @param parameters custom parameters, e.g. challenge token
+//     * @return {@link Verifiable} object representing the verified credentials or a
+//     *         presentation
+//     * 
+//     * @throws VerificationError
+//     * @throws DocumentError
+//     */
+//    public Verifiable verify(Verifiable verifiable, Parameter<?>... parameters) throws VerificationError, DocumentError {
+//        Objects.requireNonNull(verifiable);
+//        //FIXME
+//        return null;
+//    }
+
     /**
      * Verifies VC/VP document. Throws VerificationError if the document is not
      * valid or cannot be verified.
@@ -184,7 +187,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
         // extract context
         final Collection<String> context;
-            
+
         try {
             context = JsonLdContext.strings(document);
         } catch (IllegalArgumentException e) {
@@ -194,13 +197,22 @@ public class Verifier extends AbstractProcessor<Verifier> {
         final JsonLdVerifiableReader reader = verifiableAdapter.reader(context);
 
         if (reader == null) {
-            //LOGGER.log(Level.INFO, "An unknown document model {0}", context);
+            LOGGER.log(Level.INFO, "An unknown document model {0}", context);
             throw new DocumentError(ErrorType.Unknown, "DocumentModel");
         }
-        
-        Verifiable verifiable = reader.read(context, document, loader);
-        
-        verifiable.validate();
+
+        final Verifiable verifiable = reader.read(context, document, loader);
+
+        if (verifiable == null) {
+            throw new DocumentError(ErrorType.Invalid, "document");
+        }
+
+        // validate data model semantic
+        if (verifiable.isCredential()) {
+            validate(verifiable.asCredential());
+        } else {
+            verifiable.validate();
+        }
 
         if (verifiable.proofs() == null || verifiable.proofs().isEmpty()) {
             throw new DocumentError(ErrorType.Missing, "Proof");
@@ -208,11 +220,10 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
         // unsigned JSON-LD version - FIXME temporary, remove
         var signed = treeWriter.writeExpanded(verifiable.ld().root()).iterator().next().asJsonObject();
-        System.out.println(signed);
+
         // a data before issuance - no proof attached
         final JsonObject unsigned = EmbeddedProof.removeProofs(signed);
-        System.out.println(unsigned);
-        
+
         // sort the proofs in the verification order
         final ProofQueue queue = ProofQueue.create(verifiable.proofs());
 
@@ -324,7 +335,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
         // status check
         if (statusVerifier != null && credential.status() != null && !credential.status().isEmpty()) {
-            //FIXME
+            // FIXME
 //            for (final Status status : credential.status()) {
 //            for (final Status status : credential.status()) {
 //                statusVerifier.verify(credential, status);   

@@ -138,7 +138,7 @@ public class DataIntegrityProof implements Proof {
         proof.purpose = selector.id(DataIntegrityVocab.PURPOSE);
 
         proof.value = proofValue;
-        
+
         proof.previousProof = selector.id(DataIntegrityVocab.PREVIOUS_PROOF);
 
         proof.fragment = new LinkableObject(id, types, properties, rootSupplier, proof);
@@ -190,6 +190,21 @@ public class DataIntegrityProof implements Proof {
             assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
             assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
         }
+    }
+
+    @Override
+    public JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
+
+        final ProofValue derivedProofValue = ((BaseProofValue) value).derive(context, data, selectors);
+
+        final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
+
+        return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
+    }
+
+    @Override
+    public LinkedNode ld() {
+        return fragment;
     }
 
     /**
@@ -268,16 +283,6 @@ public class DataIntegrityProof implements Proof {
         return suite.methodAdapter;
     }
 
-//    @Override
-//    public VerificationMethod read(LinkedData expanded) throws DocumentError {
-//        return suite.methodAdapter.read(expanded);
-//    }
-
-//    @Override
-//    public LinkedNode write(VerificationMethod value) {
-//        throw new UnsupportedOperationException();
-//    }
-
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
         final Object value = params.get(name.name());
 
@@ -291,28 +296,10 @@ public class DataIntegrityProof implements Proof {
     }
 
     protected JsonObject unsignedCopy() {
-
-        NodeDebugWriter.printToStdout(fragment);
-
         // TODO better
         JsonLdTreeWriter writer = new JsonLdTreeWriter();
         JsonObject expanded = writer.writeFragment(fragment);
 
         return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
-    }
-
-    @Override
-    public JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
-
-        final ProofValue derivedProofValue = ((BaseProofValue) value).derive(context, data, selectors);
-
-        final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
-
-        return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
-    }
-
-    @Override
-    public LinkedNode ld() {
-        return fragment;
     }
 }

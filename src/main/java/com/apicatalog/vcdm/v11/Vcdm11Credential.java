@@ -173,7 +173,7 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
      * @return the expiration date or <code>null</code> if not set
      */
     public Instant expiration() {
-        return issuance;
+        return expiration;
     }
 
     /**
