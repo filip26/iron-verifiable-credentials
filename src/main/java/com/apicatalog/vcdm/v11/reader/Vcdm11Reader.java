@@ -35,28 +35,16 @@ public class Vcdm11Reader implements JsonLdVerifiableReader {
 
     protected final Collection<SignatureSuite> suites;
 
-    protected URI base;
-
-//    protected boolean failOnUnsupportedProof = true;
-//    if (failOnUnsupportedProof) {
-//        throw new VerificationError(Code.UnsupportedCryptoSuite);
-//    }
-
     public Vcdm11Reader(final SignatureSuite... suites) {
         this.suites = Arrays.asList(suites);
-
-        // default values
-        this.base = null;
-
-//        this.methodResolvers = defaultResolvers();
     }
 
     @Override
-    public Verifiable read(JsonObject document, DocumentLoader loader) throws DocumentError {
+    public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
         try {
             Collection<String> context = JsonLdContext.strings(document);
-            
+
             // load the document
             final JsonArray expanded = JsonLd.expand(JsonDocument.of(document))
                     .undefinedTermsPolicy(ProcessingPolicy.Fail)

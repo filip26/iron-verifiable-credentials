@@ -1,8 +1,6 @@
 package com.apicatalog.vcdm;
 
-import java.net.URI;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
@@ -14,17 +12,19 @@ import com.apicatalog.vcdm.v11.reader.Vcdm11Reader;
 
 public class VcdmAdapter implements JsonLdVerifiableAdapter {
 
-    private static final Logger LOGGER = Logger.getLogger(VcdmAdapter.class.getName());
-
     protected final SignatureSuite[] suites;
 
-    protected URI base;
-    
-    public VcdmAdapter(SignatureSuite[] suites, URI base) {
+    protected boolean v11;
+    protected boolean v20;
+
+    public VcdmAdapter(SignatureSuite[] suites) {
         this.suites = suites;
-        this.base = base;
+
+        // defaults
+        this.v11 = true;
+        this.v20 = true;
     }
-    
+
     @Override
     public JsonLdVerifiableReader reader(final Collection<String> contexts) throws DocumentError {
 
@@ -33,9 +33,9 @@ public class VcdmAdapter implements JsonLdVerifiableAdapter {
         }
 
         return switch (getVersion(contexts)) {
-            case V11 -> new Vcdm11Reader(suites);
-            case V20 -> null;
-            default -> null;
+        case V11 -> v11 ? new Vcdm11Reader(suites) : null;
+        case V20 -> null;
+        default -> null;
         };
     }
 
@@ -61,5 +61,13 @@ public class VcdmAdapter implements JsonLdVerifiableAdapter {
             }
         }
         return null;
+    }
+
+    public void v11(boolean enabled) {
+        this.v11 = enabled;
+    }
+
+    public void v20(boolean enabled) {
+        this.v20 = enabled;
     }
 }

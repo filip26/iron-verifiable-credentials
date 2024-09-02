@@ -50,7 +50,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
-        this.verifiableAdapter = new VcdmAdapter(suites, base);
+        this.verifiableAdapter = new VcdmAdapter(suites);
         this.statusVerifier = null;
     }
 
@@ -194,7 +194,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throw new DocumentError(ErrorType.Unknown, "DocumentModel");
         }
 
-        final Verifiable verifiable = reader.read(document, loader);
+        final Verifiable verifiable = reader.read(document, loader, base);
 
         if (verifiable == null) {
             throw new DocumentError(ErrorType.Invalid, "document");
