@@ -17,6 +17,6 @@ public record DataIntegrityProofAdapter(
 
     @Override
     public String proofType() {
-        return DataIntegrityVocab.TYPE.uri();
+        return VcdiVocab.TYPE.uri();
     }
 }

@@ -1,4 +1,4 @@
-package com.apicatalog.vcdm.jsonld;
+package com.apicatalog.vcdm;
 
 import java.net.URI;
 import java.util.Collection;
@@ -10,24 +10,23 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableAdapter;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.v11.reader.Vcdm11Reader;
 
-public class JsonLdVcdmAdapter implements JsonLdVerifiableAdapter {
+public class VcdmAdapter implements JsonLdVerifiableAdapter {
 
-    private static final Logger LOGGER = Logger.getLogger(JsonLdVcdmAdapter.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VcdmAdapter.class.getName());
 
     protected final SignatureSuite[] suites;
 
     protected URI base;
     
-    public JsonLdVcdmAdapter(SignatureSuite[] suites, URI base) {
+    public VcdmAdapter(SignatureSuite[] suites, URI base) {
         this.suites = suites;
         this.base = base;
     }
     
     @Override
-    public JsonLdVerifiableReader reader(Collection<String> contexts) throws DocumentError {
+    public JsonLdVerifiableReader reader(final Collection<String> contexts) throws DocumentError {
 
         if (contexts == null || contexts.isEmpty()) {
             return null;

@@ -30,7 +30,7 @@ import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vcdi.DataIntegrityProofDraft;
-import com.apicatalog.vcdi.DataIntegrityVocab;
+import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
@@ -169,7 +169,7 @@ public abstract class AbstractIssuer implements Issuer {
     }
 
     protected JsonObject signed1Copy(JsonObject unsigned, JsonObject signature) {
-        return new LdNodeBuilder(unsigned).set(DataIntegrityVocab.PROOF_VALUE).value(signature).build();
+        return new LdNodeBuilder(unsigned).set(VcdiVocab.PROOF_VALUE).value(signature).build();
     }
 
     /**

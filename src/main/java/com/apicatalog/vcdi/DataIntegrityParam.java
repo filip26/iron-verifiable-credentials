@@ -9,18 +9,18 @@ public class DataIntegrityParam {
     }
     
     public static final Parameter<String> challenge(String challenge) {
-        return Parameter.of(DataIntegrityVocab.CHALLENGE.name(), challenge);
+        return Parameter.of(VcdiVocab.CHALLENGE.name(), challenge);
     }
 
     public static final Parameter<String> domain(String domain) {
-        return Parameter.of(DataIntegrityVocab.DOMAIN.name(), domain);
+        return Parameter.of(VcdiVocab.DOMAIN.name(), domain);
     }
 
     public static final Parameter<String> purpose(String purpose) {
-        return Parameter.of(DataIntegrityVocab.PURPOSE.name(), purpose);
+        return Parameter.of(VcdiVocab.PURPOSE.name(), purpose);
     }
 
     public static final Parameter<String> nonce(String nonce) {
-        return Parameter.of(DataIntegrityVocab.NONCE.name(), nonce);
+        return Parameter.of(VcdiVocab.NONCE.name(), nonce);
     }
 }

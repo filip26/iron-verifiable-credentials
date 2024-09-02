@@ -23,7 +23,6 @@ import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
-import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
@@ -189,16 +188,6 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
     @Override
     public boolean isNotValidYet() {
         return (issuanceDate() != null && issuanceDate().isAfter(Instant.now()));
-    }
-
-    /**
-     * Verifiable credentials data model version. Will be moved into a separate
-     * interface specialized to VCDM.
-     * 
-     * @return the data model version, never <code>null</code>
-     */
-    public VcdmVersion version() {
-        return VcdmVersion.V11;
     }
 
     @Override

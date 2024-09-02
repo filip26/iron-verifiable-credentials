@@ -7,7 +7,7 @@ import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vcdi.DataIntegrityVocab;
+import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;
@@ -68,11 +68,11 @@ public abstract class ProofDraft {
         }
         
         if (previousProof != null) {
-            builder.set(DataIntegrityVocab.PREVIOUS_PROOF).id(previousProof);
+            builder.set(VcdiVocab.PREVIOUS_PROOF).id(previousProof);
         }
         
         if (verificatonUrl != null) {
-            builder.set(DataIntegrityVocab.VERIFICATION_METHOD).id(verificatonUrl);
+            builder.set(VcdiVocab.VERIFICATION_METHOD).id(verificatonUrl);
         } else if (method != null) {
 //            builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(adapter, method);
         }

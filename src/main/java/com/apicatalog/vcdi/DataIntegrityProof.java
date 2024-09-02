@@ -3,6 +3,7 @@ package com.apicatalog.vcdi;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -24,8 +25,8 @@ import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
-import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
+import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
 import com.apicatalog.vc.method.GenericVerificationMethod;
@@ -80,7 +81,7 @@ public class DataIntegrityProof implements Proof {
 
         var selector = new ObjectFragmentMapper(properties);
 
-        var proofValueLiteral = selector.single(DataIntegrityVocab.PROOF_VALUE, MultibaseLiteral.class);
+        var proofValueLiteral = selector.single(VcdiVocab.PROOF_VALUE, MultibaseLiteral.class);
 
         ProofValue proofValue = null;
 
@@ -94,27 +95,27 @@ public class DataIntegrityProof implements Proof {
         var proof = new DataIntegrityProof(suite, cryptosuite);
 
         proof.created = selector.single(
-                DataIntegrityVocab.CREATED,
+                VcdiVocab.CREATED,
                 XsdDateTime.class,
                 XsdDateTime::datetime);
 
         proof.domain = selector.single(
-                DataIntegrityVocab.DOMAIN,
+                VcdiVocab.DOMAIN,
                 LinkedLiteral.class,
                 LinkedLiteral::lexicalValue);
 
         proof.challenge = selector.single(
-                DataIntegrityVocab.CHALLENGE,
+                VcdiVocab.CHALLENGE,
                 LinkedLiteral.class,
                 LinkedLiteral::lexicalValue);
 
         proof.nonce = selector.single(
-                DataIntegrityVocab.NONCE,
+                VcdiVocab.NONCE,
                 LinkedLiteral.class,
                 LinkedLiteral::lexicalValue);
 
         proof.method = selector.single(
-                DataIntegrityVocab.VERIFICATION_METHOD,
+                VcdiVocab.VERIFICATION_METHOD,
                 method -> {
                     if (method instanceof VerificationMethod verificationMethod) {
                         return verificationMethod;
@@ -135,11 +136,11 @@ public class DataIntegrityProof implements Proof {
                             method.ld());
                 });
 
-        proof.purpose = selector.id(DataIntegrityVocab.PURPOSE);
+        proof.purpose = selector.id(VcdiVocab.PURPOSE);
 
         proof.value = proofValue;
 
-        proof.previousProof = selector.id(DataIntegrityVocab.PREVIOUS_PROOF);
+        proof.previousProof = selector.id(VcdiVocab.PREVIOUS_PROOF);
 
         proof.fragment = new LinkableObject(id, types, properties, rootSupplier, proof);
 
@@ -147,10 +148,19 @@ public class DataIntegrityProof implements Proof {
     }
 
     @Override
-    public void verify(Collection<String> context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError {
+    public void verify(VerificationKey method) throws VerificationError, DocumentError {
 
+        var treeWriter = new JsonLdTreeWriter();
+
+        // unsigned JSON-LD version - FIXME temporary, remove
+        var signed = treeWriter.writeExpanded(ld().root()).iterator().next().asJsonObject();
+
+        // a data before issuance - no proof attached
+        final JsonObject unsigned = EmbeddedProof.removeProofs(signed);
+
+        
         Objects.requireNonNull(value);
-        Objects.requireNonNull(data);
+        Objects.requireNonNull(unsigned);
         Objects.requireNonNull(method);
 
         // remove a proof value and get a new unsigned copy
@@ -159,8 +169,8 @@ public class DataIntegrityProof implements Proof {
         // verify signature
         value.verify(
                 crypto,
-                context,
-                data,
+                Collections.emptyList(),    //FIXME context from LdTree
+                unsigned,
                 unsignedProof,
                 method.publicKey());
     }
@@ -186,9 +196,9 @@ public class DataIntegrityProof implements Proof {
 //        }
 
         if (params != null) {
-            assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
-            assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
-            assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
+            assertEquals(params, VcdiVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
+            assertEquals(params, VcdiVocab.CHALLENGE, challenge);
+            assertEquals(params, VcdiVocab.DOMAIN, domain);
         }
     }
 
@@ -300,6 +310,6 @@ public class DataIntegrityProof implements Proof {
         JsonLdTreeWriter writer = new JsonLdTreeWriter();
         JsonObject expanded = writer.writeFragment(fragment);
 
-        return Json.createObjectBuilder(expanded).remove(DataIntegrityVocab.PROOF_VALUE.uri()).build();
+        return Json.createObjectBuilder(expanded).remove(VcdiVocab.PROOF_VALUE.uri()).build();
     }
 }

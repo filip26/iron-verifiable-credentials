@@ -3,7 +3,7 @@ package com.apicatalog.vcdi;
 import com.apicatalog.ld.Term;
 import com.apicatalog.vcdm.VcdmVocab;
 
-public final class DataIntegrityVocab {
+public final class VcdiVocab {
 
     public static Term TYPE = Term.create("DataIntegrityProof", VcdmVocab.SECURITY_VOCAB);
     

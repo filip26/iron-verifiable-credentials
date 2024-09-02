@@ -2,14 +2,14 @@ package com.apicatalog.vcdm.v11;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vcdm.VcdmVersion;
 
 public abstract class Vcdm11Verifiable implements Verifiable {
 
-    private static final Logger LOGGER = Logger.getLogger(Vcdm11Verifiable.class.getName());
+//    private static final Logger LOGGER = Logger.getLogger(Vcdm11Verifiable.class.getName());
 
     protected URI id;
     protected Collection<Proof> proofs;
@@ -23,6 +23,17 @@ public abstract class Vcdm11Verifiable implements Verifiable {
     public Collection<Proof> proofs() {
         return proofs;
     }
+    
+    /**
+     * Verifiable credentials data model version. Will be moved into a separate
+     * interface specialized to VCDM.
+     * 
+     * @return the data model version, never <code>null</code>
+     */
+    public VcdmVersion version() {
+        return VcdmVersion.V11;
+    }
+
 
 //    /**
 //     * Creates a new verifiable instance from the given expanded JSON-LD input.

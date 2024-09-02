@@ -87,28 +87,28 @@ public class DataIntegrityProofDraft extends ProofDraft {
      * @return
      */
     public static final JsonObject signed(JsonObject unsignedProof, JsonObject proofValue) {
-        return LdNodeBuilder.of(unsignedProof).set(DataIntegrityVocab.PROOF_VALUE).value(proofValue).build();
+        return LdNodeBuilder.of(unsignedProof).set(VcdiVocab.PROOF_VALUE).value(proofValue).build();
     }
     
     protected LdNodeBuilder unsigned(LdNodeBuilder builder) {
 
         super.unsigned(builder, suite.methodAdapter);
         
-        builder.type(DataIntegrityVocab.TYPE.uri());
-        builder.set(DataIntegrityVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", suite.cryptosuiteName);
+        builder.type(VcdiVocab.TYPE.uri());
+        builder.set(VcdiVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", suite.cryptosuiteName);
         
-        builder.set(DataIntegrityVocab.PURPOSE).id(purpose);
+        builder.set(VcdiVocab.PURPOSE).id(purpose);
         
-        builder.set(DataIntegrityVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
+        builder.set(VcdiVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
 
         if (domain != null) {
-            builder.set(DataIntegrityVocab.DOMAIN).string(domain);
+            builder.set(VcdiVocab.DOMAIN).string(domain);
         }
         if (challenge != null) {
-            builder.set(DataIntegrityVocab.CHALLENGE).string(challenge);
+            builder.set(VcdiVocab.CHALLENGE).string(challenge);
         }
         if (nonce != null) {
-            builder.set(DataIntegrityVocab.NONCE).string(nonce);
+            builder.set(VcdiVocab.NONCE).string(nonce);
         }
 
         return builder;

@@ -1,7 +1,6 @@
 package com.apicatalog.vc.proof;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
@@ -13,8 +12,6 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.vc.method.MethodAdapter;
-
-import jakarta.json.JsonObject;
 
 public record UnknownProof(LinkedFragment fragment) implements Proof {
 
@@ -54,7 +51,7 @@ public record UnknownProof(LinkedFragment fragment) implements Proof {
     }
 
     @Override
-    public void verify(Collection<String> context, JsonObject data, VerificationKey method) throws VerificationError, DocumentError {
+    public void verify(VerificationKey method) throws VerificationError, DocumentError {
         throw new VerificationError(Code.UnsupportedCryptoSuite);   
     }
     

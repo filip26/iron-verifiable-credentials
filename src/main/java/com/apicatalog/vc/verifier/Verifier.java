@@ -22,10 +22,8 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
-import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableAdapter;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
 import com.apicatalog.vc.processor.AbstractProcessor;
@@ -34,9 +32,9 @@ import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdi.DataIntegrityVocab;
+import com.apicatalog.vcdi.VcdiVocab;
+import com.apicatalog.vcdm.VcdmAdapter;
 import com.apicatalog.vcdm.VcdmVocab;
-import com.apicatalog.vcdm.jsonld.JsonLdVcdmAdapter;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -49,14 +47,10 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
     protected final JsonLdVerifiableAdapter verifiableAdapter;
 
-    // TODO remove
-    protected final JsonLdTreeWriter treeWriter;
-
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
-        this.verifiableAdapter = new JsonLdVcdmAdapter(suites, base);
-        this.treeWriter = new JsonLdTreeWriter();
+        this.verifiableAdapter = new VcdmAdapter(suites, base);
         this.statusVerifier = null;
     }
 
@@ -76,23 +70,22 @@ public class Verifier extends AbstractProcessor<Verifier> {
         return this;
     }
 
-//    /**
-//     * Verifies VC/VP document. Throws VerificationError if the document is not
-//     * valid or cannot be verified.
-//     *
-//     * @param verifiable
-//     * @param parameters custom parameters, e.g. challenge token
-//     * @return {@link Verifiable} object representing the verified credentials or a
-//     *         presentation
-//     * 
-//     * @throws VerificationError
-//     * @throws DocumentError
-//     */
-//    public Verifiable verify(Verifiable verifiable, Parameter<?>... parameters) throws VerificationError, DocumentError {
-//        Objects.requireNonNull(verifiable);
-//        //FIXME
-//        return null;
-//    }
+    /**
+     * Verifies VC/VP document. Throws VerificationError if the document is not
+     * valid or cannot be verified.
+     *
+     * @param verifiable
+     * @param parameters custom parameters, e.g. challenge token
+     * @return {@link Verifiable} object representing the verified credentials or a
+     *         presentation
+     * 
+     * @throws VerificationError
+     * @throws DocumentError
+     */
+    public Verifiable verify(Verifiable verifiable, Parameter<?>... parameters) throws VerificationError, DocumentError {
+        Objects.requireNonNull(verifiable);
+        return verify(verifiable, toMap(parameters), getLoader());
+    }
 
     /**
      * Verifies VC/VP document. Throws VerificationError if the document is not
@@ -201,10 +194,21 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throw new DocumentError(ErrorType.Unknown, "DocumentModel");
         }
 
-        final Verifiable verifiable = reader.read(context, document, loader);
+        final Verifiable verifiable = reader.read(document, loader);
 
         if (verifiable == null) {
             throw new DocumentError(ErrorType.Invalid, "document");
+        }
+
+        return verify(verifiable, params, loader);
+    }
+
+    protected Verifiable verify(Verifiable verifiable, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+
+        Objects.requireNonNull(verifiable);
+
+        if (verifiable.proofs() == null || verifiable.proofs().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, "Proof");
         }
 
         // validate data model semantic
@@ -214,16 +218,6 @@ public class Verifier extends AbstractProcessor<Verifier> {
             verifiable.validate();
         }
 
-        if (verifiable.proofs() == null || verifiable.proofs().isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, "Proof");
-        }
-
-        // unsigned JSON-LD version - FIXME temporary, remove
-        var signed = treeWriter.writeExpanded(verifiable.ld().root()).iterator().next().asJsonObject();
-
-        // a data before issuance - no proof attached
-        final JsonObject unsigned = EmbeddedProof.removeProofs(signed);
-
         // sort the proofs in the verification order
         final ProofQueue queue = ProofQueue.create(verifiable.proofs());
 
@@ -232,6 +226,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
         while (proof != null) {
 
+            // validate proof properties
             proof.validate(params);
 
             final ProofValue proofValue = proof.signature();
@@ -240,85 +235,21 @@ public class Verifier extends AbstractProcessor<Verifier> {
                 throw new DocumentError(ErrorType.Missing, "ProofValue");
             }
 
-            VerificationMethod verificationMethod = getMethod(proof, loader)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD));
+            final VerificationMethod verificationMethod = getMethod(proof, loader)
+                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD));
 
             if (!(verificationMethod instanceof VerificationKey)) {
-                throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
+                throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD);
             }
 
-            proof.verify(context, unsigned, (VerificationKey) verificationMethod);
+            proof.verify((VerificationKey) verificationMethod);
 
             proof = queue.pop();
         }
+
         // all good
         return verifiable;
     }
-
-//    protected Collection<Proof> verifyProofs(JsonStructure context, JsonObject expanded, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
-//
-//        // get proofs - throws an exception if there is no proof, never null nor an
-//        // empty collection
-//        final Collection<JsonObject> expandedProofs = EmbeddedProof.assertProof(expanded);
-//
-//        // a data before issuance - no proof attached
-//        final JsonObject unsigned = EmbeddedProof.removeProofs(expanded);
-//
-//        final Collection<Proof> proofs = new ArrayList<>(expandedProofs.size());
-//
-//        // read attached proofs
-//        for (final JsonObject expandedProof : expandedProofs) {
-//
-//            final Collection<String> proofTypes = JsonLdType.strings(expandedProof);
-//
-//            if (proofTypes == null || proofTypes.isEmpty()) {
-//                throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
-//            }
-//
-//            final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
-//
-//            if (signatureSuite == null) {
-//                throw new VerificationError(Code.UnsupportedCryptoSuite);
-//            }
-//
-////            final Proof proof = signatureSuite.getProof(expandedProof, loader);
-////
-////            if (proof == null) {
-////                throw new IllegalStateException("The suite [" + signatureSuite + "] returns null as a proof.");
-////            }
-////            proofs.add(proof);
-//        }
-//
-//        // sort the proofs in the verification order
-//        final ProofQueue queue = ProofQueue.create(proofs);
-//
-//        // verify the proofs' signatures
-//        Proof proof = queue.pop();
-//
-//        while (proof != null) {
-//
-//            proof.validate(params);
-//
-//            final ProofValue proofValue = proof.signature();
-//
-//            if (proofValue == null) {
-//                throw new DocumentError(ErrorType.Missing, "ProofValue");
-//            }
-//
-//            VerificationMethod verificationMethod = getMethod(proof, loader)
-//                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD));
-//
-//            if (!(verificationMethod instanceof VerificationKey)) {
-//                throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, DataIntegrityVocab.VERIFICATION_METHOD);
-//            }
-//
-////            proof.verify(context, unsigned, (VerificationKey) verificationMethod);
-//
-//            proof = queue.pop();
-//        }
-//        // all good
-//        return proofs;
-//    }
 
     final void validate(final Credential credential) throws DocumentError, VerificationError {
 
