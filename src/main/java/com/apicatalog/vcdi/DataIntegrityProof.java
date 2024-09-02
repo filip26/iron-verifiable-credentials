@@ -94,25 +94,13 @@ public class DataIntegrityProof implements Proof {
 
         var proof = new DataIntegrityProof(suite, cryptosuite);
 
-        proof.created = selector.single(
-                VcdiVocab.CREATED,
-                XsdDateTime.class,
-                XsdDateTime::datetime);
+        proof.created = selector.xsdDateTime(VcdiVocab.CREATED);
 
-        proof.domain = selector.single(
-                VcdiVocab.DOMAIN,
-                LinkedLiteral.class,
-                LinkedLiteral::lexicalValue);
+        proof.domain = selector.lexeme(VcdiVocab.DOMAIN);
 
-        proof.challenge = selector.single(
-                VcdiVocab.CHALLENGE,
-                LinkedLiteral.class,
-                LinkedLiteral::lexicalValue);
+        proof.challenge = selector.lexeme(VcdiVocab.CHALLENGE);
 
-        proof.nonce = selector.single(
-                VcdiVocab.NONCE,
-                LinkedLiteral.class,
-                LinkedLiteral::lexicalValue);
+        proof.nonce = selector.lexeme(VcdiVocab.NONCE);
 
         proof.method = selector.single(
                 VcdiVocab.VERIFICATION_METHOD,

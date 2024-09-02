@@ -17,7 +17,6 @@ import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.lang.LangStringSelector;
 import com.apicatalog.linkedtree.lang.LanguageMap;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
-import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.IssuerDetails;
@@ -42,6 +41,10 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
     protected LinkedFragment issuer;
 
     protected LinkedFragment fragment;
+    
+    protected Vcdm11Credential() {
+        // protected
+    }
 
     public static LinkableObject of(
             final Link id,
@@ -78,101 +81,21 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
 
         // issuer
         // TODO IssuerDetails
-        credential.issuer = selector.single(
-                VcdmVocab.ISSUER,
-                LinkedFragment.class);
+        credential.issuer = selector.fragment(VcdmVocab.ISSUER);
 
         // status
-//      credential.status(readCollection(version, document.get(VcVocab.STATUS.uri()), statusReader));
+        credential.status = selector.fragments(VcdmVocab.STATUS);
 
         // issuance date
-        credential.issuance = selector.single(
-                VcdmVocab.ISSUANCE_DATE,
-                XsdDateTime.class,
-                XsdDateTime::datetime);
+        credential.issuance = selector.xsdDateTime(VcdmVocab.ISSUANCE_DATE);
 
         // expiration date
-        credential.expiration = selector.single(
-                VcdmVocab.EXPIRATION_DATE,
-                XsdDateTime.class,
-                XsdDateTime::datetime);
+        credential.expiration = selector.xsdDateTime(VcdmVocab.EXPIRATION_DATE);
 
         if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
             credential.proofs = EmbeddedProof.getProofs(
                     selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
         }
-    }
-
-    @Override
-    public LinkedNode ld() {
-        return fragment;
-    }
-
-    @Override
-    public Collection<String> type() {
-        return fragment.type();
-    }
-
-//    public JsonLdVcdm11Credential issuanceDate(Instant issuance) {
-//        this.issuance = issuance;
-//        return this;
-//    }
-
-    /**
-     *
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
-     * @return {@link IssuerDetails} representing the issuer in an expanded form
-     */
-    @Override
-    public LinkedFragment issuer() {
-        return issuer;
-    }
-
-    /**
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>
-     * 
-     * @return
-     */
-    @Override
-    public Collection<LinkedFragment> status() {
-        return status;
-    }
-
-    /**
-     * @see <a href=
-     *      "https://www.w3.org/TR/vc-data-model/#credential-subject">Credential
-     *      Subject</a>
-     * 
-     * @return
-     */
-    @Override
-    public Collection<LinkedFragment> subject() {
-        return subject;
-    }
-
-    /**
-     * A date time when the credential has been issued.
-     * 
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
-     *      Date - Note</a>
-     * 
-     * @return a date time from which the credential claims are valid or
-     *         <code>null</code>.
-     */
-    public Instant issuanceDate() {
-        return issuance;
-    }
-
-    /**
-     * An expiration date of the {@link Verifiable}.
-     * 
-     * @see <a href=
-     *      "https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
-     * 
-     * @return the expiration date or <code>null</code> if not set
-     */
-    public Instant expiration() {
-        return expiration;
     }
 
     /**
@@ -229,5 +152,71 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
                 && issuanceDate().isAfter(expiration()))) {
             throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }
+    }
+    @Override
+    public LinkedNode ld() {
+        return fragment;
+    }
+
+    @Override
+    public Collection<String> type() {
+        return fragment.type();
+    }
+
+    /**
+     *
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
+     * @return {@link IssuerDetails} representing the issuer in an expanded form
+     */
+    @Override
+    public LinkedFragment issuer() {
+        return issuer;
+    }
+
+    /**
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>
+     * 
+     * @return
+     */
+    @Override
+    public Collection<LinkedFragment> status() {
+        return status;
+    }
+
+    /**
+     * @see <a href=
+     *      "https://www.w3.org/TR/vc-data-model/#credential-subject">Credential
+     *      Subject</a>
+     * 
+     * @return
+     */
+    @Override
+    public Collection<LinkedFragment> subject() {
+        return subject;
+    }
+
+    /**
+     * A date time when the credential has been issued.
+     * 
+     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
+     *      Date - Note</a>
+     * 
+     * @return a date time from which the credential claims are valid or
+     *         <code>null</code>.
+     */
+    public Instant issuanceDate() {
+        return issuance;
+    }
+
+    /**
+     * An expiration date of the {@link Verifiable}.
+     * 
+     * @see <a href=
+     *      "https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
+     * 
+     * @return the expiration date or <code>null</code> if not set
+     */
+    public Instant expiration() {
+        return expiration;
     }
 }

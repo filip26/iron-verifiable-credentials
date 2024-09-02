@@ -85,21 +85,6 @@ public class Vcdm11Reader implements JsonLdVerifiableReader {
             throw new DocumentError(ErrorType.Invalid);
         }
 
-//        final JsonValue verifiable = expanded.iterator().next();
-//
-//        if (JsonUtils.isNotObject(verifiable)) {
-//            throw new DocumentError(ErrorType.Invalid);
-//        }
-//
-//        return readExpanded(version, context, verifiable.asJsonObject(), loader);
-//    }
-//
-//    Verifiable readExpanded(
-//            final VcdmVersion version,
-//            final Collection<String> context,
-//            final JsonObject expanded,
-//            final DocumentLoader loader) throws DocumentError {
-
         // FIXME move, static?
         final JsonLdTreeReader.Builder readerBuilder = JsonLdTreeReader.create()
                 .with(VcdmVocab.CREDENTIAL_TYPE.uri(), Vcdm11Credential::of)

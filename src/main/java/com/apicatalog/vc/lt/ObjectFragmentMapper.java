@@ -1,6 +1,7 @@
 package com.apicatalog.vc.lt;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -15,7 +16,9 @@ import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.xsd.XsdDateTime;
 
 //????
 public record ObjectFragmentMapper(
@@ -37,9 +40,7 @@ public record ObjectFragmentMapper(
         }
         return Collections.emptyList();
     }
-    
 
-    
     public Linkable single(Term term) throws DocumentError {
 
         Objects.requireNonNull(term);
@@ -170,15 +171,13 @@ public record ObjectFragmentMapper(
 
             T value = null;
 
-            if (node.isFragment() 
-                    && clazz.isInstance(node.asFragment().cast())
-                    ) {
+            if (node.isFragment()
+                    && clazz.isInstance(node.asFragment().cast())) {
                 value = node.asFragment().cast(clazz);
-                
+
             } else if (node.isLiteral()
-                    && clazz.isInstance(node.asLiteral().cast())
-                    ) {
-                
+                    && clazz.isInstance(node.asLiteral().cast())) {
+
                 value = node.asLiteral().cast(clazz);
             } else {
                 throw new DocumentError(ErrorType.Invalid, term);
@@ -210,4 +209,23 @@ public record ObjectFragmentMapper(
         }
     }
 
+    public Instant xsdDateTime(Term term) throws DocumentError {
+        return single(
+                term,
+                XsdDateTime.class,
+                XsdDateTime::datetime);
+    }
+
+    public String lexeme(Term term) throws DocumentError {
+        return single(
+                term,
+                LinkedLiteral.class,
+                LinkedLiteral::lexicalValue);
+    }
+
+    public LinkedFragment fragment(Term term) throws DocumentError {
+        return single(
+                term,
+                LinkedFragment.class);
+    }
 }
