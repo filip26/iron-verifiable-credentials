@@ -4,8 +4,7 @@ import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
-
-import jakarta.json.JsonStructure;
+import com.apicatalog.linkedtree.LinkedTree;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
@@ -56,7 +55,7 @@ public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, 
     }
 
     @Override
-    public byte[] canonicalize(JsonStructure document) throws LinkedDataSuiteError {
+    public byte[] canonicalize(LinkedTree document) throws LinkedDataSuiteError {
         return canonicalization.canonicalize(document);
     }
 

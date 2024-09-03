@@ -15,7 +15,7 @@ class TestAlgorithm implements SignatureAlgorithm {
 
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
-
+        System.out.println(">>> " + data.length + ", " + signature.length + ", " + publicKey.length);
         final byte[] result = new byte[Math.min(publicKey.length, data.length)];
 
         for (int i = 0; i < Math.min(publicKey.length, data.length); i++) {
@@ -35,6 +35,10 @@ class TestAlgorithm implements SignatureAlgorithm {
         for (int i = 0; i < Math.min(privateKey.length, data.length); i++) {
             result[i] = (byte) (data[i] ^ privateKey[i]);
         }
+
+//TODO        for (int i = 0; i < Math.min(privateKey.length, data.length); i++) {
+//            result[i] = (byte) (data[i + 32] ^ privateKey[i]);
+//        }
 
         return result;
     }

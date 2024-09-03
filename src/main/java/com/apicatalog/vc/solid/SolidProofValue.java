@@ -1,15 +1,13 @@
 package com.apicatalog.vc.solid;
 
-import java.util.Collection;
 import java.util.Objects;
 
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.vc.proof.ProofValue;
-
-import jakarta.json.JsonObject;
 
 /**
  * Represent a proof value used together with full disclosure suites. i.e.
@@ -23,7 +21,11 @@ public record SolidProofValue(
     }
 
     @Override
-    public void verify(CryptoSuite cryptoSuite, Collection<String> context, JsonObject data, JsonObject unsignedProof, byte[] publicKey) throws VerificationError {
+    public void verify(
+            CryptoSuite cryptoSuite,  
+            LinkedTree data, 
+            LinkedTree unsignedProof, 
+            byte[] publicKey) throws VerificationError {
 
         Objects.requireNonNull(data);
         Objects.requireNonNull(publicKey);

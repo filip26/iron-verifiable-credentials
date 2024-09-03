@@ -198,7 +198,7 @@ public class JsonLdVerifiableReader2  {
         final Collection<JsonObject> expandedProofs = EmbeddedProof.assertProof(expanded);
 
         // a data before issuance - no proof attached
-        final JsonObject unsigned = EmbeddedProof.removeProofs(expanded);
+//        final JsonObject unsigned = EmbeddedProof.removeProofs(expanded);
 
         final Collection<Proof> proofs = new ArrayList<>(expandedProofs.size());
 

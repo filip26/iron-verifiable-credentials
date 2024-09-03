@@ -3,7 +3,6 @@ package com.apicatalog.vcdi;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -20,12 +19,11 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
+import com.apicatalog.linkedtree.builder.GenericTreeBuilder;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
-import com.apicatalog.linkedtree.xsd.XsdDateTime;
+import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
@@ -35,7 +33,6 @@ import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
@@ -138,26 +135,24 @@ public class DataIntegrityProof implements Proof {
     @Override
     public void verify(VerificationKey method) throws VerificationError, DocumentError {
 
-        var treeWriter = new JsonLdTreeWriter();
+//        var treeWriter = new JsonLdTreeWriter();
 
-        // unsigned JSON-LD version - FIXME temporary, remove
-        var signed = treeWriter.writeExpanded(ld().root()).iterator().next().asJsonObject();
+//        // unsigned JSON-LD version - FIXME temporary, remove
+//        var signed = treeWriter.writeExpanded(ld().root()).iterator().next().asJsonObject();
 
         // a data before issuance - no proof attached
-        final JsonObject unsigned = EmbeddedProof.removeProofs(signed);
+        final LinkedTree unsigned = EmbeddedProof.removeProofs(ld().root());
 
-        
         Objects.requireNonNull(value);
         Objects.requireNonNull(unsigned);
         Objects.requireNonNull(method);
 
         // remove a proof value and get a new unsigned copy
-        final JsonObject unsignedProof = unsignedCopy();
+        final LinkedTree unsignedProof = unsignedCopy();
 
         // verify signature
         value.verify(
                 crypto,
-                Collections.emptyList(),    //FIXME context from LdTree
                 unsigned,
                 unsignedProof,
                 method.publicKey());
@@ -197,7 +192,8 @@ public class DataIntegrityProof implements Proof {
 
         final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
 
-        return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
+//        return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -293,11 +289,11 @@ public class DataIntegrityProof implements Proof {
         }
     }
 
-    protected JsonObject unsignedCopy() {
-        // TODO better
-        JsonLdTreeWriter writer = new JsonLdTreeWriter();
-        JsonObject expanded = writer.writeFragment(fragment);
-
-        return Json.createObjectBuilder(expanded).remove(VcdiVocab.PROOF_VALUE.uri()).build();
+    protected LinkedTree unsignedCopy() {
+        var builder = new GenericTreeBuilder(fragment.root());
+        return builder.deepClone((node, indexOrder, indexTerm, depth) -> VcdiVocab.PROOF_VALUE.uri().equals(indexTerm)
+                ? ProcessingPolicy.Drop
+                : ProcessingPolicy.Accept
+        );
     }
 }

@@ -103,7 +103,7 @@ public class Holder extends AbstractProcessor<Holder> {
         }
 
         // a data before issuance - no proof attached
-        final JsonObject unsigned = EmbeddedProof.removeProofs(expanded);
+//        final JsonObject unsigned = EmbeddedProof.removeProofs(expanded);
 
         final JsonObject expandedProof = expandedProofs.iterator().next();
 

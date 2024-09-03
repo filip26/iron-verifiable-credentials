@@ -24,6 +24,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.EmbeddedProof;
@@ -155,10 +156,13 @@ public abstract class AbstractIssuer implements Issuer {
 //        }
 
         // remove proofs
-        final JsonObject unsigned = EmbeddedProof.removeProofs(object);
+//        final JsonObject unsigned = EmbeddedProof.removeProofs(object);
 
-        // signature
-        final byte[] signature = sign(context, unsigned, draft);
+        // signature - FIXME
+        final byte[] signature = sign(context,
+                null,
+//                unsigned, 
+                draft);
 
         final JsonObject proofValue = LdScalar.multibase(proofValueBase, signature);
 
@@ -184,7 +188,7 @@ public abstract class AbstractIssuer implements Issuer {
      */
     protected abstract byte[] sign(
             JsonArray context,
-            JsonObject document,
+            LinkedTree document,
             ProofDraft draft) throws SigningError, DocumentError;
 
     protected JsonArray getContext(VcdmVersion version, JsonObject document, ProofDraft draft) {

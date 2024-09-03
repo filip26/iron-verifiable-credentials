@@ -1,8 +1,7 @@
 package com.apicatalog.ld.signature.algorithm;
 
 import com.apicatalog.ld.signature.LinkedDataSuiteError;
-
-import jakarta.json.JsonStructure;
+import com.apicatalog.linkedtree.LinkedTree;
 
 /**
  * An algorithm that takes an input document that has more than one possible
@@ -11,6 +10,6 @@ import jakarta.json.JsonStructure;
  */
 public interface CanonicalizationAlgorithm {
 
-    byte[] canonicalize(JsonStructure json) throws LinkedDataSuiteError;
+    byte[] canonicalize(LinkedTree tree) throws LinkedDataSuiteError;
 
 }

@@ -4,9 +4,7 @@ import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.VerificationError.Code;
-
-import jakarta.json.JsonObject;
-import jakarta.json.JsonStructure;
+import com.apicatalog.linkedtree.LinkedTree;
 
 public class LinkedDataSignature {
     
@@ -32,8 +30,8 @@ public class LinkedDataSignature {
      * @throws DocumentError
      */
     public void verify(
-            final JsonObject expanded,
-            final JsonObject unsignedProof,
+            final LinkedTree expanded,
+            final LinkedTree unsignedProof,
             final byte[] verificationKey,
             final byte[] signature) throws VerificationError {
 
@@ -68,7 +66,7 @@ public class LinkedDataSignature {
      * @throws SigningError
      * @throws DocumentError
      */
-    public byte[] sign(JsonObject expanded, byte[] privateKey, JsonObject proof) throws SigningError {
+    public byte[] sign(LinkedTree expanded, byte[] privateKey, LinkedTree proof) throws SigningError {
 
         Objects.requireNonNull(expanded);
         Objects.requireNonNull(privateKey);
@@ -96,7 +94,7 @@ public class LinkedDataSignature {
      *
      * @throws LinkedDataSuiteError
      */
-    byte[] hashCode(JsonStructure document, JsonObject proof) throws LinkedDataSuiteError {
+    byte[] hashCode(LinkedTree document, LinkedTree proof) throws LinkedDataSuiteError {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 
