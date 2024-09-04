@@ -2,6 +2,7 @@ package com.apicatalog.vcdi;
 
 import java.util.Collection;
 
+import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.linkedtree.adapter.LinkedLiteralAdapter;
 import com.apicatalog.linkedtree.reader.LinkedFragmentReader;
 import com.apicatalog.vc.proof.ProofAdapter;

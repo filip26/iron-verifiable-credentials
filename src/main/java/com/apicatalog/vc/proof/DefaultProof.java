@@ -1,6 +1,7 @@
 package com.apicatalog.vc.proof;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
@@ -117,6 +118,12 @@ public abstract class DefaultProof implements Proof {
     @Override
     public CryptoSuite cryptoSuite() {
         return crypto;
+    }
+    
+
+    @Override
+    public Collection<String> type() {
+        return fragment.type();
     }
 
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {

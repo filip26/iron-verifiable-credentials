@@ -1,8 +1,11 @@
 package com.apicatalog.vcdm.v11;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -28,6 +31,8 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
     private static final Logger LOGGER = Logger.getLogger(Vcdm11Presentation.class.getName());
 
     protected URI holder;
+
+    protected Collection<Credential> credentials;
 
     protected LinkedFragment fragment;
 
@@ -60,18 +65,58 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
     protected static void setup(final Link id, final Collection<String> types, Vcdm11Presentation presentation, final ObjectFragmentMapper selector) throws DocumentError {
         // @id
         presentation.id = selector.id(id);
-        
+
         // holder
         presentation.holder = selector.id(VcdmVocab.HOLDER);
-    
+
         // credentials
-//        credential.credentials = selector.fragments(VcdmVocab.VERIFIABLE_CREDENTIALS);
-        
+        if (selector.properties().containsKey(VcdmVocab.VERIFIABLE_CREDENTIALS.uri())) {
+            presentation.credentials = getCredentials(
+                    selector
+                            .properties()
+                            .get(VcdmVocab.VERIFIABLE_CREDENTIALS.uri())
+                            .asContainer());
+        }
+
         // proofs
         if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
             presentation.proofs = EmbeddedProof.getProofs(
                     selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
         }
+    }
+
+    static Collection<Credential> getCredentials(final LinkedContainer tree) {
+
+        Objects.requireNonNull(tree);
+
+        if (tree.nodes().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        var credentials = new ArrayList<Credential>();
+
+        for (final LinkedNode node : tree) {
+            if (node.isTree()) {
+                credentials.add(getCredential(node.asTree().single().asFragment()));
+                continue;
+            }
+            credentials.add(getCredential(node.asFragment()));
+        }
+
+        return credentials;
+    }
+
+    static Credential getCredential(final LinkedFragment fragment) {
+
+        Objects.requireNonNull(fragment);
+
+        if (fragment.cast() instanceof Credential credential) {
+            return credential;
+        }
+
+        // FIXME
+        throw new UnsupportedOperationException();
+//        return new UnknownProof(fragment);
     }
 
     @Override
@@ -86,12 +131,10 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
 
     @Override
     public void validate() throws DocumentError {
-
         // @type - mandatory
         if (type() == null || type().isEmpty()) {
             throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
         }
-
     }
 
     @Override
@@ -101,83 +144,6 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
 
     @Override
     public Collection<Credential> credentials() {
-        // TODO Auto-generated method stub
-        return null;
+        return credentials;
     }
-    
-    //
-//  } else if (verifiable.isPresentation()) {
-//  //
-//  // // verify presentation proofs
-//  // verifiable.proofs(readProofs(context, expanded, loader));
-//  //
-//  // final Collection<Credential> credentials = new ArrayList<>();
-//  //
-//  //// for (final JsonObject presentedCredentials :
-//  // VerifiableReader.getCredentials(expanded)) {
-//  ////
-//  //// if (!VerifiableReader.isCredential(presentedCredentials)) {
-//  //// throw new DocumentError(ErrorType.Invalid, VcVocab.VERIFIABLE_CREDENTIALS,
-//  // Term.TYPE);
-//  //// }
-//  ////// var params = new HashMap<>();
-//  ////// FIXME credentials.add(verifyExpanded(version, context,
-//  // presentedCredentials, params, loader).asCredential());
-//  //// }
-//  //
-//  // ((JsonLdPresentation)verifiable.asPresentation()).credentials(credentials);
-//  //
-//  return verifiable;
-//}
-//    protected Collection<Proof> readProofs(JsonStructure context, JsonObject expanded, DocumentLoader loader) throws DocumentError {
-//
-//        // get proofs - throws an exception if there is no proof, never null nor an
-//        // empty collection
-//        final Collection<JsonObject> expandedProofs = EmbeddedProof.assertProof(expanded);
-//
-//        // a data before issuance - no proof attached
-//        final JsonObject unsigned = EmbeddedProof.removeProofs(expanded);
-//
-//        final Collection<Proof> proofs = new ArrayList<>(expandedProofs.size());
-//
-//        // read attached proofs
-//        for (final JsonObject expandedProof : expandedProofs) {
-//
-//            final Collection<String> proofTypes = LdType.strings(expandedProof);
-//
-//            if (proofTypes == null || proofTypes.isEmpty()) {
-//                throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
-//            }
-//
-//            final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
-//
-//            Proof proof = null;
-//
-//            if (signatureSuite != null) {
-////                proof = signatureSuite.getProof(expandedProof, loader);
-//            }
-//
-//            if (proof == null) {
-////                if (failOnUnsupportedProof) {
-////                    throw new VerificationError(Code.UnsupportedCryptoSuite);
-////                }
-////FIXME                proof = new UnknownProof(expandedProof);
-//            }
-//
-//            proofs.add(proof);
-//        }
-//        return proofs;
-//    }
-
-//    protected SignatureSuite findSuite(Collection<String> proofTypes, JsonObject expandedProof) {
-//        for (final SignatureSuite suite : suites) {
-//            for (final String proofType : proofTypes) {
-////                if (suite.isSupported(proofType, expandedProof)) {
-////                    return suite;
-////                }
-//            }
-//        }
-//        return null;
-//    }
-
 }

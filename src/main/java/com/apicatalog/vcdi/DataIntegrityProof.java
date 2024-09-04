@@ -39,7 +39,7 @@ import jakarta.json.JsonStructure;
 public class DataIntegrityProof extends DefaultProof implements Proof {
 
     protected final DataIntegritySuite suite;
-    
+
     protected Instant created;
     protected URI purpose;
 
@@ -68,7 +68,7 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
         ProofValue proofValue = null;
 
         if (proofValueLiteral != null) {
-            // TODO document loader???
+            // FIXME loader
             proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), null);
         }
 
@@ -99,9 +99,9 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
 
         proof.purpose = selector.id(VcdiVocab.PURPOSE);
 
-        proof.signature = proofValue;
-
         proof.previousProof = selector.id(VcdiVocab.PREVIOUS_PROOF);
+
+        proof.signature = proofValue;
 
         proof.fragment = new LinkableObject(id, types, properties, rootSupplier, proof);
 

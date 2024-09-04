@@ -1,6 +1,7 @@
 package com.apicatalog.vc.proof;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
@@ -13,7 +14,9 @@ import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.vc.method.MethodAdapter;
 
-public record UnknownProof(LinkedFragment fragment) implements Proof {
+public record UnknownProof(
+//TODO        URI id,
+        LinkedFragment fragment) implements Proof {
 
     @Override
     public VerificationMethod method() {
@@ -22,11 +25,6 @@ public record UnknownProof(LinkedFragment fragment) implements Proof {
 
     @Override
     public ProofValue signature() {
-        return null;
-    }
-
-    @Override
-    public URI id() {
         return null;
     }
 
@@ -58,5 +56,15 @@ public record UnknownProof(LinkedFragment fragment) implements Proof {
     @Override
     public LinkedNode ld() {
         return fragment;
+    }
+    
+    @Override
+    public Collection<String> type() {
+        return fragment.type();
+    }
+    
+    @Override
+    public URI id() {
+        return null;
     }
 }

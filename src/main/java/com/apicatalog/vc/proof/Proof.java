@@ -48,6 +48,8 @@ public interface Proof extends Linkable {
      */
     URI id();
 
+    Collection<String> type();
+    
     /**
      * Must be processed after the previous proof. Allow to create a chain of
      * proofs. Optional.
