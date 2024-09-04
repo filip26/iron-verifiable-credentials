@@ -20,8 +20,8 @@ import com.apicatalog.linkedtree.primitive.LinkableObject;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.IssuerDetails;
-import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
+import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {

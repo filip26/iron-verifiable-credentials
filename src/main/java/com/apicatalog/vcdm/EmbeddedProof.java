@@ -1,4 +1,4 @@
-package com.apicatalog.vc.jsonld;
+package com.apicatalog.vcdm;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +17,6 @@ import com.apicatalog.linkedtree.builder.GenericTreeBuilder;
 import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.UnknownProof;
-import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -41,6 +40,7 @@ public final class EmbeddedProof {
      *
      *
      */
+    @Deprecated
     public static final JsonObject addProof(final JsonObject document, final JsonObject proof) {
 
         final JsonValue propertyValue = document.get(VcdmVocab.PROOF.uri());
@@ -58,6 +58,7 @@ public final class EmbeddedProof {
                 .build();
     }
 
+    @Deprecated
     public static final JsonObject setProofs(final JsonObject document, final Collection<JsonObject> proofs) {
 
         final JsonArrayBuilder builder = Json.createArrayBuilder();
@@ -119,50 +120,12 @@ public final class EmbeddedProof {
         throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
     }
 
-//    public static Collection<JsonObject> getProof(final JsonObject document) throws DocumentError {
-//
-//        final JsonArray proofValue = document.getJsonArray(VcdmVocab.PROOF.uri());
-//
-//        if (proofValue != null && proofValue.size() > 0) {
-//
-//            final Collection<JsonObject> proofs = new ArrayList<>(proofValue.size());
-//
-//            for (JsonValue proofGraph : proofValue) {
-//
-//                if (JsonUtils.isNull(proofGraph)) {
-//                    throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
-//                }
-//                if (JsonUtils.isNotObject(proofGraph)) {
-//                    throw new DocumentError(ErrorType.Invalid, VcdmVocab.PROOF);
-//                }
-//                final JsonValue proof = proofGraph.asJsonObject().get(Keywords.GRAPH);
-//
-//                if (JsonUtils.isNull(proof)) {
-//                    throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
-//                }
-//
-//                if (JsonUtils.isNotArray(proof)
-//                        || proof.asJsonArray().size() != 1
-//                        || JsonUtils.isNotObject(proof.asJsonArray().get(0))) {
-//                    throw new DocumentError(ErrorType.Invalid, VcdmVocab.PROOF);
-//                }
-//                proofs.add(proof.asJsonArray().getJsonObject(0));
-//            }
-//            if (proofs.size() > 0) {
-//                return proofs;
-//            }
-//        }
-//
-//        return Collections.emptyList();
-//    }
-//    
     /**
      * Creates a new document instance with no proofs attached.
      * 
      * @param verifiable with a proof
      * @return a new document with no proofs
      */
-    @Deprecated
     public static LinkedTree removeProofs(final LinkedTree verifiable) {
         var builder = new GenericTreeBuilder(verifiable);
         

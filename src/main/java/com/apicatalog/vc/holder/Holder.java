@@ -16,10 +16,10 @@ import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
-import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.JsonArray;

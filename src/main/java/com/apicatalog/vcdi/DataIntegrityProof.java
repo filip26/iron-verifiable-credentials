@@ -4,34 +4,28 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.Term;
-import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.builder.GenericTreeBuilder;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
 import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
-import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
 import com.apicatalog.vc.method.GenericVerificationMethod;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.proof.BaseProofValue;
+import com.apicatalog.vc.proof.DefaultProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vcdm.EmbeddedProof;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -42,14 +36,10 @@ import jakarta.json.JsonStructure;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof implements Proof {
+public class DataIntegrityProof extends DefaultProof implements Proof {
 
     protected final DataIntegritySuite suite;
-    protected final CryptoSuite crypto;
-
-    protected URI id;
-    protected URI previousProof;
-
+    
     protected Instant created;
     protected URI purpose;
 
@@ -57,16 +47,11 @@ public class DataIntegrityProof implements Proof {
     protected String nonce;
     protected String challenge;
 
-    protected VerificationMethod method;
-    protected ProofValue value;
-
-    protected LinkedFragment fragment;
-
     protected DataIntegrityProof(
             DataIntegritySuite suite,
             CryptoSuite crypto) {
+        super(crypto);
         this.suite = suite;
-        this.crypto = crypto;
     }
 
     public static LinkedFragment of(
@@ -105,17 +90,8 @@ public class DataIntegrityProof implements Proof {
                     if (method instanceof VerificationMethod verificationMethod) {
                         return verificationMethod;
                     }
-                    if (method instanceof LinkedFragment fragment) {
-                        return new GenericVerificationMethod(
-                                fragment.id() != null
-                                        ? URI.create(fragment.id().uri())
-                                        : null,
-                                null, // TODO read from fragment
-                                null,
-                                fragment);
-                    }
                     return new GenericVerificationMethod(
-                            null,
+                            selector.id(VcdiVocab.VERIFICATION_METHOD),
                             null,
                             null,
                             method.ld());
@@ -123,7 +99,7 @@ public class DataIntegrityProof implements Proof {
 
         proof.purpose = selector.id(VcdiVocab.PURPOSE);
 
-        proof.value = proofValue;
+        proof.signature = proofValue;
 
         proof.previousProof = selector.id(VcdiVocab.PREVIOUS_PROOF);
 
@@ -133,51 +109,16 @@ public class DataIntegrityProof implements Proof {
     }
 
     @Override
-    public void verify(VerificationKey method) throws VerificationError, DocumentError {
-
-//        var treeWriter = new JsonLdTreeWriter();
-
-//        // unsigned JSON-LD version - FIXME temporary, remove
-//        var signed = treeWriter.writeExpanded(ld().root()).iterator().next().asJsonObject();
-
-        // a data before issuance - no proof attached
-        final LinkedTree unsigned = EmbeddedProof.removeProofs(ld().root());
-
-        Objects.requireNonNull(value);
-        Objects.requireNonNull(unsigned);
-        Objects.requireNonNull(method);
-
-        // remove a proof value and get a new unsigned copy
-        final LinkedTree unsignedProof = unsignedCopy();
-
-        // verify signature
-        value.verify(
-                crypto,
-                unsigned,
-                unsignedProof,
-                method.publicKey());
-    }
-
-    @Override
     public void validate(Map<String, Object> params) throws DocumentError {
+
+        super.validate(params);
+
         if (created == null) {
             throw new DocumentError(ErrorType.Missing, "Created");
-        }
-        if (method == null) {
-            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
         }
         if (purpose == null) {
             throw new DocumentError(ErrorType.Missing, "ProofPurpose");
         }
-        if (value == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofValue");
-        }
-
-        // TODO
-//        if (value.toByteArray() != null &&  value.to.length != 32) {
-//            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
-//        }
-
         if (params != null) {
             assertEquals(params, VcdiVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
             assertEquals(params, VcdiVocab.CHALLENGE, challenge);
@@ -187,18 +128,12 @@ public class DataIntegrityProof implements Proof {
 
     @Override
     public JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
+//FIXME        final ProofValue derivedProofValue = ((BaseProofValue) value).derive(context, data, selectors);
 
-        final ProofValue derivedProofValue = ((BaseProofValue) value).derive(context, data, selectors);
-
-        final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
+//        final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
 
 //        return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public LinkedNode ld() {
-        return fragment;
     }
 
     /**
@@ -213,11 +148,6 @@ public class DataIntegrityProof implements Proof {
      */
     public URI getPurpose() {
         return purpose;
-    }
-
-    @Override
-    public VerificationMethod method() {
-        return method;
     }
 
     /**
@@ -253,47 +183,20 @@ public class DataIntegrityProof implements Proof {
     }
 
     @Override
-    public ProofValue signature() {
-        return value;
-    }
-
-    @Override
-    public URI id() {
-        return id;
-    }
-
-    @Override
-    public URI previousProof() {
-        return previousProof;
-    }
-
-    @Override
-    public CryptoSuite cryptoSuite() {
-        return crypto;
-    }
-
-    @Override
     public MethodAdapter methodProcessor() {
         return suite.methodAdapter;
     }
 
-    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
-        final Object value = params.get(name.name());
-
-        if (value == null) {
-            return;
-        }
-
-        if (!value.equals(param)) {
-            throw new DocumentError(ErrorType.Invalid, name);
-        }
+    @Override
+    protected LinkedTree unsigned(LinkedTree verifiable) {
+        return EmbeddedProof.removeProofs(verifiable);
     }
 
-    protected LinkedTree unsignedCopy() {
-        var builder = new GenericTreeBuilder(fragment.root());
+    @Override
+    protected LinkedTree unsignedProof(LinkedTree proof) {
+        var builder = new GenericTreeBuilder(proof);
         return builder.deepClone((node, indexOrder, indexTerm, depth) -> VcdiVocab.PROOF_VALUE.uri().equals(indexTerm)
                 ? ProcessingPolicy.Drop
-                : ProcessingPolicy.Accept
-        );
+                : ProcessingPolicy.Accept);
     }
 }

@@ -25,6 +25,7 @@ import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 

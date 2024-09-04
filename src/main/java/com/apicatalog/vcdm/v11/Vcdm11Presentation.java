@@ -19,8 +19,8 @@ import com.apicatalog.linkedtree.lang.LanguageMap;
 import com.apicatalog.linkedtree.primitive.LinkableObject;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
-import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
+import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation {

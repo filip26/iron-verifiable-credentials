@@ -106,7 +106,7 @@ public record ObjectFragmentMapper(
         }
     }
 
-    public <R> R single(Term term, Function<Linkable, R> mapper) throws DocumentError {
+    public <R> R single(Term term, LinkableMapper<R> mapper) throws DocumentError {
 
         Objects.requireNonNull(term);
 
@@ -139,7 +139,7 @@ public record ObjectFragmentMapper(
                 throw new DocumentError(ErrorType.Invalid, term);
             }
 
-            return mapper.apply(value);
+            return mapper.map(value);
 
         } catch (DocumentError e) {
             throw e;

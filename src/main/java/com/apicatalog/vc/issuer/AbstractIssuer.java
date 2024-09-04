@@ -27,11 +27,11 @@ import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.jsonld.EmbeddedProof;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vcdi.DataIntegrityProofDraft;
 import com.apicatalog.vcdi.VcdiVocab;
+import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 

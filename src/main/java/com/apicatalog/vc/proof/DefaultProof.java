@@ -1,0 +1,133 @@
+package com.apicatalog.vc.proof;
+
+import java.net.URI;
+import java.util.Map;
+import java.util.Objects;
+
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.Term;
+import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.ld.signature.key.VerificationKey;
+import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.LinkedTree;
+
+/**
+ * An abstract implementation providing partial implementation.
+ *
+ */
+public abstract class DefaultProof implements Proof {
+
+    protected final CryptoSuite crypto;
+
+    protected URI id;
+    protected URI previousProof;
+
+    protected VerificationMethod method;
+    protected ProofValue signature;
+
+    protected LinkedFragment fragment;
+
+    protected DefaultProof(CryptoSuite crypto) {
+        this.crypto = crypto;
+    }
+
+    /**
+     * Create a generic copy of the verifiable that has no proof attached.
+     * 
+     * @param verifiable
+     * @return
+     */
+    protected abstract LinkedTree unsigned(LinkedTree verifiable);
+
+    /**
+     * Create a generic copy of the proof with no proof value, i.e. signature,
+     * attached.
+     * 
+     * @param proof
+     * @return
+     */
+    protected abstract LinkedTree unsignedProof(LinkedTree proof);
+
+    @Override
+    public void verify(VerificationKey method) throws VerificationError, DocumentError {
+
+        // a data before issuance - no proof attached
+        final LinkedTree unsigned = unsigned(ld().root());
+
+        Objects.requireNonNull(signature);
+        Objects.requireNonNull(unsigned);
+        Objects.requireNonNull(method);
+
+        // remove a proof value and get a new unsigned copy
+        final LinkedTree unsignedProof = unsignedProof(fragment.root());
+        
+        // verify signature
+        signature.verify(
+                crypto,
+                unsigned,
+                unsignedProof,
+                method.publicKey());
+    }
+
+    @Override
+    public void validate(Map<String, Object> params) throws DocumentError {
+        if (method == null) {
+            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
+        }
+        if (signature == null) {
+            throw new DocumentError(ErrorType.Missing, "ProofValue");
+        }
+        // FIXME
+//        if (value.toByteArray() != null &&  value.to.length != 32) {
+//            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
+//        }
+//        value.validate();
+
+    }
+
+    @Override
+    public LinkedNode ld() {
+        return fragment;
+    }
+
+    @Override
+    public VerificationMethod method() {
+        return method;
+    }
+
+    @Override
+    public ProofValue signature() {
+        return signature;
+    }
+
+    @Override
+    public URI id() {
+        return id;
+    }
+
+    @Override
+    public URI previousProof() {
+        return previousProof;
+    }
+
+    @Override
+    public CryptoSuite cryptoSuite() {
+        return crypto;
+    }
+
+    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
+        final Object value = params.get(name.name());
+
+        if (value == null) {
+            return;
+        }
+
+        if (!value.equals(param)) {
+            throw new DocumentError(ErrorType.Invalid, name);
+        }
+    }
+}
