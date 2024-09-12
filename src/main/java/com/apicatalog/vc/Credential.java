@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.status.Status;
 
 /**
@@ -25,7 +26,7 @@ public interface Credential extends Verifiable {
      */
     boolean isNotValidYet();
 
-    LinkedFragment issuer();
+    IssuerDetails issuer();
 
     Collection<Status> status();
 

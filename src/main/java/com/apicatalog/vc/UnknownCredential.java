@@ -6,11 +6,12 @@ import java.util.Collections;
 
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
 
 public record UnknownCredential(
-//TODO        URI id,
+        URI id,
         LinkedFragment fragment) implements Credential {
 
     @Override
@@ -29,7 +30,7 @@ public record UnknownCredential(
     }
 
     @Override
-    public LinkedFragment issuer() {
+    public IssuerDetails issuer() {
         return null;
     }
 
@@ -51,11 +52,5 @@ public record UnknownCredential(
     @Override
     public Collection<String> type() {
         return fragment.type().stream().toList();
-    }
-    
-    @Override
-    public URI id() {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

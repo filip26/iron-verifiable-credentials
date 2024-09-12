@@ -2,7 +2,6 @@ package com.apicatalog.vcdm.v11;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -10,17 +9,17 @@ import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.selector.InvalidSelector;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.IssuerDetails;
+import com.apicatalog.vc.issuer.GenericIssuer;
 import com.apicatalog.vc.status.Status;
-import com.apicatalog.vc.status.UnknownStatus;
+import com.apicatalog.vc.status.GenericStatus;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
 
-    private static final Logger LOGGER = Logger.getLogger(Vcdm11Credential.class.getName());
+//    private static final Logger LOGGER = Logger.getLogger(Vcdm11Credential.class.getName());
 
     /** issuanceDate */
     protected Instant issuance;
@@ -32,56 +31,40 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
 
     protected Collection<Status> status;
 
-    protected LinkedFragment issuer;
+    protected IssuerDetails issuer;
 
-    protected LinkedFragment fragment;
-    
+    protected LinkedFragment ld;
+
     protected Vcdm11Credential() {
         // protected
     }
 
-    public static Vcdm11Credential of(LinkedFragment source) throws AdapterError {
-
-        var credential = new Vcdm11Credential();
-//        var fragment = new LinkableObject(id, types, properties, credential);
-
-//        credential.fragment = fragment;
-
-//        var selector = new ObjectFragmentMapper(properties);
-
-//        setup(id, types, credential, selector);
-
-//        return fragment;
-        return credential;
+    public static Credential of(LinkedFragment source) throws AdapterError {
+        return setup(new Vcdm11Credential(), source);
     }
 
-//    protected static LangStringSelector getLangMap(Map<String, LinkedContainer> properties, String term) {
-//        final LinkedContainer container = properties.get(term);
-//        if (container != null) {
-//            return LanguageMap.of(container);
-//        }
-//        return null;
-//    }
+    protected static Credential setup(Vcdm11Credential credential, LinkedFragment source) throws AdapterError {
 
-    protected static void setup(Vcdm11Credential credential, LinkedFragment source) throws InvalidSelector {
         // @id
         credential.id = source.uri();
 
         // subject
         credential.subject = source.collection(
-                VcdmVocab.SUBJECT.uri(), 
+                VcdmVocab.SUBJECT.uri(),
                 LinkedFragment.class);
 
         // issuer
-        // TODO IssuerDetails
-        credential.issuer = source.fragment(VcdmVocab.ISSUER.uri());
+        credential.issuer = source.fragment(
+                VcdmVocab.ISSUER.uri(),
+                IssuerDetails.class,
+                GenericIssuer::new
+                );
 
         // status
         credential.status = source.collection(
                 VcdmVocab.STATUS.uri(),
                 Status.class,
-                UnknownStatus::new
-                );
+                GenericStatus::new);
 
         // issuance date
         credential.issuance = source.xsdDateTime(VcdmVocab.ISSUANCE_DATE.uri());
@@ -93,6 +76,9 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
 //            credential.proofs = EmbeddedProof.getProofs(
 //                    selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
 //        }
+
+        credential.ld = source;
+        return credential;
     }
 
     /**
@@ -134,9 +120,9 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
 
         // status
         if (status() != null) {
-//            for (final Status item : status()) {
-//                item.validate();
-//            }
+            for (final Status item : status()) {
+                item.validate();
+            }
         }
 
         if (issuanceDate() == null) {
@@ -150,14 +136,15 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
             throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }
     }
+
     @Override
     public LinkedNode ld() {
-        return fragment;
+        return ld;
     }
 
     @Override
     public Collection<String> type() {
-        return fragment.type().stream().toList();
+        return ld.type().stream().toList();
     }
 
     /**
@@ -166,7 +153,7 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
      * @return {@link IssuerDetails} representing the issuer in an expanded form
      */
     @Override
-    public LinkedFragment issuer() {
+    public IssuerDetails issuer() {
         return issuer;
     }
 

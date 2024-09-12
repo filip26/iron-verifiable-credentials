@@ -3,7 +3,7 @@ package com.apicatalog.vc.status;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedNode;
 
-public record UnknownStatus(LinkedNode ld) implements Status {
+public record GenericStatus(LinkedNode ld) implements Status {
 
     @Override
     public void validate() throws DocumentError {

@@ -38,9 +38,9 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 
     protected Collection<Status> status;
 
-    protected LinkedFragment issuer;
+    protected IssuerDetails issuer;
 
-    protected LinkedFragment fragment;
+    protected LinkedFragment ld;
 
     public static LinkableObject of(
             final Link id,
@@ -70,9 +70,9 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 
         // issuer
         //TODO IssuerDetails
-        credential.issuer = selector.single(
-                VcdmVocab.ISSUER,
-                LinkedFragment.class);
+//        credential.issuer = selector.single(
+//                VcdmVocab.ISSUER,
+//                LinkedFragment.class);
 
         // status
 //      credential.status(readCollection(version, document.get(VcVocab.STATUS.uri()), statusReader));
@@ -97,7 +97,7 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 
     @Override
     public LinkedNode ld() {
-        return fragment;
+        return ld;
     }
 
     /**
@@ -132,7 +132,7 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
      * @return {@link IssuerDetails} representing the issuer in an expanded form
      */
     @Override
-    public LinkedFragment issuer() {
+    public IssuerDetails issuer() {
         return issuer;
     }
 
@@ -237,7 +237,7 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 
     @Override
     public Collection<String> type() {
-        return fragment.type().stream().toList();
+        return ld.type().stream().toList();
     }
 
     @Override
