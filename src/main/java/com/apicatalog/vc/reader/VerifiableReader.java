@@ -1,4 +1,4 @@
-package com.apicatalog.vc.jsonld;
+package com.apicatalog.vc.reader;
 
 import java.net.URI;
 
@@ -8,7 +8,7 @@ import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonObject;
 
-public interface JsonLdVerifiableReader {
+public interface VerifiableReader {
 
     /**
      * Reads VC/VP document.

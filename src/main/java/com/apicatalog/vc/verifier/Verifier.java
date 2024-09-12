@@ -25,11 +25,11 @@ import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableAdapter;
-import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
@@ -218,7 +218,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throw new DocumentError(ErrorType.Invalid, "document");
         }
 
-        final JsonLdVerifiableReader reader = verifiableAdapter.reader(context);
+        final VerifiableReader reader = verifiableAdapter.reader(context);
 
         if (reader == null) {
             LOGGER.log(Level.INFO, "An unknown document model {0}", context);

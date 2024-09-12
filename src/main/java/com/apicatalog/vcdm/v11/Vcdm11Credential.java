@@ -2,22 +2,20 @@ package com.apicatalog.vcdm.v11;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.AdapterError;
-import com.apicatalog.linkedtree.fragment.LinkableObject;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.link.Link;
+import com.apicatalog.linkedtree.selector.InvalidSelector;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.IssuerDetails;
-import com.apicatalog.vc.lt.ObjectFragmentMapper;
+import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.status.UnknownStatus;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
@@ -32,7 +30,7 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
     /** a verifiable credential contains claims about one or more subjects */
     protected Collection<LinkedFragment> subject;
 
-    protected Collection<LinkedFragment> status;
+    protected Collection<Status> status;
 
     protected LinkedFragment issuer;
 
@@ -65,25 +63,31 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
 //        return null;
 //    }
 
-    protected static void setup(final Link id, final Collection<String> types, Vcdm11Credential credential, final ObjectFragmentMapper selector) throws DocumentError {
+    protected static void setup(Vcdm11Credential credential, LinkedFragment source) throws InvalidSelector {
         // @id
-        credential.id = selector.id(id);
+        credential.id = source.uri();
 
         // subject
-        credential.subject = selector.fragments(VcdmVocab.SUBJECT);
+        credential.subject = source.collection(
+                VcdmVocab.SUBJECT.uri(), 
+                LinkedFragment.class);
 
         // issuer
         // TODO IssuerDetails
-        credential.issuer = selector.fragment(VcdmVocab.ISSUER);
+        credential.issuer = source.fragment(VcdmVocab.ISSUER.uri());
 
         // status
-        credential.status = selector.fragments(VcdmVocab.STATUS);
+        credential.status = source.collection(
+                VcdmVocab.STATUS.uri(),
+                Status.class,
+                UnknownStatus::new
+                );
 
         // issuance date
-        credential.issuance = selector.xsdDateTime(VcdmVocab.ISSUANCE_DATE);
+        credential.issuance = source.xsdDateTime(VcdmVocab.ISSUANCE_DATE.uri());
 
         // expiration date
-        credential.expiration = selector.xsdDateTime(VcdmVocab.EXPIRATION_DATE);
+        credential.expiration = source.xsdDateTime(VcdmVocab.EXPIRATION_DATE.uri());
 
 //        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
 //            credential.proofs = EmbeddedProof.getProofs(
@@ -172,7 +176,7 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
      * @return
      */
     @Override
-    public Collection<LinkedFragment> status() {
+    public Collection<Status> status() {
         return status;
     }
 

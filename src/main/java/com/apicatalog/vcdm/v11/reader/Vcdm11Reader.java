@@ -12,11 +12,14 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
+import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
+import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -24,15 +27,18 @@ import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Credential;
 import com.apicatalog.vcdm.v11.Vcdm11Presentation;
 
+import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
+import jakarta.json.JsonValue.ValueType;
 
 /**
  * A JSON-LD based reader conforming to the
  * <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data
  * Model v1.1</a>
  */
-public class Vcdm11Reader implements JsonLdVerifiableReader {
+public class Vcdm11Reader implements VerifiableReader {
 
     protected final JsonLdTreeReader reader = JsonLdTreeReader.create()
             
@@ -82,15 +88,20 @@ public class Vcdm11Reader implements JsonLdVerifiableReader {
             final JsonArray expanded,
             final DocumentLoader loader) throws DocumentError {
 
-        if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
+        if (expanded == null 
+                || expanded.isEmpty() 
+                || expanded.size() > 1
+                || ValueType.OBJECT != expanded.iterator().next().getValueType()
+                ) {
             throw new DocumentError(ErrorType.Invalid);
         }
         
-//        EmbeddedProof.removeProofs(null);
-
-        // TODO remove proofs
-//        EmbeddedProof.removeProofs(null);
-
+        final JsonObject object = expanded.iterator().next().asJsonObject();
+        
+        // detach proofs
+        final JsonValue proofs = EmbeddedProof.getProofs(object);
+        
+        final JsonObject unsigned = EmbeddedProof.removeProofs(object);
 //
 //        suites.stream()
 //                .forEach(s -> {
@@ -102,19 +113,19 @@ public class Vcdm11Reader implements JsonLdVerifiableReader {
 //
         try {
             // get a verifiable
-            final LinkedTree verifiable = reader.read(context, expanded);
+            final LinkedTree verifiable = reader.read(context, Json.createArrayBuilder().add(unsigned).build());
             if (verifiable == null
                     || verifiable.size() != 1
                     || !verifiable.node().isFragment()
                     || !verifiable.node().asFragment().type().isAdaptableTo(Verifiable.class)) {
                 throw new DocumentError(ErrorType.Invalid, "document");
             }
-
+NodeDebugWriter.printToStdout(verifiable);
             return verifiable.object(Verifiable.class);
 
         } catch (DocumentError e) {
             throw e;
-        } catch (Exception e) {
+        } catch (TreeBuilderError | AdapterError e) {            
             throw new DocumentError(e, ErrorType.Invalid, "document");
         }
     }

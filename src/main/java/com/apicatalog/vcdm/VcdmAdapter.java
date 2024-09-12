@@ -6,7 +6,7 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableAdapter;
-import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
+import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.v11.reader.Vcdm11Reader;
 
@@ -26,7 +26,7 @@ public class VcdmAdapter implements JsonLdVerifiableAdapter {
     }
 
     @Override
-    public JsonLdVerifiableReader reader(final Collection<String> contexts) throws DocumentError {
+    public VerifiableReader reader(final Collection<String> contexts) throws DocumentError {
 
         if (contexts == null || contexts.isEmpty()) {
             return null;

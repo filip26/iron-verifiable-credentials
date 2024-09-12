@@ -18,6 +18,7 @@ import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
+import com.apicatalog.vc.status.Status;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Verifiable;
 
@@ -35,7 +36,7 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
     /** a verifiable credential contains claims about one or more subjects */
     protected Collection<LinkedFragment> subject;
 
-    protected Collection<LinkedFragment> status;
+    protected Collection<Status> status;
 
     protected LinkedFragment issuer;
 
@@ -140,7 +141,7 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
      * 
      * @return
      */
-    public Collection<LinkedFragment> status() {
+    public Collection<Status> status() {
         return status;
     }
 

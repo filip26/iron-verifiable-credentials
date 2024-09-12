@@ -7,6 +7,7 @@ import java.util.Collections;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.status.Status;
 
 public record UnknownCredential(
 //TODO        URI id,
@@ -33,7 +34,7 @@ public record UnknownCredential(
     }
 
     @Override
-    public Collection<LinkedFragment> status() {
+    public Collection<Status> status() {
         return Collections.emptyList();
     }
 

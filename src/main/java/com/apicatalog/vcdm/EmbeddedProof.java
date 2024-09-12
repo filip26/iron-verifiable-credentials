@@ -122,6 +122,14 @@ public final class EmbeddedProof {
         throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
     }
 
+    public static JsonValue getProofs(final JsonObject document) {
+        return document.get(VcdmVocab.PROOF.uri());
+    }
+
+    public static JsonObject removeProofs(final JsonObject document) {
+        return Json.createObjectBuilder(document).remove(VcdmVocab.PROOF.uri()).build();
+    }
+    
     /**
      * Creates a new document instance with no proofs attached.
      * 
@@ -130,48 +138,46 @@ public final class EmbeddedProof {
      */
     public static LinkedTree removeProofs(final LinkedTree verifiable) throws DocumentError {
         try {
-        var builder = new GenericTreeCloner(verifiable);
-        
-        return builder.deepClone(
-                (node, indexOrder, indexTerm, depth)
-                -> VcdmVocab.PROOF.uri().equals(indexTerm)
-                ? ProcessingPolicy.Drop
-                : ProcessingPolicy.Accept
-                );
+            var builder = new GenericTreeCloner(verifiable);
+
+            return builder.deepClone(
+                    (node, indexOrder, indexTerm, depth) -> VcdmVocab.PROOF.uri().equals(indexTerm)
+                            ? ProcessingPolicy.Drop
+                            : ProcessingPolicy.Accept);
         } catch (TreeBuilderError e) {
             throw new DocumentError(e, ErrorType.Invalid);
         }
     }
-    
+
     public static Collection<Proof> getProofs(final LinkedContainer tree) throws AdapterError {
 
         Objects.requireNonNull(tree);
-        
+
         if (tree.nodes().isEmpty()) {
-            return Collections.emptyList();            
+            return Collections.emptyList();
         }
-        
+
         var proofs = new ArrayList<Proof>();
 
         for (final LinkedNode node : tree) {
             if (node.isTree()) {
-                proofs.add(getProof(node.asTree().fragment())); 
+                proofs.add(getProof(node.asTree().fragment()));
                 continue;
             }
             proofs.add(getProof(node.asFragment()));
         }
-        
+
         return proofs;
     }
-    
+
     public static Proof getProof(final LinkedFragment fragment) throws AdapterError {
-        
+
         Objects.requireNonNull(fragment);
 
         if (fragment.type().isAdaptableTo(Proof.class)) {
             return fragment.type().materialize(Proof.class);
         }
-        
+
         return new UnknownProof(fragment);
     }
 }
