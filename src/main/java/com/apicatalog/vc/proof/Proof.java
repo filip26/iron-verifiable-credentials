@@ -11,7 +11,6 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.Linkable;
-import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vcdi.DataIntegrityProof;
 
 import jakarta.json.JsonObject;
@@ -80,6 +79,4 @@ public interface Proof extends Linkable {
     default JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
     }
-
-//    MethodAdapter methodProcessor();
 }

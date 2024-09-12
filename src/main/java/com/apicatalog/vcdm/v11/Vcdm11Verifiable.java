@@ -23,7 +23,12 @@ public abstract class Vcdm11Verifiable implements Verifiable {
     public Collection<Proof> proofs() {
         return proofs;
     }
-    
+
+    @Override
+    public void proofs(Collection<Proof> proofs) {
+        this.proofs = proofs;
+    }
+
     /**
      * Verifiable credentials data model version. Will be moved into a separate
      * interface specialized to VCDM.
@@ -33,7 +38,6 @@ public abstract class Vcdm11Verifiable implements Verifiable {
     public VcdmVersion version() {
         return VcdmVersion.V11;
     }
-
 
 //    /**
 //     * Creates a new verifiable instance from the given expanded JSON-LD input.

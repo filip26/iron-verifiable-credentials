@@ -5,19 +5,19 @@ import java.util.Collection;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.jsonld.JsonLdVerifiableAdapter;
+import com.apicatalog.vc.reader.VerifiableReaderResolver;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.v11.reader.Vcdm11Reader;
+import com.apicatalog.vcdm.v11.Vcdm11Reader;
 
-public class VcdmAdapter implements JsonLdVerifiableAdapter {
+public class VcdmResolver implements VerifiableReaderResolver {
 
     protected final SignatureSuite[] suites;
 
     protected boolean v11;
     protected boolean v20;
 
-    public VcdmAdapter(SignatureSuite[] suites) {
+    public VcdmResolver(SignatureSuite[] suites) {
         this.suites = suites;
 
         // defaults
@@ -26,7 +26,7 @@ public class VcdmAdapter implements JsonLdVerifiableAdapter {
     }
 
     @Override
-    public VerifiableReader reader(final Collection<String> contexts) throws DocumentError {
+    public VerifiableReader resolveReader(final Collection<String> contexts) throws DocumentError {
 
         if (contexts == null || contexts.isEmpty()) {
             return null;

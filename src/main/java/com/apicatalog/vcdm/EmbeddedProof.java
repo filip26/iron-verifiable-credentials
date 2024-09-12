@@ -18,7 +18,7 @@ import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vc.proof.UnknownProof;
+import com.apicatalog.vc.proof.GenericProof;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -122,8 +122,12 @@ public final class EmbeddedProof {
         throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
     }
 
-    public static JsonValue getProofs(final JsonObject document) {
-        return document.get(VcdmVocab.PROOF.uri());
+    public static JsonArray getProofs(final JsonObject document) throws DocumentError {
+        final JsonValue value = document.get(VcdmVocab.PROOF.uri());
+        if (JsonUtils.isNotArray(value)) {
+            throw new DocumentError(ErrorType.Invalid, VcdmVocab.PROOF);
+        }
+        return value.asJsonArray();
     }
 
     public static JsonObject removeProofs(final JsonObject document) {
@@ -178,6 +182,6 @@ public final class EmbeddedProof {
             return fragment.type().materialize(Proof.class);
         }
 
-        return new UnknownProof(fragment);
+        return new GenericProof(fragment);
     }
 }

@@ -10,12 +10,11 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 
-public record UnknownProof(
+public record GenericProof(
 //TODO        URI id,
-        LinkedFragment fragment) implements Proof {
+        LinkedNode ld) implements Proof {
 
     @Override
     public VerificationMethod method() {
@@ -39,13 +38,8 @@ public record UnknownProof(
 
     @Override
     public void validate(Map<String, Object> params) throws DocumentError {
-        throw new UnsupportedOperationException("An uknown proof cannot be validated.");
+        throw new UnsupportedOperationException("An unknown proof cannot be validated.");
     }
-
-//    @Override
-//    public MethodAdapter methodProcessor() {
-//        return null;
-//    }
 
     @Override
     public void verify(VerificationKey method) throws VerificationError, DocumentError {
@@ -53,13 +47,8 @@ public record UnknownProof(
     }
     
     @Override
-    public LinkedNode ld() {
-        return fragment;
-    }
-    
-    @Override
     public Collection<String> type() {
-        return fragment.type().stream().toList();
+        return ld().asFragment().type().stream().toList();
     }
     
     @Override

@@ -24,16 +24,17 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.jsonld.JsonLdVerifiableAdapter;
 import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.reader.VerifiableReader;
+import com.apicatalog.vc.reader.VerifiableReaderResolver;
+import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
-import com.apicatalog.vcdm.VcdmAdapter;
+import com.apicatalog.vcdm.VcdmResolver;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.JsonObject;
@@ -50,12 +51,12 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
     protected StatusVerifier statusVerifier;
 
-    protected final JsonLdVerifiableAdapter verifiableAdapter;
+    protected final VerifiableReaderResolver verifiableAdapter;
 
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
-        this.verifiableAdapter = new VcdmAdapter(suites);
+        this.verifiableAdapter = new VcdmResolver(suites);
         this.statusVerifier = null;
     }
 
@@ -218,7 +219,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
             throw new DocumentError(ErrorType.Invalid, "document");
         }
 
-        final VerifiableReader reader = verifiableAdapter.reader(context);
+        final VerifiableReader reader = verifiableAdapter.resolveReader(context);
 
         if (reader == null) {
             LOGGER.log(Level.INFO, "An unknown document model {0}", context);
@@ -245,6 +246,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
         // validate data model semantic
         if (verifiable.isCredential()) {
             validate(verifiable.asCredential());
+
         } else {
             verifiable.validate();
         }
@@ -297,11 +299,10 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
         // status check
         if (statusVerifier != null && credential.status() != null && !credential.status().isEmpty()) {
-            // FIXME
-//            for (final Status status : credential.status()) {
-//            for (final Status status : credential.status()) {
+            for (final Status status : credential.status()) {
+                // FIXME add 
 //                statusVerifier.verify(credential, status);   
-//            }
+            }
         }
     }
 

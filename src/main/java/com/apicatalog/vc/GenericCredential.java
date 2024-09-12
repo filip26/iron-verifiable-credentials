@@ -4,16 +4,15 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 
-public record UnknownCredential(
+public record GenericCredential(
         URI id,
-        LinkedFragment fragment) implements Credential {
+        LinkedNode ld) implements Credential {
 
     @Override
     public Collection<Proof> proofs() {
@@ -46,12 +45,12 @@ public record UnknownCredential(
     }
 
     @Override
-    public LinkedNode ld() {
-        return fragment;
-    }
-    
-    @Override
     public Collection<String> type() {
-        return fragment.type().stream().toList();
+        return ld().asFragment().type().stream().toList();
+    }
+
+    @Override
+    public void proofs(Collection<Proof> proofs) {
+        throw new UnsupportedOperationException();
     }
 }
