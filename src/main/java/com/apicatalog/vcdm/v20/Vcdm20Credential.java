@@ -8,22 +8,18 @@ import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
-import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.linkedtree.fragment.LinkableObject;
+import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
-import com.apicatalog.vc.status.Status;
-import com.apicatalog.vc.subject.Subject;
-import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Verifiable;
-import com.apicatalog.vcdm.v11.Vcdm11Credential;
 
 import jakarta.json.JsonValue;
 
@@ -52,15 +48,16 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
             final Supplier<LinkedTree> rootSupplier) throws DocumentError {
 
         var credential = new Vcdm20Credential();
-        var fragment = new LinkableObject(id, types, properties, rootSupplier, credential);
-
-        credential.fragment = fragment;
-
-        var selector = new ObjectFragmentMapper(properties);
-
-        setup(id, types, credential, selector);
-
-        return fragment;
+//        var fragment = new LinkableObject(id, types, properties, rootSupplier, credential);
+//
+//        credential.fragment = fragment;
+//
+//        var selector = new ObjectFragmentMapper(properties);
+//
+//        setup(id, types, credential, selector);
+//
+//        return fragment;
+        return null;
     }
 
     protected static void setup(final Link id, final Collection<String> types, Vcdm20Credential credential, final ObjectFragmentMapper selector) throws DocumentError {
@@ -91,10 +88,10 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
                 XsdDateTime.class,
                 XsdDateTime::datetime);
 
-        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
-            credential.proofs = EmbeddedProof.getProofs(
-                    selector.properties().get(VcdmVocab.PROOF.uri()).asTree());
-        }
+//        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
+//            credential.proofs = EmbeddedProof.getProofs(
+//                    selector.properties().get(VcdmVocab.PROOF.uri()).asTree());
+//        }
     }
 
     @Override
@@ -239,7 +236,7 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 
     @Override
     public Collection<String> type() {
-        return fragment.type();
+        return fragment.type().stream().toList();
     }
 
     @Override

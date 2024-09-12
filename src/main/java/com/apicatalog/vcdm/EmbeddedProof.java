@@ -13,7 +13,9 @@ import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.builder.GenericTreeBuilder;
+import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.builder.GenericTreeCloner;
+import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.UnknownProof;
@@ -126,8 +128,9 @@ public final class EmbeddedProof {
      * @param verifiable with a proof
      * @return a new document with no proofs
      */
-    public static LinkedTree removeProofs(final LinkedTree verifiable) {
-        var builder = new GenericTreeBuilder(verifiable);
+    public static LinkedTree removeProofs(final LinkedTree verifiable) throws DocumentError {
+        try {
+        var builder = new GenericTreeCloner(verifiable);
         
         return builder.deepClone(
                 (node, indexOrder, indexTerm, depth)
@@ -135,10 +138,12 @@ public final class EmbeddedProof {
                 ? ProcessingPolicy.Drop
                 : ProcessingPolicy.Accept
                 );
-        
+        } catch (TreeBuilderError e) {
+            throw new DocumentError(e, ErrorType.Invalid);
+        }
     }
     
-    public static Collection<Proof> getProofs(final LinkedContainer tree) {
+    public static Collection<Proof> getProofs(final LinkedContainer tree) throws AdapterError {
 
         Objects.requireNonNull(tree);
         
@@ -150,7 +155,7 @@ public final class EmbeddedProof {
 
         for (final LinkedNode node : tree) {
             if (node.isTree()) {
-                proofs.add(getProof(node.asTree().single().asFragment())); 
+                proofs.add(getProof(node.asTree().fragment())); 
                 continue;
             }
             proofs.add(getProof(node.asFragment()));
@@ -159,12 +164,12 @@ public final class EmbeddedProof {
         return proofs;
     }
     
-    public static Proof getProof(final LinkedFragment fragment) {
+    public static Proof getProof(final LinkedFragment fragment) throws AdapterError {
         
         Objects.requireNonNull(fragment);
 
-        if (fragment.cast() instanceof Proof proof) {
-            return proof;
+        if (fragment.type().isAdaptableTo(Proof.class)) {
+            return fragment.type().materialize(Proof.class);
         }
         
         return new UnknownProof(fragment);

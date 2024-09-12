@@ -49,7 +49,7 @@ public record UnknownCredential(
     
     @Override
     public Collection<String> type() {
-        return fragment.type();
+        return fragment.type().stream().toList();
     }
     
     @Override

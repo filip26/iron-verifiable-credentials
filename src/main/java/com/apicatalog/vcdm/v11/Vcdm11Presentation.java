@@ -6,24 +6,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.linkedtree.fragment.LinkableObject;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.lang.LangStringSelector;
-import com.apicatalog.linkedtree.lang.LanguageMap;
-import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
-import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation {
@@ -39,26 +34,18 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
     public static LinkableObject of(
             final Link id,
             final Collection<String> types,
-            final Map<String, LinkedContainer> properties,
-            final Supplier<LinkedTree> rootSupplier) throws DocumentError {
+            final Map<String, LinkedContainer> properties) throws DocumentError {
 
         var presentation = new Vcdm11Presentation();
-        var fragment = new LinkableObject(id, types, properties, rootSupplier, presentation);
+//        var fragment = new LinkableObject(id, types, properties, ctx.rootSupplier(), presentation);
 
-        presentation.fragment = fragment;
+//        presentation.fragment = fragment;
 
         var selector = new ObjectFragmentMapper(properties);
 
         setup(id, types, presentation, selector);
 
-        return fragment;
-    }
-
-    protected static LangStringSelector getLangMap(Map<String, LinkedContainer> properties, String term) {
-        final LinkedContainer container = properties.get(term);
-        if (container != null) {
-            return LanguageMap.of(container);
-        }
+//        return fragment;
         return null;
     }
 
@@ -79,10 +66,10 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
         }
 
         // proofs
-        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
-            presentation.proofs = EmbeddedProof.getProofs(
-                    selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
-        }
+//        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
+//            presentation.proofs = EmbeddedProof.getProofs(
+//                    selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
+//        }
     }
 
     static Collection<Credential> getCredentials(final LinkedContainer tree) {
@@ -97,7 +84,7 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
 
         for (final LinkedNode node : tree) {
             if (node.isTree()) {
-                credentials.add(getCredential(node.asTree().single().asFragment()));
+//                credentials.add(getCredential(node.asTree().single().asFragment()));
                 continue;
             }
             credentials.add(getCredential(node.asFragment()));
@@ -110,9 +97,9 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
 
         Objects.requireNonNull(fragment);
 
-        if (fragment.cast() instanceof Credential credential) {
-            return credential;
-        }
+//        if (fragment.cast() instanceof Credential credential) {
+//            return credential;
+//        }
 
         // FIXME
         throw new UnsupportedOperationException();
@@ -126,7 +113,7 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
 
     @Override
     public Collection<String> type() {
-        return fragment.type();
+        return fragment.type().stream().toList();
     }
 
     @Override

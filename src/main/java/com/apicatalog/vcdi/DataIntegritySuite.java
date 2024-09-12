@@ -1,20 +1,13 @@
 package com.apicatalog.vcdi;
 
 import java.net.URI;
-import java.util.List;
-import java.util.function.Supplier;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.linkedtree.LinkedLiteral;
-import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.adapter.LinkedLiteralAdapter;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.proof.ProofAdapter;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
 
@@ -26,7 +19,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected final Multibase proofValueBase;
     
-    protected ProofAdapter proofAdapter;
+//    protected ProofAdapter proofAdapter;
 
     protected DataIntegritySuite(
             String cryptosuiteName,
@@ -36,24 +29,24 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         this.cryptosuiteName = cryptosuiteName;
         this.proofValueBase = proofValueBase;
         this.methodAdapter = method;
-        this.proofAdapter = new DataIntegrityProofAdapter(this, List.of(getProofValueAdapter(proofValueBase)));
+//        this.proofAdapter = new DataIntegrityProofAdapter(this, List.of(getProofValueAdapter(proofValueBase)));
     }
 
-    protected static LinkedLiteralAdapter getProofValueAdapter(Multibase proofValueBase) {
-        //TODO multibase adapter
-        return new LinkedLiteralAdapter() {
-            @Override
-            public LinkedLiteral read(String value, Supplier<LinkedTree> rootSupplier) {
-                return new MultibaseLiteral(datatype(), value, rootSupplier, proofValueBase.decode(value));
-            }
-            
-            @Override
-            public String datatype() {
-                return MultibaseLiteral.TYPE;
-            }
-        };
-    }
-    
+//    protected static LinkedLiteralAdapter getProofValueAdapter(Multibase proofValueBase) {
+//        //TODO multibase adapter
+//        return new LinkedLiteralAdapter() {
+//            @Override
+//            public LinkedLiteral read(String value, Supplier<LinkedTree> rootSupplier) {
+//                return new MultibaseLiteral(datatype(), value, rootSupplier, proofValueBase.decode(value));
+//            }
+//            
+//            @Override
+//            public String datatype() {
+//                return MultibaseLiteral.TYPE;
+//            }
+//        };
+//    }
+//    
     protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws DocumentError;
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
@@ -129,8 +122,8 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 ////        return null;
 //    }
     
-    @Override
-    public ProofAdapter proofAdapter() {
-        return proofAdapter;
-    }
+//    @Override
+//    public ProofAdapter proofAdapter() {
+//        return proofAdapter;
+//    }
 }

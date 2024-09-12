@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
-import com.apicatalog.linkedtree.reader.LinkedReaderError;
+import com.apicatalog.linkedtree.builder.TreeBuilderError;
 
-public class DocumentError extends LinkedReaderError {
+public class DocumentError extends Exception {
 
     private static final long serialVersionUID = 2846822739681323437L;
 

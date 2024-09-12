@@ -9,10 +9,13 @@ import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
 import com.apicatalog.vcdi.DataIntegritySuite;
+
+import jakarta.json.JsonObject;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
@@ -48,5 +51,17 @@ class TestSignatureSuite extends DataIntegritySuite {
             throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
         }
         return new SolidProofValue(proofValue);
+    }
+
+    @Override
+    public boolean isSupported(Verifiable verifiable, String proofType, JsonObject proof) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Proof getProof(Verifiable verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

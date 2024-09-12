@@ -2,8 +2,6 @@ package com.apicatalog.multikey;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Supplier;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -14,22 +12,17 @@ import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
-import com.apicatalog.linkedtree.adapter.LinkedLiteralAdapter;
-import com.apicatalog.linkedtree.reader.LinkedFragmentReader;
-import com.apicatalog.linkedtree.selector.StringValueSelector;
+import com.apicatalog.linkedtree.fragment.LinkedFragmentAdapter;
+import com.apicatalog.linkedtree.fragment.LinkedFragmentReader;
+import com.apicatalog.linkedtree.literal.adapter.GenericLiteralAdapter;
+import com.apicatalog.linkedtree.literal.adapter.LiteralAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vcdm.VcdmVocab;
-
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 public abstract class MultiKeyAdapter implements MethodAdapter {
 
@@ -61,29 +54,34 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         /* implement a custom validation */
     }
 
-    @Override
-    public LinkedFragmentAdapter resolve(String id, Collection<String> types, StringValueSelector stringSelector) {
+
+    public LinkedFragmentAdapter resolve(String id, Collection<String> types) {
         if (types.contains(MultiKey.TYPE.toString())) {
             return new LinkedFragmentAdapter() {
 
-                @Override
-                public LinkedFragmentReader reader() {
-                    return ((id, types, properties, rootSupplier) -> MultiKey.of(id, types, properties, rootSupplier, decoder));
+//                @Override
+//                public LinkedFragmentReader reader() {
+////                    return ((id, types, properties, ctx) -> MultiKey.of(id, types, properties, ctx, decoder));
+//                }
+
+//                @Override
+                public Collection<LiteralAdapter> literalAdapters() {
+                    return List.of(
+                            new GenericLiteralAdapter(
+                                    MultibaseLiteral.typeName(),
+                                    ((source, root) -> new MultibaseLiteral(
+                                            MultibaseLiteral.typeName(), 
+                                            source, 
+                                            root, 
+                                            Multibase.BASE_58_BTC.decode(source))))
+                                    
+                    );
                 }
 
                 @Override
-                public Collection<LinkedLiteralAdapter> literalAdapters() {
-                    return List.of(new LinkedLiteralAdapter() {
-                        @Override
-                        public LinkedLiteral read(String value, Supplier<LinkedTree> rootSupplier) {
-                            return new MultibaseLiteral(datatype(), value, rootSupplier, Multibase.BASE_58_BTC.decode(value));
-                        }
-
-                        @Override
-                        public String datatype() {
-                            return MultibaseLiteral.TYPE;
-                        }
-                    });
+                public LinkedFragmentReader reader() {
+                    // TODO Auto-generated method stub
+                    return null;
                 }
 
             };

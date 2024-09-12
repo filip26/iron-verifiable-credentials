@@ -81,5 +81,5 @@ public interface Proof extends Linkable {
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
     }
 
-    MethodAdapter methodProcessor();
+//    MethodAdapter methodProcessor();
 }

@@ -12,7 +12,6 @@ import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.vc.method.MethodAdapter;
 
 public record UnknownProof(
 //TODO        URI id,
@@ -43,10 +42,10 @@ public record UnknownProof(
         throw new UnsupportedOperationException("An uknown proof cannot be validated.");
     }
 
-    @Override
-    public MethodAdapter methodProcessor() {
-        return null;
-    }
+//    @Override
+//    public MethodAdapter methodProcessor() {
+//        return null;
+//    }
 
     @Override
     public void verify(VerificationKey method) throws VerificationError, DocumentError {
@@ -60,7 +59,7 @@ public record UnknownProof(
     
     @Override
     public Collection<String> type() {
-        return fragment.type();
+        return fragment.type().stream().toList();
     }
     
     @Override

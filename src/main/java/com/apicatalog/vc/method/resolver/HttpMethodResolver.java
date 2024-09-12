@@ -23,23 +23,23 @@ public class HttpMethodResolver implements MethodResolver {
             final JsonArray document = JsonLd.expand(id)
                     .undefinedTermsPolicy(ProcessingPolicy.Fail)
                     .loader(loader)
-                    .context(proof.methodProcessor().context()) // an optional expansion context
+//                    .context(proof.methodProcessor().context()) // an optional expansion context
                     .get();
 
-            final JsonLdTreeReader reader = JsonLdTreeReader
-                    .with(proof.methodProcessor());
+//            final JsonLdTreeReader reader = JsonLdTreeReader
+//                    .with(proof.methodProcessor());
+//
+//            final LinkedTree tree = reader.readExpanded(document);
+//
+//            if (tree != null
+//                    && tree.nodes().size() == 1
+//                    && tree.single().isFragment()
+//                    && tree.single().asFragment().cast() instanceof VerificationMethod method) {
+//                return method;
+//            }
 
-            final LinkedTree tree = reader.readExpanded(document);
-
-            if (tree != null
-                    && tree.nodes().size() == 1
-                    && tree.single().isFragment()
-                    && tree.single().asFragment().cast() instanceof VerificationMethod method) {
-                return method;
-            }
-
-        } catch (DocumentError e) {
-            throw e;
+//        } catch (DocumentError e) {
+//            throw e;
 
         } catch (Exception e) {
             throw new DocumentError(e, ErrorType.Invalid, "ProofVerificationMethod");

@@ -3,25 +3,20 @@ package com.apicatalog.vcdm.v11;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.linkedtree.fragment.LinkableObject;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.lang.LangStringSelector;
-import com.apicatalog.linkedtree.lang.LanguageMap;
-import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
-import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
@@ -49,28 +44,28 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
     public static LinkableObject of(
             final Link id,
             final Collection<String> types,
-            final Map<String, LinkedContainer> properties,
-            final Supplier<LinkedTree> rootSupplier) throws DocumentError {
+            final Map<String, LinkedContainer> properties) throws DocumentError {
 
         var credential = new Vcdm11Credential();
-        var fragment = new LinkableObject(id, types, properties, rootSupplier, credential);
+//        var fragment = new LinkableObject(id, types, properties, credential);
 
-        credential.fragment = fragment;
+//        credential.fragment = fragment;
 
         var selector = new ObjectFragmentMapper(properties);
 
         setup(id, types, credential, selector);
 
-        return fragment;
-    }
-
-    protected static LangStringSelector getLangMap(Map<String, LinkedContainer> properties, String term) {
-        final LinkedContainer container = properties.get(term);
-        if (container != null) {
-            return LanguageMap.of(container);
-        }
+//        return fragment;
         return null;
     }
+
+//    protected static LangStringSelector getLangMap(Map<String, LinkedContainer> properties, String term) {
+//        final LinkedContainer container = properties.get(term);
+//        if (container != null) {
+//            return LanguageMap.of(container);
+//        }
+//        return null;
+//    }
 
     protected static void setup(final Link id, final Collection<String> types, Vcdm11Credential credential, final ObjectFragmentMapper selector) throws DocumentError {
         // @id
@@ -92,10 +87,10 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
         // expiration date
         credential.expiration = selector.xsdDateTime(VcdmVocab.EXPIRATION_DATE);
 
-        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
-            credential.proofs = EmbeddedProof.getProofs(
-                    selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
-        }
+//        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
+//            credential.proofs = EmbeddedProof.getProofs(
+//                    selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
+//        }
     }
 
     /**
@@ -160,7 +155,7 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
 
     @Override
     public Collection<String> type() {
-        return fragment.type();
+        return fragment.type().stream().toList();
     }
 
     /**

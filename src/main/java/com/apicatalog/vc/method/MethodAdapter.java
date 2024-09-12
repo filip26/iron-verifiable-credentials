@@ -1,13 +1,8 @@
 package com.apicatalog.vc.method;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.adapter.LinkedFragmentAdapter;
-import com.apicatalog.linkedtree.adapter.resolver.FragmentAdapterResolver;
+import com.apicatalog.linkedtree.type.TypeAdapter;
 
-public interface MethodAdapter extends FragmentAdapterResolver {
+public interface MethodAdapter extends TypeAdapter {
 
     /**
      * Provides an external JSON-LD context URI defying the proof type. The context

@@ -39,6 +39,11 @@ import com.apicatalog.vcdm.VcdmVocab;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
+/**
+ * A configurable set of suites and policies to verify. e.g. a set of allowed
+ * signature suites, verification method resolvers, status resolvers, custom
+ * validation logic, etc.
+ */
 public class Verifier extends AbstractProcessor<Verifier> {
 
     private static final Logger LOGGER = Logger.getLogger(Verifier.class.getName());
@@ -54,6 +59,12 @@ public class Verifier extends AbstractProcessor<Verifier> {
         this.statusVerifier = null;
     }
 
+    /**
+     * Set of accepted verification suites.
+     * 
+     * @param suites
+     * @return
+     */
     public static Verifier with(final SignatureSuite... suites) {
         return new Verifier(suites);
     }
@@ -85,6 +96,24 @@ public class Verifier extends AbstractProcessor<Verifier> {
     public Verifiable verify(Verifiable verifiable, Parameter<?>... parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(verifiable);
         return verify(verifiable, toMap(parameters), getLoader());
+    }
+
+    /**
+     * A method to override with a custom verification logic that is called before
+     * proofs' verification.
+     * 
+     * @param verifiable
+     */
+    protected void check(Verifiable verifiable) throws VerificationError {
+    }
+
+    /**
+     * A method to override with a custom verification logic that is called before a
+     * proof value is verified.
+     * 
+     * @param proof
+     */
+    protected void check(Proof proof) throws VerificationError {
     }
 
     /**
@@ -162,7 +191,9 @@ public class Verifier extends AbstractProcessor<Verifier> {
             final DocumentLoaderOptions options = new DocumentLoaderOptions();
             final Document loadedDocument = loader.loadDocument(location, options);
 
-            final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
+            final JsonStructure json = loadedDocument
+                    .getJsonContent()
+                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid));
 
             if (JsonUtils.isNotObject(json)) {
                 throw new DocumentError(ErrorType.Invalid);

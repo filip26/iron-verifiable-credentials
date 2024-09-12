@@ -41,8 +41,9 @@ public abstract class DefaultProof implements Proof {
      * 
      * @param verifiable
      * @return
+     * @throws DocumentError 
      */
-    protected abstract LinkedTree unsigned(LinkedTree verifiable);
+    protected abstract LinkedTree unsigned(LinkedTree verifiable) throws DocumentError;
 
     /**
      * Create a generic copy of the proof with no proof value, i.e. signature,
@@ -50,8 +51,10 @@ public abstract class DefaultProof implements Proof {
      * 
      * @param proof
      * @return
+     * @throws  
+     * @throws
      */
-    protected abstract LinkedTree unsignedProof(LinkedTree proof);
+    protected abstract LinkedTree unsignedProof(LinkedTree proof) throws DocumentError;
 
     @Override
     public void verify(VerificationKey method) throws VerificationError, DocumentError {
@@ -65,7 +68,7 @@ public abstract class DefaultProof implements Proof {
 
         // remove a proof value and get a new unsigned copy
         final LinkedTree unsignedProof = unsignedProof(fragment.root());
-        
+
         // verify signature
         signature.verify(
                 crypto,
@@ -119,11 +122,10 @@ public abstract class DefaultProof implements Proof {
     public CryptoSuite cryptoSuite() {
         return crypto;
     }
-    
 
     @Override
     public Collection<String> type() {
-        return fragment.type();
+        return fragment.type().stream().toList();
     }
 
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {

@@ -11,17 +11,12 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
-import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.JsonLdVerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVersion;
-import com.apicatalog.vcdm.VcdmVocab;
-import com.apicatalog.vcdm.v11.Vcdm11Credential;
-import com.apicatalog.vcdm.v11.Vcdm11Presentation;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -73,36 +68,40 @@ public class Vcdm11Reader implements JsonLdVerifiableReader {
             throw new DocumentError(ErrorType.Invalid);
         }
 
+        // TODO remove proofs
+        EmbeddedProof.removeProofs(null);
+        
         // FIXME move, static?
-        final JsonLdTreeReader.Builder readerBuilder = JsonLdTreeReader.create()
-                .with(VcdmVocab.CREDENTIAL_TYPE.uri(), Vcdm11Credential::of)
-                .with(VcdmVocab.PRESENTATION_TYPE.uri(), Vcdm11Presentation::of)
-                .with(XsdDateTime.TYPE, XsdDateTime::of);
-
-        suites.stream()
-                .forEach(s -> {
-                    readerBuilder.with(s.proofAdapter().proofType(), s.proofAdapter());
-                });
-
-        // get a reader
-        final JsonLdTreeReader reader = readerBuilder.build();
-
-        try {
-            // get a verifiable
-            final LinkedTree verifiable = reader.readExpanded(context, expanded);
-            if (verifiable == null
-                    || verifiable.size() != 1
-                    || !verifiable.single().isFragment()
-                    || !(verifiable.single().asFragment().cast() instanceof Verifiable)) {
-                throw new DocumentError(ErrorType.Invalid, "document");
-            }
-
-            return verifiable.single(Verifiable.class);
-
-        } catch (DocumentError e) {
-            throw e;
-        } catch (Exception e) {
-            throw new DocumentError(e, ErrorType.Invalid, "document");
-        }
+//        final JsonLdTreeReader.Builder readerBuilder = JsonLdTreeReader.create()
+//                .with(VcdmVocab.CREDENTIAL_TYPE.uri(), Vcdm11Credential::of)
+//                .with(VcdmVocab.PRESENTATION_TYPE.uri(), Vcdm11Presentation::of)
+//                .with(XsdDateTime.TYPE, XsdDateTime::of);
+//
+//        suites.stream()
+//                .forEach(s -> {
+//                    readerBuilder.with(s.proofAdapter().proofType(), s.proofAdapter());
+//                });
+//
+//        // get a reader
+//        final JsonLdTreeReader reader = readerBuilder.build();
+//
+//        try {
+//            // get a verifiable
+//            final LinkedTree verifiable = reader.readExpanded(context, expanded);
+//            if (verifiable == null
+//                    || verifiable.size() != 1
+//                    || !verifiable.single().isFragment()
+//                    || !(verifiable.single().asFragment().cast() instanceof Verifiable)) {
+//                throw new DocumentError(ErrorType.Invalid, "document");
+//            }
+//
+//            return verifiable.single(Verifiable.class);
+//
+//        } catch (DocumentError e) {
+//            throw e;
+//        } catch (Exception e) {
+//            throw new DocumentError(e, ErrorType.Invalid, "document");
+//        }
+        return null;
     }
 }

@@ -4,19 +4,18 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.builder.GenericTreeBuilder;
-import com.apicatalog.linkedtree.primitive.LinkableObject;
+import com.apicatalog.linkedtree.builder.GenericTreeCloner;
+import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
 import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
@@ -57,9 +56,10 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
     public static LinkedFragment of(
             Link id,
             Collection<String> types,
-            Map<String, LinkedContainer> properties,
-            Supplier<LinkedTree> rootSupplier,
-            DataIntegritySuite suite) throws DocumentError {
+            Map<String, LinkedContainer> properties
+            ) throws DocumentError {
+
+//        var suite = (DataIntegritySuite) ((VerifiableNodeBuilderContext) ctx).suite();
 
         var selector = new ObjectFragmentMapper(properties);
 
@@ -68,13 +68,12 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
         ProofValue proofValue = null;
 
         if (proofValueLiteral != null) {
-            // FIXME loader
-            proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), null);
+//            proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), ((VerifiableNodeBuilderContext) ctx).loader());
         }
 
-        var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
+//        var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
 
-        var proof = new DataIntegrityProof(suite, cryptosuite);
+        var proof = new DataIntegrityProof(null, null);
 
         proof.created = selector.xsdDateTime(VcdiVocab.CREATED);
 
@@ -103,7 +102,7 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
 
         proof.signature = proofValue;
 
-        proof.fragment = new LinkableObject(id, types, properties, rootSupplier, proof);
+//        proof.fragment = new LinkableObject(id, types, properties, ctx.rootSupplier(), proof);
 
         return proof.fragment;
     }
@@ -182,21 +181,25 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
         return nonce;
     }
 
-    @Override
-    public MethodAdapter methodProcessor() {
-        return suite.methodAdapter;
-    }
+//    @Override
+//    public MethodAdapter methodProcessor() {
+//        return suite.methodAdapter;
+//    }
 
     @Override
-    protected LinkedTree unsigned(LinkedTree verifiable) {
+    protected LinkedTree unsigned(LinkedTree verifiable) throws DocumentError {
         return EmbeddedProof.removeProofs(verifiable);
     }
 
     @Override
-    protected LinkedTree unsignedProof(LinkedTree proof) {
-        var builder = new GenericTreeBuilder(proof);
+    protected LinkedTree unsignedProof(LinkedTree proof) throws DocumentError {
+        try {
+        var builder = new GenericTreeCloner(proof);
         return builder.deepClone((node, indexOrder, indexTerm, depth) -> VcdiVocab.PROOF_VALUE.uri().equals(indexTerm)
                 ? ProcessingPolicy.Drop
                 : ProcessingPolicy.Accept);
+        } catch (TreeBuilderError e) {
+            throw new DocumentError(e, ErrorType.Invalid);
+        }
     }
 }

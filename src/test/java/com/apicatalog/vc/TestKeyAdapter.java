@@ -1,5 +1,7 @@
 package com.apicatalog.vc;
 
+import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
@@ -33,5 +35,17 @@ public class TestKeyAdapter extends MultiKeyAdapter {
     @Override
     protected Multicodec getPrivateKeyCodec(String algo, int keyLength) {
         return PRIVATE_KEY_CODEC;
+    }
+
+    @Override
+    public Class<?> typeInterface() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Object materialize(LinkedFragment source) throws AdapterError {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

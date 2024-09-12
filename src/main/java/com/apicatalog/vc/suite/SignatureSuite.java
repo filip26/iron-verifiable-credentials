@@ -1,20 +1,26 @@
 package com.apicatalog.vc.suite;
 
+import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.Issuer;
-import com.apicatalog.vc.proof.ProofAdapter;
+import com.apicatalog.vc.proof.Proof;
+
+import jakarta.json.JsonObject;
 
 /**
  * A container providing primitives to process a proof.
  */
 public interface SignatureSuite {
 
-    /**
-     * Provides an adapter to process a proof type and related types
-     * 
-     * @return a proof adapter, never <code>null</code>
-     */
-    ProofAdapter proofAdapter();
+//    /**
+//     * Provides an adapter to process a proof type and related types
+//     * 
+//     * @return a proof adapter, never <code>null</code>
+//     */
+//    ProofAdapter proofAdapter();
     
     /**
      * Creates a new issuer instance initialized with provided key pair.
@@ -35,7 +41,7 @@ public interface SignatureSuite {
      * @return <code>true</code> if the proof is supported, <code>false</code>
      *         otherwise
      */
-//    boolean isSupported(String proofType, LinkedNode proof);
+    boolean isSupported(Verifiable verifiable, String proofType, JsonObject proof);
 
     /**
      * Deserialize the given expanded JSON-LD object into a {@link Proof}.
@@ -47,4 +53,5 @@ public interface SignatureSuite {
      */
 //    Proof getProof(LinkedNode proof, DocumentLoader loader) throws DocumentError;
 
+    Proof getProof(Verifiable verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError;
 }

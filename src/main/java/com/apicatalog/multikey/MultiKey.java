@@ -4,18 +4,15 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Supplier;
 
+import com.apicatalog.jsonld.http.link.Link;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;
-import com.apicatalog.linkedtree.primitive.LinkableObject;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.lt.ObjectFragmentMapper;
@@ -39,9 +36,7 @@ public class MultiKey implements KeyPair {
             Link id,
             Collection<String> types,
             Map<String, LinkedContainer> properties,
-            Supplier<LinkedTree> rootSupplier,
-            MulticodecDecoder decoder
-            ) throws DocumentError {
+            MulticodecDecoder decoder) throws DocumentError {
 
         // TODO
 
@@ -49,7 +44,7 @@ public class MultiKey implements KeyPair {
 
         final MultiKey multikey = new MultiKey();
 
-        multikey.id = selector.id(id);
+//        multikey.id = selector.uri(id);
         multikey.controller = selector.id(MultiKeyAdapter.CONTROLLER);
 
         var x = selector.single(MultiKeyAdapter.PUBLIC_KEY, ByteArrayValue.class);
@@ -66,7 +61,8 @@ public class MultiKey implements KeyPair {
 //
 //        validate(multikey);
 
-        return new LinkableObject(id, types, properties, rootSupplier, multikey);
+//        return new LinkableObject(id, types, properties, multikey);
+        return null;
     }
 
     @Override
@@ -140,7 +136,7 @@ public class MultiKey implements KeyPair {
         if (decodedKey == null || decodedKey.length == 0) {
             return null;
         }
-        
+
         final Multicodec codec = decoder.getCodec(decodedKey).orElseThrow(() -> new DocumentError(ErrorType.Invalid, term.name() + "Codec"));
 
         if (multikey.algorithm == null) {
@@ -152,7 +148,7 @@ public class MultiKey implements KeyPair {
 
         return codec.decode(decodedKey);
     }
-    
+
     public static final String getAlgorithmName(Multicodec codec) {
         if (codec.name().endsWith("-priv")) {
             return codec.name().substring(0, codec.name().length() - "-priv".length()).toUpperCase();

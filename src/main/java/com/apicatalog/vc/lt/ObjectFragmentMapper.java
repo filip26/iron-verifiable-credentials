@@ -12,15 +12,16 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
-import com.apicatalog.linkedtree.Link;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 
 //????
+@Deprecated
 public record ObjectFragmentMapper(
         Map<String, LinkedContainer> properties) {
 
@@ -56,14 +57,14 @@ public record ObjectFragmentMapper(
         }
 
         try {
-            final LinkedNode node = container.single();
+            final LinkedNode node = container.node();
 
             if (node == null) {
                 return null;
             }
 
             if (node.isFragment()) {
-                return node.asFragment().cast();
+                return node.asFragment();
 
             } else if (node.isLiteral()) {
                 return node.asLiteral().cast();
@@ -121,7 +122,7 @@ public record ObjectFragmentMapper(
         }
 
         try {
-            final LinkedNode node = container.single();
+            final LinkedNode node = container.node();
 
             if (node == null) {
                 return null;
@@ -130,7 +131,7 @@ public record ObjectFragmentMapper(
             Linkable value = null;
 
             if (node.isFragment()) {
-                value = node.asFragment().cast();
+                value = node.asFragment();
 
             } else if (node.isLiteral()) {
                 value = node.asLiteral();
@@ -163,7 +164,7 @@ public record ObjectFragmentMapper(
         }
 
         try {
-            final LinkedNode node = container.single();
+            final LinkedNode node = container.node();
 
             if (node == null) {
                 return null;
@@ -172,8 +173,8 @@ public record ObjectFragmentMapper(
             T value = null;
 
             if (node.isFragment()
-                    && clazz.isInstance(node.asFragment().cast())) {
-                value = node.asFragment().cast(clazz);
+                    && clazz.isInstance(node.asFragment())) {
+//                value = node.asFragment();
 
             } else if (node.isLiteral()
                     && clazz.isInstance(node.asLiteral().cast())) {

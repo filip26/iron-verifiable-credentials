@@ -32,7 +32,7 @@ public class Urdna2015 implements CanonicalizationAlgorithm {
             var treeWriter = new JsonLdTreeWriter();
 
             // JSON-LD version - FIXME temporary, remove
-            final JsonArray expanded = treeWriter.writeExpanded(document);
+            final JsonArray expanded = treeWriter.write(document);
 
             final JsonLdOptions options = new JsonLdOptions();
             options.setUndefinedTermsPolicy(ProcessingPolicy.Fail);
