@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -13,7 +12,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.fragment.LinkableObject;
+import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.vc.Credential;
@@ -31,22 +30,19 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
 
     protected LinkedFragment fragment;
 
-    public static LinkableObject of(
-            final Link id,
-            final Collection<String> types,
-            final Map<String, LinkedContainer> properties) throws DocumentError {
+    public static Vcdm11Presentation of(LinkedFragment source) throws AdapterError {
 
         var presentation = new Vcdm11Presentation();
 //        var fragment = new LinkableObject(id, types, properties, ctx.rootSupplier(), presentation);
 
 //        presentation.fragment = fragment;
 
-        var selector = new ObjectFragmentMapper(properties);
+//        var selector = new ObjectFragmentMapper(properties);
 
-        setup(id, types, presentation, selector);
+//        setup(id, types, presentation, selector);
 
 //        return fragment;
-        return null;
+        return presentation;
     }
 
     protected static void setup(final Link id, final Collection<String> types, Vcdm11Presentation presentation, final ObjectFragmentMapper selector) throws DocumentError {

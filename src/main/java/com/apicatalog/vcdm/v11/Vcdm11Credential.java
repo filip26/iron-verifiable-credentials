@@ -10,6 +10,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.fragment.LinkableObject;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.link.Link;
@@ -41,22 +42,19 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
         // protected
     }
 
-    public static LinkableObject of(
-            final Link id,
-            final Collection<String> types,
-            final Map<String, LinkedContainer> properties) throws DocumentError {
+    public static Vcdm11Credential of(LinkedFragment source) throws AdapterError {
 
         var credential = new Vcdm11Credential();
 //        var fragment = new LinkableObject(id, types, properties, credential);
 
 //        credential.fragment = fragment;
 
-        var selector = new ObjectFragmentMapper(properties);
+//        var selector = new ObjectFragmentMapper(properties);
 
-        setup(id, types, credential, selector);
+//        setup(id, types, credential, selector);
 
 //        return fragment;
-        return null;
+        return credential;
     }
 
 //    protected static LangStringSelector getLangMap(Map<String, LinkedContainer> properties, String term) {
