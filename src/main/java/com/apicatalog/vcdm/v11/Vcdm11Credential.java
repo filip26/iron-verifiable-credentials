@@ -14,6 +14,8 @@ import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.issuer.GenericIssuer;
 import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.subject.GenericSubject;
+import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vc.status.GenericStatus;
 import com.apicatalog.vcdm.VcdmVocab;
 
@@ -27,7 +29,7 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
     protected Instant expiration;
 
     /** a verifiable credential contains claims about one or more subjects */
-    protected Collection<LinkedFragment> subject;
+    protected Collection<Subject> subject;
 
     protected Collection<Status> status;
 
@@ -51,7 +53,9 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
         // subject
         credential.subject = source.collection(
                 VcdmVocab.SUBJECT.uri(),
-                LinkedFragment.class);
+                Subject.class,
+                f -> new GenericSubject(f.asFragment().uri(), f)
+                );
 
         // issuer
         credential.issuer = source.fragment(
@@ -175,7 +179,7 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
      * @return
      */
     @Override
-    public Collection<LinkedFragment> subject() {
+    public Collection<Subject> subject() {
         return subject;
     }
 

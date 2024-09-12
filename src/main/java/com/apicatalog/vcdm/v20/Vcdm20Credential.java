@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
@@ -12,13 +11,15 @@ import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.fragment.LinkableObject;
+import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.link.Link;
-import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.issuer.GenericIssuer;
 import com.apicatalog.vc.issuer.IssuerDetails;
-import com.apicatalog.vc.lt.ObjectFragmentMapper;
+import com.apicatalog.vc.status.GenericStatus;
 import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.subject.GenericSubject;
+import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Verifiable;
 
@@ -26,15 +27,13 @@ import jakarta.json.JsonValue;
 
 public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 
-    private static final Logger LOGGER = Logger.getLogger(Vcdm20Credential.class.getName());
+//    private static final Logger LOGGER = Logger.getLogger(Vcdm20Credential.class.getName());
 
-    /** issuanceDate */
-    protected Instant issuance;
-    /** expirationDate */
-    protected Instant expiration;
+    protected Instant validFrom;
+    protected Instant validUntil;
 
     /** a verifiable credential contains claims about one or more subjects */
-    protected Collection<LinkedFragment> subject;
+    protected Collection<Subject> subject;
 
     protected Collection<Status> status;
 
@@ -42,7 +41,7 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 
     protected LinkedFragment ld;
 
-    public static LinkableObject of(
+    public static Vcdm20Credential of(
             final Link id,
             final Collection<String> types,
             final Map<String, LinkedContainer> properties,
@@ -58,72 +57,44 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 //        setup(id, types, credential, selector);
 //
 //        return fragment;
-        return null;
+        return credential;
     }
 
-    protected static void setup(final Link id, final Collection<String> types, Vcdm20Credential credential, final ObjectFragmentMapper selector) throws DocumentError {
+    protected static Vcdm20Credential setup(Vcdm20Credential credential, LinkedFragment source) throws AdapterError {
+        
         // @id
-        credential.id = selector.id(id);
+        credential.id = source.uri();
 
         // subject
-//      credential.subject(readCollection(version, document.get(VcVocab.SUBJECT.uri()), subjectReader));
+        credential.subject = source.collection(
+                VcdmVocab.SUBJECT.uri(),
+                Subject.class,
+                f -> new GenericSubject(f.asFragment().uri(), f)
+                );
 
         // issuer
-        //TODO IssuerDetails
-//        credential.issuer = selector.single(
-//                VcdmVocab.ISSUER,
-//                LinkedFragment.class);
+        credential.issuer = source.fragment(
+                VcdmVocab.ISSUER.uri(),
+                IssuerDetails.class,
+                GenericIssuer::new
+                );
 
         // status
-//      credential.status(readCollection(version, document.get(VcVocab.STATUS.uri()), statusReader));
+        credential.status = source.collection(
+                VcdmVocab.STATUS.uri(),
+                Status.class,
+                GenericStatus::new);
 
-        // issuance date
-        credential.issuance = selector.single(
-                VcdmVocab.ISSUANCE_DATE,
-                XsdDateTime.class,
-                XsdDateTime::datetime);
+        credential.validFrom = source.xsdDateTime(VcdmVocab.VALID_FROM.uri());
+        credential.validUntil = source.xsdDateTime(VcdmVocab.VALID_UNTIL.uri());
 
-        // expiration date
-        credential.expiration = selector.single(
-                VcdmVocab.EXPIRATION_DATE,
-                XsdDateTime.class,
-                XsdDateTime::datetime);
-
-//        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
-//            credential.proofs = EmbeddedProof.getProofs(
-//                    selector.properties().get(VcdmVocab.PROOF.uri()).asTree());
-//        }
+        credential.ld = source;
+        return credential;
     }
 
     @Override
     public LinkedNode ld() {
         return ld;
-    }
-
-    /**
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
-     *      Date - Note</a>
-     * 
-     * @return a date time from which the credential claims are valid or
-     *         <code>null</code>.
-     */
-    public Instant issuanceDate() {
-        return issuance;
-    }
-
-    public Vcdm20Credential issuanceDate(Instant issuance) {
-        this.issuance = issuance;
-        return this;
-    }
-
-    /**
-     * @see <a href=
-     *      "https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
-     * 
-     * @return the expiration date or <code>null</code> if not set
-     */
-    public Instant expiration() {
-        return expiration;
     }
 
     /**
@@ -145,14 +116,7 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
         return status;
     }
 
-    /**
-     * @see <a href=
-     *      "https://www.w3.org/TR/vc-data-model/#credential-subject">Credential
-     *      Subject</a>
-     * 
-     * @return
-     */
-    public Collection<LinkedFragment> subject() {
+    public Collection<Subject> subject() {
         return subject;
     }
 
@@ -228,12 +192,12 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 //        return credential;
 //    }
 
-    public static boolean isCredential(final JsonValue document) {
-        if (document == null) {
-            throw new IllegalArgumentException("The 'document' parameter must not be null.");
-        }
-        return LdNode.isTypeOf(VcdmVocab.CREDENTIAL_TYPE.uri(), document);
-    }
+//    public static boolean isCredential(final JsonValue document) {
+//        if (document == null) {
+//            throw new IllegalArgumentException("The 'document' parameter must not be null.");
+//        }
+//        return LdNode.isTypeOf(VcdmVocab.CREDENTIAL_TYPE.uri(), document);
+//    }
 
     @Override
     public Collection<String> type() {

@@ -2,20 +2,15 @@ package com.apicatalog.multikey;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Map;
 
-import com.apicatalog.jsonld.http.link.Link;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.literal.ByteArrayValue;
+import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.vc.lt.ObjectFragmentMapper;
 
 public class MultiKey implements KeyPair {
 
@@ -33,22 +28,19 @@ public class MultiKey implements KeyPair {
     protected Instant expiration;
 
     public static LinkedFragment of(
-            Link id,
-            Collection<String> types,
-            Map<String, LinkedContainer> properties,
-            MulticodecDecoder decoder) throws DocumentError {
+            LinkedFragment source,
+            MulticodecDecoder decoder) throws AdapterError {
 
         // TODO
 
-        final ObjectFragmentMapper selector = new ObjectFragmentMapper(properties);
 
         final MultiKey multikey = new MultiKey();
 
 //        multikey.id = selector.uri(id);
-        multikey.controller = selector.id(MultiKeyAdapter.CONTROLLER);
+        multikey.controller = source.uri(MultiKeyAdapter.CONTROLLER.uri());
 
-        var x = selector.single(MultiKeyAdapter.PUBLIC_KEY, ByteArrayValue.class);
-        multikey.publicKey = getKey(MultiKeyAdapter.PUBLIC_KEY, x.byteArrayValue(), multikey, decoder);
+//        var x = selector.single(MultiKeyAdapter.PUBLIC_KEY, ByteArrayValue.class);
+//        multikey.publicKey = getKey(MultiKeyAdapter.PUBLIC_KEY, x.byteArrayValue(), multikey, decoder);
 
 //            multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
 //

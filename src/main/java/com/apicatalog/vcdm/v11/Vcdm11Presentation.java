@@ -14,10 +14,8 @@ import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
-import com.apicatalog.vc.lt.ObjectFragmentMapper;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation {
@@ -28,44 +26,37 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
 
     protected Collection<Credential> credentials;
 
-    protected LinkedFragment fragment;
+    protected LinkedFragment ld;
 
     public static Vcdm11Presentation of(LinkedFragment source) throws AdapterError {
-
-        var presentation = new Vcdm11Presentation();
-//        var fragment = new LinkableObject(id, types, properties, ctx.rootSupplier(), presentation);
-
-//        presentation.fragment = fragment;
-
-//        var selector = new ObjectFragmentMapper(properties);
-
-//        setup(id, types, presentation, selector);
-
-//        return fragment;
-        return presentation;
+        return setup(new Vcdm11Presentation(), source);
     }
 
-    protected static void setup(final Link id, final Collection<String> types, Vcdm11Presentation presentation, final ObjectFragmentMapper selector) throws DocumentError {
+    protected static Vcdm11Presentation setup(Vcdm11Presentation presentation, LinkedFragment source) throws AdapterError {
+        
         // @id
-        presentation.id = selector.id(id);
+        presentation.id = source.uri();
 
         // holder
-        presentation.holder = selector.id(VcdmVocab.HOLDER);
+        presentation.holder = source.uri(VcdmVocab.HOLDER.uri());
 
         // credentials
-        if (selector.properties().containsKey(VcdmVocab.VERIFIABLE_CREDENTIALS.uri())) {
-            presentation.credentials = getCredentials(
-                    selector
-                            .properties()
-                            .get(VcdmVocab.VERIFIABLE_CREDENTIALS.uri())
-                            .asContainer());
-        }
+//        if (selector.properties().containsKey(VcdmVocab.VERIFIABLE_CREDENTIALS.uri())) {
+//            presentation.credentials = getCredentials(
+//                    selector
+//                            .properties()
+//                            .get(VcdmVocab.VERIFIABLE_CREDENTIALS.uri())
+//                            .asContainer());
+//        }
 
         // proofs
 //        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
 //            presentation.proofs = EmbeddedProof.getProofs(
 //                    selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
 //        }
+        
+        presentation.ld = source;
+        return presentation;
     }
 
     static Collection<Credential> getCredentials(final LinkedContainer tree) {
@@ -104,12 +95,12 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
 
     @Override
     public LinkedNode ld() {
-        return fragment;
+        return ld;
     }
 
     @Override
     public Collection<String> type() {
-        return fragment.type().stream().toList();
+        return ld.type().stream().toList();
     }
 
     @Override

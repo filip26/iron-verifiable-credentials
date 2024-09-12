@@ -9,6 +9,7 @@ import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.subject.Subject;
 
 public record UnknownCredential(
         URI id,
@@ -40,7 +41,7 @@ public record UnknownCredential(
     }
 
     @Override
-    public Collection<LinkedFragment> subject() {
+    public Collection<Subject> subject() {
         return Collections.emptyList();
     }
 

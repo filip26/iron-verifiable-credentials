@@ -3,9 +3,9 @@ package com.apicatalog.vc;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.subject.Subject;
 
 /**
  * A generic predecessor.
@@ -30,7 +30,7 @@ public interface Credential extends Verifiable {
 
     Collection<Status> status();
 
-    Collection<LinkedFragment> subject();
+    Collection<Subject> subject();
 
     @Override
     default void validate() throws DocumentError {

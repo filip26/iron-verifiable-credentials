@@ -10,17 +10,14 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
-import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
 import com.apicatalog.vc.lt.MultibaseLiteral;
-import com.apicatalog.vc.lt.ObjectFragmentMapper;
 import com.apicatalog.vc.method.GenericVerificationMethod;
-import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.DefaultProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
@@ -54,16 +51,13 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
     }
 
     public static LinkedFragment of(
-            Link id,
-            Collection<String> types,
-            Map<String, LinkedContainer> properties
-            ) throws DocumentError {
+            LinkedFragment source) throws DocumentError, AdapterError {
 
 //        var suite = (DataIntegritySuite) ((VerifiableNodeBuilderContext) ctx).suite();
 
-        var selector = new ObjectFragmentMapper(properties);
-
-        var proofValueLiteral = selector.single(VcdiVocab.PROOF_VALUE, MultibaseLiteral.class);
+        var proofValueLiteral = source.literal(
+                VcdiVocab.PROOF_VALUE.uri(),
+                MultibaseLiteral.class);
 
         ProofValue proofValue = null;
 
@@ -75,34 +69,31 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
 
         var proof = new DataIntegrityProof(null, null);
 
-        proof.created = selector.xsdDateTime(VcdiVocab.CREATED);
+        proof.created = source.xsdDateTime(VcdiVocab.CREATED.uri());
 
-        proof.domain = selector.lexeme(VcdiVocab.DOMAIN);
+        proof.domain = source.lexeme(VcdiVocab.DOMAIN.uri());
 
-        proof.challenge = selector.lexeme(VcdiVocab.CHALLENGE);
+        proof.challenge = source.lexeme(VcdiVocab.CHALLENGE.uri());
 
-        proof.nonce = selector.lexeme(VcdiVocab.NONCE);
+        proof.nonce = source.lexeme(VcdiVocab.NONCE.uri());
 
-        proof.method = selector.single(
-                VcdiVocab.VERIFICATION_METHOD,
-                method -> {
-                    if (method instanceof VerificationMethod verificationMethod) {
-                        return verificationMethod;
-                    }
-                    return new GenericVerificationMethod(
-                            selector.id(VcdiVocab.VERIFICATION_METHOD),
-                            null,
-                            null,
-                            method.ld());
-                });
+        proof.method = source.fragment(
+                VcdiVocab.VERIFICATION_METHOD.uri(),
+                VerificationMethod.class,
+                s -> new GenericVerificationMethod(
+//                        s.asFragment().uri(),
+                        null,
+                        null,
+                        null,
+                        null
+//                        s.ld()
+                ));
 
-        proof.purpose = selector.id(VcdiVocab.PURPOSE);
+        proof.purpose = source.uri(VcdiVocab.PURPOSE.uri());
 
-        proof.previousProof = selector.id(VcdiVocab.PREVIOUS_PROOF);
+        proof.previousProof = source.uri(VcdiVocab.PREVIOUS_PROOF.uri());
 
         proof.signature = proofValue;
-
-//        proof.fragment = new LinkableObject(id, types, properties, ctx.rootSupplier(), proof);
 
         return proof.fragment;
     }
@@ -194,10 +185,10 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
     @Override
     protected LinkedTree unsignedProof(LinkedTree proof) throws DocumentError {
         try {
-        var builder = new GenericTreeCloner(proof);
-        return builder.deepClone((node, indexOrder, indexTerm, depth) -> VcdiVocab.PROOF_VALUE.uri().equals(indexTerm)
-                ? ProcessingPolicy.Drop
-                : ProcessingPolicy.Accept);
+            var builder = new GenericTreeCloner(proof);
+            return builder.deepClone((node, indexOrder, indexTerm, depth) -> VcdiVocab.PROOF_VALUE.uri().equals(indexTerm)
+                    ? ProcessingPolicy.Drop
+                    : ProcessingPolicy.Accept);
         } catch (TreeBuilderError e) {
             throw new DocumentError(e, ErrorType.Invalid);
         }

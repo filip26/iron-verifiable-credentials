@@ -10,6 +10,4 @@ public record GenericVerificationMethod(
         URI type,
         URI controller,
         LinkedNode ld) implements VerificationMethod {
-    
-    
 }
