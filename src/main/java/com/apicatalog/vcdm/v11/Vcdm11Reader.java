@@ -9,7 +9,6 @@ import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -17,6 +16,7 @@ import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
+import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.Verifiable;
@@ -97,9 +97,6 @@ public class Vcdm11Reader implements VerifiableReader {
 
         final JsonObject jsonVerifiable = expanded.iterator().next().asJsonObject();
 
-        // detach proofs
-        final JsonArray jsonProofs = EmbeddedProof.getProofs(jsonVerifiable);
-         
         final JsonObject unsigned = EmbeddedProof.removeProofs(jsonVerifiable);
 
         try {
@@ -114,22 +111,39 @@ public class Vcdm11Reader implements VerifiableReader {
 
             final Verifiable verifiable = tree.object(Verifiable.class);
 
+            // detach proofs
+            final JsonArray jsonProofs = EmbeddedProof.getProofs(jsonVerifiable);
+
             final Collection<Proof> proofs = new ArrayList<>(jsonProofs.size());
 
             // read proofs
-            for (JsonValue jsonProof : jsonProofs) {
+            for (final JsonValue jsonProofGraph : jsonProofs) {
 
-                if (JsonUtils.isNotObject(jsonProof)) {
-                    throw new DocumentError(ErrorType.Invalid, "Proof");
+                final JsonObject jsonProof = EmbeddedProof.getProof(jsonProofGraph);
+
+                final Collection<String> proofTypes = JsonLdType.strings(jsonProof);
+                
+                if (proofTypes == null || proofTypes.size() != 1) {
+                    throw new DocumentError(ErrorType.Invalid, "ProofType");
                 }
 
+                Proof proof = null;
+                
                 for (SignatureSuite suite : suites) {
-                    if (suite.isSupported(null, null, jsonProof.asJsonObject())) {
-                        proofs.add(suite.getProof(null, jsonProof.asJsonObject(), loader));
-                    } else {
-                        proofs.add(new GenericProof(reader.read(Json.createArrayBuilder().add(jsonProof).build())));
+                    if (suite.isSupported(verifiable, proofTypes.iterator().next(), jsonProof.asJsonObject())) {
+                        proof = suite.getProof(verifiable, jsonProof.asJsonObject(), loader);
+                        if (proof != null) {
+                            break;
+                        }
                     }
                 }
+
+                if (proof == null) {
+                    var proofTree = reader.read(Json.createArrayBuilder().add(jsonProof).build());
+                    proof = GenericProof.of(proofTree.fragment());
+                }
+
+                proofs.add(proof);
             }
 
             verifiable.proofs(proofs);

@@ -1,34 +1,59 @@
 package com.apicatalog.vcdi;
 
 import java.net.URI;
+import java.util.Objects;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
+import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
+import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue.ValueType;
+
 public abstract class DataIntegritySuite implements SignatureSuite {
+
+    protected final JsonLdTreeReader reader;
 
     protected final MethodAdapter methodAdapter;
 
     protected final String cryptosuiteName;
 
     protected final Multibase proofValueBase;
-    
+
 //    protected ProofAdapter proofAdapter;
 
     protected DataIntegritySuite(
             String cryptosuiteName,
             Multibase proofValueBase,
-            MethodAdapter method
-            ) {
+            MethodAdapter method) {
         this.cryptosuiteName = cryptosuiteName;
         this.proofValueBase = proofValueBase;
         this.methodAdapter = method;
+
+        this.reader = JsonLdTreeReader.create()
+                .with(
+                        VcdiVocab.TYPE.uri(),
+                        DataIntegrityProof.class,
+                        source -> DataIntegrityProof.of(this, source)
+                        )
+                .with(MultibaseLiteral.typeAdapter(proofValueBase))
+                .with(XsdDateTime.typeAdapter())
+                .build();
 //        this.proofAdapter = new DataIntegrityProofAdapter(this, List.of(getProofValueAdapter(proofValueBase)));
     }
 
@@ -47,7 +72,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //        };
 //    }
 //    
-    protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws DocumentError;
+    protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws AdapterError;
 
     protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
 
@@ -56,12 +81,25 @@ public abstract class DataIntegritySuite implements SignatureSuite {
             URI purpose) throws DocumentError {
         return new DataIntegrityProofDraft(this, method, purpose);
     }
-    
-//    @Override
-//    public boolean isSupported(String proofType, LinkedNode expandedProof) {
-//        return PROOF_TYPE_ID.equals(proofType) && cryptosuite.equals(getCryptoSuiteName(expandedProof));
-//    }
-//
+
+    @Override
+    public boolean isSupported(Verifiable verifiable, String proofType, JsonObject expandedProof) {
+        return VcdiVocab.TYPE.uri().equals(proofType) && cryptosuiteName.equals(getCryptoSuiteName(expandedProof));
+    }
+
+    @Override
+    public Proof getProof(Verifiable verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError {
+
+        try {
+            var tree = reader.read(Json.createArrayBuilder().add(proof).build());
+
+            return tree.object(DataIntegrityProof.class);
+
+        } catch (TreeBuilderError | AdapterError e) {
+            throw new DocumentError(e, ErrorType.Invalid, "Proof");
+        }
+    }
+
 //    @Override
 //    public DataIntegrityProof getProof(LinkedNode expandedProof, DocumentLoader loader) throws DocumentError {
 //
@@ -102,26 +140,28 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //        return null;
 //    }
 
-//    protected static String getCryptoSuiteName(final LinkedNode proof) {
-//        Objects.requireNonNull(proof);
-//
-////        final Collection<LinkedData> cryptosuites = proof.values(DataIntegrityVocab.CRYPTO_SUITE.uri());
-////
-////        if (cryptosuites == null || cryptosuites.isEmpty()) {
-////          
-////        }
-//        return null;
-////        try {
-////                
-////            
-////            return LdNode.of(proof).scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
-////
-////        } catch (DocumentError e) {
-////
-////        }
-////        return null;
-//    }
-    
+    protected static String getCryptoSuiteName(final JsonObject proof) {
+        Objects.requireNonNull(proof);
+
+        if (proof.containsKey(VcdiVocab.CRYPTO_SUITE.uri())
+                && ValueType.ARRAY == proof.get(VcdiVocab.CRYPTO_SUITE.uri()).getValueType()
+                && proof.getJsonArray(VcdiVocab.CRYPTO_SUITE.uri()).size() == 1
+                && ValueType.OBJECT == proof.getJsonArray(VcdiVocab.CRYPTO_SUITE.uri()).get(0).getValueType()) {
+
+            final JsonObject valueObject = proof.getJsonArray(VcdiVocab.CRYPTO_SUITE.uri()).getJsonObject(0);
+
+            if (valueObject.containsKey(JsonLdKeyword.TYPE)
+                    && ValueType.STRING == valueObject.get(JsonLdKeyword.TYPE).getValueType()
+                    && "https://w3id.org/security#cryptosuiteString".equals(valueObject.getString(JsonLdKeyword.TYPE))
+                    && valueObject.containsKey(JsonLdKeyword.VALUE)
+                    && ValueType.STRING == valueObject.get(JsonLdKeyword.VALUE).getValueType()) {
+                return valueObject.getString(JsonLdKeyword.VALUE);
+            }
+
+        }
+        return null;
+    }
+
 //    @Override
 //    public ProofAdapter proofAdapter() {
 //        return proofAdapter;

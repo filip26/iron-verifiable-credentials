@@ -11,7 +11,7 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.issuer.IssuerDetails;
+import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -30,7 +30,7 @@ public class VerifiableReader3<C extends Verifiable, I> {
 
     private static final Logger LOGGER = Logger.getLogger(VerifiableReader3.class.getName());
 
-    protected Map<JsonObject, IssuerDetails> issuerReader;
+    protected Map<JsonObject, CredentialIssuer> issuerReader;
     protected ObjectReader<JsonObject, Subject> subjectReader;
     protected ObjectReader<JsonObject, Status> statusReader;
     protected ObjectReader<JsonObject, Status> tosReader;
@@ -41,7 +41,7 @@ public class VerifiableReader3<C extends Verifiable, I> {
 //        this.statusReader = new StatusReader();
     }
     
-    protected VerifiableReader3(ObjectReader<JsonObject, IssuerDetails> issuerReader, ObjectReader<JsonObject, Subject> subjectReader, ObjectReader<JsonObject, Status> statusReader) {
+    protected VerifiableReader3(ObjectReader<JsonObject, CredentialIssuer> issuerReader, ObjectReader<JsonObject, Subject> subjectReader, ObjectReader<JsonObject, Status> statusReader) {
 //        this.issuerReader = issuerReader;
         this.subjectReader = subjectReader;
         this.statusReader = statusReader;

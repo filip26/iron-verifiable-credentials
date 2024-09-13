@@ -11,12 +11,12 @@ import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.issuer.IssuerDetails;
+import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.issuer.GenericIssuer;
+import com.apicatalog.vc.status.GenericStatus;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.GenericSubject;
 import com.apicatalog.vc.subject.Subject;
-import com.apicatalog.vc.status.GenericStatus;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
@@ -33,7 +33,7 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
 
     protected Collection<Status> status;
 
-    protected IssuerDetails issuer;
+    protected CredentialIssuer issuer;
 
     protected LinkedFragment ld;
 
@@ -54,14 +54,14 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
         credential.subject = source.collection(
                 VcdmVocab.SUBJECT.uri(),
                 Subject.class,
-                f -> new GenericSubject(f.asFragment().uri(), f)
+                GenericSubject::of
                 );
 
         // issuer
         credential.issuer = source.fragment(
                 VcdmVocab.ISSUER.uri(),
-                IssuerDetails.class,
-                GenericIssuer::new
+                CredentialIssuer.class,
+                GenericIssuer::of
                 );
 
         // status
@@ -75,11 +75,6 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
 
         // expiration date
         credential.expiration = source.xsdDateTime(VcdmVocab.EXPIRATION_DATE.uri());
-
-//        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
-//            credential.proofs = EmbeddedProof.getProofs(
-//                    selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
-//        }
 
         credential.ld = source;
         return credential;
@@ -154,10 +149,10 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
     /**
      *
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
-     * @return {@link IssuerDetails} representing the issuer in an expanded form
+     * @return {@link CredentialIssuer} representing the issuer in an expanded form
      */
     @Override
-    public IssuerDetails issuer() {
+    public CredentialIssuer issuer() {
         return issuer;
     }
 

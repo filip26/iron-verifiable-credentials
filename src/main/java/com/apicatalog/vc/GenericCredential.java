@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.vc.issuer.IssuerDetails;
+import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
@@ -30,7 +30,7 @@ public record GenericCredential(
     }
 
     @Override
-    public IssuerDetails issuer() {
+    public CredentialIssuer issuer() {
         return null;
     }
 

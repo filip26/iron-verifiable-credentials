@@ -11,9 +11,10 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.selector.InvalidSelector;
 
 public record GenericProof(
-//TODO        URI id,
+        URI id,
         LinkedNode ld) implements Proof {
 
     @Override
@@ -38,7 +39,7 @@ public record GenericProof(
 
     @Override
     public void validate(Map<String, Object> params) throws DocumentError {
-        throw new UnsupportedOperationException("An unknown proof cannot be validated.");
+        throw new UnsupportedOperationException("An unknown proof cannot be validated " + type() + ".");
     }
 
     @Override
@@ -53,6 +54,10 @@ public record GenericProof(
     
     @Override
     public URI id() {
-        return null;
+        return id;
+    }
+    
+    public static GenericProof of(LinkedNode source) throws InvalidSelector {
+        return new GenericProof(source.asFragment().uri(), source);
     }
 }

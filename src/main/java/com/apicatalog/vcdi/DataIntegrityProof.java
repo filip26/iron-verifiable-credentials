@@ -16,6 +16,7 @@ import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
+import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.method.GenericVerificationMethod;
 import com.apicatalog.vc.proof.DefaultProof;
@@ -50,10 +51,12 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
         this.suite = suite;
     }
 
-    public static LinkedFragment of(
-            LinkedFragment source) throws DocumentError, AdapterError {
+    public static DataIntegrityProof of(
+            DataIntegritySuite suite,
+            LinkedFragment source) throws AdapterError {
+        
+        NodeDebugWriter.writeToStdOut(source);
 
-//        var suite = (DataIntegritySuite) ((VerifiableNodeBuilderContext) ctx).suite();
 
         var proofValueLiteral = source.literal(
                 VcdiVocab.PROOF_VALUE.uri(),
@@ -62,7 +65,7 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
         ProofValue proofValue = null;
 
         if (proofValueLiteral != null) {
-//            proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), ((VerifiableNodeBuilderContext) ctx).loader());
+            proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), null);
         }
 
 //        var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
@@ -95,7 +98,9 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
 
         proof.signature = proofValue;
 
-        return proof.fragment;
+        proof.fragment = source;
+        
+        return proof;
     }
 
     @Override

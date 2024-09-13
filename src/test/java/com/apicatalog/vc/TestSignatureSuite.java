@@ -7,6 +7,7 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
+import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.Proof;
@@ -46,22 +47,11 @@ class TestSignatureSuite extends DataIntegritySuite {
     }
 
     @Override
-    protected ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws DocumentError {
+    protected ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws AdapterError {
         if (proofValue.length != 32) {
-            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
+//            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
         }
         return new SolidProofValue(proofValue);
     }
 
-    @Override
-    public boolean isSupported(Verifiable verifiable, String proofType, JsonObject proof) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Proof getProof(Verifiable verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

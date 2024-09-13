@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
-import com.apicatalog.vc.issuer.IssuerDetails;
+import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -57,7 +57,7 @@ public abstract class Credential2   {
     
     protected Collection<Status> status;
     
-    protected IssuerDetails issuer;    
+    protected CredentialIssuer issuer;    
     
     //TODO termsOfUse
     
@@ -163,9 +163,9 @@ public abstract class Credential2   {
     /**
      *
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
-     * @return {@link IssuerDetails} representing the issuer in an expanded form
+     * @return {@link CredentialIssuer} representing the issuer in an expanded form
      */
-    public IssuerDetails issuer() {
+    public CredentialIssuer issuer() {
         return issuer;
     }
 

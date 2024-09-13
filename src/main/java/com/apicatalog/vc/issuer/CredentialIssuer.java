@@ -1,10 +1,14 @@
 package com.apicatalog.vc.issuer;
 
+import java.net.URI;
+
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.Linkable;
 
-public interface IssuerDetails extends Linkable {
+public interface CredentialIssuer extends Linkable {
 
+    URI id();
+    
 //    protected IssuerDetails(VcdmVersion version, JsonObject expanded) {
 ////        super(version, expanded);
 //    }

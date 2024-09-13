@@ -60,14 +60,14 @@ public abstract class DefaultProof implements Proof {
     public void verify(VerificationKey method) throws VerificationError, DocumentError {
 
         // a data before issuance - no proof attached
-        final LinkedTree unsigned = unsigned(ld().root());
+        final LinkedTree unsigned = unsigned(ld().asTree());
 
         Objects.requireNonNull(signature);
         Objects.requireNonNull(unsigned);
         Objects.requireNonNull(method);
 
         // remove a proof value and get a new unsigned copy
-        final LinkedTree unsignedProof = unsignedProof(fragment.root());
+        final LinkedTree unsignedProof = unsignedProof(fragment.asTree());
 
         // verify signature
         signature.verify(

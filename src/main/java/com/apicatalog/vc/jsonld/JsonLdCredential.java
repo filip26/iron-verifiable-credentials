@@ -9,7 +9,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.issuer.IssuerDetails;
+import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
@@ -47,7 +47,7 @@ public class JsonLdCredential   {
     
     protected Collection<Status> status;
     
-    protected IssuerDetails issuer;    
+    protected CredentialIssuer issuer;    
     
     //TODO termsOfUse
     
@@ -130,7 +130,7 @@ public class JsonLdCredential   {
     /**
      *
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
-     * @return {@link IssuerDetails} representing the issuer in an expanded form
+     * @return {@link CredentialIssuer} representing the issuer in an expanded form
      */
     public LinkedFragment issuer() {
 //        return issuer;
@@ -169,7 +169,7 @@ public class JsonLdCredential   {
         this.status = status;
     }
 
-    public void issuer(IssuerDetails issuer) {
+    public void issuer(CredentialIssuer issuer) {
         this.issuer = issuer;
     }
 

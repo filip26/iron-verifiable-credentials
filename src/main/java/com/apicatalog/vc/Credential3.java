@@ -6,7 +6,7 @@ import java.util.Collection;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.vc.issuer.IssuerDetails;
+import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -94,9 +94,9 @@ public interface Credential3  {
     /**
      *
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
-     * @return {@link IssuerDetails} representing the issuer in an expanded form
+     * @return {@link CredentialIssuer} representing the issuer in an expanded form
      */
-    IssuerDetails issuer();
+    CredentialIssuer issuer();
 
     /**
      * @see <a href="https://www.w3.org/TR/vc-data-model/#status">Status</a>

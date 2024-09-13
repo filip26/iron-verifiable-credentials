@@ -16,9 +16,10 @@ import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
-import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.GenericProof;
+import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -124,16 +125,21 @@ public final class EmbeddedProof {
 
     public static JsonArray getProofs(final JsonObject document) throws DocumentError {
         final JsonValue value = document.get(VcdmVocab.PROOF.uri());
+
+        if (JsonUtils.isNull(value)) {
+            throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
+        }
         if (JsonUtils.isNotArray(value)) {
             throw new DocumentError(ErrorType.Invalid, VcdmVocab.PROOF);
         }
+
         return value.asJsonArray();
     }
 
     public static JsonObject removeProofs(final JsonObject document) {
         return Json.createObjectBuilder(document).remove(VcdmVocab.PROOF.uri()).build();
     }
-    
+
     /**
      * Creates a new document instance with no proofs attached.
      * 
@@ -182,6 +188,19 @@ public final class EmbeddedProof {
             return fragment.type().materialize(Proof.class);
         }
 
-        return new GenericProof(fragment);
+        return GenericProof.of(fragment);
+    }
+
+    public static JsonObject getProof(final JsonValue jsonProofGraph) throws DocumentError {
+        if (JsonUtils.isObject(jsonProofGraph)
+                && jsonProofGraph.asJsonObject().containsKey(JsonLdKeyword.GRAPH)) {
+            final JsonValue jsonProof = jsonProofGraph.asJsonObject().get(JsonLdKeyword.GRAPH);
+            if (JsonUtils.isArray(jsonProof)
+                    && jsonProof.asJsonArray().size() == 1
+                    && JsonUtils.isObject(jsonProof.asJsonArray().iterator().next())) {
+                return jsonProof.asJsonArray().iterator().next().asJsonObject();
+            }
+        }
+        throw new DocumentError(ErrorType.Invalid, "Proof");
     }
 }

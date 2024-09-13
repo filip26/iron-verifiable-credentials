@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
@@ -14,16 +13,14 @@ import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.link.Link;
 import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.issuer.GenericIssuer;
-import com.apicatalog.vc.issuer.IssuerDetails;
 import com.apicatalog.vc.status.GenericStatus;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.GenericSubject;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Verifiable;
-
-import jakarta.json.JsonValue;
 
 public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 
@@ -37,7 +34,7 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
 
     protected Collection<Status> status;
 
-    protected IssuerDetails issuer;
+    protected CredentialIssuer issuer;
 
     protected LinkedFragment ld;
 
@@ -75,8 +72,8 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
         // issuer
         credential.issuer = source.fragment(
                 VcdmVocab.ISSUER.uri(),
-                IssuerDetails.class,
-                GenericIssuer::new
+                CredentialIssuer.class,
+                GenericIssuer::of
                 );
 
         // status
@@ -100,10 +97,10 @@ public class Vcdm20Credential extends Vcdm11Verifiable implements Credential {
     /**
      *
      * @see <a href="https://www.w3.org/TR/vc-data-model/#issuer">Issuerr</a>
-     * @return {@link IssuerDetails} representing the issuer in an expanded form
+     * @return {@link CredentialIssuer} representing the issuer in an expanded form
      */
     @Override
-    public IssuerDetails issuer() {
+    public CredentialIssuer issuer() {
         return issuer;
     }
 
