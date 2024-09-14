@@ -1,5 +1,4 @@
 {
-
   "id": "https://apicatalog/com/vc/test-credentials#0001",
   "type": "VerifiableCredential",
   "issuer": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
@@ -15,6 +14,6 @@
   },
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
-    "https://w3id.org/security/data-integrity/v1"
+    "https://w3id.org/security/data-integrity/v2"
   ]
 }

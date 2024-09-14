@@ -2,7 +2,7 @@
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
     "https://w3id.org/security/multikey/v1",
-    "https://w3id.org/security/data-integrity/v1"
+    "https://w3id.org/security/data-integrity/v2"
   ],
   "id": "https://apicatalog/com/vc/test-credentials#0023",
   "type": "VerifiableCredential",

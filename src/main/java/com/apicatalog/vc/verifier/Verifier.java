@@ -22,6 +22,7 @@ import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
+import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.processor.AbstractProcessor;
@@ -231,7 +232,9 @@ public class Verifier extends AbstractProcessor<Verifier> {
         if (verifiable == null) {
             throw new DocumentError(ErrorType.Invalid, "document");
         }
-
+NodeDebugWriter.writeToStdOut(verifiable.ld());
+NodeDebugWriter.writeToStdOut(verifiable.proofs().iterator().next().ld().root());
+System.out.println(verifiable.proofs().size());
         return verify(verifiable, params, loader);
     }
 
