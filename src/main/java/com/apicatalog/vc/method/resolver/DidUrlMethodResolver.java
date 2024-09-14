@@ -7,7 +7,6 @@ import com.apicatalog.did.DidUrl;
 import com.apicatalog.did.document.DidDocument;
 import com.apicatalog.did.document.DidVerificationMethod;
 import com.apicatalog.did.key.DidKeyResolver;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationMethod;
@@ -16,7 +15,6 @@ import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multikey.MultiKey;
 import com.apicatalog.multikey.MultiKeyAdapter;
-import com.apicatalog.vc.proof.Proof;
 
 public class DidUrlMethodResolver implements MethodResolver {
 
@@ -29,7 +27,7 @@ public class DidUrlMethodResolver implements MethodResolver {
     }
 
     @Override
-    public VerificationMethod resolve(URI uri, DocumentLoader loader, Proof proof) throws DocumentError {
+    public VerificationMethod resolve(URI uri) throws DocumentError {
         try {
 
             final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));

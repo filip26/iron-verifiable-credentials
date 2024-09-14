@@ -265,17 +265,18 @@ public class Verifier extends AbstractProcessor<Verifier> {
             final ProofValue proofValue = proof.signature();
 
             if (proofValue == null) {
-                throw new DocumentError(ErrorType.Missing, "ProofValue");
+                throw new DocumentError(ErrorType.Missing, VcdiVocab.PROOF_VALUE);
             }
 
             final VerificationMethod verificationMethod = getMethod(proof, loader)
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD));
 
-            if (!(verificationMethod instanceof VerificationKey)) {
+            if (verificationMethod instanceof VerificationKey verificationKey) {
+                proof.verify(verificationKey);
+
+            } else {
                 throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD);
             }
-
-            proof.verify((VerificationKey) verificationMethod);
 
             proof = queue.pop();
         }

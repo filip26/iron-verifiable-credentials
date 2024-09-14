@@ -68,9 +68,9 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
             proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), null);
         }
 
-//        var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
+        var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
 
-        var proof = new DataIntegrityProof(null, null);
+        var proof = new DataIntegrityProof(suite, cryptosuite);
 
         proof.created = source.xsdDateTime(VcdiVocab.CREATED.uri());
 
@@ -84,12 +84,10 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
                 VcdiVocab.VERIFICATION_METHOD.uri(),
                 VerificationMethod.class,
                 s -> new GenericVerificationMethod(
-//                        s.asFragment().uri(),
+                        s.asFragment().uri(),
+                        null,   //FIXME
                         null,
-                        null,
-                        null,
-                        null
-//                        s.ld()
+                        s
                 ));
 
         proof.purpose = source.uri(VcdiVocab.PURPOSE.uri());

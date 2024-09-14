@@ -1,8 +1,6 @@
 package com.apicatalog.vc;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
@@ -10,13 +8,10 @@ import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
 import com.apicatalog.vcdi.DataIntegritySuite;
-
-import jakarta.json.JsonObject;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
@@ -34,7 +29,7 @@ class TestSignatureSuite extends DataIntegritySuite {
     }
 
     @Override
-    protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError {
+    protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws AdapterError {
         if (TEST_CRYPTO_NAME.equals(cryptoName)) {
             return CRYPTO;
         }

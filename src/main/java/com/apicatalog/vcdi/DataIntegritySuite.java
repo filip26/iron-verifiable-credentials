@@ -74,7 +74,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //    
     protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws AdapterError;
 
-    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
+    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws AdapterError;
 
     public DataIntegrityProofDraft createDraft(
             VerificationMethod method,
@@ -161,9 +161,4 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         }
         return null;
     }
-
-//    @Override
-//    public ProofAdapter proofAdapter() {
-//        return proofAdapter;
-//    }
 }

@@ -55,7 +55,7 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
         this.base = null;
         this.modelVersion = null;
 
-        this.methodResolvers = defaultResolvers();
+        this.methodResolvers = null;
     }
 
     @SuppressWarnings("unchecked")
@@ -98,10 +98,10 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
         return (T) this;
     }
 
-    protected static final Collection<MethodResolver> defaultResolvers() {
+    protected static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
         resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
-        resolvers.add(new HttpMethodResolver());
+        resolvers.add(new HttpMethodResolver(loader));
         return resolvers;
     }
 
@@ -120,11 +120,11 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
         return loader;
     }
 
-    protected JsonObject fetch(final URI location, DocumentLoader loader) throws DocumentError {
+    protected JsonObject fetch(final URI location) throws DocumentError {
         try {
             // load the document
             final DocumentLoaderOptions options = new DocumentLoaderOptions();
-            final Document loadedDocument = loader.loadDocument(location, options);
+            final Document loadedDocument = getLoader().loadDocument(location, options);
 
             final JsonStructure json = loadedDocument.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid));
 
@@ -184,15 +184,22 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
         }
 
         // find the method id resolver
-        final Optional<MethodResolver> resolver = methodResolvers.stream()
+        final Optional<MethodResolver> resolver = getMethodResolvers(loader).stream()
                 .filter(r -> r.isAccepted(id))
                 .findFirst();
 
         // try to resolve the method
         if (resolver.isPresent()) {
-            return Optional.ofNullable(resolver.get().resolve(id, loader, proof));
+            return Optional.ofNullable(resolver.get().resolve(id));
         }
 
         throw new DocumentError(ErrorType.Unknown, "ProofVerificationId");
+    }
+    
+    protected Collection<MethodResolver> getMethodResolvers(DocumentLoader loader) {
+        if (methodResolvers == null) {
+            return defaultResolvers(loader);
+        }
+        return methodResolvers;
     }
 }

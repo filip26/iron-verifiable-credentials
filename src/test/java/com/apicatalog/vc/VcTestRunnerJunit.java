@@ -56,7 +56,8 @@ public class VcTestRunnerJunit {
     final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
             new SchemeRouter().set("classpath", new ClasspathLoader()));
 
-    final static Collection<MethodResolver> RESOLVERS = defaultResolvers();
+    //FIXME the static loader?
+    final static Collection<MethodResolver> RESOLVERS = defaultResolvers(new StaticContextLoader((LOADER)));
 
     final static TestSignatureSuite SUITE = (new TestSignatureSuite());
 
@@ -240,10 +241,10 @@ public class VcTestRunnerJunit {
         throw new IllegalStateException();
     }
 
-    static final Collection<MethodResolver> defaultResolvers() {
+    static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
         resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), TestKeyAdapter.DECODER));
-        resolvers.add(new HttpMethodResolver());
+        resolvers.add(new HttpMethodResolver(loader));
         return resolvers;
     }
 }
