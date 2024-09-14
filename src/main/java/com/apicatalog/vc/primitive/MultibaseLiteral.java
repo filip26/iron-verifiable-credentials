@@ -1,4 +1,4 @@
-package com.apicatalog.vc.lt;
+package com.apicatalog.vc.primitive;
 
 import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedTree;
@@ -22,7 +22,7 @@ public record MultibaseLiteral(
     public static String typeName() {
         return TYPE;
     }
-    
+
     public static LiteralAdapter typeAdapter(final Multibase base) {
         return new GenericLiteralAdapter(
                 TYPE,

@@ -15,6 +15,7 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.vc.Verifiable;
 
 /**
  * An abstract implementation providing partial implementation.
@@ -22,6 +23,7 @@ import com.apicatalog.linkedtree.LinkedTree;
  */
 public abstract class DefaultProof implements Proof {
 
+    protected final Verifiable verifiable;
     protected final CryptoSuite crypto;
 
     protected URI id;
@@ -30,20 +32,21 @@ public abstract class DefaultProof implements Proof {
     protected VerificationMethod method;
     protected ProofValue signature;
 
-    protected LinkedFragment fragment;
+    protected LinkedFragment ld;
 
-    protected DefaultProof(CryptoSuite crypto) {
+    protected DefaultProof(Verifiable verifiable, CryptoSuite crypto) {
+        this.verifiable = verifiable;
         this.crypto = crypto;
     }
 
-    /**
-     * Create a generic copy of the verifiable that has no proof attached.
-     * 
-     * @param verifiable
-     * @return
-     * @throws DocumentError 
-     */
-    protected abstract LinkedTree unsigned(LinkedTree verifiable) throws DocumentError;
+//    /**
+//     * Create a generic copy of the verifiable that has no proof attached.
+//     * 
+//     * @param verifiable
+//     * @return
+//     * @throws DocumentError 
+//     */
+//    protected abstract LinkedTree unsigned(LinkedTree verifiable) throws DocumentError;
 
     /**
      * Create a generic copy of the proof with no proof value, i.e. signature,
@@ -51,7 +54,7 @@ public abstract class DefaultProof implements Proof {
      * 
      * @param proof
      * @return
-     * @throws  
+     * @throws
      * @throws
      */
     protected abstract LinkedTree unsignedProof(LinkedTree proof) throws DocumentError;
@@ -59,15 +62,16 @@ public abstract class DefaultProof implements Proof {
     @Override
     public void verify(VerificationKey method) throws VerificationError, DocumentError {
 
-        // a data before issuance - no proof attached
-        final LinkedTree unsigned = unsigned(ld().asTree());
-
         Objects.requireNonNull(signature);
-        Objects.requireNonNull(unsigned);
         Objects.requireNonNull(method);
 
+        // a data before issuance - no proof attached
+        final LinkedTree unsigned = verifiable.ld().root();
+
+        Objects.requireNonNull(unsigned);
+
         // remove a proof value and get a new unsigned copy
-        final LinkedTree unsignedProof = unsignedProof(fragment.asTree());
+        final LinkedTree unsignedProof = unsignedProof(ld.root());
 
         // verify signature
         signature.verify(
@@ -95,7 +99,7 @@ public abstract class DefaultProof implements Proof {
 
     @Override
     public LinkedNode ld() {
-        return fragment;
+        return ld;
     }
 
     @Override
@@ -125,7 +129,7 @@ public abstract class DefaultProof implements Proof {
 
     @Override
     public Collection<String> type() {
-        return fragment.type().stream().toList();
+        return ld.type().stream().toList();
     }
 
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {

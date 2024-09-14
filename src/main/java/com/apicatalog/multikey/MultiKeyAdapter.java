@@ -20,8 +20,8 @@ import com.apicatalog.linkedtree.literal.adapter.LiteralAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.primitive.MultibaseLiteral;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public abstract class MultiKeyAdapter implements MethodAdapter {

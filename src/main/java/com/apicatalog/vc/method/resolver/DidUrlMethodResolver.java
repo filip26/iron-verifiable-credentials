@@ -47,6 +47,7 @@ public class DidUrlMethodResolver implements MethodResolver {
         return DidUrl.isDidUrl(uri);
     }
 
+    @Deprecated
     public static final MultiKey from(DidVerificationMethod did, final MulticodecDecoder codecs) {
         final MultiKey multikey = new MultiKey();
         multikey.id(did.id().toUri());

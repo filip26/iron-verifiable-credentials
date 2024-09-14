@@ -15,8 +15,8 @@ import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.lt.MultibaseLiteral;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.primitive.MultibaseLiteral;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -26,8 +26,6 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonValue.ValueType;
 
 public abstract class DataIntegritySuite implements SignatureSuite {
-
-    protected final JsonLdTreeReader reader;
 
     protected final MethodAdapter methodAdapter;
 
@@ -45,16 +43,6 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         this.proofValueBase = proofValueBase;
         this.methodAdapter = method;
 
-        this.reader = JsonLdTreeReader.create()
-                .with(
-                        VcdiVocab.TYPE.uri(),
-                        DataIntegrityProof.class,
-                        source -> DataIntegrityProof.of(this, source)
-                        )
-                .with(MultibaseLiteral.typeAdapter(proofValueBase))
-                .with(XsdDateTime.typeAdapter())
-                .build();
-//        this.proofAdapter = new DataIntegrityProofAdapter(this, List.of(getProofValueAdapter(proofValueBase)));
     }
 
 //    protected static LinkedLiteralAdapter getProofValueAdapter(Multibase proofValueBase) {
@@ -90,6 +78,18 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     @Override
     public Proof getProof(Verifiable verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError {
 
+        var reader = JsonLdTreeReader.create()
+                .with(
+                        VcdiVocab.TYPE.uri(),
+                        DataIntegrityProof.class,
+                        //TODO remove suite
+                        source -> DataIntegrityProof.of(verifiable, this, source)
+                        )
+                .with(MultibaseLiteral.typeAdapter(proofValueBase))
+                .with(XsdDateTime.typeAdapter())
+                .build();
+
+        
         try {
             var tree = reader.read(Json.createArrayBuilder().add(proof).build());
 

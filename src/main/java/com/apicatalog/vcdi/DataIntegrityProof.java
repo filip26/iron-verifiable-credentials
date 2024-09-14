@@ -17,12 +17,12 @@ import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
 import com.apicatalog.linkedtree.writer.NodeDebugWriter;
-import com.apicatalog.vc.lt.MultibaseLiteral;
+import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.method.GenericVerificationMethod;
+import com.apicatalog.vc.primitive.MultibaseLiteral;
 import com.apicatalog.vc.proof.DefaultProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vcdm.EmbeddedProof;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -45,13 +45,15 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
     protected String challenge;
 
     protected DataIntegrityProof(
+            Verifiable verifiable,
             DataIntegritySuite suite,
             CryptoSuite crypto) {
-        super(crypto);
+        super(verifiable, crypto);
         this.suite = suite;
     }
 
     public static DataIntegrityProof of(
+            Verifiable verifiable,            
             DataIntegritySuite suite,
             LinkedFragment source) throws AdapterError {
         
@@ -70,7 +72,7 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
 
         var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
 
-        var proof = new DataIntegrityProof(suite, cryptosuite);
+        var proof = new DataIntegrityProof(verifiable, suite, cryptosuite);
 
         proof.created = source.xsdDateTime(VcdiVocab.CREATED.uri());
 
@@ -96,7 +98,7 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
 
         proof.signature = proofValue;
 
-        proof.fragment = source;
+        proof.ld = source;
         
         return proof;
     }
@@ -180,10 +182,10 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
 //        return suite.methodAdapter;
 //    }
 
-    @Override
-    protected LinkedTree unsigned(LinkedTree verifiable) throws DocumentError {
-        return EmbeddedProof.removeProofs(verifiable);
-    }
+//    @Override
+//    protected LinkedTree unsigned(LinkedTree verifiable) throws DocumentError {
+//        return EmbeddedProof.removeProofs(verifiable);
+//    }
 
     @Override
     protected LinkedTree unsignedProof(LinkedTree proof) throws DocumentError {
