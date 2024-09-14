@@ -53,12 +53,11 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
     }
 
     public static DataIntegrityProof of(
-            Verifiable verifiable,            
+            Verifiable verifiable,
             DataIntegritySuite suite,
             LinkedFragment source) throws AdapterError {
-        
-        NodeDebugWriter.writeToStdOut(source);
 
+        NodeDebugWriter.writeToStdOut(source);
 
         var proofValueLiteral = source.literal(
                 VcdiVocab.PROOF_VALUE.uri(),
@@ -87,10 +86,9 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
                 VerificationMethod.class,
                 s -> new GenericVerificationMethod(
                         s.asFragment().uri(),
-                        null,   //FIXME
+                        null, // FIXME
                         null,
-                        s
-                ));
+                        s));
 
         proof.purpose = source.uri(VcdiVocab.PURPOSE.uri());
 
@@ -99,7 +97,7 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
         proof.signature = proofValue;
 
         proof.ld = source;
-        
+
         return proof;
     }
 
@@ -176,16 +174,6 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
     public String nonce() {
         return nonce;
     }
-
-//    @Override
-//    public MethodAdapter methodProcessor() {
-//        return suite.methodAdapter;
-//    }
-
-//    @Override
-//    protected LinkedTree unsigned(LinkedTree verifiable) throws DocumentError {
-//        return EmbeddedProof.removeProofs(verifiable);
-//    }
 
     @Override
     protected LinkedTree unsignedProof(LinkedTree proof) throws DocumentError {

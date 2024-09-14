@@ -36,7 +36,7 @@ import jakarta.json.JsonValue.ValueType;
 
 /**
  * A JSON-LD based reader conforming to the
- * <a href="https://www.w3.org/TR/vc-data-model/">Verifiable Credentials Data
+ * <a href="https://www.w3.org/TR/vc-data-model-1.1/">Verifiable Credentials Data
  * Model v1.1</a>
  */
 public class Vcdm11Reader implements VerifiableReader {

@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
-import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.selector.InvalidSelector;
 
 public class DocumentError extends Exception {
 
@@ -14,48 +14,56 @@ public class DocumentError extends Exception {
         Missing,
         Unknown,
         Invalid,
-        // Malformed,
     }
 
     private final ErrorType type;
+//    private final String term;
     private final String code;
 
     public DocumentError(ErrorType type, String code) {
-        super();
+        super(toCode(type, code));
         this.type = type;
         this.code = toCode(type, code);
     }
 
     public DocumentError(Throwable e, ErrorType type, String code) {
-        super(e);
+        super(toCode(type, code), e);
         this.type = type;
         this.code = toCode(type, code);
     }
 
     public DocumentError(ErrorType type, Term... terms) {
-        super();
+        super(toCode(type, terms));
         this.type = type;
         this.code = toCode(type, terms);
     }
 
     public DocumentError(Throwable e, ErrorType type, Term... terms) {
-        super(e);
+        super(toCode(type, terms), e);
         this.type = type;
         this.code = toCode(type, terms);
+    }
+
+    public static DocumentError of(InvalidSelector e) {
+        return new DocumentError(e, ErrorType.Invalid, e.term());
     }
 
     public ErrorType getType() {
         return type;
     }
 
-    @Override
-    public String toString() {
-        return super.toString() + ": " + getCode();
-    }
+//    @Override
+//    public String toString() {
+//        return super.toString() + ": " + getCode();
+//    }
 
-    public String getCode() {
+    public String code() {
         return code;
     }
+
+//    public String term() {
+//        return term;
+//    }
 
     public static void failWithJsonLd(JsonLdError e) throws DocumentError {
         if (JsonLdErrorCode.LOADING_DOCUMENT_FAILED == e.getCode()) {
@@ -108,7 +116,13 @@ public class DocumentError extends Exception {
 
         Arrays.stream(terms)
                 .forEach(term -> {
-                    int index = (term.startsWith("@")) ? 1 : 0;
+                    int index = term.lastIndexOf('#') + 1;
+                    if (index == 0) {
+                        index = term.lastIndexOf('/') + 1;
+                    }
+                    if (index == 0) {
+                        index = (term.startsWith("@")) ? 1 : 0;
+                    }
 
                     sb.append(Character.toUpperCase(term.charAt(index)));
                     sb.append(term.substring(index + 1));

@@ -1,14 +1,15 @@
 package com.apicatalog.ld.signature;
 
-public class VerificationError extends Throwable {
+public class VerificationError extends Exception {
 
-    private static final long serialVersionUID = 5031043246158660527L;
+    private static final long serialVersionUID = -7137366427204418675L;
 
     public enum Code {
         Expired,
         NotValidYet,
         InvalidSignature,
         UnsupportedCryptoSuite,
+        Internal,
     }
 
     private Code code;
@@ -23,7 +24,7 @@ public class VerificationError extends Throwable {
         this.code = code;
     }
 
-    public Code getCode() {
+    public Code code() {
         return code;
     }
 }

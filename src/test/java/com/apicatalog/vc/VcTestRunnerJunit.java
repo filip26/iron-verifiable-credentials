@@ -151,13 +151,13 @@ public class VcTestRunnerJunit {
             }
 
         } catch (VerificationError e) {
-            assertException(e.getCode() != null ? e.getCode().name() : null, e);
+            assertException(e.code() != null ? e.code().name() : null, e);
 
         } catch (SigningError e) {
-            assertException(e.getCode() != null ? e.getCode().name() : null, e);
+            assertException(e.code() != null ? e.code().name() : null, e);
 
         } catch (DocumentError e) {
-            assertException(e.getCode(), e);
+            assertException(e.code(), e);
 
         } catch (JsonLdError e) {
             e.printStackTrace();

@@ -46,7 +46,7 @@
       ],
       "name": "invalid verificationMethod property",
       "input": "verifier/0007-in.jsonld",
-      "expectErrorCode": "UnknownProofVerificationId"
+      "expectErrorCode": "UnknownVerificationMethod"
     },
     {
       "@id": "#t0008",
@@ -95,7 +95,7 @@
       ],
       "name": "invalid verificationMethod property",
       "input": "verifier/0012-in.jsonld",
-      "expectErrorCode": "InvalidVerificationMethod"
+      "expectErrorCode": "MissingVerificationMethodId"
     },
     {
       "@id": "#t0013",

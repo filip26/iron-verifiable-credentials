@@ -12,6 +12,7 @@ import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
+import com.apicatalog.linkedtree.selector.InvalidSelector;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
@@ -95,6 +96,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
             return tree.object(DataIntegrityProof.class);
 
+        } catch (InvalidSelector e) {
+            throw DocumentError.of(e);
+            
         } catch (TreeBuilderError | AdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }

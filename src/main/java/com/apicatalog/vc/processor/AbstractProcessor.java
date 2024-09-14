@@ -180,7 +180,7 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
             DocumentLoader loader) throws DocumentError {
 
         if (id == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofVerificationId");
+            throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
         }
 
         // find the method id resolver
@@ -193,7 +193,7 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
             return Optional.ofNullable(resolver.get().resolve(id));
         }
 
-        throw new DocumentError(ErrorType.Unknown, "ProofVerificationId");
+        throw new DocumentError(ErrorType.Unknown, "VerificationMethod");
     }
     
     protected Collection<MethodResolver> getMethodResolvers(DocumentLoader loader) {
