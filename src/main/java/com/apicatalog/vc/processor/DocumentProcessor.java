@@ -1,9 +1,6 @@
 package com.apicatalog.vc.processor;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Optional;
 
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -17,24 +14,14 @@ import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.multicodec.Multicodec.Tag;
-import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
-import com.apicatalog.vc.method.resolver.HttpMethodResolver;
-import com.apicatalog.vc.method.resolver.MethodResolver;
-import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
-public class AbstractProcessor<T extends AbstractProcessor<T>> {
+public class DocumentProcessor<T extends DocumentProcessor<T>> {
 
     protected final SignatureSuite[] suites;
 
@@ -42,20 +29,14 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
     protected boolean bundledContexts;
     protected URI base;
 
-    protected VcdmVersion modelVersion;
-
-    protected Collection<MethodResolver> methodResolvers;
-
-    protected AbstractProcessor(final SignatureSuite... suites) {
+    protected DocumentProcessor(final SignatureSuite... suites) {
         this.suites = suites;
 
         // default values
         this.defaultLoader = null;
         this.bundledContexts = true;
         this.base = null;
-        this.modelVersion = null;
 
-        this.methodResolvers = null;
     }
 
     @SuppressWarnings("unchecked")
@@ -88,21 +69,6 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
     public T base(URI base) {
         this.base = base;
         return (T) this;
-    }
-
-    // TODO resolvers should be multilevel, per verifier, per proof type, e.g.
-    // DidUrlMethodResolver could be different.
-    @SuppressWarnings("unchecked")
-    public T methodResolvers(Collection<MethodResolver> resolvers) {
-        this.methodResolvers = resolvers;
-        return (T) this;
-    }
-
-    protected static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
-        Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
-        resolvers.add(new HttpMethodResolver(loader));
-        return resolvers;
     }
 
     protected DocumentLoader getLoader() {
@@ -153,53 +119,5 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
             DocumentError.failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);
         }
-    }
-
-    protected Optional<VerificationMethod> getMethod(final Proof proof) throws VerificationError, DocumentError {
-
-        final VerificationMethod method = proof.method();
-
-        if (method == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");
-        }
-
-        final URI methodType = method.type();
-
-        if (methodType != null
-                && method instanceof VerificationKey
-                && (((VerificationKey) method).publicKey() != null)) {
-            return Optional.of(method);
-        }
-
-        return resolveMethod(method.id(), proof);
-    }
-
-    protected Optional<VerificationMethod> resolveMethod(
-            URI id,
-            Proof proof
-            ) throws DocumentError {
-
-        if (id == null) {
-            throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
-        }
-
-        // find the method id resolver
-        final Optional<MethodResolver> resolver = getMethodResolvers().stream()
-                .filter(r -> r.isAccepted(id))
-                .findFirst();
-
-        // try to resolve the method
-        if (resolver.isPresent()) {
-            return Optional.ofNullable(resolver.get().resolve(id));
-        }
-
-        throw new DocumentError(ErrorType.Unknown, "VerificationMethod");
-    }
-    
-    protected Collection<MethodResolver> getMethodResolvers() {
-        if (methodResolvers == null) {
-            return defaultResolvers(getLoader());
-        }
-        return methodResolvers;
     }
 }

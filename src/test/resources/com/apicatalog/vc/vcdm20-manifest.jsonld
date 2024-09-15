@@ -13,9 +13,18 @@
       "@id": "#t0001",
       "@type": [
         "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "R/W signed VC",
+      "input": "vcdm20/0001-signed.jsonld"
+    },
+    {
+      "@id": "#t0002",
+      "@type": [
+        "PositiveEvaluationTest",
         "VeriferTest"
       ],
-      "name": "valid signed VC",
+      "name": "Verify signed VC",
       "input": "vcdm20/0001-signed.jsonld"
     }
   ]

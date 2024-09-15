@@ -29,6 +29,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
@@ -36,7 +37,9 @@ import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
+import com.apicatalog.vc.primitive.VerifiableTree;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
+import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
 import com.apicatalog.vcdi.DataIntegrityProofDraft;
 
@@ -56,12 +59,14 @@ public class VcTestRunnerJunit {
     final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
             new SchemeRouter().set("classpath", new ClasspathLoader()));
 
-    //FIXME the static loader?
+    // FIXME the static loader?
     final static Collection<MethodResolver> RESOLVERS = defaultResolvers(new StaticContextLoader((LOADER)));
 
     final static TestSignatureSuite SUITE = (new TestSignatureSuite());
 
     final static Verifier VERIFIER = Verifier.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
+
+    final static Reader READER = Reader.with(SUITE).loader(LOADER);
 
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
@@ -108,7 +113,7 @@ public class VcTestRunnerJunit {
                 draft.domain(testCase.domain);
                 draft.challenge(testCase.challenge);
                 draft.nonce(testCase.nonce);
-                
+
                 final ExpandedVerifiable issued = issuer.sign(testCase.input, draft);
 
                 JsonObject signed = null;
@@ -136,6 +141,28 @@ public class VcTestRunnerJunit {
                 if (!match) {
 
                     write(testCase, signed, expected.getJsonContent().orElse(null));
+
+                    fail("Expected result does not match");
+                }
+
+            } else if (testCase.type.contains(VcTestCase.vocab("ReaderTest"))) {
+
+                Verifiable verifiable = READER.read(testCase.input);
+                assertNotNull(verifiable);
+
+                final Document expected = LOADER.loadDocument(testCase.input,
+                        new DocumentLoaderOptions());
+
+                JsonArray result = (new JsonLdTreeWriter()).write(
+                        VerifiableTree.compose(verifiable)
+                        );
+                
+                boolean match = JsonLdComparison.equals(result,
+                        expected.getJsonContent().orElse(null));
+
+                if (!match) {
+
+                    write(testCase, result, expected.getJsonContent().orElse(null));
 
                     fail("Expected result does not match");
                 }
@@ -236,7 +263,7 @@ public class VcTestRunnerJunit {
             }
 
 //            return (KeyPair) methodAdapter.read(JsonLdObject.of(key.asJsonObject()));
-            
+
         }
         throw new IllegalStateException();
     }

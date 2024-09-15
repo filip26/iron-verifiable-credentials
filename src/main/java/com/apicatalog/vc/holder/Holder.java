@@ -16,7 +16,7 @@ import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
-import com.apicatalog.vc.processor.AbstractProcessor;
+import com.apicatalog.vc.processor.VerificationProcessor;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.EmbeddedProof;
@@ -27,7 +27,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
-public class Holder extends AbstractProcessor<Holder> {
+public class Holder extends VerificationProcessor<Holder> {
 
     protected Holder(final SignatureSuite... suites) {
         super(suites);

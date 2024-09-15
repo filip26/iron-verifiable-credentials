@@ -16,13 +16,12 @@ import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.traversal.NodeSelector.TraversalPolicy;
-import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.method.GenericVerificationMethod;
 import com.apicatalog.vc.primitive.MultibaseLiteral;
-import com.apicatalog.vc.proof.VerifiableProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vc.proof.VerifiableProof;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -66,7 +65,7 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
         ProofValue proofValue = null;
 
         if (proofValueLiteral != null) {
-            proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), null);
+            proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), null); //FIXME loader
         }
 
         var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);

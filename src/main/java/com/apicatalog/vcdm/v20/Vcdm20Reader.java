@@ -9,6 +9,8 @@ import com.apicatalog.vc.reader.ReaderResolver;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmReader;
+import com.apicatalog.vcdm.VcdmResolver;
+import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm20Reader extends VcdmReader {
@@ -32,6 +34,8 @@ public class Vcdm20Reader extends VcdmReader {
 
     @Override
     protected VerifiableReader resolve(Collection<String> context) throws DocumentError {
-        return resolver.resolveReader(context);
+        return VcdmVersion.V11 == VcdmResolver.getVersion(context)
+                ? this
+                : resolver.resolveReader(context);
     }
 }

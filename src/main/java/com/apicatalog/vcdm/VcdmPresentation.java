@@ -21,7 +21,7 @@ public abstract class VcdmPresentation extends VcdmVerifiable implements Present
     protected LinkedFragment ld;
 
     protected static VcdmPresentation setup(VcdmPresentation presentation, LinkedFragment source) throws AdapterError {
-        
+
         // @id
         presentation.id = source.uri();
 
@@ -47,6 +47,10 @@ public abstract class VcdmPresentation extends VcdmVerifiable implements Present
         // @type - mandatory
         if (type() == null || type().isEmpty()) {
             throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
+        }
+        // credentials
+        if (credentials == null || credentials.isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, VcdmVocab.VERIFIABLE_CREDENTIALS);
         }
     }
 

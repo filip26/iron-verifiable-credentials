@@ -24,6 +24,7 @@ import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.primitive.MultibaseLiteral;
 import com.apicatalog.vcdm.VcdmVocab;
 
+@Deprecated
 public abstract class MultiKeyAdapter implements MethodAdapter {
 
     public static final Term CONTROLLER = Term.create("controller", VcdmVocab.SECURITY_VOCAB);

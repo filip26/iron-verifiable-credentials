@@ -24,7 +24,7 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.processor.AbstractProcessor;
+import com.apicatalog.vc.processor.VerificationProcessor;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
@@ -47,7 +47,7 @@ import jakarta.json.JsonStructure;
  * signature suites, verification method resolvers, status resolvers, custom
  * validation logic, etc.
  */
-public class Verifier extends AbstractProcessor<Verifier> {
+public class Verifier extends VerificationProcessor<Verifier> {
 
     private static final Logger LOGGER = Logger.getLogger(Verifier.class.getName());
 

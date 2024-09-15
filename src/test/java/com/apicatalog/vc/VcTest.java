@@ -37,10 +37,10 @@ class VcTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "vcdm20Manifest" })
     @Order(3)
-    void verifyVcdm20(VcTestCase testCase) {
+    void VCDM20(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
-
+    
     @DisplayName("VCDM 1.1 Issuer")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "issuerManifest" })

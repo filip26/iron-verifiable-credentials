@@ -85,10 +85,24 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
         return VcdmVersion.V20;
     }
 
+    /**
+     * A date time from the credential is valid.
+     * 
+     * @return a date time
+     */
     public Instant validFrom() {
         return validFrom;
     }
-    
+
+
+    /**
+     * The date and time the credential ceases to be valid, which could be a date
+     * and time in the past. Note that this value represents the latest point in
+     * time at which the information associated with the credentialSubject property
+     * is valid.
+     * 
+     * @return the date and time the credential ceases to be valid
+     */
     public Instant validUntil() {
         return validUntil;
     }

@@ -12,18 +12,12 @@ import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
-import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.builder.GenericTreeCompiler;
-import com.apicatalog.linkedtree.builder.TreeBuilderError;
-import com.apicatalog.linkedtree.traversal.NodePointer;
-import com.apicatalog.linkedtree.traversal.TreeComposer;
 import com.apicatalog.linkedtree.writer.NodeDebugWriter;
-import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vcdm.VcdmVocab;
+import com.apicatalog.vc.primitive.VerifiableTree;
 
 /**
  * An abstract implementation providing partial implementation.
@@ -47,15 +41,6 @@ public abstract class VerifiableProof implements Proof {
         this.crypto = crypto;
     }
 
-//    /**
-//     * Create a generic copy of the verifiable that has no proof attached.
-//     * 
-//     * @param verifiable
-//     * @return
-//     * @throws DocumentError 
-//     */
-//    protected abstract LinkedTree unsigned(LinkedTree verifiable) throws DocumentError;
-
     /**
      * Create a generic copy of the proof with no proof value, i.e. signature,
      * attached.
@@ -74,7 +59,7 @@ public abstract class VerifiableProof implements Proof {
         Objects.requireNonNull(key);
 
         // a data before issuance - no proof attached
-        final LinkedTree unsigned = compose(verifiable);
+        final LinkedTree unsigned = VerifiableTree.unsigned(verifiable);
 
         Objects.requireNonNull(unsigned);
 
@@ -90,79 +75,6 @@ public abstract class VerifiableProof implements Proof {
                 unsigned,
                 unsignedProof,
                 key.publicKey());
-    }
-
-    protected LinkedTree compose(Verifiable verifiable) {
-
-        if (verifiable.isCredential()) {
-            return verifiable.ld().root();
-        }
-
-        if (verifiable.isPresentation()) {
-
-            var x = new TreeComposer(verifiable.ld().root()) {
-
-                GenericTreeCompiler compiler = new GenericTreeCompiler();
-
-                @Override
-                protected void end(LinkedNode node, Object[] path) {
-                    compiler.accept(node,
-                            path.length > 0 && (path[path.length - 1] instanceof Integer)
-                                    ? (int) path[path.length - 1]
-                                    : -1,
-                            path.length > 0 && (path[path.length - 1] instanceof String)
-                                    ? (String) path[path.length - 1]
-                                    : null,
-                            path.length);
-                }
-
-                @Override
-                protected void begin(LinkedNode node, Object[] path) throws TreeBuilderError {
-                    compiler.test(node, 
-                            path.length > 0 && (path[path.length - 1] instanceof Integer)
-                            ? (int) path[path.length - 1]
-                            : -1,
-                    path.length > 0 && (path[path.length - 1] instanceof String)
-                            ? (String) path[path.length - 1]
-                            : null,
-                    path.length);
-                            
-                }
-            };
-            x.inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri()),
-                    LinkedContainer.EMPTY);
-
-            int index = 0;
-            for (Credential credential : verifiable.asPresentation().credentials()) {
-                x.inject(NodePointer.of(
-                        0,
-                        VcdmVocab.VERIFIABLE_CREDENTIALS.uri(),
-                        index),
-                        credential.ld().root())
-                        .inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), index,
-                                VcdmVocab.PROOF.uri()),
-                                LinkedContainer.EMPTY);
-
-                int proofIndex = 0;
-                for (Proof proof : credential.proofs()) {
-                    x.inject(NodePointer.of(0,
-                            VcdmVocab.VERIFIABLE_CREDENTIALS.uri(),
-                            index,
-                            VcdmVocab.PROOF.uri(),
-                            proofIndex++),
-                            proof.ld().root());
-                }
-                index++;
-            }
-
-            try {
-                x.compose();
-                return x.compiler.tree();
-            } catch (TreeBuilderError e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 
     @Override
