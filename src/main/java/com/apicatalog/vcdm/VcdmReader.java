@@ -1,4 +1,4 @@
-package com.apicatalog.vcdm.v11;
+package com.apicatalog.vcdm;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -28,9 +28,6 @@ import com.apicatalog.vc.proof.GenericProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.EmbeddedProof;
-import com.apicatalog.vcdm.VcdmVerifiable;
-import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -112,8 +109,8 @@ public abstract class VcdmReader implements VerifiableReader {
                     loader,
                     base);
 
-            ((Vcdm11Presentation) presentation).credentials = 
-                    getCredentials(context, document.get(VcdmVocab.VERIFIABLE_CREDENTIALS.name()), loader, base);
+            ((VcdmPresentation) presentation).credentials( 
+                    getCredentials(context, document.get(VcdmVocab.VERIFIABLE_CREDENTIALS.name()), loader, base));
 
             return presentation;
 

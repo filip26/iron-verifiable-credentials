@@ -1,4 +1,4 @@
-package com.apicatalog.vcdm.v11;
+package com.apicatalog.vcdm.v20;
 
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.AdapterError;
@@ -6,14 +6,14 @@ import com.apicatalog.vc.Presentation;
 import com.apicatalog.vcdm.VcdmPresentation;
 import com.apicatalog.vcdm.VcdmVersion;
 
-public class Vcdm11Presentation extends VcdmPresentation implements Presentation {
+public class Vcdm20Presentation extends VcdmPresentation implements Presentation {
 
     public static Presentation of(LinkedFragment source) throws AdapterError {
-        return setup(new Vcdm11Presentation(), source);
+        return setup(new Vcdm20Presentation(), source);
     }
 
     @Override
     public VcdmVersion version() {
-        return VcdmVersion.V11;
+        return VcdmVersion.V20;
     }
 }

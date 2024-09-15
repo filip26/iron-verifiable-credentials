@@ -8,24 +8,23 @@ import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.reader.ReaderResolver;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.VcdmReader;
 import com.apicatalog.vcdm.VcdmVocab;
-import com.apicatalog.vcdm.v11.VcdmReader;
 
 public class Vcdm20Reader extends VcdmReader {
 
     protected static final JsonLdTreeReader reader = JsonLdTreeReader.create()
-
             .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
                     Vcdm20Credential.class,
                     Vcdm20Credential::of)
-//            .with(VcdmVocab.PRESENTATION_TYPE.uri(),
-//                    Vcdm11Presentation.class,
-//                    Vcdm11Presentation::of)
+            .with(VcdmVocab.PRESENTATION_TYPE.uri(),
+                    Vcdm20Presentation.class,
+                    Vcdm20Presentation::of)
             .with(XsdDateTime.typeAdapter())
             .build();
 
     protected final ReaderResolver resolver;
-    
+
     public Vcdm20Reader(final ReaderResolver resolver, final SignatureSuite... suites) {
         super(reader, suites);
         this.resolver = resolver;
@@ -35,6 +34,4 @@ public class Vcdm20Reader extends VcdmReader {
     protected VerifiableReader resolve(Collection<String> context) throws DocumentError {
         return resolver.resolveReader(context);
     }
-
-
 }
