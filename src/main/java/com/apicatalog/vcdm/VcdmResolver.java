@@ -5,24 +5,19 @@ import java.util.Collection;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.reader.VerifiableReaderResolver;
+import com.apicatalog.vc.reader.ReaderResolver;
 import com.apicatalog.vc.reader.VerifiableReader;
-import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
+import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
-public class VcdmResolver implements VerifiableReaderResolver {
+public class VcdmResolver implements ReaderResolver {
 
-    protected final SignatureSuite[] suites;
+    protected Vcdm11Reader v11;
+    protected Vcdm20Reader v20;
 
-    protected boolean v11;
-    protected boolean v20;
-
-    public VcdmResolver(SignatureSuite[] suites) {
-        this.suites = suites;
-
-        // defaults
-        this.v11 = true;
-        this.v20 = true;
+    public VcdmResolver() {
+        this.v11 = null;
+        this.v20 = null;
     }
 
     @Override
@@ -33,8 +28,8 @@ public class VcdmResolver implements VerifiableReaderResolver {
         }
 
         return switch (getVersion(contexts)) {
-        case V11 -> v11 ? new Vcdm11Reader(suites) : null;
-        case V20 -> null;
+        case V11 -> v11;
+        case V20 -> v20;
         default -> null;
         };
     }
@@ -46,16 +41,17 @@ public class VcdmResolver implements VerifiableReaderResolver {
         }
 
         final String firstContext = contexts.iterator().next();
-        if ("https://www.w3.org/2018/credentials/v1".equals(firstContext)) {
+
+        if (VcdmVocab.CONTEXT_MODEL_V1.equals(firstContext)) {
             return VcdmVersion.V11;
         }
-        if ("https://www.w3.org/ns/credentials/v2".equals(firstContext)) {
+        if (VcdmVocab.CONTEXT_MODEL_V2.equals(firstContext)) {
             return VcdmVersion.V20;
         }
 
         for (final String context : contexts) {
-            if ("https://www.w3.org/2018/credentials/v1".equals(context)
-                    || "https://www.w3.org/ns/credentials/v2".equals(context)) {
+            if (VcdmVocab.CONTEXT_MODEL_V1.equals(context)
+                    || VcdmVocab.CONTEXT_MODEL_V2.equals(context)) {
 
                 throw new DocumentError(ErrorType.Invalid, Keywords.CONTEXT);
             }
@@ -63,11 +59,11 @@ public class VcdmResolver implements VerifiableReaderResolver {
         return null;
     }
 
-    public void v11(boolean enabled) {
-        this.v11 = enabled;
+    public void v11(Vcdm11Reader v11) {
+        this.v11 = v11;
     }
-
-    public void v20(boolean enabled) {
-        this.v20 = enabled;
+    
+    public void v20(Vcdm20Reader v20) {
+        this.v20 = v20;
     }
 }

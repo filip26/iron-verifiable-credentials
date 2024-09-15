@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -16,11 +15,13 @@ import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
+import com.apicatalog.vcdm.VcdmVerifiable;
+import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
-public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation {
+public class Vcdm11Presentation extends VcdmVerifiable implements Presentation {
 
-    private static final Logger LOGGER = Logger.getLogger(Vcdm11Presentation.class.getName());
+//    private static final Logger LOGGER = Logger.getLogger(Vcdm11Presentation.class.getName());
 
     protected URI holder;
 
@@ -40,26 +41,11 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
         // holder
         presentation.holder = source.uri(VcdmVocab.HOLDER.uri());
 
-        // credentials
-//        if (selector.properties().containsKey(VcdmVocab.VERIFIABLE_CREDENTIALS.uri())) {
-//            presentation.credentials = getCredentials(
-//                    selector
-//                            .properties()
-//                            .get(VcdmVocab.VERIFIABLE_CREDENTIALS.uri())
-//                            .asContainer());
-//        }
-
-        // proofs
-//        if (selector.properties().containsKey(VcdmVocab.PROOF.uri())) {
-//            presentation.proofs = EmbeddedProof.getProofs(
-//                    selector.properties().get(VcdmVocab.PROOF.uri()).asContainer());
-//        }
-        
         presentation.ld = source;
         return presentation;
     }
 
-    static Collection<Credential> getCredentials(final LinkedContainer tree) {
+    static Collection<Credential> getCredentials(final LinkedContainer tree) throws AdapterError {
 
         Objects.requireNonNull(tree);
 
@@ -70,26 +56,25 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
         var credentials = new ArrayList<Credential>();
 
         for (final LinkedNode node : tree) {
-            if (node.isTree()) {
-//                credentials.add(getCredential(node.asTree().single().asFragment()));
-                continue;
-            }
             credentials.add(getCredential(node.asFragment()));
         }
 
         return credentials;
     }
 
-    static Credential getCredential(final LinkedFragment fragment) {
+    static Credential getCredential(final LinkedFragment fragment) throws AdapterError {
 
         Objects.requireNonNull(fragment);
 
+        //TODO unknown credentials
+        return fragment.type().materialize(Credential.class);
+        
 //        if (fragment.cast() instanceof Credential credential) {
 //            return credential;
 //        }
 
         // FIXME
-        throw new UnsupportedOperationException();
+//        throw new UnsupportedOperationException();
 //        return new UnknownProof(fragment);
     }
 
@@ -119,5 +104,10 @@ public class Vcdm11Presentation extends Vcdm11Verifiable implements Presentation
     @Override
     public Collection<Credential> credentials() {
         return credentials;
+    }
+
+    @Override
+    public VcdmVersion version() {
+        return VcdmVersion.V20;
     }
 }

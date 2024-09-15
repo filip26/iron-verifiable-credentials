@@ -20,8 +20,6 @@ public interface Verifiable extends Linkable {
 
     Collection<Proof> proofs();
     
-    void proofs(Collection<Proof> proofs);
-
     default boolean isCredential() {
         return false;
     }

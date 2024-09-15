@@ -9,11 +9,11 @@
     "credentialSubject": "d1id:example:ebfeb1f712ebc6f1c276e12ec21",
     "proof": {
       "type": "DataIntegrityProof",
-      "cryptosuite": "test-2022",
+      "cryptosuite": "test-201122",
       "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
       "created": "2022-06-04T20:33:02Z",
       "proofPurpose": "assertionMethod",
-      "proofValue": "zDzvG9arTUkqwTCncUFEkwhYvK9iHefBNAHvhorShoj9M"
+      "proofValue": "zDzvG9a1rTUkqwTCncUFEkwhYvK9iHefBNAHvhorShoj9M"
     }
   },
   "proof": {

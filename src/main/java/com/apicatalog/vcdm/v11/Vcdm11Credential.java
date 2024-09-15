@@ -17,9 +17,11 @@ import com.apicatalog.vc.status.GenericStatus;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.GenericSubject;
 import com.apicatalog.vc.subject.Subject;
+import com.apicatalog.vcdm.VcdmVerifiable;
+import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
-public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
+public class Vcdm11Credential extends VcdmVerifiable implements Credential {
 
 //    private static final Logger LOGGER = Logger.getLogger(Vcdm11Credential.class.getName());
 
@@ -201,5 +203,10 @@ public class Vcdm11Credential extends Vcdm11Verifiable implements Credential {
      */
     public Instant expiration() {
         return expiration;
+    }
+
+    @Override
+    public VcdmVersion version() {
+        return VcdmVersion.V11;
     }
 }

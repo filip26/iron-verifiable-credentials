@@ -69,7 +69,7 @@ public class HttpMethodResolver implements MethodResolver {
                     .get();
 
             final LinkedTree tree = reader.read(document);
-NodeDebugWriter.writeToStdOut(tree);
+//NodeDebugWriter.writeToStdOut(tree);
             if (tree != null
                     && tree.nodes().size() == 1
                     && tree.node().isFragment()) {

@@ -17,7 +17,7 @@ import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
+import com.apicatalog.linkedtree.traversal.NodeSelector.TraversalPolicy;
 import com.apicatalog.vc.proof.GenericProof;
 import com.apicatalog.vc.proof.Proof;
 
@@ -136,6 +136,7 @@ public final class EmbeddedProof {
         return value.asJsonArray();
     }
 
+    @Deprecated
     public static JsonObject removeProofs(final JsonObject document) {
         return Json.createObjectBuilder(document).remove(VcdmVocab.PROOF.uri()).build();
     }
@@ -146,14 +147,15 @@ public final class EmbeddedProof {
      * @param verifiable with a proof
      * @return a new document with no proofs
      */
+    @Deprecated    
     public static LinkedTree removeProofs(final LinkedTree verifiable) throws DocumentError {
         try {
             var builder = new GenericTreeCloner(verifiable);
 
             return builder.deepClone(
                     (node, indexOrder, indexTerm, depth) -> VcdmVocab.PROOF.uri().equals(indexTerm)
-                            ? ProcessingPolicy.Drop
-                            : ProcessingPolicy.Accept);
+                            ? TraversalPolicy.Drop
+                            : TraversalPolicy.Accept);
         } catch (TreeBuilderError e) {
             throw new DocumentError(e, ErrorType.Invalid);
         }

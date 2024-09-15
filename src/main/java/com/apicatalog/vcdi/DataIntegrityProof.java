@@ -15,12 +15,12 @@ import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.AdapterError;
 import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
-import com.apicatalog.linkedtree.traversal.NodeSelector.ProcessingPolicy;
+import com.apicatalog.linkedtree.traversal.NodeSelector.TraversalPolicy;
 import com.apicatalog.linkedtree.writer.NodeDebugWriter;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.method.GenericVerificationMethod;
 import com.apicatalog.vc.primitive.MultibaseLiteral;
-import com.apicatalog.vc.proof.DefaultProof;
+import com.apicatalog.vc.proof.VerifiableProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 
@@ -33,7 +33,7 @@ import jakarta.json.JsonStructure;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof extends DefaultProof implements Proof {
+public class DataIntegrityProof extends VerifiableProof implements Proof {
 
     protected final DataIntegritySuite suite;
 
@@ -57,7 +57,7 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
             DataIntegritySuite suite,
             LinkedFragment source) throws AdapterError {
 
-        NodeDebugWriter.writeToStdOut(source);
+//        NodeDebugWriter.writeToStdOut(source);
 
         var proofValueLiteral = source.literal(
                 VcdiVocab.PROOF_VALUE.uri(),
@@ -180,8 +180,8 @@ public class DataIntegrityProof extends DefaultProof implements Proof {
         try {
             var builder = new GenericTreeCloner(proof);
             return builder.deepClone((node, indexOrder, indexTerm, depth) -> VcdiVocab.PROOF_VALUE.uri().equals(indexTerm)
-                    ? ProcessingPolicy.Drop
-                    : ProcessingPolicy.Accept);
+                    ? TraversalPolicy.Drop
+                    : TraversalPolicy.Accept);
         } catch (TreeBuilderError e) {
             throw new DocumentError(e, ErrorType.Invalid);
         }

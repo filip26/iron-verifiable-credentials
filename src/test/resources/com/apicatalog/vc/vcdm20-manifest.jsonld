@@ -1,0 +1,22 @@
+{
+  "@context": [
+    "context.jsonld",
+    {
+      "@base": "verifier-manifest"
+    }
+  ],
+  "@id": "",
+  "@type": "mf:Manifest",
+  "name": "VCDM 2.0 Test Suite",
+  "sequence": [
+    {
+      "@id": "#t0001",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "valid signed VC",
+      "input": "vcdm20/0001-signed.jsonld"
+    }
+  ]
+}

@@ -25,7 +25,7 @@ import jakarta.json.JsonValue;
 @TestMethodOrder(OrderAnnotation.class)
 class VcTest {
 
-    @DisplayName("Verifier")
+    @DisplayName("VCDM 1.1 Verifier")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "verifierManifest" })
     @Order(2)
@@ -33,14 +33,26 @@ class VcTest {
         new VcTestRunnerJunit(testCase).execute();
     }
 
-    @DisplayName("Issuer")
+    @DisplayName("VCDM 2.0 Verifier")
+    @ParameterizedTest(name = "{0}")
+    @MethodSource({ "vcdm20Manifest" })
+    @Order(3)
+    void verifyVcdm20(VcTestCase testCase) {
+        new VcTestRunnerJunit(testCase).execute();
+    }
+
+    @DisplayName("VCDM 1.1 Issuer")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "issuerManifest" })
-    @Order(3)
+    @Order(4)
     void sign(VcTestCase testCase) {
         assumeFalse("t0005".equals(testCase.id.getFragment())); // skip require issuanceDate when issuing
-        
+
         new VcTestRunnerJunit(testCase).execute();
+    }
+
+    static final Stream<VcTestCase> vcdm20Manifest() throws JsonLdError, IOException {
+        return manifest("vcdm20-manifest.jsonld");
     }
 
     static final Stream<VcTestCase> verifierManifest() throws JsonLdError, IOException {

@@ -48,9 +48,4 @@ public record GenericCredential(
     public Collection<String> type() {
         return ld().asFragment().type().stream().toList();
     }
-
-    @Override
-    public void proofs(Collection<Proof> proofs) {
-        throw new UnsupportedOperationException();
-    }
 }

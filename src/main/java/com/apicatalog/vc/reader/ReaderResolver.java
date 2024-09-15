@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 
-public interface VerifiableReaderResolver {
+public interface ReaderResolver {
 
     VerifiableReader resolveReader(Collection<String> contexts) throws DocumentError;
     

@@ -8,6 +8,7 @@ import com.apicatalog.vcdm.VcdmVersion;
  * @since 0.15.0
  */
 
+@Deprecated
 public interface ObjectReader<P, R> {
 
     R read(VcdmVersion version, P expanded) throws DocumentError;

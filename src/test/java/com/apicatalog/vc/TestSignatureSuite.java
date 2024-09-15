@@ -1,6 +1,8 @@
 package com.apicatalog.vc;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.primitive.MessageDigest;

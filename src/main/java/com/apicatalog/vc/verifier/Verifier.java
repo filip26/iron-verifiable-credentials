@@ -28,14 +28,16 @@ import com.apicatalog.vc.processor.AbstractProcessor;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vc.reader.ReaderResolver;
 import com.apicatalog.vc.reader.VerifiableReader;
-import com.apicatalog.vc.reader.VerifiableReaderResolver;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmResolver;
 import com.apicatalog.vcdm.VcdmVocab;
+import com.apicatalog.vcdm.v11.Vcdm11Reader;
+import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -51,15 +53,23 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
     protected StatusVerifier statusVerifier;
 
-    protected final VerifiableReaderResolver verifiableAdapter;
+    protected final ReaderResolver readerResolver;
 
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
-        this.verifiableAdapter = new VcdmResolver(suites);
+        this.readerResolver = vcdmResolver(suites); 
+        
         this.statusVerifier = null;
     }
 
+    protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
+        var resolver = new VcdmResolver();
+        resolver.v11(new Vcdm11Reader(suites));
+        resolver.v20(new Vcdm20Reader(resolver, suites));
+        return resolver;
+    }
+    
     /**
      * Set of accepted verification suites.
      * 
@@ -96,7 +106,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
      */
     public Verifiable verify(Verifiable verifiable, Parameter<?>... parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(verifiable);
-        return verify(verifiable, toMap(parameters), getLoader());
+        return verify(verifiable, toMap(parameters));
     }
 
     /**
@@ -216,26 +226,26 @@ public class Verifier extends AbstractProcessor<Verifier> {
         try {
             context = JsonLdContext.strings(document);
         } catch (IllegalArgumentException e) {
-            throw new DocumentError(ErrorType.Invalid, "document");
+            throw new DocumentError(e, ErrorType.Invalid, "Context");
         }
 
-        final VerifiableReader reader = verifiableAdapter.resolveReader(context);
+        final VerifiableReader reader = readerResolver.resolveReader(context);
 
         if (reader == null) {
             LOGGER.log(Level.INFO, "An unknown document model {0}", context);
-            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+            throw new DocumentError(ErrorType.Unknown, "Model");
         }
 
-        final Verifiable verifiable = reader.read(document, loader, base);
+        final Verifiable verifiable = reader.read(context, document, loader, base);
 
         if (verifiable == null) {
             throw new DocumentError(ErrorType.Invalid, "document");
         }
 
-        return verify(verifiable, params, loader);
+        return verify(verifiable, params);
     }
 
-    protected Verifiable verify(Verifiable verifiable, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Verifiable verify(Verifiable verifiable, Map<String, Object> params) throws VerificationError, DocumentError {
 
         Objects.requireNonNull(verifiable);
 
@@ -260,7 +270,9 @@ public class Verifier extends AbstractProcessor<Verifier> {
         while (proof != null) {
 
             // validate proof properties
-            proof.validate(params);
+            proof.validate(params == null
+                    ? Collections.emptyMap()
+                    : params);
 
             final ProofValue proofValue = proof.signature();
 
@@ -268,7 +280,7 @@ public class Verifier extends AbstractProcessor<Verifier> {
                 throw new DocumentError(ErrorType.Missing, VcdiVocab.PROOF_VALUE);
             }
 
-            final VerificationMethod verificationMethod = getMethod(proof, loader)
+            final VerificationMethod verificationMethod = getMethod(proof)
                     .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD));
 
             if (verificationMethod instanceof VerificationKey verificationKey) {
@@ -289,7 +301,6 @@ public class Verifier extends AbstractProcessor<Verifier> {
 
         credential.validate();
 
-        // validation
         if (credential.isExpired()) {
             throw new VerificationError(Code.Expired);
         }

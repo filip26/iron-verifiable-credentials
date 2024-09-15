@@ -155,7 +155,7 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
         }
     }
 
-    protected Optional<VerificationMethod> getMethod(final Proof proof, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Optional<VerificationMethod> getMethod(final Proof proof) throws VerificationError, DocumentError {
 
         final VerificationMethod method = proof.method();
 
@@ -171,20 +171,20 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
             return Optional.of(method);
         }
 
-        return resolveMethod(method.id(), proof, loader);
+        return resolveMethod(method.id(), proof);
     }
 
     protected Optional<VerificationMethod> resolveMethod(
             URI id,
-            Proof proof,
-            DocumentLoader loader) throws DocumentError {
+            Proof proof
+            ) throws DocumentError {
 
         if (id == null) {
             throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
         }
 
         // find the method id resolver
-        final Optional<MethodResolver> resolver = getMethodResolvers(loader).stream()
+        final Optional<MethodResolver> resolver = getMethodResolvers().stream()
                 .filter(r -> r.isAccepted(id))
                 .findFirst();
 
@@ -196,9 +196,9 @@ public class AbstractProcessor<T extends AbstractProcessor<T>> {
         throw new DocumentError(ErrorType.Unknown, "VerificationMethod");
     }
     
-    protected Collection<MethodResolver> getMethodResolvers(DocumentLoader loader) {
+    protected Collection<MethodResolver> getMethodResolvers() {
         if (methodResolvers == null) {
-            return defaultResolvers(loader);
+            return defaultResolvers(getLoader());
         }
         return methodResolvers;
     }
