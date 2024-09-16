@@ -1,7 +1,7 @@
 package com.apicatalog.vc;
 
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
@@ -44,7 +44,7 @@ public class TestKeyAdapter extends MultiKeyAdapter {
     }
 
     @Override
-    public Object materialize(LinkedFragment source) throws AdapterError {
+    public Object materialize(LinkedFragment source) throws NodeAdapterError {
         // TODO Auto-generated method stub
         return null;
     }

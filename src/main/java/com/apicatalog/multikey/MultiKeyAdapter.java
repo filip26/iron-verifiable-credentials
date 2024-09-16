@@ -15,7 +15,7 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.fragment.LinkedFragmentAdapter;
 import com.apicatalog.linkedtree.fragment.LinkedFragmentReader;
-import com.apicatalog.linkedtree.literal.adapter.GenericLiteralAdapter;
+import com.apicatalog.linkedtree.literal.adapter.GenericDatatypeAdapter;
 import com.apicatalog.linkedtree.literal.adapter.LiteralAdapter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
@@ -55,7 +55,6 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         /* implement a custom validation */
     }
 
-
     public LinkedFragmentAdapter resolve(String id, Collection<String> types) {
         if (types.contains(MultiKey.TYPE.toString())) {
             return new LinkedFragmentAdapter() {
@@ -68,14 +67,13 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
 //                @Override
                 public Collection<LiteralAdapter> literalAdapters() {
                     return List.of(
-                            new GenericLiteralAdapter(
+                            new GenericDatatypeAdapter(
                                     MultibaseLiteral.typeName(),
                                     ((source, root) -> new MultibaseLiteral(
-                                            MultibaseLiteral.typeName(), 
-                                            source, 
-                                            root, 
-                                            Multibase.BASE_58_BTC.decode(source))))
-                                    
+                                            MultibaseLiteral.typeName(),
+                                            source,
+                                            Multibase.BASE_58_BTC.decode(source),
+                                            root)))
                     );
                 }
 

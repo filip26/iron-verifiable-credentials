@@ -6,7 +6,7 @@ import java.time.Instant;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
@@ -30,7 +30,7 @@ public class MultiKey implements KeyPair {
     public static MultiKey of(
             MulticodecDecoder decoder,
             LinkedFragment source
-            ) throws AdapterError {
+            ) throws NodeAdapterError {
 
         final MultiKey multikey = new MultiKey();
 
@@ -121,20 +121,20 @@ public class MultiKey implements KeyPair {
         this.expiration = expiration;
     }
 
-    protected static final byte[] getKey(Term term, final byte[] decodedKey, MultiKey multikey, MulticodecDecoder decoder) throws AdapterError {
+    protected static final byte[] getKey(Term term, final byte[] decodedKey, MultiKey multikey, MulticodecDecoder decoder) throws NodeAdapterError {
 
         if (decodedKey == null || decodedKey.length == 0) {
             return null;
         }
 
         final Multicodec codec = decoder.getCodec(decodedKey)
-                .orElseThrow(() -> new AdapterError("Invalid " + term.name() + " codec"));
+                .orElseThrow(() -> new NodeAdapterError("Invalid " + term.name() + " codec"));
 
         if (multikey.algorithm == null) {
             multikey.algorithm = getAlgorithmName(codec);
 
         } else if (!multikey.algorithm.equals(getAlgorithmName(codec))) {
-            throw new AdapterError("Invalid key pair codec [" + codec + "]");
+            throw new NodeAdapterError("Invalid key pair codec [" + codec + "]");
         }
 
         return codec.decode(decodedKey);

@@ -8,7 +8,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
@@ -61,9 +61,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //        };
 //    }
 //    
-    protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws AdapterError;
+    protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws NodeAdapterError;
 
-    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws AdapterError;
+    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws NodeAdapterError;
 
     public DataIntegrityProofDraft createDraft(
             VerificationMethod method,
@@ -99,7 +99,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         } catch (InvalidSelector e) {
             throw DocumentError.of(e);
             
-        } catch (TreeBuilderError | AdapterError e) {
+        } catch (TreeBuilderError | NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }
     }

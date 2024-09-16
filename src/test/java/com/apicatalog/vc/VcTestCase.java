@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.signature.VerificationMethod;
-import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 
@@ -118,7 +118,7 @@ public class VcTestCase {
                 testCase.verificationMethod = reader.read(method)
                         .asFragment().type().materialize(VerificationMethod.class);
 
-                } catch (AdapterError | TreeBuilderError e) {
+                } catch (NodeAdapterError | TreeBuilderError e) {
                     fail(e);
                 }
             }

@@ -12,7 +12,7 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.traversal.NodeSelector.TraversalPolicy;
@@ -54,7 +54,7 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
     public static DataIntegrityProof of(
             Verifiable verifiable,
             DataIntegritySuite suite,
-            LinkedFragment source) throws AdapterError {
+            LinkedFragment source) throws NodeAdapterError {
 
 //        NodeDebugWriter.writeToStdOut(source);
 

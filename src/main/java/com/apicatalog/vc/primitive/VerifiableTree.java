@@ -1,10 +1,10 @@
 package com.apicatalog.vc.primitive;
 
-import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.builder.GenericTreeCompiler;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.primitive.GenericContainer;
 import com.apicatalog.linkedtree.traversal.NodePointer;
 import com.apicatalog.linkedtree.traversal.TreeComposer;
 import com.apicatalog.vc.Credential;
@@ -52,7 +52,7 @@ public class VerifiableTree {
                 }
             };
             x.inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri()),
-                    LinkedContainer.EMPTY);
+                    GenericContainer.empty(null));  //FIXME hack
 
             int index = 0;
             for (Credential credential : verifiable.asPresentation().credentials()) {
@@ -63,7 +63,7 @@ public class VerifiableTree {
                         credential.ld().root())
                         .inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), index,
                                 VcdmVocab.PROOF.uri()),
-                                LinkedContainer.EMPTY);
+                                GenericContainer.empty(null));  //FIXME hack
 
                 int proofIndex = 0;
                 for (Proof proof : credential.proofs()) {
@@ -122,7 +122,7 @@ public class VerifiableTree {
 
             crendential.inject(NodePointer.of(0,
                     VcdmVocab.PROOF.uri()),
-                    LinkedContainer.EMPTY);
+                    GenericContainer.empty(null));  //FIXME hack
 
             int proofIndex = 0;
             for (Proof proof : verifiable.proofs()) {
@@ -172,7 +172,7 @@ public class VerifiableTree {
                 }
             };
             presentation.inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri()),
-                    LinkedContainer.EMPTY);
+                    GenericContainer.empty(null));  //FIXME hack
 
             int index = 0;
             for (Credential credential : verifiable.asPresentation().credentials()) {
@@ -183,7 +183,7 @@ public class VerifiableTree {
                         credential.ld().root())
                         .inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), index,
                                 VcdmVocab.PROOF.uri()),
-                                LinkedContainer.EMPTY);
+                                GenericContainer.empty(null));  //FIXME hack
 
                 int proofIndex = 0;
                 for (Proof proof : credential.proofs()) {
@@ -198,7 +198,7 @@ public class VerifiableTree {
 
             presentation.inject(NodePointer.of(0,
                     VcdmVocab.PROOF.uri()),
-                    LinkedContainer.EMPTY);
+                    GenericContainer.empty(null));  //FIXME hack
 
             int proofIndex = 0;
             for (Proof proof : verifiable.proofs()) {

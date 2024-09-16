@@ -7,7 +7,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
@@ -20,7 +20,7 @@ public abstract class VcdmPresentation extends VcdmVerifiable implements Present
 
     protected LinkedFragment ld;
 
-    protected static VcdmPresentation setup(VcdmPresentation presentation, LinkedFragment source) throws AdapterError {
+    protected static VcdmPresentation setup(VcdmPresentation presentation, LinkedFragment source) throws NodeAdapterError {
 
         // @id
         presentation.id = source.uri();

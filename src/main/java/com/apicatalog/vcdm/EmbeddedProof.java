@@ -13,7 +13,7 @@ import com.apicatalog.linkedtree.LinkedContainer;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
@@ -161,7 +161,7 @@ public final class EmbeddedProof {
         }
     }
 
-    public static Collection<Proof> getProofs(final LinkedContainer tree) throws AdapterError {
+    public static Collection<Proof> getProofs(final LinkedContainer tree) throws NodeAdapterError {
 
         Objects.requireNonNull(tree);
 
@@ -182,7 +182,7 @@ public final class EmbeddedProof {
         return proofs;
     }
 
-    public static Proof getProof(final LinkedFragment fragment) throws AdapterError {
+    public static Proof getProof(final LinkedFragment fragment) throws NodeAdapterError {
 
         Objects.requireNonNull(fragment);
 

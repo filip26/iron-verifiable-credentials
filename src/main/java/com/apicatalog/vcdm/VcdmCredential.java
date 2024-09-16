@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.issuer.GenericIssuer;
@@ -28,7 +28,7 @@ public abstract class VcdmCredential extends VcdmVerifiable implements Credentia
         // protected
     }
 
-    protected static Credential setup(VcdmCredential credential, LinkedFragment source) throws AdapterError {
+    protected static Credential setup(VcdmCredential credential, LinkedFragment source) throws NodeAdapterError {
 
         // @id
         credential.id = source.uri();

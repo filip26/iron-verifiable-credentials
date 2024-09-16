@@ -5,7 +5,7 @@ import java.time.Instant;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.adapter.AdapterError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
@@ -25,13 +25,13 @@ public class Vcdm11Credential extends VcdmCredential implements Credential {
         // protected
     }
 
-    public static Credential of(LinkedFragment source) throws AdapterError {
+    public static Credential of(LinkedFragment source) throws NodeAdapterError {
         var credential = new Vcdm11Credential();
         VcdmCredential.setup(credential, source);
         return setup(credential, source);
     }
 
-    protected static Credential setup(Vcdm11Credential credential, LinkedFragment source) throws AdapterError {
+    protected static Credential setup(Vcdm11Credential credential, LinkedFragment source) throws NodeAdapterError {
         // issuance date
         credential.issuance = source.xsdDateTime(VcdmVocab.ISSUANCE_DATE.uri());
 
