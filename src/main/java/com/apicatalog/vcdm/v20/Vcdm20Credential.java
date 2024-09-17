@@ -7,6 +7,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
+import com.apicatalog.linkedtree.lang.LanguageMap;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vcdm.VcdmCredential;
@@ -17,7 +18,17 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
 
     protected Instant validFrom;
     protected Instant validUntil;
+    
+    protected LanguageMap name;
+    protected LanguageMap description;
 
+    //TODO
+    //evidence
+    //termsOfUse
+    //relatedResource
+    //refreshService
+    //confidenceMethod
+    
     protected Vcdm20Credential() {
         // protected
     }

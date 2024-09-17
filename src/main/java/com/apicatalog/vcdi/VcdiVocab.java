@@ -21,4 +21,7 @@ public final class VcdiVocab {
     public static Term CRYPTO_SUITE = Term.create("cryptosuite", VcdmVocab.SECURITY_VOCAB);
 
     public static Term PREVIOUS_PROOF = Term.create("previousProof", VcdmVocab.SECURITY_VOCAB);
+    
+    public static Term ASSERTION = Term.create("assertionMethod", VcdmVocab.SECURITY_VOCAB);
+    public static Term AUTHENTICATION = Term.create("authentication", VcdmVocab.SECURITY_VOCAB);
 }

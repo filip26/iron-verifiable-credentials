@@ -15,7 +15,7 @@
         "PositiveEvaluationTest",
         "ReaderTest"
       ],
-      "name": "R/W signed VC",
+      "name": "signed VC",
       "input": "vcdm20/0001-signed.jsonld"
     },
     {
@@ -24,7 +24,7 @@
         "PositiveEvaluationTest",
         "ReaderTest"
       ],
-      "name": "R/W enveloped unsigned VC",
+      "name": "enveloped VC in unsigned VP",
       "input": "vcdm20/0002-unsigned.jsonld"
     },
     {
@@ -33,7 +33,7 @@
         "PositiveEvaluationTest",
         "ReaderTest"
       ],
-      "name": "R/W enveloped signed VC",
+      "name": "enveloped signed VP",
       "input": "vcdm20/0003-signed.jsonld"
     }    
   ]

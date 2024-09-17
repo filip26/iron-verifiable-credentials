@@ -56,8 +56,6 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
             DataIntegritySuite suite,
             LinkedFragment source) throws NodeAdapterError {
 
-//        NodeDebugWriter.writeToStdOut(source);
-
         var proofValueLiteral = source.literal(
                 VcdiVocab.PROOF_VALUE.uri(),
                 MultibaseLiteral.class);
