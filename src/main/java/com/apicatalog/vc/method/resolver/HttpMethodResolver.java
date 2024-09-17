@@ -11,7 +11,7 @@ import com.apicatalog.ld.signature.GenericVerificationMethod;
 import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.linkedtree.writer.NodeDebugWriter;
+import com.apicatalog.linkedtree.writer.DictionaryWriter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;

@@ -30,6 +30,7 @@ import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
+import com.apicatalog.linkedtree.writer.DebugNodeWriter;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
@@ -150,13 +151,12 @@ public class VcTestRunnerJunit {
                 Verifiable verifiable = READER.read(testCase.input);
                 assertNotNull(verifiable);
 
+                JsonObject result = READER.compact(
+                        VerifiableTree.compose(verifiable));
+
                 final Document expected = LOADER.loadDocument(testCase.input,
                         new DocumentLoaderOptions());
 
-                JsonArray result = (new JsonLdTreeWriter()).write(
-                        VerifiableTree.compose(verifiable)
-                        );
-                
                 boolean match = JsonLdComparison.equals(result,
                         expected.getJsonContent().orElse(null));
 
