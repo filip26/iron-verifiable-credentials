@@ -31,7 +31,7 @@ public class Vcdm11Reader extends VcdmReader {
             .build();
 
     public Vcdm11Reader(final SignatureSuite... suites) {
-        super(reader, suites);
+        super(VcdmVersion.V11, reader, suites);
     }
 
     @Override

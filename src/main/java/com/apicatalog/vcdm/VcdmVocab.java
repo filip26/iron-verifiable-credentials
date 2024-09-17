@@ -48,5 +48,8 @@ public final class VcdmVocab {
     
     public static final Term MULTIBASE_TYPE = Term.create("multibase", SECURITY_VOCAB);
 
+    public static final Term ENVELOPED_CREDENTIAL_TYPE = Term.create("EnvelopedVerifiableCredential", CREDENTIALS_VOCAB);
+
+    
     private VcdmVocab() { /* protected */ }
 }

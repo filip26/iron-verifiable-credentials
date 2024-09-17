@@ -17,10 +17,12 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.selector.InvalidSelector;
 import com.apicatalog.linkedtree.traversal.NodeSelector.TraversalPolicy;
+import com.apicatalog.linkedtree.writer.DebugNodeWriter;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
@@ -42,7 +44,10 @@ public abstract class VcdmReader implements VerifiableReader {
 
     protected final Collection<SignatureSuite> suites;
 
-    public VcdmReader(JsonLdTreeReader reader, final SignatureSuite... suites) {
+    protected final VcdmVersion version;
+
+    public VcdmReader(VcdmVersion version, JsonLdTreeReader reader, final SignatureSuite... suites) {
+        this.version = version;
         this.suites = Arrays.asList(suites);
         this.reader = reader;
     }
@@ -62,14 +67,14 @@ public abstract class VcdmReader implements VerifiableReader {
         } else if (isPresentation(types)) {
             return readPresentation(context, document, loader, base);
         }
-        throw new DocumentError(ErrorType.Unknown, "Verifiable");
+        throw new DocumentError(ErrorType.Unknown, "Verifiable type=" + types);
     }
 
-    protected static boolean isCredential(Collection<String> types) {
+    protected boolean isCredential(Collection<String> types) {
         return types.contains(VcdmVocab.CREDENTIAL_TYPE.name());
     }
 
-    protected static boolean isPresentation(Collection<String> types) {
+    protected boolean isPresentation(Collection<String> types) {
         return types.contains(VcdmVocab.PRESENTATION_TYPE.name());
     }
 
@@ -109,7 +114,7 @@ public abstract class VcdmReader implements VerifiableReader {
                     loader,
                     base);
 
-            ((VcdmPresentation) presentation).credentials( 
+            ((VcdmPresentation) presentation).credentials(
                     getCredentials(context, document.get(VcdmVocab.VERIFIABLE_CREDENTIALS.name()), loader, base));
 
             return presentation;
@@ -168,12 +173,14 @@ public abstract class VcdmReader implements VerifiableReader {
                             || VcdmVocab.VERIFIABLE_CREDENTIALS.uri().equals(indexTerm))
                                     ? TraversalPolicy.Drop
                                     : TraversalPolicy.Accept));
-
-            if (tree == null
-                    || tree.size() != 1
-                    || !tree.node().isFragment()
-                    || !tree.node().asFragment().type().isAdaptableTo(Verifiable.class)) {
+            DebugNodeWriter.writeToStdOut(tree);
+            if (tree == null) {
                 throw new DocumentError(ErrorType.Invalid, "document");
+            }
+            if ((tree.size() != 1
+                    || !tree.node().isFragment()
+                    || !tree.node().asFragment().type().isAdaptableTo(Verifiable.class))) {
+//                throw new DocumentError(ErrorType.Invalid, "document");
             }
 
             final Verifiable verifiable = tree.object(Verifiable.class);
@@ -181,7 +188,12 @@ public abstract class VcdmReader implements VerifiableReader {
             // detach proofs
             final JsonArray jsonProofs = EmbeddedProof.getProofs(expanded.iterator().next().asJsonObject());
 
-            ((VcdmVerifiable) verifiable).proofs(getProofs(verifiable, jsonProofs, loader));
+            if (verifiable instanceof VcdmVerifiable vcdmVerifiable) {
+                vcdmVerifiable.proofs(
+                        jsonProofs == null || jsonProofs.isEmpty()
+                                ? Collections.emptyList()
+                                : getProofs(verifiable, jsonProofs, loader));
+            }
 
             return verifiable;
 
@@ -257,27 +269,31 @@ public abstract class VcdmReader implements VerifiableReader {
 
         final Collection<Credential> credentials = new ArrayList<>(container.size());
 
-        for (JsonValue item : container) {
+        for (final JsonValue item : container) {
             if (JsonUtils.isNotObject(item)) {
                 throw new DocumentError(ErrorType.Invalid, "Credential");
             }
-            
-            VerifiableReader credentialReader = resolve(context);
-            
+
+            final VerifiableReader credentialReader = resolve(context);
+
             if (credentialReader == null) {
                 throw new DocumentError(ErrorType.Unknown, "Credential");
             }
-            
-            Verifiable verifiable = credentialReader.read(context, item.asJsonObject(), loader, base);
-            
+
+            final Verifiable verifiable = credentialReader.read(
+                    JsonLdContext.strings(item.asJsonObject(), context),
+                    item.asJsonObject(),
+                    loader,
+                    base);
+
             if (!(verifiable instanceof Credential)) {
                 throw new DocumentError(ErrorType.Invalid, "Credential");
             }
-            credentials.add((Credential)verifiable);
+            credentials.add((Credential) verifiable);
         }
         return credentials;
     }
-    
+
     protected abstract VerifiableReader resolve(Collection<String> context) throws DocumentError;
 
 }

@@ -19,6 +19,9 @@ public class Vcdm20Reader extends VcdmReader {
             .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
                     Vcdm20Credential.class,
                     Vcdm20Credential::of)
+            .with(VcdmVocab.ENVELOPED_CREDENTIAL_TYPE.uri(),
+                    Vcdm20EnvelopedCredential.class,
+                    Vcdm20EnvelopedCredential::of)            
             .with(VcdmVocab.PRESENTATION_TYPE.uri(),
                     Vcdm20Presentation.class,
                     Vcdm20Presentation::of)
@@ -28,14 +31,20 @@ public class Vcdm20Reader extends VcdmReader {
     protected final ReaderResolver resolver;
 
     public Vcdm20Reader(final ReaderResolver resolver, final SignatureSuite... suites) {
-        super(reader, suites);
+        super(VcdmVersion.V20, reader, suites);
         this.resolver = resolver;
     }
 
     @Override
     protected VerifiableReader resolve(Collection<String> context) throws DocumentError {
-        return VcdmVersion.V11 == VcdmResolver.getVersion(context)
+        return VcdmVersion.V20 == VcdmResolver.getVersion(context)
                 ? this
                 : resolver.resolveReader(context);
     }
+
+    @Override
+    protected boolean isCredential(Collection<String> types) {
+        return super.isCredential(types) || types.contains(VcdmVocab.ENVELOPED_CREDENTIAL_TYPE.name());
+    }
+
 }

@@ -127,7 +127,8 @@ public final class EmbeddedProof {
         final JsonValue value = document.get(VcdmVocab.PROOF.uri());
 
         if (JsonUtils.isNull(value)) {
-            throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
+            return null;
+//            throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
         }
         if (JsonUtils.isNotArray(value)) {
             throw new DocumentError(ErrorType.Invalid, VcdmVocab.PROOF);

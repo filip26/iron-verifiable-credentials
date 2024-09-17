@@ -26,6 +26,24 @@
       ],
       "name": "Verify signed VC",
       "input": "vcdm20/0001-signed.jsonld"
-    }
+    },
+    {
+      "@id": "#t0003",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "R/W enveloped unsigned VC",
+      "input": "vcdm20/0002-unsigned.jsonld"
+    },
+    {
+      "@id": "#t0004",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "R/W enveloped signed VC",
+      "input": "vcdm20/0003-signed.jsonld"
+    }    
   ]
 }
