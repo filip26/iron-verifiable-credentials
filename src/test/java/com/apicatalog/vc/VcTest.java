@@ -33,14 +33,22 @@ class VcTest {
         new VcTestRunnerJunit(testCase).execute();
     }
 
+    @DisplayName("VCDM 2.0 Reader")
+    @ParameterizedTest(name = "{0}")
+    @MethodSource({ "vcdm20ReaderManifest" })
+    @Order(3)
+    void vcdm20Reader(VcTestCase testCase) {
+        new VcTestRunnerJunit(testCase).execute();
+    }
+
     @DisplayName("VCDM 2.0 Verifier")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "vcdm20Manifest" })
-    @Order(3)
-    void VCDM20(VcTestCase testCase) {
+    @Order(4)
+    void vcdm20Verifier(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
-    
+
     @DisplayName("VCDM 1.1 Issuer")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "issuerManifest" })
@@ -53,6 +61,10 @@ class VcTest {
 
     static final Stream<VcTestCase> vcdm20Manifest() throws JsonLdError, IOException {
         return manifest("vcdm20-manifest.jsonld");
+    }
+
+    static final Stream<VcTestCase> vcdm20ReaderManifest() throws JsonLdError, IOException {
+        return manifest("vcdm20-reader-manifest.jsonld");
     }
 
     static final Stream<VcTestCase> verifierManifest() throws JsonLdError, IOException {

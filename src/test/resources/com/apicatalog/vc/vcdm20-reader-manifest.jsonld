@@ -1,0 +1,40 @@
+{
+  "@context": [
+    "context.jsonld",
+    {
+      "@base": "verifier-manifest"
+    }
+  ],
+  "@id": "",
+  "@type": "mf:Manifest",
+  "name": "VCDM 2.0 Reader",
+  "sequence": [
+    {
+      "@id": "#t0001",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "R/W signed VC",
+      "input": "vcdm20/0001-signed.jsonld"
+    },
+    {
+      "@id": "#t0002",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "R/W enveloped unsigned VC",
+      "input": "vcdm20/0002-unsigned.jsonld"
+    },
+    {
+      "@id": "#t0003",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "R/W enveloped signed VC",
+      "input": "vcdm20/0003-signed.jsonld"
+    }    
+  ]
+}
