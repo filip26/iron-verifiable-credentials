@@ -1,6 +1,5 @@
 package com.apicatalog.vcdm;
 
-import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
@@ -11,10 +10,12 @@ import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
+import com.apicatalog.vc.holder.PresentationHolder;
+import com.apicatalog.vc.holder.PresentationHolderReference;
 
 public abstract class VcdmPresentation extends VcdmVerifiable implements Presentation {
 
-    protected URI holder;
+    protected PresentationHolder holder;
 
     protected Collection<Credential> credentials;
 
@@ -26,7 +27,11 @@ public abstract class VcdmPresentation extends VcdmVerifiable implements Present
         presentation.id = source.uri();
 
         // holder
-        presentation.holder = source.uri(VcdmVocab.HOLDER.uri());
+        presentation.holder = source.fragment(
+                VcdmVocab.HOLDER.uri(), 
+                PresentationHolder.class,
+                PresentationHolderReference::of             
+                );
 
         presentation.ld = source;
         return presentation;
@@ -55,7 +60,7 @@ public abstract class VcdmPresentation extends VcdmVerifiable implements Present
     }
 
     @Override
-    public URI holder() {
+    public PresentationHolder holder() {
         return holder;
     }
 

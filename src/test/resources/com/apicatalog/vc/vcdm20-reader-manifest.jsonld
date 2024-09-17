@@ -35,6 +35,15 @@
       ],
       "name": "enveloped signed VP",
       "input": "vcdm20/0003-signed.jsonld"
+    },
+    {
+      "@id": "#t0004",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "unsigned VP (1 VC)",
+      "input": "vcdm20/0004-unsigned.jsonld"
     }    
   ]
 }
