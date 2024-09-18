@@ -39,7 +39,7 @@ public class VcdmWriter implements VerifiableWriter {
             };
         }
 
-        throw new DocumentError(ErrorType.Unknown, "Document");
+        return v20.write(verifiable, loader, base);
     }
 
     public static JsonArray getContext(final LinkedTree tree) {

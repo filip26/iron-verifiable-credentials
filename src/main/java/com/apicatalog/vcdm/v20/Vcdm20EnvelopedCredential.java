@@ -2,6 +2,7 @@ package com.apicatalog.vcdm.v20;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
@@ -45,7 +46,7 @@ public class Vcdm20EnvelopedCredential implements Credential {
 
     @Override
     public Collection<Proof> proofs() {
-        throw new UnsupportedOperationException();
+        return Collections.emptyList();
     }
 
     @Override

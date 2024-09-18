@@ -22,7 +22,6 @@ import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.selector.InvalidSelector;
 import com.apicatalog.linkedtree.traversal.NodeSelector.TraversalPolicy;
-import com.apicatalog.linkedtree.writer.DebugNodeWriter;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
@@ -118,8 +117,10 @@ public abstract class VcdmReader implements VerifiableReader {
                     loader,
                     base);
 
-            ((VcdmPresentation) presentation).credentials(
-                    getCredentials(context, document.get(VcdmVocab.VERIFIABLE_CREDENTIALS.name()), loader, base));
+            if (presentation instanceof VcdmPresentation vcdmPresentation) {
+                vcdmPresentation.credentials(
+                        getCredentials(context, document.get(VcdmVocab.VERIFIABLE_CREDENTIALS.name()), loader, base));
+            }
 
             return presentation;
 

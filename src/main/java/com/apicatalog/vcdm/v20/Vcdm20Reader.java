@@ -21,10 +21,13 @@ public class Vcdm20Reader extends VcdmReader {
                     Vcdm20Credential::of)
             .with(VcdmVocab.ENVELOPED_CREDENTIAL_TYPE.uri(),
                     Vcdm20EnvelopedCredential.class,
-                    Vcdm20EnvelopedCredential::of)            
+                    Vcdm20EnvelopedCredential::of)
             .with(VcdmVocab.PRESENTATION_TYPE.uri(),
                     Vcdm20Presentation.class,
                     Vcdm20Presentation::of)
+            .with(VcdmVocab.ENVELOPED_PRESENTATION_TYPE.uri(),
+                    Vcdm20EnvelopedPresentation.class,
+                    Vcdm20EnvelopedPresentation::of)
             .with(XsdDateTime.typeAdapter())
             .build();
 
@@ -45,6 +48,11 @@ public class Vcdm20Reader extends VcdmReader {
     @Override
     protected boolean isCredential(Collection<String> types) {
         return super.isCredential(types) || types.contains(VcdmVocab.ENVELOPED_CREDENTIAL_TYPE.name());
+    }
+
+    @Override
+    protected boolean isPresentation(Collection<String> types) {
+        return super.isPresentation(types) || types.contains(VcdmVocab.ENVELOPED_PRESENTATION_TYPE.name());
     }
 
 }
