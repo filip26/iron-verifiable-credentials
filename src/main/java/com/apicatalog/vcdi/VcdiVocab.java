@@ -8,6 +8,8 @@ public final class VcdiVocab {
     public static Term TYPE = Term.create("DataIntegrityProof", VcdmVocab.SECURITY_VOCAB);
     
     public static Term CREATED = Term.create("created", "http://purl.org/dc/terms/");
+    
+    public static Term EXPIRES = Term.create("expiration", VcdmVocab.SECURITY_VOCAB);
 
     public static Term PURPOSE = Term.create("proofPurpose", VcdmVocab.SECURITY_VOCAB);
     public static Term VERIFICATION_METHOD = Term.create("verificationMethod", VcdmVocab.SECURITY_VOCAB);

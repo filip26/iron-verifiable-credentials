@@ -37,6 +37,8 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
     protected final DataIntegritySuite suite;
 
     protected Instant created;
+    protected Instant expires;
+    
     protected URI purpose;
 
     protected String domain;
@@ -71,6 +73,8 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
         var proof = new DataIntegrityProof(verifiable, suite, cryptosuite);
 
         proof.created = source.xsdDateTime(VcdiVocab.CREATED.uri());
+        
+        proof.expires = source.xsdDateTime(VcdiVocab.EXPIRES.uri());
 
         proof.domain = source.lexeme(VcdiVocab.DOMAIN.uri());
 
@@ -172,6 +176,10 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
         return nonce;
     }
 
+    public Instant expires() {
+        return expires;
+    }
+    
     @Override
     protected LinkedTree unsignedProof(LinkedTree proof) throws DocumentError {
         try {
