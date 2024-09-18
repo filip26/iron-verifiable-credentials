@@ -17,7 +17,7 @@ import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.processor.DocumentProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.VcdmResolver;
+import com.apicatalog.vcdm.io.VcdmResolver;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
 

@@ -14,7 +14,7 @@ import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.primitive.VerifiableTree;
 import com.apicatalog.vc.writer.VerifiableWriter;
 import com.apicatalog.vcdm.VcdmVocab;
-import com.apicatalog.vcdm.VcdmWriter;
+import com.apicatalog.vcdm.io.VcdmWriter;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;

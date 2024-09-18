@@ -12,7 +12,7 @@ import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.primitive.VerifiableTree;
 import com.apicatalog.vc.writer.VerifiableWriter;
-import com.apicatalog.vcdm.VcdmWriter;
+import com.apicatalog.vcdm.io.VcdmWriter;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;

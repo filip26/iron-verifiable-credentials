@@ -41,7 +41,7 @@ import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
 import com.apicatalog.vc.writer.VerifiableWriter;
 import com.apicatalog.vcdi.DataIntegrityProofDraft;
-import com.apicatalog.vcdm.VcdmWriter;
+import com.apicatalog.vcdm.io.VcdmWriter;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;

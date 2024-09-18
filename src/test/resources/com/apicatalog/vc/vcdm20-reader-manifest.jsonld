@@ -110,6 +110,15 @@
       "name": "uknown @type",
       "input": "vcdm20/0011-draft.jsonld",
       "expectErrorCode": "UnknownVerifiableType"
+    },
+    {
+      "@id": "#t0012",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "unsigned evidence",
+      "input": "vcdm20/0012-unsigned-ev.jsonld"
     }
   ]
 }

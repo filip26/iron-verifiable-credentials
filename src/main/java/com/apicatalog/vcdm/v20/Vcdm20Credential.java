@@ -9,6 +9,10 @@ import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.lang.LanguageMap;
 import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.model.Evidence;
+import com.apicatalog.vc.model.GenericEvidence;
+import com.apicatalog.vc.model.GenericTermsOfUse;
+import com.apicatalog.vc.model.TermsOfUse;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vcdm.VcdmCredential;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -18,17 +22,18 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
 
     protected Instant validFrom;
     protected Instant validUntil;
-    
+
     protected LanguageMap name;
     protected LanguageMap description;
 
-    //TODO
-    //evidence
-    //termsOfUse
-    //relatedResource
-    //refreshService
-    //confidenceMethod
-    
+    protected TermsOfUse termsOfUse;
+    protected Evidence evidence;
+
+    // TODO
+    // relatedResource
+    // refreshService
+    // confidenceMethod
+
     protected Vcdm20Credential() {
         // protected
     }
@@ -42,6 +47,19 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
     protected static Vcdm20Credential setup(Vcdm20Credential credential, LinkedFragment source) throws NodeAdapterError {
         credential.validFrom = source.xsdDateTime(VcdmVocab.VALID_FROM.uri());
         credential.validUntil = source.xsdDateTime(VcdmVocab.VALID_UNTIL.uri());
+        
+        //TODO description, name
+        
+        credential.evidence = source.fragment(
+                VcdmVocab.EVIDENCE.uri(), 
+                Evidence.class, 
+                GenericEvidence::of);
+
+        credential.termsOfUse = source.fragment(
+                VcdmVocab.TERMS_OF_USE.uri(), 
+                TermsOfUse.class, 
+                GenericTermsOfUse::of);
+
         return credential;
     }
 
@@ -80,7 +98,7 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
 //            throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
 //        }
     }
-    
+
     @Override
     public boolean isExpired() {
         return (validUntil != null && validUntil.isBefore(Instant.now()));
@@ -105,7 +123,6 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
         return validFrom;
     }
 
-
     /**
      * The date and time the credential ceases to be valid, which could be a date
      * and time in the past. Note that this value represents the latest point in
@@ -116,5 +133,21 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
      */
     public Instant validUntil() {
         return validUntil;
+    }
+
+    public Evidence evidence() {
+        return evidence;
+    }
+
+    public TermsOfUse termsOfUse() {
+        return termsOfUse;
+    }
+
+    public LanguageMap description() {
+        return description;
+    }
+
+    public LanguageMap name() {
+        return name;
     }
 }

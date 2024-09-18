@@ -1,4 +1,4 @@
-package com.apicatalog.vcdm;
+package com.apicatalog.vcdm.io;
 
 import java.net.URI;
 import java.util.Collection;
@@ -11,6 +11,7 @@ import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.pi.ProcessingInstruction;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.writer.VerifiableWriter;
+import com.apicatalog.vcdm.VcdmVerifiable;
 import com.apicatalog.vcdm.v11.Vcdm11Writer;
 import com.apicatalog.vcdm.v20.Vcdm20Writer;
 

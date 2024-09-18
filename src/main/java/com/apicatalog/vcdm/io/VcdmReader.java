@@ -1,4 +1,4 @@
-package com.apicatalog.vcdm;
+package com.apicatalog.vcdm.io;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -29,6 +29,11 @@ import com.apicatalog.vc.proof.GenericProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.EmbeddedProof;
+import com.apicatalog.vcdm.VcdmPresentation;
+import com.apicatalog.vcdm.VcdmVerifiable;
+import com.apicatalog.vcdm.VcdmVersion;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;

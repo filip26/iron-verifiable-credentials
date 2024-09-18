@@ -7,10 +7,10 @@ import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.VcdmReader;
-import com.apicatalog.vcdm.VcdmResolver;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
+import com.apicatalog.vcdm.io.VcdmReader;
+import com.apicatalog.vcdm.io.VcdmResolver;
 
 /**
  * A JSON-LD based reader conforming to the
