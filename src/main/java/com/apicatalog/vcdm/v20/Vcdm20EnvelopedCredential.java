@@ -2,7 +2,6 @@ package com.apicatalog.vcdm.v20;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
@@ -29,7 +28,6 @@ public class Vcdm20EnvelopedCredential implements Credential {
         // @id
         credential.id = source.uri();
 
-        
         credential.ld = source;
         
         return credential;
@@ -42,40 +40,37 @@ public class Vcdm20EnvelopedCredential implements Credential {
 
     @Override
     public Collection<String> type() {
-        return Collections.emptyList();
+        return ld.type().stream().toList();
     }
 
     @Override
     public Collection<Proof> proofs() {
-        return Collections.emptyList();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isExpired() {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isNotValidYet() {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CredentialIssuer issuer() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<Status> status() {
-        return Collections.emptyList();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<Subject> subject() {
-        return Collections.emptyList();
+        throw new UnsupportedOperationException();
     }
 
     @Override
