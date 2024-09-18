@@ -177,7 +177,7 @@ public abstract class VcdmReader implements VerifiableReader {
                             || VcdmVocab.VERIFIABLE_CREDENTIALS.uri().equals(indexTerm))
                                     ? TraversalPolicy.Drop
                                     : TraversalPolicy.Accept));
-            DebugNodeWriter.writeToStdOut(tree);
+//            DebugNodeWriter.writeToStdOut(tree);
             if (tree == null) {
                 throw new DocumentError(ErrorType.Invalid, "document");
             }

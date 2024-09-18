@@ -12,14 +12,13 @@ import jakarta.json.JsonObject;
 public interface VerifiableReader {
 
     /**
-     * Reads VC/VP document.
+     * Read VC/VP document
      * 
      * @param context
      * @param document
      * @param loader
      * @param base
-     * @return {@link Verifiable} object representing the verified credentials or a
-     *         presentation
+     * @return {@link Verifiable} object representing a credential or a presentation
      * 
      * @throws DocumentError if the document cannot be read or parsed
      * 

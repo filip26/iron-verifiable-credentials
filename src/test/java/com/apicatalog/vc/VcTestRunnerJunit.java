@@ -29,8 +29,6 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
-import com.apicatalog.linkedtree.writer.DebugNodeWriter;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
@@ -38,11 +36,12 @@ import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
-import com.apicatalog.vc.primitive.VerifiableTree;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
+import com.apicatalog.vc.writer.VerifiableWriter;
 import com.apicatalog.vcdi.DataIntegrityProofDraft;
+import com.apicatalog.vcdm.VcdmWriter;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -68,6 +67,8 @@ public class VcTestRunnerJunit {
     final static Verifier VERIFIER = Verifier.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
 
     final static Reader READER = Reader.with(SUITE).loader(LOADER);
+    
+    final static VerifiableWriter WRITER = new VcdmWriter();
 
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
@@ -151,7 +152,7 @@ public class VcTestRunnerJunit {
                 Verifiable verifiable = READER.read(testCase.input);
                 assertNotNull(verifiable);
 
-                JsonObject result = READER.compact(verifiable);
+                JsonObject result = WRITER.write(verifiable, new StaticContextLoader(LOADER), null);
 
                 final Document expected = LOADER.loadDocument(testCase.input,
                         new DocumentLoaderOptions());
