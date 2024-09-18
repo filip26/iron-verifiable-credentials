@@ -11,7 +11,13 @@ public interface Evidence extends Linkable {
     URI id();
 
     Collection<String> type();
-    
-    void validate() throws DocumentError;
-    
+
+    /**
+     * A custom validation implemented by an ancestor.
+     * 
+     * @throws DocumentError
+     */
+    default void validate() throws DocumentError {
+        // custom validation
+    }
 }

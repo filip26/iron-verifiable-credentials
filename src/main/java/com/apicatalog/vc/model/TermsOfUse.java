@@ -12,6 +12,12 @@ public interface TermsOfUse extends Linkable {
     
     Collection<String> type();
     
-    void validate() throws DocumentError;
-    
+    /**
+     * A custom validation implemented by an ancestor.
+     * 
+     * @throws DocumentError
+     */
+    default void validate() throws DocumentError {
+        // custom validation
+    }
 }

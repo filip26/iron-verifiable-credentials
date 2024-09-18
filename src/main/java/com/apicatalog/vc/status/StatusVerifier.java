@@ -10,15 +10,14 @@ import com.apicatalog.vc.Credential;
 public interface StatusVerifier {
 
     /**
-     * Verify the given credential status in an expanded JSON-LD form
+     * Verify the given credential status
      * 
      * @param credential
      * @param status
      * @throws DocumentError
      */
-    void verify( 
+    void verify(
             Credential credential,
-            Status status
-            ) throws DocumentError;
+            Status status) throws DocumentError;
 
 }

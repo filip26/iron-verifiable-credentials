@@ -9,8 +9,15 @@ import com.apicatalog.linkedtree.Linkable;
 public interface RefreshService extends Linkable {
 
     URI id();
-    
+
     Collection<String> type();
-    
-    void validate() throws DocumentError;
+
+    /**
+     * A custom validation implemented by an ancestor.
+     * 
+     * @throws DocumentError
+     */
+    default void validate() throws DocumentError {
+        // custom validation
+    }
 }

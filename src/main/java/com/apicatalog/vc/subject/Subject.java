@@ -9,8 +9,12 @@ public interface Subject extends Linkable {
 
     URI id();
     
+    /**
+     * A custom validation implemented by an ancestor.
+     * 
+     * @throws DocumentError
+     */
     default void validate() throws DocumentError {
-        throw new UnsupportedOperationException();
+        // custom validation
     }
-
 }

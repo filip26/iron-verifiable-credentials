@@ -9,5 +9,5 @@ public interface CredentialSchema extends Linkable {
 
     URI id();
     Collection<String> type();
-    
+
 }
