@@ -1,4 +1,4 @@
-package com.apicatalog.vc.processor;
+package com.apicatalog.vc.verifier;
 
 import java.net.URI;
 import java.util.Collection;
@@ -17,6 +17,7 @@ import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
+import com.apicatalog.vc.processor.DocumentProcessor;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
@@ -39,7 +40,9 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
 
     protected static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), MulticodecDecoder.getInstance(Tag.Key)));
+        resolvers.add(new DidUrlMethodResolver(
+                MultibaseDecoder.getInstance(),
+                MulticodecDecoder.getInstance(Tag.Key)));
         resolvers.add(new HttpMethodResolver(loader));
         return resolvers;
     }

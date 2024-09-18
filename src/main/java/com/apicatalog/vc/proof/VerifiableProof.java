@@ -85,6 +85,7 @@ public abstract class VerifiableProof implements Proof {
         if (signature == null) {
             throw new DocumentError(ErrorType.Missing, "ProofValue");
         }
+//FIXME        signature.validate();
         // TODO ???
 //        if (signature.toByteArray() != null &&  signature.toByteArray().length != 32) {
 //            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");

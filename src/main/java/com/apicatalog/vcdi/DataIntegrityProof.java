@@ -72,6 +72,8 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
 
         var proof = new DataIntegrityProof(verifiable, suite, cryptosuite);
 
+        proof.id = source.uri();
+        
         proof.created = source.xsdDateTime(VcdiVocab.CREATED.uri());
         
         proof.expires = source.xsdDateTime(VcdiVocab.EXPIRES.uri());
@@ -107,11 +109,11 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
 
         super.validate(params);
 
-        if (created == null) {
-            throw new DocumentError(ErrorType.Missing, "Created");
-        }
         if (purpose == null) {
             throw new DocumentError(ErrorType.Missing, "ProofPurpose");
+        }
+        if (crypto == null) {
+            throw new DocumentError(ErrorType.Missing, "CryptoSuite");
         }
                 
         if (params != null) {

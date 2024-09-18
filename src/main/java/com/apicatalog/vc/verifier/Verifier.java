@@ -24,8 +24,7 @@ import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.processor.VerificationProcessor;
-import com.apicatalog.vc.processor.Parameter;
+import com.apicatalog.vc.model.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.reader.ReaderResolver;
@@ -109,23 +108,23 @@ public class Verifier extends VerificationProcessor<Verifier> {
         return verify(verifiable, toMap(parameters));
     }
 
-    /**
-     * A method to override with a custom verification logic that is called before
-     * proofs' verification.
-     * 
-     * @param verifiable
-     */
-    protected void check(Verifiable verifiable) throws VerificationError {
-    }
-
-    /**
-     * A method to override with a custom verification logic that is called before a
-     * proof value is verified.
-     * 
-     * @param proof
-     */
-    protected void check(Proof proof) throws VerificationError {
-    }
+//    /**
+//     * A method to override with a custom verification logic that is called before
+//     * proofs' verification.
+//     * 
+//     * @param verifiable
+//     */
+//    protected void check(Verifiable verifiable) throws VerificationError {
+//    }
+//
+//    /**
+//     * A method to override with a custom verification logic that is called before a
+//     * proof value is verified.
+//     * 
+//     * @param proof
+//     */
+//    protected void check(Proof proof) throws VerificationError {
+//    }
 
     /**
      * Verifies VC/VP document. Throws VerificationError if the document is not
@@ -245,7 +244,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         return verify(verifiable, params);
     }
 
-    protected Verifiable verify(Verifiable verifiable, Map<String, Object> params) throws VerificationError, DocumentError {
+    public Verifiable verify(Verifiable verifiable, Map<String, Object> params) throws VerificationError, DocumentError {
 
         Objects.requireNonNull(verifiable);
 
@@ -312,8 +311,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         // status check
         if (statusVerifier != null && credential.status() != null && !credential.status().isEmpty()) {
             for (final Status status : credential.status()) {
-                // FIXME add
-//                statusVerifier.verify(credential, status);   
+                statusVerifier.verify(credential, status);   
             }
         }
     }

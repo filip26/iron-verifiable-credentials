@@ -1,4 +1,4 @@
-package com.apicatalog.vc.processor;
+package com.apicatalog.vc.model;
 
 public class Parameter<V> {
     
