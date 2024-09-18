@@ -8,7 +8,9 @@ import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.issuer.GenericIssuer;
+import com.apicatalog.vc.model.CredentialSchema;
 import com.apicatalog.vc.model.Evidence;
+import com.apicatalog.vc.model.GenericCredentialSchema;
 import com.apicatalog.vc.model.GenericEvidence;
 import com.apicatalog.vc.model.GenericRefreshService;
 import com.apicatalog.vc.model.GenericTermsOfUse;
@@ -28,11 +30,13 @@ public abstract class VcdmCredential extends VcdmVerifiable implements Credentia
 
     protected CredentialIssuer issuer;
 
-    protected TermsOfUse termsOfUse;
+    protected Collection<TermsOfUse> termsOfUse;
     
-    protected Evidence evidence;
+    protected Collection<Evidence> evidence;
     
-    protected RefreshService refreshService;
+    protected Collection<RefreshService> refreshService;
+    
+    protected Collection<CredentialSchema> schema;
     
     protected LinkedFragment ld;
 
@@ -61,23 +65,28 @@ public abstract class VcdmCredential extends VcdmVerifiable implements Credentia
         credential.status = source.collection(
                 VcdmVocab.STATUS.uri(),
                 Status.class,
-                GenericStatus::new);
+                GenericStatus::of);
 
-        credential.evidence = source.fragment(
+        credential.evidence = source.collection(
                 VcdmVocab.EVIDENCE.uri(), 
                 Evidence.class, 
                 GenericEvidence::of);
 
-        credential.termsOfUse = source.fragment(
+        credential.termsOfUse = source.collection(
                 VcdmVocab.TERMS_OF_USE.uri(), 
                 TermsOfUse.class, 
                 GenericTermsOfUse::of);
         
-        credential.refreshService = source.fragment(
+        credential.refreshService = source.collection(
                 VcdmVocab.REFRESH_SERVICE.uri(), 
                 RefreshService.class, 
                 GenericRefreshService::of);
-        
+
+        credential.schema = source.collection(
+                VcdmVocab.CREDENTIAL_SCHEMA.uri(), 
+                CredentialSchema.class, 
+                GenericCredentialSchema::of);
+
         credential.ld = source;
         return credential;
     }
@@ -107,15 +116,19 @@ public abstract class VcdmCredential extends VcdmVerifiable implements Credentia
         return subject;
     }
     
-    public Evidence evidence() {
+    public Collection<Evidence> evidence() {
         return evidence;
     }
 
-    public TermsOfUse termsOfUse() {
+    public Collection<TermsOfUse> termsOfUse() {
         return termsOfUse;
     }
     
-    public RefreshService refreshService() {
+    public Collection<RefreshService> refreshService() {
         return refreshService;
+    }
+    
+    public Collection<CredentialSchema> schema() {
+        return schema;
     }
 }

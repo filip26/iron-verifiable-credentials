@@ -16,7 +16,7 @@
         "VeriferTest"
       ],
       "name": "Verify signed VC",
-      "input": "vcdm20/0001-signed.jsonld"
+      "input": "vcdm20/0001-unsigned.jsonld"
     }
   ]
 }

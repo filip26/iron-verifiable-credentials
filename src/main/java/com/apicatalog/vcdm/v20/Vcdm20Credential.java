@@ -7,9 +7,14 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.lang.LanguageMap;
+import com.apicatalog.linkedtree.lang.LangStringSelector;
 import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.model.CredentialSchema;
+import com.apicatalog.vc.model.Evidence;
+import com.apicatalog.vc.model.RefreshService;
+import com.apicatalog.vc.model.TermsOfUse;
 import com.apicatalog.vc.status.Status;
+import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmCredential;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
@@ -19,8 +24,8 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
     protected Instant validFrom;
     protected Instant validUntil;
 
-    protected LanguageMap name;
-    protected LanguageMap description;
+    protected LangStringSelector name;
+    protected LangStringSelector description;
 
     // TODO
     // relatedResource
@@ -40,7 +45,8 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
         credential.validFrom = source.xsdDateTime(VcdmVocab.VALID_FROM.uri());
         credential.validUntil = source.xsdDateTime(VcdmVocab.VALID_UNTIL.uri());
         
-        //TODO description, name
+        credential.name = source.langMap(VcdmVocab.NAME.uri());
+        credential.description = source.langMap(VcdmVocab.DESCRIPTION.uri());
         
         return credential;
     }
@@ -57,20 +63,60 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
         if (subject() == null || subject().isEmpty()) {
             throw new DocumentError(ErrorType.Missing, VcdmVocab.SUBJECT);
         }
-//FIXME        for (Subject item : subject()) {
-//            item.validate();
-//        }
+        for (Subject item : subject()) {
+            if (item.ld().asFragment().terms().isEmpty()) {
+                throw new DocumentError(ErrorType.Invalid, VcdmVocab.SUBJECT);
+            }
+            item.validate();
+        }
 
         // issuer
         if (issuer() == null) {
             throw new DocumentError(ErrorType.Missing, VcdmVocab.ISSUER);
         }
-//FIXME        issuer().validate();
+        if (issuer().id() == null) {
+            throw new DocumentError(ErrorType.Missing, "IssuerId");
+        }
 
         // status
         if (status() != null) {
             for (final Status item : status()) {
+                if (item.type() == null || item.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "StatusType");
+                }
                 item.validate();
+            }
+        }
+
+        if (termsOfUse() != null) {
+            for (final TermsOfUse item : termsOfUse()) {
+                if (item.type() == null || item.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "TermsOfUseType");
+                }
+            }
+        }
+
+        if (evidence() != null) {
+            for (final Evidence item : evidence()) {
+                if (item.type() == null || item.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "EvidenceType");
+                }
+            }
+        }
+
+        if (refreshService() != null) {
+            for (final RefreshService item : refreshService()) {
+                if (item.type() == null || item.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "RefreshServiceType");
+                }
+            }
+        }
+
+        if (schema() != null) {
+            for (final CredentialSchema item : schema()) {
+                if (item.type() == null || item.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "CredentialSchemaType");
+                }
             }
         }
 
@@ -117,11 +163,11 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
         return validUntil;
     }
 
-    public LanguageMap description() {
+    public LangStringSelector description() {
         return description;
     }
 
-    public LanguageMap name() {
+    public LangStringSelector name() {
         return name;
     }
 }

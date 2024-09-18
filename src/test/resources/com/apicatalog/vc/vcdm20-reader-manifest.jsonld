@@ -16,7 +16,7 @@
         "ReaderTest"
       ],
       "name": "signed VC",
-      "input": "vcdm20/0001-signed.jsonld"
+      "input": "vcdm20/0001-unsigned.jsonld"
     },
     {
       "@id": "#t0002",
@@ -128,6 +128,15 @@
       ],
       "name": "unsigned refresh",
       "input": "vcdm20/0013-unsigned-refresh.jsonld"
-    }    
+    },
+    {
+      "@id": "#t0014",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "unsigned all props",
+      "input": "vcdm20/0014-unsigned-all-props.jsonld"
+    }
   ]
 }

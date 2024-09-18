@@ -52,6 +52,8 @@ public final class VcdmVocab {
     
     public static final Term ENVELOPED_PRESENTATION_TYPE = Term.create("EnvelopedVerifiablePresentation", CREDENTIALS_VOCAB);
 
+    public static final Term NAME = Term.create("name", "https://schema.org/");
+    public static final Term DESCRIPTION = Term.create("description", "https://schema.org/");
     
     private VcdmVocab() { /* protected */ }
 }

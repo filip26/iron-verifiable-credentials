@@ -307,7 +307,7 @@
       ],
       "name": "NULL @type",
       "input": "verifier/0302-in.jsonld",
-      "expectErrorCode": "UnknownVerifiable"
+      "expectErrorCode": "MissingVerifiableType"
     }
   ]
 }
