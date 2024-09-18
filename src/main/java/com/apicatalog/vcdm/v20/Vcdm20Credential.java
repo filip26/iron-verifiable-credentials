@@ -9,10 +9,6 @@ import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.lang.LanguageMap;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.model.Evidence;
-import com.apicatalog.vc.model.GenericEvidence;
-import com.apicatalog.vc.model.GenericTermsOfUse;
-import com.apicatalog.vc.model.TermsOfUse;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vcdm.VcdmCredential;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -26,12 +22,8 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
     protected LanguageMap name;
     protected LanguageMap description;
 
-    protected TermsOfUse termsOfUse;
-    protected Evidence evidence;
-
     // TODO
     // relatedResource
-    // refreshService
     // confidenceMethod
 
     protected Vcdm20Credential() {
@@ -50,16 +42,6 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
         
         //TODO description, name
         
-        credential.evidence = source.fragment(
-                VcdmVocab.EVIDENCE.uri(), 
-                Evidence.class, 
-                GenericEvidence::of);
-
-        credential.termsOfUse = source.fragment(
-                VcdmVocab.TERMS_OF_USE.uri(), 
-                TermsOfUse.class, 
-                GenericTermsOfUse::of);
-
         return credential;
     }
 
@@ -133,14 +115,6 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
      */
     public Instant validUntil() {
         return validUntil;
-    }
-
-    public Evidence evidence() {
-        return evidence;
-    }
-
-    public TermsOfUse termsOfUse() {
-        return termsOfUse;
     }
 
     public LanguageMap description() {

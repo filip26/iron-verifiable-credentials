@@ -119,6 +119,15 @@
       ],
       "name": "unsigned evidence",
       "input": "vcdm20/0012-unsigned-ev.jsonld"
-    }
+    },
+    {
+      "@id": "#t0013",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "unsigned refresh",
+      "input": "vcdm20/0013-unsigned-refresh.jsonld"
+    }    
   ]
 }
