@@ -1,0 +1,17 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://www.w3.org/ns/credentials/examples/v2"
+  ],
+  "type": "VerifiablePresentation",
+  "verifiableCredential": [
+    {
+      "@context": "https://www.w3.org/2018/credentials/v1",
+      "type": "VerifiableCredential",
+      "issuer": "did:example:12345678",
+      "credentialSubject": {
+        "id": "urn:uuid:313801ba-24b7-11ee-be02-ff560265cf9b"
+      }
+    }
+  ]
+}

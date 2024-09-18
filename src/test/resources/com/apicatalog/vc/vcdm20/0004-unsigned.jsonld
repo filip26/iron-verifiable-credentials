@@ -19,7 +19,7 @@
       "issuer": "did:example:12345678",
       "credentialSubject": {
         "id": "urn:uuid:313801ba-24b7-11ee-be02-ff560265cf9b",
-        "assertion": "This VP is submitted by the subject as evidence of a legal right to drive"
+        "description": "This VP is submitted by the subject as evidence of a legal right to drive"
       }
     }
   ]

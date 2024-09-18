@@ -113,6 +113,7 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
         if (purpose == null) {
             throw new DocumentError(ErrorType.Missing, "ProofPurpose");
         }
+                
         if (params != null) {
             assertEquals(params, VcdiVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
             assertEquals(params, VcdiVocab.CHALLENGE, challenge);

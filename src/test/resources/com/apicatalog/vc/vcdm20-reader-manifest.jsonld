@@ -42,8 +42,53 @@
         "PositiveEvaluationTest",
         "ReaderTest"
       ],
-      "name": "unsigned VP (1 VC)",
+      "name": "unsigned VP",
       "input": "vcdm20/0004-unsigned.jsonld"
+    },
+    {
+      "@id": "#t0005",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "unsigned VP (1.1 VC)",
+      "input": "vcdm20/0005-unsigned.jsonld"
+    },
+    {
+      "@id": "#t0006",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "draft: @context",
+      "input": "vcdm20/0006-draft.jsonld"
+    },
+    {
+      "@id": "#t0007",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "draft: @context, @type",
+      "input": "vcdm20/0007-draft.jsonld"
+    },
+    {
+      "@id": "#t0008",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "draft: subject",
+      "input": "vcdm20/0008-draft.jsonld"
+    },
+    {
+      "@id": "#t0009",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "draft: empty",
+      "input": "vcdm20/0009-draft.jsonld"
     }    
   ]
 }
