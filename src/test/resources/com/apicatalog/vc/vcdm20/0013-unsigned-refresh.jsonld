@@ -8,8 +8,8 @@
     "AgeVerificationCredential"
   ],
   "issuer": "did:key:z6MksFxi8wnHkNq4zgEskSZF45SuWQ4HndWSAVYRRGe9qDks",
-  "issuanceDate": "2024-04-03T00:00:00.000Z",
-  "expirationDate": "2024-12-15T00:00:00.000Z",
+  "validFrom": "2024-04-03T00:00:00.000Z",
+  "validUntil": "2024-12-15T00:00:00.000Z",
   "name": "Age Verification Credential",
   "credentialSubject": {
     "overAge": 21
