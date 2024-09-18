@@ -19,11 +19,13 @@ import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.linkedtree.pi.ProcessingInstruction;
+import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.primitive.VerifiableTree;
 import com.apicatalog.vc.processor.DocumentProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmResolver;
+import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
@@ -109,19 +111,56 @@ public class Reader extends DocumentProcessor<Reader> {
         }
     }
 
+    //TODO needs refactor, it even does not belong here
     public JsonObject compact(Verifiable verifiable) throws DocumentError {
-
+        
         var tree = VerifiableTree.compose(verifiable);
 
         JsonArray expanded = new JsonLdTreeWriter().write(tree);
 
         try {
+            
+            JsonObject compacted = JsonLd.compact(
+                    JsonDocument.of(expanded),
+                    JsonDocument.of(getContext(tree)))
+                    .loader(getLoader())
+                    .base(base)
+                    .get();
+            
+            if (verifiable.isCredential() || !verifiable.isPresentation() || verifiable.asPresentation().credentials().isEmpty()) {
+                return compacted;
+            }
+            
+            var credentials = Json.createArrayBuilder();
+            
+            for (Credential cred : verifiable.asPresentation().credentials()) {
+                credentials.add(compactCredential(cred));
+            }
+            
+            return Json.createObjectBuilder(compacted)
+                    .add(VcdmVocab.VERIFIABLE_CREDENTIALS.name(), credentials)
+                    .build();
+            
+        } catch (JsonLdError e) {
+            DocumentError.failWithJsonLd(e);
+            throw new DocumentError(e, ErrorType.Invalid);
+        }
+    }
+
+    protected JsonObject compactCredential(Credential credential) throws DocumentError {
+        var tree = VerifiableTree.compose(credential);
+
+        JsonArray expanded = new JsonLdTreeWriter().write(tree);
+
+        try {
+
             return JsonLd.compact(
                     JsonDocument.of(expanded),
                     JsonDocument.of(getContext(tree)))
                     .loader(getLoader())
                     .base(base)
                     .get();
+
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
             throw new DocumentError(e, ErrorType.Invalid);

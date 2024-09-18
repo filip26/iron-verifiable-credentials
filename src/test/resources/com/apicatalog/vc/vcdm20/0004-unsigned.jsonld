@@ -9,8 +9,7 @@
   ],
   "id": "urn:uuid:313801ba-24b7-11ee-be02-ff560265cf9b",
   "holder": "did:example:12345678",
-  "verifiableCredential": [
-    {
+  "verifiableCredential": [{
       "@context": "https://www.w3.org/ns/credentials/v2",
       "type": [
         "VerifiableCredential",

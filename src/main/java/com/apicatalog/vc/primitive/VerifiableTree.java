@@ -88,6 +88,117 @@ public class VerifiableTree {
     }
 
     public static LinkedTree compose(Verifiable verifiable) {
+        if (verifiable.isCredential()) {
+            var crendential = new TreeComposer(verifiable.ld().root()) {
+
+                GenericTreeCompiler compiler = new GenericTreeCompiler();
+
+                @Override
+                protected void end(LinkedNode node, Object[] path) {
+                    compiler.accept(node,
+                            path.length > 0 && (path[path.length - 1] instanceof Integer)
+                                    ? (int) path[path.length - 1]
+                                    : -1,
+                            path.length > 0 && (path[path.length - 1] instanceof String)
+                                    ? (String) path[path.length - 1]
+                                    : null,
+                            path.length);
+                }
+
+                @Override
+                protected void begin(LinkedNode node, Object[] path) throws TreeBuilderError {
+                    compiler.test(node,
+                            path.length > 0 && (path[path.length - 1] instanceof Integer)
+                                    ? (int) path[path.length - 1]
+                                    : -1,
+                            path.length > 0 && (path[path.length - 1] instanceof String)
+                                    ? (String) path[path.length - 1]
+                                    : null,
+                            path.length);
+
+                }
+            };
+
+            if (!verifiable.proofs().isEmpty()) {
+                crendential.inject(NodePointer.of(0,
+                        VcdmVocab.PROOF.uri()),
+                        GenericContainer.empty(null)); // FIXME hack
+
+                int proofIndex = 0;
+                for (Proof proof : verifiable.proofs()) {
+                    crendential.inject(NodePointer.of(0,
+                            VcdmVocab.PROOF.uri(),
+                            proofIndex++),
+                            proof.ld().root());
+                }
+            }
+
+            try {
+                crendential.compose();
+                return crendential.compiler.tree();
+            } catch (TreeBuilderError e) {
+                e.printStackTrace();    //FIXME
+            }
+        }
+
+        if (verifiable.isPresentation()) {
+
+            var presentation = new TreeComposer(verifiable.ld().root()) {
+
+                GenericTreeCompiler compiler = new GenericTreeCompiler();
+
+                @Override
+                protected void end(LinkedNode node, Object[] path) {
+                    compiler.accept(node,
+                            path.length > 0 && (path[path.length - 1] instanceof Integer)
+                                    ? (int) path[path.length - 1]
+                                    : -1,
+                            path.length > 0 && (path[path.length - 1] instanceof String)
+                                    ? (String) path[path.length - 1]
+                                    : null,
+                            path.length);
+                }
+
+                @Override
+                protected void begin(LinkedNode node, Object[] path) throws TreeBuilderError {
+                    compiler.test(node,
+                            path.length > 0 && (path[path.length - 1] instanceof Integer)
+                                    ? (int) path[path.length - 1]
+                                    : -1,
+                            path.length > 0 && (path[path.length - 1] instanceof String)
+                                    ? (String) path[path.length - 1]
+                                    : null,
+                            path.length);
+
+                }
+            };
+
+            if (!verifiable.proofs().isEmpty()) {
+                presentation.inject(NodePointer.of(0,
+                        VcdmVocab.PROOF.uri()),
+                        GenericContainer.empty(null)); // FIXME hack
+
+                int proofIndex = 0;
+                for (Proof proof : verifiable.proofs()) {
+                    presentation.inject(NodePointer.of(0,
+                            VcdmVocab.PROOF.uri(),
+                            proofIndex++),
+                            proof.ld().root());
+                }
+            }
+
+            try {
+                presentation.compose();
+                return presentation.compiler.tree();
+            } catch (TreeBuilderError e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+        
+    }
+    
+    public static LinkedTree complete(Verifiable verifiable) {
 
         if (verifiable.isCredential()) {
             var crendential = new TreeComposer(verifiable.ld().root()) {
@@ -138,7 +249,7 @@ public class VerifiableTree {
                 crendential.compose();
                 return crendential.compiler.tree();
             } catch (TreeBuilderError e) {
-                e.printStackTrace();
+                e.printStackTrace();    //FIXME
             }
         }
 
@@ -182,34 +293,39 @@ public class VerifiableTree {
                         0,
                         VcdmVocab.VERIFIABLE_CREDENTIALS.uri(),
                         index),
-                        credential.ld().root())
-                        .inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), index,
-                                VcdmVocab.PROOF.uri()),
-                                GenericContainer.empty(null)); // FIXME hack
+                        credential.ld().root());
+
+                if (!credential.proofs().isEmpty()) {
+                    presentation.inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), index,
+                            VcdmVocab.PROOF.uri()),
+                            GenericContainer.empty(null)); // FIXME hack
+
+                    int proofIndex = 0;
+                    for (Proof proof : credential.proofs()) {
+                        presentation.inject(NodePointer.of(0,
+                                VcdmVocab.VERIFIABLE_CREDENTIALS.uri(),
+                                index,
+                                VcdmVocab.PROOF.uri(),
+                                proofIndex++),
+                                proof.ld().root());
+                    }
+                }
+                index++;
+            }
+
+            if (!verifiable.proofs().isEmpty()) {
+                presentation.inject(NodePointer.of(0,
+                        VcdmVocab.PROOF.uri()),
+                        GenericContainer.empty(null)); // FIXME hack
 
                 int proofIndex = 0;
-                for (Proof proof : credential.proofs()) {
+                for (Proof proof : verifiable.proofs()) {
                     presentation.inject(NodePointer.of(0,
-                            VcdmVocab.VERIFIABLE_CREDENTIALS.uri(),
-                            index,
                             VcdmVocab.PROOF.uri(),
                             proofIndex++),
                             proof.ld().root());
                 }
             }
-
-            presentation.inject(NodePointer.of(0,
-                    VcdmVocab.PROOF.uri()),
-                    GenericContainer.empty(null)); // FIXME hack
-
-            int proofIndex = 0;
-            for (Proof proof : verifiable.proofs()) {
-                presentation.inject(NodePointer.of(0,
-                        VcdmVocab.PROOF.uri(),
-                        proofIndex++),
-                        proof.ld().root());
-            }
-            index++;
 
             try {
                 presentation.compose();
