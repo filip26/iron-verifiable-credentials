@@ -151,8 +151,7 @@ public class VcTestRunnerJunit {
                 Verifiable verifiable = READER.read(testCase.input);
                 assertNotNull(verifiable);
 
-                JsonObject result = READER.compact(
-                        VerifiableTree.compose(verifiable));
+                JsonObject result = READER.compact(verifiable);
 
                 final Document expected = LOADER.loadDocument(testCase.input,
                         new DocumentLoaderOptions());

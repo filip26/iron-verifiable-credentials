@@ -52,7 +52,7 @@ public class VerifiableTree {
                 }
             };
             x.inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri()),
-                    GenericContainer.empty(null));  //FIXME hack
+                    GenericContainer.empty(null)); // FIXME hack
 
             int index = 0;
             for (Credential credential : verifiable.asPresentation().credentials()) {
@@ -63,7 +63,7 @@ public class VerifiableTree {
                         credential.ld().root())
                         .inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), index,
                                 VcdmVocab.PROOF.uri()),
-                                GenericContainer.empty(null));  //FIXME hack
+                                GenericContainer.empty(null)); // FIXME hack
 
                 int proofIndex = 0;
                 for (Proof proof : credential.proofs()) {
@@ -120,16 +120,18 @@ public class VerifiableTree {
                 }
             };
 
-            crendential.inject(NodePointer.of(0,
-                    VcdmVocab.PROOF.uri()),
-                    GenericContainer.empty(null));  //FIXME hack
-
-            int proofIndex = 0;
-            for (Proof proof : verifiable.proofs()) {
+            if (!verifiable.proofs().isEmpty()) {
                 crendential.inject(NodePointer.of(0,
-                        VcdmVocab.PROOF.uri(),
-                        proofIndex++),
-                        proof.ld().root());
+                        VcdmVocab.PROOF.uri()),
+                        GenericContainer.empty(null)); // FIXME hack
+
+                int proofIndex = 0;
+                for (Proof proof : verifiable.proofs()) {
+                    crendential.inject(NodePointer.of(0,
+                            VcdmVocab.PROOF.uri(),
+                            proofIndex++),
+                            proof.ld().root());
+                }
             }
 
             try {
@@ -172,7 +174,7 @@ public class VerifiableTree {
                 }
             };
             presentation.inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri()),
-                    GenericContainer.empty(null));  //FIXME hack
+                    GenericContainer.empty(null)); // FIXME hack
 
             int index = 0;
             for (Credential credential : verifiable.asPresentation().credentials()) {
@@ -183,7 +185,7 @@ public class VerifiableTree {
                         credential.ld().root())
                         .inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), index,
                                 VcdmVocab.PROOF.uri()),
-                                GenericContainer.empty(null));  //FIXME hack
+                                GenericContainer.empty(null)); // FIXME hack
 
                 int proofIndex = 0;
                 for (Proof proof : credential.proofs()) {
@@ -198,7 +200,7 @@ public class VerifiableTree {
 
             presentation.inject(NodePointer.of(0,
                     VcdmVocab.PROOF.uri()),
-                    GenericContainer.empty(null));  //FIXME hack
+                    GenericContainer.empty(null)); // FIXME hack
 
             int proofIndex = 0;
             for (Proof proof : verifiable.proofs()) {

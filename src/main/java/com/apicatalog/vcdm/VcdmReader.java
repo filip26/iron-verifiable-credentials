@@ -61,13 +61,17 @@ public abstract class VcdmReader implements VerifiableReader {
 
         final Collection<String> types = types(document);
 
+        if (types == null || types.isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, "VerifiableType");
+        }
+
         if (isCredential(types)) {
             return readCredential(context, document, loader, base);
 
         } else if (isPresentation(types)) {
             return readPresentation(context, document, loader, base);
         }
-        throw new DocumentError(ErrorType.Unknown, "Verifiable type=" + types);
+        throw new DocumentError(ErrorType.Unknown, "VerifiableType");
     }
 
     protected boolean isCredential(Collection<String> types) {

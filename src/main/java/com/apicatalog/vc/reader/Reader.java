@@ -20,6 +20,7 @@ import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.linkedtree.pi.ProcessingInstruction;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.primitive.VerifiableTree;
 import com.apicatalog.vc.processor.DocumentProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmResolver;
@@ -108,7 +109,10 @@ public class Reader extends DocumentProcessor<Reader> {
         }
     }
 
-    public JsonObject compact(LinkedTree tree) throws DocumentError {
+    public JsonObject compact(Verifiable verifiable) throws DocumentError {
+
+        var tree = VerifiableTree.compose(verifiable);
+
         JsonArray expanded = new JsonLdTreeWriter().write(tree);
 
         try {
@@ -125,7 +129,7 @@ public class Reader extends DocumentProcessor<Reader> {
     }
 
     protected JsonArray getContext(LinkedTree tree) {
-        Collection<ProcessingInstruction> ops = tree.pi(0); 
+        Collection<ProcessingInstruction> ops = tree.pi(0);
         if (ops != null && !ops.isEmpty()) {
             for (ProcessingInstruction pi : ops) {
                 if (pi instanceof JsonLdContext context) {
@@ -137,7 +141,7 @@ public class Reader extends DocumentProcessor<Reader> {
         }
         return JsonValue.EMPTY_JSON_ARRAY;
     }
-    
+
     protected Verifiable read(final JsonObject document, DocumentLoader loader) throws DocumentError {
 
         // extract context

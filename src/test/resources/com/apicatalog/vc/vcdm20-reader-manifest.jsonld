@@ -57,11 +57,12 @@
     {
       "@id": "#t0006",
       "@type": [
-        "PositiveEvaluationTest",
+        "NegativeEvaluationTest",
         "ReaderTest"
       ],
       "name": "draft: @context",
-      "input": "vcdm20/0006-draft.jsonld"
+      "input": "vcdm20/0006-draft.jsonld",
+      "expectErrorCode": "MissingVerifiableType"
     },
     {
       "@id": "#t0007",
@@ -84,11 +85,31 @@
     {
       "@id": "#t0009",
       "@type": [
-        "PositiveEvaluationTest",
+        "NegativeEvaluationTest",
         "ReaderTest"
       ],
       "name": "draft: empty",
-      "input": "vcdm20/0009-draft.jsonld"
-    }    
+      "input": "vcdm20/0009-draft.jsonld",
+      "expectErrorCode": "UnknownModel"
+    },
+    {
+      "@id": "#t0010",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "unsigned ToS",
+      "input": "vcdm20/0010-unsigned-toc.jsonld"
+    },
+    {
+      "@id": "#t0011",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "uknown @type",
+      "input": "vcdm20/0011-draft.jsonld",
+      "expectErrorCode": "UnknownVerifiableType"
+    }
   ]
 }
