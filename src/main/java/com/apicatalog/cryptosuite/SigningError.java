@@ -6,8 +6,6 @@ public class SigningError extends CryptoSuiteError {
 
     public enum SignatureErrorCode {
         Expired,
-        UnsupportedCryptoSuite,
-        Internal,
         //InvalidKey?
     }
 

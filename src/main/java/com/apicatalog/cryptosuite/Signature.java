@@ -7,7 +7,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedTree;
 
 public class Signature {
-    
+
     private final CryptoSuite suite;
 
     public Signature(CryptoSuite suite) {
@@ -62,24 +62,19 @@ public class Signature {
      * @param proof
      *
      * @return computed signature
+     * @throws CryptoSuiteError 
      *
-     * @throws SigningError
      * @throws DocumentError
      */
-    public byte[] sign(LinkedTree expanded, byte[] privateKey, LinkedTree proof) throws SigningError {
+    public byte[] sign(LinkedTree expanded, byte[] privateKey, LinkedTree proof) throws CryptoSuiteError {
 
         Objects.requireNonNull(expanded);
         Objects.requireNonNull(privateKey);
         Objects.requireNonNull(proof);
 
-        try {
-            final byte[] documentHashCode = hashCode(expanded, proof);
+        final byte[] documentHashCode = hashCode(expanded, proof);
 
-            return suite.sign(privateKey, documentHashCode);
-
-        } catch (CryptoSuiteError e) {
-            throw new SigningError(SigningError.SignatureErrorCode.Internal, e);
-        }
+        return suite.sign(privateKey, documentHashCode);
     }
 
     /**

@@ -8,8 +8,6 @@ public class VerificationError extends CryptoSuiteError {
         Expired,
         NotValidYet,
         InvalidSignature,
-        UnsupportedCryptoSuite,
-        Internal,
     }
 
     private VerificationErrorCode code;

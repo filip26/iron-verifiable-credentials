@@ -5,7 +5,9 @@ public class CryptoSuiteError extends Throwable {
     private static final long serialVersionUID = 1850026823047424380L;
 
     public enum CryptoSuiteErrorCode {
-        Canonicalization, Digest, Signature
+        Canonicalization, 
+        Digest, 
+        Signature,
     }
 
     private CryptoSuiteErrorCode code;

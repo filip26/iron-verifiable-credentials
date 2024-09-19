@@ -8,7 +8,6 @@ import com.apicatalog.controller.method.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.VerificationError;
-import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.selector.InvalidSelector;
@@ -43,8 +42,8 @@ public record GenericProof(
     }
 
     @Override
-    public void verify(VerificationKey method) throws VerificationError, DocumentError {
-        throw new VerificationError(VerificationErrorCode.UnsupportedCryptoSuite);   
+    public void verify(VerificationKey method) throws VerificationError, DocumentError {   
+        throw new UnsupportedOperationException("An unknown proof cannot be verified " + type() + ".");
     }
     
     @Override

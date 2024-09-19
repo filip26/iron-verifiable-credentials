@@ -57,8 +57,8 @@ public class Verifier extends VerificationProcessor<Verifier> {
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
-        this.readerResolver = vcdmResolver(suites); 
-        
+        this.readerResolver = vcdmResolver(suites);
+
         this.statusVerifier = null;
     }
 
@@ -68,7 +68,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         resolver.v20(new Vcdm20Reader(resolver, suites));
         return resolver;
     }
-    
+
     /**
      * Set of accepted verification suites.
      * 
@@ -252,48 +252,59 @@ public class Verifier extends VerificationProcessor<Verifier> {
             throw new DocumentError(ErrorType.Missing, "Proof");
         }
 
-        // validate data model semantic
-        if (verifiable.isCredential()) {
-            validate(verifiable.asCredential());
-
-        } else {
-            verifiable.validate();
-        }
-
-        // sort the proofs in the verification order
-        final ProofQueue queue = ProofQueue.create(verifiable.proofs());
-
-        // verify the proofs' signatures
-        Proof proof = queue.pop();
-
-        while (proof != null) {
-
-            // validate proof properties
-            proof.validate(params == null
-                    ? Collections.emptyMap()
-                    : params);
-
-            final ProofValue proofValue = proof.signature();
-
-            if (proofValue == null) {
-                throw new DocumentError(ErrorType.Missing, VcdiVocab.PROOF_VALUE);
-            }
-
-            final VerificationMethod verificationMethod = getMethod(proof)
-                    .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD));
-
-            if (verificationMethod instanceof VerificationKey verificationKey) {
-                proof.verify(verificationKey);
+        try {
+            // validate data model semantic
+            if (verifiable.isCredential()) {
+                validate(verifiable.asCredential());
 
             } else {
-                throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD);
+                verifiable.validate();
             }
 
-            proof = queue.pop();
-        }
+            // sort the proofs in the verification order
+            final ProofQueue queue = ProofQueue.create(verifiable.proofs());
 
-        // all good
-        return verifiable;
+            // verify the proofs' signatures
+            Proof proof = queue.pop();
+
+            while (proof != null) {
+
+                // validate proof properties
+                proof.validate(params == null
+                        ? Collections.emptyMap()
+                        : params);
+
+                final ProofValue proofValue = proof.signature();
+
+                if (proofValue == null) {
+                    throw new DocumentError(ErrorType.Missing, VcdiVocab.PROOF_VALUE);
+                }
+
+                final VerificationMethod verificationMethod = getMethod(proof)
+                        .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD));
+
+                if (verificationMethod instanceof VerificationKey verificationKey) {
+                    proof.verify(verificationKey);
+
+                } else {
+                    throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD);
+                }
+
+                proof = queue.pop();
+            }
+            
+            // all good
+            return verifiable;
+            
+        } catch (UnsupportedOperationException e) {
+            throw new DocumentError(e, ErrorType.Unknown);
+
+        } catch (IllegalArgumentException e) {
+            throw new DocumentError(e, ErrorType.Invalid);
+
+        } catch (NullPointerException e) {
+            throw new DocumentError(e, ErrorType.Missing);
+        }
     }
 
     final void validate(final Credential credential) throws DocumentError, VerificationError {
@@ -311,7 +322,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         // status check
         if (statusVerifier != null && credential.status() != null && !credential.status().isEmpty()) {
             for (final Status status : credential.status()) {
-                statusVerifier.verify(credential, status);   
+                statusVerifier.verify(credential, status);
             }
         }
     }

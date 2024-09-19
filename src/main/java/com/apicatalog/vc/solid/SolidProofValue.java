@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.Signature;
 import com.apicatalog.cryptosuite.VerificationError;
-import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.vc.proof.ProofValue;
 
@@ -29,10 +28,7 @@ public record SolidProofValue(
 
         Objects.requireNonNull(data);
         Objects.requireNonNull(publicKey);
-
-        if (cryptoSuite == null) {
-            throw new VerificationError(VerificationErrorCode.UnsupportedCryptoSuite);
-        }
+        Objects.requireNonNull(cryptoSuite);
 
         final Signature signature = new Signature(cryptoSuite);
 
