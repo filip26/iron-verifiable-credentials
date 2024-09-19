@@ -5,11 +5,12 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 
+import com.apicatalog.controller.method.GenericVerificationMethod;
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
@@ -17,7 +18,6 @@ import com.apicatalog.linkedtree.builder.GenericTreeCloner;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.traversal.NodeSelector.TraversalPolicy;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.method.GenericVerificationMethod;
 import com.apicatalog.vc.primitive.MultibaseLiteral;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
@@ -87,11 +87,7 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
         proof.method = source.fragment(
                 VcdiVocab.VERIFICATION_METHOD.uri(),
                 VerificationMethod.class,
-                s -> new GenericVerificationMethod(
-                        s.asFragment().uri(),
-                        null, // FIXME
-                        null,
-                        s));
+                GenericVerificationMethod::of);
 
         proof.purpose = source.uri(VcdiVocab.PURPOSE.uri());
 

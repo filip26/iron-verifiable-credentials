@@ -2,17 +2,17 @@ package com.apicatalog.vc.method.resolver;
 
 import java.net.URI;
 
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.VerificationMethod;
 
 public interface MethodResolver {
 
     /**
-     * Resolves the given {@link URI} into {@link VerificationMethod}
+     * Resolve the given {@link URI} into {@link VerificationMethod}
      *
-     * @param id an {@link URI} To resolve as a verification method
+     * @param id an {@link URI} to resolve as a verification method
      * 
-     * @return the new {@link VerificationMethod} instance
+     * @return a new {@link VerificationMethod} instance
      * 
      * @throws DocumentError
      */

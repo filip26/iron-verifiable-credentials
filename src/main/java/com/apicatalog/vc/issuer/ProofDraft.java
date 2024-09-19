@@ -3,9 +3,9 @@ package com.apicatalog.vc.issuer;
 import java.net.URI;
 import java.util.Collection;
 
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVersion;

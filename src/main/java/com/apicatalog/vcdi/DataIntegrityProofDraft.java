@@ -5,9 +5,9 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vcdm.VcdmVersion;
 

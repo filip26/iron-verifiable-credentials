@@ -3,13 +3,13 @@ package com.apicatalog.vc;
 import java.util.Arrays;
 import java.util.Random;
 
+import com.apicatalog.controller.multikey.MultiKey;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
 import com.apicatalog.ld.signature.key.KeyPair;
-import com.apicatalog.multikey.MultiKey;
 
 class TestAlgorithm implements SignatureAlgorithm {
 

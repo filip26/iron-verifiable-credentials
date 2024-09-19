@@ -1,4 +1,4 @@
-package com.apicatalog.multikey;
+package com.apicatalog.controller.multikey;
 
 import java.net.URI;
 import java.time.Instant;
@@ -14,7 +14,7 @@ import com.apicatalog.multicodec.MulticodecDecoder;
 public class MultiKey implements KeyPair {
 
     protected static final String TYPE_NAME = "https://w3id.org/security#Multikey";
-    protected static final URI TYPE = URI.create(TYPE_NAME);
+//    protected static final URI TYPE = URI.create(TYPE_NAME);
 
     protected URI id;
     protected URI controller;
@@ -74,8 +74,8 @@ public class MultiKey implements KeyPair {
     }
 
     @Override
-    public URI type() {
-        return TYPE;
+    public String type() {
+        return TYPE_NAME;
     }
 
     @Override

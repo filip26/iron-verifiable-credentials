@@ -2,13 +2,14 @@ package com.apicatalog.vc.method.resolver;
 
 import java.net.URI;
 
+import com.apicatalog.controller.method.GenericVerificationMethod;
+import com.apicatalog.controller.method.VerificationMethod;
+import com.apicatalog.controller.multikey.MultiKey;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.GenericVerificationMethod;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.writer.DictionaryWriter;
@@ -16,7 +17,6 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.Multicodec.Tag;
-import com.apicatalog.multikey.MultiKey;
 import com.apicatalog.vc.primitive.MultibaseLiteral;
 
 import jakarta.json.JsonArray;

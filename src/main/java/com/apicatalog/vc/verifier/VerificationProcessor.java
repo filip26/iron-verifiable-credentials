@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.Multicodec.Tag;
@@ -55,7 +55,7 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
             throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");
         }
 
-        final URI methodType = method.type();
+        final String methodType = method.type();
 
         if (methodType != null
                 && method instanceof VerificationKey

@@ -1,11 +1,11 @@
 package com.apicatalog.vc;
 
+import com.apicatalog.controller.multikey.MultiKeyAdapter;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.multikey.MultiKeyAdapter;
 
 public class TestKeyAdapter extends MultiKeyAdapter {
 

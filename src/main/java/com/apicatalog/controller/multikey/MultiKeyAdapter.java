@@ -1,15 +1,15 @@
-package com.apicatalog.multikey;
+package com.apicatalog.controller.multikey;
 
 import java.util.Collection;
 import java.util.List;
 
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
 import com.apicatalog.ld.node.LdNode;
 import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.node.LdScalar;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.LinkedNode;
@@ -56,7 +56,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
     }
 
     public LinkedFragmentAdapter resolve(String id, Collection<String> types) {
-        if (types.contains(MultiKey.TYPE.toString())) {
+        if (types.contains(MultiKey.TYPE_NAME)) {
             return new LinkedFragmentAdapter() {
 
 //                @Override
@@ -203,7 +203,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         }
 
         if (embedded) {
-            builder.type(value.type().toASCIIString());
+            builder.type(value.type());
         }
 
 //        return builder.build();

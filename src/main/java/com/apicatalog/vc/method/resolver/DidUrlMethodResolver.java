@@ -2,6 +2,9 @@ package com.apicatalog.vc.method.resolver;
 
 import java.net.URI;
 
+import com.apicatalog.controller.method.VerificationMethod;
+import com.apicatalog.controller.multikey.MultiKey;
+import com.apicatalog.controller.multikey.MultiKeyAdapter;
 import com.apicatalog.did.DidResolver;
 import com.apicatalog.did.DidUrl;
 import com.apicatalog.did.document.DidDocument;
@@ -9,12 +12,9 @@ import com.apicatalog.did.document.DidVerificationMethod;
 import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.VerificationMethod;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.multikey.MultiKey;
-import com.apicatalog.multikey.MultiKeyAdapter;
 
 public class DidUrlMethodResolver implements MethodResolver {
 
