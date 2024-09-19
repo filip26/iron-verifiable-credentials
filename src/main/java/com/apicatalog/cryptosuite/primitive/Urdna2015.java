@@ -1,18 +1,18 @@
-package com.apicatalog.ld.signature.primitive;
+package com.apicatalog.cryptosuite.primitive;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
+import com.apicatalog.cryptosuite.CryptoSuiteError;
+import com.apicatalog.cryptosuite.CryptoSuiteError.CryptoSuiteErrorCode;
+import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.http.media.MediaType;
-import com.apicatalog.ld.signature.CryptoSuiteError;
-import com.apicatalog.ld.signature.CryptoSuiteError.CryptoSuiteErrorCode;
-import com.apicatalog.ld.signature.algorithm.Canonicalizer;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.rdf.Rdf;

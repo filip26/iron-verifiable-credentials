@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.apicatalog.controller.method.VerificationMethod;
-import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vcdm.VcdmVersion;
 

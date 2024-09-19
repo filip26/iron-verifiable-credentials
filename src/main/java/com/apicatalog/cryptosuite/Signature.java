@@ -1,9 +1,9 @@
-package com.apicatalog.ld.signature;
+package com.apicatalog.cryptosuite;
 
 import java.util.Objects;
 
+import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.LinkedTree;
 
 public class Signature {

@@ -7,10 +7,10 @@ import java.util.Optional;
 
 import com.apicatalog.controller.method.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
+import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;

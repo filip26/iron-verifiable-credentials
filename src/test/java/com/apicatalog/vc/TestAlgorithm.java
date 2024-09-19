@@ -5,11 +5,11 @@ import java.util.Random;
 
 import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.controller.multikey.MultiKey;
-import com.apicatalog.ld.signature.KeyGenError;
-import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
-import com.apicatalog.ld.signature.algorithm.Signer;
+import com.apicatalog.cryptosuite.KeyGenError;
+import com.apicatalog.cryptosuite.SigningError;
+import com.apicatalog.cryptosuite.VerificationError;
+import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
+import com.apicatalog.cryptosuite.algorithm.Signer;
 
 class TestAlgorithm implements Signer {
 

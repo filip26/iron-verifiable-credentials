@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.sd;
+package com.apicatalog.cryptosuite.sd;
 
 import java.util.Collection;
 import java.util.Collections;

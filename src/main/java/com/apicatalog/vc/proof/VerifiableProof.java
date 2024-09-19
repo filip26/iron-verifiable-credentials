@@ -7,11 +7,11 @@ import java.util.Objects;
 
 import com.apicatalog.controller.method.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
+import com.apicatalog.cryptosuite.CryptoSuite;
+import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
-import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;

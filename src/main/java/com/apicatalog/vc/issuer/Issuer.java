@@ -2,9 +2,9 @@ package com.apicatalog.vc.issuer;
 
 import java.net.URI;
 
+import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 
 import jakarta.json.JsonObject;

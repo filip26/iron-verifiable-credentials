@@ -4,10 +4,10 @@ import java.net.URI;
 import java.util.Objects;
 
 import com.apicatalog.controller.method.VerificationMethod;
+import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;

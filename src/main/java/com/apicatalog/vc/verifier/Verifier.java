@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 
 import com.apicatalog.controller.method.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
+import com.apicatalog.cryptosuite.VerificationError;
+import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -19,8 +21,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;

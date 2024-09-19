@@ -1,7 +1,7 @@
 package com.apicatalog.vcdi;
 
 import com.apicatalog.controller.method.VerificationKey;
-import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.cryptosuite.CryptoSuite;
 
 @FunctionalInterface
 public interface CryptoSuiteProvider {

@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.controller.method.VerificationMethod;
-import com.apicatalog.ld.signature.CryptoSuite;
+import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;

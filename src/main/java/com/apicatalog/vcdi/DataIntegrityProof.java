@@ -7,10 +7,10 @@ import java.util.Map;
 
 import com.apicatalog.controller.method.GenericVerificationMethod;
 import com.apicatalog.controller.method.VerificationMethod;
+import com.apicatalog.cryptosuite.CryptoSuite;
+import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;

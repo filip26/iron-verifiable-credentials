@@ -2,10 +2,10 @@ package com.apicatalog.vc.solid;
 
 import java.util.Objects;
 
-import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.Signature;
-import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
+import com.apicatalog.cryptosuite.CryptoSuite;
+import com.apicatalog.cryptosuite.Signature;
+import com.apicatalog.cryptosuite.VerificationError;
+import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.vc.proof.ProofValue;
 

@@ -1,10 +1,10 @@
-package com.apicatalog.ld.signature.primitive;
+package com.apicatalog.cryptosuite.primitive;
 
 import java.security.NoSuchAlgorithmException;
 
-import com.apicatalog.ld.signature.CryptoSuiteError;
-import com.apicatalog.ld.signature.CryptoSuiteError.CryptoSuiteErrorCode;
-import com.apicatalog.ld.signature.algorithm.Digester;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
+import com.apicatalog.cryptosuite.CryptoSuiteError.CryptoSuiteErrorCode;
+import com.apicatalog.cryptosuite.algorithm.Digester;
 
 public final class MessageDigest implements Digester {
 

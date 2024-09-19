@@ -1,6 +1,6 @@
-package com.apicatalog.ld.signature.algorithm;
+package com.apicatalog.cryptosuite.algorithm;
 
-import com.apicatalog.ld.signature.CryptoSuiteError;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.linkedtree.LinkedTree;
 
 /**

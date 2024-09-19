@@ -18,6 +18,8 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 
 import com.apicatalog.controller.method.KeyPair;
+import com.apicatalog.cryptosuite.SigningError;
+import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
@@ -27,8 +29,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;

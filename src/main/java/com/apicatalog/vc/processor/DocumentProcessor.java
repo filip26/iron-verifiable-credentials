@@ -2,6 +2,7 @@ package com.apicatalog.vc.processor;
 
 import java.net.URI;
 
+import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
@@ -13,7 +14,6 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.suite.SignatureSuite;
 

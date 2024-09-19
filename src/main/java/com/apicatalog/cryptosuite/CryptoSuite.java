@@ -1,9 +1,9 @@
-package com.apicatalog.ld.signature;
+package com.apicatalog.cryptosuite;
 
 import com.apicatalog.controller.method.KeyPair;
-import com.apicatalog.ld.signature.algorithm.Canonicalizer;
-import com.apicatalog.ld.signature.algorithm.Digester;
-import com.apicatalog.ld.signature.algorithm.Signer;
+import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
+import com.apicatalog.cryptosuite.algorithm.Digester;
+import com.apicatalog.cryptosuite.algorithm.Signer;
 import com.apicatalog.linkedtree.LinkedTree;
 
 /**

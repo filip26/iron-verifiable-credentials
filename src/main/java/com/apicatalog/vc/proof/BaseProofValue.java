@@ -2,11 +2,11 @@ package com.apicatalog.vc.proof;
 
 import java.util.Collection;
 
+import com.apicatalog.cryptosuite.CryptoSuite;
+import com.apicatalog.cryptosuite.SigningError;
+import com.apicatalog.cryptosuite.VerificationError;
+import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.LinkedTree;
 
 import jakarta.json.JsonObject;

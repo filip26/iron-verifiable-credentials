@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature;
+package com.apicatalog.cryptosuite;
 
 public class CryptoSuiteError extends Throwable {
 

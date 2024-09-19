@@ -6,10 +6,10 @@ import java.util.Map;
 
 import com.apicatalog.controller.method.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
+import com.apicatalog.cryptosuite.CryptoSuite;
+import com.apicatalog.cryptosuite.VerificationError;
+import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.selector.InvalidSelector;
 

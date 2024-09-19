@@ -3,6 +3,7 @@ package com.apicatalog.vc.holder;
 import java.util.Collection;
 import java.util.Objects;
 
+import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
@@ -13,7 +14,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
-import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vc.verifier.VerificationProcessor;
