@@ -1,6 +1,6 @@
 package com.apicatalog.ld.signature.algorithm;
 
-import com.apicatalog.ld.signature.LinkedDataSuiteError;
+import com.apicatalog.ld.signature.CryptoSuiteError;
 import com.apicatalog.linkedtree.LinkedTree;
 
 /**
@@ -8,8 +8,8 @@ import com.apicatalog.linkedtree.LinkedTree;
  * representation and always transforms it into a canonical form. This process
  * is sometimes also called normalization.
  */
-public interface CanonicalizationAlgorithm {
+public interface Canonicalizer {
 
-    byte[] canonicalize(LinkedTree tree) throws LinkedDataSuiteError;
+    byte[] canonicalize(LinkedTree tree) throws CryptoSuiteError;
 
 }

@@ -17,12 +17,14 @@ class TestSignatureSuite extends DataIntegritySuite {
 
     static final MethodAdapter METHOD_ADAPTER = new TestKeyAdapter();
 
+    static final String TEST_CRYPTO_NAME = "test-2022";
+
     static final CryptoSuite CRYPTO = new CryptoSuite(
+            TEST_CRYPTO_NAME,
+            32,
             new Urdna2015(),
             new MessageDigest("SHA-256"),
             new TestAlgorithm());
-
-    static final String TEST_CRYPTO_NAME = "test-2022";
 
     protected TestSignatureSuite() {
         super(TEST_CRYPTO_NAME, Multibase.BASE_58_BTC, METHOD_ADAPTER);

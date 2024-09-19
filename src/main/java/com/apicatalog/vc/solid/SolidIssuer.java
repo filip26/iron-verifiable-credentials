@@ -2,7 +2,7 @@ package com.apicatalog.vc.solid;
 
 import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.LinkedDataSignature;
+import com.apicatalog.ld.signature.Signature;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.multibase.Multibase;
@@ -25,7 +25,7 @@ public class SolidIssuer extends AbstractIssuer {
     protected byte[] sign(JsonArray context, LinkedTree document, ProofDraft draft) throws SigningError {
         final JsonObject unsignedDraft = draft.unsigned();
 
-        final LinkedDataSignature ldSignature = new LinkedDataSignature(crypto);
+        final Signature ldSignature = new Signature(crypto);
 
 //FIXME        return ldSignature.sign(document, keyPair.privateKey(), unsignedDraft);
         return null;

@@ -3,14 +3,14 @@ package com.apicatalog.ld.signature;
 import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.LinkedTree;
 
-public class LinkedDataSignature {
+public class Signature {
     
     private final CryptoSuite suite;
 
-    public LinkedDataSignature(CryptoSuite suite) {
+    public Signature(CryptoSuite suite) {
         this.suite = suite;
     }
 
@@ -45,8 +45,8 @@ public class LinkedDataSignature {
 
             suite.verify(verificationKey, signature, computeSignature);
 
-        } catch (LinkedDataSuiteError e) {
-            throw new VerificationError(Code.InvalidSignature, e);
+        } catch (CryptoSuiteError e) {
+            throw new VerificationError(VerificationErrorCode.InvalidSignature, e);
         }
     }
 
@@ -77,8 +77,8 @@ public class LinkedDataSignature {
 
             return suite.sign(privateKey, documentHashCode);
 
-        } catch (LinkedDataSuiteError e) {
-            throw new SigningError(SigningError.Code.Internal, e);
+        } catch (CryptoSuiteError e) {
+            throw new SigningError(SigningError.SignatureErrorCode.Internal, e);
         }
     }
 
@@ -92,9 +92,9 @@ public class LinkedDataSignature {
      *
      * @return computed hash code
      *
-     * @throws LinkedDataSuiteError
+     * @throws CryptoSuiteError
      */
-    byte[] hashCode(LinkedTree document, LinkedTree proof) throws LinkedDataSuiteError {
+    byte[] hashCode(LinkedTree document, LinkedTree proof) throws CryptoSuiteError {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 

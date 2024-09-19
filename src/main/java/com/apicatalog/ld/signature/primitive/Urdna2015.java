@@ -10,9 +10,9 @@ import com.apicatalog.jsonld.JsonLdOptions;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.http.media.MediaType;
-import com.apicatalog.ld.signature.LinkedDataSuiteError;
-import com.apicatalog.ld.signature.LinkedDataSuiteError.Code;
-import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
+import com.apicatalog.ld.signature.CryptoSuiteError;
+import com.apicatalog.ld.signature.CryptoSuiteError.CryptoSuiteErrorCode;
+import com.apicatalog.ld.signature.algorithm.Canonicalizer;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.rdf.Rdf;
@@ -24,10 +24,10 @@ import com.apicatalog.rdf.io.error.UnsupportedContentException;
 import io.setl.rdf.normalization.RdfNormalize;
 import jakarta.json.JsonArray;
 
-public class Urdna2015 implements CanonicalizationAlgorithm {
+public class Urdna2015 implements Canonicalizer {
 
     @Override
-    public byte[] canonicalize(LinkedTree document) throws LinkedDataSuiteError {
+    public byte[] canonicalize(LinkedTree document) throws CryptoSuiteError {
         try {
             var treeWriter = new JsonLdTreeWriter();
 
@@ -53,7 +53,7 @@ public class Urdna2015 implements CanonicalizationAlgorithm {
             return writer.toString().getBytes(StandardCharsets.UTF_8);
 
         } catch (JsonLdError | UnsupportedContentException | IOException | RdfWriterException e) {
-            throw new LinkedDataSuiteError(Code.Canonicalization, e);
+            throw new CryptoSuiteError(CryptoSuiteErrorCode.Canonicalization, e);
         }
     }
 }

@@ -6,7 +6,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.LinkedTree;
 
 import jakarta.json.JsonObject;
@@ -16,7 +16,7 @@ public interface BaseProofValue extends ProofValue {
 
     @Override
     default void verify(CryptoSuite crypto, LinkedTree data, LinkedTree unsignedProof, byte[] publicKey) throws VerificationError, DocumentError {
-        throw new VerificationError(Code.InvalidSignature);
+        throw new VerificationError(VerificationErrorCode.InvalidSignature);
     }
 
     /**

@@ -1,10 +1,10 @@
 package com.apicatalog.ld.signature;
 
-public class VerificationError extends Exception {
-
+public class VerificationError extends CryptoSuiteError {
+    
     private static final long serialVersionUID = -7137366427204418675L;
 
-    public enum Code {
+    public enum VerificationErrorCode {
         Expired,
         NotValidYet,
         InvalidSignature,
@@ -12,19 +12,19 @@ public class VerificationError extends Exception {
         Internal,
     }
 
-    private Code code;
+    private VerificationErrorCode code;
 
-    public VerificationError(Code code) {
-        super(code.name());
+    public VerificationError(VerificationErrorCode code) {
+        super(CryptoSuiteErrorCode.Signature, code.name());
         this.code = code;
     }
 
-    public VerificationError(Code code, Throwable e) {
-        super(code.name(), e);
+    public VerificationError(VerificationErrorCode code, Throwable e) {
+        super(CryptoSuiteErrorCode.Signature, code.name(), e);
         this.code = code;
     }
 
-    public Code code() {
+    public VerificationErrorCode verificationErrorCode() {
         return code;
     }
 }

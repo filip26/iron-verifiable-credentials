@@ -178,10 +178,10 @@ public class VcTestRunnerJunit {
             }
 
         } catch (VerificationError e) {
-            assertException(e.code() != null ? e.code().name() : null, e);
+            assertException(e.verificationErrorCode() != null ? e.verificationErrorCode().name() : null, e);
 
         } catch (SigningError e) {
-            assertException(e.code() != null ? e.code().name() : null, e);
+            assertException(e.signatureErrorCode() != null ? e.signatureErrorCode().name() : null, e);
 
         } catch (DocumentError e) {
             assertException(e.code(), e);

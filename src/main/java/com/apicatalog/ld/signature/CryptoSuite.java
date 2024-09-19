@@ -1,44 +1,22 @@
 package com.apicatalog.ld.signature;
 
 import com.apicatalog.controller.method.KeyPair;
-import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
-import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
-import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.algorithm.Canonicalizer;
+import com.apicatalog.ld.signature.algorithm.Digester;
+import com.apicatalog.ld.signature.algorithm.Signer;
 import com.apicatalog.linkedtree.LinkedTree;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
  * algorithm, a message digest algorithm, and a signature algorithm.
  */
-public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, SignatureAlgorithm {
-
-    protected final String id;
-    protected final CanonicalizationAlgorithm canonicalization;
-    protected final DigestAlgorithm digester;
-    protected final SignatureAlgorithm signer;
-
-    /*
-     * https://www.w3.org/TR/vc-data-integrity/#verification-material A
-     * cryptographic suite specification is responsible for specifying the
-     * verification method
-     */
-    public CryptoSuite(
-            final CanonicalizationAlgorithm canonicalization,
-            final DigestAlgorithm digester,
-            final SignatureAlgorithm signer) {
-        this(null, canonicalization, digester, signer);
-    }
-
-    public CryptoSuite(
-            final String id,
-            final CanonicalizationAlgorithm canonicalization,
-            final DigestAlgorithm digester,
-            final SignatureAlgorithm signer) {
-        this.id = id;
-        this.canonicalization = canonicalization;
-        this.digester = digester;
-        this.signer = signer;
-    }
+public record CryptoSuite(
+        String id,
+        int keyLength,
+        Canonicalizer canonicalizer,
+        Digester digester,
+        Signer signer) implements Canonicalizer, Digester, Signer {
+    
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
         signer.verify(publicKey, signature, data);
@@ -50,13 +28,13 @@ public class CryptoSuite implements CanonicalizationAlgorithm, DigestAlgorithm, 
     }
 
     @Override
-    public byte[] digest(byte[] data) throws LinkedDataSuiteError {
+    public byte[] digest(byte[] data) throws CryptoSuiteError {
         return digester.digest(data);
     }
 
     @Override
-    public byte[] canonicalize(LinkedTree document) throws LinkedDataSuiteError {
-        return canonicalization.canonicalize(document);
+    public byte[] canonicalize(LinkedTree document) throws CryptoSuiteError {
+        return canonicalizer.canonicalize(document);
     }
 
     @Override

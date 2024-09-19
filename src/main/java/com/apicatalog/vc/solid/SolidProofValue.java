@@ -3,9 +3,9 @@ package com.apicatalog.vc.solid;
 import java.util.Objects;
 
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.LinkedDataSignature;
+import com.apicatalog.ld.signature.Signature;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.vc.proof.ProofValue;
 
@@ -31,10 +31,10 @@ public record SolidProofValue(
         Objects.requireNonNull(publicKey);
 
         if (cryptoSuite == null) {
-            throw new VerificationError(Code.UnsupportedCryptoSuite);
+            throw new VerificationError(VerificationErrorCode.UnsupportedCryptoSuite);
         }
 
-        final LinkedDataSignature signature = new LinkedDataSignature(cryptoSuite);
+        final Signature signature = new Signature(cryptoSuite);
 
         // verify signature
         signature.verify(

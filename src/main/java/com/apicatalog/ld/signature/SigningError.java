@@ -1,29 +1,29 @@
 package com.apicatalog.ld.signature;
 
-public class SigningError extends Exception {
+public class SigningError extends CryptoSuiteError {
 
     private static final long serialVersionUID = 5560695193588466945L;
 
-    public enum Code {
+    public enum SignatureErrorCode {
         Expired,
         UnsupportedCryptoSuite,
         Internal,
         //InvalidKey?
     }
 
-    private Code code;
+    private SignatureErrorCode code;
 
-    public SigningError(Code code) {
-        super(code.name());
+    public SigningError(SignatureErrorCode code) {
+        super(CryptoSuiteErrorCode.Signature, code.name());
         this.code = code;
     }
 
-    public SigningError(Code code, Throwable e) {
-        super(code.name(), e);
+    public SigningError(SignatureErrorCode code, Throwable e) {
+        super(CryptoSuiteErrorCode.Signature, code.name(), e);
         this.code = code;
     }
 
-    public Code code() {
+    public SignatureErrorCode signatureErrorCode() {
         return code;
     }
 }

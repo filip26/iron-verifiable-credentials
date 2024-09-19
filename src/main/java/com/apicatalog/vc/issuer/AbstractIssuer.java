@@ -19,7 +19,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.SigningError.Code;
+import com.apicatalog.ld.signature.SigningError.SignatureErrorCode;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
@@ -129,7 +129,7 @@ public abstract class AbstractIssuer implements Issuer {
 
         // TODO do something with exceptions, unify
         if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
-            throw new SigningError(Code.Expired);
+            throw new SigningError(SignatureErrorCode.Expired);
         }
 
         verifiable.validate();

@@ -6,6 +6,7 @@ import java.time.Instant;
 import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.ld.Term;
 import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.multicodec.Multicodec;
@@ -27,6 +28,8 @@ public class MultiKey implements KeyPair {
     protected Instant revoked;
     protected Instant expiration;
 
+    protected LinkedFragment ld;
+    
     public static MultiKey of(
             MulticodecDecoder decoder,
             LinkedFragment source
@@ -52,6 +55,9 @@ public class MultiKey implements KeyPair {
 //        validate(multikey);
 
 //        return new LinkableObject(id, types, properties, multikey);
+        
+        multikey.ld = source;
+        
         return multikey;
     }
 
@@ -109,6 +115,7 @@ public class MultiKey implements KeyPair {
         this.revoked = revoked;
     }
 
+    @Override
     public Instant revoked() {
         return revoked;
     }
@@ -152,5 +159,10 @@ public class MultiKey implements KeyPair {
     
     public static String typeName() {
         return TYPE_NAME;
+    }
+
+    @Override
+    public LinkedNode ld() {
+        return ld;
     }
 }

@@ -6,9 +6,12 @@ import java.util.List;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.Term;
+import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.fragment.LinkedFragmentAdapter;
 import com.apicatalog.linkedtree.fragment.LinkedFragmentReader;
+import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.literal.adapter.GenericDatatypeAdapter;
 import com.apicatalog.linkedtree.literal.adapter.LiteralAdapter;
 import com.apicatalog.multibase.Multibase;
@@ -18,7 +21,6 @@ import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.primitive.MultibaseLiteral;
 import com.apicatalog.vcdm.VcdmVocab;
 
-@Deprecated
 public abstract class MultiKeyAdapter implements MethodAdapter {
 
     public static final Term CONTROLLER = Term.create("controller", VcdmVocab.SECURITY_VOCAB);
@@ -49,6 +51,33 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
         /* implement a custom validation */
     }
 
+    public MultiKey of(
+            MulticodecDecoder decoder,
+            LinkedFragment source) throws NodeAdapterError {
+
+        final MultiKey multikey = new MultiKey();
+
+        multikey.id = source.uri();
+        multikey.controller = source.uri(MultiKeyAdapter.CONTROLLER.uri());
+
+        var x = source.literal(MultiKeyAdapter.PUBLIC_KEY.uri(), ByteArrayValue.class);
+//        multikey.publicKey = getKey(MultiKeyAdapter.PUBLIC_KEY, x.byteArrayValue(), multikey, decoder);
+
+//            multikey.privateKey = getKey(node, PRIVATE_KEY, multikey);
+//
+//            multikey.expiration = node.scalar(EXPIRATION).xsdDateTime();
+//            multikey.revoked = node.scalar(REVOKED).xsdDateTime();
+//
+//        } else if (node.type().exists()) {
+//            throw new DocumentError(ErrorType.Invalid, "VerificationMethodType");
+//        }
+//
+//        validate(multikey);
+
+//        return new LinkableObject(id, types, properties, multikey);
+        return multikey;
+    }
+
     public LinkedFragmentAdapter resolve(String id, Collection<String> types) {
         if (types.contains(MultiKey.TYPE_NAME)) {
             return new LinkedFragmentAdapter() {
@@ -67,8 +96,7 @@ public abstract class MultiKeyAdapter implements MethodAdapter {
                                             MultibaseLiteral.typeName(),
                                             source,
                                             Multibase.BASE_58_BTC.decode(source),
-                                            root)))
-                    );
+                                            root))));
                 }
 
                 @Override

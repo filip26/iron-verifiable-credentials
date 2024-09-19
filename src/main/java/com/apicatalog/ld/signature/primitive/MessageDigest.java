@@ -2,11 +2,11 @@ package com.apicatalog.ld.signature.primitive;
 
 import java.security.NoSuchAlgorithmException;
 
-import com.apicatalog.ld.signature.LinkedDataSuiteError;
-import com.apicatalog.ld.signature.LinkedDataSuiteError.Code;
-import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
+import com.apicatalog.ld.signature.CryptoSuiteError;
+import com.apicatalog.ld.signature.CryptoSuiteError.CryptoSuiteErrorCode;
+import com.apicatalog.ld.signature.algorithm.Digester;
 
-public final class MessageDigest implements DigestAlgorithm {
+public final class MessageDigest implements Digester {
 
     private final String type;
 
@@ -15,14 +15,14 @@ public final class MessageDigest implements DigestAlgorithm {
     }
 
     @Override
-    public byte[] digest(final byte[] data) throws LinkedDataSuiteError {
+    public byte[] digest(final byte[] data) throws CryptoSuiteError {
 
         try {
             java.security.MessageDigest digest = java.security.MessageDigest.getInstance(type);
             return digest.digest(data);
 
         } catch (NoSuchAlgorithmException e) {
-            throw new LinkedDataSuiteError(Code.Digest, e);
+            throw new CryptoSuiteError(CryptoSuiteErrorCode.Digest, e);
         }
     }
 }

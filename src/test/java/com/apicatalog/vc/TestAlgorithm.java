@@ -8,10 +8,10 @@ import com.apicatalog.controller.multikey.MultiKey;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.Code;
-import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
+import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
+import com.apicatalog.ld.signature.algorithm.Signer;
 
-class TestAlgorithm implements SignatureAlgorithm {
+class TestAlgorithm implements Signer {
 
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
@@ -22,7 +22,7 @@ class TestAlgorithm implements SignatureAlgorithm {
         }
 
         if (!Arrays.equals(result, signature)) {
-            throw new VerificationError(Code.InvalidSignature);
+            throw new VerificationError(VerificationErrorCode.InvalidSignature);
         }
     }
 

@@ -20,7 +20,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.VerificationError.Code;
+import com.apicatalog.ld.signature.VerificationError.VerificationErrorCode;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
@@ -301,11 +301,11 @@ public class Verifier extends VerificationProcessor<Verifier> {
         credential.validate();
 
         if (credential.isExpired()) {
-            throw new VerificationError(Code.Expired);
+            throw new VerificationError(VerificationErrorCode.Expired);
         }
 
         if (credential.isNotValidYet()) {
-            throw new VerificationError(Code.NotValidYet);
+            throw new VerificationError(VerificationErrorCode.NotValidYet);
         }
 
         // status check

@@ -11,7 +11,7 @@ import com.apicatalog.ld.signature.VerificationError;
  * not been modified in transit and came from someone possessing a particular
  * secret.
  */
-public interface SignatureAlgorithm {
+public interface Signer {
 
     void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError;
 
