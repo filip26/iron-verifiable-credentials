@@ -1,11 +1,10 @@
 package com.apicatalog.vc.issuer;
 
 import java.net.URI;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashSet;
 
+import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
@@ -18,22 +17,15 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.node.LdNodeBuilder;
-import com.apicatalog.ld.node.LdScalar;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.SigningError.Code;
-import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
-import com.apicatalog.vcdi.DataIntegrityProofDraft;
-import com.apicatalog.vcdi.VcdiVocab;
-import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVersion;
-import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -164,17 +156,18 @@ public abstract class AbstractIssuer implements Issuer {
 //                unsigned, 
                 draft);
 
-        final JsonObject proofValue = LdScalar.multibase(proofValueBase, signature);
-
-        // signed proof
-        final JsonObject signedProof = DataIntegrityProofDraft.signed(draft.unsigned(), proofValue);
-
-        return new ExpandedVerifiable(EmbeddedProof.addProof(object, signedProof), context, loader);
+//        final JsonObject proofValue = LdScalar.multibase(proofValueBase, signature);
+//
+//        // signed proof
+//        final JsonObject signedProof = DataIntegrityProofDraft.signed(draft.unsigned(), proofValue);
+//
+//        return new ExpandedVerifiable(EmbeddedProof.addProof(object, signedProof), context, loader);
+        return null; //FIXMe
     }
 
-    protected JsonObject signed1Copy(JsonObject unsigned, JsonObject signature) {
-        return new LdNodeBuilder(unsigned).set(VcdiVocab.PROOF_VALUE).value(signature).build();
-    }
+//    protected JsonObject signed1Copy(JsonObject unsigned, JsonObject signature) {
+//        return new LdNodeBuilder(unsigned).set(VcdiVocab.PROOF_VALUE).value(signature).build();
+//    }
 
     /**
      * Returns a signed proof.

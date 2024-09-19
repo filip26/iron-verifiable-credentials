@@ -1,8 +1,8 @@
 package com.apicatalog.vc.suite;
 
+import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.proof.Proof;

@@ -1,8 +1,8 @@
 package com.apicatalog.vc.keygen;
 
+import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.KeyGenError;
-import com.apicatalog.ld.signature.key.KeyPair;
 
 public class KeysGenerator {
 

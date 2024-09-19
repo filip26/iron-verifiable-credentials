@@ -1,4 +1,4 @@
-package com.apicatalog.ld.signature.key;
+package com.apicatalog.controller.method;
 
 public interface KeyPair extends VerificationKey {
 

@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.apicatalog.controller.method.VerificationMethod;
-import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -76,7 +75,8 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
     @Override
     public JsonObject unsigned() {
-        return unsigned(new LdNodeBuilder()).build();
+//FIXME        return unsigned(new LdNodeBuilder()).build();
+        return null;
     }
     
     /**
@@ -87,30 +87,31 @@ public class DataIntegrityProofDraft extends ProofDraft {
      * @return
      */
     public static final JsonObject signed(JsonObject unsignedProof, JsonObject proofValue) {
-        return LdNodeBuilder.of(unsignedProof).set(VcdiVocab.PROOF_VALUE).value(proofValue).build();
+//FIXME        return LdNodeBuilder.of(unsignedProof).set(VcdiVocab.PROOF_VALUE).value(proofValue).build();
+        return null;
     }
     
-    protected LdNodeBuilder unsigned(LdNodeBuilder builder) {
-
-        super.unsigned(builder, suite.methodAdapter);
-        
-        builder.type(VcdiVocab.TYPE.uri());
-        builder.set(VcdiVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", suite.cryptosuiteName);
-        
-        builder.set(VcdiVocab.PURPOSE).id(purpose);
-        
-        builder.set(VcdiVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
-
-        if (domain != null) {
-            builder.set(VcdiVocab.DOMAIN).string(domain);
-        }
-        if (challenge != null) {
-            builder.set(VcdiVocab.CHALLENGE).string(challenge);
-        }
-        if (nonce != null) {
-            builder.set(VcdiVocab.NONCE).string(nonce);
-        }
-
-        return builder;
-    }
+//    protected LdNodeBuilder unsigned(LdNodeBuilder builder) {
+//
+//        super.unsigned(builder, suite.methodAdapter);
+//        
+//        builder.type(VcdiVocab.TYPE.uri());
+//        builder.set(VcdiVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", suite.cryptosuiteName);
+//        
+//        builder.set(VcdiVocab.PURPOSE).id(purpose);
+//        
+//        builder.set(VcdiVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
+//
+//        if (domain != null) {
+//            builder.set(VcdiVocab.DOMAIN).string(domain);
+//        }
+//        if (challenge != null) {
+//            builder.set(VcdiVocab.CHALLENGE).string(challenge);
+//        }
+//        if (nonce != null) {
+//            builder.set(VcdiVocab.NONCE).string(nonce);
+//        }
+//
+//        return builder;
+//    }
 }

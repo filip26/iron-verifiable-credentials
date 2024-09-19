@@ -3,8 +3,8 @@ package com.apicatalog.controller.multikey;
 import java.net.URI;
 import java.time.Instant;
 
+import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.ld.Term;
-import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;

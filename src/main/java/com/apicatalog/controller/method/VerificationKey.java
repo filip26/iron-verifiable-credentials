@@ -1,6 +1,4 @@
-package com.apicatalog.ld.signature.key;
-
-import com.apicatalog.controller.method.VerificationMethod;
+package com.apicatalog.controller.method;
 
 public interface VerificationKey extends VerificationMethod {
 

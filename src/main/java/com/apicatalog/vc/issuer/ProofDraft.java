@@ -4,10 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.controller.method.VerificationMethod;
-import com.apicatalog.ld.node.LdNodeBuilder;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.JsonObject;
@@ -61,22 +58,22 @@ public abstract class ProofDraft {
         this.previousProof = previousProof;
     }
 
-    protected LdNodeBuilder unsigned(LdNodeBuilder builder, MethodAdapter adapter) {
-        
-        if (id != null) {
-            builder.id(id);
-        }
-        
-        if (previousProof != null) {
-            builder.set(VcdiVocab.PREVIOUS_PROOF).id(previousProof);
-        }
-        
-        if (verificatonUrl != null) {
-            builder.set(VcdiVocab.VERIFICATION_METHOD).id(verificatonUrl);
-        } else if (method != null) {
-//            builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(adapter, method);
-        }
-        return builder;
-    }
+//    protected LdNodeBuilder unsigned(LdNodeBuilder builder, MethodAdapter adapter) {
+//        
+//        if (id != null) {
+//            builder.id(id);
+//        }
+//        
+//        if (previousProof != null) {
+//            builder.set(VcdiVocab.PREVIOUS_PROOF).id(previousProof);
+//        }
+//        
+//        if (verificatonUrl != null) {
+//            builder.set(VcdiVocab.VERIFICATION_METHOD).id(verificatonUrl);
+//        } else if (method != null) {
+////            builder.set(DataIntegrityVocab.VERIFICATION_METHOD).map(adapter, method);
+//        }
+//        return builder;
+//    }
 
 }

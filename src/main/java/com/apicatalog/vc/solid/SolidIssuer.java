@@ -1,9 +1,9 @@
 package com.apicatalog.vc.solid;
 
+import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.LinkedDataSignature;
 import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.issuer.AbstractIssuer;

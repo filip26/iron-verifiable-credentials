@@ -1,9 +1,9 @@
 package com.apicatalog.ld.signature.algorithm;
 
+import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.key.KeyPair;
 
 /**
  * An algorithm that takes an input message and produces an output value where

@@ -13,14 +13,11 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
-import com.apicatalog.ld.node.LdType;
 import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.SigningError.Code;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vc.verifier.VerificationProcessor;
 import com.apicatalog.vcdm.EmbeddedProof;
-import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -107,11 +104,11 @@ public class Holder extends VerificationProcessor<Holder> {
 
         final JsonObject expandedProof = expandedProofs.iterator().next();
 
-        final Collection<String> proofTypes = LdType.strings(expandedProof);
-
-        if (proofTypes == null || proofTypes.isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
-        }
+//        final Collection<String> proofTypes = LdType.strings(expandedProof);
+//
+//        if (proofTypes == null || proofTypes.isEmpty()) {
+//            throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
+//        }
         //FIXME
 //        final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
 //

@@ -1,9 +1,9 @@
 package com.apicatalog.ld.signature;
 
+import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.ld.signature.algorithm.CanonicalizationAlgorithm;
 import com.apicatalog.ld.signature.algorithm.DigestAlgorithm;
 import com.apicatalog.ld.signature.algorithm.SignatureAlgorithm;
-import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.linkedtree.LinkedTree;
 
 /**

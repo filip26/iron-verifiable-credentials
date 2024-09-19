@@ -1,8 +1,8 @@
 package com.apicatalog.vc;
 
+import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.signature.CryptoSuite;
-import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.primitive.MessageDigest;
 import com.apicatalog.ld.signature.primitive.Urdna2015;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;

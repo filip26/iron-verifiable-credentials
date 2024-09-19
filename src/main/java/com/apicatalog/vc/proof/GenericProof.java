@@ -4,12 +4,12 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
+import com.apicatalog.controller.method.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.CryptoSuite;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.VerificationError.Code;
-import com.apicatalog.ld.signature.key.VerificationKey;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.selector.InvalidSelector;
 
