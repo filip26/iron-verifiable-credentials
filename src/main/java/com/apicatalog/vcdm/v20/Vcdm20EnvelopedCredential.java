@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
@@ -77,5 +78,10 @@ public class Vcdm20EnvelopedCredential implements Credential {
     @Override
     public LinkedNode ld() {
         return ld;
+    }
+
+    @Override
+    public void validate() throws DocumentError {
+        throw new UnsupportedOperationException();
     }
 }

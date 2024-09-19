@@ -2,7 +2,6 @@ package com.apicatalog.vc;
 
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
@@ -31,58 +30,6 @@ public interface Credential extends Verifiable {
     Collection<Status> status();
 
     Collection<Subject> subject();
-
-    @Override
-    default void validate() throws DocumentError {
-        throw new UnsupportedOperationException();
-    }
-////    
-////    {
-//        
-//        // @type - mandatory
-//        if (type() == null || type().isEmpty()) {
-//            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
-//        }
-//
-//        // subject - mandatory
-//        if (claims() == null || claims().isEmpty()) {
-//            throw new DocumentError(ErrorType.Missing, VcVocab.SUBJECT);
-//        }
-//        for (Subject item : claims()) {
-//            item.validate();
-//        }
-//
-//        // issuer
-//        if (issuer() == null) {
-//            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUER);
-//        }
-//        issuer().validate();
-//
-//        // status
-//        if (status() != null) {
-//            for (final Status item : status()) {
-//                item.validate();
-//            }
-//        }
-//
-//        // v1
-//        if ((version() == null || ModelVersion.V11.equals(version()))
-//                && issuanceDate() == null) {
-//            // issuance date is a mandatory property
-//            throw new DocumentError(ErrorType.Missing, VcVocab.ISSUANCE_DATE);
-//        }
-//
-//        // model v1
-//        if ((issuanceDate() != null
-//                && expiration() != null
-//                && issuanceDate().isAfter(expiration()))
-//                // model v2
-//                || (validFrom() != null
-//                        && validUntil() != null
-//                        && validFrom().isAfter(validUntil()))) {
-//            throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
-//        }
-//    }
 
     @Override
     default boolean isCredential() {

@@ -1,6 +1,6 @@
 package com.apicatalog.vcdi;
 
-import com.apicatalog.vc.model.Parameter;
+import com.apicatalog.vc.processor.Parameter;
 
 public class DataIntegrityParam {
 

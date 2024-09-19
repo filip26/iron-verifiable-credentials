@@ -1,10 +1,12 @@
-package com.apicatalog.vc;
+package com.apicatalog.vc.primitive;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
@@ -47,5 +49,10 @@ public record GenericCredential(
     @Override
     public Collection<String> type() {
         return ld().asFragment().type().stream().toList();
+    }
+
+    @Override
+    public void validate() throws DocumentError {
+        throw new UnsupportedOperationException();
     }
 }
