@@ -111,9 +111,10 @@ try {
 
 [![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
 
+![Data Flow](/iron-vc-data-flow-1.0.3.png)
+
 ![Data Model](/iron-vc-data-model-0.15.0.png)
 
-![Data Flow](/iron-vc-data-flow-1.0.1.png)
 
 ## Installation
 
