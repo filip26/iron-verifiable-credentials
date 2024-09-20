@@ -113,6 +113,8 @@ try {
 
 ![Data Model](/iron-vc-data-model-0.15.0.png)
 
+![Data Flow](/iron-vc-data-flow-1.0.1.png)
+
 ## Installation
 
 ### Maven
