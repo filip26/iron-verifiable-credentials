@@ -110,9 +110,9 @@ try {
 
 ## Documentation
 
-![Data Flow](/iron-vc-signature-verification-data-flow-v1.0.5.png)
+![Verification Data Flow](/doc/iron-vc-signature-verification-data-flow-v1.0.5.png)
 
-![Data Model](/iron-vc-core-data-model-v1.0.0.png)
+![Core Data Model](/doc/iron-vc-core-data-model-v1.0.1.png)
 
 [![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
 
