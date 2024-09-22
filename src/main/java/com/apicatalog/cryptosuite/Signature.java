@@ -57,22 +57,22 @@ public class Signature {
      *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-algorithm">Proof
      *      Algorithm</a>
      *
-     * @param expanded   expanded unsigned VC/VP document
-     * @param privateKey
-     * @param proof
+     * @param verifiable an unsigned VC/VP document
+     * @param proof      a proof with no signature, proofValue, attached *
+     * @param privateKey a private key to sign with
      *
-     * @return computed signature
-     * @throws CryptoSuiteError 
+     * @return a signature
+     * @throws CryptoSuiteError
      *
      * @throws DocumentError
      */
-    public byte[] sign(LinkedTree expanded, byte[] privateKey, LinkedTree proof) throws CryptoSuiteError {
+    public byte[] sign(LinkedTree verifiable, LinkedTree proof, byte[] privateKey) throws CryptoSuiteError {
 
-        Objects.requireNonNull(expanded);
-        Objects.requireNonNull(privateKey);
+        Objects.requireNonNull(verifiable);
         Objects.requireNonNull(proof);
+        Objects.requireNonNull(privateKey);
 
-        final byte[] documentHashCode = hashCode(expanded, proof);
+        final byte[] documentHashCode = hashCode(verifiable, proof);
 
         return suite.sign(privateKey, documentHashCode);
     }

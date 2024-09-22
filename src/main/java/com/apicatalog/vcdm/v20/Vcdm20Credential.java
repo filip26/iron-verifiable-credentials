@@ -39,8 +39,8 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
         credential.validFrom = source.xsdDateTime(VcdmVocab.VALID_FROM.uri());
         credential.validUntil = source.xsdDateTime(VcdmVocab.VALID_UNTIL.uri());
         
-        credential.name = source.langMap(VcdmVocab.NAME.uri());
-        credential.description = source.langMap(VcdmVocab.DESCRIPTION.uri());
+        credential.name = source.languageMap(VcdmVocab.NAME.uri());
+        credential.description = source.languageMap(VcdmVocab.DESCRIPTION.uri());
         
         return credential;
     }

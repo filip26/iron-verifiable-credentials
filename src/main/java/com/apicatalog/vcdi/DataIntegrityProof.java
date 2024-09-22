@@ -78,11 +78,11 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
         
         proof.expires = source.xsdDateTime(VcdiVocab.EXPIRES.uri());
 
-        proof.domain = source.lexeme(VcdiVocab.DOMAIN.uri());
+        proof.domain = source.lexicalValue(VcdiVocab.DOMAIN.uri());
 
-        proof.challenge = source.lexeme(VcdiVocab.CHALLENGE.uri());
+        proof.challenge = source.lexicalValue(VcdiVocab.CHALLENGE.uri());
 
-        proof.nonce = source.lexeme(VcdiVocab.NONCE.uri());
+        proof.nonce = source.lexicalValue(VcdiVocab.NONCE.uri());
 
         proof.method = source.fragment(
                 VcdiVocab.VERIFICATION_METHOD.uri(),

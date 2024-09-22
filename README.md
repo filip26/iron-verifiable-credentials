@@ -20,13 +20,11 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
     * [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023) (planned)
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature suite? List it here, open PR.
-* Credentail Status Verification
+* Status Verification
   * Bitstring Status List (planned) 
 * Data Models
-  * [v2.0](https://w3c.github.io/vc-data-model/)
-  * [v1.1](https://www.w3.org/TR/vc-data-model/)
-
-[Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
+  * [v2.0](https://www.w3.org/TR/vc-data-model-2.0)
+  * [v1.1](https://www.w3.org/TR/vc-data-model-1.1)
   
 ## Installation
 
@@ -46,7 +44,7 @@ Iron VC SDK for Android is distributed under a commercial license. [Contact](m
 
 ## Usage
 
-This repository provides common logic and primitives to easily implement a signature suite. It is intended to be used together with a suite, or suites, of your choice, e.g. [ECDSA SD 2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
+This repository provides common logic and primitives to easily implement a signature suite. It is intended to be used together with a suite, or suites, of your choice, e.g. [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
 
 ### Verifier
 
@@ -149,12 +147,11 @@ Fork and clone the project repository.
 ## Resources
 
 * [VC Playground](https://vcplayground.org/)
-* [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
-* [W3C Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
-* [W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
-* [W3C Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
-* [W3C Verifiable Credentials Implementation Guidelines 1.0](https://www.w3.org/TR/vc-imp-guide/)
+* [W3C Verifiable Credentials Data Model v2.0](https://www.w3.org/TR/vc-data-model-2.0)
+* [W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model-1.1)
+* [W3C Verifiable Credential Data Integrity v1.0](https://www.w3.org/TR/vc-data-integrity)
 * [W3C Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
+* [W3C Controller Documents v1.0](https://www.w3.org/TR/controller-document)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
 
 ## Sponsors

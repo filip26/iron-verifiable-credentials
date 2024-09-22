@@ -193,7 +193,7 @@ public abstract class VcdmReader implements VerifiableReader {
 //                throw new DocumentError(ErrorType.Invalid, "document");
             }
 
-            final Verifiable verifiable = tree.object(Verifiable.class);
+            final Verifiable verifiable = tree.materialize(Verifiable.class);
 
             // detach proofs
             final JsonArray jsonProofs = EmbeddedProof.getProofs(expanded.iterator().next().asJsonObject());

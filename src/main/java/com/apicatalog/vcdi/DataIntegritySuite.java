@@ -94,7 +94,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         try {
             var tree = reader.read(Json.createArrayBuilder().add(proof).build());
 
-            return tree.object(DataIntegrityProof.class);
+            return tree.materialize(DataIntegrityProof.class);
 
         } catch (InvalidSelector e) {
             throw DocumentError.of(e);
