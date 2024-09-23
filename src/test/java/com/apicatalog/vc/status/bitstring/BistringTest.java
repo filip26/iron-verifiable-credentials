@@ -1,6 +1,7 @@
 package com.apicatalog.vc.status.bitstring;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -45,6 +46,21 @@ class BistringTest {
         for (int i = 0; i < bstr.length(); i++) {
             assertEquals(i == 5, bstr.isSet(i), "index: " + i);
         }
+    }
+
+    @Test
+    void testOutOfRangeUp() {
+        assertThrows(IndexOutOfBoundsException.class, () -> new Bitstring(new byte[] { (byte) 0x02 }, 9));
+    }
+
+    @Test
+    void testOutOfRangeDown() {
+        assertThrows(IndexOutOfBoundsException.class, () -> new Bitstring(new byte[] { (byte) 0x02 }, 0));
+    }
+
+    @Test
+    void testEmpty() {
+        assertThrows(IndexOutOfBoundsException.class, () -> new Bitstring(new byte[0], 1));
     }
 
 }

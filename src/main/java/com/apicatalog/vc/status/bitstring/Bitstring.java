@@ -1,26 +1,27 @@
 package com.apicatalog.vc.status.bitstring;
 
+import java.util.Objects;
+
 public record Bitstring(byte[] bits, long length) {
 
     public static long DEFAULT_SIZE = 131072;
 
+    public Bitstring {
+        Objects.requireNonNull(bits);
+        Objects.checkIndex(length - 1, bits.length * 8);
+    }
+    
     /**
      * Check if a given index is set or not.
      * 
-     * @param index to check
+     * @param index to check, starts with <code>0</code>
      * @return <code>true</code> if the given index is set
      * 
-     * @throws IllegalArgumentException
      * @throws IndexOutOfBoundsException
      */
-    public boolean isSet(long index) throws IllegalArgumentException, IndexOutOfBoundsException {
+    public boolean isSet(long index) throws IndexOutOfBoundsException {
 
-        if (index < 0) {
-            throw new IllegalArgumentException("The index must greater or equal to zero but is " + index);
-        }
-        if (index > length) {
-            throw new IndexOutOfBoundsException(index);
-        }
+        Objects.checkIndex(index, length);
 
         int byteIndex = (int) (index / 8);
         byte bitIndex = (byte) (index % 8);
