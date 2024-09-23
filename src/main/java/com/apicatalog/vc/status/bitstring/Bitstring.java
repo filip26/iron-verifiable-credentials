@@ -59,9 +59,4 @@ public record Bitstring(byte[] bits, long length) {
 
         return this;
     }
-
-    public String toString() {
-        return Base2.encode(bits, 0, bits.length);
-    }
-
 }
