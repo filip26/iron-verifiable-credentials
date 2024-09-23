@@ -9,7 +9,7 @@ public interface BitstringStatusListEntry extends Status {
 
     String purpose();
 
-    int indexList();
+    long index();
 
     URI credential();
 
