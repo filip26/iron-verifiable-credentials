@@ -4,7 +4,8 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 
 [![Java 17 CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/java17-build.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/806688cdb1d248e8b5cc2a67f6c2f0f8)](https://app.codacy.com/gh/filip26/iron-verifiable-credentials/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/806688cdb1d248e8b5cc2a67f6c2f0f8)](https://app.codacy.com/gh/filip26/iron-verifiable-credentials/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/806688cdb1d248e8b5cc2a67f6c2f0f8?branch=main)](https://app.codacy.com/gh/filip26/iron-verifiable-credentials/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=filip26_iron-verifiable-credentials&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=filip26_iron-verifiable-credentials)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=filip26_iron-verifiable-credentials&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=filip26_iron-verifiable-credentials)
 [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.apicatalog%20AND%20a:iron-verifiable-credentials)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -25,7 +26,9 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 * Data Models
   * [v2.0](https://www.w3.org/TR/vc-data-model-2.0)
   * [v1.1](https://www.w3.org/TR/vc-data-model-1.1)
-  
+
+[Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
+
 ## Installation
 
 ### Maven
@@ -123,6 +126,10 @@ try {
 
 ## Documentation
 
+![Verification Data Flow](/doc/iron-vc-signature-verification-data-flow-v1.0.5.png)
+
+![Core Data Model](/doc/iron-vc-core-data-model-v1.0.1.png)
+
 [![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
 
 ## Contributing
@@ -146,13 +153,14 @@ Fork and clone the project repository.
 
 ## Resources
 
-* [VC Playground](https://vcplayground.org/)
 * [W3C Verifiable Credentials Data Model v2.0](https://www.w3.org/TR/vc-data-model-2.0)
 * [W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model-1.1)
 * [W3C Verifiable Credential Data Integrity v1.0](https://www.w3.org/TR/vc-data-integrity)
 * [W3C Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
 * [W3C Controller Documents v1.0](https://www.w3.org/TR/controller-document)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
+* [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
+* [VC Playground](https://vcplayground.org/)
 
 ## Sponsors
 
