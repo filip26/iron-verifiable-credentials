@@ -29,22 +29,6 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 
 [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
 
-## Installation
-
-### Maven
-Java 17+
-
-```xml
-<dependency>
-    <groupId>com.apicatalog</groupId>
-    <artifactId>iron-verifiable-credentials</artifactId>
-    <version>0.14.0</version>
-</dependency>
-
-```
-
-Iron VC SDK for Android is distributed under a commercial license. [Contact](mailto:filip26@gmail.com)
-
 ## Usage
 
 This repository provides common logic and primitives to easily implement a signature suite. It is intended to be used together with a suite, or suites, of your choice, e.g. [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023). Read the suite(s) documentation for specifics.
@@ -126,11 +110,29 @@ try {
 
 ## Documentation
 
-![Verification Data Flow](/doc/iron-vc-signature-verification-data-flow-v1.0.5.png)
+![Verifiable Credentials Signature Verification Data Flow](/doc/iron-vc-signature-verification-data-flow-v1.0.6.png)
 
-![Core Data Model](/doc/iron-vc-core-data-model-v1.0.1.png)
+![Verifiable Credentials Core Data Model](/doc/iron-vc-core-data-model-v1.0.3.png)
 
 [![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-verifiable-credentials/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-verifiable-credentials)
+
+
+
+## Installation
+
+### Maven
+Java 17+
+
+```xml
+<dependency>
+    <groupId>com.apicatalog</groupId>
+    <artifactId>iron-verifiable-credentials</artifactId>
+    <version>0.14.0</version>
+</dependency>
+
+```
+
+Iron VC SDK for Android is distributed under a commercial license. [Contact](mailto:filip26@gmail.com)
 
 ## Contributing
 
