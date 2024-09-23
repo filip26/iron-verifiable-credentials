@@ -49,6 +49,23 @@ class BistringTest {
     }
 
     @Test
+    void testOfZeros() {
+        var bstr = Bitstring.ofZeros(100);
+        assertEquals(13, bstr.bits().length);
+        for (int i = 0; i < bstr.bits().length; i++) {
+            assertEquals(0, bstr.bits()[i]);
+        }
+    }
+
+    @Test
+    void testSetUnset() {
+        var bstr = Bitstring.ofZeros(10).set(9).set(1).set(3).unset(1);
+        for (int i = 0; i < bstr.length(); i++) {
+            assertEquals(i == 3 || i == 9, bstr.isSet(i), "index: " + i);
+        }
+    }
+
+    @Test
     void testOutOfRangeUp() {
         assertThrows(IndexOutOfBoundsException.class, () -> new Bitstring(new byte[] { (byte) 0x02 }, 9));
     }
