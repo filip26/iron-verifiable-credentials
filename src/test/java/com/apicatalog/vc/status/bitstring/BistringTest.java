@@ -66,6 +66,17 @@ class BistringTest {
     }
 
     @Test
+    void testBits() {
+        var bstr = new Bitstring(new byte[] { 0x1, (byte) 0xaa, (byte) 0xaa }, 24);
+
+        assertEquals(0x2, bstr.bits(8, 2));
+        assertEquals(0x1, bstr.bits(8, 1));
+        assertEquals(0x0, bstr.bits(9, 1));
+        assertEquals(0x5, bstr.bits(8, 3));
+        assertEquals(0x3, bstr.bits(7, 2));
+    }
+
+    @Test
     void testOutOfRangeUp() {
         assertThrows(IndexOutOfBoundsException.class, () -> new Bitstring(new byte[] { (byte) 0x02 }, 9));
     }

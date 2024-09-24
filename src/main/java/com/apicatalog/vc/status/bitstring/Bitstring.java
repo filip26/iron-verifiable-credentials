@@ -36,7 +36,7 @@ public record Bitstring(byte[] bits, long length) {
 
         return (bits[byteIndex] & (0x80 >>> bitIndex)) != 0;
     }
-    
+
     public Bitstring set(long index) throws IndexOutOfBoundsException {
         return bit(index, true);
     }
@@ -48,6 +48,7 @@ public record Bitstring(byte[] bits, long length) {
     public Bitstring bit(long index, boolean set) throws IndexOutOfBoundsException {
 
         Objects.checkIndex(index, length);
+
         int byteIndex = (int) (index / 8);
         byte bitIndex = (byte) (index % 8);
 
@@ -58,5 +59,22 @@ public record Bitstring(byte[] bits, long length) {
         }
 
         return this;
+    }
+
+    public int bits(long index, int length) throws IndexOutOfBoundsException {
+
+        Objects.checkIndex(length - 1, 7); // max 8 bits
+        Objects.checkIndex(index + length - 1, this.length);
+
+        int code = 0;
+
+        for (long i = 0; i < length; i++) {
+            code |= isSet(index + length - i - 1)
+                    ? 1 << (i)
+                    : 0;
+
+        }
+        return code;
+
     }
 }
