@@ -3,6 +3,8 @@ package com.apicatalog.vc.status.bitstring;
 import java.util.Arrays;
 import java.util.Objects;
 
+import com.apicatalog.linkedtree.LinkedNode;
+
 /**
  * A {@link Bitstring} is a sequence of bits where each bit can have only two
  * states, set or unset.
@@ -14,6 +16,10 @@ public record Bitstring(byte[] bits, long length) {
     public Bitstring {
         Objects.requireNonNull(bits);
         Objects.checkIndex(length - 1, bits.length * 8);
+    }
+
+    public static Bitstring of(LinkedNode node) {
+        return null;
     }
 
     /**

@@ -13,7 +13,7 @@ public interface BitstringStatusListEntry extends Status {
 
     URI credential();
 
-    int size();
+    int indexBitLength();
 
     BitstringStatusListMessages messages();
     

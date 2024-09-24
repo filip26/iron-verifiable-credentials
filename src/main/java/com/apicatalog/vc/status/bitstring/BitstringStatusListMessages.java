@@ -1,13 +1,29 @@
 package com.apicatalog.vc.status.bitstring;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 
-public interface BitstringStatusListMessages {
+public record BitstringStatusListMessages(
+        Map<Integer, String> messages) {
 
-    Collection<String> code();
+    public BitstringStatusListMessages {
+        Objects.requireNonNull(messages);
+    }
 
-    String message(String code);
+    public Collection<Integer> code() {
+        return messages.keySet();
+    }
 
-    int size();
+    public String message(int code) {
+        return messages.get(code);
+    }
 
+    public int size() {
+        return messages.size();
+    }
+
+    public boolean isEmpty() {
+        return messages.isEmpty();
+    }
 }

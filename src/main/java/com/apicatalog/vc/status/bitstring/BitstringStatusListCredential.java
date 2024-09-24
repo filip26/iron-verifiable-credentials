@@ -20,6 +20,8 @@ public class BitstringStatusListCredential implements Linkable {
     protected Instant validFrom;
     protected Instant validUntil;
 
+    protected BitstringStatusList subject;
+    
     protected LinkedFragment ld;
 
     protected BitstringStatusListCredential() {
@@ -39,6 +41,11 @@ public class BitstringStatusListCredential implements Linkable {
         credential.validFrom = source.xsdDateTime(VcdmVocab.VALID_FROM.uri());
         credential.validUntil = source.xsdDateTime(VcdmVocab.VALID_UNTIL.uri());
 
+        credential.subject = source.fragment(
+                VcdmVocab.SUBJECT.uri(), 
+                BitstringStatusList.class, 
+                BitstringStatusList::of);
+        
         credential.ld = source;
         return credential;
     }
@@ -57,18 +64,15 @@ public class BitstringStatusListCredential implements Linkable {
     }
 
     public boolean isExpired() {
-        // TODO Auto-generated method stub
-        return false;
+        return (validUntil != null && validUntil.isBefore(Instant.now()));
     }
 
     public boolean isNotValidYet() {
-        // TODO Auto-generated method stub
-        return false;
+        return (validFrom != null && validFrom.isAfter(Instant.now()));
     }
 
     public BitstringStatusList subject() {
-        // TODO Auto-generated method stub
-        return null;
+        return subject;
     }
 
     public Instant validFrom() {
