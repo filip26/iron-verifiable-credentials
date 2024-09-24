@@ -3,6 +3,10 @@ package com.apicatalog.vc.status.bitstring;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A {@link Bitstring} is a sequence of bits where each bit can have only two
+ * states, set or unset.
+ */
 public record Bitstring(byte[] bits, long length) {
 
     public static long DEFAULT_SIZE = 131072;
@@ -12,6 +16,13 @@ public record Bitstring(byte[] bits, long length) {
         Objects.checkIndex(length - 1, bits.length * 8);
     }
 
+    /**
+     * Create a new {@link Bitstring} instance initialized with zero bits.
+     * 
+     * @param length a fixed length
+     * 
+     * @return a new instance initialized with zero bits
+     */
     public static Bitstring ofZeros(int length) {
         int bytes = (int) (length / 8) + (length % 8 != 0 ? 1 : 0);
         byte[] bits = new byte[bytes];
@@ -37,10 +48,24 @@ public record Bitstring(byte[] bits, long length) {
         return (bits[byteIndex] & (0x80 >>> bitIndex)) != 0;
     }
 
+    /**
+     * Set a bit at the index.
+     * 
+     * @param index
+     * @return
+     * @throws IndexOutOfBoundsException
+     */
     public Bitstring set(long index) throws IndexOutOfBoundsException {
         return bit(index, true);
     }
 
+    /**
+     * Unset a bit at the index.
+     * 
+     * @param index
+     * @return
+     * @throws IndexOutOfBoundsException
+     */
     public Bitstring unset(long index) throws IndexOutOfBoundsException {
         return bit(index, false);
     }
@@ -61,16 +86,25 @@ public record Bitstring(byte[] bits, long length) {
         return this;
     }
 
+    /**
+     * Get an integer representation of a sequence of bites in the
+     * {@link Bitstring}.
+     * 
+     * @param index
+     * @param length
+     * @return an integer value representing a bit sequence
+     * @throws IndexOutOfBoundsException
+     */
     public int bits(long index, int length) throws IndexOutOfBoundsException {
 
-        Objects.checkIndex(length - 1, 7); // max 8 bits
+        Objects.checkIndex(length - 1, 8); // max 8 bits
         Objects.checkIndex(index + length - 1, this.length);
 
         int code = 0;
 
         for (long i = 0; i < length; i++) {
             code |= isSet(index + length - i - 1)
-                    ? 1 << (i)
+                    ? 1 << i
                     : 0;
 
         }
