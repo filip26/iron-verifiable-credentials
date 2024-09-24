@@ -137,6 +137,15 @@
       ],
       "name": "unsigned all props",
       "input": "vcdm20/0014-unsigned-all-props.jsonld"
+    },
+    {
+      "@id": "#bs001",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ReaderTest"
+      ],
+      "name": "Bitstring Ex. 1",
+      "input": "bitstring/ex-1.jsonld"
     }
   ]
 }

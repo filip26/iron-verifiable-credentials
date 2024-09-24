@@ -1,6 +1,7 @@
 package com.apicatalog.vcdm.v11;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
@@ -19,19 +20,27 @@ import com.apicatalog.vcdm.io.VcdmResolver;
  */
 public class Vcdm11Reader extends VcdmReader {
 
-    protected static final JsonLdTreeReader reader = JsonLdTreeReader.create()
-
-            .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
-                    Vcdm11Credential.class,
-                    Vcdm11Credential::of)
-            .with(VcdmVocab.PRESENTATION_TYPE.uri(),
-                    Vcdm11Presentation.class,
-                    Vcdm11Presentation::of)
-            .with(XsdDateTime.typeAdapter())
-            .build();
-
-    public Vcdm11Reader(final SignatureSuite... suites) {
+    protected Vcdm11Reader(final JsonLdTreeReader reader, final SignatureSuite... suites) {
         super(VcdmVersion.V11, reader, suites);
+    }
+
+    public static Vcdm11Reader with(
+            final Consumer<JsonLdTreeReader.Builder> apply,
+            final SignatureSuite... suites) {
+
+        JsonLdTreeReader.Builder reader = JsonLdTreeReader
+                .create()
+                .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
+                        Vcdm11Credential.class,
+                        Vcdm11Credential::of)
+                .with(VcdmVocab.PRESENTATION_TYPE.uri(),
+                        Vcdm11Presentation.class,
+                        Vcdm11Presentation::of)
+                .with(XsdDateTime.typeAdapter());
+        
+        apply.accept(reader);
+
+        return new Vcdm11Reader(reader.build(), suites);
     }
 
     @Override

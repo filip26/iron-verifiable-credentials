@@ -31,6 +31,7 @@ import com.apicatalog.vc.reader.ReaderResolver;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
+import com.apicatalog.vc.status.bitstring.BitstringStatusListEntry;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVocab;
@@ -64,8 +65,17 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
         var resolver = new VcdmResolver();
-        resolver.v11(new Vcdm11Reader(suites));
-        resolver.v20(new Vcdm20Reader(resolver, suites));
+        resolver.v11(Vcdm11Reader.with(
+                r -> {
+                },
+                suites));
+        resolver.v20(Vcdm20Reader.with(
+                r -> r.with(
+                        "https://www.w3.org/ns/credentials/status#BitstringStatusListEntry",
+                        BitstringStatusListEntry.class,
+                        BitstringStatusListEntry::of),
+                resolver,
+                suites));
         return resolver;
     }
 
@@ -292,10 +302,10 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
                 proof = queue.pop();
             }
-            
+
             // all good
             return verifiable;
-            
+
         } catch (UnsupportedOperationException e) {
             throw new DocumentError(e, ErrorType.Unknown);
 

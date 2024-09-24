@@ -1,0 +1,34 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://www.w3.org/ns/credentials/examples/v2"
+  ],
+  "id": "https://example.com/credentials/23894672394",
+  "type": [
+    "VerifiableCredential",
+    "EmployeeIdCredential"
+  ],
+  "issuer": "did:example:12345",
+  "validFrom": "2024-04-05T14:27:42Z",
+  "credentialStatus": [
+    {
+      "id": "https://example.com/credentials/status/3#94567",
+      "type": "BitstringStatusListEntry",
+      "statusPurpose": "revocation",
+      "statusListIndex": "94567",
+      "statusListCredential": "https://example.com/credentials/status/3"
+    },
+    {
+      "id": "https://example.com/credentials/status/4#23452",
+      "type": "BitstringStatusListEntry",
+      "statusPurpose": "suspension",
+      "statusListIndex": "23452",
+      "statusListCredential": "https://example.com/credentials/status/4"
+    }
+  ],
+  "credentialSubject": {
+    "id": "did:example:6789",
+    "type": "Person",
+    "employeeId": "A-123456"
+  }
+}

@@ -16,6 +16,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.processor.DocumentProcessor;
+import com.apicatalog.vc.status.bitstring.BitstringStatusListEntry;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.io.VcdmResolver;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
@@ -38,8 +39,17 @@ public class Reader extends DocumentProcessor<Reader> {
 
     protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
         var resolver = new VcdmResolver();
-        resolver.v11(new Vcdm11Reader(suites));
-        resolver.v20(new Vcdm20Reader(resolver, suites));
+        resolver.v11(Vcdm11Reader.with(
+                r -> {
+                },
+                suites));
+        resolver.v20(Vcdm20Reader.with(
+                r -> r.with(
+                        "https://www.w3.org/ns/credentials/status#BitstringStatusListEntry",
+                        BitstringStatusListEntry.class,
+                        BitstringStatusListEntry::of),
+                resolver,
+                suites));
         return resolver;
     }
 

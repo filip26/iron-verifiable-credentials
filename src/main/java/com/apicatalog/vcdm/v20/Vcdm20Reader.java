@@ -1,6 +1,7 @@
 package com.apicatalog.vcdm.v20;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
@@ -14,28 +15,37 @@ import com.apicatalog.vcdm.io.VcdmReader;
 import com.apicatalog.vcdm.io.VcdmResolver;
 
 public class Vcdm20Reader extends VcdmReader {
-
-    protected static final JsonLdTreeReader reader = JsonLdTreeReader.create()
-            .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
-                    Vcdm20Credential.class,
-                    Vcdm20Credential::of)
-            .with(VcdmVocab.ENVELOPED_CREDENTIAL_TYPE.uri(),
-                    Vcdm20EnvelopedCredential.class,
-                    Vcdm20EnvelopedCredential::of)
-            .with(VcdmVocab.PRESENTATION_TYPE.uri(),
-                    Vcdm20Presentation.class,
-                    Vcdm20Presentation::of)
-            .with(VcdmVocab.ENVELOPED_PRESENTATION_TYPE.uri(),
-                    Vcdm20EnvelopedPresentation.class,
-                    Vcdm20EnvelopedPresentation::of)
-            .with(XsdDateTime.typeAdapter())
-            .build();
-
+    
     protected final ReaderResolver resolver;
 
-    public Vcdm20Reader(final ReaderResolver resolver, final SignatureSuite... suites) {
+    protected Vcdm20Reader(final JsonLdTreeReader reader, final ReaderResolver resolver, final SignatureSuite... suites) {
         super(VcdmVersion.V20, reader, suites);
         this.resolver = resolver;
+    }
+    
+    public static Vcdm20Reader with(
+            final Consumer<JsonLdTreeReader.Builder> apply,
+            final ReaderResolver resolver,
+            final SignatureSuite... suites) {
+    
+        JsonLdTreeReader.Builder reader = JsonLdTreeReader.create()
+                .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
+                        Vcdm20Credential.class,
+                        Vcdm20Credential::of)
+                .with(VcdmVocab.ENVELOPED_CREDENTIAL_TYPE.uri(),
+                        Vcdm20EnvelopedCredential.class,
+                        Vcdm20EnvelopedCredential::of)
+                .with(VcdmVocab.PRESENTATION_TYPE.uri(),
+                        Vcdm20Presentation.class,
+                        Vcdm20Presentation::of)
+                .with(VcdmVocab.ENVELOPED_PRESENTATION_TYPE.uri(),
+                        Vcdm20EnvelopedPresentation.class,
+                        Vcdm20EnvelopedPresentation::of)
+                .with(XsdDateTime.typeAdapter());
+                
+        apply.accept(reader);
+        
+        return new Vcdm20Reader(reader.build(), resolver, suites);
     }
 
     @Override
