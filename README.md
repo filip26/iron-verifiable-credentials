@@ -149,9 +149,9 @@ Fork and clone the project repository.
 ```
 
 ## Extensions
-* [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
-* [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
-* [LEXREX](https://lexrex.web.app/) - Semantic vocabularies visual builder and manager
+* :package: [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
+* :gear: [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
+* :hammer_and_wrench: [LEXREX](https://lexrex.web.app/) - Semantic vocabularies visual builder and manager
 
 ## Resources
 
