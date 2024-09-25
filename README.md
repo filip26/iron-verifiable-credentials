@@ -14,7 +14,7 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 
 * Issuer, Verifier, Holder
 * Signature Suites
-  * [W3C Data Integrity Cryptosuites](https://www.w3.org/TR/vc-data-integrity/)
+  * [W3C Data Integrity Cryptosuites](https://www.w3.org/TR/vc-data-integrity/) :package:
     * [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023) [selective disclosure]
     * [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
     * [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019) [P-256, P-384]
@@ -22,10 +22,10 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature suite? List it here, open PR.
 * Status Verification
-  * Bitstring Status List (planned) 
+  * [Bitstring Status List](https://www.w3.org/TR/vc-bitstring-status-list/) :package:
 * Data Models
-  * [v2.0](https://www.w3.org/TR/vc-data-model-2.0)
-  * [v1.1](https://www.w3.org/TR/vc-data-model-1.1)
+  * [v2.0](https://www.w3.org/TR/vc-data-model-2.0) :package:
+  * [v1.1](https://www.w3.org/TR/vc-data-model-1.1) :package:
 
 [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
 
@@ -158,6 +158,7 @@ Fork and clone the project repository.
 * [W3C Verifiable Credentials Data Model v2.0](https://www.w3.org/TR/vc-data-model-2.0)
 * [W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model-1.1)
 * [W3C Verifiable Credential Data Integrity v1.0](https://www.w3.org/TR/vc-data-integrity)
+* [W3C Bitstring Status List](https://www.w3.org/TR/vc-bitstring-status-list/) 
 * [W3C Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
 * [W3C Controller Documents v1.0](https://www.w3.org/TR/controller-document)
 * [The did:key Method v0.7](https://w3c-ccg.github.io/did-method-key/)
