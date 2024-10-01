@@ -2,6 +2,7 @@ package com.apicatalog.vc.proof;
 
 import java.util.Collection;
 
+import com.apicatalog.controller.key.Key;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
@@ -15,7 +16,7 @@ import jakarta.json.JsonStructure;
 public interface BaseProofValue extends ProofValue {
 
     @Override
-    default void verify(CryptoSuite crypto, LinkedTree data, LinkedTree unsignedProof, byte[] publicKey) throws VerificationError, DocumentError {
+    default void verify(CryptoSuite crypto, LinkedTree data, LinkedTree unsignedProof, Key publicKey) throws VerificationError, DocumentError {
         throw new VerificationError(VerificationErrorCode.InvalidSignature);
     }
 

@@ -3,17 +3,12 @@ package com.apicatalog.vc.method.resolver;
 import java.net.URI;
 
 import com.apicatalog.controller.method.VerificationMethod;
-import com.apicatalog.controller.multikey.MultiKey;
-import com.apicatalog.controller.multikey.MultiKeyAdapter;
-import com.apicatalog.did.DidResolver;
 import com.apicatalog.did.DidUrl;
 import com.apicatalog.did.document.DidDocument;
-import com.apicatalog.did.document.DidVerificationMethod;
 import com.apicatalog.did.key.DidKeyResolver;
+import com.apicatalog.did.resolver.DidResolver;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.MulticodecDecoder;
 
 public class DidUrlMethodResolver implements MethodResolver {
@@ -21,8 +16,8 @@ public class DidUrlMethodResolver implements MethodResolver {
     final DidResolver resolver;
     final MulticodecDecoder codecs;
 
-    public DidUrlMethodResolver(final MultibaseDecoder bases, final MulticodecDecoder codecs) {
-        this.resolver = new DidKeyResolver(bases);
+    public DidUrlMethodResolver(final MulticodecDecoder codecs) {
+        this.resolver = new DidKeyResolver(codecs);
         this.codecs = codecs;
     }
 
@@ -30,11 +25,11 @@ public class DidUrlMethodResolver implements MethodResolver {
     public VerificationMethod resolve(URI uri) throws DocumentError {
         try {
 
-            final DidDocument didDocument = resolver.resolve(DidUrl.from(uri));
+            final DidDocument didDocument = resolver.resolve(DidUrl.of(uri));
 
             return didDocument
                     .verificationMethod().stream()
-                    .map(did -> from(did, codecs))
+//                    .map(did -> from(did, codecs))
                     .findFirst()
                     .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "ProofVerificationMethod"));
         } catch (IllegalArgumentException e) {
@@ -47,21 +42,21 @@ public class DidUrlMethodResolver implements MethodResolver {
         return DidUrl.isDidUrl(uri);
     }
 
-    @Deprecated
-    public static final MultiKey from(DidVerificationMethod did, final MulticodecDecoder codecs) {
-        final MultiKey multikey = new MultiKey();
-        multikey.id(did.id().toUri());
-        multikey.controller(did.controller().toUri());
-        
-        //TODO improve
-        final Multicodec codec = codecs.getCodec(did.publicKey()).orElseThrow(IllegalArgumentException::new);
-        
-        if (!codec.isEncoded(did.publicKey())) {
-            throw new IllegalArgumentException("Unsupported key encoding [" + did + "].");
-        }
-
-        multikey.algorithm(MultiKeyAdapter.getAlgorithmName(codec));
-        multikey.publicKey(codec.decode(did.publicKey()));
-        return multikey;
-    }
+//    @Deprecated
+//    public static final MultiKey from(VerificationMethod did, final MulticodecDecoder codecs) {
+//        final MultiKey multikey = new MultiKey();
+//        multikey.id(did.id().toUri());
+//        multikey.controller(did.controller().toUri());
+//        
+//        //TODO improve
+//        final Multicodec codec = codecs.getCodec(did.publicKey()).orElseThrow(IllegalArgumentException::new);
+//        
+//        if (!codec.isEncoded(did.publicKey())) {
+//            throw new IllegalArgumentException("Unsupported key encoding [" + did + "].");
+//        }
+//
+//        multikey.algorithm(MultiKeyAdapter.getAlgorithmName(codec));
+//        multikey.publicKey(codec.decode(did.publicKey()));
+//        return multikey;
+//    }
 }

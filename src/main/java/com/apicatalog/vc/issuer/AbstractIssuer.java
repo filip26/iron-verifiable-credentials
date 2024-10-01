@@ -119,7 +119,9 @@ public abstract class AbstractIssuer implements Issuer {
     protected ExpandedVerifiable sign(final VcdmVersion version, final JsonArray context, final JsonObject expanded,
             final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
-        if (keyPair.privateKey() == null || keyPair.privateKey().length == 0) {
+        if (keyPair.privateKey() == null 
+                || keyPair.privateKey().raw() == null
+                || keyPair.privateKey().raw().length == 0) {
             throw new IllegalArgumentException("The private key is not provided, is null or an empty array.");
         }
 

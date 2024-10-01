@@ -29,7 +29,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -270,7 +269,7 @@ public class VcTestRunnerJunit {
 
     static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver(MultibaseDecoder.getInstance(), TestKeyAdapter.DECODER));
+        resolvers.add(new DidUrlMethodResolver(TestAlgorithm.DECODER));
         resolvers.add(new HttpMethodResolver(loader));
         return resolvers;
     }

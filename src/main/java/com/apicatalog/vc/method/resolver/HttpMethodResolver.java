@@ -4,7 +4,6 @@ import java.net.URI;
 
 import com.apicatalog.controller.method.GenericVerificationMethod;
 import com.apicatalog.controller.method.VerificationMethod;
-import com.apicatalog.controller.multikey.MultiKey;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.loader.DocumentLoader;
@@ -12,11 +11,11 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.linkedtree.writer.DictionaryWriter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.Multicodec.Tag;
+import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.multikey.MultiKey;
 import com.apicatalog.vc.primitive.MultibaseLiteral;
 
 import jakarta.json.JsonArray;
@@ -28,31 +27,31 @@ public class HttpMethodResolver implements MethodResolver {
     protected JsonLdTreeReader reader;
     
 
-    protected static Multicodec PUBLIC_KEY_CODEC = Multicodec.of(
-            "test-pub",
-            Tag.Key,
-            12345l);
-
-    protected static Multicodec PRIVATE_KEY_CODEC = Multicodec.of(
-            "test-priv",
-            Tag.Key,
-            12346l);
-
-    protected static MulticodecDecoder DECODER = MulticodecDecoder.getInstance(
-            PUBLIC_KEY_CODEC,
-            PRIVATE_KEY_CODEC);
-    
+//    protected static Multicodec PUBLIC_KEY_CODEC = Multicodec.of(
+//            "test-pub",
+//            Tag.Key,
+//            12345l);
+//
+//    protected static Multicodec PRIVATE_KEY_CODEC = Multicodec.of(
+//            "test-priv",
+//            Tag.Key,
+//            12346l);
+//
+//    protected static MulticodecDecoder DECODER = MulticodecDecoder.getInstance(
+//            PUBLIC_KEY_CODEC,
+//            PRIVATE_KEY_CODEC);
+//    
     public HttpMethodResolver(
             DocumentLoader loader
             ) {
         this.loader = loader;
         this.reader = JsonLdTreeReader
                 .create()
-                .with(
-                        MultiKey.typeName(), 
-                        MultiKey.class,
-                        source -> MultiKey.of(DECODER, source)
-                        )
+//                .with(
+//                        MultiKey.typeName(), 
+//                        MultiKey.class,
+//                        source -> MultiKey.of(source, DECODER)
+//                        )
                 .with(MultibaseLiteral.typeAdapter(Multibase.BASE_58_BTC))
 //              .with(proof.methodProcessor());
                 .build();

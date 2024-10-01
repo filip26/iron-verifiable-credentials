@@ -2,6 +2,7 @@ package com.apicatalog.vc.solid;
 
 import java.util.Objects;
 
+import com.apicatalog.controller.key.Key;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.Signature;
 import com.apicatalog.cryptosuite.VerificationError;
@@ -24,19 +25,21 @@ public record SolidProofValue(
             CryptoSuite cryptoSuite,  
             LinkedTree data, 
             LinkedTree unsignedProof, 
-            byte[] publicKey) throws VerificationError {
+            Key publicKey) throws VerificationError {
 
         Objects.requireNonNull(data);
         Objects.requireNonNull(publicKey);
         Objects.requireNonNull(cryptoSuite);
 
+        //TODO check key type
+        
         final Signature signature = new Signature(cryptoSuite);
 
         // verify signature
         signature.verify(
                 data,
                 unsignedProof,
-                publicKey,
+                publicKey.raw(),
                 toByteArray);
     }
 }

@@ -5,6 +5,7 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.primitive.MessageDigest;
 import com.apicatalog.cryptosuite.primitive.Urdna2015;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -15,7 +16,20 @@ import com.apicatalog.vcdi.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
-    static final MethodAdapter METHOD_ADAPTER = new TestKeyAdapter();
+    static final MethodAdapter METHOD_ADAPTER = new MethodAdapter() {
+        
+        @Override
+        public Object materialize(LinkedFragment source) throws NodeAdapterError {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+        @Override
+        public Class<?> typeInterface() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+    };
 
     static final String TEST_CRYPTO_NAME = "test-2022";
 

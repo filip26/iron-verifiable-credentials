@@ -11,7 +11,6 @@ import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
@@ -40,9 +39,7 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
 
     protected static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver(
-                MultibaseDecoder.getInstance(),
-                MulticodecDecoder.getInstance(Tag.Key)));
+        resolvers.add(new DidUrlMethodResolver(MulticodecDecoder.getInstance(Tag.Key)));
         resolvers.add(new HttpMethodResolver(loader));
         return resolvers;
     }

@@ -15,7 +15,6 @@ import com.apicatalog.ld.Term;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.writer.DictionaryWriter;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.primitive.VerifiableTree;
 
@@ -66,8 +65,8 @@ public abstract class VerifiableProof implements Proof {
         // remove a proof value and get a new unsigned copy
         final LinkedTree unsignedProof = unsignedProof(ld.root());
 
-        DictionaryWriter.writeToStdOut(unsigned);
-        DictionaryWriter.writeToStdOut(unsignedProof);
+//        DictionaryWriter.writeToStdOut(unsigned);
+//        DictionaryWriter.writeToStdOut(unsignedProof);
 
         // verify signature
         signature.verify(
