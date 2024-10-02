@@ -3,7 +3,7 @@ package com.apicatalog.vc;
 import java.util.Arrays;
 import java.util.Random;
 
-import com.apicatalog.controller.key.MultihashKey;
+import com.apicatalog.controller.key.MulticodecKey;
 import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.cryptosuite.KeyGenError;
 import com.apicatalog.cryptosuite.SigningError;
@@ -11,8 +11,8 @@ import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.cryptosuite.algorithm.Signer;
 import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.Multicodec.Tag;
+import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multikey.MultiKey;
 
 class TestAlgorithm implements Signer {
@@ -68,7 +68,7 @@ class TestAlgorithm implements Signer {
 
         new Random().nextBytes(raw);
 
-        var publicKey = new MultihashKey() {
+        var publicKey = new MulticodecKey() {
 
             @Override
             public String type() {
@@ -86,7 +86,7 @@ class TestAlgorithm implements Signer {
             }
         };
 
-        var privateKey = new MultihashKey() {
+        var privateKey = new MulticodecKey() {
 
             @Override
             public String type() {

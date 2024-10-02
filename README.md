@@ -26,6 +26,11 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 * Data Models
   * [v2.0](https://www.w3.org/TR/vc-data-model-2.0)
   * [v1.1](https://www.w3.org/TR/vc-data-model-1.1)
+* Verification Methods
+  * `did:key` 
+  * `did:web`
+  * Multikey
+  * custom
 
 [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
 
