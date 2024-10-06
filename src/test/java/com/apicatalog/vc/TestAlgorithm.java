@@ -3,7 +3,6 @@ package com.apicatalog.vc;
 import java.util.Arrays;
 import java.util.Random;
 
-import com.apicatalog.controller.key.MulticodecKey;
 import com.apicatalog.controller.method.KeyPair;
 import com.apicatalog.cryptosuite.KeyGenError;
 import com.apicatalog.cryptosuite.SigningError;
@@ -13,6 +12,7 @@ import com.apicatalog.cryptosuite.algorithm.Signer;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.multicodec.MulticodecKey;
 import com.apicatalog.multikey.MultiKey;
 
 class TestAlgorithm implements Signer {

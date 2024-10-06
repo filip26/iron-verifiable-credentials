@@ -62,7 +62,7 @@
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
         <titanium.version>1.4.1</titanium.version>
-        <linked-tree.version>0.0.12-SNAPSHOT</linked-tree.version>
+        <linked-tree.version>0.0.13-SNAPSHOT</linked-tree.version>
         <carbon.version>0.9.0-SNAPSHOT</carbon.version>
         <rdf-urdna.version>1.3</rdf-urdna.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>

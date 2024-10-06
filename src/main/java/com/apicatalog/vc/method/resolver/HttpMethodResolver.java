@@ -12,11 +12,11 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multibase.MultibaseLiteral;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multikey.MultiKey;
-import com.apicatalog.vc.primitive.MultibaseLiteral;
 
 import jakarta.json.JsonArray;
 
