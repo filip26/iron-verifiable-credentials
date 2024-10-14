@@ -14,7 +14,6 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jwk.JsonWebKey;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeMapping;
@@ -39,10 +38,11 @@ public class HttpMethodResolver implements MethodResolver {
         this.reader = reader;
     }
 
-    public static HttpMethodResolver of(DocumentLoader loader, Class<?>... classes) {
+    public static HttpMethodResolver getInstance(DocumentLoader loader, Class<?>... classes) {
 
         try {
-            TreeMappingBuilder mapping = TreeMapping.createBuilder();
+            TreeMappingBuilder mapping = TreeMapping.createBuilder()
+                    .scan(VerificationMethod.class);
 
             if (classes == null || classes.length == 0) {
                 mapping.scan(Multikey.class)
@@ -54,7 +54,6 @@ public class HttpMethodResolver implements MethodResolver {
             }
 
             JsonLdTreeReader reader = JsonLdTreeReader.of(mapping.build());
-//          .with(proof.methodProcessor());
 
             return new HttpMethodResolver(loader, reader);
 
@@ -64,7 +63,7 @@ public class HttpMethodResolver implements MethodResolver {
 
         return new HttpMethodResolver(loader, JsonLdTreeReader.generic());
     }
-    
+
     @Override
     public VerificationMethod resolve(URI id) throws DocumentError {
 
@@ -75,7 +74,7 @@ public class HttpMethodResolver implements MethodResolver {
             JsonStructure input = doc.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid, "Document"));
 
             JsonStructure context;
-            
+
             // TODO inject @context
 //          .context(proof.methodProcessor().context()) // an optional expansion context
 
@@ -98,5 +97,4 @@ public class HttpMethodResolver implements MethodResolver {
         return "http".equalsIgnoreCase(id.getScheme())
                 || "https".equalsIgnoreCase(id.getScheme());
     }
-
 }

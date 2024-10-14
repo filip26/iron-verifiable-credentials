@@ -40,7 +40,7 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
     protected static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
         resolvers.add(new DidUrlMethodResolver(MulticodecDecoder.getInstance(Tag.Key)));
-        resolvers.add(HttpMethodResolver.of(loader));
+        resolvers.add(HttpMethodResolver.getInstance(loader));
         return resolvers;
     }
 

@@ -270,7 +270,7 @@ public class VcTestRunnerJunit {
     static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
         resolvers.add(new DidUrlMethodResolver(TestAlgorithm.DECODER));
-        resolvers.add(new HttpMethodResolver(loader));
+        resolvers.add(HttpMethodResolver.getInstance(loader));
         return resolvers;
     }
 }

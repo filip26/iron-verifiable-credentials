@@ -22,15 +22,16 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * :package: [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature suite? List it here, open PR.
 * Status Verification
-  * [Bitstring Status List](https://www.w3.org/TR/vc-bitstring-status-list/)
+  * :soon: [Bitstring Status List](https://www.w3.org/TR/vc-bitstring-status-list/)
 * Data Models
   * [v2.0](https://www.w3.org/TR/vc-data-model-2.0)
   * [v1.1](https://www.w3.org/TR/vc-data-model-1.1)
 * Verification Methods
   * `did:key` 
-  * `did:web`
-  * Multikey
-  * custom
+  * `Multikey`
+  * :soon: `did:web`
+  * :soon: `JsonWebKey` 
+  * `custom`
 
 [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
 
