@@ -107,20 +107,20 @@ public class VcTestCase {
                 final JsonObject method = options.getJsonArray(vocab("verificationMethod"))
                         .getJsonObject(0);
 
-                try {
-                JsonLdTreeReader reader = JsonLdTreeReader
-                        .create()
-//                        .with(
+//                try {
+//                JsonLdTreeReader reader = JsonLdTreeReader
+//                        .createBuilder()
+////                        .with(
+////
+////                        )
+//                        .build();
 //
-//                        )
-                        .build();
+//                testCase.verificationMethod = reader.read(method)
+//                        .asFragment().type().materialize(VerificationMethod.class);
 
-                testCase.verificationMethod = reader.read(method)
-                        .asFragment().type().materialize(VerificationMethod.class);
-
-                } catch (NodeAdapterError | TreeBuilderError e) {
-                    fail(e);
-                }
+//                } catch (NodeAdapterError | TreeBuilderError e) {
+//                    fail(e);
+//                }
             }
 
             if (options.containsKey(vocab("created"))) {

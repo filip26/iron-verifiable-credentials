@@ -3,6 +3,7 @@ package com.apicatalog.vc.status.bitstring;
 import java.net.URI;
 import java.util.Collection;
 
+import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
@@ -10,7 +11,7 @@ import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.literal.NumericValue;
 import com.apicatalog.vc.subject.Subject;
 
-public class BitstringStatusList implements Subject {
+public class BitstringStatusList implements Subject, Linkable {
 
     protected URI id;
     protected Collection<String> type;

@@ -3,9 +3,10 @@ package com.apicatalog.vc.subject;
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.orm.Fragment;
 
-public interface Subject extends Linkable {
+@Fragment(generic = true)
+public interface Subject {
 
     URI id();
     

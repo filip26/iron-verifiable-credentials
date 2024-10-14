@@ -39,17 +39,17 @@ public class Reader extends DocumentProcessor<Reader> {
 
     protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
         var resolver = new VcdmResolver();
-        resolver.v11(Vcdm11Reader.with(
-                r -> {
-                },
-                suites));
-        resolver.v20(Vcdm20Reader.with(
-                r -> r.with(
-                        "https://www.w3.org/ns/credentials/status#BitstringStatusListEntry",
-                        BitstringStatusListEntry.class,
-                        BitstringStatusListEntry::of),
-                resolver,
-                suites));
+//        resolver.v11(Vcdm11Reader.with(
+//                r -> {
+//                },
+//                suites));
+//        resolver.v20(Vcdm20Reader.with(
+//                r -> r.with(
+//                        "https://www.w3.org/ns/credentials/status#BitstringStatusListEntry",
+//                        BitstringStatusListEntry.class,
+//                        BitstringStatusListEntry::of),
+//                resolver,
+//                suites));
         return resolver;
     }
 

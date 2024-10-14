@@ -5,8 +5,6 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 
-import com.apicatalog.controller.method.GenericVerificationMethod;
-import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.ld.DocumentError;
@@ -84,10 +82,10 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
 
         proof.nonce = source.lexicalValue(VcdiVocab.NONCE.uri());
 
-        proof.method = source.fragment(
-                VcdiVocab.VERIFICATION_METHOD.uri(),
-                VerificationMethod.class,
-                GenericVerificationMethod::of);
+//        proof.method = source.fragment(
+//                VcdiVocab.VERIFICATION_METHOD.uri(),
+//                VerificationMethod.class,
+//                GenericVerificationMethod::of);
 
         proof.purpose = source.uri(VcdiVocab.PURPOSE.uri());
 

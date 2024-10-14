@@ -78,30 +78,31 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     @Override
     public Proof getProof(Verifiable verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError {
-
-        var reader = JsonLdTreeReader.create()
-                .with(
-                        VcdiVocab.TYPE.uri(),
-                        DataIntegrityProof.class,
-                        //TODO remove suite
-                        source -> DataIntegrityProof.of(verifiable, this, source)
-                        )
-                .with(MultibaseLiteral.typeAdapter(proofValueBase))
-                .with(XsdDateTime.typeAdapter())
-                .build();
-
-        
-        try {
-            var tree = reader.read(Json.createArrayBuilder().add(proof).build());
-
-            return tree.materialize(DataIntegrityProof.class);
-
-        } catch (InvalidSelector e) {
-            throw DocumentError.of(e);
-            
-        } catch (TreeBuilderError | NodeAdapterError e) {
-            throw new DocumentError(e, ErrorType.Invalid, "Proof");
-        }
+        return null;
+//
+//        var reader = JsonLdTreeReader.createBuilder()
+//                .with(
+//                        VcdiVocab.TYPE.uri(),
+//                        DataIntegrityProof.class,
+//                        //TODO remove suite
+//                        source -> DataIntegrityProof.of(verifiable, this, source)
+//                        )
+//                .with(MultibaseLiteral.typeAdapter(proofValueBase))
+//                .with(XsdDateTime.typeAdapter())
+//                .build();
+//
+//        
+//        try {
+//            var tree = reader.read(Json.createArrayBuilder().add(proof).build());
+//
+//            return tree.materialize(DataIntegrityProof.class);
+//
+//        } catch (InvalidSelector e) {
+//            throw DocumentError.of(e);
+//            
+//        } catch (TreeBuilderError | NodeAdapterError e) {
+//            throw new DocumentError(e, ErrorType.Invalid, "Proof");
+//        }
     }
 
 //    @Override

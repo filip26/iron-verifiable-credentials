@@ -3,14 +3,19 @@ package com.apicatalog.vc.status.bitstring;
 import java.net.URI;
 import java.util.Collection;
 
+import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.literal.NumericValue;
+import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.vc.status.Status;
 
-public class BitstringStatusListEntry implements Status {
+@Fragment
+@Vocab("https://www.w3.org/ns/credentials/status#")
+public class BitstringStatusListEntry implements Status, Linkable {
 
     protected URI id;
     

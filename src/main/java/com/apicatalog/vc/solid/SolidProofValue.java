@@ -2,7 +2,7 @@ package com.apicatalog.vc.solid;
 
 import java.util.Objects;
 
-import com.apicatalog.controller.key.RawKey;
+import com.apicatalog.controller.method.RawKey;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.Signature;
 import com.apicatalog.cryptosuite.VerificationError;
@@ -39,7 +39,7 @@ public record SolidProofValue(
         signature.verify(
                 data,
                 unsignedProof,
-                publicKey.raw(),
+                publicKey.rawBytes(),
                 toByteArray);
     }
 }

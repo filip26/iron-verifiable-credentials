@@ -120,8 +120,8 @@ public abstract class AbstractIssuer implements Issuer {
             final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         if (keyPair.privateKey() == null 
-                || keyPair.privateKey().raw() == null
-                || keyPair.privateKey().raw().length == 0) {
+                || keyPair.privateKey().rawBytes() == null
+                || keyPair.privateKey().rawBytes().length == 0) {
             throw new IllegalArgumentException("The private key is not provided, is null or an empty array.");
         }
 

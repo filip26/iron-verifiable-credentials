@@ -29,6 +29,12 @@ class TestSignatureSuite extends DataIntegritySuite {
             // TODO Auto-generated method stub
             return null;
         }
+
+        @Override
+        public String type() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     };
 
     static final String TEST_CRYPTO_NAME = "test-2022";

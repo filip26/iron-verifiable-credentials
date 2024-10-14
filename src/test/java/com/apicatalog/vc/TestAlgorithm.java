@@ -12,8 +12,8 @@ import com.apicatalog.cryptosuite.algorithm.Signer;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.multicodec.MulticodecKey;
-import com.apicatalog.multikey.MultiKey;
+import com.apicatalog.multicodec.key.MulticodecKey;
+import com.apicatalog.multikey.GenericMultikey;
 
 class TestAlgorithm implements Signer {
 
@@ -76,7 +76,7 @@ class TestAlgorithm implements Signer {
             }
 
             @Override
-            public byte[] raw() {
+            public byte[] rawBytes() {
                 return raw;
             }
 
@@ -94,7 +94,7 @@ class TestAlgorithm implements Signer {
             }
 
             @Override
-            public byte[] raw() {
+            public byte[] rawBytes() {
                 return raw;
             }
 
@@ -104,7 +104,7 @@ class TestAlgorithm implements Signer {
             }
         };
 
-        return MultiKey.of(null, null, publicKey, privateKey);
+        return GenericMultikey.of(null, null, publicKey, privateKey);
     }
 
     public static void main(String[] args) throws KeyGenError {

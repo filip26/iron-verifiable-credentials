@@ -24,24 +24,24 @@ public class Vcdm11Reader extends VcdmReader {
         super(VcdmVersion.V11, reader, suites);
     }
 
-    public static Vcdm11Reader with(
-            final Consumer<JsonLdTreeReader.Builder> apply,
-            final SignatureSuite... suites) {
-
-        JsonLdTreeReader.Builder reader = JsonLdTreeReader
-                .create()
-                .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
-                        Vcdm11Credential.class,
-                        Vcdm11Credential::of)
-                .with(VcdmVocab.PRESENTATION_TYPE.uri(),
-                        Vcdm11Presentation.class,
-                        Vcdm11Presentation::of)
-                .with(XsdDateTime.typeAdapter());
-        
-        apply.accept(reader);
-
-        return new Vcdm11Reader(reader.build(), suites);
-    }
+//    public static Vcdm11Reader with(
+//            final Consumer<JsonLdTreeReader.Builder> apply,
+//            final SignatureSuite... suites) {
+//
+//        JsonLdTreeReader.Builder reader = JsonLdTreeReader
+//                .createBuilder()
+//                .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
+//                        Vcdm11Credential.class,
+//                        Vcdm11Credential::of)
+//                .with(VcdmVocab.PRESENTATION_TYPE.uri(),
+//                        Vcdm11Presentation.class,
+//                        Vcdm11Presentation::of)
+//                .with(XsdDateTime.typeAdapter());
+//        
+//        apply.accept(reader);
+//
+//        return new Vcdm11Reader(reader.build(), suites);
+//    }
 
     @Override
     protected VerifiableReader resolve(Collection<String> context) throws DocumentError {

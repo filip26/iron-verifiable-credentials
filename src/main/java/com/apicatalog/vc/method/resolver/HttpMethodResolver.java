@@ -1,88 +1,96 @@
 package com.apicatalog.vc.method.resolver;
 
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.apicatalog.controller.method.GenericVerificationMethod;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
+import com.apicatalog.jsonld.document.Document;
+import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
+import com.apicatalog.jwk.JsonWebKey;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multibase.MultibaseLiteral;
-import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Tag;
-import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.multikey.MultiKey;
+import com.apicatalog.linkedtree.orm.mapper.TreeMapping;
+import com.apicatalog.linkedtree.orm.mapper.TreeMappingBuilder;
+import com.apicatalog.multikey.Multikey;
 
 import jakarta.json.JsonArray;
+import jakarta.json.JsonStructure;
 
 public class HttpMethodResolver implements MethodResolver {
 
-    protected DocumentLoader loader;
+    private static final Logger LOGGER = Logger.getLogger(HttpMethodResolver.class.getName());
 
-    protected JsonLdTreeReader reader;
-    
+    final DocumentLoader loader;
 
-//    protected static Multicodec PUBLIC_KEY_CODEC = Multicodec.of(
-//            "test-pub",
-//            Tag.Key,
-//            12345l);
-//
-//    protected static Multicodec PRIVATE_KEY_CODEC = Multicodec.of(
-//            "test-priv",
-//            Tag.Key,
-//            12346l);
-//
-//    protected static MulticodecDecoder DECODER = MulticodecDecoder.getInstance(
-//            PUBLIC_KEY_CODEC,
-//            PRIVATE_KEY_CODEC);
-//    
+    final JsonLdTreeReader reader;
+
     public HttpMethodResolver(
-            DocumentLoader loader
-            ) {
+            DocumentLoader loader,
+            JsonLdTreeReader reader) {
         this.loader = loader;
-        this.reader = JsonLdTreeReader
-                .create()
-//                .with(
-//                        MultiKey.typeName(), 
-//                        MultiKey.class,
-//                        source -> MultiKey.of(source, DECODER)
-//                        )
-                .with(MultibaseLiteral.typeAdapter(Multibase.BASE_58_BTC))
-//              .with(proof.methodProcessor());
-                .build();
+        this.reader = reader;
+    }
+
+    public static HttpMethodResolver of(DocumentLoader loader, Class<?>... classes) {
+
+        try {
+            TreeMappingBuilder mapping = TreeMapping.createBuilder();
+
+            if (classes == null || classes.length == 0) {
+                mapping.scan(Multikey.class)
+                        .scan(JsonWebKey.class);
+            } else {
+                for (Class<?> clazz : classes) {
+                    mapping.scan(clazz);
+                }
+            }
+
+            JsonLdTreeReader reader = JsonLdTreeReader.of(mapping.build());
+//          .with(proof.methodProcessor());
+
+            return new HttpMethodResolver(loader, reader);
+
+        } catch (NodeAdapterError e) {
+            LOGGER.log(Level.SEVERE, e, () -> "An unexpected error, falling back to a generic reader.");
+        }
+
+        return new HttpMethodResolver(loader, JsonLdTreeReader.generic());
     }
     
     @Override
     public VerificationMethod resolve(URI id) throws DocumentError {
 
         try {
-            final JsonArray document = JsonLd.expand(id)
+
+            Document doc = loader.loadDocument(id, new DocumentLoaderOptions());
+
+            JsonStructure input = doc.getJsonContent().orElseThrow(() -> new DocumentError(ErrorType.Invalid, "Document"));
+
+            JsonStructure context;
+            
+            // TODO inject @context
+//          .context(proof.methodProcessor().context()) // an optional expansion context
+
+            final JsonArray document = JsonLd.expand((JsonDocument) doc)
                     .undefinedTermsPolicy(ProcessingPolicy.Fail)
                     .loader(loader)
-//                    .context(proof.methodProcessor().context()) // an optional expansion context
                     .get();
 
-            final LinkedTree tree = reader.read(document);
-//NodeDebugWriter.writeToStdOut(tree);
-            if (tree != null
-                    && tree.nodes().size() == 1
-                    && tree.node().isFragment()) {
-                if (tree.fragment().type().isAdaptableTo(VerificationMethod.class)) {
-                    return tree.fragment().type().materialize(VerificationMethod.class);
-                }
-                return GenericVerificationMethod.of(tree.fragment());                
-            }
+            return reader.read(VerificationMethod.class, document);
 
         } catch (Exception e) {
             throw new DocumentError(e, ErrorType.Invalid, "ProofVerificationMethod");
         }
 
-        throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
+//        throw new DocumentError(ErrorType.Unknown, "ProofVerificationMethod");
     }
 
     @Override

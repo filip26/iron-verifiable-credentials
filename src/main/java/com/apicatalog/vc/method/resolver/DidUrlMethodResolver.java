@@ -28,8 +28,7 @@ public class DidUrlMethodResolver implements MethodResolver {
             final DidDocument didDocument = resolver.resolve(DidUrl.of(uri));
 
             return didDocument
-                    .verificationMethod().stream()
-//                    .map(did -> from(did, codecs))
+                    .verification().stream()
                     .findFirst()
                     .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "ProofVerificationMethod"));
         } catch (IllegalArgumentException e) {
@@ -41,22 +40,4 @@ public class DidUrlMethodResolver implements MethodResolver {
     public boolean isAccepted(URI uri) {
         return DidUrl.isDidUrl(uri);
     }
-
-//    @Deprecated
-//    public static final MultiKey from(VerificationMethod did, final MulticodecDecoder codecs) {
-//        final MultiKey multikey = new MultiKey();
-//        multikey.id(did.id().toUri());
-//        multikey.controller(did.controller().toUri());
-//        
-//        //TODO improve
-//        final Multicodec codec = codecs.getCodec(did.publicKey()).orElseThrow(IllegalArgumentException::new);
-//        
-//        if (!codec.isEncoded(did.publicKey())) {
-//            throw new IllegalArgumentException("Unsupported key encoding [" + did + "].");
-//        }
-//
-//        multikey.algorithm(MultiKeyAdapter.getAlgorithmName(codec));
-//        multikey.publicKey(codec.decode(did.publicKey()));
-//        return multikey;
-//    }
 }

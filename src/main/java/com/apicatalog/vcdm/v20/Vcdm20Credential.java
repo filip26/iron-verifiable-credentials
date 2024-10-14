@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.lang.LangStringSelector;
@@ -38,10 +39,10 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
     protected static Vcdm20Credential setup(Vcdm20Credential credential, LinkedFragment source) throws NodeAdapterError {
         credential.validFrom = source.xsdDateTime(VcdmVocab.VALID_FROM.uri());
         credential.validUntil = source.xsdDateTime(VcdmVocab.VALID_UNTIL.uri());
-        
+
         credential.name = source.languageMap(VcdmVocab.NAME.uri());
         credential.description = source.languageMap(VcdmVocab.DESCRIPTION.uri());
-        
+
         return credential;
     }
 
@@ -49,14 +50,15 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
     public void validate() throws DocumentError {
 
         super.validate();
-        
+
         for (Subject item : subject()) {
-            if (item.ld().asFragment().terms().isEmpty()) {
+            if (item instanceof Linkable ld
+                    && ld.ld().asFragment().terms().isEmpty()) {
                 throw new DocumentError(ErrorType.Invalid, VcdmVocab.SUBJECT);
             }
             item.validate();
         }
-        
+
         if ((validFrom() != null
                 && validUntil() != null
                 && validFrom().isAfter(validUntil()))) {

@@ -2,7 +2,7 @@ package com.apicatalog.vc.proof;
 
 import java.util.Collection;
 
-import com.apicatalog.controller.key.RawKey;
+import com.apicatalog.controller.method.RawKey;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;

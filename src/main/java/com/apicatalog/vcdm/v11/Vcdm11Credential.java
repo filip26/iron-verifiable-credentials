@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.vc.Credential;
@@ -60,8 +61,9 @@ public class Vcdm11Credential extends VcdmCredential implements Credential {
         super.validate();
 
         for (Subject item : subject()) {
-            if (item.ld().asFragment().terms().isEmpty()
-                    && item.ld().asFragment().id() == null) {
+            if (item instanceof Linkable ld
+                    && ld.ld().asFragment().terms().isEmpty()
+                    && item.id() == null) {
                 throw new DocumentError(ErrorType.Invalid, VcdmVocab.SUBJECT);
             }
             item.validate();
