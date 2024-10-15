@@ -3,10 +3,13 @@ package com.apicatalog.vc.issuer;
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Id;
 
-public interface CredentialIssuer extends Linkable {
+@Fragment(generic = true)
+public interface CredentialIssuer {
 
+    @Id
     URI id();
 
     /**

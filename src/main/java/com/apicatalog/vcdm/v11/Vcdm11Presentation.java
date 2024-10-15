@@ -6,14 +6,14 @@ import com.apicatalog.vc.Presentation;
 import com.apicatalog.vcdm.VcdmPresentation;
 import com.apicatalog.vcdm.VcdmVersion;
 
-public class Vcdm11Presentation extends VcdmPresentation implements Presentation {
+public class Vcdm11Presentation  {
 
-    public static Presentation of(LinkedFragment source) throws NodeAdapterError {
-        return setup(new Vcdm11Presentation(), source);
-    }
-
-    @Override
-    public VcdmVersion version() {
-        return VcdmVersion.V11;
-    }
+//    public static Presentation of(LinkedFragment source) throws NodeAdapterError {
+//        return setup(new Vcdm11Presentation(), source);
+//    }
+//
+//    @Override
+//    public VcdmVersion version() {
+//        return VcdmVersion.V11;
+//    }
 }

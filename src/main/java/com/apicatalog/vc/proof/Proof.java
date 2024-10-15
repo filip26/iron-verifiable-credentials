@@ -11,6 +11,7 @@ import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.vcdi.DataIntegrityProof;
 
 import jakarta.json.JsonObject;
@@ -21,6 +22,7 @@ import jakarta.json.JsonStructure;
  *
  * @see {@link DataIntegrityProof} for an example implementation
  */
+@Fragment(generic = true)
 public interface Proof extends Linkable {
 
     /**

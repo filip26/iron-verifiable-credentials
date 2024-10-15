@@ -1,14 +1,20 @@
 package com.apicatalog.vcdm.v20;
 
+import java.net.URI;
 import java.time.Instant;
+import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.lang.LangStringSelector;
 import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.issuer.CredentialIssuer;
+import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmCredential;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -32,7 +38,7 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
 
     public static Credential of(LinkedFragment source) throws NodeAdapterError {
         var credential = new Vcdm20Credential();
-        VcdmCredential.setup(credential, source);
+//        VcdmCredential.setup(credential, source);
         return setup(credential, source);
     }
 
@@ -49,7 +55,7 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
     @Override
     public void validate() throws DocumentError {
 
-        super.validate();
+//        super.validate();
 
         for (Subject item : subject()) {
             if (item instanceof Linkable ld
@@ -76,10 +82,10 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
         return (validFrom != null && validFrom.isAfter(Instant.now()));
     }
 
-    @Override
-    public VcdmVersion version() {
-        return VcdmVersion.V20;
-    }
+//    @Override
+//    public VcdmVersion version() {
+//        return VcdmVersion.V20;
+//    }
 
     /**
      * A date time from the credential is valid.
@@ -108,5 +114,47 @@ public class Vcdm20Credential extends VcdmCredential implements Credential {
 
     public LangStringSelector name() {
         return name;
+    }
+
+    @Override
+    public URI id() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<String> type() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<Proof> proofs() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public LinkedNode ld() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public CredentialIssuer issuer() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<Status> status() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<Subject> subject() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

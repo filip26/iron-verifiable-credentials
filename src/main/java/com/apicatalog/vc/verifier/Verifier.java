@@ -31,13 +31,11 @@ import com.apicatalog.vc.reader.ReaderResolver;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
-import com.apicatalog.vc.status.bitstring.BitstringStatusListEntry;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmResolver;
-import com.apicatalog.vcdm.v11.Vcdm11Reader;
-import com.apicatalog.vcdm.v20.Vcdm20Reader;
+import com.apicatalog.vcdm.v11.Vcdm11Reader2;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -65,6 +63,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
         var resolver = new VcdmResolver();
+        resolver.v11(Vcdm11Reader2.with(suites));
 //        resolver.v11(Vcdm11Reader.with(
 //                r -> {
 //                },

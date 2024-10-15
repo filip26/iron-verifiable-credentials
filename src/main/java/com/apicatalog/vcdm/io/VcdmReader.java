@@ -27,11 +27,11 @@ import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.proof.GenericProof;
 import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.proof.ProofConsumer;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmPresentation;
-import com.apicatalog.vcdm.VcdmVerifiable;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
@@ -198,11 +198,11 @@ public abstract class VcdmReader implements VerifiableReader {
             // detach proofs
             final JsonArray jsonProofs = EmbeddedProof.getProofs(expanded.iterator().next().asJsonObject());
 
-            if (verifiable instanceof VcdmVerifiable vcdmVerifiable) {
-                vcdmVerifiable.proofs(
-                        jsonProofs == null || jsonProofs.isEmpty()
-                                ? Collections.emptyList()
-                                : getProofs(verifiable, jsonProofs, loader));
+            if (jsonProofs != null 
+                    && !jsonProofs.isEmpty() 
+                    && verifiable instanceof ProofConsumer proofConsumer) {
+                    
+                    setProofs(proofConsumer, verifiable, jsonProofs, loader);
             }
 
             return verifiable;
@@ -215,10 +215,8 @@ public abstract class VcdmReader implements VerifiableReader {
         }
     }
 
-    protected Collection<Proof> getProofs(Verifiable verifiable, JsonArray jsonProofs, DocumentLoader loader) throws DocumentError {
+    protected void setProofs(ProofConsumer consumer, Verifiable verifiable, JsonArray jsonProofs, DocumentLoader loader) throws DocumentError {
         try {
-            final Collection<Proof> proofs = new ArrayList<>(jsonProofs.size());
-
             // read proofs
             for (final JsonValue jsonProofGraph : jsonProofs) {
 
@@ -246,9 +244,8 @@ public abstract class VcdmReader implements VerifiableReader {
                     proof = GenericProof.of(proofTree.fragment());
                 }
 
-                proofs.add(proof);
+                consumer.accept(proof);
             }
-            return proofs;
 
         } catch (InvalidSelector e) {
             throw DocumentError.of(e);

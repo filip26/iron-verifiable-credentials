@@ -12,7 +12,7 @@ import com.apicatalog.vc.model.RefreshService;
 import com.apicatalog.vc.model.TermsOfUse;
 import com.apicatalog.vc.status.Status;
 
-public interface VcdmCredential2 extends VcdmVerifiable2, Credential {
+public interface VcdmCredential2 extends VcdmVerifiable, Credential {
     
     Collection<Evidence> evidence();
     

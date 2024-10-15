@@ -7,7 +7,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.vc.Presentation;
 
-public interface VcdmPresentation2 extends VcdmVerifiable2, Presentation {
+public interface VcdmPresentation2 extends VcdmVerifiable, Presentation {
 
 //
 //    protected static VcdmPresentation2 setup(VcdmPresentation2 presentation, LinkedFragment source) throws NodeAdapterError {

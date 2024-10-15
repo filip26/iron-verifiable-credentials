@@ -59,6 +59,7 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
         if (methodType != null
                 && method instanceof VerificationKey
                 && (((VerificationKey) method).publicKey() != null)) {
+            //TODO accept method
             return Optional.of(method);
         }
 
