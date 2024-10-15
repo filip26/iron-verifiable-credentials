@@ -20,6 +20,7 @@ import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
+import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.linkedtree.selector.InvalidSelector;
 import com.apicatalog.linkedtree.traversal.NodeSelector.TraversalPolicy;
 import com.apicatalog.vc.Credential;
@@ -27,7 +28,6 @@ import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.proof.GenericProof;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vc.proof.ProofConsumer;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.EmbeddedProof;
@@ -198,11 +198,10 @@ public abstract class VcdmReader implements VerifiableReader {
             // detach proofs
             final JsonArray jsonProofs = EmbeddedProof.getProofs(expanded.iterator().next().asJsonObject());
 
-            if (jsonProofs != null 
-                    && !jsonProofs.isEmpty() 
-                    && verifiable instanceof ProofConsumer proofConsumer) {
-                    
-                    setProofs(proofConsumer, verifiable, jsonProofs, loader);
+            if (jsonProofs != null
+                    && !jsonProofs.isEmpty()
+                    && verifiable instanceof PropertyValueConsumer proofConsumer) {
+                proofConsumer.acceptFragmentPropertyValue("proofs", getProofs(verifiable, jsonProofs, loader));
             }
 
             return verifiable;
@@ -215,8 +214,10 @@ public abstract class VcdmReader implements VerifiableReader {
         }
     }
 
-    protected void setProofs(ProofConsumer consumer, Verifiable verifiable, JsonArray jsonProofs, DocumentLoader loader) throws DocumentError {
+    protected Collection<Proof> getProofs(Verifiable verifiable, JsonArray jsonProofs, DocumentLoader loader) throws DocumentError {
         try {
+            final Collection<Proof> proofs = new ArrayList<>(jsonProofs.size());
+
             // read proofs
             for (final JsonValue jsonProofGraph : jsonProofs) {
 
@@ -244,8 +245,9 @@ public abstract class VcdmReader implements VerifiableReader {
                     proof = GenericProof.of(proofTree.fragment());
                 }
 
-                consumer.accept(proof);
+                proofs.add(proof);
             }
+            return proofs;
 
         } catch (InvalidSelector e) {
             throw DocumentError.of(e);
