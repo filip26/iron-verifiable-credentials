@@ -59,4 +59,10 @@ public record GenericProof(
     public static GenericProof of(LinkedNode source) throws InvalidSelector {
         return new GenericProof(source.asFragment().uri(), source);
     }
+
+    @Override
+    public URI purpose() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

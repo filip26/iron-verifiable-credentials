@@ -13,7 +13,7 @@ import jakarta.json.JsonObject;
  * A container providing primitives to process a proof.
  */
 public interface SignatureSuite {
-    
+
     /**
      * Creates a new issuer instance initialized with provided key pair.
      * 
@@ -27,9 +27,9 @@ public interface SignatureSuite {
     /**
      * Check if the given proof can be processed by the suite.
      * 
-     * @param verifiable a verifiable to which the proof is bound
-     * @param proofType an URI representing a proof JSON-LD type
-     * @param proof     a proof in an expanded JSON-LD form
+     * @param verifiable a verifiable to which the proof is bound to
+     * @param proofType  an URI representing a proof JSON-LD type
+     * @param proof      a proof in an expanded JSON-LD form
      * 
      * @return <code>true</code> if the proof is supported, <code>false</code>
      *         otherwise
@@ -39,8 +39,8 @@ public interface SignatureSuite {
     /**
      * Deserialize the given expanded JSON-LD object into a {@link Proof}.
      * 
-     * @param verifiable a verifiable to which the proof is bound
-     * @param proof JSON-LD object in an expanded form
+     * @param verifiable a verifiable to which the proof is bound to
+     * @param proof      JSON-LD object in an expanded form
      * @param loader
      * 
      * @return a new {@link Proof} instance

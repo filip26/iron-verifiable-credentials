@@ -7,22 +7,15 @@ import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
-import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.linkedtree.selector.InvalidSelector;
-import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multibase.MultibaseLiteral;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue.ValueType;
 
@@ -146,6 +139,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //    }
 
     protected static String getCryptoSuiteName(final JsonObject proof) {
+
         Objects.requireNonNull(proof);
 
         if (proof.containsKey(VcdiVocab.CRYPTO_SUITE.uri())

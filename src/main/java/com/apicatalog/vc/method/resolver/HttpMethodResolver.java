@@ -1,6 +1,8 @@
 package com.apicatalog.vc.method.resolver;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,29 +13,32 @@ import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
-import com.apicatalog.jwk.JsonWebKey;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeMappingBuilder;
-import com.apicatalog.multikey.Multikey;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonStructure;
 
+@Deprecated
 public class HttpMethodResolver implements MethodResolver {
 
     private static final Logger LOGGER = Logger.getLogger(HttpMethodResolver.class.getName());
 
+    Collection<String> contexts;
+    
     final DocumentLoader loader;
 
     final JsonLdTreeReader reader;
 
     public HttpMethodResolver(
+            Collection<String> contexts,
             DocumentLoader loader,
             JsonLdTreeReader reader) {
+        this.contexts = contexts;
         this.loader = loader;
         this.reader = reader;
     }
@@ -44,28 +49,27 @@ public class HttpMethodResolver implements MethodResolver {
             TreeMappingBuilder mapping = TreeMapping.createBuilder()
                     .scan(VerificationMethod.class);
 
-            if (classes == null || classes.length == 0) {
-                mapping.scan(Multikey.class)
-                        .scan(JsonWebKey.class);
-            } else {
+            if (classes != null && classes.length > 0) {
                 for (Class<?> clazz : classes) {
                     mapping.scan(clazz);
                 }
             }
 
             JsonLdTreeReader reader = JsonLdTreeReader.of(mapping.build());
+            
+            Collection<String> contexts = mapping.contexts(VerificationMethod.class);
 
-            return new HttpMethodResolver(loader, reader);
+            return new HttpMethodResolver(contexts, loader, reader);
 
         } catch (NodeAdapterError e) {
             LOGGER.log(Level.SEVERE, e, () -> "An unexpected error, falling back to a generic reader.");
         }
 
-        return new HttpMethodResolver(loader, JsonLdTreeReader.generic());
+        return new HttpMethodResolver(Collections.emptyList(), loader, JsonLdTreeReader.generic());
     }
 
     @Override
-    public VerificationMethod resolve(URI id) throws DocumentError {
+    public VerificationMethod resolve(URI id, URI purpose) throws DocumentError {
 
         try {
 

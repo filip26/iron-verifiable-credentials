@@ -9,11 +9,13 @@ import com.apicatalog.controller.method.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.jwk.JsonWebKey;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
+import com.apicatalog.multikey.Multikey;
+import com.apicatalog.vc.method.resolver.DidKeyMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.processor.DocumentProcessor;
@@ -39,8 +41,8 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
 
     protected static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver(MulticodecDecoder.getInstance(Tag.Key)));
-        resolvers.add(HttpMethodResolver.getInstance(loader));
+        resolvers.add(new DidKeyMethodResolver(MulticodecDecoder.getInstance(Tag.Key)));
+        resolvers.add(HttpMethodResolver.getInstance(loader, Multikey.class, JsonWebKey.class));
         return resolvers;
     }
 
@@ -78,7 +80,7 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
 
         // try to resolve the method
         if (resolver.isPresent()) {
-            return Optional.ofNullable(resolver.get().resolve(id));
+            return Optional.ofNullable(resolver.get().resolve(id, proof.purpose()));
         }
 
         throw new DocumentError(ErrorType.Unknown, "VerificationMethod");

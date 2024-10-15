@@ -48,7 +48,7 @@ public interface Proof extends Linkable {
     URI id();
 
     Collection<String> type();
-    
+
     /**
      * Must be processed after the previous proof. Allow to create a chain of
      * proofs. Optional.
@@ -63,6 +63,14 @@ public interface Proof extends Linkable {
      * @return {@link CryptoSuite} attached to the proof.
      */
     CryptoSuite cryptoSuite();
+
+    /**
+     * The intent for the proof, the reason why an entity created it. e.g.
+     * an assertion, authentication.
+     *
+     * @return {@link URI} identifying the purpose
+     */
+    URI purpose();
 
     /**
      * Validates the proof data, not a signature.

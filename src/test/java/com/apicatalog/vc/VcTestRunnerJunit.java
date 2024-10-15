@@ -29,10 +29,11 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.multikey.Multikey;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.method.resolver.DidUrlMethodResolver;
+import com.apicatalog.vc.method.resolver.DidKeyMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.MethodResolver;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
@@ -269,7 +270,7 @@ public class VcTestRunnerJunit {
 
     static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
         Collection<MethodResolver> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidUrlMethodResolver(TestAlgorithm.DECODER));
+        resolvers.add(new DidKeyMethodResolver(TestAlgorithm.DECODER));
         resolvers.add(HttpMethodResolver.getInstance(loader));
         return resolvers;
     }

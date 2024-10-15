@@ -2,6 +2,7 @@ package com.apicatalog.vc.method;
 
 import com.apicatalog.linkedtree.type.TypeAdapter;
 
+@Deprecated
 public interface MethodAdapter extends TypeAdapter {
 
     /**

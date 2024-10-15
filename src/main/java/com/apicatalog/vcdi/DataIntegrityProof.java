@@ -137,7 +137,7 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
      *
      * @return {@link URI} identifying the purpose
      */
-    public URI getPurpose() {
+    public URI purpose() {
         return purpose;
     }
 
