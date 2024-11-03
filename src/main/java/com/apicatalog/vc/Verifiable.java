@@ -7,7 +7,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Id;
-import com.apicatalog.linkedtree.orm.Provided;
+import com.apicatalog.linkedtree.orm.Type;
 import com.apicatalog.vc.proof.Proof;
 
 /**
@@ -21,9 +21,9 @@ public interface Verifiable extends Linkable {
     @Id
     URI id();
 
+    @Type
     Collection<String> type();
 
-    @Provided
     Collection<Proof> proofs();
 
     default boolean isCredential() {

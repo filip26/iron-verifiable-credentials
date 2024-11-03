@@ -1,17 +1,19 @@
 package com.apicatalog.vcdm.v11;
 
 import java.time.Instant;
+import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Literal;
+import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
-import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmCredential2;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -20,8 +22,12 @@ import com.apicatalog.vcdm.VcdmVocab;
 @Fragment
 @Term("VerifiableCredential")
 @Vocab("https://www.w3.org/2018/credentials#")
-public interface Vcdm11Credential2 extends VcdmCredential2, Credential {
+public interface Vcdm11Credential2 extends VcdmCredential2 {
 
+    @Provided
+    @Override
+    Collection<Proof> proofs();
+    
     /**
      * Checks if the credential is expired.
      *

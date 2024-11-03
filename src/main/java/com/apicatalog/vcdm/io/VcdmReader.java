@@ -231,6 +231,7 @@ public abstract class VcdmReader implements VerifiableReader {
 
                 Proof proof = null;
 
+                // find a suite that can materialize the proof
                 for (SignatureSuite suite : suites) {
                     if (suite.isSupported(verifiable, proofTypes.iterator().next(), jsonProof.asJsonObject())) {
                         proof = suite.getProof(verifiable, jsonProof.asJsonObject(), loader);
@@ -240,11 +241,13 @@ public abstract class VcdmReader implements VerifiableReader {
                     }
                 }
 
+                // process as a generic, i.e. an unknown, proof
                 if (proof == null) {
                     var proofTree = reader.read(Json.createArrayBuilder().add(jsonProof).build());
                     proof = GenericProof.of(proofTree.fragment());
                 }
 
+                // add a proof to the list
                 proofs.add(proof);
             }
             return proofs;

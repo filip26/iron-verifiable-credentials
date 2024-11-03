@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
+import com.apicatalog.linkedtree.orm.Type;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.model.CredentialSchema;
 import com.apicatalog.vc.model.Evidence;
@@ -91,6 +92,7 @@ public interface VcdmCredential2 extends VcdmVerifiable, Credential {
         }        
     }
     
+    @Type
     @Override
     default Collection<String> type() {
         return ld().asFragment().type().stream().toList();

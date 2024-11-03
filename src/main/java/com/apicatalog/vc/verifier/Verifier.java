@@ -63,7 +63,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
         var resolver = new VcdmResolver();
-//        resolver.v11(Vcdm11Reader2.with(suites));
+        resolver.v11(Vcdm11Reader2.with(suites));
 //        resolver.v11(Vcdm11Reader.with(
 //                r -> {
 //                },

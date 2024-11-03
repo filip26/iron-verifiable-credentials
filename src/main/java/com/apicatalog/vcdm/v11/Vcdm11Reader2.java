@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.linkedtree.orm.mapper.TreeMapping;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeMappingBuilder;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -32,8 +32,7 @@ public class Vcdm11Reader2 extends VcdmReader {
             Class<?>[] types,
             final SignatureSuite... suites) {
 
-//        try {
-        TreeMappingBuilder builder = TreeMapping.createBuilder();
+        TreeMappingBuilder builder = TreeReaderMapping.createBuilder();
         for (Class<?> type : types) {
             builder.scan(type);
         }
@@ -41,10 +40,6 @@ public class Vcdm11Reader2 extends VcdmReader {
                 .scan(Vcdm11Presentation2.class);
 
         return new Vcdm11Reader(JsonLdTreeReader.of(builder.build()), suites);
-
-//        } catch (NodeAdapterError e) {
-//            throw new IllegalArgumentException(e);
-//        }
     }
 
     @Override
