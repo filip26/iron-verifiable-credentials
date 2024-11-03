@@ -1,6 +1,6 @@
 package com.apicatalog.cryptosuite;
 
-import com.apicatalog.controller.method.KeyPair;
+import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
 import com.apicatalog.cryptosuite.algorithm.Digester;
 import com.apicatalog.cryptosuite.algorithm.Signer;

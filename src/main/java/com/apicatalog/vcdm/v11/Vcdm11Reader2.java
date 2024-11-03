@@ -3,7 +3,6 @@ package com.apicatalog.vcdm.v11;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeMappingBuilder;
@@ -33,19 +32,19 @@ public class Vcdm11Reader2 extends VcdmReader {
             Class<?>[] types,
             final SignatureSuite... suites) {
 
-        try {
-            TreeMappingBuilder builder = TreeMapping.createBuilder();
-            for (Class<?> type : types) {
-                builder.scan(type);
-            }
-            builder.scan(Vcdm11Credential2.class)
-                    .scan(Vcdm11Presentation2.class);
-
-            return new Vcdm11Reader(JsonLdTreeReader.of(builder.build()), suites);
-
-        } catch (NodeAdapterError e) {
-            throw new IllegalArgumentException(e);
+//        try {
+        TreeMappingBuilder builder = TreeMapping.createBuilder();
+        for (Class<?> type : types) {
+            builder.scan(type);
         }
+        builder.scan(Vcdm11Credential2.class)
+                .scan(Vcdm11Presentation2.class);
+
+        return new Vcdm11Reader(JsonLdTreeReader.of(builder.build()), suites);
+
+//        } catch (NodeAdapterError e) {
+//            throw new IllegalArgumentException(e);
+//        }
     }
 
     @Override

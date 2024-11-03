@@ -1,6 +1,6 @@
 package com.apicatalog.cryptosuite.algorithm;
 
-import com.apicatalog.controller.method.KeyPair;
+import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.KeyGenError;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;

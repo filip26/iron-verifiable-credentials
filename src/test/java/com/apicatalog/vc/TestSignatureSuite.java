@@ -1,6 +1,6 @@
 package com.apicatalog.vc;
 
-import com.apicatalog.controller.method.KeyPair;
+import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.primitive.MessageDigest;
 import com.apicatalog.cryptosuite.primitive.Urdna2015;

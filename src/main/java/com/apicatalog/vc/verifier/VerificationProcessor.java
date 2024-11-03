@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 
-import com.apicatalog.controller.method.VerificationKey;
+import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.jsonld.loader.DocumentLoader;

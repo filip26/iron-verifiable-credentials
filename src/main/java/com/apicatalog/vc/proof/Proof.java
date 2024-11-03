@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
-import com.apicatalog.controller.method.VerificationKey;
+import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.SigningError;

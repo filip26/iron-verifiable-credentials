@@ -17,12 +17,12 @@ public class VerifiableTree {
     public static LinkedTree unsigned(Verifiable verifiable) {
 
         if (verifiable.isCredential()) {
-            return verifiable.ld().root();
+            return verifiable.ld().asFragment().root();
         }
 
         if (verifiable.isPresentation()) {
 
-            var x = new TreeComposer(verifiable.ld().root()) {
+            var x = new TreeComposer(verifiable.ld().asFragment().root()) {
 
                 GenericTreeCompiler compiler = new GenericTreeCompiler();
 
@@ -60,7 +60,7 @@ public class VerifiableTree {
                         0,
                         VcdmVocab.VERIFIABLE_CREDENTIALS.uri(),
                         index),
-                        credential.ld().root())
+                        credential.ld().asFragment().root())
                         .inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), index,
                                 VcdmVocab.PROOF.uri()),
                                 GenericContainer.empty(null)); // FIXME hack
@@ -72,7 +72,7 @@ public class VerifiableTree {
                             index,
                             VcdmVocab.PROOF.uri(),
                             proofIndex++),
-                            proof.ld().root());
+                            proof.ld().asFragment().root());
                 }
                 index++;
             }
@@ -89,7 +89,7 @@ public class VerifiableTree {
 
     public static LinkedTree compose(Verifiable verifiable) {
         if (verifiable.isCredential()) {
-            var crendential = new TreeComposer(verifiable.ld().root()) {
+            var crendential = new TreeComposer(verifiable.ld().asFragment().root()) {
 
                 GenericTreeCompiler compiler = new GenericTreeCompiler();
 
@@ -129,7 +129,7 @@ public class VerifiableTree {
                     crendential.inject(NodePointer.of(0,
                             VcdmVocab.PROOF.uri(),
                             proofIndex++),
-                            proof.ld().root());
+                            proof.ld().asFragment().root());
                 }
             }
 
@@ -143,7 +143,7 @@ public class VerifiableTree {
 
         if (verifiable.isPresentation()) {
 
-            var presentation = new TreeComposer(verifiable.ld().root()) {
+            var presentation = new TreeComposer(verifiable.ld().asFragment().root()) {
 
                 GenericTreeCompiler compiler = new GenericTreeCompiler();
 
@@ -183,7 +183,7 @@ public class VerifiableTree {
                     presentation.inject(NodePointer.of(0,
                             VcdmVocab.PROOF.uri(),
                             proofIndex++),
-                            proof.ld().root());
+                            proof.ld().asFragment().root());
                 }
             }
 
@@ -201,7 +201,7 @@ public class VerifiableTree {
     public static LinkedTree complete(Verifiable verifiable) {
 
         if (verifiable.isCredential()) {
-            var crendential = new TreeComposer(verifiable.ld().root()) {
+            var crendential = new TreeComposer(verifiable.ld().asFragment().root()) {
 
                 GenericTreeCompiler compiler = new GenericTreeCompiler();
 
@@ -241,7 +241,7 @@ public class VerifiableTree {
                     crendential.inject(NodePointer.of(0,
                             VcdmVocab.PROOF.uri(),
                             proofIndex++),
-                            proof.ld().root());
+                            proof.ld().asFragment().root());
                 }
             }
 
@@ -255,7 +255,7 @@ public class VerifiableTree {
 
         if (verifiable.isPresentation()) {
 
-            var presentation = new TreeComposer(verifiable.ld().root()) {
+            var presentation = new TreeComposer(verifiable.ld().asFragment().root()) {
 
                 GenericTreeCompiler compiler = new GenericTreeCompiler();
 
@@ -293,7 +293,7 @@ public class VerifiableTree {
                         0,
                         VcdmVocab.VERIFIABLE_CREDENTIALS.uri(),
                         index),
-                        credential.ld().root());
+                        credential.ld().asFragment().root());
 
                 if (!credential.proofs().isEmpty()) {
                     presentation.inject(NodePointer.of(0, VcdmVocab.VERIFIABLE_CREDENTIALS.uri(), index,
@@ -307,7 +307,7 @@ public class VerifiableTree {
                                 index,
                                 VcdmVocab.PROOF.uri(),
                                 proofIndex++),
-                                proof.ld().root());
+                                proof.ld().asFragment().root());
                     }
                 }
                 index++;
@@ -323,7 +323,7 @@ public class VerifiableTree {
                     presentation.inject(NodePointer.of(0,
                             VcdmVocab.PROOF.uri(),
                             proofIndex++),
-                            proof.ld().root());
+                            proof.ld().asFragment().root());
                 }
             }
 

@@ -3,12 +3,13 @@ package com.apicatalog.vc;
 import java.util.Arrays;
 import java.util.Random;
 
-import com.apicatalog.controller.method.KeyPair;
+import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.KeyGenError;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.cryptosuite.algorithm.Signer;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
@@ -84,6 +85,11 @@ class TestAlgorithm implements Signer {
             public Multicodec codec() {
                 return PUBLIC_KEY_CODEC;
             }
+
+            @Override
+            public Multibase base() {
+                return Multibase.BASE_58_BTC;
+            }
         };
 
         var privateKey = new MulticodecKey() {
@@ -102,27 +108,13 @@ class TestAlgorithm implements Signer {
             public Multicodec codec() {
                 return PRIVATE_KEY_CODEC;
             }
+            
+            @Override
+            public Multibase base() {
+                return Multibase.BASE_58_BTC;
+            }            
         };
 
         return GenericMultikey.of(null, null, publicKey, privateKey);
-    }
-
-    public static void main(String[] args) throws KeyGenError {
-
-//        final LinkedData keypair = (new TestKeyAdapter()).write((new TestAlgorithm()).keygen());
-
-//        System.out.println(keypair.asObject().id());
-//        System.out.println(keypair.asObject().type());
-
-//        final StringWriter out = new StringWriter();
-
-//        final JsonWriterFactory writerFactory = Json.createWriterFactory(
-//                Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
-//        
-//        try (final JsonWriter jsonWriter = writerFactory.createWriter(out)) {
-//            jsonWriter.write(keypair);
-//        }
-
-        // System.out.println(out.toString());
     }
 }

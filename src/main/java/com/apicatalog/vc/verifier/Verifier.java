@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.apicatalog.controller.method.VerificationKey;
+import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
@@ -63,7 +63,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
         var resolver = new VcdmResolver();
-        resolver.v11(Vcdm11Reader2.with(suites));
+//        resolver.v11(Vcdm11Reader2.with(suites));
 //        resolver.v11(Vcdm11Reader.with(
 //                r -> {
 //                },

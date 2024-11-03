@@ -45,7 +45,7 @@ public class HttpMethodResolver implements MethodResolver {
 
     public static HttpMethodResolver getInstance(DocumentLoader loader, Class<?>... classes) {
 
-        try {
+//        try {
             TreeMappingBuilder mapping = TreeMapping.createBuilder()
                     .scan(VerificationMethod.class);
 
@@ -61,11 +61,11 @@ public class HttpMethodResolver implements MethodResolver {
 
             return new HttpMethodResolver(contexts, loader, reader);
 
-        } catch (NodeAdapterError e) {
-            LOGGER.log(Level.SEVERE, e, () -> "An unexpected error, falling back to a generic reader.");
-        }
+//        } catch (NodeAdapterError e) {
+//            LOGGER.log(Level.SEVERE, e, () -> "An unexpected error, falling back to a generic reader.");
+//        }
 
-        return new HttpMethodResolver(Collections.emptyList(), loader, JsonLdTreeReader.generic());
+//        return new HttpMethodResolver(Collections.emptyList(), loader, JsonLdTreeReader.generic());
     }
 
     @Override

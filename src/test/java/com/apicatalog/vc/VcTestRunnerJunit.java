@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 
-import com.apicatalog.controller.method.KeyPair;
+import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.jsonld.JsonLd;

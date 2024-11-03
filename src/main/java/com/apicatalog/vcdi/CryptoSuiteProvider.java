@@ -1,6 +1,6 @@
 package com.apicatalog.vcdi;
 
-import com.apicatalog.controller.method.VerificationKey;
+import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.CryptoSuite;
 
 @FunctionalInterface

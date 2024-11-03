@@ -2,7 +2,7 @@ package com.apicatalog.vc.solid;
 
 import java.util.Objects;
 
-import com.apicatalog.controller.method.RawKey;
+import com.apicatalog.controller.key.RawByteKey;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.Signature;
 import com.apicatalog.cryptosuite.VerificationError;
@@ -25,7 +25,7 @@ public record SolidProofValue(
             CryptoSuite cryptoSuite,  
             LinkedTree data, 
             LinkedTree unsignedProof, 
-            RawKey publicKey) throws VerificationError {
+            RawByteKey publicKey) throws VerificationError {
 
         Objects.requireNonNull(data);
         Objects.requireNonNull(publicKey);

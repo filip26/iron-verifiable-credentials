@@ -12,7 +12,7 @@ public record PresentationHolderReference(
         LinkedTree root) implements PresentationHolder {
 
     public static PresentationHolderReference of(LinkedNode node) throws InvalidSelector {
-        return new PresentationHolderReference(node.asFragment().uri(), node.root());
+        return new PresentationHolderReference(node.asFragment().uri(), node.asFragment().root());
     }
 
     @Override

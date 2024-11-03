@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 
-import com.apicatalog.controller.method.KeyPair;
+import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.SigningError.SignatureErrorCode;

@@ -1,6 +1,6 @@
 package com.apicatalog.vc.proof;
 
-import com.apicatalog.controller.method.RawKey;
+import com.apicatalog.controller.key.RawByteKey;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
@@ -13,7 +13,7 @@ public interface ProofValue {
             CryptoSuite crypto,
             LinkedTree data,
             LinkedTree unsignedProof,
-            RawKey publicKey) throws VerificationError, DocumentError;
+            RawByteKey publicKey) throws VerificationError, DocumentError;
 
     byte[] toByteArray() throws DocumentError;
 }
