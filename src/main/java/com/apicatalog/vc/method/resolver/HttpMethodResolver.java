@@ -18,7 +18,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
-import com.apicatalog.linkedtree.orm.mapper.TreeMappingBuilder;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonStructure;
@@ -46,7 +46,7 @@ public class HttpMethodResolver implements MethodResolver {
     public static HttpMethodResolver getInstance(DocumentLoader loader, Class<?>... classes) {
 
 //        try {
-            TreeMappingBuilder mapping = TreeReaderMapping.createBuilder()
+            TreeReaderMappingBuilder mapping = TreeReaderMapping.createBuilder()
                     .scan(VerificationMethod.class);
 
             if (classes != null && classes.length > 0) {

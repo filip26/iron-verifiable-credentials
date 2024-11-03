@@ -305,14 +305,15 @@ public class Verifier extends VerificationProcessor<Verifier> {
             // all good
             return verifiable;
 
-        } catch (UnsupportedOperationException e) {
-            throw new DocumentError(e, ErrorType.Unknown);
-
         } catch (IllegalArgumentException e) {
             throw new DocumentError(e, ErrorType.Invalid);
 
         } catch (NullPointerException e) {
             throw new DocumentError(e, ErrorType.Missing);
+            
+        } catch (UnsupportedOperationException e) {
+            throw new DocumentError(e, ErrorType.Unknown);
+            
         }
     }
 

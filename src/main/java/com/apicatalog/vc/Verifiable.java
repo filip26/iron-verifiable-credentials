@@ -11,7 +11,7 @@ import com.apicatalog.linkedtree.orm.Type;
 import com.apicatalog.vc.proof.Proof;
 
 /**
- * Represents a common ancestor for verifiable data.
+ * Represents a common ancestor for verifiable data/material.
  * 
  * @since 0.9.0
  */

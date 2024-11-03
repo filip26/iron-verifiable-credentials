@@ -3,11 +3,17 @@ package com.apicatalog.vc.model;
 import java.net.URI;
 import java.util.Collection;
 
-import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Id;
+import com.apicatalog.linkedtree.orm.Type;
 
-public interface CredentialSchema extends Linkable {
+@Fragment(generic = true)
+public interface CredentialSchema {
 
+    @Id
     URI id();
+
+    @Type
     Collection<String> type();
 
 }

@@ -4,12 +4,15 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Type;
 
-public interface TermsOfUse extends Linkable {
+@Fragment(generic = true)
+public interface TermsOfUse {
 
     URI id();
-    
+
+    @Type
     Collection<String> type();
     
     /**

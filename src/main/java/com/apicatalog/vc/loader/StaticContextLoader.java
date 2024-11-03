@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.apicatalog.controller.ControllerDocumentLoader;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
@@ -38,18 +39,16 @@ public class StaticContextLoader implements DocumentLoader {
 
     public static Map<String, Document> defaultValues() {
 
-        Map<String, Document> staticCache = new LinkedHashMap<>();
-
+        Map<String, Document> staticCache = new LinkedHashMap<>(ControllerDocumentLoader.defaultValues());
+        
         staticCache.put("https://www.w3.org/2018/credentials/examples/v1", get("2018-credentials-examples-v1.jsonld"));
         staticCache.put("https://www.w3.org/2018/credentials/v1", get("2018-credentials-v1.jsonld"));
         staticCache.put("https://www.w3.org/ns/credentials/examples/v2", get("2023-credentials-examples-v2.jsonld"));
         staticCache.put("https://www.w3.org/ns/credentials/v2", get("2023-credentials-v2.jsonld"));
         staticCache.put("https://www.w3.org/ns/odrl.jsonld", get("odrl.jsonld"));
-        staticCache.put("https://www.w3.org/ns/did/v1", get("did-v1.jsonld"));
         staticCache.put("https://w3id.org/security/data-integrity/v1", get("data-integrity-v1.jsonld"));
         staticCache.put("https://w3id.org/security/data-integrity/v2", get("data-integrity-v2.jsonld"));
-        staticCache.put("https://w3id.org/security/multikey/v1", get("multikey-v1.jsonld"));
-
+        
         return Collections.unmodifiableMap(staticCache);
     }
 

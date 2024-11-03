@@ -5,7 +5,7 @@ import java.util.Collection;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
-import com.apicatalog.linkedtree.orm.mapper.TreeMappingBuilder;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -32,7 +32,7 @@ public class Vcdm11Reader2 extends VcdmReader {
             Class<?>[] types,
             final SignatureSuite... suites) {
 
-        TreeMappingBuilder builder = TreeReaderMapping.createBuilder();
+        TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder();
         for (Class<?> type : types) {
             builder.scan(type);
         }
