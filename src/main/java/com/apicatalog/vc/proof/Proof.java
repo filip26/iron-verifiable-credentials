@@ -35,7 +35,7 @@ public interface Proof extends Linkable {
      *
      * @return {@link VerificationMethod} to verify the proof signature
      */
-    @Term("verificationMethod")
+    @Term(value = "verificationMethod", vocab = "https://w3id.org/security#")
     VerificationMethod method();
 
     /**

@@ -78,7 +78,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
         var mapping = TreeReaderMapping.createBuilder()
                 .scan(DataIntegrityProof.class)
-                .with(new MultibaseAdapter())
+                .with(new MultibaseAdapter())   //TODO supported bases only
                 // TODO add custom type -> custom mapper
                 .build();
 
@@ -112,30 +112,6 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         } catch (TreeBuilderError | NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }
-
-//        var reader = JsonLdTreeReader.createBuilder()
-//                .with(
-//                        VcdiVocab.TYPE.uri(),
-//                        DataIntegrityProof.class,
-//                        //TODO remove suite
-//                        source -> DataIntegrityProof.of(verifiable, this, source)
-//                        )
-//                .with(MultibaseLiteral.typeAdapter(proofValueBase))
-//                .with(XsdDateTime.typeAdapter())
-//                .build();
-//
-//        
-//        try {
-//            var tree = reader.read(Json.createArrayBuilder().add(proof).build());
-//
-//            return tree.materialize(DataIntegrityProof.class);
-//
-//        } catch (InvalidSelector e) {
-//            throw DocumentError.of(e);
-//            
-//        } catch (TreeBuilderError | NodeAdapterError e) {
-//            throw new DocumentError(e, ErrorType.Invalid, "Proof");
-//        }
     }
 
 //    @Override
