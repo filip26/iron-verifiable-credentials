@@ -2,7 +2,7 @@ package com.apicatalog.vc.solid;
 
 import java.util.Objects;
 
-import com.apicatalog.controller.key.RawByteKey;
+import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.Signature;
 import com.apicatalog.cryptosuite.VerificationError;
@@ -14,32 +14,33 @@ import com.apicatalog.vc.proof.ProofValue;
  * suites do not allowing a selective disclosure.
  */
 public record SolidProofValue(
+        LinkedTree data,
+        LinkedTree unsignedProof,
+        Signature signature,
         byte[] toByteArray) implements ProofValue {
 
     public SolidProofValue {
         Objects.requireNonNull(toByteArray);
     }
 
+    public static SolidProofValue of(CryptoSuite cryptoSuite, LinkedTree data, LinkedTree unsignedProof, byte[] signature) {
+        return new SolidProofValue(data, unsignedProof, new Signature(cryptoSuite), signature);
+    }
+
     @Override
-    public void verify(
-            CryptoSuite cryptoSuite,  
-            LinkedTree data, 
-            LinkedTree unsignedProof, 
-            RawByteKey publicKey) throws VerificationError {
+    public void verify(VerificationKey key) throws VerificationError {
 
-        Objects.requireNonNull(data);
-        Objects.requireNonNull(publicKey);
-        Objects.requireNonNull(cryptoSuite);
+//        Objects.requireNonNull(data);
+        Objects.requireNonNull(key);
+//        Objects.requireNonNull(cryptoSuite);
 
-        //TODO check key type
-        
-        final Signature signature = new Signature(cryptoSuite);
+        // TODO check key type
 
         // verify signature
         signature.verify(
                 data,
                 unsignedProof,
-                publicKey.rawBytes(),
+                key.publicKey().rawBytes(),
                 toByteArray);
     }
 }

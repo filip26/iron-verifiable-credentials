@@ -5,7 +5,10 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.primitive.MessageDigest;
 import com.apicatalog.cryptosuite.primitive.Urdna2015;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.di.DataIntegritySuite;
@@ -13,6 +16,7 @@ import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
+import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
@@ -51,7 +55,7 @@ class TestSignatureSuite extends DataIntegritySuite {
     }
 
     @Override
-    protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws NodeAdapterError {
+    protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) {
         if (TEST_CRYPTO_NAME.equals(cryptoName)) {
             return CRYPTO;
         }
@@ -64,10 +68,14 @@ class TestSignatureSuite extends DataIntegritySuite {
     }
 
     @Override
-    protected ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws NodeAdapterError {
-//FIXME        if (proofValue.length != 32) {
-//            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
-//        }
-        return new SolidProofValue(proofValue);
+    protected ProofValue getProofValue(VerifiableMaterial data, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader) throws DocumentError {
+        if (proofValue == null) {
+            return null;
+        }
+        
+        if (proofValue.length != 32) {
+            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
+        }
+        return SolidProofValue.of(CRYPTO, data.tree(), proof.tree(), proofValue);
     }
 }

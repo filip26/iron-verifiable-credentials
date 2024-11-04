@@ -206,7 +206,14 @@ public abstract class VcdmReader implements VerifiableReader {
             if (jsonProofs != null
                     && !jsonProofs.isEmpty()
                     && verifiable instanceof PropertyValueConsumer proofConsumer) {
-                proofConsumer.acceptFragmentPropertyValue("proofs", getProofs(new VerifiableMaterial(compacted, expanded, verifiable), jsonProofs, loader));
+
+                final VerifiableMaterial data = new VerifiableMaterial(
+                        tree,
+                        compacted,
+                        expanded,
+                        verifiable);
+
+                proofConsumer.acceptFragmentPropertyValue("proofs", getProofs(data, jsonProofs, loader));
             }
 
             return verifiable;
@@ -220,6 +227,7 @@ public abstract class VcdmReader implements VerifiableReader {
     }
 
     protected Collection<Proof> getProofs(VerifiableMaterial material, JsonArray jsonProofs, DocumentLoader loader) throws DocumentError {
+
         try {
             final Collection<Proof> proofs = new ArrayList<>(jsonProofs.size());
 

@@ -19,7 +19,7 @@ import com.apicatalog.multibase.MultibaseLiteral;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.proof.VerifiableProof;
+import com.apicatalog.vc.proof.DeprecatedVerifiableProof;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -30,7 +30,7 @@ import jakarta.json.JsonStructure;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DeprecatedDataIntegrityProof extends VerifiableProof implements Proof {
+public class DeprecatedDataIntegrityProof extends DeprecatedVerifiableProof implements Proof {
 
     protected final DataIntegritySuite suite;
 
@@ -63,39 +63,40 @@ public class DeprecatedDataIntegrityProof extends VerifiableProof implements Pro
         ProofValue proofValue = null;
 
         if (proofValueLiteral != null) {
-            proofValue = suite.getProofValue(proofValueLiteral.byteArrayValue(), null); //FIXME loader
+//            proofValue = suite.getProofValue(null, proofValueLiteral.byteArrayValue(), null); //FIXME loader
         }
 
-        var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
+//        var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
 
-        var proof = new DeprecatedDataIntegrityProof(verifiable, suite, cryptosuite);
+//        var proof = new DeprecatedDataIntegrityProof(verifiable, suite, cryptosuite);
 
-        proof.id = source.uri();
+//        proof.id = source.uri();
         
-        proof.created = source.xsdDateTime(VcdiVocab.CREATED.uri());
-        
-        proof.expires = source.xsdDateTime(VcdiVocab.EXPIRES.uri());
-
-        proof.domain = source.lexicalValue(VcdiVocab.DOMAIN.uri());
-
-        proof.challenge = source.lexicalValue(VcdiVocab.CHALLENGE.uri());
-
-        proof.nonce = source.lexicalValue(VcdiVocab.NONCE.uri());
-
-//        proof.method = source.fragment(
-//                VcdiVocab.VERIFICATION_METHOD.uri(),
-//                VerificationMethod.class,
-//                GenericVerificationMethod::of);
-
-        proof.purpose = source.uri(VcdiVocab.PURPOSE.uri());
-
-        proof.previousProof = source.uri(VcdiVocab.PREVIOUS_PROOF.uri());
-
-        proof.signature = proofValue;
-
-        proof.ld = source;
-
-        return proof;
+//        proof.created = source.xsdDateTime(VcdiVocab.CREATED.uri());
+//        
+//        proof.expires = source.xsdDateTime(VcdiVocab.EXPIRES.uri());
+//
+//        proof.domain = source.lexicalValue(VcdiVocab.DOMAIN.uri());
+//
+//        proof.challenge = source.lexicalValue(VcdiVocab.CHALLENGE.uri());
+//
+//        proof.nonce = source.lexicalValue(VcdiVocab.NONCE.uri());
+//
+////        proof.method = source.fragment(
+////                VcdiVocab.VERIFICATION_METHOD.uri(),
+////                VerificationMethod.class,
+////                GenericVerificationMethod::of);
+//
+//        proof.purpose = source.uri(VcdiVocab.PURPOSE.uri());
+//
+//        proof.previousProof = source.uri(VcdiVocab.PREVIOUS_PROOF.uri());
+//
+//        proof.signature = proofValue;
+//
+//        proof.ld = source;
+//
+//        return proof;
+        return null;
     }
 
     @Override

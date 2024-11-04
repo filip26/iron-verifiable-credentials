@@ -23,6 +23,7 @@ import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vc.verifier.VerifiableMaterial;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue.ValueType;
 
@@ -58,9 +59,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //        };
 //    }
 //    
-    protected abstract ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws NodeAdapterError;
+    protected abstract ProofValue getProofValue(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader) throws DocumentError;
 
-    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws NodeAdapterError;
+    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
 
     public DataIntegrityProofDraft createDraft(
             VerificationMethod method,
@@ -97,7 +98,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
                         .literal(VcdiVocab.PROOF_VALUE.uri(), ByteArrayValue.class);
 
                 if (signature != null) {
-                    ProofValue proofValue = getProofValue(signature.byteArrayValue(), loader);
+                    VerifiableMaterial proofMaterial = new VerifiableMaterial(linkable.ld().asFragment().root(), null, Json.createArrayBuilder().add(expanded).build(), null);
+                            
+                    ProofValue proofValue = getProofValue(verifiable, proofMaterial, signature.byteArrayValue(), loader);
                     consumer.acceptFragmentPropertyValue("signature", proofValue);
 
                     if (proofValue != null) {
