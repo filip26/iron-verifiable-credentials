@@ -1,4 +1,4 @@
-package com.apicatalog.vcdi;
+package com.apicatalog.vc.di;
 
 import java.net.URI;
 import java.time.Instant;
@@ -30,7 +30,7 @@ import jakarta.json.JsonStructure;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
-public class DataIntegrityProof extends VerifiableProof implements Proof {
+public class DeprecatedDataIntegrityProof extends VerifiableProof implements Proof {
 
     protected final DataIntegritySuite suite;
 
@@ -43,7 +43,7 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
     protected String nonce;
     protected String challenge;
 
-    protected DataIntegrityProof(
+    protected DeprecatedDataIntegrityProof(
             Verifiable verifiable,
             DataIntegritySuite suite,
             CryptoSuite crypto) {
@@ -51,7 +51,7 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
         this.suite = suite;
     }
 
-    public static DataIntegrityProof of(
+    public static DeprecatedDataIntegrityProof of(
             Verifiable verifiable,
             DataIntegritySuite suite,
             LinkedFragment source) throws NodeAdapterError {
@@ -68,7 +68,7 @@ public class DataIntegrityProof extends VerifiableProof implements Proof {
 
         var cryptosuite = suite.getCryptoSuite(suite.cryptosuiteName, proofValue);
 
-        var proof = new DataIntegrityProof(verifiable, suite, cryptosuite);
+        var proof = new DeprecatedDataIntegrityProof(verifiable, suite, cryptosuite);
 
         proof.id = source.uri();
         

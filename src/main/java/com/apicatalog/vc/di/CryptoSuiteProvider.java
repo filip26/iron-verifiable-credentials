@@ -1,4 +1,4 @@
-package com.apicatalog.vcdi;
+package com.apicatalog.vc.di;
 
 import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.CryptoSuite;

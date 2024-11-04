@@ -15,7 +15,7 @@ import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Id;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Type;
-import com.apicatalog.vcdi.DataIntegrityProof;
+import com.apicatalog.vc.di.DeprecatedDataIntegrityProof;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -23,7 +23,7 @@ import jakarta.json.JsonStructure;
 /**
  * Represents generic VC/VP proof.
  *
- * @see {@link DataIntegrityProof} for an example implementation
+ * @see {@link DeprecatedDataIntegrityProof} for an example implementation
  */
 @Fragment(generic = true)
 public interface Proof extends Linkable {

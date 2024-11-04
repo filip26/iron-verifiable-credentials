@@ -1,4 +1,4 @@
 /**
  * W3C Verifiable Credential Data Integrity 
  */
-package com.apicatalog.vcdi;
+package com.apicatalog.vc.di;

@@ -9,12 +9,12 @@ import com.apicatalog.vc.reader.ReaderResolver;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
-import com.apicatalog.vcdm.v11.DeprecatedVcdm11Reader;
+import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
 public class VcdmResolver implements ReaderResolver {
 
-    protected DeprecatedVcdm11Reader v11;
+    protected Vcdm11Reader v11;
     protected Vcdm20Reader v20;
 
     public VcdmResolver() {
@@ -61,7 +61,7 @@ public class VcdmResolver implements ReaderResolver {
         return null;
     }
 
-    public void v11(DeprecatedVcdm11Reader v11) {
+    public void v11(Vcdm11Reader v11) {
         this.v11 = v11;
     }
     

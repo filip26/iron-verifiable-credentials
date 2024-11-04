@@ -6,6 +6,7 @@ import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
+import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmPresentation;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -18,6 +19,10 @@ public interface Vcdm11Presentation extends VcdmPresentation {
     @Provided
     @Override
     Collection<Proof> proofs();
+    
+    @Provided
+    @Override
+    Collection<Credential> credentials();
 
     @Override
     default VcdmVersion version() {

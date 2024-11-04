@@ -24,12 +24,12 @@ public class Vcdm11Reader extends VcdmReader {
         super(VcdmVersion.V11, reader, suites);
     }
 
-    public static DeprecatedVcdm11Reader with(
+    public static Vcdm11Reader with(
             final SignatureSuite... suites) {
         return with(new Class[0], suites);
     }
 
-    public static DeprecatedVcdm11Reader with(
+    public static Vcdm11Reader with(
             Class<?>[] types,
             final SignatureSuite... suites) {
 
@@ -37,13 +37,14 @@ public class Vcdm11Reader extends VcdmReader {
         
         TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder()
                 .scan(Vcdm11Credential.class)
-                .scan(Vcdm11Presentation.class); 
+                .scan(Vcdm11Presentation.class)
+                ; 
         
         for (Class<?> type : types) {
             builder.scan(type);
         }
 
-        return new DeprecatedVcdm11Reader(JsonLdTreeReader.of(builder.build()), suites);
+        return new Vcdm11Reader(JsonLdTreeReader.of(builder.build()), suites);
     }
 
     @Override

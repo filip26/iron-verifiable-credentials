@@ -1,4 +1,4 @@
-package com.apicatalog.vcdi;
+package com.apicatalog.vc.di;
 
 import java.net.URI;
 import java.util.Objects;

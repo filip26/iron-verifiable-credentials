@@ -3,12 +3,8 @@ package com.apicatalog.vcdm;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.orm.Fragment;
-import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.vc.Presentation;
 
-@Fragment
-@Term("VerifiablePresentation")
 public interface VcdmPresentation extends VcdmVerifiable, Presentation {
 
 //

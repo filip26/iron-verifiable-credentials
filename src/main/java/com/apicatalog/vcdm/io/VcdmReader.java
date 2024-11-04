@@ -30,8 +30,8 @@ import com.apicatalog.vc.proof.GenericProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.DeprecatedVcdmPresentation;
+import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 

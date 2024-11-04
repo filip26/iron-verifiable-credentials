@@ -8,11 +8,11 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.vc.di.DataIntegritySuite;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
-import com.apicatalog.vcdi.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
 
