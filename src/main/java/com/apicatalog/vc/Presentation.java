@@ -4,12 +4,17 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.vc.holder.PresentationHolder;
 
+@Fragment(generic = true)
 public interface Presentation extends Verifiable {
 
+    @Term
     PresentationHolder holder();
-    
+
+    @Term
     Collection<Credential> credentials();
 
     @Override

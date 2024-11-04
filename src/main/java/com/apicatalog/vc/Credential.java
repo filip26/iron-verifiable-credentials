@@ -2,6 +2,8 @@ package com.apicatalog.vc;
 
 import java.util.Collection;
 
+import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
@@ -9,6 +11,7 @@ import com.apicatalog.vc.subject.Subject;
 /**
  * A generic predecessor.
  */
+@Fragment(generic = true)
 public interface Credential extends Verifiable {
 
     /**
@@ -25,10 +28,13 @@ public interface Credential extends Verifiable {
      */
     boolean isNotValidYet();
 
+    @Term
     CredentialIssuer issuer();
 
+    @Term
     Collection<Status> status();
 
+    @Term
     Collection<Subject> subject();
 
     @Override

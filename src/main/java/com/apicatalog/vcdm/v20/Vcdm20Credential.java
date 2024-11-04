@@ -16,11 +16,11 @@ import com.apicatalog.vc.issuer.CredentialIssuer;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
-import com.apicatalog.vcdm.VcdmCredential;
+import com.apicatalog.vcdm.DeprecatedVcdmCredential;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
-public class Vcdm20Credential extends VcdmCredential implements Credential {
+public class Vcdm20Credential extends DeprecatedVcdmCredential implements Credential {
 
     protected Instant validFrom;
     protected Instant validUntil;

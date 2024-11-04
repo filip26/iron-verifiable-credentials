@@ -31,7 +31,7 @@ import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.EmbeddedProof;
-import com.apicatalog.vcdm.VcdmPresentation;
+import com.apicatalog.vcdm.DeprecatedVcdmPresentation;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
@@ -122,7 +122,7 @@ public abstract class VcdmReader implements VerifiableReader {
                     loader,
                     base);
 
-            if (presentation instanceof VcdmPresentation vcdmPresentation) {
+            if (presentation instanceof DeprecatedVcdmPresentation vcdmPresentation) {
                 vcdmPresentation.credentials(
                         getCredentials(context, document.get(VcdmVocab.VERIFIABLE_CREDENTIALS.name()), loader, base));
             }

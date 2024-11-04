@@ -6,7 +6,7 @@ import java.util.Collection;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.proof.Proof;
 
-public abstract class VcdmVerifiable3 implements Verifiable {
+public abstract class DeprecatedVcdmVerifiable implements Verifiable {
 
     protected URI id;
     protected Collection<Proof> proofs;

@@ -35,7 +35,7 @@ import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmResolver;
-import com.apicatalog.vcdm.v11.Vcdm11Reader2;
+import com.apicatalog.vcdm.v11.Vcdm11Reader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -63,7 +63,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
         var resolver = new VcdmResolver();
-        resolver.v11(Vcdm11Reader2.with(suites));
+        resolver.v11(Vcdm11Reader.with(suites));
 //        resolver.v11(Vcdm11Reader.with(
 //                r -> {
 //                },

@@ -12,6 +12,9 @@ import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Id;
+import com.apicatalog.linkedtree.orm.Term;
+import com.apicatalog.linkedtree.orm.Type;
 import com.apicatalog.vcdi.DataIntegrityProof;
 
 import jakarta.json.JsonObject;
@@ -32,6 +35,7 @@ public interface Proof extends Linkable {
      *
      * @return {@link VerificationMethod} to verify the proof signature
      */
+    @Term
     VerificationMethod method();
 
     /**
@@ -40,6 +44,7 @@ public interface Proof extends Linkable {
      *
      * @return the proof value
      */
+    @Term("proofValue")
     ProofValue signature();
 
     /**
@@ -47,8 +52,10 @@ public interface Proof extends Linkable {
      * 
      * @return {@link URI} representing the proof id
      */
+    @Id
     URI id();
 
+    @Type
     Collection<String> type();
 
     /**
@@ -57,6 +64,7 @@ public interface Proof extends Linkable {
      * 
      * @return {@link URI} uniquely identifying the previous proof
      */
+    @Term
     URI previousProof();
 
     /**
@@ -72,6 +80,7 @@ public interface Proof extends Linkable {
      *
      * @return {@link URI} identifying the purpose
      */
+    @Term
     URI purpose();
 
     /**

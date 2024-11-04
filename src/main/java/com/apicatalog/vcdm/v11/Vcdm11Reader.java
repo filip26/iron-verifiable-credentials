@@ -1,15 +1,15 @@
 package com.apicatalog.vcdm.v11;
 
 import java.util.Collection;
-import java.util.function.Consumer;
+import java.util.Objects;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.linkedtree.xsd.XsdDateTime;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmVersion;
-import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmReader;
 import com.apicatalog.vcdm.io.VcdmResolver;
 
@@ -24,24 +24,27 @@ public class Vcdm11Reader extends VcdmReader {
         super(VcdmVersion.V11, reader, suites);
     }
 
-//    public static Vcdm11Reader with(
-//            final Consumer<JsonLdTreeReader.Builder> apply,
-//            final SignatureSuite... suites) {
-//
-//        JsonLdTreeReader.Builder reader = JsonLdTreeReader
-//                .createBuilder()
-//                .with(VcdmVocab.CREDENTIAL_TYPE.uri(),
-//                        Vcdm11Credential.class,
-//                        Vcdm11Credential::of)
-//                .with(VcdmVocab.PRESENTATION_TYPE.uri(),
-//                        Vcdm11Presentation.class,
-//                        Vcdm11Presentation::of)
-//                .with(XsdDateTime.typeAdapter());
-//        
-//        apply.accept(reader);
-//
-//        return new Vcdm11Reader(reader.build(), suites);
-//    }
+    public static DeprecatedVcdm11Reader with(
+            final SignatureSuite... suites) {
+        return with(new Class[0], suites);
+    }
+
+    public static DeprecatedVcdm11Reader with(
+            Class<?>[] types,
+            final SignatureSuite... suites) {
+
+        Objects.requireNonNull(types);
+        
+        TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder()
+                .scan(Vcdm11Credential.class)
+                .scan(Vcdm11Presentation.class); 
+        
+        for (Class<?> type : types) {
+            builder.scan(type);
+        }
+
+        return new DeprecatedVcdm11Reader(JsonLdTreeReader.of(builder.build()), suites);
+    }
 
     @Override
     protected VerifiableReader resolve(Collection<String> context) throws DocumentError {
@@ -49,5 +52,4 @@ public class Vcdm11Reader extends VcdmReader {
                 ? this
                 : null;
     }
-
 }
