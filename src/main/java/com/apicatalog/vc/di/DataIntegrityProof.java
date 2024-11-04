@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
 
+import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.orm.Context;
@@ -79,15 +80,20 @@ public interface DataIntegrityProof extends Proof {
     @Override
     ProofValue signature();
     
+    @Term("cryptosuite")
+    @Provided
+    @Override
+    CryptoSuite cryptoSuite();
+    
     @Override
     default void validate(Map<String, Object> params) throws DocumentError {
 
         if (purpose() == null) {
             throw new DocumentError(ErrorType.Missing, "ProofPurpose");
         }
-//TODO        if (cryptoSuite() == null) {
-//            throw new DocumentError(ErrorType.Missing, "CryptoSuite");
-//        }
+        if (cryptoSuite() == null) {
+            throw new DocumentError(ErrorType.Missing, "CryptoSuite");
+        }
                 
         if (params != null) {
 //            assertEquals(params, VcdiVocab.PURPOSE, purpose().toString()); // TODO compare as URI, expect URI in params

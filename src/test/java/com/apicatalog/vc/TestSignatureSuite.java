@@ -65,9 +65,9 @@ class TestSignatureSuite extends DataIntegritySuite {
 
     @Override
     protected ProofValue getProofValue(byte[] proofValue, DocumentLoader loader) throws NodeAdapterError {
-        if (proofValue.length != 32) {
+//FIXME        if (proofValue.length != 32) {
 //            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
-        }
+//        }
         return new SolidProofValue(proofValue);
     }
 }

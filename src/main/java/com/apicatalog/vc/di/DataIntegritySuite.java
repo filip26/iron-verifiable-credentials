@@ -8,12 +8,16 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
+import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
+import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multibase.MultibaseAdapter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -70,21 +74,45 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public Proof getProof(VerifiableMaterial verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError {
+    public Proof getProof(VerifiableMaterial verifiable, JsonObject expanded, DocumentLoader loader) throws DocumentError {
 
         var mapping = TreeReaderMapping.createBuilder()
                 .scan(DataIntegrityProof.class)
-                //TODO add custom type -> custom mapper
+                .with(new MultibaseAdapter())
+                // TODO add custom type -> custom mapper
                 .build();
 
         var reader = JsonLdReader.of(mapping, loader);
 
         try {
-            return reader.read(DataIntegrityProof.class, proof);
+            Proof proof = reader.read(Proof.class, expanded);
+            if (proof == null) {
+                return null;
+            }
+
+            if (proof instanceof PropertyValueConsumer consumer
+                    && proof instanceof Linkable linkable) {
+
+                final ByteArrayValue signature = linkable.ld().asFragment()
+                        .literal(VcdiVocab.PROOF_VALUE.uri(), ByteArrayValue.class);
+
+                if (signature != null) {
+                    ProofValue proofValue = getProofValue(signature.byteArrayValue(), loader);
+                    consumer.acceptFragmentPropertyValue("signature", proofValue);
+
+                    if (proofValue != null) {
+                        CryptoSuite cryptoSuite = getCryptoSuite(cryptosuiteName, proofValue);
+                        consumer.acceptFragmentPropertyValue("cryptoSuite", cryptoSuite);
+                    }
+                }
+            }
+
+            return proof;
+
         } catch (TreeBuilderError | NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }
-        
+
 //        var reader = JsonLdTreeReader.createBuilder()
 //                .with(
 //                        VcdiVocab.TYPE.uri(),
@@ -150,16 +178,16 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //        return null;
 //    }
 
-    protected static String getCryptoSuiteName(final JsonObject proof) {
+    protected static String getCryptoSuiteName(final JsonObject expandedProof) {
 
-        Objects.requireNonNull(proof);
+        Objects.requireNonNull(expandedProof);
 
-        if (proof.containsKey(VcdiVocab.CRYPTO_SUITE.uri())
-                && ValueType.ARRAY == proof.get(VcdiVocab.CRYPTO_SUITE.uri()).getValueType()
-                && proof.getJsonArray(VcdiVocab.CRYPTO_SUITE.uri()).size() == 1
-                && ValueType.OBJECT == proof.getJsonArray(VcdiVocab.CRYPTO_SUITE.uri()).get(0).getValueType()) {
+        if (expandedProof.containsKey(VcdiVocab.CRYPTO_SUITE.uri())
+                && ValueType.ARRAY == expandedProof.get(VcdiVocab.CRYPTO_SUITE.uri()).getValueType()
+                && expandedProof.getJsonArray(VcdiVocab.CRYPTO_SUITE.uri()).size() == 1
+                && ValueType.OBJECT == expandedProof.getJsonArray(VcdiVocab.CRYPTO_SUITE.uri()).get(0).getValueType()) {
 
-            final JsonObject valueObject = proof.getJsonArray(VcdiVocab.CRYPTO_SUITE.uri()).getJsonObject(0);
+            final JsonObject valueObject = expandedProof.getJsonArray(VcdiVocab.CRYPTO_SUITE.uri()).getJsonObject(0);
 
             if (valueObject.containsKey(JsonLdKeyword.TYPE)
                     && ValueType.STRING == valueObject.get(JsonLdKeyword.TYPE).getValueType()
