@@ -5,6 +5,7 @@ import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
 import com.apicatalog.cryptosuite.algorithm.Digester;
 import com.apicatalog.cryptosuite.algorithm.Signer;
 import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
@@ -33,7 +34,7 @@ public record CryptoSuite(
     }
 
     @Override
-    public byte[] canonicalize(LinkedTree document) throws CryptoSuiteError {
+    public byte[] canonicalize(VerifiableMaterial document) throws CryptoSuiteError {
         return canonicalizer.canonicalize(document);
     }
 

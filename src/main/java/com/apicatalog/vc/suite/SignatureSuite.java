@@ -7,8 +7,6 @@ import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.verifier.VerifiableMaterial;
 
-import jakarta.json.JsonObject;
-
 /**
  * A container providing primitives to process a proof.
  */
@@ -28,23 +26,22 @@ public interface SignatureSuite {
      * Check if the given proof can be processed by the suite.
      * 
      * @param verifiable a verifiable to which the proof is bound to
-     * @param proofType  an URI representing a proof JSON-LD type
-     * @param proof      a proof in an expanded JSON-LD form
+     * @param proof
      * 
      * @return <code>true</code> if the proof is supported, <code>false</code>
      *         otherwise
      */
-    boolean isSupported(VerifiableMaterial verifiable, String proofType, JsonObject proof);
+    boolean isSupported(VerifiableMaterial verifiable, VerifiableMaterial proof);
 
     /**
      * Deserialize the given expanded JSON-LD object into a {@link Proof}.
      * 
      * @param verifiable a verifiable to which the proof is bound to
-     * @param proof      JSON-LD object in an expanded form
+     * @param proof
      * @param loader
      * 
      * @return a new {@link Proof} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    Proof getProof(VerifiableMaterial verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError;
+    Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proof, DocumentLoader loader) throws DocumentError;
 }

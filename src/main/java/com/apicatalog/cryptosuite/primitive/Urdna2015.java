@@ -13,26 +13,24 @@ import com.apicatalog.jsonld.JsonLdOptions;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.http.media.MediaType;
-import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
 import com.apicatalog.rdf.Rdf;
 import com.apicatalog.rdf.RdfDataset;
 import com.apicatalog.rdf.io.RdfWriter;
 import com.apicatalog.rdf.io.error.RdfWriterException;
 import com.apicatalog.rdf.io.error.UnsupportedContentException;
+import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 import io.setl.rdf.normalization.RdfNormalize;
 import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
 
 public class Urdna2015 implements Canonicalizer {
 
     @Override
-    public byte[] canonicalize(LinkedTree document) throws CryptoSuiteError {
+    public byte[] canonicalize(VerifiableMaterial document) throws CryptoSuiteError {
+        //TODO process compacted version
         try {
-            var treeWriter = new JsonLdTreeWriter();
-
-            // JSON-LD version - FIXME temporary, remove
-            final JsonArray expanded = treeWriter.write(document);
+            final JsonObject expanded = document.expanded();
 
             final JsonLdOptions options = new JsonLdOptions();
             options.setUndefinedTermsPolicy(ProcessingPolicy.Fail);

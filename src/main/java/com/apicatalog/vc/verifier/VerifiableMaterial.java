@@ -1,9 +1,7 @@
 package com.apicatalog.vc.verifier;
 
-import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.vc.Verifiable;
+import java.util.Collection;
 
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
 /**
@@ -11,9 +9,9 @@ import jakarta.json.JsonObject;
  * representation must be semantically equivalent.
  */
 public record VerifiableMaterial(
-        LinkedTree tree,
+        Collection<String> context,
         JsonObject compacted,
-        JsonArray expanded,
-        Verifiable materialized) {
+        JsonObject expanded
+        ) {
 
 }

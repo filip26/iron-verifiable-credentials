@@ -8,14 +8,15 @@ import com.apicatalog.cryptosuite.Signature;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 /**
  * Represent a proof value used together with full disclosure suites. i.e.
  * suites do not allowing a selective disclosure.
  */
 public record SolidProofValue(
-        LinkedTree data,
-        LinkedTree unsignedProof,
+        VerifiableMaterial data,
+        VerifiableMaterial unsignedProof,
         Signature signature,
         byte[] toByteArray) implements ProofValue {
 
@@ -23,7 +24,7 @@ public record SolidProofValue(
         Objects.requireNonNull(toByteArray);
     }
 
-    public static SolidProofValue of(CryptoSuite cryptoSuite, LinkedTree data, LinkedTree unsignedProof, byte[] signature) {
+    public static SolidProofValue of(CryptoSuite cryptoSuite, VerifiableMaterial data, VerifiableMaterial unsignedProof, byte[] signature) {
         return new SolidProofValue(data, unsignedProof, new Signature(cryptoSuite), signature);
     }
 

@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 public class Signature {
 
@@ -21,7 +21,7 @@ public class Signature {
      *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification
      *      Algorithm</a>
      *
-     * @param expanded        expanded unsigned VC/VP document
+     * @param data        expanded unsigned VC/VP document
      * @param unsignedProof   expanded proof with no proofValue
      * @param verificationKey
      * @param signature
@@ -30,18 +30,18 @@ public class Signature {
      * @throws DocumentError
      */
     public void verify(
-            final LinkedTree expanded,
-            final LinkedTree unsignedProof,
+            final VerifiableMaterial data,
+            final VerifiableMaterial unsignedProof,
             final byte[] verificationKey,
             final byte[] signature) throws VerificationError {
 
-        Objects.requireNonNull(expanded);
+        Objects.requireNonNull(data);
         Objects.requireNonNull(unsignedProof);
         Objects.requireNonNull(verificationKey);
         Objects.requireNonNull(signature);
 
         try {
-            final byte[] computeSignature = hashCode(expanded, unsignedProof);
+            final byte[] computeSignature = hashCode(data, unsignedProof);
 
             suite.verify(verificationKey, signature, computeSignature);
 
@@ -66,7 +66,7 @@ public class Signature {
      *
      * @throws DocumentError
      */
-    public byte[] sign(LinkedTree verifiable, LinkedTree proof, byte[] privateKey) throws CryptoSuiteError {
+    public byte[] sign(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] privateKey) throws CryptoSuiteError {
 
         Objects.requireNonNull(verifiable);
         Objects.requireNonNull(proof);
@@ -89,7 +89,7 @@ public class Signature {
      *
      * @throws CryptoSuiteError
      */
-    byte[] hashCode(LinkedTree document, LinkedTree proof) throws CryptoSuiteError {
+    byte[] hashCode(VerifiableMaterial document, VerifiableMaterial proof) throws CryptoSuiteError {
 
         byte[] proofHash = suite.digest(suite.canonicalize(proof));
 

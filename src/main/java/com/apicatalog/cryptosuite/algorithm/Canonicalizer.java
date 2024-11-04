@@ -1,7 +1,7 @@
 package com.apicatalog.cryptosuite.algorithm;
 
 import com.apicatalog.cryptosuite.CryptoSuiteError;
-import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 /**
  * An algorithm that takes an input document that has more than one possible
@@ -10,6 +10,6 @@ import com.apicatalog.linkedtree.LinkedTree;
  */
 public interface Canonicalizer {
 
-    byte[] canonicalize(LinkedTree tree) throws CryptoSuiteError;
+    byte[] canonicalize(VerifiableMaterial material) throws CryptoSuiteError;
 
 }

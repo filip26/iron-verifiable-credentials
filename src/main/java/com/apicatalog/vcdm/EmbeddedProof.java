@@ -128,7 +128,6 @@ public final class EmbeddedProof {
 
         if (JsonUtils.isNull(value)) {
             return null;
-//            throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
         }
         if (JsonUtils.isNotArray(value)) {
             throw new DocumentError(ErrorType.Invalid, VcdmVocab.PROOF);
@@ -137,7 +136,6 @@ public final class EmbeddedProof {
         return value.asJsonArray();
     }
 
-    @Deprecated
     public static JsonObject removeProofs(final JsonObject document) {
         return Json.createObjectBuilder(document).remove(VcdmVocab.PROOF.uri()).build();
     }

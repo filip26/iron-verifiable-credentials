@@ -1,6 +1,7 @@
 package com.apicatalog.vc.di;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Objects;
 
 import com.apicatalog.controller.method.VerificationMethod;
@@ -12,7 +13,8 @@ import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
+import com.apicatalog.linkedtree.jsonld.JsonLdType;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
@@ -70,12 +72,21 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public boolean isSupported(VerifiableMaterial verifiable, String proofType, JsonObject expandedProof) {
-        return VcdiVocab.TYPE.uri().equals(proofType) && cryptosuiteName.equals(getCryptoSuiteName(expandedProof));
+    public boolean isSupported(VerifiableMaterial verifiable, VerifiableMaterial proofMaterial) {
+
+        Collection<String> proofType = JsonLdType.strings(proofMaterial.expanded());
+
+        if (proofType == null || proofType.isEmpty()) {
+            return false;
+        }
+        
+        final JsonObject expandedProof = proofMaterial.expanded();
+        
+        return proofType.contains(VcdiVocab.TYPE.uri()) && cryptosuiteName.equals(getCryptoSuiteName(expandedProof));
     }
 
     @Override
-    public Proof getProof(VerifiableMaterial verifiable, JsonObject expanded, DocumentLoader loader) throws DocumentError {
+    public Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proofMaterial, DocumentLoader loader) throws DocumentError {
 
         var mapping = TreeReaderMapping.createBuilder()
                 .scan(DataIntegrityProof.class)
@@ -83,10 +94,10 @@ public abstract class DataIntegritySuite implements SignatureSuite {
                 // TODO add custom type -> custom mapper
                 .build();
 
-        var reader = JsonLdReader.of(mapping, loader);
+        var reader = JsonLdTreeReader.of(mapping);
 
         try {
-            Proof proof = reader.read(Proof.class, expanded);
+            Proof proof = reader.read(Proof.class, Json.createArrayBuilder().add(proofMaterial.expanded()).build());
             if (proof == null) {
                 return null;
             }
@@ -97,9 +108,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
                 final ByteArrayValue signature = linkable.ld().asFragment()
                         .literal(VcdiVocab.PROOF_VALUE.uri(), ByteArrayValue.class);
 
-                if (signature != null) {
-                    VerifiableMaterial proofMaterial = new VerifiableMaterial(linkable.ld().asFragment().root(), null, Json.createArrayBuilder().add(expanded).build(), null);
-                            
+                if (signature != null) {                            
                     ProofValue proofValue = getProofValue(verifiable, proofMaterial, signature.byteArrayValue(), loader);
                     consumer.acceptFragmentPropertyValue("signature", proofValue);
 
