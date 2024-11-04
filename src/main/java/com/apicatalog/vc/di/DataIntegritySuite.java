@@ -13,9 +13,7 @@ import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
-import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -26,7 +24,7 @@ import jakarta.json.JsonValue.ValueType;
 
 public abstract class DataIntegritySuite implements SignatureSuite {
 
-    protected final MethodAdapter methodAdapter;
+//    protected final MethodAdapter methodAdapter;
 
     protected final String cryptosuiteName;
 
@@ -36,12 +34,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected DataIntegritySuite(
             String cryptosuiteName,
-            Multibase proofValueBase,
-            MethodAdapter method) {
+            Multibase proofValueBase) {
         this.cryptosuiteName = cryptosuiteName;
         this.proofValueBase = proofValueBase;
-        this.methodAdapter = method;
-
     }
 
 //    protected static LinkedLiteralAdapter getProofValueAdapter(Multibase proofValueBase) {
@@ -78,7 +73,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     public Proof getProof(VerifiableMaterial verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError {
 
         var mapping = TreeReaderMapping.createBuilder()
-                .scan(DataIntegrityProof.class).build();
+                .scan(DataIntegrityProof.class)
+                //TODO add custom type -> custom mapper
+                .build();
 
         var reader = JsonLdReader.of(mapping, loader);
 

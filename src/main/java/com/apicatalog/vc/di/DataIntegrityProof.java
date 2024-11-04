@@ -5,10 +5,13 @@ import java.time.Instant;
 import java.util.Map;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Literal;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
+import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
@@ -20,7 +23,8 @@ import com.apicatalog.vc.proof.ProofValue;
  *
  */
 @Fragment
-//TODO vocab, context
+@Context("https://w3id.org/security/data-integrity/v2")
+@Vocab("https://w3id.org/security#")
 public interface DataIntegrityProof extends Proof {
 
     /**
@@ -33,7 +37,7 @@ public interface DataIntegrityProof extends Proof {
      *
      * @return {@link URI} identifying the purpose
      */
-    @Term
+    @Term("proofPurpose")
     @Override
     URI purpose();
 
@@ -42,7 +46,7 @@ public interface DataIntegrityProof extends Proof {
      *
      * @return the date time when the proof has been created
      */
-    @Term
+    @Vocab("http://purl.org/dc/terms/")
     @Literal(XsdDateTimeAdapter.class)
     Instant created();
 
@@ -70,13 +74,25 @@ public interface DataIntegrityProof extends Proof {
     @Term(value = "expiration", compact = false)
     Instant expires();
     
+    @Term("proofValue")
     @Provided
     @Override
     ProofValue signature();
     
     @Override
     default void validate(Map<String, Object> params) throws DocumentError {
-        // TODO Auto-generated method stub
-        
+
+        if (purpose() == null) {
+            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
+        }
+//TODO        if (cryptoSuite() == null) {
+//            throw new DocumentError(ErrorType.Missing, "CryptoSuite");
+//        }
+                
+        if (params != null) {
+//            assertEquals(params, VcdiVocab.PURPOSE, purpose().toString()); // TODO compare as URI, expect URI in params
+//            assertEquals(params, VcdiVocab.CHALLENGE, challenge());
+//            assertEquals(params, VcdiVocab.DOMAIN, domain());
+        }
     }
 }

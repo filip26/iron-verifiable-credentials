@@ -35,7 +35,7 @@ public interface Proof extends Linkable {
      *
      * @return {@link VerificationMethod} to verify the proof signature
      */
-    @Term
+    @Term("verificationMethod")
     VerificationMethod method();
 
     /**
@@ -80,7 +80,7 @@ public interface Proof extends Linkable {
      *
      * @return {@link URI} identifying the purpose
      */
-    @Term
+    @Term("proofPurpose")
     URI purpose();
 
     /**

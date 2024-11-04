@@ -47,7 +47,7 @@ class TestSignatureSuite extends DataIntegritySuite {
             new TestAlgorithm());
 
     protected TestSignatureSuite() {
-        super(TEST_CRYPTO_NAME, Multibase.BASE_58_BTC, METHOD_ADAPTER);
+        super(TEST_CRYPTO_NAME, Multibase.BASE_58_BTC);
     }
 
     @Override

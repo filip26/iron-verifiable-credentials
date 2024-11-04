@@ -64,7 +64,7 @@ public abstract class VcdmReader implements VerifiableReader {
             final DocumentLoader loader,
             final URI base) throws DocumentError {
 
-        final Collection<String> types = types(document);
+        final Collection<String> types = compactedType(document);
 
         if (types == null || types.isEmpty()) {
             throw new DocumentError(ErrorType.Missing, "VerifiableType");
@@ -76,18 +76,19 @@ public abstract class VcdmReader implements VerifiableReader {
         } else if (isPresentation(types)) {
             return readPresentation(context, document, loader, base);
         }
+
         throw new DocumentError(ErrorType.Unknown, "VerifiableType");
     }
 
-    protected boolean isCredential(Collection<String> types) {
-        return types.contains(VcdmVocab.CREDENTIAL_TYPE.name());
+    protected boolean isCredential(Collection<String> compactedType) {
+        return compactedType.contains(VcdmVocab.CREDENTIAL_TYPE.name());
     }
 
-    protected boolean isPresentation(Collection<String> types) {
-        return types.contains(VcdmVocab.PRESENTATION_TYPE.name());
+    protected boolean isPresentation(Collection<String> compactedType) {
+        return compactedType.contains(VcdmVocab.PRESENTATION_TYPE.name());
     }
 
-    protected static Collection<String> types(JsonObject document) {
+    protected static Collection<String> compactedType(JsonObject document) {
         JsonValue value = document.get("type");
         if (JsonUtils.isNotNull(value)) {
             return JsonUtils.toJsonArray(value).stream()
@@ -139,13 +140,13 @@ public abstract class VcdmReader implements VerifiableReader {
 
     protected Credential readCredential(
             final Collection<String> context,
-            final JsonObject document,
+            final JsonObject compacted,
             final DocumentLoader loader,
             final URI base) throws DocumentError {
 
         try {
-            // load the document
-            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document))
+            // expand the document
+            final JsonArray expanded = JsonLd.expand(JsonDocument.of(compacted))
                     .undefinedTermsPolicy(ProcessingPolicy.Fail)
                     .context(Json.createArrayBuilder(context).build())
                     .loader(loader)
@@ -153,7 +154,7 @@ public abstract class VcdmReader implements VerifiableReader {
 
             return (Credential) read(
                     context,
-                    document,
+                    compacted,
                     expanded,
                     loader,
                     base);
@@ -187,14 +188,14 @@ public abstract class VcdmReader implements VerifiableReader {
                             || VcdmVocab.VERIFIABLE_CREDENTIALS.uri().equals(indexTerm))
                                     ? TraversalPolicy.Drop
                                     : TraversalPolicy.Accept));
-//            DebugNodeWriter.writeToStdOut(tree);
+
             if (tree == null) {
                 throw new DocumentError(ErrorType.Invalid, "document");
             }
             if ((tree.size() != 1
                     || !tree.node().isFragment()
                     || !tree.node().asFragment().type().isAdaptableTo(Verifiable.class))) {
-//                throw new DocumentError(ErrorType.Invalid, "document");
+                throw new DocumentError(ErrorType.Invalid, "document");
             }
 
             final Verifiable verifiable = tree.materialize(Verifiable.class);
