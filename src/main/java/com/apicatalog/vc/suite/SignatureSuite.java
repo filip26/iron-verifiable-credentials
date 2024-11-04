@@ -3,9 +3,9 @@ package com.apicatalog.vc.suite;
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 import jakarta.json.JsonObject;
 
@@ -34,7 +34,7 @@ public interface SignatureSuite {
      * @return <code>true</code> if the proof is supported, <code>false</code>
      *         otherwise
      */
-    boolean isSupported(Verifiable verifiable, String proofType, JsonObject proof);
+    boolean isSupported(VerifiableMaterial verifiable, String proofType, JsonObject proof);
 
     /**
      * Deserialize the given expanded JSON-LD object into a {@link Proof}.
@@ -46,5 +46,5 @@ public interface SignatureSuite {
      * @return a new {@link Proof} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    Proof getProof(Verifiable verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError;
+    Proof getProof(VerifiableMaterial verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError;
 }

@@ -255,8 +255,6 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     public Verifiable verify(Verifiable verifiable, Map<String, Object> params) throws VerificationError, DocumentError {
 
-        Objects.requireNonNull(verifiable);
-
         if (verifiable.proofs() == null || verifiable.proofs().isEmpty()) {
             throw new DocumentError(ErrorType.Missing, "Proof");
         }
@@ -310,10 +308,10 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
         } catch (NullPointerException e) {
             throw new DocumentError(e, ErrorType.Missing);
-            
+
         } catch (UnsupportedOperationException e) {
             throw new DocumentError(e, ErrorType.Unknown);
-            
+
         }
     }
 

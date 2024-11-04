@@ -30,6 +30,7 @@ import com.apicatalog.vc.proof.GenericProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vc.verifier.VerifiableMaterial;
 import com.apicatalog.vcdm.DeprecatedVcdmPresentation;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -118,6 +119,7 @@ public abstract class VcdmReader implements VerifiableReader {
 
             final Presentation presentation = (Presentation) read(
                     context,
+                    jsonPresentation,
                     expanded,
                     loader,
                     base);
@@ -151,6 +153,7 @@ public abstract class VcdmReader implements VerifiableReader {
 
             return (Credential) read(
                     context,
+                    document,
                     expanded,
                     loader,
                     base);
@@ -163,6 +166,7 @@ public abstract class VcdmReader implements VerifiableReader {
 
     Verifiable read(
             final Collection<String> context,
+            final JsonObject compacted,
             final JsonArray expanded,
             final DocumentLoader loader,
             final URI base) throws DocumentError {
@@ -201,7 +205,7 @@ public abstract class VcdmReader implements VerifiableReader {
             if (jsonProofs != null
                     && !jsonProofs.isEmpty()
                     && verifiable instanceof PropertyValueConsumer proofConsumer) {
-                proofConsumer.acceptFragmentPropertyValue("proofs", getProofs(verifiable, jsonProofs, loader));
+                proofConsumer.acceptFragmentPropertyValue("proofs", getProofs(new VerifiableMaterial(compacted, expanded, verifiable), jsonProofs, loader));
             }
 
             return verifiable;
@@ -214,7 +218,7 @@ public abstract class VcdmReader implements VerifiableReader {
         }
     }
 
-    protected Collection<Proof> getProofs(Verifiable verifiable, JsonArray jsonProofs, DocumentLoader loader) throws DocumentError {
+    protected Collection<Proof> getProofs(VerifiableMaterial material, JsonArray jsonProofs, DocumentLoader loader) throws DocumentError {
         try {
             final Collection<Proof> proofs = new ArrayList<>(jsonProofs.size());
 
@@ -233,8 +237,8 @@ public abstract class VcdmReader implements VerifiableReader {
 
                 // find a suite that can materialize the proof
                 for (SignatureSuite suite : suites) {
-                    if (suite.isSupported(verifiable, proofTypes.iterator().next(), jsonProof.asJsonObject())) {
-                        proof = suite.getProof(verifiable, jsonProof.asJsonObject(), loader);
+                    if (suite.isSupported(material, proofTypes.iterator().next(), jsonProof.asJsonObject())) {
+                        proof = suite.getProof(material, jsonProof.asJsonObject(), loader);
                         if (proof != null) {
                             break;
                         }

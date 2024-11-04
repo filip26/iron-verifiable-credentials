@@ -7,14 +7,19 @@ import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
+import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue.ValueType;
@@ -65,14 +70,24 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public boolean isSupported(Verifiable verifiable, String proofType, JsonObject expandedProof) {
+    public boolean isSupported(VerifiableMaterial verifiable, String proofType, JsonObject expandedProof) {
         return VcdiVocab.TYPE.uri().equals(proofType) && cryptosuiteName.equals(getCryptoSuiteName(expandedProof));
     }
 
     @Override
-    public Proof getProof(Verifiable verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError {
-        return null;
-//
+    public Proof getProof(VerifiableMaterial verifiable, JsonObject proof, DocumentLoader loader) throws DocumentError {
+
+        var mapping = TreeReaderMapping.createBuilder()
+                .scan(DataIntegrityProof.class).build();
+
+        var reader = JsonLdReader.of(mapping, loader);
+
+        try {
+            return reader.read(DataIntegrityProof.class, proof);
+        } catch (TreeBuilderError | NodeAdapterError e) {
+            throw new DocumentError(e, ErrorType.Invalid, "Proof");
+        }
+        
 //        var reader = JsonLdTreeReader.createBuilder()
 //                .with(
 //                        VcdiVocab.TYPE.uri(),

@@ -2,7 +2,9 @@ package com.apicatalog.vc.di;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Literal;
 import com.apicatalog.linkedtree.orm.Provided;
@@ -41,6 +43,7 @@ public interface DataIntegrityProof extends Proof {
      * @return the date time when the proof has been created
      */
     @Term
+    @Literal(XsdDateTimeAdapter.class)
     Instant created();
 
     /**
@@ -70,4 +73,10 @@ public interface DataIntegrityProof extends Proof {
     @Provided
     @Override
     ProofValue signature();
+    
+    @Override
+    default void validate(Map<String, Object> params) throws DocumentError {
+        // TODO Auto-generated method stub
+        
+    }
 }
