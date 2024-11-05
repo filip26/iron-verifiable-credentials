@@ -89,7 +89,9 @@ public interface DataIntegrityProof extends VerifiableProof {
     @Override
     default void validate(Map<String, Object> params) throws DocumentError {
 
+        assertNotNull(this::method, "VerificationMethod");
         assertNotNull(this::purpose, "ProofPurpose");
+        assertNotNull(this::signature, "ProofValue");
         assertNotNull(this::cryptoSuite, "CryptoSuite");
         assertExist(this::created, "Created");
         assertExist(this::expires, "Expires");
@@ -110,13 +112,20 @@ public interface DataIntegrityProof extends VerifiableProof {
     }
 
     static void assertNotNull(Supplier<?> fnc, String term) throws DocumentError {
+
+        Object value = null;
+
         try {
-            if (fnc.get() == null) {
-                throw new DocumentError(ErrorType.Missing, term);
-            }
+            value = fnc.get();
+
         } catch (Exception e) {
             throw new DocumentError(e, ErrorType.Invalid, term);
         }
+
+        if (value == null) {
+            throw new DocumentError(ErrorType.Missing, term);
+        }
+
     }
 
     static void assertExist(Supplier<?> fnc, String term) throws DocumentError {

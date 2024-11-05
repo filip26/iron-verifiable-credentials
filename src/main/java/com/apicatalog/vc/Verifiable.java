@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Id;
 import com.apicatalog.linkedtree.orm.Term;
@@ -17,7 +16,7 @@ import com.apicatalog.vc.proof.Proof;
  * @since 0.9.0
  */
 @Fragment(generic = true)
-public interface Verifiable extends Linkable {
+public interface Verifiable {
 
     @Id
     URI id();

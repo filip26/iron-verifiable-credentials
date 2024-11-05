@@ -10,7 +10,6 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Id;
 import com.apicatalog.linkedtree.orm.Term;
@@ -26,7 +25,7 @@ import jakarta.json.JsonStructure;
  * @see {@link DeprecatedDataIntegrityProof} for an example implementation
  */
 @Fragment(generic = true)
-public interface Proof extends Linkable {
+public interface Proof {
 
     /**
      * A set of parameters required to independently verify the proof, such as an

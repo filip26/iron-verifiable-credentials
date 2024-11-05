@@ -8,7 +8,6 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.lang.LangStringSelector;
 import com.apicatalog.vc.Credential;
@@ -17,7 +16,6 @@ import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.DeprecatedVcdmCredential;
-import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class Vcdm20Credential extends DeprecatedVcdmCredential implements Credential {
@@ -130,12 +128,6 @@ public class Vcdm20Credential extends DeprecatedVcdmCredential implements Creden
 
     @Override
     public Collection<Proof> proofs() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public LinkedNode ld() {
         // TODO Auto-generated method stub
         return null;
     }

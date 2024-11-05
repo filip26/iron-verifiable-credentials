@@ -12,8 +12,7 @@ import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.Term;
-import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
+import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.primitive.VerifiableTree;
@@ -32,8 +31,6 @@ public abstract class DeprecatedVerifiableProof implements Proof {
 
     protected VerificationMethod method;
     protected ProofValue signature;
-
-    protected LinkedFragment ld;
 
     protected DeprecatedVerifiableProof(Verifiable verifiable, CryptoSuite crypto) {
         this.verifiable = verifiable;
@@ -63,7 +60,7 @@ public abstract class DeprecatedVerifiableProof implements Proof {
         Objects.requireNonNull(unsigned);
 
         // remove a proof value and get a new unsigned copy
-        final LinkedTree unsignedProof = unsignedProof(ld.root());
+//        final LinkedTree unsignedProof = unsignedProof(ld.root());
 
 //        DictionaryWriter.writeToStdOut(unsigned);
 //        DictionaryWriter.writeToStdOut(unsignedProof);
@@ -89,11 +86,6 @@ public abstract class DeprecatedVerifiableProof implements Proof {
 //        if (signature.toByteArray() != null &&  signature.toByteArray().length != 32) {
 //            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
 //        }
-    }
-
-    @Override
-    public LinkedNode ld() {
-        return ld;
     }
 
     @Override
@@ -123,7 +115,7 @@ public abstract class DeprecatedVerifiableProof implements Proof {
 
     @Override
     public Collection<String> type() {
-        return ld.type().stream().toList();
+        return ((Linkable)this).ld().asFragment().type().stream().toList();
     }
 
     protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {

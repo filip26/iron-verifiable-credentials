@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
@@ -46,11 +45,6 @@ public class Vcdm20EnvelopedPresentation implements Presentation {
     @Override
     public Collection<Proof> proofs() {
         return Collections.emptyList();
-    }
-
-    @Override
-    public LinkedNode ld() {
-        return ld;
     }
 
     @Override

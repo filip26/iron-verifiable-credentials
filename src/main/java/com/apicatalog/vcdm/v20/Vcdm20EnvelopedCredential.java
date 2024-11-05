@@ -6,7 +6,6 @@ import java.util.Collections;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.issuer.CredentialIssuer;
@@ -73,11 +72,6 @@ public class Vcdm20EnvelopedCredential implements Credential {
     @Override
     public Collection<Subject> subject() {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public LinkedNode ld() {
-        return ld;
     }
 
     @Override

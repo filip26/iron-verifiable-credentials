@@ -3,15 +3,11 @@ package com.apicatalog.vcdm.v20;
 import java.net.URI;
 import java.util.Collection;
 
-import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.holder.PresentationHolder;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.DeprecatedVcdmPresentation;
-import com.apicatalog.vcdm.VcdmVersion;
 
 public class Vcdm20Presentation extends DeprecatedVcdmPresentation implements Presentation {
 
@@ -41,13 +37,7 @@ public class Vcdm20Presentation extends DeprecatedVcdmPresentation implements Pr
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
-    public LinkedNode ld() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+    
     @Override
     public PresentationHolder holder() {
         // TODO Auto-generated method stub
