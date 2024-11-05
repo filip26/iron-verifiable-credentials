@@ -11,6 +11,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
+import com.apicatalog.linkedtree.adapter.PropertyValueError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.JsonLdType;
@@ -89,7 +90,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     public Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proofMaterial, DocumentLoader loader) throws DocumentError {
 
         var mapping = TreeReaderMapping.createBuilder()
-                .scan(DataIntegrityProof.class)
+                .scan(DataIntegrityProof.class, true)
                 .with(new MultibaseAdapter()) // TODO supported bases only
                 // TODO add custom type -> custom mapper
                 .build();
@@ -129,6 +130,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
             return proof;
 
+        } catch (PropertyValueError e) {
+            throw new DocumentError(e, ErrorType.Invalid, e.getPropertyName());
+            
         } catch (TreeBuilderError | NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }

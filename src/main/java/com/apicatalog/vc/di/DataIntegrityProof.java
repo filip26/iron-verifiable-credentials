@@ -89,13 +89,11 @@ public interface DataIntegrityProof extends VerifiableProof {
     @Override
     default void validate(Map<String, Object> params) throws DocumentError {
 
-        assertNotNull(this::method, "VerificationMethod");
+//        assertNotNull(this::method, "VerificationMethod");
         assertNotNull(this::purpose, "ProofPurpose");
         assertNotNull(this::signature, "ProofValue");
         assertNotNull(this::cryptoSuite, "CryptoSuite");
-        assertExist(this::created, "Created");
-        assertExist(this::expires, "Expires");
-
+        
         if (created() != null && Instant.now().isBefore(created())) {
             throw new DocumentError(ErrorType.Invalid, "Created");
         }

@@ -34,12 +34,11 @@ public class Vcdm11Reader extends VcdmReader {
             final SignatureSuite... suites) {
 
         Objects.requireNonNull(types);
-        
+
         TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder()
-                .scan(Vcdm11Credential.class)
-                .scan(Vcdm11Presentation.class)
-                ; 
-        
+                .scan(Vcdm11Credential.class, true)
+                .scan(Vcdm11Presentation.class, true);
+
         for (Class<?> type : types) {
             builder.scan(type);
         }
