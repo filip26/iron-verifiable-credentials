@@ -51,7 +51,7 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
         final VerificationMethod method = proof.method();
 
         if (method == null) {
-            throw new DocumentError(ErrorType.Missing, "ProofVerificationMethod");
+            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
         }
 
         final String methodType = method.type();

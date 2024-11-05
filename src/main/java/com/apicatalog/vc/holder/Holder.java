@@ -13,7 +13,7 @@ import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.Term;
+import com.apicatalog.ld.VocabTerm;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vc.verifier.VerificationProcessor;
@@ -85,7 +85,7 @@ public class Holder extends VerificationProcessor<Holder> {
 //        } else if (VerifiableReader.isPresentation(expanded)) {
 //            // ?
 //        }
-        throw new DocumentError(ErrorType.Unknown, Term.TYPE);
+        throw new DocumentError(ErrorType.Unknown, VocabTerm.TYPE);
     }
 
     protected ExpandedVerifiable deriveProof(JsonStructure context, final JsonObject document, JsonObject expanded, Collection<String> selectors, DocumentLoader loader)

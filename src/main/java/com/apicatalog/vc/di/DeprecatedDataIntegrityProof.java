@@ -30,6 +30,7 @@ import jakarta.json.JsonStructure;
  * @see <a href="https://www.w3.org/TR/vc-data-integrity/#proofs">Proofs</a>
  *
  */
+@Deprecated
 public class DeprecatedDataIntegrityProof extends DeprecatedVerifiableProof implements Proof {
 
     protected final DataIntegritySuite suite;

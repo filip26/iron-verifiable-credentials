@@ -65,7 +65,7 @@
       ],
       "name": "missing created property",
       "input": "verifier/0009-in.jsonld",
-      "expectErrorCode": "InvalidProofVerificationMethod"
+      "expectErrorCode": "MissingCreated"
     },
     {
       "@id": "#t0010",

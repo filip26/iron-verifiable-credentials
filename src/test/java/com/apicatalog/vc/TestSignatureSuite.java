@@ -7,38 +7,14 @@ import com.apicatalog.cryptosuite.primitive.Urdna2015;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.di.DataIntegritySuite;
-import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
 import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 class TestSignatureSuite extends DataIntegritySuite {
-
-    static final MethodAdapter METHOD_ADAPTER = new MethodAdapter() {
-
-        @Override
-        public Object materialize(LinkedFragment source) throws NodeAdapterError {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public Class<?> typeInterface() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public String type() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-    };
 
     static final String TEST_CRYPTO_NAME = "test-2022";
 
@@ -50,7 +26,7 @@ class TestSignatureSuite extends DataIntegritySuite {
             new TestAlgorithm());
 
     protected TestSignatureSuite() {
-        super(TEST_CRYPTO_NAME, Multibase.BASE_58_BTC);
+        super(TEST_CRYPTO_NAME, TestDataIntegrityProof.class, Multibase.BASE_58_BTC);
     }
 
     @Override

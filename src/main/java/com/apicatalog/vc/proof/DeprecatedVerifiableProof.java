@@ -11,7 +11,7 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.ld.Term;
+import com.apicatalog.ld.VocabTerm;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.vc.Verifiable;
@@ -21,6 +21,7 @@ import com.apicatalog.vc.primitive.VerifiableTree;
  * An abstract implementation providing partial implementation.
  *
  */
+@Deprecated
 public abstract class DeprecatedVerifiableProof implements Proof {
 
     protected final Verifiable verifiable;
@@ -118,7 +119,7 @@ public abstract class DeprecatedVerifiableProof implements Proof {
         return ((Linkable)this).ld().asFragment().type().stream().toList();
     }
 
-    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
+    protected static void assertEquals(Map<String, Object> params, VocabTerm name, String param) throws DocumentError {
         final Object value = params.get(name.name());
 
         if (value == null) {

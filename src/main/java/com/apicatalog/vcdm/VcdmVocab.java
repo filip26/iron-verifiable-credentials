@@ -1,6 +1,6 @@
 package com.apicatalog.vcdm;
 
-import com.apicatalog.ld.Term;
+import com.apicatalog.ld.VocabTerm;
 
 public final class VcdmVocab {
 
@@ -12,48 +12,48 @@ public final class VcdmVocab {
 
     public static final String SECURITY_VOCAB = "https://w3id.org/security#";
 
-    public static final Term CREDENTIAL_TYPE = Term.create("VerifiableCredential", CREDENTIALS_VOCAB);
+    public static final VocabTerm CREDENTIAL_TYPE = VocabTerm.create("VerifiableCredential", CREDENTIALS_VOCAB);
     
-    public static final Term PRESENTATION_TYPE = Term.create("VerifiablePresentation", CREDENTIALS_VOCAB);
+    public static final VocabTerm PRESENTATION_TYPE = VocabTerm.create("VerifiablePresentation", CREDENTIALS_VOCAB);
 
-    public static final Term STATUS = Term.create("credentialStatus", CREDENTIALS_VOCAB);
+    public static final VocabTerm STATUS = VocabTerm.create("credentialStatus", CREDENTIALS_VOCAB);
 
-    public static final Term ISSUANCE_DATE = Term.create("issuanceDate", CREDENTIALS_VOCAB);
+    public static final VocabTerm ISSUANCE_DATE = VocabTerm.create("issuanceDate", CREDENTIALS_VOCAB);
 
-    public static final Term SUBJECT = Term.create( "credentialSubject", CREDENTIALS_VOCAB);
+    public static final VocabTerm SUBJECT = VocabTerm.create( "credentialSubject", CREDENTIALS_VOCAB);
     
-    public static final Term ISSUER = Term.create("issuer", CREDENTIALS_VOCAB);
+    public static final VocabTerm ISSUER = VocabTerm.create("issuer", CREDENTIALS_VOCAB);
 
-    public static final Term VALID_FROM = Term.create("validFrom", CREDENTIALS_VOCAB);
+    public static final VocabTerm VALID_FROM = VocabTerm.create("validFrom", CREDENTIALS_VOCAB);
     
-    public static final Term VALID_UNTIL = Term.create("validUntil", CREDENTIALS_VOCAB);
+    public static final VocabTerm VALID_UNTIL = VocabTerm.create("validUntil", CREDENTIALS_VOCAB);
     
-    public static final Term ISSUED = Term.create("issued", CREDENTIALS_VOCAB);
+    public static final VocabTerm ISSUED = VocabTerm.create("issued", CREDENTIALS_VOCAB);
 
-    public static final Term EXPIRATION_DATE = Term.create("expirationDate", CREDENTIALS_VOCAB);
+    public static final VocabTerm EXPIRATION_DATE = VocabTerm.create("expirationDate", CREDENTIALS_VOCAB);
 
-    public static final Term CREDENTIAL_SCHEMA = Term.create("credentialSchema", CREDENTIALS_VOCAB);
+    public static final VocabTerm CREDENTIAL_SCHEMA = VocabTerm.create("credentialSchema", CREDENTIALS_VOCAB);
     
-    public static final Term REFRESH_SERVICE = Term.create("refreshService", CREDENTIALS_VOCAB);
+    public static final VocabTerm REFRESH_SERVICE = VocabTerm.create("refreshService", CREDENTIALS_VOCAB);
     
-    public static final Term TERMS_OF_USE = Term.create("termsOfUse", CREDENTIALS_VOCAB);
+    public static final VocabTerm TERMS_OF_USE = VocabTerm.create("termsOfUse", CREDENTIALS_VOCAB);
     
-    public static final Term EVIDENCE = Term.create("evidence", CREDENTIALS_VOCAB);
+    public static final VocabTerm EVIDENCE = VocabTerm.create("evidence", CREDENTIALS_VOCAB);
 
-    public static final Term VERIFIABLE_CREDENTIALS = Term.create("verifiableCredential", CREDENTIALS_VOCAB);
+    public static final VocabTerm VERIFIABLE_CREDENTIALS = VocabTerm.create("verifiableCredential", CREDENTIALS_VOCAB);
 
-    public static final Term HOLDER = Term.create("holder", CREDENTIALS_VOCAB);
+    public static final VocabTerm HOLDER = VocabTerm.create("holder", CREDENTIALS_VOCAB);
 
-    public static final Term PROOF = Term.create("proof", SECURITY_VOCAB);
+    public static final VocabTerm PROOF = VocabTerm.create("proof", SECURITY_VOCAB);
     
-    public static final Term MULTIBASE_TYPE = Term.create("multibase", SECURITY_VOCAB);
+    public static final VocabTerm MULTIBASE_TYPE = VocabTerm.create("multibase", SECURITY_VOCAB);
 
-    public static final Term ENVELOPED_CREDENTIAL_TYPE = Term.create("EnvelopedVerifiableCredential", CREDENTIALS_VOCAB);
+    public static final VocabTerm ENVELOPED_CREDENTIAL_TYPE = VocabTerm.create("EnvelopedVerifiableCredential", CREDENTIALS_VOCAB);
     
-    public static final Term ENVELOPED_PRESENTATION_TYPE = Term.create("EnvelopedVerifiablePresentation", CREDENTIALS_VOCAB);
+    public static final VocabTerm ENVELOPED_PRESENTATION_TYPE = VocabTerm.create("EnvelopedVerifiablePresentation", CREDENTIALS_VOCAB);
 
-    public static final Term NAME = Term.create("name", "https://schema.org/");
-    public static final Term DESCRIPTION = Term.create("description", "https://schema.org/");
+    public static final VocabTerm NAME = VocabTerm.create("name", "https://schema.org/");
+    public static final VocabTerm DESCRIPTION = VocabTerm.create("description", "https://schema.org/");
     
     private VcdmVocab() { /* protected */ }
 }

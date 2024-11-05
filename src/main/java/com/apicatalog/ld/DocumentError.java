@@ -38,13 +38,13 @@ public class DocumentError extends Exception {
         this.code = toCode(type, code);
     }
 
-    public DocumentError(ErrorType type, Term... terms) {
+    public DocumentError(ErrorType type, VocabTerm... terms) {
         super(toCode(type, terms));
         this.type = type;
         this.code = toCode(type, terms);
     }
 
-    public DocumentError(Throwable e, ErrorType type, Term... terms) {
+    public DocumentError(Throwable e, ErrorType type, VocabTerm... terms) {
         super(toCode(type, terms), e);
         this.type = type;
         this.code = toCode(type, terms);
@@ -85,7 +85,7 @@ public class DocumentError extends Exception {
         }
     }
 
-    static final String toCode(ErrorType type, Term... terms) {
+    static final String toCode(ErrorType type, VocabTerm... terms) {
 
         final StringBuilder sb = new StringBuilder();
 

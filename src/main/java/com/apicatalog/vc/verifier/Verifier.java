@@ -33,7 +33,6 @@ import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmResolver;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 
@@ -288,13 +287,13 @@ public class Verifier extends VerificationProcessor<Verifier> {
                 }
 
                 final VerificationMethod verificationMethod = getMethod(proof)
-                        .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD));
+                        .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdiVocab.VERIFICATION_METHOD));
 
                 if (verificationMethod instanceof VerificationKey verificationKey) {
                     proof.verify(verificationKey);
 
                 } else {
-                    throw new DocumentError(ErrorType.Unknown, VcdmVocab.PROOF, VcdiVocab.VERIFICATION_METHOD);
+                    throw new DocumentError(ErrorType.Unknown, VcdiVocab.VERIFICATION_METHOD);
                 }
 
                 proof = queue.pop();

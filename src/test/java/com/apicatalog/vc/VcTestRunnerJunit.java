@@ -103,7 +103,7 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, TestSignatureSuite.METHOD_ADAPTER))
+                final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, null))
                         .loader(LOADER);
 
                 // proof draft

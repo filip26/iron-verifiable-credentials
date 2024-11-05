@@ -37,13 +37,18 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     protected final String cryptosuiteName;
 
     protected final Multibase proofValueBase;
+    
+    protected final Class<? extends DataIntegrityProof> proofInterface;
 
 //    protected ProofAdapter proofAdapter;
 
     protected DataIntegritySuite(
             String cryptosuiteName,
-            Multibase proofValueBase) {
+            Class<? extends DataIntegrityProof> proofInterface,
+            Multibase proofValueBase
+            ) {
         this.cryptosuiteName = cryptosuiteName;
+        this.proofInterface = proofInterface;
         this.proofValueBase = proofValueBase;
     }
 
@@ -90,7 +95,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
     public Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proofMaterial, DocumentLoader loader) throws DocumentError {
 
         var mapping = TreeReaderMapping.createBuilder()
-                .scan(DataIntegrityProof.class, true)
+                .scan(proofInterface, true)
                 .with(new MultibaseAdapter()) // TODO supported bases only
                 // TODO add custom type -> custom mapper
                 .build();
@@ -131,8 +136,8 @@ public abstract class DataIntegritySuite implements SignatureSuite {
             return proof;
 
         } catch (FragmentPropertyError e) {
-            throw new DocumentError(e, ErrorType.Invalid, "Proof", e.getPropertyName());
-            
+            throw new DocumentError(e, ErrorType.Invalid, e.getPropertyName());
+
         } catch (TreeBuilderError | NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }

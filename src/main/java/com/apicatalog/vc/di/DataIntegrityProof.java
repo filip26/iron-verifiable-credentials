@@ -3,10 +3,12 @@ package com.apicatalog.vc.di;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.VocabTerm;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
@@ -89,27 +91,40 @@ public interface DataIntegrityProof extends VerifiableProof {
     @Override
     default void validate(Map<String, Object> params) throws DocumentError {
 
-//        assertNotNull(this::method, "VerificationMethod");
-        assertNotNull(this::purpose, "ProofPurpose");
-        assertNotNull(this::signature, "ProofValue");
-        assertNotNull(this::cryptoSuite, "CryptoSuite");
+        assertNotNull(this::purpose, VcdiVocab.PURPOSE);
+        assertNotNull(this::cryptoSuite, VcdiVocab.CRYPTO_SUITE);
+        assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
         
         if (created() != null && Instant.now().isBefore(created())) {
-            throw new DocumentError(ErrorType.Invalid, "Created");
+            throw new DocumentError(ErrorType.Invalid, VcdiVocab.CREATED);
         }
 
         if (expires() != null && Instant.now().isAfter(expires())) {
-            throw new DocumentError(ErrorType.Invalid, "Expires");
+            throw new DocumentError(ErrorType.Invalid, VcdiVocab.EXPIRES);
         }
 
         if (params != null) {
-//            assertEquals(params, VcdiVocab.PURPOSE, purpose().toString()); // TODO compare as URI, expect URI in params
-//            assertEquals(params, VcdiVocab.CHALLENGE, challenge());
-//            assertEquals(params, VcdiVocab.DOMAIN, domain());
+            assertEquals(params, VcdiVocab.PURPOSE, purpose());
+            assertEquals(params, VcdiVocab.CHALLENGE, challenge());
+            assertEquals(params, VcdiVocab.DOMAIN, domain());
+            assertEquals(params, VcdiVocab.NONCE, nonce());
         }
     }
 
-    static void assertNotNull(Supplier<?> fnc, String term) throws DocumentError {
+    static void assertEquals(Map<String, Object> params, VocabTerm name, Object expected) throws DocumentError {
+
+        final Object value = params.get(name.name());
+        System.out.println(name.name() + " -> " + value + " : " + expected);
+        if (value == null) {
+            return;
+        }
+
+        if (!Objects.equals(value, expected)) {
+            throw new DocumentError(ErrorType.Invalid, name);
+        }
+    }
+
+    static void assertNotNull(Supplier<?> fnc, VocabTerm term) throws DocumentError {
 
         Object value = null;
 
@@ -122,15 +137,6 @@ public interface DataIntegrityProof extends VerifiableProof {
 
         if (value == null) {
             throw new DocumentError(ErrorType.Missing, term);
-        }
-
-    }
-
-    static void assertExist(Supplier<?> fnc, String term) throws DocumentError {
-        try {
-            fnc.get();
-        } catch (Exception e) {
-            throw new DocumentError(e, ErrorType.Invalid, term);
         }
     }
 }
