@@ -8,10 +8,12 @@ import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 public class Signature {
 
-    private final CryptoSuite suite;
-
-    public Signature(CryptoSuite suite) {
+    protected final CryptoSuite suite;
+    protected final byte[] signature;
+    
+    public Signature(CryptoSuite suite, byte[] signature) {
         this.suite = suite;
+        this.signature = signature;
     }
 
     /**
@@ -24,7 +26,6 @@ public class Signature {
      * @param data        expanded unsigned VC/VP document
      * @param unsignedProof   expanded proof with no proofValue
      * @param verificationKey
-     * @param signature
      *
      * @throws VerificationError
      * @throws DocumentError
@@ -32,13 +33,11 @@ public class Signature {
     public void verify(
             final VerifiableMaterial data,
             final VerifiableMaterial unsignedProof,
-            final byte[] verificationKey,
-            final byte[] signature) throws VerificationError {
+            final byte[] verificationKey) throws VerificationError {
 
         Objects.requireNonNull(data);
         Objects.requireNonNull(unsignedProof);
         Objects.requireNonNull(verificationKey);
-        Objects.requireNonNull(signature);
 
         try {
             final byte[] computeSignature = hashCode(data, unsignedProof);

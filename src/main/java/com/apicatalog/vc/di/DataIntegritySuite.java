@@ -79,9 +79,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         if (proofType == null || proofType.isEmpty()) {
             return false;
         }
-        
+
         final JsonObject expandedProof = proofMaterial.expanded();
-        
+
         return proofType.contains(VcdiVocab.TYPE.uri()) && cryptosuiteName.equals(getCryptoSuiteName(expandedProof));
     }
 
@@ -90,7 +90,7 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
         var mapping = TreeReaderMapping.createBuilder()
                 .scan(DataIntegrityProof.class)
-                .with(new MultibaseAdapter())   //TODO supported bases only
+                .with(new MultibaseAdapter()) // TODO supported bases only
                 // TODO add custom type -> custom mapper
                 .build();
 
@@ -108,8 +108,16 @@ public abstract class DataIntegritySuite implements SignatureSuite {
                 final ByteArrayValue signature = linkable.ld().asFragment()
                         .literal(VcdiVocab.PROOF_VALUE.uri(), ByteArrayValue.class);
 
-                if (signature != null) {                            
-                    ProofValue proofValue = getProofValue(verifiable, proofMaterial, signature.byteArrayValue(), loader);
+                if (signature != null) {
+
+                    final VerifiableMaterial unsignedProof = new VerifiableMaterial(
+                            proofMaterial.context(),
+                            Json.createObjectBuilder(proofMaterial.compacted())
+                                    .remove(VcdiVocab.PROOF_VALUE.name()).build(),
+                            Json.createObjectBuilder(proofMaterial.expanded())
+                                    .remove(VcdiVocab.PROOF_VALUE.uri()).build());
+
+                    ProofValue proofValue = getProofValue(verifiable, unsignedProof, signature.byteArrayValue(), loader);
                     consumer.acceptFragmentPropertyValue("signature", proofValue);
 
                     if (proofValue != null) {

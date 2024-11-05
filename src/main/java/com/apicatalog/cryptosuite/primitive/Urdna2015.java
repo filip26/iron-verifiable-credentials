@@ -21,14 +21,13 @@ import com.apicatalog.rdf.io.error.UnsupportedContentException;
 import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 import io.setl.rdf.normalization.RdfNormalize;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
 public class Urdna2015 implements Canonicalizer {
 
     @Override
     public byte[] canonicalize(VerifiableMaterial document) throws CryptoSuiteError {
-        //TODO process compacted version
+        // TODO process compacted version
         try {
             final JsonObject expanded = document.expanded();
 

@@ -4,7 +4,6 @@ import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
 import com.apicatalog.cryptosuite.algorithm.Digester;
 import com.apicatalog.cryptosuite.algorithm.Signer;
-import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 /**
@@ -17,7 +16,7 @@ public record CryptoSuite(
         Canonicalizer canonicalizer,
         Digester digester,
         Signer signer) implements Canonicalizer, Digester, Signer {
-    
+
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
         signer.verify(publicKey, signature, data);
@@ -42,7 +41,7 @@ public record CryptoSuite(
     public KeyPair keygen() throws KeyGenError {
         return signer.keygen();
     }
-    
+
     public String id() {
         return id;
     }

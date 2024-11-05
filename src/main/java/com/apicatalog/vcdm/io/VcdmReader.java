@@ -258,7 +258,7 @@ public abstract class VcdmReader implements VerifiableReader {
 //                    throw new DocumentError(ErrorType.Invalid, "ProofType");
 //                }
 
-                JsonValue expandedProof = EmbeddedProof.getProof(expandedProofIterator.next());;
+                JsonValue expandedProof = EmbeddedProof.getProof(expandedProofIterator.next());
                 
                 
                 

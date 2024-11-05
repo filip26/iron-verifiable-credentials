@@ -15,17 +15,17 @@ import com.apicatalog.vc.verifier.VerifiableMaterial;
  * suites do not allowing a selective disclosure.
  */
 public record SolidProofValue(
-        VerifiableMaterial data,
-        VerifiableMaterial unsignedProof,
         Signature signature,
-        byte[] toByteArray) implements ProofValue {
-
-    public SolidProofValue {
-        Objects.requireNonNull(toByteArray);
-    }
+        VerifiableMaterial data,
+        VerifiableMaterial unsignedProof
+        ) implements ProofValue {
+//
+//    public SolidProofValue {
+//        Objects.requireNonNull(toByteArray);
+//    }
 
     public static SolidProofValue of(CryptoSuite cryptoSuite, VerifiableMaterial data, VerifiableMaterial unsignedProof, byte[] signature) {
-        return new SolidProofValue(data, unsignedProof, new Signature(cryptoSuite), signature);
+        return new SolidProofValue(new Signature(cryptoSuite, signature), data, unsignedProof);
     }
 
     @Override
@@ -41,7 +41,7 @@ public record SolidProofValue(
         signature.verify(
                 data,
                 unsignedProof,
-                key.publicKey().rawBytes(),
-                toByteArray);
+                key.publicKey().rawBytes()
+                );
     }
 }

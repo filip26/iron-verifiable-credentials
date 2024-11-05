@@ -8,7 +8,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.di.DataIntegritySuite;
@@ -21,13 +20,13 @@ import com.apicatalog.vc.verifier.VerifiableMaterial;
 class TestSignatureSuite extends DataIntegritySuite {
 
     static final MethodAdapter METHOD_ADAPTER = new MethodAdapter() {
-        
+
         @Override
         public Object materialize(LinkedFragment source) throws NodeAdapterError {
             // TODO Auto-generated method stub
             return null;
         }
-        
+
         @Override
         public Class<?> typeInterface() {
             // TODO Auto-generated method stub
@@ -72,10 +71,10 @@ class TestSignatureSuite extends DataIntegritySuite {
         if (proofValue == null) {
             return null;
         }
-        
+
         if (proofValue.length != 32) {
             throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
         }
-        return SolidProofValue.of(CRYPTO, null, null, proofValue);
+        return SolidProofValue.of(CRYPTO, data, proof, proofValue);
     }
 }

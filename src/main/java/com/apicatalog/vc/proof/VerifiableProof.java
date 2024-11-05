@@ -5,9 +5,6 @@ import java.util.Objects;
 import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.Linkable;
-import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.vc.primitive.VerifiableTree;
 
 public interface VerifiableProof extends Proof {
 

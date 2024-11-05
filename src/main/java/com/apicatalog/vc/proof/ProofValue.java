@@ -15,5 +15,5 @@ public interface ProofValue {
 
     void verify(VerificationKey key) throws VerificationError, DocumentError;
 
-    byte[] toByteArray() throws DocumentError;
+//    byte[] toByteArray() throws DocumentError;
 }
