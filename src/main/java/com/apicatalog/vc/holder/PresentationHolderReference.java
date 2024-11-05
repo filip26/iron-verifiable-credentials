@@ -5,13 +5,13 @@ import java.net.URI;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.selector.InvalidSelector;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 
 public record PresentationHolderReference(
         URI id,
         LinkedTree root) implements PresentationHolder {
 
-    public static PresentationHolderReference of(LinkedNode node) throws InvalidSelector {
+    public static PresentationHolderReference of(LinkedNode node) throws NodeAdapterError {
         return new PresentationHolderReference(node.asFragment().uri(), node.asFragment().root());
     }
 

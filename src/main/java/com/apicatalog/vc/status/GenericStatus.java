@@ -4,11 +4,11 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.selector.InvalidSelector;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 
 public record GenericStatus(URI id, LinkedNode ld) implements Status {
 
-    public static Status of(LinkedNode node) throws InvalidSelector {
+    public static Status of(LinkedNode node) throws NodeAdapterError {
         return new GenericStatus(node.asFragment().uri(), node);
     }
 

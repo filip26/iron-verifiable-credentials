@@ -10,7 +10,7 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.selector.InvalidSelector;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 
 public record GenericProof(
         URI id,
@@ -42,21 +42,21 @@ public record GenericProof(
     }
 
     @Override
-    public void verify(VerificationKey method) throws VerificationError, DocumentError {   
+    public void verify(VerificationKey method) throws VerificationError, DocumentError {
         throw new UnsupportedOperationException("An unknown proof cannot be verified " + type() + ".");
     }
-    
+
     @Override
     public Collection<String> type() {
         return ld().asFragment().type().stream().toList();
     }
-    
+
     @Override
     public URI id() {
         return id;
     }
-    
-    public static GenericProof of(LinkedNode source) throws InvalidSelector {
+
+    public static GenericProof of(LinkedNode source) throws NodeAdapterError {
         return new GenericProof(source.asFragment().uri(), source);
     }
 

@@ -11,8 +11,8 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
-import com.apicatalog.linkedtree.adapter.PropertyValueError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
@@ -130,8 +130,8 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
             return proof;
 
-        } catch (PropertyValueError e) {
-            throw new DocumentError(e, ErrorType.Invalid, e.getPropertyName());
+        } catch (FragmentPropertyError e) {
+            throw new DocumentError(e, ErrorType.Invalid, "Proof", e.getPropertyName());
             
         } catch (TreeBuilderError | NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");

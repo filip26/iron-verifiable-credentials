@@ -17,10 +17,10 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
-import com.apicatalog.linkedtree.selector.InvalidSelector;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
@@ -155,7 +155,7 @@ public abstract class VcdmReader implements VerifiableReader {
                     || ValueType.OBJECT != expanded.iterator().next().getValueType()) {
                 throw new DocumentError(ErrorType.Invalid, "Credential");
             }
-            
+
             return (Credential) read(
                     context,
                     document,
@@ -203,11 +203,11 @@ public abstract class VcdmReader implements VerifiableReader {
             final JsonArray expandedProofs = EmbeddedProof.getProofs(expanded);
 
             final JsonObject expandedUnsigned = EmbeddedProof.removeProofs(expanded);
-            
+
             final Verifiable verifiable = reader.read(Verifiable.class, Json.createArrayBuilder().add(expandedUnsigned).build());
-            
+
             Collection<JsonObject> compactedProofs = getProofs(proofs);
-            
+
             if (compactedProofs != null
                     && !compactedProofs.isEmpty()
                     && verifiable instanceof PropertyValueConsumer proofConsumer) {
@@ -233,20 +233,20 @@ public abstract class VcdmReader implements VerifiableReader {
     }
 
     protected Collection<Proof> getProofs(
-            VerifiableMaterial verifiable, 
-            Collection<JsonObject> compacted, 
+            VerifiableMaterial verifiable,
+            Collection<JsonObject> compacted,
             JsonArray expanded,
             DocumentLoader loader) throws DocumentError {
 
         if (compacted.size() != expanded.size()) {
             throw new DocumentError(ErrorType.Invalid, "ProofIntegrity");
         }
-        
+
         try {
             final Collection<Proof> proofs = new ArrayList<>(compacted.size());
 
             Iterator<JsonValue> expandedProofIterator = expanded.iterator();
-            
+
             // read proofs
             for (final JsonObject compactedProof : compacted) {
 
@@ -259,19 +259,17 @@ public abstract class VcdmReader implements VerifiableReader {
 //                }
 
                 JsonValue expandedProof = EmbeddedProof.getProof(expandedProofIterator.next());
-                
-                
-                
+
                 if (JsonUtils.isNotObject(expandedProof)) {
                     throw new DocumentError(ErrorType.Invalid, "ProofIntegrity");
                 }
-                
-                //FIXME
+
+                // FIXME
                 VerifiableMaterial proofMaterial = new VerifiableMaterial(
                         null,
                         compactedProof,
                         expandedProof.asJsonObject());
-                
+
                 Proof proof = null;
 
                 // find a suite that can materialize the proof
@@ -295,10 +293,10 @@ public abstract class VcdmReader implements VerifiableReader {
             }
             return proofs;
 
-        } catch (InvalidSelector e) {
+        } catch (FragmentPropertyError e) {
             throw DocumentError.of(e);
 
-        } catch (TreeBuilderError e) {
+        } catch (TreeBuilderError | NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }
     }
@@ -354,7 +352,7 @@ public abstract class VcdmReader implements VerifiableReader {
 
         if (JsonUtils.isObject(proofs)) {
             jsonProofs.add(proofs.asJsonObject());
-            
+
         } else if (JsonUtils.isArray(proofs)) {
             for (JsonValue jsonProof : proofs.asJsonArray()) {
                 if (JsonUtils.isObject(jsonProof)) {
@@ -366,7 +364,7 @@ public abstract class VcdmReader implements VerifiableReader {
         }
         return jsonProofs;
     }
-    
+
     protected abstract VerifiableReader resolve(Collection<String> context) throws DocumentError;
 
 }

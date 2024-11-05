@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
-import com.apicatalog.linkedtree.selector.InvalidSelector;
+import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 
 public class DocumentError extends Exception {
 
@@ -26,7 +26,13 @@ public class DocumentError extends Exception {
         this.code = toCode(type, code);
     }
 
-    public DocumentError(Throwable e, ErrorType type, String code) {
+    public DocumentError(Throwable e, ErrorType type) {
+        super(type.name() + "Document", e);
+        this.type = type;
+        this.code = toCode(type, type.name() + "Document");
+    }
+
+    public DocumentError(Throwable e, ErrorType type, String... code) {
         super(toCode(type, code), e);
         this.type = type;
         this.code = toCode(type, code);
@@ -44,8 +50,8 @@ public class DocumentError extends Exception {
         this.code = toCode(type, terms);
     }
 
-    public static DocumentError of(InvalidSelector e) {
-        return new DocumentError(e, ErrorType.Invalid, e.term());
+    public static DocumentError of(FragmentPropertyError e) {
+        return new DocumentError(e, ErrorType.Invalid, e.getPropertyName());
     }
 
     public ErrorType getType() {
