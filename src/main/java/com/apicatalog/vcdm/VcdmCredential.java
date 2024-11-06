@@ -14,6 +14,9 @@ import com.apicatalog.vc.model.RefreshService;
 import com.apicatalog.vc.model.TermsOfUse;
 import com.apicatalog.vc.status.Status;
 
+/**
+ * A common ancestor to all W3C VCDM based verifiable credentials.
+ */
 @Fragment
 @Term("VerifiableCredential")
 public interface VcdmCredential extends VcdmVerifiable, Credential {

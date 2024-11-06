@@ -1,23 +1,20 @@
 package com.apicatalog.vc.method.resolver;
 
-import java.net.URI;
-
-import com.apicatalog.controller.method.VerificationMethod;
+import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.vc.proof.Proof;
 
 public interface MethodResolver {
 
     /**
-     * Resolve the given {@link URI} into {@link VerificationMethod}
+     * Get {@link VerificationKey} for the given {@link Proof}. 
      *
-     * @param id      an {@link URI} to resolve as a verification method
-     * @param purpose a purpose of the requested verification method
+     * @param proof a proof to verify
      * 
-     * @return a new {@link VerificationMethod} instance
+     * @return {@link VerificationKey} instance
      * 
      * @throws DocumentError
      */
-    VerificationMethod resolve(URI id, URI purpose) throws DocumentError;
+    VerificationKey resolve(Proof proof) throws DocumentError;
 
-    boolean isAccepted(URI id);
 }

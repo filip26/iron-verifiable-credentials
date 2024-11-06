@@ -9,32 +9,37 @@ import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 
 /**
- * A generic predecessor.
+ * A generic verifiable credential.
  */
 @Fragment(generic = true)
 public interface Credential extends Verifiable {
 
     /**
-     * Checks if the credential is expired.
+     * Check if the credential is expired.
      *
      * @return <code>true</code> if the credential is expired
      */
     boolean isExpired();
 
     /**
-     * Checks if the credential is active.
+     * Check if the credential is active.
      * 
      * @return <code>true</code> if the an issuance is set an is in the future
      */
     boolean isNotValidYet();
 
+    /**
+     * Information about an issuer.
+     * 
+     * @return an issuer instance or <code>null</code>.
+     */
     @Term
     CredentialIssuer issuer();
 
     @Term
     Collection<Status> status();
 
-    @Term
+    @Term("credentialSubject")
     Collection<Subject> subject();
 
     @Override

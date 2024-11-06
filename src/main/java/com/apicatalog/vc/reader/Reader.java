@@ -29,7 +29,7 @@ public class Reader extends DocumentProcessor<Reader> {
 
     private static final Logger LOGGER = Logger.getLogger(Reader.class.getName());
 
-    protected final ReaderResolver readerResolver;
+    protected final VerifiableReaderProvider readerResolver;
 
     protected Reader(final SignatureSuite... suites) {
         super(suites);
@@ -37,7 +37,7 @@ public class Reader extends DocumentProcessor<Reader> {
         this.readerResolver = vcdmResolver(suites);
     }
 
-    protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
+    protected static VerifiableReaderProvider vcdmResolver(final SignatureSuite... suites) {
         var resolver = new VcdmResolver();
 //        resolver.v11(Vcdm11Reader.with(
 //                r -> {
@@ -120,7 +120,7 @@ public class Reader extends DocumentProcessor<Reader> {
             throw new DocumentError(e, ErrorType.Invalid, "Context");
         }
 
-        final VerifiableReader reader = readerResolver.resolveReader(context);
+        final VerifiableReader reader = readerResolver.reader(context);
 
         if (reader == null) {
             LOGGER.log(Level.INFO, "An unknown document model {0}", context);

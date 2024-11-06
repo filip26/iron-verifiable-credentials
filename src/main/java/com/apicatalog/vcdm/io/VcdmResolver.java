@@ -5,14 +5,14 @@ import java.util.Collection;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.reader.ReaderResolver;
+import com.apicatalog.vc.reader.VerifiableReaderProvider;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
-public class VcdmResolver implements ReaderResolver {
+public class VcdmResolver implements VerifiableReaderProvider {
 
     protected Vcdm11Reader v11;
     protected Vcdm20Reader v20;
@@ -23,7 +23,7 @@ public class VcdmResolver implements ReaderResolver {
     }
 
     @Override
-    public VerifiableReader resolveReader(final Collection<String> contexts) throws DocumentError {
+    public VerifiableReader reader(final Collection<String> contexts) throws DocumentError {
 
         if (contexts == null || contexts.isEmpty()) {
             return null;

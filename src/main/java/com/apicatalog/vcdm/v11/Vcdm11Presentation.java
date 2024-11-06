@@ -11,6 +11,13 @@ import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmPresentation;
 import com.apicatalog.vcdm.VcdmVersion;
 
+/**
+ * Represents W3C VCDM 1.1 Verifiable Presentation.
+ * 
+ * @see <a href=
+ *      "https://www.w3.org/TR/vc-data-model-1.1/#presentations">Verifiable
+ *      Credentials Data Model v1.1</a>
+ */
 @Fragment
 @Term("VerifiablePresentation")
 @Vocab("https://www.w3.org/2018/credentials#")
@@ -19,7 +26,7 @@ public interface Vcdm11Presentation extends VcdmPresentation {
     @Provided
     @Override
     Collection<Proof> proofs();
-    
+
     @Provided
     @Override
     Collection<Credential> credentials();

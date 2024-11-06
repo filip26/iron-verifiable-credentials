@@ -2,10 +2,9 @@ package com.apicatalog.vc.method.resolver;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
@@ -15,16 +14,16 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
+import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonStructure;
 
 @Deprecated
-public class HttpMethodResolver implements MethodResolver {
+public class HttpMethodResolver implements DeprecatedVerificationMethodResolver {
 
     private static final Logger LOGGER = Logger.getLogger(HttpMethodResolver.class.getName());
 
@@ -69,7 +68,7 @@ public class HttpMethodResolver implements MethodResolver {
     }
 
     @Override
-    public VerificationMethod resolve(URI id, URI purpose) throws DocumentError {
+    public VerificationKey resolve(URI id, Proof proof) throws DocumentError {
 
         try {
 
@@ -87,7 +86,7 @@ public class HttpMethodResolver implements MethodResolver {
                     .loader(loader)
                     .get();
 
-            return reader.read(VerificationMethod.class, document);
+            return reader.read(VerificationKey.class, document);
 
         } catch (Exception e) {
             throw new DocumentError(e, ErrorType.Invalid, "ProofVerificationMethod");

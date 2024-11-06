@@ -17,14 +17,14 @@ import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multikey.Multikey;
 import com.apicatalog.vc.method.resolver.DidKeyMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
-import com.apicatalog.vc.method.resolver.MethodResolver;
+import com.apicatalog.vc.method.resolver.DeprecatedVerificationMethodResolver;
 import com.apicatalog.vc.processor.DocumentProcessor;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 public class VerificationProcessor<T extends VerificationProcessor<T>> extends DocumentProcessor<T> {
 
-    protected Collection<MethodResolver> methodResolvers;
+    protected Collection<DeprecatedVerificationMethodResolver> methodResolvers;
 
     protected VerificationProcessor(final SignatureSuite... suites) {
         super(suites);
@@ -34,13 +34,13 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
     // TODO resolvers should be multilevel, per verifier, per proof type, e.g.
     // DidUrlMethodResolver could be different.
     @SuppressWarnings("unchecked")
-    public T methodResolvers(Collection<MethodResolver> resolvers) {
+    public T methodResolvers(Collection<DeprecatedVerificationMethodResolver> resolvers) {
         this.methodResolvers = resolvers;
         return (T) this;
     }
 
-    protected static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
-        Collection<MethodResolver> resolvers = new LinkedHashSet<>();
+    protected static final Collection<DeprecatedVerificationMethodResolver> defaultResolvers(DocumentLoader loader) {
+        Collection<DeprecatedVerificationMethodResolver> resolvers = new LinkedHashSet<>();
         resolvers.add(new DidKeyMethodResolver(MulticodecDecoder.getInstance(Tag.Key)));
         resolvers.add(HttpMethodResolver.getInstance(loader, Multikey.class, JsonWebKey.class));
         return resolvers;
@@ -75,19 +75,19 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
         }
 
         // find the method id resolver
-        final Optional<MethodResolver> resolver = getMethodResolvers().stream()
+        final Optional<DeprecatedVerificationMethodResolver> resolver = getMethodResolvers().stream()
                 .filter(r -> r.isAccepted(id))
                 .findFirst();
 
         // try to resolve the method
         if (resolver.isPresent()) {
-            return Optional.ofNullable(resolver.get().resolve(id, proof.purpose()));
+            return Optional.ofNullable(resolver.get().resolve(id, proof));
         }
 
         throw new DocumentError(ErrorType.Unknown, "VerificationMethod");
     }
 
-    protected Collection<MethodResolver> getMethodResolvers() {
+    protected Collection<DeprecatedVerificationMethodResolver> getMethodResolvers() {
         if (methodResolvers == null) {
             return defaultResolvers(getLoader());
         }

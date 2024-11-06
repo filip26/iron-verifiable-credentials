@@ -12,22 +12,51 @@ import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
-import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmCredential;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
+/**
+ * Represents W3C VCDM 1.1 Verifiable Credential.
+ * 
+ * @see <a href=
+ *      "https://www.w3.org/TR/vc-data-model-1.1/#credentials">Verifiable
+ *      Credentials Data Model v1.1</a>
+ */
 @Fragment
 @Term("VerifiableCredential")
 @Vocab("https://www.w3.org/2018/credentials#")
 public interface Vcdm11Credential extends VcdmCredential {
 
-    @Provided
-    @Override
-    Collection<Proof> proofs();
-    
+    /**
+     * A date time when the credential has been issued.
+     * 
+     * @see <a href=
+     *      "https://www.w3.org/TR/vc-data-model-1.1/#issuance-date">Issuance
+     *      Date</a>
+     * 
+     * @return a date time from which the credential claims are valid or
+     *         <code>null</code>.
+     */
+    @Term("issuanceDate")
+    @Literal(XsdDateTimeAdapter.class)
+    Instant issuance();
+
+    /**
+     * An expiration date of the {@link Vcdm11Credential}.
+     * 
+     * @see <a href=
+     *      "https://www.w3.org/TR/vc-data-model-1.1/#expiration">Expiration
+     *      Date</a>.
+     * 
+     * @return the expiration date or <code>null</code> if not set
+     */
+    @Term("expirationDate")
+    @Literal(XsdDateTimeAdapter.class)
+    Instant expiration();
+
     /**
      * Checks if the credential is expired.
      *
@@ -40,8 +69,12 @@ public interface Vcdm11Credential extends VcdmCredential {
 
     @Override
     default boolean isNotValidYet() {
-        return (issuanceDate() != null && issuanceDate().isAfter(Instant.now()));
+        return (issuance() != null && issuance().isAfter(Instant.now()));
     }
+
+    @Provided
+    @Override
+    Collection<Proof> proofs();
 
     @Override
     default void validate() throws DocumentError {
@@ -55,40 +88,17 @@ public interface Vcdm11Credential extends VcdmCredential {
             item.validate();
         }
 
-        if (issuanceDate() == null) {
+        if (issuance() == null) {
             // issuance date is a mandatory property
             throw new DocumentError(ErrorType.Missing, VcdmVocab.ISSUANCE_DATE);
         }
 
-        if ((issuanceDate() != null
+        if ((issuance() != null
                 && expiration() != null
-                && issuanceDate().isAfter(expiration()))) {
+                && issuance().isAfter(expiration()))) {
             throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }
     }
-
-    /**
-     * A date time when the credential has been issued.
-     * 
-     * @see <a href="https://www.w3.org/TR/vc-data-model/#issuance-date">Issuance
-     *      Date - Note</a>
-     * 
-     * @return a date time from which the credential claims are valid or
-     *         <code>null</code>.
-     */
-    @Literal(XsdDateTimeAdapter.class)
-    Instant issuanceDate();
-
-    /**
-     * An expiration date of the {@link Verifiable}.
-     * 
-     * @see <a href=
-     *      "https://www.w3.org/TR/vc-data-model/#expiration">Expiration</a>.
-     * 
-     * @return the expiration date or <code>null</code> if not set
-     */
-    @Literal(XsdDateTimeAdapter.class)
-    Instant expiration();
 
     @Override
     default VcdmVersion version() {

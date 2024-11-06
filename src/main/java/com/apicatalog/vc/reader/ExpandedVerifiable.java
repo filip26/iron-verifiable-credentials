@@ -16,6 +16,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
 
+@Deprecated
 public class ExpandedVerifiable {
 
     protected JsonStructure context;

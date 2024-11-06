@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
-import com.apicatalog.vc.reader.ReaderResolver;
+import com.apicatalog.vc.reader.VerifiableReaderProvider;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -16,9 +16,9 @@ import com.apicatalog.vcdm.io.VcdmResolver;
 
 public class Vcdm20Reader extends VcdmReader {
     
-    protected final ReaderResolver resolver;
+    protected final VerifiableReaderProvider resolver;
 
-    protected Vcdm20Reader(final JsonLdTreeReader reader, final ReaderResolver resolver, final SignatureSuite... suites) {
+    protected Vcdm20Reader(final JsonLdTreeReader reader, final VerifiableReaderProvider resolver, final SignatureSuite... suites) {
         super(VcdmVersion.V20, reader, suites);
         this.resolver = resolver;
     }
@@ -52,7 +52,7 @@ public class Vcdm20Reader extends VcdmReader {
     protected VerifiableReader resolve(Collection<String> context) throws DocumentError {
         return VcdmVersion.V20 == VcdmResolver.getVersion(context)
                 ? this
-                : resolver.resolveReader(context);
+                : resolver.reader(context);
     }
 
     @Override

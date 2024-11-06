@@ -12,8 +12,6 @@ import com.apicatalog.vc.proof.Proof;
 
 /**
  * Represents a common ancestor for verifiable data/material.
- * 
- * @since 0.9.0
  */
 @Fragment(generic = true)
 public interface Verifiable {

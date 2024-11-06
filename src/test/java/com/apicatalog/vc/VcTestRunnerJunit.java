@@ -36,7 +36,7 @@ import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DidKeyMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
-import com.apicatalog.vc.method.resolver.MethodResolver;
+import com.apicatalog.vc.method.resolver.DeprecatedVerificationMethodResolver;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
@@ -60,7 +60,7 @@ public class VcTestRunnerJunit {
             new SchemeRouter().set("classpath", new ClasspathLoader()));
 
     // FIXME the static loader?
-    final static Collection<MethodResolver> RESOLVERS = defaultResolvers(new StaticContextLoader((LOADER)));
+    final static Collection<DeprecatedVerificationMethodResolver> RESOLVERS = defaultResolvers(new StaticContextLoader((LOADER)));
 
     final static TestSignatureSuite SUITE = (new TestSignatureSuite());
 
@@ -268,8 +268,8 @@ public class VcTestRunnerJunit {
         throw new IllegalStateException();
     }
 
-    static final Collection<MethodResolver> defaultResolvers(DocumentLoader loader) {
-        Collection<MethodResolver> resolvers = new LinkedHashSet<>();
+    static final Collection<DeprecatedVerificationMethodResolver> defaultResolvers(DocumentLoader loader) {
+        Collection<DeprecatedVerificationMethodResolver> resolvers = new LinkedHashSet<>();
         resolvers.add(new DidKeyMethodResolver(TestAlgorithm.DECODER));
         resolvers.add(HttpMethodResolver.getInstance(loader));
         return resolvers;

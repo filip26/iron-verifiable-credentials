@@ -8,6 +8,9 @@ import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.vc.holder.PresentationHolder;
 
+/**
+ * A generic verifiable presentation.
+ */
 @Fragment(generic = true)
 public interface Presentation extends Verifiable {
 

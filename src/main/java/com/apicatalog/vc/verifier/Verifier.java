@@ -28,7 +28,7 @@ import com.apicatalog.vc.di.VcdiVocab;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.reader.ReaderResolver;
+import com.apicatalog.vc.reader.VerifiableReaderProvider;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
@@ -50,17 +50,17 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected StatusVerifier statusVerifier;
 
-    protected final ReaderResolver readerResolver;
+    protected final VerifiableReaderProvider readerProvider;
 
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
-        this.readerResolver = vcdmResolver(suites);
+        this.readerProvider = vcdmResolver(suites);
 
         this.statusVerifier = null;
     }
 
-    protected static ReaderResolver vcdmResolver(final SignatureSuite... suites) {
+    protected static VerifiableReaderProvider vcdmResolver(final SignatureSuite... suites) {
         var resolver = new VcdmResolver();
         resolver.v11(Vcdm11Reader.with(suites));
 //        resolver.v11(Vcdm11Reader.with(
@@ -232,27 +232,28 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
         try {
             context = JsonLdContext.strings(document);
+
         } catch (IllegalArgumentException e) {
             throw new DocumentError(e, ErrorType.Invalid, "Context");
         }
 
-        final VerifiableReader reader = readerResolver.resolveReader(context);
+        final VerifiableReader reader = readerProvider.reader(context);
 
         if (reader == null) {
             LOGGER.log(Level.INFO, "An unknown document model {0}", context);
-            throw new DocumentError(ErrorType.Unknown, "Model");
+            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
         }
 
         final Verifiable verifiable = reader.read(context, document, loader, base);
 
         if (verifiable == null) {
-            throw new DocumentError(ErrorType.Invalid, "document");
+            throw new DocumentError(ErrorType.Invalid, "Document");
         }
 
         return verify(verifiable, params);
     }
 
-    public Verifiable verify(Verifiable verifiable, Map<String, Object> params) throws VerificationError, DocumentError {
+    public Verifiable verify(final Verifiable verifiable, final Map<String, Object> params) throws VerificationError, DocumentError {
 
         if (verifiable.proofs() == null || verifiable.proofs().isEmpty()) {
             throw new DocumentError(ErrorType.Missing, "Proof");
