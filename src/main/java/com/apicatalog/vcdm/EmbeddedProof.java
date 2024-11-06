@@ -2,24 +2,12 @@ package com.apicatalog.vcdm;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.LinkedContainer;
-import com.apicatalog.linkedtree.LinkedFragment;
-import com.apicatalog.linkedtree.LinkedNode;
-import com.apicatalog.linkedtree.LinkedTree;
-import com.apicatalog.linkedtree.adapter.NodeAdapterError;
-import com.apicatalog.linkedtree.builder.GenericTreeCloner;
-import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.traversal.NodeSelector.TraversalPolicy;
-import com.apicatalog.vc.proof.GenericProof;
-import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -164,58 +152,6 @@ public final class EmbeddedProof {
 
     public static JsonObject removeProofs(final JsonObject document) {
         return Json.createObjectBuilder(document).remove(VcdmVocab.PROOF.uri()).build();
-    }
-
-    /**
-     * Creates a new document instance with no proofs attached.
-     * 
-     * @param verifiable with a proof
-     * @return a new document with no proofs
-     */
-    @Deprecated
-    public static LinkedTree removeProofs(final LinkedTree verifiable) throws DocumentError {
-        try {
-            var builder = new GenericTreeCloner(verifiable);
-
-            return builder.deepClone(
-                    (node, indexOrder, indexTerm, depth) -> VcdmVocab.PROOF.uri().equals(indexTerm)
-                            ? TraversalPolicy.Drop
-                            : TraversalPolicy.Accept);
-        } catch (TreeBuilderError e) {
-            throw new DocumentError(e, ErrorType.Invalid);
-        }
-    }
-
-    public static Collection<Proof> getProofs(final LinkedContainer tree) throws NodeAdapterError {
-
-        Objects.requireNonNull(tree);
-
-        if (tree.nodes().isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        var proofs = new ArrayList<Proof>();
-
-        for (final LinkedNode node : tree) {
-            if (node.isTree()) {
-                proofs.add(getProof(node.asTree().fragment()));
-                continue;
-            }
-            proofs.add(getProof(node.asFragment()));
-        }
-
-        return proofs;
-    }
-
-    public static Proof getProof(final LinkedFragment fragment) throws NodeAdapterError {
-
-        Objects.requireNonNull(fragment);
-
-        if (fragment.type().isAdaptableTo(Proof.class)) {
-            return fragment.type().materialize(Proof.class);
-        }
-
-        return GenericProof.of(fragment);
     }
 
     public static JsonObject expandedProof(final JsonValue jsonProofGraph) throws DocumentError {

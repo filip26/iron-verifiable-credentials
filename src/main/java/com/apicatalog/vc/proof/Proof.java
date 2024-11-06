@@ -12,6 +12,7 @@ import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Id;
+import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Type;
 import com.apicatalog.linkedtree.orm.Vocab;
@@ -54,6 +55,8 @@ public interface Proof {
      * @return the proof value
      */
     @Term("proofValue")
+    @Provided
+    //TODO generic is string version
     ProofValue signature();
 
     /**

@@ -29,7 +29,7 @@ public class DocumentError extends Exception {
     public DocumentError(Throwable e, ErrorType type) {
         super(type.name() + "Document", e);
         this.type = type;
-        this.code = toCode(type, type.name() + "Document");
+        this.code = toCode(type, "Document");
     }
 
     public DocumentError(Throwable e, ErrorType type, String... code) {

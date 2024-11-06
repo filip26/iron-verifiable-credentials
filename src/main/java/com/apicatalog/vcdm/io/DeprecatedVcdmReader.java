@@ -2,7 +2,6 @@ package com.apicatalog.vcdm.io;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -26,7 +25,6 @@ import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.VerifiableMaterial;
-import com.apicatalog.vc.proof.GenericProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -269,7 +267,7 @@ public abstract class DeprecatedVcdmReader implements VerifiableReader {
                 // process as a generic, i.e. an unknown, proof
                 if (proof == null) {
                     var proofTree = reader.read(Json.createArrayBuilder().add(expandedProof.asJsonObject()).build());
-                    proof = GenericProof.of(proofTree.fragment());
+//                    proof = GenericProof.of(proofTree.fragment());
                 }
 
                 // add a proof to the list
@@ -277,10 +275,10 @@ public abstract class DeprecatedVcdmReader implements VerifiableReader {
             }
             return proofs;
 
-        } catch (FragmentPropertyError e) {
-            throw DocumentError.of(e);
+//        } catch (FragmentPropertyError e) {
+//            throw DocumentError.of(e);
 
-        } catch (TreeBuilderError | NodeAdapterError e) {
+        } catch (TreeBuilderError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }
     }

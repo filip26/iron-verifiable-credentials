@@ -43,9 +43,9 @@ public class VcdmMaterializer implements VerifiableAdapter {
 
     protected final JsonLdTreeReader reader;
 
-    public VcdmMaterializer( 
-            JsonLdTreeReader reader, 
-            VerifiableAdapterProvider credentialAdapterProvider, 
+    public VcdmMaterializer(
+            JsonLdTreeReader reader,
+            VerifiableAdapterProvider credentialAdapterProvider,
             VerifiableModelReader credentialModelReader,
             ProofAdapter proofMaterializer) {
         this.reader = reader;
@@ -87,7 +87,8 @@ public class VcdmMaterializer implements VerifiableAdapter {
                         base));
             }
 
-        } else if (model.expandedProofs() != null || model.compactedProofs() != null) {
+        } else if ((model.expandedProofs() != null && !model.expandedProofs().isEmpty())
+                || (model.compactedProofs() != null && !model.compactedProofs().isEmpty())) {
             throw new IllegalStateException("Inconsistent model - proofs");
         }
 
@@ -141,20 +142,20 @@ public class VcdmMaterializer implements VerifiableAdapter {
         VerifiableModel model = credentialModelReader.read(data);
 
         if (model instanceof Vcdm) {
-            
+
             VerifiableAdapter adapter = credentialAdapterProvider.adapter(model.data().context());
-            
+
             if (adapter == null) {
                 throw new DocumentError(ErrorType.Invalid, VcdmVocab.VERIFIABLE_CREDENTIALS);
             }
-            
+
             Verifiable verifiable = adapter.materialize(model, loader, base);
 
             if (verifiable instanceof Credential credential) {
                 return credential;
-            }            
+            }
         }
-        
+
         throw new DocumentError(ErrorType.Invalid, VcdmVocab.VERIFIABLE_CREDENTIALS);
     }
 
@@ -189,11 +190,11 @@ public class VcdmMaterializer implements VerifiableAdapter {
     }
 
     protected boolean isCredential(Collection<String> compactedType) {
-        return compactedType.contains(VcdmVocab.CREDENTIAL_TYPE.name());
+        return compactedType.contains(VcdmVocab.CREDENTIAL_TYPE.uri());
     }
 
     protected boolean isPresentation(Collection<String> compactedType) {
-        return compactedType.contains(VcdmVocab.PRESENTATION_TYPE.name());
+        return compactedType.contains(VcdmVocab.PRESENTATION_TYPE.uri());
     }
 
     protected static Collection<JsonObject> expandedCredentials(JsonValue value) throws DocumentError {
