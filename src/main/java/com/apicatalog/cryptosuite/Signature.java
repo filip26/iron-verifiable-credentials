@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.verifier.VerifiableMaterial;
+import com.apicatalog.vc.model.VerifiableMaterial;
 
 public class Signature {
 

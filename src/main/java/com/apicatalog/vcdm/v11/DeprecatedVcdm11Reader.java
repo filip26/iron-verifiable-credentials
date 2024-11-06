@@ -7,7 +7,7 @@ import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmVersion;
-import com.apicatalog.vcdm.io.VcdmReader;
+import com.apicatalog.vcdm.io.DeprecatedVcdmReader;
 import com.apicatalog.vcdm.io.VcdmResolver;
 
 /**
@@ -15,7 +15,7 @@ import com.apicatalog.vcdm.io.VcdmResolver;
  * <a href="https://www.w3.org/TR/vc-data-model-1.1/">Verifiable Credentials
  * Data Model v1.1</a>
  */
-public class DeprecatedVcdm11Reader extends VcdmReader {
+public class DeprecatedVcdm11Reader extends DeprecatedVcdmReader {
 
     protected DeprecatedVcdm11Reader(final JsonLdTreeReader reader, final SignatureSuite... suites) {
         super(VcdmVersion.V11, reader, suites);

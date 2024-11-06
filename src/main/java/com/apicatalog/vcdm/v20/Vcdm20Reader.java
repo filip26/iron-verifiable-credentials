@@ -11,10 +11,10 @@ import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
-import com.apicatalog.vcdm.io.VcdmReader;
+import com.apicatalog.vcdm.io.DeprecatedVcdmReader;
 import com.apicatalog.vcdm.io.VcdmResolver;
 
-public class Vcdm20Reader extends VcdmReader {
+public class Vcdm20Reader extends DeprecatedVcdmReader {
     
     protected final VerifiableReaderProvider resolver;
 

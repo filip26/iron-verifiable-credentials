@@ -18,7 +18,7 @@ import com.apicatalog.rdf.RdfDataset;
 import com.apicatalog.rdf.io.RdfWriter;
 import com.apicatalog.rdf.io.error.RdfWriterException;
 import com.apicatalog.rdf.io.error.UnsupportedContentException;
-import com.apicatalog.vc.verifier.VerifiableMaterial;
+import com.apicatalog.vc.model.VerifiableMaterial;
 
 import io.setl.rdf.normalization.RdfNormalize;
 import jakarta.json.JsonObject;

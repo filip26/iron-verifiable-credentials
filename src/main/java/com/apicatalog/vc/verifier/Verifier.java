@@ -25,11 +25,13 @@ import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.di.VcdiVocab;
+import com.apicatalog.vc.model.ProofAdapter;
+import com.apicatalog.vc.model.ProofAdapterProvider;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.reader.VerifiableReaderProvider;
 import com.apicatalog.vc.reader.VerifiableReader;
+import com.apicatalog.vc.reader.VerifiableReaderProvider;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -55,14 +57,16 @@ public class Verifier extends VerificationProcessor<Verifier> {
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
-        this.readerProvider = vcdmResolver(suites);
+        ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
+        
+        this.readerProvider = vcdmResolver(proofAdapter);
 
         this.statusVerifier = null;
     }
 
-    protected static VerifiableReaderProvider vcdmResolver(final SignatureSuite... suites) {
+    protected static VerifiableReaderProvider vcdmResolver(final ProofAdapter proofAdapter) {
         var resolver = new VcdmResolver();
-        resolver.v11(Vcdm11Reader.with(suites));
+        resolver.v11(Vcdm11Reader.with(proofAdapter));
 //        resolver.v11(Vcdm11Reader.with(
 //                r -> {
 //                },

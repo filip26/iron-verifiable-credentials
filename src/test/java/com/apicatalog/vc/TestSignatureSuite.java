@@ -9,10 +9,10 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.di.DataIntegritySuite;
+import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
-import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 class TestSignatureSuite extends DataIntegritySuite {
 

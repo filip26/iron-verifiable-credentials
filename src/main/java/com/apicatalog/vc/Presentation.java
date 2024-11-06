@@ -17,7 +17,7 @@ public interface Presentation extends Verifiable {
     @Term
     PresentationHolder holder();
 
-    @Term
+    @Term("verifiableCredential")
     Collection<Credential> credentials();
 
     @Override

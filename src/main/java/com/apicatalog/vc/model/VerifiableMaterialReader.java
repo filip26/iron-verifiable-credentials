@@ -1,29 +1,28 @@
-package com.apicatalog.vc.reader;
+package com.apicatalog.vc.model;
 
 import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.Verifiable;
 
 import jakarta.json.JsonObject;
 
-public interface VerifiableReader {
+public interface VerifiableMaterialReader {
 
     /**
-     * Materialize VC/VP document into a verifiable instance.
+     * Read verifiable material.
      * 
-     * @param context
-     * @param document a document to materialize
+     * @param context  a document JSON-LD context
+     * @param document a document to read
      * @param loader   a document loader
      * @param base     a base URL, might be null
-     * @return a new object representing a credential or a presentation
+     * @return a verifiable material instance
      * 
      * @throws DocumentError if the document cannot be read or parsed
      * 
      */
-    Verifiable read(
+    VerifiableMaterial read(
             Collection<String> context,
             JsonObject document,
             DocumentLoader loader,

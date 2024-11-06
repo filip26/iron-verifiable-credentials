@@ -1,4 +1,4 @@
-package com.apicatalog.vc.verifier;
+package com.apicatalog.vc.model;
 
 import java.util.Collection;
 

@@ -3,11 +3,11 @@ package com.apicatalog.vcdm;
 import java.util.Collection;
 
 import com.apicatalog.linkedtree.LinkedFragment;
+import com.apicatalog.vc.CredentialSchema;
+import com.apicatalog.vc.Evidence;
+import com.apicatalog.vc.RefreshService;
+import com.apicatalog.vc.TermsOfUse;
 import com.apicatalog.vc.issuer.CredentialIssuer;
-import com.apicatalog.vc.model.CredentialSchema;
-import com.apicatalog.vc.model.Evidence;
-import com.apicatalog.vc.model.RefreshService;
-import com.apicatalog.vc.model.TermsOfUse;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 

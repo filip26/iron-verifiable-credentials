@@ -21,10 +21,10 @@ import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseAdapter;
+import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;

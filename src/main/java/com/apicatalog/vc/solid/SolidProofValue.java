@@ -7,8 +7,8 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.Signature;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.linkedtree.LinkedTree;
+import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.verifier.VerifiableMaterial;
 
 /**
  * Represent a proof value used together with full disclosure suites. i.e.

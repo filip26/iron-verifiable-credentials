@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc;
 
 import java.net.URI;
 import java.util.Collection;

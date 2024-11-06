@@ -8,14 +8,14 @@ import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.model.CredentialSchema;
-import com.apicatalog.vc.model.Evidence;
-import com.apicatalog.vc.model.RefreshService;
-import com.apicatalog.vc.model.TermsOfUse;
+import com.apicatalog.vc.CredentialSchema;
+import com.apicatalog.vc.Evidence;
+import com.apicatalog.vc.RefreshService;
+import com.apicatalog.vc.TermsOfUse;
 import com.apicatalog.vc.status.Status;
 
 /**
- * A common ancestor to all W3C VCDM based verifiable credentials.
+ * A common ancestor to W3C VCDM based verifiable credentials.
  */
 @Fragment
 @Term("VerifiableCredential")

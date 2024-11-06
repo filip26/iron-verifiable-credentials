@@ -1,15 +1,17 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc;
 
 import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Id;
 import com.apicatalog.linkedtree.orm.Type;
 
 @Fragment(generic = true)
 public interface TermsOfUse {
 
+    @Id
     URI id();
 
     @Type

@@ -123,7 +123,28 @@ public final class EmbeddedProof {
         throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF);
     }
 
-    public static JsonArray getProofs(final JsonObject document) throws DocumentError {
+    public static Collection<JsonObject> compactedProofs(JsonObject compacted) throws DocumentError {
+
+        JsonValue proofs = compacted.get(VcdmVocab.PROOF.name());
+
+        Collection<JsonObject> jsonProofs = new ArrayList<>(3);
+
+        if (JsonUtils.isObject(proofs)) {
+            jsonProofs.add(proofs.asJsonObject());
+
+        } else if (JsonUtils.isArray(proofs)) {
+            for (JsonValue jsonProof : proofs.asJsonArray()) {
+                if (JsonUtils.isObject(jsonProof)) {
+                    jsonProofs.add(jsonProof.asJsonObject());
+                } else {
+                    throw new DocumentError(ErrorType.Invalid, "Proof");
+                }
+            }
+        }
+        return jsonProofs;
+    }
+
+    public static Collection<JsonObject> expandedProofs(final JsonObject document) throws DocumentError {
         final JsonValue value = document.get(VcdmVocab.PROOF.uri());
 
         if (JsonUtils.isNull(value)) {
@@ -133,7 +154,12 @@ public final class EmbeddedProof {
             throw new DocumentError(ErrorType.Invalid, VcdmVocab.PROOF);
         }
 
-        return value.asJsonArray();
+        final Collection<JsonObject> jsonProofs = new ArrayList<>(value.asJsonArray().size());
+
+        for (JsonValue jsonProof : value.asJsonArray()) {
+            jsonProofs.add(expandedProof(jsonProof));
+        }
+        return jsonProofs;
     }
 
     public static JsonObject removeProofs(final JsonObject document) {
@@ -146,7 +172,7 @@ public final class EmbeddedProof {
      * @param verifiable with a proof
      * @return a new document with no proofs
      */
-    @Deprecated    
+    @Deprecated
     public static LinkedTree removeProofs(final LinkedTree verifiable) throws DocumentError {
         try {
             var builder = new GenericTreeCloner(verifiable);
@@ -192,7 +218,7 @@ public final class EmbeddedProof {
         return GenericProof.of(fragment);
     }
 
-    public static JsonObject getProof(final JsonValue jsonProofGraph) throws DocumentError {
+    public static JsonObject expandedProof(final JsonValue jsonProofGraph) throws DocumentError {
         if (JsonUtils.isObject(jsonProofGraph)
                 && jsonProofGraph.asJsonObject().containsKey(JsonLdKeyword.GRAPH)) {
             final JsonValue jsonProof = jsonProofGraph.asJsonObject().get(JsonLdKeyword.GRAPH);
@@ -202,6 +228,6 @@ public final class EmbeddedProof {
                 return jsonProof.asJsonArray().iterator().next().asJsonObject();
             }
         }
-        throw new DocumentError(ErrorType.Invalid, "Proof");
+        throw new DocumentError(ErrorType.Invalid, VcdmVocab.PROOF);
     }
 }

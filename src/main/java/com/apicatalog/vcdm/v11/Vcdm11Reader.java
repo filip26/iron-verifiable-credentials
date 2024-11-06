@@ -1,37 +1,50 @@
 package com.apicatalog.vcdm.v11;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Objects;
 
+import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
-import com.apicatalog.vc.reader.VerifiableReader;
-import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.model.ProofAdapter;
+import com.apicatalog.vc.model.VerifiableAdapter;
+import com.apicatalog.vc.model.VerifiableAdapterProvider;
+import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vcdm.VcdmVersion;
+import com.apicatalog.vcdm.io.VcdmMaterializer;
 import com.apicatalog.vcdm.io.VcdmReader;
 import com.apicatalog.vcdm.io.VcdmResolver;
+
+import jakarta.json.JsonObject;
 
 /**
  * A JSON-LD based reader conforming to the
  * <a href="https://www.w3.org/TR/vc-data-model-1.1/">Verifiable Credentials
  * Data Model v1.1</a>
  */
-public class Vcdm11Reader extends VcdmReader {
+public class Vcdm11Reader extends VcdmReader implements VerifiableAdapterProvider {
 
-    protected Vcdm11Reader(final JsonLdTreeReader reader, final SignatureSuite... suites) {
-        super(VcdmVersion.V11, reader, suites);
+    protected final VerifiableAdapter credentialAdapter;
+    protected final ProofAdapter proofAdapter;
+
+    protected Vcdm11Reader(final JsonLdTreeReader reader, ProofAdapter proofAdapter) {
+        super(VcdmVersion.V11);
+        this.credentialAdapter = new VcdmMaterializer(reader, this, this, proofAdapter);
+        this.proofAdapter = proofAdapter;
     }
 
-    public static Vcdm11Reader with(
-            final SignatureSuite... suites) {
-        return with(new Class[0], suites);
+    public static Vcdm11Reader with(final ProofAdapter proofAdapter) {
+        return with(new Class[0], proofAdapter);
     }
 
     public static Vcdm11Reader with(
             Class<?>[] types,
-            final SignatureSuite... suites) {
+            final ProofAdapter proofAdapter) {
 
         Objects.requireNonNull(types);
 
@@ -43,13 +56,23 @@ public class Vcdm11Reader extends VcdmReader {
             builder.scan(type);
         }
 
-        return new Vcdm11Reader(JsonLdTreeReader.of(builder.build()), suites);
+        return new Vcdm11Reader(JsonLdTreeReader.of(builder.build()), proofAdapter);
     }
 
     @Override
-    protected VerifiableReader resolve(Collection<String> context) throws DocumentError {
+    public Verifiable read(Collection<String> context, JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
+
+        VerifiableMaterial material = materialReader.read(context, document, loader, base);
+
+        VerifiableModel model = read(material);
+
+        return credentialAdapter.materialize(model, loader, base);
+    }
+
+    @Override
+    public VerifiableAdapter adapter(Collection<String> context) throws DocumentError {
         return VcdmVersion.V11 == VcdmResolver.getVersion(context)
-                ? this
+                ? credentialAdapter
                 : null;
     }
 }

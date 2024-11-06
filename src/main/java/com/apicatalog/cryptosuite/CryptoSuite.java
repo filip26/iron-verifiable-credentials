@@ -4,7 +4,7 @@ import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
 import com.apicatalog.cryptosuite.algorithm.Digester;
 import com.apicatalog.cryptosuite.algorithm.Signer;
-import com.apicatalog.vc.verifier.VerifiableMaterial;
+import com.apicatalog.vc.model.VerifiableMaterial;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
