@@ -3,9 +3,7 @@
     "https://www.w3.org/ns/credentials/v2",
     "https://www.w3.org/ns/credentials/examples/v2"
   ],
-  "verifiableCredential": [{
-    "@context": "https://www.w3.org/ns/credentials/v2",
-    "id": "data:application/vc+sd-jwt,QzVjV...RMjU",
-    "type": "EnvelopedVerifiableCredential"
-  }]
+  "credentialSubject": {
+    "id": "data:application/vc+sd-jwt,QzVjV...RMjU"
+  }
 }

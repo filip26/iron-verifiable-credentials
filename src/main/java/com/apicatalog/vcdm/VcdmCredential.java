@@ -7,6 +7,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
+import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.CredentialSchema;
 import com.apicatalog.vc.Evidence;
@@ -19,6 +20,7 @@ import com.apicatalog.vc.status.Status;
  */
 @Fragment
 @Term("VerifiableCredential")
+@Vocab("https://www.w3.org/2018/credentials#")
 public interface VcdmCredential extends VcdmVerifiable, Credential {
     
     @Term

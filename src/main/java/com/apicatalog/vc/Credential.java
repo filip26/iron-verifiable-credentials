@@ -7,6 +7,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
+import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmVocab;
@@ -15,6 +16,7 @@ import com.apicatalog.vcdm.VcdmVocab;
  * A generic verifiable credential.
  */
 @Fragment(generic = true)
+@Vocab("https://www.w3.org/2018/credentials#")
 public interface Credential extends Verifiable {
 
     /**

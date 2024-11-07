@@ -29,14 +29,13 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.multikey.Multikey;
 import com.apicatalog.vc.di.DataIntegrityProofDraft;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
+import com.apicatalog.vc.method.resolver.DeprecatedVerificationMethodResolver;
 import com.apicatalog.vc.method.resolver.DidKeyMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
-import com.apicatalog.vc.method.resolver.DeprecatedVerificationMethodResolver;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
@@ -197,6 +196,8 @@ public class VcTestRunnerJunit {
         } catch (JsonLdError e) {
             e.printStackTrace();
             fail(e);
+        } catch (Exception e) {
+            assertException(e.getClass().getSimpleName(), e);
         }
     }
 
