@@ -1,0 +1,19 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://www.w3.org/ns/credentials/examples/v2"
+  ],
+  "type": [
+    "VerifiableCredential"
+  ],
+  "credentialSubject": {
+    "id": "https://example.com/subject/1",
+    "type": "Subject"
+  },
+  "issuer": "https://example.com/issuer/1",
+  "termsOfUse": {
+    "trustFramework": "Employment&Life",
+    "policyId": "https://policy.example/policies/125",
+    "legalBasis": "professional qualifications directive"
+  }
+}

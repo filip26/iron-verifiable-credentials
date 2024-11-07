@@ -40,7 +40,7 @@ public interface Credential extends Verifiable {
     @Term
     CredentialIssuer issuer();
 
-    @Term
+    @Term("credentialStatus")
     Collection<Status> status();
 
     @Term("credentialSubject")

@@ -6,8 +6,8 @@
   "type": [
     "VerifiableCredential"
   ],
-  "issuer": "https://example.com/issuer/1",
   "credentialSubject": {
+    "id": "https://example.com/subject/1",
     "type": "Subject"
   }
 }

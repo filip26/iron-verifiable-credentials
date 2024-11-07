@@ -81,7 +81,7 @@ public class BitstringStatusList implements Subject, Linkable {
     }
 
     @Override
-    public boolean includesClaims() {
+    public boolean hasClaims() {
         return !ld.terms().isEmpty();
     }
 }

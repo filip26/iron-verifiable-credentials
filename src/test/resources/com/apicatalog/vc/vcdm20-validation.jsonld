@@ -82,7 +82,7 @@
         "ValidationTest"
       ],
       "name": "Missing @type",
-     "input": "vcdm20/validation/vcdm20-missing-type.jsonld",
+      "input": "vcdm20/validation/vcdm20-missing-type.jsonld",
       "expectErrorCode": "MissingType"
     },
     {
@@ -114,6 +114,86 @@
       "name": "Missing subject claims",
       "input": "vcdm20/validation/vcdm20-missing-subject-claims.jsonld",
       "expectErrorCode": "MissingCredentialSubjectClaims"
-    }    
+    },
+    {
+      "@id": "#t00012",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing issuer",
+      "input": "vcdm20/validation/vcdm20-missing-issuer.jsonld",
+      "expectErrorCode": "MissingIssuer"
+    },
+    {
+      "@id": "#t00013",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing issuer @id",
+      "input": "vcdm20/validation/vcdm20-missing-issuer-id.jsonld",
+      "expectErrorCode": "MissingIssuerId"
+    },
+    {
+      "@id": "#t00014",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing status @type",
+      "input": "vcdm20/validation/vcdm20-missing-status-type.jsonld",
+      "expectErrorCode": "MissingStatusType"
+    },
+    {
+      "@id": "#t00015",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing schema @id",
+      "input": "vcdm20/validation/vcdm20-missing-schema-id.jsonld",
+      "expectErrorCode": "MissingSchemaId"
+    },
+    {
+      "@id": "#t00016",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing schema @type",
+      "input": "vcdm20/validation/vcdm20-missing-schema-type.jsonld",
+      "expectErrorCode": "MissingSchemaType"
+    },
+    {
+      "@id": "#t00017",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing refreshService @type",
+      "input": "vcdm20/validation/vcdm20-missing-refresh-service-type.jsonld",
+      "expectErrorCode": "MissingRefreshServiceType"
+    },
+    {
+      "@id": "#t00018",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing evidence @type",
+      "input": "vcdm20/validation/vcdm20-missing-evidence-type.jsonld",
+      "expectErrorCode": "MissingEvidenceType"
+    },
+    {
+      "@id": "#t00019",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing terms of use @type",
+      "input": "vcdm20/validation/vcdm20-missing-tou-type.jsonld",
+      "expectErrorCode": "MissingTermsOfUseType"
+    }        
   ]
 }
