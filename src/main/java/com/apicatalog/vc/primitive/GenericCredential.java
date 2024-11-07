@@ -8,9 +8,9 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.CredentialIssuer;
+import com.apicatalog.vc.Subject;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
-import com.apicatalog.vc.subject.Subject;
 
 public record GenericCredential(
         URI id,

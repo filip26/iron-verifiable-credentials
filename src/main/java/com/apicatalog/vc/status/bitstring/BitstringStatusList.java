@@ -9,7 +9,7 @@ import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.literal.NumericValue;
-import com.apicatalog.vc.subject.Subject;
+import com.apicatalog.vc.Subject;
 
 public class BitstringStatusList implements Subject, Linkable {
 
@@ -78,5 +78,10 @@ public class BitstringStatusList implements Subject, Linkable {
     @Override
     public URI id() {
         return id;
+    }
+
+    @Override
+    public boolean includesClaims() {
+        return !ld.terms().isEmpty();
     }
 }

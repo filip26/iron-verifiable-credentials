@@ -7,9 +7,9 @@ import com.apicatalog.vc.CredentialIssuer;
 import com.apicatalog.vc.CredentialSchema;
 import com.apicatalog.vc.Evidence;
 import com.apicatalog.vc.RefreshService;
+import com.apicatalog.vc.Subject;
 import com.apicatalog.vc.TermsOfUse;
 import com.apicatalog.vc.status.Status;
-import com.apicatalog.vc.subject.Subject;
 
 public abstract class DeprecatedVcdmCredential {
 

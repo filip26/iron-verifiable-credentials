@@ -12,9 +12,9 @@ import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.lang.LangStringSelector;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.CredentialIssuer;
+import com.apicatalog.vc.Subject;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.status.Status;
-import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.DeprecatedVcdmCredential;
 import com.apicatalog.vcdm.VcdmVocab;
 

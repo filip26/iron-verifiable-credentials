@@ -16,7 +16,7 @@
         "ValidationTest"
       ],
       "name": "Valid unsigned VC",
-      "input": "vcdm20/validation/0001-valid-unsigned-vc.jsonld"
+      "input": "vcdm20/validation/vcdm20-valid-unsigned-vc.jsonld"
     },
     {
       "@id": "#t0002",
@@ -25,7 +25,7 @@
         "ValidationTest"
       ],
       "name": "Valid unsigned VP with VC2.0",
-      "input": "vcdm20/validation/0002-valid-unsigned-vp-vc.jsonld"
+      "input": "vcdm20/validation/vcdm20-valid-unsigned-vp-vc.jsonld"
     },
     {
       "@id": "#t0003",
@@ -34,7 +34,7 @@
         "ValidationTest"
       ],
       "name": "Valid unsigned VP with VC1.0",
-      "input": "vcdm20/validation/0003-valid-unsigned-vp-vc11.jsonld",
+      "input": "vcdm20/validation/vcdm20-valid-unsigned-vp-vc11.jsonld",
       "expectErrorCode": "MissingProof"
     },
     {
@@ -44,7 +44,7 @@
         "ValidationTest"
       ],
       "name": "Valid unsigned VP with EVC",
-      "input": "vcdm20/validation/0004-valid-unsigned-vp-evc.jsonld"
+      "input": "vcdm20/validation/vcdm20-valid-unsigned-vp-evc.jsonld"
     },
     {
       "@id": "#t0005",
@@ -53,38 +53,27 @@
         "ValidationTest"
       ],
       "name": "Valid EVP",
-      "input": "vcdm20/validation/0005-valid-evp.jsonld",
+      "input": "vcdm20/validation/vcdm20-valid-evp.jsonld",
       "expectErrorCode": "UnsupportedOperationException"
     },
     {
       "@id": "#t0006",
       "@type": [
-        "PositiveEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Valid unsigned Lang Maps",
-      "input": "vcdm20/0005-unsigned.jsonld",
-      "expectErrorCode": "MissingProof"
-    },
-    {
-      "@id": "#t0006",
-      "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing @type",
-      "input": "vcdm20/0001-invalid.jsonld",
-      "expectErrorCode": "MissingType"
+      "name": "@context only",
+      "input": "vcdm20/validation/vcdm20-context-only.jsonld",
+      "expectErrorCode": "InvalidDocument"
     },
     {
       "@id": "#t0007",
       "@type": [
-        "NegativeEvaluationTest",
+        "PositiveEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Unknown @type",
-      "input": "vcdm20/0002-invalid.jsonld",
-      "expectErrorCode": "UnknownType"
+      "name": "Valid unsigned LangMaps",
+      "input": "vcdm20/validation/vcdm20-valid-unsigned-langmap.jsonld"
     },
     {
       "@id": "#t0008",
@@ -92,9 +81,39 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
+      "name": "Missing @type",
+     "input": "vcdm20/validation/vcdm20-missing-type.jsonld",
+      "expectErrorCode": "MissingType"
+    },
+    {
+      "@id": "#t0009",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Unknown @type",
+      "input": "vcdm20/validation/vcdm20-unknown-type.jsonld",
+      "expectErrorCode": "UnknownType"
+    },
+    {
+      "@id": "#t00010",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
       "name": "Missing subject",
-      "input": "vcdm20/0003-invalid.jsonld",
+      "input": "vcdm20/validation/vcdm20-missing-subject.jsonld",
       "expectErrorCode": "MissingCredentialSubject"
-    }
+    },
+    {
+      "@id": "#t00011",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing subject claims",
+      "input": "vcdm20/validation/vcdm20-missing-subject-claims.jsonld",
+      "expectErrorCode": "MissingCredentialSubjectClaims"
+    }    
   ]
 }

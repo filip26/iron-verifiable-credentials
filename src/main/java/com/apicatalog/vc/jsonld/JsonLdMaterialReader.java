@@ -38,7 +38,7 @@ public class JsonLdMaterialReader implements VerifiableMaterialReader {
             if (expanded == null
                     || expanded.size() != 1
                     || ValueType.OBJECT != expanded.iterator().next().getValueType()) {
-                throw new DocumentError(ErrorType.Invalid, "Credential");
+                throw new DocumentError(ErrorType.Invalid, "Document");
             }
 
             return new VerifiableMaterial(
