@@ -4,7 +4,7 @@ import java.time.Instant;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.lang.LangStringSelector;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
@@ -12,6 +12,8 @@ import com.apicatalog.linkedtree.orm.Literal;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
+import com.apicatalog.vc.CredentialSchema;
+import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.subject.Subject;
 import com.apicatalog.vcdm.VcdmCredential;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -70,14 +72,20 @@ public interface Vcdm20Credential extends VcdmCredential {
     @Override
     default void validate() throws DocumentError {
 
-//        super.validate();
+        if (type() == null || type().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
+        }
 
-        for (Subject item : subject()) {
-            if (item instanceof Linkable ld
-                    && ld.ld().asFragment().terms().isEmpty()) {
-                throw new DocumentError(ErrorType.Invalid, VcdmVocab.SUBJECT);
-            }
-            item.validate();
+        if (issuer() != null) {
+            issuer().validate();
+        }
+
+        if (subject() == null || subject().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, VcdmVocab.SUBJECT);
+        }
+
+        for (Subject subject : subject()) {
+            subject.validate();
         }
 
         if ((validFrom() != null
@@ -85,6 +93,17 @@ public interface Vcdm20Credential extends VcdmCredential {
                 && validFrom().isAfter(validUntil()))) {
             throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }
+        
+        if (status() != null && !status().isEmpty()) {
+            for (Status status : status()) {
+                status.validate();
+            }
+        }
+        
+        if (schema() != null && !schema().isEmpty()) {
+            for (CredentialSchema schema: schema()) {
+                schema.validate();
+            }
+        }
     }
-
 }

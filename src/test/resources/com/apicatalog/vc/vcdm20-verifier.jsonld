@@ -48,6 +48,26 @@
       "name": "Unsigned VP with EVC",
       "input": "vcdm20/0004-unsigned.jsonld",
       "expectErrorCode": "MissingProof"
+    },
+    {
+      "@id": "#t0050",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Missing @type",
+      "input": "vcdm20/0001-invalid.jsonld",
+      "expectErrorCode": "MissingType"
+    },
+    {
+      "@id": "#t0051",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Unknown @type",
+      "input": "vcdm20/0002-invalid.jsonld",
+      "expectErrorCode": "UnknownType"
     }
   ]
 }

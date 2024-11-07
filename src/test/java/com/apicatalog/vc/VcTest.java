@@ -27,23 +27,31 @@ class VcTest {
 
     @DisplayName("VCDM 1.1 Verifier")
     @ParameterizedTest(name = "{0}")
-    @MethodSource({ "verifierManifest" })
+    @MethodSource({ "vcdm11Verifier" })
     @Order(2)
     void verify(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
 
-    @DisplayName("VCDM 2.0 Reader")
+//    @DisplayName("VCDM 2.0 Reader")
+//    @ParameterizedTest(name = "{0}")
+//    @MethodSource({ "vcdm20ReaderManifest" })
+//    @Order(3)
+//    void vcdm20Reader(VcTestCase testCase) {
+//        new VcTestRunnerJunit(testCase).execute();
+//    }
+
+    @DisplayName("VCDM 2.0 Validation")
     @ParameterizedTest(name = "{0}")
-    @MethodSource({ "vcdm20ReaderManifest" })
+    @MethodSource({ "vcdm20Validation" })
     @Order(3)
-    void vcdm20Reader(VcTestCase testCase) {
+    void vcdm20Validation(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
 
     @DisplayName("VCDM 2.0 Verifier")
     @ParameterizedTest(name = "{0}")
-    @MethodSource({ "vcdm20Manifest" })
+    @MethodSource({ "vcdm20Verifier" })
     @Order(4)
     void vcdm20Verifier(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
@@ -59,16 +67,20 @@ class VcTest {
         new VcTestRunnerJunit(testCase).execute();
     }
 
-    static final Stream<VcTestCase> vcdm20Manifest() throws JsonLdError, IOException {
-        return manifest("vcdm20-manifest.jsonld");
+    static final Stream<VcTestCase> vcdm11Verifier() throws JsonLdError, IOException {
+        return manifest("vcdm11-verifier.jsonld");
+    }
+
+    static final Stream<VcTestCase> vcdm20Validation() throws JsonLdError, IOException {
+        return manifest("vcdm20-validation.jsonld");
+    }
+
+    static final Stream<VcTestCase> vcdm20Verifier() throws JsonLdError, IOException {
+        return manifest("vcdm20-verifier.jsonld");
     }
 
     static final Stream<VcTestCase> vcdm20ReaderManifest() throws JsonLdError, IOException {
         return manifest("vcdm20-reader-manifest.jsonld");
-    }
-
-    static final Stream<VcTestCase> verifierManifest() throws JsonLdError, IOException {
-        return manifest("verifier-manifest.jsonld");
     }
 
     static final Stream<VcTestCase> issuerManifest() throws JsonLdError, IOException {

@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
@@ -24,9 +25,12 @@ public interface Presentation extends Verifiable {
 
     @Override
     default void validate() throws DocumentError {
-        if (credentials() == null || credentials().isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, "VerifiableCredentials");
+        if (type() == null || type().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
         }
+//        if (credentials() == null || credentials().isEmpty()) {
+//            throw new DocumentError(ErrorType.Missing, "VerifiableCredentials");
+//        }
     }
 
     @Override

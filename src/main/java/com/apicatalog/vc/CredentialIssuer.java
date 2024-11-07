@@ -1,8 +1,10 @@
-package com.apicatalog.vc.issuer;
+package com.apicatalog.vc;
 
 import java.net.URI;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Id;
 
@@ -18,6 +20,8 @@ public interface CredentialIssuer {
      * @throws DocumentError
      */
     default void validate() throws DocumentError {
-        // custom validation
+        if (id() == null) {
+            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.ID);
+        }
     }
 }

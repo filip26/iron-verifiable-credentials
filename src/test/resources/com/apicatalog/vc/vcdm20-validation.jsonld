@@ -1,0 +1,93 @@
+{
+  "@context": [
+    "context.jsonld",
+    {
+      "@base": "verifier-manifest"
+    }
+  ],
+  "@id": "",
+  "@type": "mf:Manifest",
+  "name": "VCDM 2.0 Validation",
+  "sequence": [
+    {
+      "@id": "#t0001",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Unsigned VC",
+      "input": "vcdm20/0001-unsigned.jsonld",
+      "expectErrorCode": "MissingProof"
+    },
+    {
+      "@id": "#t0002",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Unsigned VP with VC2.0",
+      "input": "vcdm20/0002-unsigned.jsonld",
+      "expectErrorCode": "MissingProof"
+    },
+    {
+      "@id": "#t0003",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Unsigned VP with VC1.0",
+      "input": "vcdm20/0003-unsigned.jsonld",
+      "expectErrorCode": "MissingProof"
+    },
+    {
+      "@id": "#t0004",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Unsigned VP with EVC",
+      "input": "vcdm20/0004-unsigned.jsonld",
+      "expectErrorCode": "MissingProof"
+    },
+    {
+      "@id": "#t0005",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Unsigned Lang Maps",
+      "input": "vcdm20/0005-unsigned.jsonld",
+      "expectErrorCode": "MissingProof"
+    },
+    {
+      "@id": "#t0006",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing @type",
+      "input": "vcdm20/0001-invalid.jsonld",
+      "expectErrorCode": "MissingType"
+    },
+    {
+      "@id": "#t0007",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Unknown @type",
+      "input": "vcdm20/0002-invalid.jsonld",
+      "expectErrorCode": "UnknownType"
+    },    
+    {
+      "@id": "#t0008",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing subject",
+      "input": "vcdm20/0003-invalid.jsonld",
+      "expectErrorCode": "MissingCredentialSubject"
+    }    
+  ]
+}

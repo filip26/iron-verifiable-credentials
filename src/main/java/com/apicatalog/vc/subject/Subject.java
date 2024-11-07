@@ -19,5 +19,6 @@ public interface Subject {
      */
     default void validate() throws DocumentError {
         // custom validation
+        //TODO must have claims
     }
 }

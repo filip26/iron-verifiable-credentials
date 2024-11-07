@@ -4,6 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
+import com.apicatalog.vc.CredentialIssuer;
 
 public record GenericIssuer(
         URI id,

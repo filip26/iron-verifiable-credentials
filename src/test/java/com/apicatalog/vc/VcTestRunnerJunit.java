@@ -147,6 +147,14 @@ public class VcTestRunnerJunit {
                     fail("Expected result does not match");
                 }
 
+            } else if (testCase.type.contains(VcTestCase.vocab("ValidationTest"))) {
+
+                Verifiable verifiable = READER.read(testCase.input);
+                assertNotNull(verifiable);
+
+                verifiable.validate();
+                
+
             } else if (testCase.type.contains(VcTestCase.vocab("ReaderTest"))) {
 
                 Verifiable verifiable = READER.read(testCase.input);

@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Id;
 import com.apicatalog.linkedtree.orm.Type;
@@ -23,7 +25,9 @@ public interface Status {
      * @throws DocumentError
      */
     default void validate() throws DocumentError {
-        // custom validation
+        if (type() == null || type().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
+        }
     }
 
 }
