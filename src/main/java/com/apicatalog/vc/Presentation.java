@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.vc.holder.PresentationHolder;
 
@@ -17,6 +18,7 @@ public interface Presentation extends Verifiable {
     @Term
     PresentationHolder holder();
 
+    @Provided
     @Term("verifiableCredential")
     Collection<Credential> credentials();
 

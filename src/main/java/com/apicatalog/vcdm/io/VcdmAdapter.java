@@ -13,6 +13,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
+import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
@@ -31,6 +32,7 @@ import com.apicatalog.vcdm.Vcdm;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
@@ -77,11 +79,13 @@ public class VcdmAdapter implements VerifiableAdapter {
 
             for (JsonObject expandedProof : model.expandedProofs()) {
 
+                JsonObject compactedProof = itCompactedProofs.next();
+
                 proofs.add(proofAdapter.materialize(
                         model.data(),
                         new VerifiableMaterial(
-                                model.data().context(),
-                                itCompactedProofs.next(),
+                                JsonLdContext.strings(compactedProof, model.data().context()),
+                                compactedProof,
                                 expandedProof),
                         loader,
                         base));
@@ -107,7 +111,7 @@ public class VcdmAdapter implements VerifiableAdapter {
             Collection<Proof> proofs,
             DocumentLoader loader,
             URI base) throws DocumentError {
-
+        
         Presentation presentation = read(Presentation.class, data, proofs);
 
         if (presentation instanceof PropertyValueConsumer consumer) {
@@ -177,11 +181,14 @@ public class VcdmAdapter implements VerifiableAdapter {
 
         Iterator<JsonObject> itc = compacted.iterator();
 
-        for (JsonObject ex : expanded) {
+        for (JsonObject expandedCredential : expanded) {
+            
+            JsonObject compactedCredential = itc.next();
+            
             credentials.add(credential(new VerifiableMaterial(
-                    data.context(),
-                    itc.next(),
-                    ex),
+                    JsonLdContext.strings(compactedCredential, data.context()),
+                    compactedCredential,
+                    expandedCredential),
                     loader,
                     base));
         }
@@ -210,10 +217,14 @@ public class VcdmAdapter implements VerifiableAdapter {
         }
 
         final Collection<JsonObject> objects = container.stream()
-                .filter(JsonUtils::isNotObject)
+                .filter(JsonUtils::isObject)
                 .map(JsonObject.class::cast)
                 .map(o -> o.get(JsonLdKeyword.GRAPH))
-                .filter(JsonUtils::isNotObject)
+                .filter(JsonUtils::isArray)
+                .map(JsonArray.class::cast)
+                .filter(a -> a.size() == 1)
+                .map(a -> a.iterator().next())
+                .filter(JsonUtils::isObject)
                 .map(JsonObject.class::cast)
                 .toList();
 
@@ -236,7 +247,7 @@ public class VcdmAdapter implements VerifiableAdapter {
         }
 
         final Collection<JsonObject> objects = container.stream()
-                .filter(JsonUtils::isNotObject)
+                .filter(JsonUtils::isObject)
                 .map(JsonObject.class::cast)
                 .toList();
 

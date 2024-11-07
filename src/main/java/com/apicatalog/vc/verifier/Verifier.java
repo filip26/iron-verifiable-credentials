@@ -36,8 +36,6 @@ import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.io.VcdmResolver;
-import com.apicatalog.vcdm.v11.Vcdm11Reader;
-import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -59,30 +57,10 @@ public class Verifier extends VerificationProcessor<Verifier> {
         super(suites);
 
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
-        
-        this.readerProvider = vcdmResolver(proofAdapter);
+
+        this.readerProvider = VcdmResolver.create(proofAdapter);
 
         this.statusVerifier = null;
-    }
-
-    protected static VerifiableReaderProvider vcdmResolver(final ProofAdapter proofAdapter) {
-        var resolver = new VcdmResolver();
-        resolver.v11(Vcdm11Reader.with(proofAdapter));
-        resolver.v20(Vcdm20Reader.with(proofAdapter)
-                // add VCDM 1.1 credential support
-                .v11(resolver.v11().adapter()));
-//        resolver.v11(Vcdm11Reader.with(
-//                r -> {
-//                },
-//                suites));
-//        resolver.v20(Vcdm20Reader.with(
-//                r -> r.with(
-//                        "https://www.w3.org/ns/credentials/status#BitstringStatusListEntry",
-//                        BitstringStatusListEntry.class,
-//                        BitstringStatusListEntry::of),
-//                resolver,
-//                suites));
-        return resolver;
     }
 
     /**
@@ -123,24 +101,6 @@ public class Verifier extends VerificationProcessor<Verifier> {
         Objects.requireNonNull(verifiable);
         return verify(verifiable, toMap(parameters));
     }
-
-//    /**
-//     * A method to override with a custom verification logic that is called before
-//     * proofs' verification.
-//     * 
-//     * @param verifiable
-//     */
-//    protected void check(Verifiable verifiable) throws VerificationError {
-//    }
-//
-//    /**
-//     * A method to override with a custom verification logic that is called before a
-//     * proof value is verified.
-//     * 
-//     * @param proof
-//     */
-//    protected void check(Proof proof) throws VerificationError {
-//    }
 
     /**
      * Verifies VC/VP document. Throws VerificationError if the document is not
@@ -211,7 +171,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         return verify(location, parameters, getLoader());
     }
 
-    protected Verifiable verify(final URI location, final Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Verifiable verify(final URI location, final Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
         try {
             // load the document
             final DocumentLoaderOptions options = new DocumentLoaderOptions();
@@ -225,7 +185,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
                 throw new DocumentError(ErrorType.Invalid);
             }
 
-            return verify(json.asJsonObject(), params, loader);
+            return verify(json.asJsonObject(), parameters, loader);
 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
@@ -233,7 +193,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         }
     }
 
-    protected Verifiable verify(final JsonObject document, Map<String, Object> params, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Verifiable verify(final JsonObject document, Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
 
         // extract context
         final Collection<String> context;
@@ -258,10 +218,10 @@ public class Verifier extends VerificationProcessor<Verifier> {
             throw new DocumentError(ErrorType.Invalid, "Document");
         }
 
-        return verify(verifiable, params);
+        return verify(verifiable, parameters);
     }
 
-    public Verifiable verify(final Verifiable verifiable, final Map<String, Object> params) throws VerificationError, DocumentError {
+    public Verifiable verify(final Verifiable verifiable, final Map<String, Object> parameters) throws VerificationError, DocumentError {
 
         if (verifiable.proofs() == null || verifiable.proofs().isEmpty()) {
             throw new DocumentError(ErrorType.Missing, "Proof");
@@ -285,9 +245,9 @@ public class Verifier extends VerificationProcessor<Verifier> {
             while (proof != null) {
 
                 // validate proof properties
-                proof.validate(params == null
+                proof.validate(parameters == null
                         ? Collections.emptyMap()
-                        : params);
+                        : parameters);
 
                 final ProofValue proofValue = proof.signature();
 
@@ -345,9 +305,11 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected static final Map<String, Object> toMap(Parameter<?>... parameters) {
         return parameters != null && parameters.length > 0
-                ? Stream.of(parameters).filter(p -> p.value() != null).collect(Collectors.toMap(
-                        Parameter::name,
-                        Parameter::value))
+                ? Stream.of(parameters)
+                        .filter(p -> p.name() != null && p.value() != null)
+                        .collect(Collectors.toMap(
+                                Parameter::name,
+                                Parameter::value))
                 : Collections.emptyMap();
     }
 }

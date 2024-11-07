@@ -5,8 +5,10 @@ import java.util.Collection;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.reader.VerifiableReaderProvider;
+import com.apicatalog.vc.status.bitstring.BitstringStatusListEntry;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
@@ -22,6 +24,15 @@ public class VcdmResolver implements VerifiableReaderProvider {
         this.v20 = null;
     }
 
+    public static VerifiableReaderProvider create(final ProofAdapter proofAdapter) {
+        VcdmResolver resolver = new VcdmResolver();
+        resolver.v11(Vcdm11Reader.with(proofAdapter));
+        resolver.v20(Vcdm20Reader.with(proofAdapter, BitstringStatusListEntry.class)
+                // add VCDM 1.1 credential support
+                .v11(resolver.v11().adapter()));
+        return resolver;
+    }
+        
     @Override
     public VerifiableReader reader(final Collection<String> contexts) throws DocumentError {
 
@@ -64,15 +75,15 @@ public class VcdmResolver implements VerifiableReaderProvider {
     public void v11(Vcdm11Reader v11) {
         this.v11 = v11;
     }
-    
+
     public void v20(Vcdm20Reader v20) {
         this.v20 = v20;
     }
-    
+
     public Vcdm11Reader v11() {
         return v11;
     }
-    
+
     public Vcdm20Reader v20() {
         return v20;
     }

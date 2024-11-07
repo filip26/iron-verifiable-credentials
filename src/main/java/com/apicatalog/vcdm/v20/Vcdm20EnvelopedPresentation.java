@@ -14,7 +14,7 @@ import com.apicatalog.vc.holder.PresentationHolder;
 import com.apicatalog.vc.proof.Proof;
 
 @Fragment
-@Term("EnvelopedCredential")
+@Term("EnvelopedVerifiablePresentation")
 @Context("https://www.w3.org/ns/credentials/v2")
 @Vocab("https://www.w3.org/2018/credentials#")
 public interface Vcdm20EnvelopedPresentation extends Presentation {

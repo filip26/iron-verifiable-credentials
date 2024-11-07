@@ -12,7 +12,7 @@ import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.proof.Proof;
 
 @Fragment
-@Term("EnvelopedCredential")
+@Term("EnvelopedVerifiableCredential")
 @Context("https://www.w3.org/ns/credentials/v2")
 @Vocab("https://www.w3.org/2018/credentials#")
 public interface Vcdm20EnvelopedCredential extends Credential {

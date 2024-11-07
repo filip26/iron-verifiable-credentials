@@ -15,12 +15,16 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.model.ProofAdapter;
+import com.apicatalog.vc.model.ProofAdapterProvider;
 import com.apicatalog.vc.processor.DocumentProcessor;
 import com.apicatalog.vc.status.bitstring.BitstringStatusListEntry;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.io.VcdmResolver;
 import com.apicatalog.vcdm.v11.DeprecatedVcdm11Reader;
+import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.DeprecatedVcdm20Reader;
+import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -29,16 +33,24 @@ public class Reader extends DocumentProcessor<Reader> {
 
     private static final Logger LOGGER = Logger.getLogger(Reader.class.getName());
 
-    protected final VerifiableReaderProvider readerResolver;
+    protected final VerifiableReaderProvider readerProvider;
 
     protected Reader(final SignatureSuite... suites) {
         super(suites);
+        
+        ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
+        
+        this.readerProvider = vcdm(proofAdapter);
 
-        this.readerResolver = vcdmResolver(suites);
     }
 
-    protected static VerifiableReaderProvider vcdmResolver(final SignatureSuite... suites) {
+    protected static VerifiableReaderProvider vcdm(final ProofAdapter proofAdapter) {
         var resolver = new VcdmResolver();
+        resolver.v11(Vcdm11Reader.with(proofAdapter));
+        resolver.v20(Vcdm20Reader.with(proofAdapter)
+                // add VCDM 1.1 credential support
+                .v11(resolver.v11().adapter()));
+
 //        resolver.v11(Vcdm11Reader.with(
 //                r -> {
 //                },
@@ -120,7 +132,7 @@ public class Reader extends DocumentProcessor<Reader> {
             throw new DocumentError(e, ErrorType.Invalid, "Context");
         }
 
-        final VerifiableReader reader = readerResolver.reader(context);
+        final VerifiableReader reader = readerProvider.reader(context);
 
         if (reader == null) {
             LOGGER.log(Level.INFO, "An unknown document model {0}", context);

@@ -9,7 +9,9 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeWriter;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
 import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.primitive.VerifiableTree;
 import com.apicatalog.vc.writer.VerifiableWriter;
@@ -22,8 +24,21 @@ import jakarta.json.JsonObject;
 
 public class Vcdm20Writer implements VerifiableWriter {
 
+    protected static final JsonLdWriter WRITER = new JsonLdWriter()
+            .scan(Vcdm20Credential.class)
+            .scan(Vcdm20Presentation.class)
+            .scan(Credential.class)
+            .scan(Presentation.class)
+            .scan(Verifiable.class)
+            ;
+
+    
     @Override
     public JsonObject write(Verifiable verifiable, DocumentLoader loader, URI base) throws DocumentError {
+        return WRITER.compacted(verifiable);
+    }
+    
+    public JsonObject write2(Verifiable verifiable, DocumentLoader loader, URI base) throws DocumentError {
 
         var tree = VerifiableTree.compose(verifiable);
 

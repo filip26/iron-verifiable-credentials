@@ -9,6 +9,8 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
+import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableAdapter;
@@ -50,7 +52,10 @@ public class Vcdm11Reader extends VcdmReader implements VerifiableAdapterProvide
 
         TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder()
                 .scan(Vcdm11Credential.class, true)
-                .scan(Vcdm11Presentation.class, true);
+                .scan(Vcdm11Presentation.class, true)
+                .scan(Credential.class, true)
+                .scan(Presentation.class, true)
+                .scan(Verifiable.class, true);
 
         for (Class<?> type : types) {
             builder.scan(type);
