@@ -35,7 +35,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
-public class VcdmMaterializer implements VerifiableAdapter {
+public class VcdmAdapter implements VerifiableAdapter {
 
     protected final ProofAdapter proofAdapter;
     protected final VerifiableModelReader credentialModelReader;
@@ -43,7 +43,7 @@ public class VcdmMaterializer implements VerifiableAdapter {
 
     protected final JsonLdTreeReader reader;
 
-    public VcdmMaterializer(
+    public VcdmAdapter(
             JsonLdTreeReader reader,
             VerifiableAdapterProvider credentialAdapterProvider,
             VerifiableModelReader credentialModelReader,

@@ -16,7 +16,7 @@ import com.apicatalog.vc.model.VerifiableAdapterProvider;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vcdm.VcdmVersion;
-import com.apicatalog.vcdm.io.VcdmMaterializer;
+import com.apicatalog.vcdm.io.VcdmAdapter;
 import com.apicatalog.vcdm.io.VcdmReader;
 import com.apicatalog.vcdm.io.VcdmResolver;
 
@@ -29,12 +29,12 @@ import jakarta.json.JsonObject;
  */
 public class Vcdm11Reader extends VcdmReader implements VerifiableAdapterProvider {
 
-    protected final VerifiableAdapter credentialAdapter;
+    protected final VerifiableAdapter adapter;
     protected final ProofAdapter proofAdapter;
 
     protected Vcdm11Reader(final JsonLdTreeReader reader, ProofAdapter proofAdapter) {
         super(VcdmVersion.V11);
-        this.credentialAdapter = new VcdmMaterializer(reader, this, this, proofAdapter);
+        this.adapter = new VcdmAdapter(reader, this, this, proofAdapter);
         this.proofAdapter = proofAdapter;
     }
 
@@ -66,13 +66,17 @@ public class Vcdm11Reader extends VcdmReader implements VerifiableAdapterProvide
 
         VerifiableModel model = read(material);
 
-        return credentialAdapter.materialize(model, loader, base);
+        return adapter.materialize(model, loader, base);
     }
 
     @Override
     public VerifiableAdapter adapter(Collection<String> context) throws DocumentError {
         return VcdmVersion.V11 == VcdmResolver.getVersion(context)
-                ? credentialAdapter
+                ? adapter
                 : null;
+    }
+    
+    public VerifiableAdapter adapter() {
+        return adapter;
     }
 }

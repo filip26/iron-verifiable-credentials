@@ -37,6 +37,7 @@ import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.io.VcdmResolver;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
+import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -67,6 +68,9 @@ public class Verifier extends VerificationProcessor<Verifier> {
     protected static VerifiableReaderProvider vcdmResolver(final ProofAdapter proofAdapter) {
         var resolver = new VcdmResolver();
         resolver.v11(Vcdm11Reader.with(proofAdapter));
+        resolver.v20(Vcdm20Reader.with(proofAdapter)
+                // add VCDM 1.1 credential support
+                .v11(resolver.v11().adapter()));
 //        resolver.v11(Vcdm11Reader.with(
 //                r -> {
 //                },

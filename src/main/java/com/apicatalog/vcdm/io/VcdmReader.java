@@ -1,6 +1,7 @@
 package com.apicatalog.vcdm.io;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.jsonld.JsonLdMaterialReader;
@@ -47,7 +48,11 @@ public abstract class VcdmReader implements VerifiableModelReader, VerifiableRea
                         data.context(),
                         compactedUnsigned,
                         expandedUnsigned),
-                compactedProofs,
-                expandedProofs);
+                compactedProofs != null
+                        ? compactedProofs
+                        : Collections.emptyList(),
+                expandedProofs != null
+                        ? expandedProofs
+                        : Collections.emptyList());
     }
 }

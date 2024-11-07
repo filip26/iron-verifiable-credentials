@@ -2,6 +2,7 @@ package com.apicatalog.vcdm.v11;
 
 import java.util.Collection;
 
+import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
@@ -21,6 +22,7 @@ import com.apicatalog.vcdm.VcdmVersion;
 @Fragment
 @Term("VerifiablePresentation")
 @Vocab("https://www.w3.org/2018/credentials#")
+@Context("https://www.w3.org/2018/credentials/v1")
 public interface Vcdm11Presentation extends VcdmPresentation {
 
     @Provided

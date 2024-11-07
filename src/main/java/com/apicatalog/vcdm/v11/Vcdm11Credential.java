@@ -6,6 +6,7 @@ import java.util.Collection;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Literal;
 import com.apicatalog.linkedtree.orm.Provided;
@@ -28,6 +29,7 @@ import com.apicatalog.vcdm.VcdmVocab;
 @Fragment
 @Term("VerifiableCredential")
 @Vocab("https://www.w3.org/2018/credentials#")
+@Context("https://www.w3.org/2018/credentials/v1")
 public interface Vcdm11Credential extends VcdmCredential {
 
     /**

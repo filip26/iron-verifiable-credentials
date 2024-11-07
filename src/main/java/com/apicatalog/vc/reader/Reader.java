@@ -20,7 +20,7 @@ import com.apicatalog.vc.status.bitstring.BitstringStatusListEntry;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.io.VcdmResolver;
 import com.apicatalog.vcdm.v11.DeprecatedVcdm11Reader;
-import com.apicatalog.vcdm.v20.Vcdm20Reader;
+import com.apicatalog.vcdm.v20.DeprecatedVcdm20Reader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;

@@ -1,52 +1,33 @@
 package com.apicatalog.vcdm.v20;
 
-import java.net.URI;
 import java.util.Collection;
 
+import com.apicatalog.linkedtree.orm.Context;
+import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Provided;
+import com.apicatalog.linkedtree.orm.Term;
+import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.Presentation;
-import com.apicatalog.vc.holder.PresentationHolder;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vcdm.DeprecatedVcdmPresentation;
+import com.apicatalog.vcdm.VcdmPresentation;
+import com.apicatalog.vcdm.VcdmVersion;
 
-public class Vcdm20Presentation extends DeprecatedVcdmPresentation implements Presentation {
+@Fragment
+@Term("VerifiablePresentation")
+@Vocab("https://www.w3.org/2018/credentials#")
+@Context("https://www.w3.org/ns/credentials/v2")
+public interface Vcdm20Presentation extends VcdmPresentation {
 
-//    public static Presentation of(LinkedFragment source) throws NodeAdapterError {
-//        return setup(new Vcdm20Presentation(), source);
-//    }
-//
-//    @Override
-//    public VcdmVersion version() {
-//        return VcdmVersion.V20;
-//    }
+    @Provided
+    @Override
+    Collection<Proof> proofs();
+
+    @Provided
+    @Override
+    Collection<Credential> credentials();
 
     @Override
-    public URI id() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<String> type() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Proof> proofs() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    @Override
-    public PresentationHolder holder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Credential> credentials() {
-        // TODO Auto-generated method stub
-        return null;
+    default VcdmVersion version() {
+        return VcdmVersion.V20;
     }
 }

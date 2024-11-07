@@ -5,8 +5,8 @@ import java.util.Collection;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.reader.VerifiableReaderProvider;
 import com.apicatalog.vc.reader.VerifiableReader;
+import com.apicatalog.vc.reader.VerifiableReaderProvider;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
@@ -68,4 +68,13 @@ public class VcdmResolver implements VerifiableReaderProvider {
     public void v20(Vcdm20Reader v20) {
         this.v20 = v20;
     }
+    
+    public Vcdm11Reader v11() {
+        return v11;
+    }
+    
+    public Vcdm20Reader v20() {
+        return v20;
+    }
+
 }
