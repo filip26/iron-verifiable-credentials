@@ -194,6 +194,51 @@
       "name": "Missing terms of use @type",
       "input": "vcdm20/validation/vcdm20-missing-tou-type.jsonld",
       "expectErrorCode": "MissingTermsOfUseType"
-    }        
+    },
+    {
+      "@id": "#t00020",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid status",
+      "input": "vcdm20/validation/vcdm20-valid-status.jsonld"
+    },
+    {
+      "@id": "#t00021",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid schema",
+      "input": "vcdm20/validation/vcdm20-valid-schema.jsonld"
+    },
+    {
+      "@id": "#t00022",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid refresh service",
+      "input": "vcdm20/validation/vcdm20-valid-refresh-service.jsonld"
+    },
+    {
+      "@id": "#t00023",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid evidence",
+      "input": "vcdm20/validation/vcdm20-valid-evidence.jsonld"
+    },
+    {
+      "@id": "#t00024",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid terms of use",
+      "input": "vcdm20/validation/vcdm20-valid-tou.jsonld"
+    }
   ]
 }

@@ -1,0 +1,36 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://www.w3.org/ns/credentials/examples/v2"
+  ],
+  "id": "http://license.example/credentials/9837",
+  "type": [
+    "VerifiableCredential",
+    "ExampleDrivingLicenseCredential"
+  ],
+  "issuer": "https://license.example/issuers/48",
+  "validFrom": "2020-03-14T12:10:42Z",
+  "credentialSubject": {
+    "id": "did:example:f1c276e12ec21ebfeb1f712ebc6",
+    "license": {
+      "type": "ExampleDrivingLicense",
+      "name": "License to Drive a Car"
+    }
+  },
+  "credentialStatus": [
+    {
+      "id": "https://license.example/credentials/status/84#14278",
+      "type": "BitstringStatusListEntry",
+      "statusPurpose": "revocation",
+      "statusListIndex": "14278",
+      "statusListCredential": "https://license.example/credentials/status/84"
+    },
+    {
+      "id": "https://license.example/credentials/status/84#82938",
+      "type": "BitstringStatusListEntry",
+      "statusPurpose": "suspension",
+      "statusListIndex": "82938",
+      "statusListCredential": "https://license.example/credentials/status/84"
+    }
+  ]
+}
