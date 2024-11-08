@@ -24,7 +24,6 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.di.VcdiVocab;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
 import com.apicatalog.vc.processor.Parameter;
@@ -35,6 +34,7 @@ import com.apicatalog.vc.reader.VerifiableReaderProvider;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.io.VcdmResolver;
 
 import jakarta.json.JsonObject;

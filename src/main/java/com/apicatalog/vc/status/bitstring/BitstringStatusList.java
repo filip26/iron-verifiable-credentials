@@ -3,15 +3,16 @@ package com.apicatalog.vc.status.bitstring;
 import java.net.URI;
 import java.util.Collection;
 
-import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.literal.NumericValue;
+import com.apicatalog.linkedtree.orm.Literal;
+import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.vc.Subject;
 
-public class BitstringStatusList implements Subject, Linkable {
+public class BitstringStatusList implements Subject {
 
     protected URI id;
     protected Collection<String> type;
@@ -19,8 +20,7 @@ public class BitstringStatusList implements Subject, Linkable {
     protected Collection<String> purpose;
     protected Bitstring list;
     protected long ttl;
-
-    protected LinkedFragment ld;
+    protected boolean hasClaims;
 
     protected BitstringStatusList() {
         // protected
@@ -50,7 +50,7 @@ public class BitstringStatusList implements Subject, Linkable {
                 NumericValue.class,
                 n -> n.numberValue().longValue());
 
-        statusList.ld = source;
+        statusList.hasClaims = !source.terms().isEmpty();
         return statusList;
     }
 
@@ -62,6 +62,8 @@ public class BitstringStatusList implements Subject, Linkable {
         return purpose;
     }
 
+    @Term(value =  "encodedList", compact = false)
+    @Literal(BitstringAdapter.class)
     public Bitstring list() {
         return list;
     }
@@ -71,17 +73,12 @@ public class BitstringStatusList implements Subject, Linkable {
     }
 
     @Override
-    public LinkedNode ld() {
-        return ld;
-    }
-
-    @Override
     public URI id() {
         return id;
     }
 
     @Override
     public boolean hasClaims() {
-        return !ld.terms().isEmpty();
+        return hasClaims;
     }
 }

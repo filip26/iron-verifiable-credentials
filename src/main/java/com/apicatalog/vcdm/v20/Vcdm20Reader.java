@@ -9,7 +9,6 @@ import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableAdapter;
@@ -49,9 +48,7 @@ public class Vcdm20Reader extends VcdmReader implements VerifiableAdapterProvide
                 .scan(Vcdm20Presentation.class, true)
                 .scan(Vcdm20EnvelopedCredential.class, true)
                 .scan(Vcdm20EnvelopedPresentation.class, true)
-                .scan(Credential.class, true)
-                .scan(Presentation.class, true)
-                .scan(Verifiable.class, true);
+                .scan(Credential.class, true);
 
         if (types != null) {
             for (Class<?> type : types) {

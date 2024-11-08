@@ -11,9 +11,8 @@
     "type": "Subject"
   },
   "issuer": "https://example.com/issuer/1",
-  "termsOfUse": {
-    "trustFramework": "Employment&Life",
-    "policyId": "https://policy.example/policies/125",
-    "legalBasis": "professional qualifications directive"
+  "issuanceDate": "2010-01-01T19:23:24Z",
+  "refreshService": {
+    "id": "https://example.edu/refresh/3732"
   }
 }

@@ -11,7 +11,8 @@
     "type": "Subject"
   },
   "issuer": "https://example.com/issuer/1",
-  "credentialSchema": {
-    "type": "Schema"
+  "issuanceDate": "2010-01-01T19:23:24Z",
+  "termsOfUse": {
+    "id": "https://example.com/tou/1"
   }
 }

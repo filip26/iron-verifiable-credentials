@@ -297,6 +297,16 @@
       "name": "Invalid EVC @id scheme",
       "input": "vcdm20/validation/vcdm20-invalid-evc-id.jsonld",
       "expectErrorCode": "InvalidIdScheme"
+    },
+    {
+      "@id": "#t0031",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Unknown VP VC model",
+      "input": "vcdm20/validation/vcdm20-unknown-vp-vc-model.jsonld",
+      "expectErrorCode": "InvalidCredentialModel"
     }
   ]
 }

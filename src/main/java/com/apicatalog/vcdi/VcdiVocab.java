@@ -1,4 +1,4 @@
-package com.apicatalog.vc.di;
+package com.apicatalog.vcdi;
 
 import com.apicatalog.ld.VocabTerm;
 import com.apicatalog.vcdm.VcdmVocab;

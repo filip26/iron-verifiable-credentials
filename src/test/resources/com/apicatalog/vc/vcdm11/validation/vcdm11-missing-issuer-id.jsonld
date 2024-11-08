@@ -9,5 +9,10 @@
   "credentialSubject": {
     "id": "https://example.com/subject/1",
     "type": "Subject"
-  }
+  },
+  "issuer": {
+    "type": "Issuer",
+    "name": "Test Issuer"
+  },
+  "issuanceDate": "2010-01-01T19:23:24Z"
 }

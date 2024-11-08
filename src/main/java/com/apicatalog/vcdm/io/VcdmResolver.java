@@ -8,7 +8,6 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.reader.VerifiableReaderProvider;
-import com.apicatalog.vc.status.bitstring.BitstringStatusListEntry;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
@@ -27,7 +26,7 @@ public class VcdmResolver implements VerifiableReaderProvider {
     public static VerifiableReaderProvider create(final ProofAdapter proofAdapter) {
         VcdmResolver resolver = new VcdmResolver();
         resolver.v11(Vcdm11Reader.with(proofAdapter));
-        resolver.v20(Vcdm20Reader.with(proofAdapter, BitstringStatusListEntry.class)
+        resolver.v20(Vcdm20Reader.with(proofAdapter)
                 // add VCDM 1.1 credential support
                 .v11(resolver.v11().adapter()));
         return resolver;

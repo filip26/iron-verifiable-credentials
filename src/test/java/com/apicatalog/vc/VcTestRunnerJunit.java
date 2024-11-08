@@ -1,9 +1,9 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.vc.di.DataIntegrityParam.challenge;
-import static com.apicatalog.vc.di.DataIntegrityParam.domain;
-import static com.apicatalog.vc.di.DataIntegrityParam.nonce;
-import static com.apicatalog.vc.di.DataIntegrityParam.purpose;
+import static com.apicatalog.vcdi.DataIntegrityParam.challenge;
+import static com.apicatalog.vcdi.DataIntegrityParam.domain;
+import static com.apicatalog.vcdi.DataIntegrityParam.nonce;
+import static com.apicatalog.vcdi.DataIntegrityParam.purpose;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,7 +29,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.di.DataIntegrityProofDraft;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
@@ -40,6 +39,7 @@ import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
 import com.apicatalog.vc.writer.VerifiableWriter;
+import com.apicatalog.vcdi.DataIntegrityProofDraft;
 import com.apicatalog.vcdm.io.VcdmWriter;
 
 import jakarta.json.Json;

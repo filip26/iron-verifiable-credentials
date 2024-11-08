@@ -12,7 +12,7 @@
   },
   "issuer": "https://example.com/issuer/1",
   "issuanceDate": "2010-01-01T19:23:24Z",
-  "credentialStatus": {
-    "type": "https://example.com/status/1"
+  "credentialSchema": {
+    "id": "https://example.com/schema/1"
   }
 }

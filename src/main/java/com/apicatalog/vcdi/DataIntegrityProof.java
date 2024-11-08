@@ -1,4 +1,4 @@
-package com.apicatalog.vc.di;
+package com.apicatalog.vcdi;
 
 import java.net.URI;
 import java.time.Instant;
@@ -94,7 +94,7 @@ public interface DataIntegrityProof extends VerifiableProof {
         assertNotNull(this::purpose, VcdiVocab.PURPOSE);
         assertNotNull(this::cryptoSuite, VcdiVocab.CRYPTO_SUITE);
         assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
-        
+
         if (created() != null && Instant.now().isBefore(created())) {
             throw new DocumentError(ErrorType.Invalid, VcdiVocab.CREATED);
         }
@@ -114,7 +114,6 @@ public interface DataIntegrityProof extends VerifiableProof {
     static void assertEquals(Map<String, Object> params, VocabTerm name, Object expected) throws DocumentError {
 
         final Object value = params.get(name.name());
-        System.out.println(name.name() + " -> " + value + " : " + expected);
         if (value == null) {
             return;
         }

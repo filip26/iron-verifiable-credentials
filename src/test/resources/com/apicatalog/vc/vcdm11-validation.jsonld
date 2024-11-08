@@ -46,7 +46,7 @@
       "input": "vcdm11/validation/vcdm11-valid-schema.jsonld"
     },
     {
-      "@id": "#t0008",
+      "@id": "#t0005",
       "@type": [
         "PositiveEvaluationTest",
         "ValidationTest"
@@ -55,7 +55,7 @@
       "input": "vcdm11/validation/vcdm11-valid-refresh-service.jsonld"
     },
     {
-      "@id": "#t0009",
+      "@id": "#t0006",
       "@type": [
         "PositiveEvaluationTest",
         "ValidationTest"
@@ -64,7 +64,7 @@
       "input": "vcdm11/validation/vcdm11-valid-evidence.jsonld"
     },
     {
-      "@id": "#t0010",
+      "@id": "#t0007",
       "@type": [
         "PositiveEvaluationTest",
         "ValidationTest"
@@ -73,7 +73,7 @@
       "input": "vcdm11/validation/vcdm11-valid-tou.jsonld"
     },
     {
-      "@id": "#t0011",
+      "@id": "#t0008",
       "@type": [
         "PositiveEvaluationTest",
         "ValidationTest"
@@ -82,7 +82,7 @@
       "input": "vcdm11/validation/vcdm11-valid-unsigned-full-vc.jsonld"
     },
     {
-      "@id": "#t0013",
+      "@id": "#t0009",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -92,7 +92,7 @@
       "expectErrorCode": "InvalidDocument"
     },
     {
-      "@id": "#t0014",
+      "@id": "#t0010",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -102,7 +102,7 @@
       "expectErrorCode": "MissingType"
     },
     {
-      "@id": "#t0015",
+      "@id": "#t0011",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -112,7 +112,7 @@
       "expectErrorCode": "UnknownType"
     },
     {
-      "@id": "#t0016",
+      "@id": "#t0012",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -122,7 +122,7 @@
       "expectErrorCode": "MissingIssuer"
     },
     {
-      "@id": "#t0017",
+      "@id": "#t0013",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -132,7 +132,7 @@
       "expectErrorCode": "MissingCredentialSubject"
     },
     {
-      "@id": "#t0018",
+      "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -142,7 +142,7 @@
       "expectErrorCode": "MissingCredentialSubjectClaims"
     },
     {
-      "@id": "#t0019",
+      "@id": "#t0015",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -152,7 +152,7 @@
       "expectErrorCode": "MissingIssuer"
     },
     {
-      "@id": "#t0020",
+      "@id": "#t0016",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -162,7 +162,7 @@
       "expectErrorCode": "MissingIssuerId"
     },
     {
-      "@id": "#t0021",
+      "@id": "#t0017",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -172,7 +172,7 @@
       "expectErrorCode": "MissingStatusId"
     },    
     {
-      "@id": "#t0021",
+      "@id": "#t0018",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -182,7 +182,7 @@
       "expectErrorCode": "MissingStatusType"
     },
     {
-      "@id": "#t0022",
+      "@id": "#t0019",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -192,7 +192,7 @@
       "expectErrorCode": "MissingSchemaId"
     },
     {
-      "@id": "#t0023",
+      "@id": "#t0020",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -202,17 +202,17 @@
       "expectErrorCode": "MissingSchemaType"
     },
     {
-      "@id": "#t0024",
+      "@id": "#t0021",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing refreshService @type",
+      "name": "Missing refreshService @id",
       "input": "vcdm11/validation/vcdm11-missing-refresh-service-id.jsonld",
       "expectErrorCode": "MissingRefreshServiceId"
     },    
     {
-      "@id": "#t0024",
+      "@id": "#t0022",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -222,7 +222,7 @@
       "expectErrorCode": "MissingRefreshServiceType"
     },
     {
-      "@id": "#t0025",
+      "@id": "#t0023",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -232,7 +232,7 @@
       "expectErrorCode": "MissingEvidenceType"
     },
     {
-      "@id": "#t0026",
+      "@id": "#t0024",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -242,44 +242,14 @@
       "expectErrorCode": "MissingTermsOfUseType"
     },
     {
-      "@id": "#t0027",
+      "@id": "#t0025",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing EVP @id",
-      "input": "vcdm11/validation/vcdm11-missing-evp-id.jsonld",
-      "expectErrorCode": "MissingId"
-    },
-    {
-      "@id": "#t0027",
-      "@type": [
-        "NegativeEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Invalid EVP @id scheme",
-      "input": "vcdm11/validation/vcdm11-invalid-evp-id.jsonld",
-      "expectErrorCode": "InvalidIdScheme"
-    },
-    {
-      "@id": "#t0029",
-      "@type": [
-        "NegativeEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Missing EVC @id",
-      "input": "vcdm11/validation/vcdm11-missing-evc-id.jsonld",
-      "expectErrorCode": "MissingId"
-    },
-    {
-      "@id": "#t0030",
-      "@type": [
-        "NegativeEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Invalid EVC @id scheme",
-      "input": "vcdm11/validation/vcdm11-invalid-evc-id.jsonld",
-      "expectErrorCode": "InvalidIdScheme"
+      "name": "Missing issuance date",
+      "input": "vcdm11/validation/vcdm11-missing-issuance.jsonld",
+      "expectErrorCode": "MissingIssuanceDate"
     }
   ]
 }

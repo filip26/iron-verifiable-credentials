@@ -11,7 +11,9 @@
     "type": "Subject"
   },
   "issuer": "https://example.com/issuer/1",
-  "refreshService": {
-    "id": "https://example.edu/refresh/3732"
+  "issuanceDate": "2010-01-01T19:23:24Z",
+  "evidence": {
+    "id": "https://videos.example/training/alice-espresso.mp4",
+    "name": "Talk-aloud video of double espresso preparation"
   }
 }

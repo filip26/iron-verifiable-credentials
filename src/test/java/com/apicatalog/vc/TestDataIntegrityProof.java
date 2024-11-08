@@ -7,8 +7,8 @@ import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
-import com.apicatalog.vc.di.DataIntegrityProof;
-import com.apicatalog.vc.di.VcdiVocab;
+import com.apicatalog.vcdi.DataIntegrityProof;
+import com.apicatalog.vcdi.VcdiVocab;
 
 @Fragment
 @Context("https://w3id.org/security/data-integrity/v2")

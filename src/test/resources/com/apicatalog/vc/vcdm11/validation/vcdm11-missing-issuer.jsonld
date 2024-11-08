@@ -10,8 +10,5 @@
     "id": "https://example.com/subject/1",
     "type": "Subject"
   },
-  "issuer": "https://example.com/issuer/1",
-  "credentialStatus": {
-    "id": "https://example.com/status/1"
-  }
+  "issuanceDate": "2010-01-01T19:23:24Z"
 }

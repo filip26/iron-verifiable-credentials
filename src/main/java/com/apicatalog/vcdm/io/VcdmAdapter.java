@@ -150,7 +150,7 @@ public class VcdmAdapter implements VerifiableAdapter {
             VerifiableAdapter adapter = credentialAdapterProvider.adapter(model.data().context());
 
             if (adapter == null) {
-                throw new DocumentError(ErrorType.Invalid, VcdmVocab.VERIFIABLE_CREDENTIALS);
+                throw new DocumentError(ErrorType.Invalid, "CredentialModel");
             }
 
             Verifiable verifiable = adapter.materialize(model, loader, base);
@@ -160,7 +160,7 @@ public class VcdmAdapter implements VerifiableAdapter {
             }
         }
 
-        throw new DocumentError(ErrorType.Invalid, VcdmVocab.VERIFIABLE_CREDENTIALS);
+        throw new DocumentError(ErrorType.Invalid, "CredentialModel");
     }
 
     protected Collection<Credential> credentials(VerifiableMaterial data, DocumentLoader loader, URI base) throws DocumentError {
