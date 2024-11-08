@@ -25,6 +25,15 @@ import jakarta.json.JsonValue;
 @TestMethodOrder(OrderAnnotation.class)
 class VcTest {
 
+    @DisplayName("VCDM 1.1 Validation")
+    @ParameterizedTest(name = "{0}")
+    @MethodSource({ "vcdm11Validation" })
+    @Order(1)
+    void validate(VcTestCase testCase) {
+        new VcTestRunnerJunit(testCase).execute();
+    }
+
+    
     @DisplayName("VCDM 1.1 Verifier")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "vcdm11Verifier" })
@@ -67,6 +76,10 @@ class VcTest {
         new VcTestRunnerJunit(testCase).execute();
     }
 
+    static final Stream<VcTestCase> vcdm11Validation() throws JsonLdError, IOException {
+        return manifest("vcdm11-validation.jsonld");
+    }
+    
     static final Stream<VcTestCase> vcdm11Verifier() throws JsonLdError, IOException {
         return manifest("vcdm11-verifier.jsonld");
     }

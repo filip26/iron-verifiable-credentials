@@ -1,0 +1,17 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://www.w3.org/2018/credentials/examples/v1"
+  ],
+  "type": [
+    "VerifiableCredential"
+  ],
+  "credentialSubject": {
+    "id": "https://example.com/subject/1",
+    "type": "Subject"
+  },
+  "issuer": "https://example.com/issuer/1",
+  "credentialSchema": {
+    "id": "https://example.com/schema/1"
+  }
+}

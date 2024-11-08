@@ -1,0 +1,62 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://www.w3.org/ns/credentials/examples/v2"
+  ],
+  "type": [
+    "VerifiableCredential",
+    "AgeVerificationCredential"
+  ],
+  "id": "did:key:z6MksFxi8wnHkNq4zgEskSZF45SuWQ4HndWSAVYRRGe9qDks",
+  "issuer": "did:key:z6MksFxi8wnHkNq4zgEskSZF45SuWQ4HndWSAVYRRGe9qDks",
+  "validFrom": "2024-04-03T00:00:00.000Z",
+  "validUntil": "2024-12-15T00:00:00.000Z",
+  "name": "Age Verification Credential",
+  "description": "Age Description",
+  "credentialSubject": {
+    "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+    "type": "AchievementSubject",
+    "name": "Alice Smith",
+    "activityEndDate": "2023-12-02T00:00:00Z",
+    "activityStartDate": "2023-12-01T00:00:00Z",
+    "awardedDate": "2024-01-01T00:00:00Z",
+    "achievement": {
+      "id": "urn:uuid:d46e8ef1-c647-419b-be18-5e045d1c4e64",
+      "type": "Achievement",
+      "name": "Basic Barista Training",
+      "criteria": {
+        "narrative": "Team members are nominated for this badge by their supervisors, after passing the Basic Barista Training course."
+      },
+      "description": "This achievement certifies that the bearer is proficient in basic barista skills."
+    }
+  },
+  "evidence": {
+    "id": "https://videos.example/training/alice-espresso.mp4",
+    "type": "Evidence",
+    "name": "Talk-aloud video of double espresso preparation",
+    "description": "This is a talk-aloud video of Alice demonstrating preparation of a double espresso drink.",
+    "digestMultibase": "uELq9FnJ5YLa5iAszyJ518bXcnlc5P7xp1u-5uJRDYKvc"
+  },
+  "refreshService": {
+    "type": "VerifiableCredentialRefreshService2021",
+    "url": "https://registration.provider.example/flows/reissue-age-token",
+    "refreshToken": "z2BJYfNtmWRiouWhDrbDQmC2zicUPBxsPg"
+  },
+  "termsOfUse": {
+    "type": "TrustFrameworkPolicy",
+    "trustFramework": "Employment&Life",
+    "policyId": "https://policy.example/policies/125",
+    "legalBasis": "professional qualifications directive"
+  },
+  "credentialStatus": {
+    "id": "https://university.example/credentials/status/3#94567",
+    "type": "BitstringStatusListEntry",
+    "statusPurpose": "revocation",
+    "statusListIndex": "94567",
+    "statusListCredential": "https://university.example/credentials/status/3"
+  },
+  "credentialSchema": {
+    "id": "https://example.org/examples/degree.json",
+    "type": "JsonSchema"
+  }
+}
