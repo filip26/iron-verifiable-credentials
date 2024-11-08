@@ -12,6 +12,12 @@ public interface PresentationHolder {
     @Id
     URI id();
 
-    void validate() throws DocumentError;
+    /**
+     * Custom validation
+     * @throws DocumentError
+     */
+    default void validate() throws DocumentError {
+        // custom validation
+    }
 
 }

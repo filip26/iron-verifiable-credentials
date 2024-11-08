@@ -2,15 +2,20 @@ package com.apicatalog.vcdm.v11;
 
 import java.util.Collection;
 
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vcdm.VcdmPresentation;
+import com.apicatalog.vcdm.VcdmVerifiable;
 import com.apicatalog.vcdm.VcdmVersion;
+import com.apicatalog.vcdm.VcdmVocab;
 
 /**
  * Represents W3C VCDM 1.1 Verifiable Presentation.
@@ -23,7 +28,7 @@ import com.apicatalog.vcdm.VcdmVersion;
 @Term("VerifiablePresentation")
 @Vocab("https://www.w3.org/2018/credentials#")
 @Context("https://www.w3.org/2018/credentials/v1")
-public interface Vcdm11Presentation extends VcdmPresentation {
+public interface Vcdm11Presentation extends VcdmVerifiable, Presentation {
 
     @Provided
     @Override
@@ -36,5 +41,17 @@ public interface Vcdm11Presentation extends VcdmPresentation {
     @Override
     default VcdmVersion version() {
         return VcdmVersion.V11;
+    }
+    
+    @Override
+    default void validate() throws DocumentError {
+        // @type - mandatory
+        if (type() == null || type().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
+        }
+        // credentials
+        if (credentials() == null || credentials().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, VcdmVocab.VERIFIABLE_CREDENTIALS);
+        }
     }
 }

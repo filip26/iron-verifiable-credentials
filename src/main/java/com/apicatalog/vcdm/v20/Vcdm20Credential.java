@@ -12,13 +12,14 @@ import com.apicatalog.linkedtree.orm.Literal;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
+import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.CredentialSchema;
 import com.apicatalog.vc.Evidence;
 import com.apicatalog.vc.RefreshService;
 import com.apicatalog.vc.Subject;
 import com.apicatalog.vc.TermsOfUse;
 import com.apicatalog.vc.status.Status;
-import com.apicatalog.vcdm.VcdmCredential;
+import com.apicatalog.vcdm.VcdmVerifiable;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
@@ -26,7 +27,7 @@ import com.apicatalog.vcdm.VcdmVocab;
 @Term("VerifiableCredential")
 @Vocab("https://www.w3.org/2018/credentials#")
 @Context("https://www.w3.org/ns/credentials/v2")
-public interface Vcdm20Credential extends VcdmCredential {
+public interface Vcdm20Credential extends VcdmVerifiable, Credential {
 
     /**
      * A date time from the credential is valid.
@@ -152,6 +153,6 @@ public interface Vcdm20Credential extends VcdmCredential {
                 }
                 tou.validate();
             }
-        }        
+        }    
     }
 }

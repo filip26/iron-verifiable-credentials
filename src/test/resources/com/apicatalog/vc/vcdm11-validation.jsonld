@@ -82,15 +82,6 @@
       "input": "vcdm11/validation/vcdm11-valid-unsigned-full-vc.jsonld"
     },
     {
-      "@id": "#t0012",
-      "@type": [
-        "PositiveEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Valid unsigned LangMaps",
-      "input": "vcdm11/validation/vcdm11-valid-unsigned-langmap.jsonld"
-    },
-    {
       "@id": "#t0013",
       "@type": [
         "NegativeEvaluationTest",
@@ -176,6 +167,16 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
+      "name": "Missing status @id",
+      "input": "vcdm11/validation/vcdm11-missing-status-id.jsonld",
+      "expectErrorCode": "MissingStatusId"
+    },    
+    {
+      "@id": "#t0021",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
       "name": "Missing status @type",
       "input": "vcdm11/validation/vcdm11-missing-status-type.jsonld",
       "expectErrorCode": "MissingStatusType"
@@ -200,6 +201,16 @@
       "input": "vcdm11/validation/vcdm11-missing-schema-type.jsonld",
       "expectErrorCode": "MissingSchemaType"
     },
+    {
+      "@id": "#t0024",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing refreshService @type",
+      "input": "vcdm11/validation/vcdm11-missing-refresh-service-id.jsonld",
+      "expectErrorCode": "MissingRefreshServiceId"
+    },    
     {
       "@id": "#t0024",
       "@type": [

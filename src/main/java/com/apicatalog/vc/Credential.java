@@ -46,6 +46,19 @@ public interface Credential extends Verifiable {
     @Term("credentialSubject")
     Collection<Subject> subject();
 
+    @Term
+    Collection<Evidence> evidence();
+
+    @Term
+    Collection<TermsOfUse> termsOfUse();
+    
+    @Term
+    Collection<RefreshService> refreshService();
+    
+    @Term("credentialSchema")
+    Collection<CredentialSchema> schema();
+
+    
     @Override
     default boolean isCredential() {
         return true;

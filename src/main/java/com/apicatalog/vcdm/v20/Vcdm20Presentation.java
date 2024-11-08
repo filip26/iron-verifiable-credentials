@@ -9,15 +9,16 @@ import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vcdm.VcdmPresentation;
+import com.apicatalog.vcdm.VcdmVerifiable;
 import com.apicatalog.vcdm.VcdmVersion;
 
 @Fragment
 @Term("VerifiablePresentation")
 @Vocab("https://www.w3.org/2018/credentials#")
 @Context("https://www.w3.org/ns/credentials/v2")
-public interface Vcdm20Presentation extends VcdmPresentation {
+public interface Vcdm20Presentation extends VcdmVerifiable, Presentation {
 
     @Provided
     @Override

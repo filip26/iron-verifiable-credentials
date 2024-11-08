@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Literal;
@@ -13,9 +13,15 @@ import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
+import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.CredentialSchema;
+import com.apicatalog.vc.Evidence;
+import com.apicatalog.vc.RefreshService;
 import com.apicatalog.vc.Subject;
+import com.apicatalog.vc.TermsOfUse;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vcdm.VcdmCredential;
+import com.apicatalog.vc.status.Status;
+import com.apicatalog.vcdm.VcdmVerifiable;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
@@ -30,7 +36,7 @@ import com.apicatalog.vcdm.VcdmVocab;
 @Term("VerifiableCredential")
 @Vocab("https://www.w3.org/2018/credentials#")
 @Context("https://www.w3.org/2018/credentials/v1")
-public interface Vcdm11Credential extends VcdmCredential {
+public interface Vcdm11Credential extends VcdmVerifiable, Credential {
 
     /**
      * A date time when the credential has been issued.
@@ -81,13 +87,29 @@ public interface Vcdm11Credential extends VcdmCredential {
     @Override
     default void validate() throws DocumentError {
 
-        for (Subject item : subject()) {
-            if (item instanceof Linkable ld
-                    && ld.ld().asFragment().terms().isEmpty()
-                    && item.id() == null) {
-                throw new DocumentError(ErrorType.Invalid, VcdmVocab.SUBJECT);
+        if (type() == null || type().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
+        }
+
+        if (issuer() == null) {
+            throw new DocumentError(ErrorType.Missing, VcdmVocab.ISSUER);
+        }
+
+        if (issuer().id() == null) {
+            throw new DocumentError(ErrorType.Missing, "IssuerId");
+        }
+
+        issuer().validate();
+
+        if (subject() == null || subject().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, VcdmVocab.SUBJECT);
+        }
+
+        for (Subject subject : subject()) {
+            if (subject.id() == null && !subject.hasClaims()) {
+                throw new DocumentError(ErrorType.Missing, "CredentialSubjectClaims");
             }
-            item.validate();
+            subject.validate();
         }
 
         if (issuance() == null) {
@@ -95,10 +117,62 @@ public interface Vcdm11Credential extends VcdmCredential {
             throw new DocumentError(ErrorType.Missing, VcdmVocab.ISSUANCE_DATE);
         }
 
-        if ((issuance() != null
-                && expiration() != null
-                && issuance().isAfter(expiration()))) {
+        if (expiration() != null && issuance().isAfter(expiration())) {
             throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
+        }
+
+        if (status() != null && !status().isEmpty()) {
+            for (Status status : status()) {
+                if (status.id() == null) {
+                    throw new DocumentError(ErrorType.Missing, "StatusId");
+                }                
+                if (status.type() == null || status.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "StatusType");
+                }
+                status.validate();
+            }
+        }
+
+        if (schema() != null && !schema().isEmpty()) {
+            for (CredentialSchema schema : schema()) {
+                if (schema.id() == null) {
+                    throw new DocumentError(ErrorType.Missing, "SchemaId");
+                }
+                if (schema.type() == null || schema.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "SchemaType");
+                }
+                schema.validate();
+            }
+        }
+
+        if (refreshService() != null && !refreshService().isEmpty()) {
+            for (RefreshService refreshService : refreshService()) {
+                if (refreshService.id() == null) {
+                    throw new DocumentError(ErrorType.Missing, "RefreshServiceId");
+                }
+                if (refreshService.type() == null || refreshService.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "RefreshServiceType");
+                }
+                refreshService.validate();
+            }
+        }
+
+        if (evidence() != null && !evidence().isEmpty()) {
+            for (Evidence evidence : evidence()) {
+                if (evidence.type() == null || evidence.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "EvidenceType");
+                }
+                evidence.validate();
+            }
+        }
+
+        if (termsOfUse() != null && !termsOfUse().isEmpty()) {
+            for (TermsOfUse tou : termsOfUse()) {
+                if (tou.type() == null || tou.type().isEmpty()) {
+                    throw new DocumentError(ErrorType.Missing, "TermsOfUseType");
+                }
+                tou.validate();
+            }
         }
     }
 
