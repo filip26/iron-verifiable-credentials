@@ -2,6 +2,7 @@ package com.apicatalog.vcdm.v20;
 
 import java.util.Collection;
 
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Provided;
@@ -29,5 +30,14 @@ public interface Vcdm20Presentation extends VcdmPresentation {
     @Override
     default VcdmVersion version() {
         return VcdmVersion.V20;
+    }
+
+    @Override
+    default void validate() throws DocumentError {
+        if (credentials() != null) {
+            for (Credential credential : credentials()) {
+                credential.validate();
+            }
+        }
     }
 }

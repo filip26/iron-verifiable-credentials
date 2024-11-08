@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
@@ -23,7 +25,17 @@ public interface Vcdm20EnvelopedCredential extends Credential {
     }
 
     @Override
-    default void validate() throws DocumentError {
-        throw new UnsupportedOperationException();
+    default void validate() throws DocumentError {        
+        if (id() == null) {
+            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.ID);
+        }
+
+        if (type() == null || type().isEmpty()) {
+            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
+        }
+        
+        if (!id().getScheme().equals("data")) {
+            throw new DocumentError(ErrorType.Invalid, "IdScheme");
+        }
     }
 }

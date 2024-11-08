@@ -10,7 +10,6 @@
   "verifiableCredential": [
     {
       "@context": "https://www.w3.org/ns/credentials/v2",
-      "id": "data:application/vc+sd-jwt,QzVjV...RMjU",
       "type": "EnvelopedVerifiableCredential"
     }
   ]

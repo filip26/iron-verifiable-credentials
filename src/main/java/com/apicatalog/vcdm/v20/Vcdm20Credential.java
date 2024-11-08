@@ -152,6 +152,6 @@ public interface Vcdm20Credential extends VcdmCredential {
                 }
                 tou.validate();
             }
-        }
+        }        
     }
 }
