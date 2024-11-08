@@ -49,7 +49,14 @@
     "legalBasis": "professional qualifications directive"
   },
   "credentialStatus": {
-    "id": "https://api-test.ebsi.eu/trusted-issuers-registry/v5/issuers/did:ebsi:zvHWX359A3CvfJnCYaAiAde/attributes/60ae46e4fe9adffe0bc83c5e5be825aafe6b5246676398cd1ac36b8999e088a8",
-    "type": "EbsiAccreditationEntry"
+    "id": "https://university.example/credentials/status/3#94567",
+    "type": "BitstringStatusListEntry",
+    "statusPurpose": "revocation",
+    "statusListIndex": "94567",
+    "statusListCredential": "https://university.example/credentials/status/3"
+  },
+  "credentialSchema": {
+    "id": "https://example.org/examples/degree.json",
+    "type": "JsonSchema"
   }
 }

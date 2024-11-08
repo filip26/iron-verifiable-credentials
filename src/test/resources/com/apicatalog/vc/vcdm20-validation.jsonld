@@ -59,12 +59,11 @@
     {
       "@id": "#t0006",
       "@type": [
-        "NegativeEvaluationTest",
+        "PositiveEvaluationTest",
         "ValidationTest"
       ],
-      "name": "@context only",
-      "input": "vcdm20/validation/vcdm20-context-only.jsonld",
-      "expectErrorCode": "InvalidDocument"
+      "name": "Valid status",
+      "input": "vcdm20/validation/vcdm20-valid-status.jsonld"
     },
     {
       "@id": "#t0007",
@@ -72,11 +71,66 @@
         "PositiveEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Valid unsigned LangMaps",
-      "input": "vcdm20/validation/vcdm20-valid-unsigned-langmap.jsonld"
+      "name": "Valid schema",
+      "input": "vcdm20/validation/vcdm20-valid-schema.jsonld"
     },
     {
       "@id": "#t0008",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid refresh service",
+      "input": "vcdm20/validation/vcdm20-valid-refresh-service.jsonld"
+    },
+    {
+      "@id": "#t0009",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid evidence",
+      "input": "vcdm20/validation/vcdm20-valid-evidence.jsonld"
+    },
+    {
+      "@id": "#t0010",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid terms of use",
+      "input": "vcdm20/validation/vcdm20-valid-tou.jsonld"
+    },
+    {
+      "@id": "#t0011",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid unsigned full VC",
+      "input": "vcdm20/validation/vcdm20-valid-unsigned-full-vc.jsonld"
+    },    
+    {
+      "@id": "#t0012",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid unsigned LangMaps",
+      "input": "vcdm20/validation/vcdm20-valid-unsigned-langmap.jsonld"
+    },    
+    {
+      "@id": "#t0013",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "@context only",
+      "input": "vcdm20/validation/vcdm20-context-only.jsonld",
+      "expectErrorCode": "InvalidDocument"
+    },    
+    {
+      "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -86,7 +140,7 @@
       "expectErrorCode": "MissingType"
     },
     {
-      "@id": "#t0009",
+      "@id": "#t0015",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -96,7 +150,17 @@
       "expectErrorCode": "UnknownType"
     },
     {
-      "@id": "#t00010",
+      "@id": "#t0016",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Empty VC",
+      "input": "vcdm20/validation/vcdm20-empty-vc.jsonld",
+      "expectErrorCode": "MissingIssuer"
+    },    
+    {
+      "@id": "#t0017",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -106,7 +170,7 @@
       "expectErrorCode": "MissingCredentialSubject"
     },
     {
-      "@id": "#t00011",
+      "@id": "#t0018",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -116,7 +180,7 @@
       "expectErrorCode": "MissingCredentialSubjectClaims"
     },
     {
-      "@id": "#t00012",
+      "@id": "#t0019",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -126,7 +190,7 @@
       "expectErrorCode": "MissingIssuer"
     },
     {
-      "@id": "#t00013",
+      "@id": "#t0020",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -136,7 +200,7 @@
       "expectErrorCode": "MissingIssuerId"
     },
     {
-      "@id": "#t00014",
+      "@id": "#t0021",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -146,7 +210,7 @@
       "expectErrorCode": "MissingStatusType"
     },
     {
-      "@id": "#t00015",
+      "@id": "#t0022",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -156,7 +220,7 @@
       "expectErrorCode": "MissingSchemaId"
     },
     {
-      "@id": "#t00016",
+      "@id": "#t0023",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -166,7 +230,7 @@
       "expectErrorCode": "MissingSchemaType"
     },
     {
-      "@id": "#t00017",
+      "@id": "#t0024",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -176,7 +240,7 @@
       "expectErrorCode": "MissingRefreshServiceType"
     },
     {
-      "@id": "#t00018",
+      "@id": "#t0025",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -186,7 +250,7 @@
       "expectErrorCode": "MissingEvidenceType"
     },
     {
-      "@id": "#t00019",
+      "@id": "#t0026",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -194,51 +258,6 @@
       "name": "Missing terms of use @type",
       "input": "vcdm20/validation/vcdm20-missing-tou-type.jsonld",
       "expectErrorCode": "MissingTermsOfUseType"
-    },
-    {
-      "@id": "#t00020",
-      "@type": [
-        "PositiveEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Valid status",
-      "input": "vcdm20/validation/vcdm20-valid-status.jsonld"
-    },
-    {
-      "@id": "#t00021",
-      "@type": [
-        "PositiveEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Valid schema",
-      "input": "vcdm20/validation/vcdm20-valid-schema.jsonld"
-    },
-    {
-      "@id": "#t00022",
-      "@type": [
-        "PositiveEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Valid refresh service",
-      "input": "vcdm20/validation/vcdm20-valid-refresh-service.jsonld"
-    },
-    {
-      "@id": "#t00023",
-      "@type": [
-        "PositiveEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Valid evidence",
-      "input": "vcdm20/validation/vcdm20-valid-evidence.jsonld"
-    },
-    {
-      "@id": "#t00024",
-      "@type": [
-        "PositiveEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Valid terms of use",
-      "input": "vcdm20/validation/vcdm20-valid-tou.jsonld"
     }
   ]
 }
