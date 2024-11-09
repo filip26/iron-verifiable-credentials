@@ -1,9 +1,7 @@
 package com.apicatalog.vc.reader;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.apicatalog.jsonld.JsonLdError;
@@ -13,17 +11,15 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.model.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
+import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vc.processor.DocumentProcessor;
-import com.apicatalog.vc.status.bitstring.BitstringStatusListEntry;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdm.io.VcdmResolver;
-import com.apicatalog.vcdm.v11.DeprecatedVcdm11Reader;
+import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
-import com.apicatalog.vcdm.v20.DeprecatedVcdm20Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
 import jakarta.json.JsonObject;
@@ -33,23 +29,33 @@ public class Reader extends DocumentProcessor<Reader> {
 
     private static final Logger LOGGER = Logger.getLogger(Reader.class.getName());
 
-    protected final VerifiableReaderProvider readerProvider;
+    protected final VerifiableReader reader;
 
     protected Reader(final SignatureSuite... suites) {
         super(suites);
-        
+
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
-        
-        this.readerProvider = vcdm(proofAdapter);
+
+        this.reader = defaultReaders(proofAdapter);
 
     }
 
-    protected static VerifiableReaderProvider vcdm(final ProofAdapter proofAdapter) {
-        var resolver = new VcdmResolver();
-        resolver.v11(Vcdm11Reader.with(proofAdapter));
-        resolver.v20(Vcdm20Reader.with(proofAdapter)
-                // add VCDM 1.1 credential support
-                .v11(resolver.v11().adapter()));
+    protected static VerifiableReader defaultReaders(final ProofAdapter proofAdapter) {
+
+        Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
+
+        return new ContextAwareReaderProvider()
+                .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
+                .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
+                        // add VCDM 1.1 credential support
+                        .v11(vcdm11.adapter()));
+
+//        
+//        var vcdm = new VcdmResolver();
+//        vcdm.v11(Vcdm11Reader.with(proofAdapter));
+//        vcdm.v20(Vcdm20Reader.with(proofAdapter)
+//                // add VCDM 1.1 credential support
+//                .v11(vcdm.v11().adapter()));
 
 //        resolver.v11(Vcdm11Reader.with(
 //                r -> {
@@ -61,8 +67,9 @@ public class Reader extends DocumentProcessor<Reader> {
 //                        BitstringStatusListEntry.class,
 //                        BitstringStatusListEntry::of),
 //                resolver,
-//                suites));
-        return resolver;
+//                suites)); 
+
+
     }
 
     /**
@@ -123,23 +130,11 @@ public class Reader extends DocumentProcessor<Reader> {
 
     protected Verifiable read(final JsonObject document, DocumentLoader loader) throws DocumentError {
 
-        // extract context
-        final Collection<String> context;
-
-        try {
-            context = JsonLdContext.strings(document);
-        } catch (IllegalArgumentException e) {
-            throw new DocumentError(e, ErrorType.Invalid, "Context");
+        final Verifiable verifiable = reader.read(document, loader, base);
+        
+        if (verifiable == null) {
+            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
         }
-
-        final VerifiableReader reader = readerProvider.reader(context);
-
-        if (reader == null) {
-            LOGGER.log(Level.INFO, "An unknown document model {0}", context);
-            throw new DocumentError(ErrorType.Unknown, "Model");
-        }
-
-        return reader.read(context, document, loader, base);
+        return verifiable;
     }
-
 }

@@ -56,7 +56,6 @@ public interface Proof {
      */
     @Term("proofValue")
     @Provided
-    //TODO generic is string version
     ProofValue signature();
 
     /**
@@ -73,11 +72,12 @@ public interface Proof {
      * 
      * @return {@link CryptoSuite} attached to the proof.
      */
+    @Provided
     CryptoSuite cryptoSuite();
 
     /**
-     * The intent for the proof, the reason why an entity created it. e.g.
-     * an assertion, authentication.
+     * The intent for the proof, the reason why an entity created it. e.g. an
+     * assertion, authentication.
      *
      * @return {@link URI} identifying the purpose
      */
@@ -85,17 +85,41 @@ public interface Proof {
     URI purpose();
 
     /**
-     * Validates the proof data, not a signature.
+     * Validate the proof data, required presence, a match with parameters, and a
+     * serialization format.
      * 
      * @param params custom, suite specific parameters to validate against
      * 
      * @throws DocumentError if the proof is not valid, e.g. is created in the
      *                       future
      */
-    void validate(Map<String, Object> params) throws DocumentError;
+    default void validate(Map<String, Object> params) throws DocumentError {
+        throw new UnsupportedOperationException("An unknown, generic, proof cannot be validated.");
+    }
 
-    void verify(VerificationKey method) throws VerificationError, DocumentError;
+    /**
+     * Verify the proof. Runs all check necessary to verify the proof integrity and
+     * a signature genuity.
+     * 
+     * @param method
+     * @throws VerificationError
+     * @throws DocumentError
+     */
+    default void verify(VerificationKey method) throws VerificationError, DocumentError {
+        throw new UnsupportedOperationException("An unknown, generic, proof cannot be verified.");
+    }
 
+    /**
+     * Derive a new proof from this proof. Supported by selective disclosure proofs
+     * only.
+     * 
+     * @param context
+     * @param data
+     * @param selectors
+     * @return
+     * @throws SigningError
+     * @throws DocumentError
+     */
     default JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
     }

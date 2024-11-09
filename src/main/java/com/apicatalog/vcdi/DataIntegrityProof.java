@@ -54,6 +54,10 @@ public interface DataIntegrityProof extends VerifiableProof {
     @Literal(XsdDateTimeAdapter.class)
     Instant created();
 
+    @Literal(XsdDateTimeAdapter.class)
+    @Term(value = "expiration", compact = false)
+    Instant expires();
+
     /**
      * A string value specifying the restricted domain of the proof.
      *
@@ -73,10 +77,6 @@ public interface DataIntegrityProof extends VerifiableProof {
 
     @Term
     String nonce();
-
-    @Literal(XsdDateTimeAdapter.class)
-    @Term(value = "expiration", compact = false)
-    Instant expires();
 
     @Term("proofValue")
     @Provided

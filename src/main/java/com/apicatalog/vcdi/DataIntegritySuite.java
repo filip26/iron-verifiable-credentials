@@ -44,6 +44,13 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
     protected DataIntegritySuite(
             String cryptosuiteName,
+            Multibase proofValueBase
+            ) {
+        this(cryptosuiteName, DataIntegrityProof.class, proofValueBase);
+    }
+
+    protected DataIntegritySuite(
+            String cryptosuiteName,
             Class<? extends DataIntegrityProof> proofInterface,
             Multibase proofValueBase
             ) {

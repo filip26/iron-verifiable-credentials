@@ -7,57 +7,78 @@
   ],
   "@id": "",
   "@type": "mf:Manifest",
-  "name": "Verifiable Credentials Verifier Test Suite",
+  "name": "VC Data Integrity Tests",
   "sequence": [
-    {
-      "@id": "#t0301",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "NULL @context",
-      "input": "verifier/0301-in.jsonld",
-      "expectErrorCode": "InvalidContext"
-    },
-    {
-      "@id": "#t0302",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "NULL @type",
-      "input": "verifier/0302-in.jsonld",
-      "expectErrorCode": "InvalidDocument"
-    },  
     {
       "@id": "#t0001",
       "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
+        "PositiveEvaluationTest",
+        "ValidationTest"
       ],
-      "name": "missing proof",
-      "input": "verifier/0003-in.jsonld",
-      "expectErrorCode": "MissingProof"
-    },
+      "name": "Valid minimal DI",
+      "input": "vcdi10/vcdi10-valid-minimal.jsonld"
+    },  
     {
-      "@id": "#t0005",
+      "@id": "#t0002",
       "@type": [
         "PositiveEvaluationTest",
-        "VeriferTest"
+        "ValidationTest"
       ],
-      "name": "valid signed VC",
-      "input": "verifier/0005-in.jsonld"
+      "name": "Valid minimal DI VC1.1",
+      "input": "vcdi10/vcdi10-valid-minimal-vc11.jsonld"
     },
     {
-      "@id": "#t0006",
+      "@id": "#t0003",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid minimal DI VC2.0",
+      "input": "vcdi10/vcdi10-valid-minimal-vc20.jsonld"
+    },
+
+
+    {
+      "@id": "#t0010",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing proofPurpose",
+      "input": "vcdi10/vcdi10-missing-purpose-vc20.jsonld",
+      "expectErrorCode": "MissingProofPurpose"
+    },
+    {
+      "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
       ],
-      "name": "forged credentials subject",
-      "input": "verifier/0006-in.jsonld",
-      "expectErrorCode": "InvalidSignature"
+      "name": "invalid proofPurpose property",
+      "input": "verifier/0014-in.jsonld",
+      "expectErrorCode": "InvalidProofPurpose"
     },
+    {
+      "@id": "#t0015",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing proofValue",
+      "input": "vcdi10/vcdi10-missing-signature-vc20.jsonld",
+      "expectErrorCode": "MissingProofValue"
+    },
+    {
+      "@id": "#t0016",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "invalid proofValue property",
+      "input": "verifier/0016-in.jsonld",
+      "expectErrorCode": "InvalidProofValue"
+    },
+  
     {
       "@id": "#t0007",
       "@type": [
@@ -117,46 +138,7 @@
       "input": "verifier/0012-in.jsonld",
       "expectErrorCode": "MissingVerificationMethodId"
     },
-    {
-      "@id": "#t0013",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "missing proofPurpose property",
-      "input": "verifier/0013-in.jsonld",
-      "expectErrorCode": "MissingProofPurpose"
-    },
-    {
-      "@id": "#t0014",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "invalid proofPurpose property",
-      "input": "verifier/0014-in.jsonld",
-      "expectErrorCode": "InvalidProofPurpose"
-    },
-    {
-      "@id": "#t0015",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "missing proofValue property",
-      "input": "verifier/0015-in.jsonld",
-      "expectErrorCode": "MissingProofValue"
-    },
-    {
-      "@id": "#t0016",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "invalid proofValue property",
-      "input": "verifier/0016-in.jsonld",
-      "expectErrorCode": "InvalidProofValue"
-    },
+
     {
       "@id": "#t0019",
       "@type": [
@@ -166,25 +148,6 @@
       "name": "invalid document using embededed credentials",
       "input": "verifier/0019-in.jsonld",
       "expectErrorCode": "UnknownModel"
-    },
-    {
-      "@id": "#t0020",
-      "@type": [
-        "PositiveEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "proof set of two valid proofs",
-      "input": "verifier/0020-in.jsonld"
-    },
-    {
-      "@id": "#t0021",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "proof set having one forged proof",
-      "input": "verifier/0021-in.jsonld",
-      "expectErrorCode": "InvalidSignature"
     },
     {
       "@id": "#t0022",
@@ -251,7 +214,7 @@
         "NegativeEvaluationTest",
         "VeriferTest"
       ],
-      "name": "expired certificate",
+      "name": "Expired proof",
       "input": "verifier/0027-in.jsonld",
       "expectErrorCode": "Expired"
     },
@@ -279,35 +242,6 @@
         "purpose": "https://w3id.org/security#invalidMethod"
       },
       "expectErrorCode": "InvalidProofPurpose"
-    },
-    {
-      "@id": "#t0030",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "invalid did method",
-      "input": "verifier/0030-in.jsonld",
-      "expectErrorCode": "UnknownProofVerificationMethod"
-    },
-    {
-      "@id": "#t0050",
-      "@type": [
-        "PositiveEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "valid signed VP",
-      "input": "verifier/0050-in.jsonld"
-    },
-    {
-      "@id": "#t0051",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "forged signed VP",
-      "input": "verifier/0051-in.jsonld",
-      "expectErrorCode": "InvalidSignature"
     }
   ]
 }

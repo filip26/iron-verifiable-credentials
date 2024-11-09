@@ -25,12 +25,16 @@ public interface Presentation extends Verifiable {
 
     @Override
     default void validate() throws DocumentError {
+        // @type - mandatory
         if (type() == null || type().isEmpty()) {
             throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
         }
-//        if (credentials() == null || credentials().isEmpty()) {
-//            throw new DocumentError(ErrorType.Missing, "VerifiableCredentials");
-//        }
+        // credentials
+        if (credentials() != null && !credentials().isEmpty()) {
+            for (Credential credential : credentials()) {
+                credential.validate();
+            }
+        }
     }
 
     @Override

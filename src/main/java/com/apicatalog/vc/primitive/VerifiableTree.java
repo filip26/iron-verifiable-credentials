@@ -13,6 +13,7 @@ import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmVocab;
 
+@Deprecated
 public class VerifiableTree {
 
     public static LinkedTree unsigned(Verifiable verifiable) {

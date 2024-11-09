@@ -1,0 +1,16 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://w3id.org/security/data-integrity/v2"
+  ],
+  "type": "VerifiableCredential",
+  "issuer": "https://example.com/issuer/1",
+  "issuanceDate": "2022-06-03T21:18:40Z",
+  "credentialSubject": "https://example.com/subject/1",
+  "proof": {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "test-2022",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "zDzvG9arTUkqwTCncUFEkwhYvK9iHefBNAHvhorShoj9M"
+  }
+}

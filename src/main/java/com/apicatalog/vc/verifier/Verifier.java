@@ -1,11 +1,9 @@
 package com.apicatalog.vc.verifier;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,21 +19,18 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
+import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.reader.VerifiableReader;
-import com.apicatalog.vc.reader.VerifiableReaderProvider;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
-import com.apicatalog.vcdm.io.VcdmResolver;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -51,14 +46,15 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected StatusVerifier statusVerifier;
 
-    protected final VerifiableReaderProvider readerProvider;
+    protected final VerifiableReader reader;
 
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
 
-        this.readerProvider = VcdmResolver.create(proofAdapter);
+//        this.readerProvider = VcdmResolver.create(proofAdapter);
+        this.reader = null; //TODO
 
         this.statusVerifier = null;
     }
@@ -195,27 +191,27 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected Verifiable verify(final JsonObject document, Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
 
-        // extract context
-        final Collection<String> context;
+//        // extract context
+//        final Collection<String> context;
+//
+//        try {
+//            context = JsonLdContext.strings(document);
+//
+//        } catch (IllegalArgumentException e) {
+//            throw new DocumentError(e, ErrorType.Invalid, "Context");
+//        }
 
-        try {
-            context = JsonLdContext.strings(document);
+//        final VerifiableReader reader = readerProvider.reader(document);
+//
+//        if (reader == null) {
+////            LOGGER.log(Level.INFO, "An unknown document model {0}", context);
+//            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+//        }
 
-        } catch (IllegalArgumentException e) {
-            throw new DocumentError(e, ErrorType.Invalid, "Context");
-        }
-
-        final VerifiableReader reader = readerProvider.reader(context);
-
-        if (reader == null) {
-            LOGGER.log(Level.INFO, "An unknown document model {0}", context);
-            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
-        }
-
-        final Verifiable verifiable = reader.read(context, document, loader, base);
+        final Verifiable verifiable = reader.read(document, loader, base);
 
         if (verifiable == null) {
-            throw new DocumentError(ErrorType.Invalid, "Document");
+            throw new DocumentError(ErrorType.Invalid, "DocumentModel");
         }
 
         return verify(verifiable, parameters);
@@ -279,7 +275,6 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
         } catch (UnsupportedOperationException e) {
             throw new DocumentError(e, ErrorType.Unknown);
-
         }
     }
 

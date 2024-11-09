@@ -9,10 +9,7 @@
   ],
   "id": "did:key:z6MksFxi8wnHkNq4zgEskSZF45SuWQ4HndWSAVYRRGe9qDks",
   "issuer": "did:key:z6MksFxi8wnHkNq4zgEskSZF45SuWQ4HndWSAVYRRGe9qDks",
-  "validFrom": "2024-04-03T00:00:00.000Z",
-  "validUntil": "2024-12-15T00:00:00.000Z",
-  "name": "Age Verification Credential",
-  "description": "Age Description",
+  "issuanceDate": "2010-01-01T19:23:24Z",
   "credentialSubject": {
     "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
     "type": "AchievementSubject",

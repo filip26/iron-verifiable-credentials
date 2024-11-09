@@ -2,6 +2,7 @@ package com.apicatalog.vcdm.v11;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
@@ -19,7 +20,6 @@ import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.io.VcdmAdapter;
 import com.apicatalog.vcdm.io.VcdmReader;
-import com.apicatalog.vcdm.io.VcdmResolver;
 
 import jakarta.json.JsonObject;
 
@@ -40,12 +40,12 @@ public class Vcdm11Reader extends VcdmReader implements VerifiableAdapterProvide
     }
 
     public static Vcdm11Reader with(final ProofAdapter proofAdapter) {
-        return with(new Class[0], proofAdapter);
+        return with(proofAdapter, new Class[0]);
     }
 
     public static Vcdm11Reader with(
-            Class<?>[] types,
-            final ProofAdapter proofAdapter) {
+            final ProofAdapter proofAdapter,
+            final Class<?>... types) {
 
         Objects.requireNonNull(types);
 
@@ -62,9 +62,9 @@ public class Vcdm11Reader extends VcdmReader implements VerifiableAdapterProvide
     }
 
     @Override
-    public Verifiable read(Collection<String> context, JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
+    public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
-        VerifiableMaterial material = materialReader.read(context, document, loader, base);
+        VerifiableMaterial material = materialReader.read(Collections.emptyList(), document, loader, base);
 
         VerifiableModel model = read(material);
 
@@ -73,7 +73,7 @@ public class Vcdm11Reader extends VcdmReader implements VerifiableAdapterProvide
 
     @Override
     public VerifiableAdapter adapter(Collection<String> context) throws DocumentError {
-        return VcdmVersion.V11 == VcdmResolver.getVersion(context)
+        return VcdmVersion.V11 == VcdmVersion.of(context)
                 ? adapter
                 : null;
     }

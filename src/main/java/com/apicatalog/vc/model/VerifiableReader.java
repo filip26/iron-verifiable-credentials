@@ -1,4 +1,4 @@
-package com.apicatalog.vc.reader;
+package com.apicatalog.vc.model;
 
 import java.net.URI;
 import java.util.Collection;
@@ -14,7 +14,7 @@ public interface VerifiableReader {
     /**
      * Materialize VC/VP document into a verifiable instance.
      * 
-     * @param context
+//     * @param context
      * @param document a document to materialize
      * @param loader   a document loader
      * @param base     a base URL, might be null
@@ -24,7 +24,7 @@ public interface VerifiableReader {
      * 
      */
     Verifiable read(
-            Collection<String> context,
+//            Collection<String> context,
             JsonObject document,
             DocumentLoader loader,
             URI base) throws DocumentError;

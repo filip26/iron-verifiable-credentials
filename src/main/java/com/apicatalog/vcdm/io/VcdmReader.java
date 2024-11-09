@@ -9,7 +9,7 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableMaterialReader;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableModelReader;
-import com.apicatalog.vc.reader.VerifiableReader;
+import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.Vcdm;
 import com.apicatalog.vcdm.VcdmVersion;

@@ -29,7 +29,23 @@ class VcTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "vcdm11Validation" })
     @Order(1)
-    void validate(VcTestCase testCase) {
+    void vcdm11Validation(VcTestCase testCase) {
+        new VcTestRunnerJunit(testCase).execute();
+    }
+
+    @DisplayName("VCDM 2.0 Validation")
+    @ParameterizedTest(name = "{0}")
+    @MethodSource({ "vcdm20Validation" })
+    @Order(2)
+    void vcdm20Validation(VcTestCase testCase) {
+        new VcTestRunnerJunit(testCase).execute();
+    }
+
+    @DisplayName("VCDI 1.0 Validation")
+    @ParameterizedTest(name = "{0}")
+    @MethodSource({ "vcdi10Validation" })
+    @Order(3)
+    void vcdi10Validation(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
 
@@ -37,7 +53,7 @@ class VcTest {
     @DisplayName("VCDM 1.1 Verifier")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "vcdm11Verifier" })
-    @Order(2)
+    @Order(20)
     void verify(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
@@ -50,18 +66,11 @@ class VcTest {
 //        new VcTestRunnerJunit(testCase).execute();
 //    }
 
-    @DisplayName("VCDM 2.0 Validation")
-    @ParameterizedTest(name = "{0}")
-    @MethodSource({ "vcdm20Validation" })
-    @Order(3)
-    void vcdm20Validation(VcTestCase testCase) {
-        new VcTestRunnerJunit(testCase).execute();
-    }
 
     @DisplayName("VCDM 2.0 Verifier")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "vcdm20Verifier" })
-    @Order(4)
+    @Order(40)
     void vcdm20Verifier(VcTestCase testCase) {
         new VcTestRunnerJunit(testCase).execute();
     }
@@ -69,7 +78,7 @@ class VcTest {
     @DisplayName("VCDM 1.1 Issuer")
     @ParameterizedTest(name = "{0}")
     @MethodSource({ "issuerManifest" })
-    @Order(4)
+    @Order(50)
     void sign(VcTestCase testCase) {
         assumeFalse("t0005".equals(testCase.id.getFragment())); // skip require issuanceDate when issuing
 
@@ -94,6 +103,10 @@ class VcTest {
 
     static final Stream<VcTestCase> vcdm20ReaderManifest() throws JsonLdError, IOException {
         return manifest("vcdm20-reader-manifest.jsonld");
+    }
+
+    static final Stream<VcTestCase> vcdi10Validation() throws JsonLdError, IOException {
+        return manifest("vcdi10-validation-manifest.jsonld");
     }
 
     static final Stream<VcTestCase> issuerManifest() throws JsonLdError, IOException {

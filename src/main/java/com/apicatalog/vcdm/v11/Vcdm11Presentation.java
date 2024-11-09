@@ -15,7 +15,6 @@ import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmVerifiable;
 import com.apicatalog.vcdm.VcdmVersion;
-import com.apicatalog.vcdm.VcdmVocab;
 
 /**
  * Represents W3C VCDM 1.1 Verifiable Presentation.
@@ -42,7 +41,7 @@ public interface Vcdm11Presentation extends VcdmVerifiable, Presentation {
     default VcdmVersion version() {
         return VcdmVersion.V11;
     }
-    
+
     @Override
     default void validate() throws DocumentError {
         // @type - mandatory
@@ -50,8 +49,13 @@ public interface Vcdm11Presentation extends VcdmVerifiable, Presentation {
             throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
         }
         // credentials
-        if (credentials() == null || credentials().isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, VcdmVocab.VERIFIABLE_CREDENTIALS);
+        if (credentials() != null && !credentials().isEmpty()) {
+            for (Credential credential : credentials()) {
+                credential.validate();
+            }
+            // anything to present?
+        } else if (id() == null && holder() == null) {
+            throw new DocumentError(ErrorType.Missing, "Verifiable");
         }
     }
 }

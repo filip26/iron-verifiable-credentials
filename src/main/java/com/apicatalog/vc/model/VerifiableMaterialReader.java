@@ -13,7 +13,7 @@ public interface VerifiableMaterialReader {
     /**
      * Read verifiable material.
      * 
-     * @param context  a document JSON-LD context
+     * @param context  an injected JSON-LD context or an empty collection
      * @param document a document to read
      * @param loader   a document loader
      * @param base     a base URL, might be null

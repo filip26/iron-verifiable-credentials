@@ -2,6 +2,7 @@ package com.apicatalog.vcdm.v20;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -17,7 +18,6 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.io.VcdmReader;
-import com.apicatalog.vcdm.io.VcdmResolver;
 
 import jakarta.json.JsonObject;
 
@@ -41,7 +41,7 @@ public class Vcdm20Reader extends VcdmReader implements VerifiableAdapterProvide
 
     public static Vcdm20Reader with(
             final ProofAdapter proofAdapter,
-            Class<?>... types) {
+            final Class<?>... types) {
 
         TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder()
                 .scan(Vcdm20Credential.class, true)
@@ -60,9 +60,9 @@ public class Vcdm20Reader extends VcdmReader implements VerifiableAdapterProvide
     }
 
     @Override
-    public Verifiable read(Collection<String> context, JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
+    public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
-        VerifiableMaterial material = materialReader.read(context, document, loader, base);
+        VerifiableMaterial material = materialReader.read(Collections.emptyList(), document, loader, base);
 
         VerifiableModel model = read(material);
 
@@ -72,7 +72,7 @@ public class Vcdm20Reader extends VcdmReader implements VerifiableAdapterProvide
     @Override
     public VerifiableAdapter adapter(Collection<String> context) throws DocumentError {
 
-        final VcdmVersion vcdmVersion = VcdmResolver.getVersion(context);
+        final VcdmVersion vcdmVersion = VcdmVersion.of(context);
 
         return VcdmVersion.V20 == vcdmVersion
                 ? v20

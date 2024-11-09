@@ -25,8 +25,8 @@ import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vc.reader.VerifiableReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -42,7 +42,7 @@ import jakarta.json.JsonValue.ValueType;
 /**
  * An abstract W3C VCDM JSON-LD based reader.
  */
-public abstract class DeprecatedVcdmReader implements VerifiableReader {
+public abstract class DeprecatedVcdmReader  {
 
     protected final JsonLdTreeReader reader;
 
@@ -56,28 +56,28 @@ public abstract class DeprecatedVcdmReader implements VerifiableReader {
         this.reader = reader;
     }
 
-    @Override
-    public Verifiable read(
-            final Collection<String> context,
-            final JsonObject document,
-            final DocumentLoader loader,
-            final URI base) throws DocumentError {
-
-        final Collection<String> types = compactedType(document);
-
-        if (types == null || types.isEmpty()) {
-            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
-        }
-
-        if (isCredential(types)) {
-            return readCredential(context, document, loader, base);
-
-        } else if (isPresentation(types)) {
-            return readPresentation(context, document, loader, base);
-        }
-
-        throw new DocumentError(ErrorType.Unknown, JsonLdKeyword.TYPE);
-    }
+//    @Override
+//    public Verifiable read(
+//            final Collection<String> context,
+//            final JsonObject document,
+//            final DocumentLoader loader,
+//            final URI base) throws DocumentError {
+//
+//        final Collection<String> types = compactedType(document);
+//
+//        if (types == null || types.isEmpty()) {
+//            throw new DocumentError(ErrorType.Missing, JsonLdKeyword.TYPE);
+//        }
+//
+//        if (isCredential(types)) {
+//            return readCredential(context, document, loader, base);
+//
+//        } else if (isPresentation(types)) {
+//            return readPresentation(context, document, loader, base);
+//        }
+//
+//        throw new DocumentError(ErrorType.Unknown, JsonLdKeyword.TYPE);
+//    }
 
     protected Credential readCredential(
             final Collection<String> context,
@@ -315,16 +315,16 @@ public abstract class DeprecatedVcdmReader implements VerifiableReader {
                 throw new DocumentError(ErrorType.Unknown, "Credential");
             }
 
-            final Verifiable verifiable = credentialReader.read(
-                    JsonLdContext.strings(item.asJsonObject(), context),
-                    item.asJsonObject(),
-                    loader,
-                    base);
-
-            if (!(verifiable instanceof Credential)) {
-                throw new DocumentError(ErrorType.Invalid, "Credential");
-            }
-            credentials.add((Credential) verifiable);
+//            final Verifiable verifiable = credentialReader.read(
+//                    JsonLdContext.strings(item.asJsonObject(), context),
+//                    item.asJsonObject(),
+//                    loader,
+//                    base);
+//
+//            if (!(verifiable instanceof Credential)) {
+//                throw new DocumentError(ErrorType.Invalid, "Credential");
+//            }
+//            credentials.add((Credential) verifiable);
         }
         return credentials;
     }

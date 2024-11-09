@@ -1,0 +1,113 @@
+{
+  "@context": [
+    "context.jsonld",
+    {
+      "@base": "verifier-manifest"
+    }
+  ],
+  "@id": "",
+  "@type": "mf:Manifest",
+  "name": "Verifier Tests",
+  "sequence": [
+    {
+      "@id": "#t0002",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Empty document",
+      "input": "verifier/0301-in.jsonld",
+      "expectErrorCode": "InvalidContext"
+    },
+    {
+      "@id": "#t0002",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Missing context",
+      "input": "verifier/0301-in.jsonld",
+      "expectErrorCode": "InvalidContext"
+    },
+    {
+      "@id": "#t0003",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "NULL @context",
+      "input": "verifier/0301-in.jsonld",
+      "expectErrorCode": "InvalidContext"
+    },
+    {
+      "@id": "#t0003",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Unknown model",
+      "input": "verifier/0301-in.jsonld",
+      "expectErrorCode": "InvalidContext"
+    },
+    {
+      "@id": "#t0003",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Missing @type",
+      "input": "verifier/0301-in.jsonld",
+      "expectErrorCode": "InvalidContext"
+    },
+    {
+      "@id": "#t0302",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "NULL @type",
+      "input": "verifier/0302-in.jsonld",
+      "expectErrorCode": "InvalidDocument"
+    },
+    {
+      "@id": "#t0003",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Unknown @type",
+      "input": "verifier/0301-in.jsonld",
+      "expectErrorCode": "InvalidContext"
+    },
+    {
+      "@id": "#t0001",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Missing proof",
+      "input": "verifier/0003-in.jsonld",
+      "expectErrorCode": "MissingProof"
+    },
+    {
+      "@id": "#t0027",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Expired VCDM1.1",
+      "input": "verifier/0027-in.jsonld",
+      "expectErrorCode": "Expired"
+    },
+    {
+      "@id": "#t0027",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Not Valid Yet VCDM1.1",
+      "input": "verifier/0027-in.jsonld",
+      "expectErrorCode": "NotValidYet"
+    }    
+  ]
+}

@@ -15,8 +15,8 @@
         "PositiveEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Valid unsigned VC",
-      "input": "vcdm20/validation/vcdm20-valid-unsigned-vc.jsonld"
+      "name": "Valid minimal VC",
+      "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld"
     },
     {
       "@id": "#t0002",
@@ -24,8 +24,8 @@
         "PositiveEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Valid unsigned VP with VC2.0",
-      "input": "vcdm20/validation/vcdm20-valid-unsigned-vp-vc.jsonld"
+      "name": "Valid minimal VP with VC2.0",
+      "input": "vcdm20/vcdm20-valid-minimal-vp-vc.jsonld"
     },
     {
       "@id": "#t0003",
@@ -33,8 +33,8 @@
         "PositiveEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Valid unsigned VP with VC1.0",
-      "input": "vcdm20/validation/vcdm20-valid-unsigned-vp-vc11.jsonld",
+      "name": "Valid minimal VP with VC1.0",
+      "input": "vcdm20/vcdm20-valid-minimal-vp-vc11.jsonld",
       "expectErrorCode": "MissingProof"
     },
     {
@@ -43,8 +43,8 @@
         "PositiveEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Valid unsigned VP with EVC",
-      "input": "vcdm20/validation/vcdm20-valid-unsigned-vp-evc.jsonld"
+      "name": "Valid minimal VP with EVC",
+      "input": "vcdm20/vcdm20-valid-minimal-vp-evc.jsonld"
     },
     {
       "@id": "#t0005",
@@ -53,7 +53,7 @@
         "ValidationTest"
       ],
       "name": "Valid EVP",
-      "input": "vcdm20/validation/vcdm20-valid-evp.jsonld"
+      "input": "vcdm20/vcdm20-valid-evp.jsonld"
     },
     {
       "@id": "#t0006",
@@ -62,7 +62,7 @@
         "ValidationTest"
       ],
       "name": "Valid status",
-      "input": "vcdm20/validation/vcdm20-valid-status.jsonld"
+      "input": "vcdm20/vcdm20-valid-status.jsonld"
     },
     {
       "@id": "#t0007",
@@ -71,7 +71,7 @@
         "ValidationTest"
       ],
       "name": "Valid schema",
-      "input": "vcdm20/validation/vcdm20-valid-schema.jsonld"
+      "input": "vcdm20/vcdm20-valid-schema.jsonld"
     },
     {
       "@id": "#t0008",
@@ -80,7 +80,7 @@
         "ValidationTest"
       ],
       "name": "Valid refresh service",
-      "input": "vcdm20/validation/vcdm20-valid-refresh-service.jsonld"
+      "input": "vcdm20/vcdm20-valid-refresh-service.jsonld"
     },
     {
       "@id": "#t0009",
@@ -89,7 +89,7 @@
         "ValidationTest"
       ],
       "name": "Valid evidence",
-      "input": "vcdm20/validation/vcdm20-valid-evidence.jsonld"
+      "input": "vcdm20/vcdm20-valid-evidence.jsonld"
     },
     {
       "@id": "#t0010",
@@ -98,7 +98,7 @@
         "ValidationTest"
       ],
       "name": "Valid terms of use",
-      "input": "vcdm20/validation/vcdm20-valid-tou.jsonld"
+      "input": "vcdm20/vcdm20-valid-tou.jsonld"
     },
     {
       "@id": "#t0011",
@@ -107,7 +107,7 @@
         "ValidationTest"
       ],
       "name": "Valid unsigned full VC",
-      "input": "vcdm20/validation/vcdm20-valid-unsigned-full-vc.jsonld"
+      "input": "vcdm20/vcdm20-valid-unsigned-full-vc.jsonld"
     },
     {
       "@id": "#t0012",
@@ -116,7 +116,7 @@
         "ValidationTest"
       ],
       "name": "Valid unsigned LangMaps",
-      "input": "vcdm20/validation/vcdm20-valid-unsigned-langmap.jsonld"
+      "input": "vcdm20/vcdm20-valid-unsigned-langmap.jsonld"
     },
     {
       "@id": "#t0013",
@@ -125,7 +125,7 @@
         "ValidationTest"
       ],
       "name": "@context only",
-      "input": "vcdm20/validation/vcdm20-context-only.jsonld",
+      "input": "vcdm20/vcdm20-context-only.jsonld",
       "expectErrorCode": "InvalidDocument"
     },
     {
@@ -135,7 +135,7 @@
         "ValidationTest"
       ],
       "name": "Missing @type",
-      "input": "vcdm20/validation/vcdm20-missing-type.jsonld",
+      "input": "vcdm20/vcdm20-missing-type.jsonld",
       "expectErrorCode": "MissingType"
     },
     {
@@ -145,7 +145,7 @@
         "ValidationTest"
       ],
       "name": "Unknown @type",
-      "input": "vcdm20/validation/vcdm20-unknown-type.jsonld",
+      "input": "vcdm20/vcdm20-unknown-type.jsonld",
       "expectErrorCode": "UnknownType"
     },
     {
@@ -155,7 +155,7 @@
         "ValidationTest"
       ],
       "name": "Empty VC",
-      "input": "vcdm20/validation/vcdm20-empty-vc.jsonld",
+      "input": "vcdm20/vcdm20-empty-vc.jsonld",
       "expectErrorCode": "MissingIssuer"
     },
     {
@@ -164,9 +164,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing subject",
-      "input": "vcdm20/validation/vcdm20-missing-subject.jsonld",
-      "expectErrorCode": "MissingCredentialSubject"
+      "name": "Empty VP",
+      "input": "vcdm20/vcdm20-empty-vp.jsonld",
+      "expectErrorCode": "MissingVerifiable"
     },
     {
       "@id": "#t0018",
@@ -174,9 +174,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing subject claims",
-      "input": "vcdm20/validation/vcdm20-missing-subject-claims.jsonld",
-      "expectErrorCode": "MissingCredentialSubjectClaims"
+      "name": "Missing subject",
+      "input": "vcdm20/vcdm20-missing-subject.jsonld",
+      "expectErrorCode": "MissingCredentialSubject"
     },
     {
       "@id": "#t0019",
@@ -184,9 +184,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing issuer",
-      "input": "vcdm20/validation/vcdm20-missing-issuer.jsonld",
-      "expectErrorCode": "MissingIssuer"
+      "name": "Missing subject claims",
+      "input": "vcdm20/vcdm20-missing-subject-claims.jsonld",
+      "expectErrorCode": "MissingCredentialSubjectClaims"
     },
     {
       "@id": "#t0020",
@@ -194,9 +194,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing issuer @id",
-      "input": "vcdm20/validation/vcdm20-missing-issuer-id.jsonld",
-      "expectErrorCode": "MissingIssuerId"
+      "name": "Missing issuer",
+      "input": "vcdm20/vcdm20-missing-issuer.jsonld",
+      "expectErrorCode": "MissingIssuer"
     },
     {
       "@id": "#t0021",
@@ -204,9 +204,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing status @type",
-      "input": "vcdm20/validation/vcdm20-missing-status-type.jsonld",
-      "expectErrorCode": "MissingStatusType"
+      "name": "Missing issuer @id",
+      "input": "vcdm20/vcdm20-missing-issuer-id.jsonld",
+      "expectErrorCode": "MissingIssuerId"
     },
     {
       "@id": "#t0022",
@@ -214,9 +214,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing schema @id",
-      "input": "vcdm20/validation/vcdm20-missing-schema-id.jsonld",
-      "expectErrorCode": "MissingSchemaId"
+      "name": "Missing status @type",
+      "input": "vcdm20/vcdm20-missing-status-type.jsonld",
+      "expectErrorCode": "MissingStatusType"
     },
     {
       "@id": "#t0023",
@@ -224,9 +224,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing schema @type",
-      "input": "vcdm20/validation/vcdm20-missing-schema-type.jsonld",
-      "expectErrorCode": "MissingSchemaType"
+      "name": "Missing schema @id",
+      "input": "vcdm20/vcdm20-missing-schema-id.jsonld",
+      "expectErrorCode": "MissingSchemaId"
     },
     {
       "@id": "#t0024",
@@ -234,9 +234,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing refreshService @type",
-      "input": "vcdm20/validation/vcdm20-missing-refresh-service-type.jsonld",
-      "expectErrorCode": "MissingRefreshServiceType"
+      "name": "Missing schema @type",
+      "input": "vcdm20/vcdm20-missing-schema-type.jsonld",
+      "expectErrorCode": "MissingSchemaType"
     },
     {
       "@id": "#t0025",
@@ -244,9 +244,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing evidence @type",
-      "input": "vcdm20/validation/vcdm20-missing-evidence-type.jsonld",
-      "expectErrorCode": "MissingEvidenceType"
+      "name": "Missing refreshService @type",
+      "input": "vcdm20/vcdm20-missing-refresh-service-type.jsonld",
+      "expectErrorCode": "MissingRefreshServiceType"
     },
     {
       "@id": "#t0026",
@@ -254,29 +254,29 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing terms of use @type",
-      "input": "vcdm20/validation/vcdm20-missing-tou-type.jsonld",
-      "expectErrorCode": "MissingTermsOfUseType"
+      "name": "Missing evidence @type",
+      "input": "vcdm20/vcdm20-missing-evidence-type.jsonld",
+      "expectErrorCode": "MissingEvidenceType"
     },
     {
       "@id": "#t0027",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Missing terms of use @type",
+      "input": "vcdm20/vcdm20-missing-tou-type.jsonld",
+      "expectErrorCode": "MissingTermsOfUseType"
+    },
+    {
+      "@id": "#t0028",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
       "name": "Missing EVP @id",
-      "input": "vcdm20/validation/vcdm20-missing-evp-id.jsonld",
+      "input": "vcdm20/vcdm20-missing-evp-id.jsonld",
       "expectErrorCode": "MissingId"
-    },
-    {
-      "@id": "#t0027",
-      "@type": [
-        "NegativeEvaluationTest",
-        "ValidationTest"
-      ],
-      "name": "Invalid EVP @id scheme",
-      "input": "vcdm20/validation/vcdm20-invalid-evp-id.jsonld",
-      "expectErrorCode": "InvalidIdScheme"
     },
     {
       "@id": "#t0029",
@@ -284,9 +284,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing EVC @id",
-      "input": "vcdm20/validation/vcdm20-missing-evc-id.jsonld",
-      "expectErrorCode": "MissingId"
+      "name": "Invalid EVP @id scheme",
+      "input": "vcdm20/vcdm20-invalid-evp-id.jsonld",
+      "expectErrorCode": "InvalidIdScheme"
     },
     {
       "@id": "#t0030",
@@ -294,9 +294,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Invalid EVC @id scheme",
-      "input": "vcdm20/validation/vcdm20-invalid-evc-id.jsonld",
-      "expectErrorCode": "InvalidIdScheme"
+      "name": "Missing EVC @id",
+      "input": "vcdm20/vcdm20-missing-evc-id.jsonld",
+      "expectErrorCode": "MissingId"
     },
     {
       "@id": "#t0031",
@@ -304,8 +304,18 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
+      "name": "Invalid EVC @id scheme",
+      "input": "vcdm20/vcdm20-invalid-evc-id.jsonld",
+      "expectErrorCode": "InvalidIdScheme"
+    },
+    {
+      "@id": "#t0032",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
       "name": "Unknown VP VC model",
-      "input": "vcdm20/validation/vcdm20-unknown-vp-vc-model.jsonld",
+      "input": "vcdm20/vcdm20-unknown-vp-vc-model.jsonld",
       "expectErrorCode": "InvalidCredentialModel"
     }
   ]

@@ -7,6 +7,7 @@ import static com.apicatalog.vcdi.DataIntegrityParam.purpose;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.PrintWriter;
@@ -35,6 +36,7 @@ import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DeprecatedVerificationMethodResolver;
 import com.apicatalog.vc.method.resolver.DidKeyMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
@@ -152,6 +154,13 @@ public class VcTestRunnerJunit {
                 assertNotNull(verifiable);
 
                 verifiable.validate();
+                
+                assertNotNull(verifiable.proofs());
+//                assertFalse(verifiable.proofs().isEmpty());
+
+                for (Proof proof : verifiable.proofs()) {
+                    proof.validate(null);
+                }
                 
 
             } else if (testCase.type.contains(VcTestCase.vocab("ReaderTest"))) {

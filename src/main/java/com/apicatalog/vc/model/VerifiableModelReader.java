@@ -7,12 +7,12 @@ public interface VerifiableModelReader {
     /**
      * Extract verifiable data model.
      * 
-     * @param material
+     * @param data
      * @return a verifiable data model
      * 
      * @throws DocumentError
      * 
      */
-    VerifiableModel read(VerifiableMaterial material) throws DocumentError;
-    
+    VerifiableModel read(VerifiableMaterial data) throws DocumentError;
+
 }

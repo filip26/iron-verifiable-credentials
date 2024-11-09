@@ -15,8 +15,8 @@
         "PositiveEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Valid unsigned VC",
-      "input": "vcdm11/validation/vcdm11-valid-unsigned-vc.jsonld"
+      "name": "Valid minimal VC",
+      "input": "vcdm11/vcdm11-valid-minimal-vc.jsonld"
     },
     {
       "@id": "#t0002",
@@ -24,8 +24,8 @@
         "PositiveEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Valid unsigned VP with VC",
-      "input": "vcdm11/validation/vcdm11-valid-unsigned-vp-vc.jsonld"
+      "name": "Valid minimal VP with VC",
+      "input": "vcdm11/vcdm11-valid-minimal-vp-vc.jsonld"
     },
     {
       "@id": "#t0003",
@@ -34,7 +34,7 @@
         "ValidationTest"
       ],
       "name": "Valid status",
-      "input": "vcdm11/validation/vcdm11-valid-status.jsonld"
+      "input": "vcdm11/vcdm11-valid-status.jsonld"
     },
     {
       "@id": "#t0004",
@@ -43,7 +43,7 @@
         "ValidationTest"
       ],
       "name": "Valid schema",
-      "input": "vcdm11/validation/vcdm11-valid-schema.jsonld"
+      "input": "vcdm11/vcdm11-valid-schema.jsonld"
     },
     {
       "@id": "#t0005",
@@ -52,7 +52,7 @@
         "ValidationTest"
       ],
       "name": "Valid refresh service",
-      "input": "vcdm11/validation/vcdm11-valid-refresh-service.jsonld"
+      "input": "vcdm11/vcdm11-valid-refresh-service.jsonld"
     },
     {
       "@id": "#t0006",
@@ -61,7 +61,7 @@
         "ValidationTest"
       ],
       "name": "Valid evidence",
-      "input": "vcdm11/validation/vcdm11-valid-evidence.jsonld"
+      "input": "vcdm11/vcdm11-valid-evidence.jsonld"
     },
     {
       "@id": "#t0007",
@@ -70,7 +70,7 @@
         "ValidationTest"
       ],
       "name": "Valid terms of use",
-      "input": "vcdm11/validation/vcdm11-valid-tou.jsonld"
+      "input": "vcdm11/vcdm11-valid-tou.jsonld"
     },
     {
       "@id": "#t0008",
@@ -79,7 +79,7 @@
         "ValidationTest"
       ],
       "name": "Valid unsigned full VC",
-      "input": "vcdm11/validation/vcdm11-valid-unsigned-full-vc.jsonld"
+      "input": "vcdm11/vcdm11-valid-unsigned-full-vc.jsonld"
     },
     {
       "@id": "#t0009",
@@ -88,7 +88,7 @@
         "ValidationTest"
       ],
       "name": "@context only",
-      "input": "vcdm11/validation/vcdm11-context-only.jsonld",
+      "input": "vcdm11/vcdm11-context-only.jsonld",
       "expectErrorCode": "InvalidDocument"
     },
     {
@@ -98,7 +98,7 @@
         "ValidationTest"
       ],
       "name": "Missing @type",
-      "input": "vcdm11/validation/vcdm11-missing-type.jsonld",
+      "input": "vcdm11/vcdm11-missing-type.jsonld",
       "expectErrorCode": "MissingType"
     },
     {
@@ -108,7 +108,7 @@
         "ValidationTest"
       ],
       "name": "Unknown @type",
-      "input": "vcdm11/validation/vcdm11-unknown-type.jsonld",
+      "input": "vcdm11/vcdm11-unknown-type.jsonld",
       "expectErrorCode": "UnknownType"
     },
     {
@@ -118,7 +118,7 @@
         "ValidationTest"
       ],
       "name": "Empty VC",
-      "input": "vcdm11/validation/vcdm11-empty-vc.jsonld",
+      "input": "vcdm11/vcdm11-empty-vc.jsonld",
       "expectErrorCode": "MissingIssuer"
     },
     {
@@ -127,19 +127,19 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing subject",
-      "input": "vcdm11/validation/vcdm11-missing-subject.jsonld",
-      "expectErrorCode": "MissingCredentialSubject"
-    },
+      "name": "Empty VP",
+      "input": "vcdm11/vcdm11-empty-vp.jsonld",
+      "expectErrorCode": "MissingVerifiable"
+    },    
     {
       "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing subject claims",
-      "input": "vcdm11/validation/vcdm11-missing-subject-claims.jsonld",
-      "expectErrorCode": "MissingCredentialSubjectClaims"
+      "name": "Missing subject",
+      "input": "vcdm11/vcdm11-missing-subject.jsonld",
+      "expectErrorCode": "MissingCredentialSubject"
     },
     {
       "@id": "#t0015",
@@ -147,9 +147,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing issuer",
-      "input": "vcdm11/validation/vcdm11-missing-issuer.jsonld",
-      "expectErrorCode": "MissingIssuer"
+      "name": "Missing subject claims",
+      "input": "vcdm11/vcdm11-missing-subject-claims.jsonld",
+      "expectErrorCode": "MissingCredentialSubjectClaims"
     },
     {
       "@id": "#t0016",
@@ -157,9 +157,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing issuer @id",
-      "input": "vcdm11/validation/vcdm11-missing-issuer-id.jsonld",
-      "expectErrorCode": "MissingIssuerId"
+      "name": "Missing issuer",
+      "input": "vcdm11/vcdm11-missing-issuer.jsonld",
+      "expectErrorCode": "MissingIssuer"
     },
     {
       "@id": "#t0017",
@@ -167,29 +167,29 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing status @id",
-      "input": "vcdm11/validation/vcdm11-missing-status-id.jsonld",
-      "expectErrorCode": "MissingStatusId"
-    },    
+      "name": "Missing issuer @id",
+      "input": "vcdm11/vcdm11-missing-issuer-id.jsonld",
+      "expectErrorCode": "MissingIssuerId"
+    },
     {
       "@id": "#t0018",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing status @type",
-      "input": "vcdm11/validation/vcdm11-missing-status-type.jsonld",
-      "expectErrorCode": "MissingStatusType"
-    },
+      "name": "Missing status @id",
+      "input": "vcdm11/vcdm11-missing-status-id.jsonld",
+      "expectErrorCode": "MissingStatusId"
+    },    
     {
       "@id": "#t0019",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing schema @id",
-      "input": "vcdm11/validation/vcdm11-missing-schema-id.jsonld",
-      "expectErrorCode": "MissingSchemaId"
+      "name": "Missing status @type",
+      "input": "vcdm11/vcdm11-missing-status-type.jsonld",
+      "expectErrorCode": "MissingStatusType"
     },
     {
       "@id": "#t0020",
@@ -197,9 +197,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing schema @type",
-      "input": "vcdm11/validation/vcdm11-missing-schema-type.jsonld",
-      "expectErrorCode": "MissingSchemaType"
+      "name": "Missing schema @id",
+      "input": "vcdm11/vcdm11-missing-schema-id.jsonld",
+      "expectErrorCode": "MissingSchemaId"
     },
     {
       "@id": "#t0021",
@@ -207,29 +207,29 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing refreshService @id",
-      "input": "vcdm11/validation/vcdm11-missing-refresh-service-id.jsonld",
-      "expectErrorCode": "MissingRefreshServiceId"
-    },    
+      "name": "Missing schema @type",
+      "input": "vcdm11/vcdm11-missing-schema-type.jsonld",
+      "expectErrorCode": "MissingSchemaType"
+    },
     {
       "@id": "#t0022",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing refreshService @type",
-      "input": "vcdm11/validation/vcdm11-missing-refresh-service-type.jsonld",
-      "expectErrorCode": "MissingRefreshServiceType"
-    },
+      "name": "Missing refreshService @id",
+      "input": "vcdm11/vcdm11-missing-refresh-service-id.jsonld",
+      "expectErrorCode": "MissingRefreshServiceId"
+    },    
     {
       "@id": "#t0023",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing evidence @type",
-      "input": "vcdm11/validation/vcdm11-missing-evidence-type.jsonld",
-      "expectErrorCode": "MissingEvidenceType"
+      "name": "Missing refreshService @type",
+      "input": "vcdm11/vcdm11-missing-refresh-service-type.jsonld",
+      "expectErrorCode": "MissingRefreshServiceType"
     },
     {
       "@id": "#t0024",
@@ -237,9 +237,9 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
-      "name": "Missing terms of use @type",
-      "input": "vcdm11/validation/vcdm11-missing-tou-type.jsonld",
-      "expectErrorCode": "MissingTermsOfUseType"
+      "name": "Missing evidence @type",
+      "input": "vcdm11/vcdm11-missing-evidence-type.jsonld",
+      "expectErrorCode": "MissingEvidenceType"
     },
     {
       "@id": "#t0025",
@@ -247,8 +247,18 @@
         "NegativeEvaluationTest",
         "ValidationTest"
       ],
+      "name": "Missing terms of use @type",
+      "input": "vcdm11/vcdm11-missing-tou-type.jsonld",
+      "expectErrorCode": "MissingTermsOfUseType"
+    },
+    {
+      "@id": "#t0026",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
       "name": "Missing issuance date",
-      "input": "vcdm11/validation/vcdm11-missing-issuance.jsonld",
+      "input": "vcdm11/vcdm11-missing-issuance.jsonld",
       "expectErrorCode": "MissingIssuanceDate"
     }
   ]

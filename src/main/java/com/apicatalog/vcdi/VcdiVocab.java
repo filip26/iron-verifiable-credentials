@@ -5,6 +5,8 @@ import com.apicatalog.vcdm.VcdmVocab;
 
 public final class VcdiVocab {
 
+    public static String CONTEXT_MODEL_V2 = "https://w3id.org/security/data-integrity/v2";
+    
     public static VocabTerm TYPE = VocabTerm.create("DataIntegrityProof", VcdmVocab.SECURITY_VOCAB);
     
     public static VocabTerm CREATED = VocabTerm.create("created", "http://purl.org/dc/terms/");

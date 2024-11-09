@@ -6,13 +6,12 @@ import java.util.function.Consumer;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.xsd.XsdDateTime;
-import com.apicatalog.vc.reader.VerifiableReaderProvider;
-import com.apicatalog.vc.reader.VerifiableReader;
+import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.VerifiableReaderProvider;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.DeprecatedVcdmReader;
-import com.apicatalog.vcdm.io.VcdmResolver;
 
 public class DeprecatedVcdm20Reader extends DeprecatedVcdmReader {
     
@@ -50,9 +49,10 @@ public class DeprecatedVcdm20Reader extends DeprecatedVcdmReader {
 
     @Override
     protected VerifiableReader resolve(Collection<String> context) throws DocumentError {
-        return VcdmVersion.V20 == VcdmResolver.getVersion(context)
-                ? this
-                : resolver.reader(context);
+//        return VcdmVersion.V20 == VcdmResolver.getVersion(context)
+//                ? null
+//                : null; //resolver.reader(context);
+        return null;
     }
 
     @Override
