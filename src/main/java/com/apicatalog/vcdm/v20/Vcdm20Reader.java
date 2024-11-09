@@ -1,7 +1,6 @@
 package com.apicatalog.vcdm.v20;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Collections;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
@@ -16,6 +15,7 @@ import com.apicatalog.vc.model.VerifiableAdapter;
 import com.apicatalog.vc.model.VerifiableAdapterProvider;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vcdm.Vcdm;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.io.VcdmReader;
 
@@ -70,16 +70,18 @@ public class Vcdm20Reader extends VcdmReader implements VerifiableAdapterProvide
     }
 
     @Override
-    public VerifiableAdapter adapter(Collection<String> context) throws DocumentError {
-
-        final VcdmVersion vcdmVersion = VcdmVersion.of(context);
-
-        return VcdmVersion.V20 == vcdmVersion
-                ? v20
-                : (VcdmVersion.V11 == vcdmVersion
-                        ? v11
-                        : null);
+    public VerifiableAdapter adapter(VerifiableModel model) throws DocumentError {
+        if (model instanceof Vcdm vcdm) {
+            if (VcdmVersion.V20 == vcdm.version()) {
+                return v20;
+            }
+            if (VcdmVersion.V11 == vcdm.version()) {
+                return v11;
+            }
+        }
+        return null;
     }
+
 
     public Vcdm20Reader v11(VerifiableAdapter v11) {
         this.v11 = v11;

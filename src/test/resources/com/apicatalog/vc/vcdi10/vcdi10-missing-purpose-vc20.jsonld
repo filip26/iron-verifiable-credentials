@@ -6,7 +6,6 @@
   "proof": {
     "type": "DataIntegrityProof",
     "cryptosuite": "test-2022",
-    "proofPurpose": "assertionMethod",
     "proofValue": "zDzvG9arTUkqwTCncUFEkwhYvK9iHefBNAHvhorShoj9M"
   }
 }

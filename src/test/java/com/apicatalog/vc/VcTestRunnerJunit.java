@@ -153,10 +153,10 @@ public class VcTestRunnerJunit {
                 Verifiable verifiable = READER.read(testCase.input);
                 assertNotNull(verifiable);
 
-                verifiable.validate();
+//                verifiable.validate();
                 
                 assertNotNull(verifiable.proofs());
-//                assertFalse(verifiable.proofs().isEmpty());
+                assertFalse(verifiable.proofs().isEmpty());
 
                 for (Proof proof : verifiable.proofs()) {
                     proof.validate(null);

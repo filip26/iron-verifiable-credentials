@@ -5,7 +5,6 @@
   "credentialSubject": "https://example.com/subject/1",
   "proof": {
     "type": "DataIntegrityProof",
-    "cryptosuite": "test-2022",
     "proofPurpose": "assertionMethod",
     "proofValue": "zDzvG9arTUkqwTCncUFEkwhYvK9iHefBNAHvhorShoj9M"
   }

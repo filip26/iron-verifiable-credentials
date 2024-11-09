@@ -24,7 +24,7 @@ public class ContextAwareReaderProvider implements VerifiableReader {
     public ContextAwareReaderProvider() {
         this(new HashMap<>());
     }
-    
+
     public ContextAwareReaderProvider with(String context, VerifiableReader reader) {
         readers.put(context, reader);
         return this;

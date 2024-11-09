@@ -17,8 +17,6 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
-import com.apicatalog.linkedtree.jsonld.JsonLdContext;
-import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.vc.Credential;
@@ -26,6 +24,7 @@ import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.EmbeddedProof;
@@ -193,7 +192,7 @@ public abstract class DeprecatedVcdmReader  {
 
                 final JsonObject compactedUnsigned = Json.createObjectBuilder(compacted).remove(VcdmVocab.PROOF.name()).build();
 
-                final VerifiableMaterial data = new VerifiableMaterial(
+                final VerifiableMaterial data = new GenericMaterial(
                         context,
                         compactedUnsigned,
                         expandedUnsigned);
@@ -247,8 +246,8 @@ public abstract class DeprecatedVcdmReader  {
                 }
 
                 // FIXME
-                VerifiableMaterial proofMaterial = new VerifiableMaterial(
-                        null,
+                VerifiableMaterial proofMaterial = new GenericMaterial(
+                        Collections.emptyList(),
                         compactedProof,
                         expandedProof.asJsonObject());
 

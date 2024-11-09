@@ -10,6 +10,7 @@ import com.apicatalog.vc.model.VerifiableMaterialReader;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableModelReader;
 import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.Vcdm;
 import com.apicatalog.vcdm.VcdmVersion;
@@ -44,7 +45,7 @@ public abstract class VcdmReader implements VerifiableModelReader, VerifiableRea
 
         return new Vcdm(
                 version,
-                new VerifiableMaterial(
+                new GenericMaterial(
                         data.context(),
                         compactedUnsigned,
                         expandedUnsigned),

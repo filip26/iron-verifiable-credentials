@@ -2,7 +2,6 @@ package com.apicatalog.vc.reader;
 
 import java.net.URI;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
@@ -16,8 +15,10 @@ import com.apicatalog.vc.model.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
 import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.DocumentProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
@@ -26,9 +27,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
 public class Reader extends DocumentProcessor<Reader> {
-
-    private static final Logger LOGGER = Logger.getLogger(Reader.class.getName());
-
+    
     protected final VerifiableReader reader;
 
     protected Reader(final SignatureSuite... suites) {
@@ -37,7 +36,6 @@ public class Reader extends DocumentProcessor<Reader> {
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
 
         this.reader = defaultReaders(proofAdapter);
-
     }
 
     protected static VerifiableReader defaultReaders(final ProofAdapter proofAdapter) {
@@ -48,7 +46,8 @@ public class Reader extends DocumentProcessor<Reader> {
                 .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
                 .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
                         // add VCDM 1.1 credential support
-                        .v11(vcdm11.adapter()));
+                        .v11(vcdm11.adapter()))
+                .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter));
 
 //        
 //        var vcdm = new VcdmResolver();
@@ -105,6 +104,9 @@ public class Reader extends DocumentProcessor<Reader> {
      * @throws DocumentError
      */
     public Verifiable read(final URI location) throws DocumentError {
+        
+        Objects.requireNonNull(location);
+        
         try {
             final DocumentLoader loader = getLoader();
 
@@ -129,12 +131,13 @@ public class Reader extends DocumentProcessor<Reader> {
     }
 
     protected Verifiable read(final JsonObject document, DocumentLoader loader) throws DocumentError {
-
+        
         final Verifiable verifiable = reader.read(document, loader, base);
         
         if (verifiable == null) {
             throw new DocumentError(ErrorType.Unknown, "DocumentModel");
         }
+
         return verifiable;
     }
 }

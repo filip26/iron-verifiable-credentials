@@ -12,6 +12,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableMaterialReader;
+import com.apicatalog.vc.model.generic.GenericMaterial;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -41,7 +42,7 @@ public class JsonLdMaterialReader implements VerifiableMaterialReader {
                 throw new DocumentError(ErrorType.Invalid, "Document");
             }
 
-            return new VerifiableMaterial(
+            return new GenericMaterial(
                     context,
                     document,
                     expanded.iterator().next().asJsonObject());

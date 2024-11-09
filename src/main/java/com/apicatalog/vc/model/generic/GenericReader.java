@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc.model.generic;
 
 import java.net.URI;
 import java.util.Collection;
@@ -12,29 +12,34 @@ import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.JsonLdMaterialReader;
+import com.apicatalog.vc.model.ProofAdapter;
+import com.apicatalog.vc.model.VerifiableAdapter;
+import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.VerifiableMaterialReader;
+import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vc.model.VerifiableModelReader;
+import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
-public class GenericVerifiableReader implements VerifiableModelReader, VerifiableReader {
+public class GenericReader implements VerifiableModelReader, VerifiableReader {
 
     protected final VerifiableAdapter adapter;
-    protected final ProofAdapter proofAdapter;
     protected final VerifiableMaterialReader materialReader;
 
-    protected GenericVerifiableReader(final JsonLdTreeReader reader, ProofAdapter proofAdapter) {
-        this.adapter = null;// new VcdmAdapter(reader, this, this, proofAdapter);
-        this.proofAdapter = proofAdapter;
-        this.materialReader = new JsonLdMaterialReader();
+    protected GenericReader(final VerifiableAdapter adapter, VerifiableMaterialReader reader) {
+        this.adapter = adapter;
+        this.materialReader = reader;
     }
 
-    public static GenericVerifiableReader with(final ProofAdapter proofAdapter) {
+    public static GenericReader with(final ProofAdapter proofAdapter) {
         return with(proofAdapter, new Class[0]);
     }
 
-    public static GenericVerifiableReader with(
+    public static GenericReader with(
             final ProofAdapter proofAdapter,
             final Class<?>... types) {
 
@@ -48,7 +53,9 @@ public class GenericVerifiableReader implements VerifiableModelReader, Verifiabl
 
         builder.scan(Verifiable.class, true);
 
-        return new GenericVerifiableReader(JsonLdTreeReader.of(builder.build()), proofAdapter);
+        return new GenericReader(
+                new GenericAdapter(JsonLdTreeReader.of(builder.build()), proofAdapter),
+                new JsonLdMaterialReader());
     }
 
     @Override
@@ -71,8 +78,8 @@ public class GenericVerifiableReader implements VerifiableModelReader, Verifiabl
 
         final Collection<JsonObject> expandedProofs = EmbeddedProof.expandedProofs(data.expanded());
 
-        return new GenericVerifiableModel(
-                new VerifiableMaterial(
+        return new GenericModel(
+                new GenericMaterial(
                         data.context(),
                         compactedUnsigned,
                         expandedUnsigned),
@@ -83,5 +90,4 @@ public class GenericVerifiableReader implements VerifiableModelReader, Verifiabl
                         ? expandedProofs
                         : Collections.emptyList());
     }
-
 }
