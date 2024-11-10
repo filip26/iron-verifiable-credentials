@@ -1,6 +1,7 @@
 package com.apicatalog.ld;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdErrorCode;
@@ -112,6 +113,7 @@ public class DocumentError extends Exception {
         }
 
         Arrays.stream(terms)
+                .filter(Objects::nonNull)
                 .forEach(term -> {
                     int index = term.lastIndexOf('#') + 1;
                     if (index == 0) {

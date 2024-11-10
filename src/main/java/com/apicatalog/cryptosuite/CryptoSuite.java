@@ -19,30 +19,49 @@ public record CryptoSuite(
 
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
+        if (signer == null) {
+            throw new UnsupportedOperationException();
+        }
         signer.verify(publicKey, signature, data);
     }
 
     @Override
     public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
+        if (signer == null) {
+            throw new UnsupportedOperationException();
+        }
         return signer.sign(privateKey, data);
     }
 
     @Override
     public byte[] digest(byte[] data) throws CryptoSuiteError {
+        if (digester == null) {
+            throw new UnsupportedOperationException();
+        }
         return digester.digest(data);
     }
 
     @Override
     public byte[] canonicalize(VerifiableMaterial document) throws CryptoSuiteError {
+        if (canonicalizer != null) {
+            throw new UnsupportedOperationException();
+        }
         return canonicalizer.canonicalize(document);
     }
 
     @Override
     public KeyPair keygen() throws KeyGenError {
+        if (signer == null) {
+            throw new UnsupportedOperationException();
+        }
         return signer.keygen();
     }
 
     public String id() {
         return id;
+    }
+
+    public boolean isUnknown() {
+        return signer == null && canonicalizer == null && digester == null;
     }
 }

@@ -23,6 +23,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
+import com.apicatalog.vc.proof.GenericSignature;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -31,33 +32,33 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue.ValueType;
 
-public abstract class DataIntegritySuite implements SignatureSuite {
+public class DataIntegritySuite implements SignatureSuite {
 
-//    protected final MethodAdapter methodAdapter;
+    protected final static DataIntegritySuite GENERIC = new DataIntegritySuite(null, null);
 
     protected final String cryptosuiteName;
 
     protected final Multibase proofValueBase;
-    
-    protected final Class<? extends DataIntegrityProof> proofInterface;
 
-//    protected ProofAdapter proofAdapter;
+    protected final Class<? extends DataIntegrityProof> proofInterface;
 
     protected DataIntegritySuite(
             String cryptosuiteName,
-            Multibase proofValueBase
-            ) {
+            Multibase proofValueBase) {
         this(cryptosuiteName, DataIntegrityProof.class, proofValueBase);
     }
 
     protected DataIntegritySuite(
             String cryptosuiteName,
             Class<? extends DataIntegrityProof> proofInterface,
-            Multibase proofValueBase
-            ) {
+            Multibase proofValueBase) {
         this.cryptosuiteName = cryptosuiteName;
         this.proofInterface = proofInterface;
         this.proofValueBase = proofValueBase;
+    }
+
+    public static DataIntegritySuite generic() {
+        return GENERIC;
     }
 
 //    protected static LinkedLiteralAdapter getProofValueAdapter(Multibase proofValueBase) {
@@ -75,9 +76,16 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 //        };
 //    }
 //    
-    protected abstract ProofValue getProofValue(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader) throws DocumentError;
+    protected ProofValue getProofValue(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader) throws DocumentError {
+        return new GenericSignature();
+    }
 
-    protected abstract CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError;
+    protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError {
+        if (cryptoName == null) {
+            return null;
+        }
+        return new CryptoSuite(cryptoName, -1, null, null, null);
+    }
 
     public DataIntegrityProofDraft createDraft(
             VerificationMethod method,
@@ -96,7 +104,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
 
         final JsonObject expandedProof = proofMaterial.expanded();
 
-        return proofType.contains(VcdiVocab.TYPE.uri()) && cryptosuiteName.equals(getCryptoSuiteName(expandedProof));
+        return proofType.contains(VcdiVocab.TYPE.uri()) &&
+                (cryptosuiteName == null
+                        || cryptosuiteName.equals(getCryptoSuiteName(expandedProof)));
     }
 
     @Override
@@ -105,7 +115,6 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         var mapping = TreeReaderMapping.createBuilder()
                 .scan(proofInterface, true)
                 .with(new MultibaseAdapter()) // TODO supported bases only
-                // TODO add custom type -> custom mapper
                 .build();
 
         var reader = JsonLdTreeReader.of(mapping);
@@ -122,8 +131,9 @@ public abstract class DataIntegritySuite implements SignatureSuite {
                 final ByteArrayValue signature = linkable.ld().asFragment()
                         .literal(VcdiVocab.PROOF_VALUE.uri(), ByteArrayValue.class);
 
-                if (signature != null) {
+                ProofValue proofValue = null;
 
+                if (signature != null) {
                     final VerifiableMaterial unsignedProof = new GenericMaterial(
                             proofMaterial.context(),
                             Json.createObjectBuilder(proofMaterial.compacted())
@@ -131,14 +141,27 @@ public abstract class DataIntegritySuite implements SignatureSuite {
                             Json.createObjectBuilder(proofMaterial.expanded())
                                     .remove(VcdiVocab.PROOF_VALUE.uri()).build());
 
-                    ProofValue proofValue = getProofValue(verifiable, unsignedProof, signature.byteArrayValue(), loader);
+                    proofValue = getProofValue(verifiable, unsignedProof, signature.byteArrayValue(), loader);
                     consumer.acceptFragmentPropertyValue("signature", proofValue);
-
-                    if (proofValue != null) {
-                        CryptoSuite cryptoSuite = getCryptoSuite(cryptosuiteName, proofValue);
-                        consumer.acceptFragmentPropertyValue("cryptoSuite", cryptoSuite);
-                    }
                 }
+
+                CryptoSuite cryptoSuite = null;
+
+                if (proofValue == null) {
+                    cryptoSuite = DataIntegritySuite.this.getCryptoSuite(
+                            cryptosuiteName == null
+                                    ? getCryptoSuiteName(proofMaterial.expanded())
+                                    : cryptosuiteName,
+                            proofValue);
+                } else {
+                    cryptoSuite = getCryptoSuite(
+                            cryptosuiteName == null
+                                    ? getCryptoSuiteName(proofMaterial.expanded())
+                                    : cryptosuiteName,
+                            proofValue);
+                }
+
+                consumer.acceptFragmentPropertyValue("cryptoSuite", cryptoSuite);
             }
 
             return proof;
@@ -146,9 +169,16 @@ public abstract class DataIntegritySuite implements SignatureSuite {
         } catch (FragmentPropertyError e) {
             throw new DocumentError(e, ErrorType.Invalid, e.getPropertyName());
 
-        } catch (TreeBuilderError | NodeAdapterError e) {
+        } catch (TreeBuilderError e) {
+            if (e.term() != null) {
+                throw new DocumentError(e, ErrorType.Invalid, e.term());
+            }
+            throw new DocumentError(e, ErrorType.Invalid, "Proof", e.term());
+
+        } catch (NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }
+
     }
 
 //    @Override
@@ -209,7 +239,6 @@ public abstract class DataIntegritySuite implements SignatureSuite {
                     && ValueType.STRING == valueObject.get(JsonLdKeyword.VALUE).getValueType()) {
                 return valueObject.getString(JsonLdKeyword.VALUE);
             }
-
         }
         return null;
     }

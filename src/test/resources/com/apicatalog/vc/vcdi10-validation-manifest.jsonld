@@ -45,17 +45,17 @@
         "ProofValidationTest"
       ],
       "name": "Missing proofPurpose",
-      "input": "vcdi10/vcdi10-missing-purpose-vc20.jsonld",
+      "input": "vcdi10/vcdi10-missing-purpose.jsonld",
       "expectErrorCode": "MissingProofPurpose"
     },
     {
       "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
-        "VeriferTest"
+        "ProofValidationTest"
       ],
-      "name": "invalid proofPurpose property",
-      "input": "verifier/0014-in.jsonld",
+      "name": "Invalid proofPurpose",
+      "input": "vcdi10/vcdi10-invalid-purpose.jsonld",
       "expectErrorCode": "InvalidProofPurpose"
     },
     {
@@ -65,18 +65,38 @@
         "ProofValidationTest"
       ],
       "name": "Missing proofValue",
-      "input": "vcdi10/vcdi10-missing-signature-vc20.jsonld",
+      "input": "vcdi10/vcdi10-missing-signature.jsonld",
       "expectErrorCode": "MissingProofValue"
     },
     {
       "@id": "#t0016",
       "@type": [
         "NegativeEvaluationTest",
-        "VeriferTest"
+        "ProofValidationTest"
       ],
-      "name": "invalid proofValue property",
-      "input": "verifier/0016-in.jsonld",
+      "name": "Invalid proofValue",
+      "input": "vcdi10/vcdi10-invalid-signature.jsonld",
       "expectErrorCode": "InvalidProofValue"
+    },
+    {
+      "@id": "#t0014",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ProofValidationTest"
+      ],
+      "name": "Missing cryptosuite",
+      "input": "vcdi10/vcdi10-missing-crypto.jsonld",
+      "expectErrorCode": "MissingCryptosuite"
+    },
+    {
+      "@id": "#t0014",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ProofValidationTest"
+      ],
+      "name": "Unknown cryptosuite",
+      "input": "vcdi10/vcdi10-unknown-crypto.jsonld",
+      "expectErrorCode": "UnknownCryptosuite"
     },
   
     {

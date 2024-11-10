@@ -92,9 +92,13 @@ public interface DataIntegrityProof extends VerifiableProof {
     default void validate(Map<String, Object> params) throws DocumentError {
 
         assertNotNull(this::purpose, VcdiVocab.PURPOSE);
-        assertNotNull(this::cryptoSuite, VcdiVocab.CRYPTO_SUITE);
         assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
+        assertNotNull(this::cryptoSuite, VcdiVocab.CRYPTO_SUITE);
 
+        if (cryptoSuite().isUnknown()) {
+            throw new DocumentError(ErrorType.Unknown, VcdiVocab.CRYPTO_SUITE);
+        }
+        
         if (created() != null && Instant.now().isBefore(created())) {
             throw new DocumentError(ErrorType.Invalid, VcdiVocab.CREATED);
         }

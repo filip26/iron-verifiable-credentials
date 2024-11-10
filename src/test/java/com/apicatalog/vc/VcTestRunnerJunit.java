@@ -42,6 +42,7 @@ import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
 import com.apicatalog.vc.writer.VerifiableWriter;
 import com.apicatalog.vcdi.DataIntegrityProofDraft;
+import com.apicatalog.vcdi.DataIntegritySuite;
 import com.apicatalog.vcdm.io.VcdmWriter;
 
 import jakarta.json.Json;
@@ -63,11 +64,11 @@ public class VcTestRunnerJunit {
     // FIXME the static loader?
     final static Collection<DeprecatedVerificationMethodResolver> RESOLVERS = defaultResolvers(new StaticContextLoader((LOADER)));
 
-    final static TestSignatureSuite SUITE = (new TestSignatureSuite());
+    final static TestSignatureSuite TEST_DI_SUITE = (new TestSignatureSuite());
 
-    final static Verifier VERIFIER = Verifier.with(SUITE).loader(LOADER).methodResolvers(RESOLVERS);
+    final static Verifier VERIFIER = Verifier.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER).methodResolvers(RESOLVERS);
 
-    final static Reader READER = Reader.with(SUITE).loader(LOADER);
+    final static Reader READER = Reader.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER);
     
     final static VerifiableWriter WRITER = new VcdmWriter();
 
@@ -104,11 +105,11 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
                 }
 
-                final Issuer issuer = SUITE.createIssuer(getKeys(keyPairLocation, LOADER, null))
+                final Issuer issuer = TEST_DI_SUITE.createIssuer(getKeys(keyPairLocation, LOADER, null))
                         .loader(LOADER);
 
                 // proof draft
-                final DataIntegrityProofDraft draft = SUITE.createDraft(
+                final DataIntegrityProofDraft draft = TEST_DI_SUITE.createDraft(
                         testCase.verificationMethod,
                         URI.create("https://w3id.org/security#assertionMethod"));
 

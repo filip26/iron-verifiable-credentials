@@ -1,0 +1,8 @@
+{
+  "@context": "https://w3id.org/security/data-integrity/v2",
+  "proof": {
+    "type": "DataIntegrityProof",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "zDzvG9arTUkqwTCncUFEkwhYvK9iHefBNAHvhorShoj9M"
+  }
+}

@@ -30,7 +30,7 @@ public class Reader extends DocumentProcessor<Reader> {
 
     protected final VerifiableReader reader;
 
-    protected Reader(final SignatureSuite... suites) {
+    protected Reader(final SignatureSuite[] suites) {
         super(suites);
 
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);

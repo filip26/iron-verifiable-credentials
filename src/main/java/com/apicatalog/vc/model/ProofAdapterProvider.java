@@ -1,8 +1,6 @@
 package com.apicatalog.vc.model;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collection;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -10,6 +8,8 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
+import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
@@ -17,20 +17,31 @@ import jakarta.json.Json;
 
 public class ProofAdapterProvider implements ProofAdapter {
 
-    protected static final TreeReaderMapping MAPPING = TreeReaderMapping.createBuilder()
-            .scan(Proof.class)
-            .build();
+    protected final JsonLdTreeReader reader;
 
-    protected static final JsonLdTreeReader READER = JsonLdTreeReader.of(MAPPING);
-    
-    protected final Collection<SignatureSuite> suites;
+    protected final SignatureSuite[] suites;
 
-    protected ProofAdapterProvider(Collection<SignatureSuite> suites) {
+    protected ProofAdapterProvider(SignatureSuite[] suites, JsonLdTreeReader genericReader) {
         this.suites = suites;
+        this.reader = genericReader;
     }
 
-    public static ProofAdapter of(final SignatureSuite... suites) {
-        return new ProofAdapterProvider(Arrays.asList(suites));
+    public static ProofAdapter of(SignatureSuite[] suites) {
+        return of(suites, new Class<?>[0]);
+    }
+
+    public static ProofAdapter of(final SignatureSuite[] suites, Class<?>... types) {
+
+        TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder();
+
+        if (types != null) {
+            for (Class<?> type : types) {
+                builder.scan(type);
+            }
+        }
+        builder.scan(Proof.class);
+
+        return new ProofAdapterProvider(suites, JsonLdTreeReader.of(builder.build()));
     }
 
     @Override
@@ -50,11 +61,16 @@ public class ProofAdapterProvider implements ProofAdapter {
 
         // process as a generic, i.e. an unknown, proof
         try {
-            return READER.read(Proof.class, Json.createArrayBuilder().add(proofMaterial.expanded()).build());
+            final Proof generic = reader.read(Proof.class, Json.createArrayBuilder().add(proofMaterial.expanded()).build());
             
+//            if (generic instanceof PropertyValueConsumer consumer) {
+//                consumer.acceptFragmentPropertyValue("cryptoSuite", new Generic);
+//            }
+            return generic;
+
         } catch (FragmentPropertyError e) {
             throw DocumentError.of(e);
-            
+
         } catch (Exception e) {
             throw new DocumentError(e, ErrorType.Invalid, "Proof");
         }
