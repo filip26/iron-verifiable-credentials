@@ -325,7 +325,7 @@
       ],
       "name": "Unknown VP VC model",
       "input": "vcdm20/vcdm20-unknown-vp-vc-model.jsonld",
-      "expectErrorCode": "InvalidCredentialModel"
+      "expectErrorCode": "UnknownDocumentModel"
     }
   ]
 }

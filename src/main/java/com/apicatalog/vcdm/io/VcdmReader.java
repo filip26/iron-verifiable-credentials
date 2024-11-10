@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.jsonld.JsonLdMaterialReader;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableMaterialReader;
@@ -24,16 +25,22 @@ import jakarta.json.JsonObject;
  */
 public abstract class VcdmReader implements VerifiableModelReader, VerifiableReader {
 
+    protected final VcdmVersion readerVersion;
     protected final VerifiableMaterialReader materialReader;
-    protected final VcdmVersion version;
 
-    protected VcdmReader(VcdmVersion version) {
-        this.version = version;
+    protected VcdmReader(VcdmVersion readerVersion) {
+        this.readerVersion = readerVersion;
         this.materialReader = new JsonLdMaterialReader();
     }
 
     @Override
     public VerifiableModel read(VerifiableMaterial data) throws DocumentError {
+        
+        VcdmVersion version = modelVersion(data.context());
+        
+        if (version == null || version != readerVersion) {
+            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+        }
         
         final JsonObject expandedUnsigned = EmbeddedProof.removeProofs(data.expanded());
 
@@ -56,4 +63,6 @@ public abstract class VcdmReader implements VerifiableModelReader, VerifiableRea
                         ? expandedProofs
                         : Collections.emptyList());
     }
+    
+    protected abstract VcdmVersion modelVersion(Collection<String> context) throws DocumentError;
 }

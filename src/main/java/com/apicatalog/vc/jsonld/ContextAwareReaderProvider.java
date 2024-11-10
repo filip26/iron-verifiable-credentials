@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc.jsonld;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.model.VerifiableReader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -38,7 +39,7 @@ public class ContextAwareReaderProvider implements VerifiableReader {
     @Override
     public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
-        // extract the first context string value
+        // extract the first context as string value
         final String firstContext = firstContext(document);
 
         if (firstContext != null) {

@@ -11,7 +11,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.Verifiable;
-import com.apicatalog.vc.model.ContextAwareReaderProvider;
+import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
 import com.apicatalog.vc.model.VerifiableReader;
@@ -27,7 +27,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
 public class Reader extends DocumentProcessor<Reader> {
-    
+
     protected final VerifiableReader reader;
 
     protected Reader(final SignatureSuite... suites) {
@@ -46,7 +46,7 @@ public class Reader extends DocumentProcessor<Reader> {
                 .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
                 .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
                         // add VCDM 1.1 credential support
-                        .v11(vcdm11.adapter()))
+                        .v11(vcdm11))
                 .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter));
 
 //        
@@ -67,7 +67,6 @@ public class Reader extends DocumentProcessor<Reader> {
 //                        BitstringStatusListEntry::of),
 //                resolver,
 //                suites)); 
-
 
     }
 
@@ -104,9 +103,9 @@ public class Reader extends DocumentProcessor<Reader> {
      * @throws DocumentError
      */
     public Verifiable read(final URI location) throws DocumentError {
-        
+
         Objects.requireNonNull(location);
-        
+
         try {
             final DocumentLoader loader = getLoader();
 
@@ -131,9 +130,9 @@ public class Reader extends DocumentProcessor<Reader> {
     }
 
     protected Verifiable read(final JsonObject document, DocumentLoader loader) throws DocumentError {
-        
+
         final Verifiable verifiable = reader.read(document, loader, base);
-        
+
         if (verifiable == null) {
             throw new DocumentError(ErrorType.Unknown, "DocumentModel");
         }

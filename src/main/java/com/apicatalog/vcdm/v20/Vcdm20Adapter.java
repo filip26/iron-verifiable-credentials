@@ -4,15 +4,14 @@ import java.util.Collection;
 
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableAdapterProvider;
-import com.apicatalog.vc.model.VerifiableModelReader;
+import com.apicatalog.vcdm.CredentialAdapter;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmAdapter;
 
 public class Vcdm20Adapter extends VcdmAdapter {
 
-    public Vcdm20Adapter(JsonLdTreeReader reader, VerifiableAdapterProvider credentialAdapterProvider, VerifiableModelReader credentialModelReader, ProofAdapter proofMaterializer) {
-        super(reader, credentialAdapterProvider, credentialModelReader, proofMaterializer);
+    public Vcdm20Adapter(JsonLdTreeReader reader, CredentialAdapter credentialAdapter, ProofAdapter proofMaterializer) {
+        super(reader, credentialAdapter, proofMaterializer);
     }
 
     @Override

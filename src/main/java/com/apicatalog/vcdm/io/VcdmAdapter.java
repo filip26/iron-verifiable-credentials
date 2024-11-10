@@ -23,12 +23,11 @@ import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableAdapter;
-import com.apicatalog.vc.model.VerifiableAdapterProvider;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableModelReader;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.Proof;
+import com.apicatalog.vcdm.CredentialAdapter;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
@@ -40,19 +39,18 @@ import jakarta.json.JsonValue;
 public class VcdmAdapter implements VerifiableAdapter {
 
     protected final ProofAdapter proofAdapter;
-    protected final VerifiableModelReader credentialModelReader;
-    protected final VerifiableAdapterProvider credentialAdapterProvider;
+    protected final CredentialAdapter credentialAdapter;
+//    protected final VerifiableModelReader credentialModelReader;
+//    protected final VerifiableAdapterProvider credentialAdapterProvider;
 
     protected final JsonLdTreeReader reader;
 
     public VcdmAdapter(
             JsonLdTreeReader reader,
-            VerifiableAdapterProvider credentialAdapterProvider,
-            VerifiableModelReader credentialModelReader,
+            CredentialAdapter credentialAdapter,
             ProofAdapter proofMaterializer) {
         this.reader = reader;
-        this.credentialAdapterProvider = credentialAdapterProvider;
-        this.credentialModelReader = credentialModelReader;
+        this.credentialAdapter = credentialAdapter;
         this.proofAdapter = proofMaterializer;
     }
 
@@ -142,21 +140,7 @@ public class VcdmAdapter implements VerifiableAdapter {
     }
 
     protected Credential credential(VerifiableMaterial data, DocumentLoader loader, URI base) throws DocumentError {
-
-        final VerifiableModel model = credentialModelReader.read(data);
-
-        final VerifiableAdapter adapter = credentialAdapterProvider.adapter(model);
-
-        if (adapter != null) {
-
-            final Verifiable verifiable = adapter.materialize(model, loader, base);
-
-            if (verifiable instanceof Credential credential) {
-                return credential;
-            }
-        }
-
-        throw new DocumentError(ErrorType.Invalid, "CredentialModel");
+        return credentialAdapter.materialize(data, loader, base);        
     }
 
     protected Collection<Credential> credentials(VerifiableMaterial data, DocumentLoader loader, URI base) throws DocumentError {
@@ -265,4 +249,25 @@ public class VcdmAdapter implements VerifiableAdapter {
         }
         return Collections.emptySet();
     }
+    
+    
+//    final VerifiableModel model = credentialModelReader.read(data);
+//    
+//    if (model == null) {
+//        throw new DocumentError(ErrorType.Unknown, "CredentialModel");
+//    }
+
+//    final VerifiableAdapter adapter = credentialAdapterProvider.adapter(data);
+//
+//    if (adapter != null) {
+//
+//        final Verifiable verifiable = adapter.materialize(model, loader, base);
+//
+//        if (verifiable instanceof Credential credential) {
+//            return credential;
+//        }
+//    }
+//
+//    throw new DocumentError(ErrorType.Invalid, "CredentialModel");
+
 }

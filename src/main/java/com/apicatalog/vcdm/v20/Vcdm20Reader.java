@@ -1,10 +1,11 @@
 package com.apicatalog.vcdm.v20;
 
 import java.net.URI;
-import java.util.Collections;
+import java.util.Collection;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
@@ -12,25 +13,26 @@ import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableAdapter;
-import com.apicatalog.vc.model.VerifiableAdapterProvider;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vcdm.Vcdm;
+import com.apicatalog.vcdm.CredentialAdapter;
 import com.apicatalog.vcdm.VcdmVersion;
+import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmReader;
+import com.apicatalog.vcdm.v11.Vcdm11Reader;
 
 import jakarta.json.JsonObject;
 
-public class Vcdm20Reader extends VcdmReader implements VerifiableAdapterProvider {
+public class Vcdm20Reader extends VcdmReader implements CredentialAdapter {
 
-    protected final VerifiableAdapter v20;
-    protected VerifiableAdapter v11;
+    protected VerifiableAdapter v20;
+    protected Vcdm11Reader v11;
 
     protected final ProofAdapter proofAdapter;
 
     protected Vcdm20Reader(final JsonLdTreeReader reader, ProofAdapter proofAdapter) {
         super(VcdmVersion.V20);
-        this.v20 = new Vcdm20Adapter(reader, this, this, proofAdapter);
+        this.v20 = new Vcdm20Adapter(reader, this, proofAdapter);
         this.v11 = null;
         this.proofAdapter = proofAdapter;
     }
@@ -60,47 +62,72 @@ public class Vcdm20Reader extends VcdmReader implements VerifiableAdapterProvide
     }
 
     @Override
-    public VerifiableModel read(VerifiableMaterial data) throws DocumentError {
-
-        // TODO check and validate contexts
-
-        return super.read(data);
-    }
-
-    @Override
     public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
         VerifiableMaterial material = materialReader.read(document, loader, base);
 
-        VerifiableModel model = read(material);
+        if (material != null) {
 
-        return v20.materialize(model, loader, base);
-    }
-
-    @Override
-    public VerifiableAdapter adapter(VerifiableModel model) throws DocumentError {
-        if (model instanceof Vcdm vcdm) {
-            if (VcdmVersion.V20 == vcdm.version()) {
-                return v20;
-            }
-            if (VcdmVersion.V11 == vcdm.version()) {
-                return v11;
+            VerifiableModel model = read(material);
+            if (model != null) {
+                return v20.materialize(model, loader, base);
             }
         }
-        return null;
+        throw new DocumentError(ErrorType.Unknown, "DocumentModel");
     }
 
-    public Vcdm20Reader v11(VerifiableAdapter v11) {
+    public Vcdm20Reader v11(Vcdm11Reader v11) {
         this.v11 = v11;
         return this;
     }
 
-    public VerifiableAdapter v11() {
-        return v11;
+    @Override
+    public Credential materialize(VerifiableMaterial data, DocumentLoader loader, URI base) throws DocumentError {
+
+        VcdmVersion version = modelVersion(data.context());
+
+        if (version == null) {
+            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+        }
+
+        if (v20 != null && VcdmVersion.V20 == version) {
+
+            VerifiableModel model = read(data);
+
+            if (model != null) {
+                Verifiable verifiable = v20.materialize(model, loader, base);
+
+                if (verifiable instanceof Credential credential) {
+                    return credential;
+                }
+            }
+            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+
+        }
+
+        if (v11 != null && VcdmVersion.V11 == version) {
+            return v11.materialize(data, loader, base);
+        }
+
+        throw new DocumentError(ErrorType.Unknown, "DocumentModel");
     }
 
-    public VerifiableAdapter v20() {
-        return v20;
+    @Override
+    protected VcdmVersion modelVersion(Collection<String> context) throws DocumentError {
+        
+        if (context == null || context.isEmpty()) {
+            return null;
+        }
+        
+        final String firstContext = context.iterator().next();
+    
+        if (VcdmVocab.CONTEXT_MODEL_V2.equals(firstContext)) {
+            return VcdmVersion.V20;
+        }
+        if (VcdmVocab.CONTEXT_MODEL_V1.equals(firstContext)) {
+            return VcdmVersion.V11;
+        }
+        
+        return null;
     }
-
 }
