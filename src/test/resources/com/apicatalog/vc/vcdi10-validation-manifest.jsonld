@@ -13,7 +13,7 @@
       "@id": "#t0001",
       "@type": [
         "PositiveEvaluationTest",
-        "ValidationTest"
+        "ProofValidationTest"
       ],
       "name": "Valid minimal DI",
       "input": "vcdi10/vcdi10-valid-minimal.jsonld"
@@ -22,7 +22,7 @@
       "@id": "#t0002",
       "@type": [
         "PositiveEvaluationTest",
-        "ValidationTest"
+        "ProofValidationTest"
       ],
       "name": "Valid minimal DI VC1.1",
       "input": "vcdi10/vcdi10-valid-minimal-vc11.jsonld"
@@ -31,7 +31,7 @@
       "@id": "#t0003",
       "@type": [
         "PositiveEvaluationTest",
-        "ValidationTest"
+        "ProofValidationTest"
       ],
       "name": "Valid minimal DI VC2.0",
       "input": "vcdi10/vcdi10-valid-minimal-vc20.jsonld"
@@ -42,7 +42,7 @@
       "@id": "#t0010",
       "@type": [
         "NegativeEvaluationTest",
-        "ValidationTest"
+        "ProofValidationTest"
       ],
       "name": "Missing proofPurpose",
       "input": "vcdi10/vcdi10-missing-purpose-vc20.jsonld",
@@ -62,7 +62,7 @@
       "@id": "#t0015",
       "@type": [
         "NegativeEvaluationTest",
-        "ValidationTest"
+        "ProofValidationTest"
       ],
       "name": "Missing proofValue",
       "input": "vcdi10/vcdi10-missing-signature-vc20.jsonld",

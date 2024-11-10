@@ -34,7 +34,7 @@ public abstract class VcdmReader implements VerifiableModelReader, VerifiableRea
 
     @Override
     public VerifiableModel read(VerifiableMaterial data) throws DocumentError {
-
+        
         final JsonObject expandedUnsigned = EmbeddedProof.removeProofs(data.expanded());
 
         final Collection<JsonObject> compactedProofs = EmbeddedProof.compactedProofs(data.compacted());

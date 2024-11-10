@@ -82,6 +82,16 @@
       "input": "vcdm11/vcdm11-valid-unsigned-full-vc.jsonld"
     },
     {
+      "@id": "#t0008",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid usigned VC with inline @context",
+      "input": "vcdm11/vcdm11-valid-vc-inline-context.jsonld"
+    },
+    
+    {
       "@id": "#t0009",
       "@type": [
         "NegativeEvaluationTest",

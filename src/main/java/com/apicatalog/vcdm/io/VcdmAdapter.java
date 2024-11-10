@@ -145,20 +145,17 @@ public class VcdmAdapter implements VerifiableAdapter {
 
         final VerifiableModel model = credentialModelReader.read(data);
 
-//        if (model instanceof Vcdm) {
+        final VerifiableAdapter adapter = credentialAdapterProvider.adapter(model);
 
-            final VerifiableAdapter adapter = credentialAdapterProvider.adapter(model);
+        if (adapter != null) {
 
-            if (adapter != null) {
+            final Verifiable verifiable = adapter.materialize(model, loader, base);
 
-                final Verifiable verifiable = adapter.materialize(model, loader, base);
-
-                if (verifiable instanceof Credential credential) {
-                    return credential;
-                }
+            if (verifiable instanceof Credential credential) {
+                return credential;
             }
-//        }
-//
+        }
+
         throw new DocumentError(ErrorType.Invalid, "CredentialModel");
     }
 

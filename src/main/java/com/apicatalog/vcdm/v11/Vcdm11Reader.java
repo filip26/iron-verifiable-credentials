@@ -62,9 +62,17 @@ public class Vcdm11Reader extends VcdmReader implements VerifiableAdapterProvide
     }
 
     @Override
+    public VerifiableModel read(VerifiableMaterial data) throws DocumentError {
+
+        //TODO check and validate contexts
+        
+        return super.read(data);
+    }
+
+    @Override
     public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
-        VerifiableMaterial material = materialReader.read(Collections.emptyList(), document, loader, base);
+        VerifiableMaterial material = materialReader.read(document, loader, base);
 
         VerifiableModel model = read(material);
 
@@ -78,7 +86,7 @@ public class Vcdm11Reader extends VcdmReader implements VerifiableAdapterProvide
         }
         return null;
     }
-    
+
     public VerifiableAdapter adapter() {
         return adapter;
     }

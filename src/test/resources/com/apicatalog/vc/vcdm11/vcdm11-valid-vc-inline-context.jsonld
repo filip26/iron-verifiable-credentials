@@ -1,0 +1,13 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    {
+      "@vocab": "https://schema.org"
+    }
+  ],
+  "type": "VerifiableCredential",
+  "issuer": "https://example.com/issuer/1",
+  "issuanceDate": "2010-01-01T00:00:00Z",
+  "credentialSubject": "https://example.com/subject/1",
+  "name": "An inline context should print a warning"
+}

@@ -153,15 +153,22 @@ public class VcTestRunnerJunit {
                 Verifiable verifiable = READER.read(testCase.input);
                 assertNotNull(verifiable);
 
-//                verifiable.validate();
+                verifiable.validate();
                 
+                assertNotNull(verifiable.proofs());
+                assertTrue(verifiable.proofs().isEmpty());
+
+            } else if (testCase.type.contains(VcTestCase.vocab("ProofValidationTest"))) {
+
+                Verifiable verifiable = READER.read(testCase.input);
+                assertNotNull(verifiable);
+
                 assertNotNull(verifiable.proofs());
                 assertFalse(verifiable.proofs().isEmpty());
 
                 for (Proof proof : verifiable.proofs()) {
                     proof.validate(null);
                 }
-                
 
             } else if (testCase.type.contains(VcTestCase.vocab("ReaderTest"))) {
 

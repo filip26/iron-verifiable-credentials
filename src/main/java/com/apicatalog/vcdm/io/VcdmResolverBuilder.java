@@ -1,19 +1,5 @@
 package com.apicatalog.vcdm.io;
 
-import java.util.Collection;
-
-import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableReader;
-import com.apicatalog.vc.model.VerifiableReaderProvider;
-import com.apicatalog.vc.status.bitstring.BitstringStatusListEntry;
-import com.apicatalog.vcdm.VcdmVersion;
-import com.apicatalog.vcdm.VcdmVocab;
-import com.apicatalog.vcdm.v11.Vcdm11Reader;
-import com.apicatalog.vcdm.v20.Vcdm20Reader;
-
 public class VcdmResolverBuilder  {
 //    protected final ProofAdapter proofAdapter;
 //    protected final VcdmResolverBuilder resolver;

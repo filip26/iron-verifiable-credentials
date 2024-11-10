@@ -17,7 +17,7 @@ public class DocumentError extends Exception {
     }
 
     private final ErrorType type;
-//    private final String term;
+
     private final String code;
 
     public DocumentError(ErrorType type, String code) {
@@ -58,18 +58,9 @@ public class DocumentError extends Exception {
         return type;
     }
 
-//    @Override
-//    public String toString() {
-//        return super.toString() + ": " + getCode();
-//    }
-
     public String code() {
         return code;
     }
-
-//    public String term() {
-//        return term;
-//    }
 
     public static void failWithJsonLd(JsonLdError e) throws DocumentError {
         if (JsonLdErrorCode.LOADING_DOCUMENT_FAILED == e.getCode()) {

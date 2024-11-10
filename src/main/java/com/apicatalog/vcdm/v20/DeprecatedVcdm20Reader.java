@@ -1,13 +1,10 @@
 package com.apicatalog.vcdm.v20;
 
 import java.util.Collection;
-import java.util.function.Consumer;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.linkedtree.xsd.XsdDateTime;
 import com.apicatalog.vc.model.VerifiableReader;
-import com.apicatalog.vc.model.VerifiableReaderProvider;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
@@ -15,11 +12,11 @@ import com.apicatalog.vcdm.io.DeprecatedVcdmReader;
 
 public class DeprecatedVcdm20Reader extends DeprecatedVcdmReader {
     
-    protected final VerifiableReaderProvider resolver;
+//    protected final VerifiableReaderProvider resolver;
 
-    protected DeprecatedVcdm20Reader(final JsonLdTreeReader reader, final VerifiableReaderProvider resolver, final SignatureSuite... suites) {
+    protected DeprecatedVcdm20Reader(final JsonLdTreeReader reader, final SignatureSuite... suites) {
         super(VcdmVersion.V20, reader, suites);
-        this.resolver = resolver;
+//        this.resolver = resolver;
     }
     
 //    public static Vcdm20Reader with(

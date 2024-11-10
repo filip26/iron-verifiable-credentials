@@ -119,6 +119,15 @@
       "input": "vcdm20/vcdm20-valid-unsigned-langmap.jsonld"
     },
     {
+      "@id": "#t0012",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Valid unsigned VC with inline @context",
+      "input": "vcdm20/vcdm20-valid-vc-inline-context.jsonld"
+    },    
+    {
       "@id": "#t0013",
       "@type": [
         "NegativeEvaluationTest",

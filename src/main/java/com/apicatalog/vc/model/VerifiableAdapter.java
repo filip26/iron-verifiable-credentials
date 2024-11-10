@@ -6,6 +6,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.Verifiable;
 
+@FunctionalInterface
 public interface VerifiableAdapter {
 
     /**

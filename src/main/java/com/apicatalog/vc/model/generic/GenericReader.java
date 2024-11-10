@@ -60,7 +60,7 @@ public class GenericReader implements VerifiableModelReader, VerifiableReader {
 
     @Override
     public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
-        VerifiableMaterial material = materialReader.read(Collections.emptyList(), document, loader, base);
+        VerifiableMaterial material = materialReader.read(document, loader, base);
 
         VerifiableModel model = read(material);
 
