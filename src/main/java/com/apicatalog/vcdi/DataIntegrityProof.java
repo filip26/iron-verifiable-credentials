@@ -6,10 +6,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.CryptoSuite;
+import com.apicatalog.cryptosuite.VerificationError;
+import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.VocabTerm;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.VocabTerm;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Literal;
@@ -98,13 +101,9 @@ public interface DataIntegrityProof extends VerifiableProof {
         if (cryptoSuite().isUnknown()) {
             throw new DocumentError(ErrorType.Unknown, VcdiVocab.CRYPTO_SUITE);
         }
-        
-        if (created() != null && Instant.now().isBefore(created())) {
-            throw new DocumentError(ErrorType.Invalid, VcdiVocab.CREATED);
-        }
 
-        if (expires() != null && Instant.now().isAfter(expires())) {
-            throw new DocumentError(ErrorType.Invalid, VcdiVocab.EXPIRES);
+        if (created() != null && expires() != null && created().isAfter(expires())) {
+            throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }
 
         if (params != null) {
@@ -113,6 +112,17 @@ public interface DataIntegrityProof extends VerifiableProof {
             assertEquals(params, VcdiVocab.DOMAIN, domain());
             assertEquals(params, VcdiVocab.NONCE, nonce());
         }
+    }
+
+    @Override
+    default void verify(VerificationKey key) throws VerificationError, DocumentError {
+        if (created() != null && Instant.now().isBefore(created())) {
+            throw new DocumentError(ErrorType.Invalid, "Created");
+        }
+        if (expires() != null && Instant.now().isAfter(expires())) {
+            throw new VerificationError(VerificationErrorCode.Expired);
+        }
+        VerifiableProof.super.verify(key);
     }
 
     static void assertEquals(Map<String, Object> params, VocabTerm name, Object expected) throws DocumentError {

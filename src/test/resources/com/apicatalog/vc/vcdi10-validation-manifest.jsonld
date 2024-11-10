@@ -17,7 +17,7 @@
       ],
       "name": "Valid minimal DI",
       "input": "vcdi10/vcdi10-valid-minimal.jsonld"
-    },  
+    },
     {
       "@id": "#t0002",
       "@type": [
@@ -36,8 +36,6 @@
       "name": "Valid minimal DI VC2.0",
       "input": "vcdi10/vcdi10-valid-minimal-vc20.jsonld"
     },
-
-
     {
       "@id": "#t0010",
       "@type": [
@@ -98,7 +96,36 @@
       "input": "vcdi10/vcdi10-unknown-crypto.jsonld",
       "expectErrorCode": "UnknownCryptosuite"
     },
-  
+    {
+      "@id": "#t0014",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ProofValidationTest"
+      ],
+      "name": "Invalid Created",
+      "input": "vcdi10/vcdi10-invalid-created.jsonld",
+      "expectErrorCode": "InvalidCreated"
+    },    
+    {
+      "@id": "#t0014",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ProofValidationTest"
+      ],
+      "name": "Invalid Expires",
+      "input": "vcdi10/vcdi10-invalid-expires.jsonld",
+      "expectErrorCode": "InvalidExpires"
+    },
+{
+      "@id": "#t0014",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ProofValidationTest"
+      ],
+      "name": "Invalid Validity Period",
+      "input": "vcdi10/vcdi10-invalid-period.jsonld",
+      "expectErrorCode": "InvalidValidityPeriod"
+    },    
     {
       "@id": "#t0007",
       "@type": [
@@ -119,36 +146,6 @@
       "input": "verifier/0008-in.jsonld"
     },
     {
-      "@id": "#t0009",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "missing created property",
-      "input": "verifier/0009-in.jsonld",
-      "expectErrorCode": "MissingCreated"
-    },
-    {
-      "@id": "#t0010",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "invalid created property",
-      "input": "verifier/0010-in.jsonld",
-      "expectErrorCode": "InvalidCreated"
-    },
-    {
-      "@id": "#t0011",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "missing verificationMethod property",
-      "input": "verifier/0011-in.jsonld",
-      "expectErrorCode": "MissingVerificationMethod"
-    },
-    {
       "@id": "#t0012",
       "@type": [
         "NegativeEvaluationTest",
@@ -158,7 +155,6 @@
       "input": "verifier/0012-in.jsonld",
       "expectErrorCode": "MissingVerificationMethodId"
     },
-
     {
       "@id": "#t0019",
       "@type": [

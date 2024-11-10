@@ -11,8 +11,9 @@ public interface VerifiableProof extends Proof {
     @Override
     default void verify(VerificationKey key) throws VerificationError, DocumentError {
 
-//        Objects.requireNonNull(signature);
         Objects.requireNonNull(key);
+        
+        
 
 //        // a data before issuance - no proof attached
 //        final LinkedTree unsigned = VerifiableTree.unsigned(verifiable);

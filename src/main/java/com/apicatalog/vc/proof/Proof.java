@@ -85,8 +85,8 @@ public interface Proof {
     URI purpose();
 
     /**
-     * Validate the proof data, required presence, a match with parameters, and a
-     * serialization format.
+     * Validate the proof data. e.g required properties presence, a match with
+     * parameters, a serialization format, custom properties, etc. 
      * 
      * @param params custom, suite specific parameters to validate against
      * 
@@ -98,8 +98,7 @@ public interface Proof {
     }
 
     /**
-     * Verify the proof. Runs all check necessary to verify the proof integrity and
-     * a signature genuity.
+     * Verify the proof integrity and a signature genuity.
      * 
      * @param method
      * @throws VerificationError
