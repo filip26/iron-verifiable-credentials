@@ -102,6 +102,10 @@ public interface DataIntegrityProof extends VerifiableProof {
             throw new DocumentError(ErrorType.Unknown, VcdiVocab.CRYPTO_SUITE);
         }
 
+        if (method() != null && method().id() == null) {
+            throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
+        }
+        
         if (created() != null && expires() != null && created().isAfter(expires())) {
             throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }

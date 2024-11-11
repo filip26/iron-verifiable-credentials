@@ -126,16 +126,26 @@
       "input": "vcdi10/vcdi10-invalid-period.jsonld",
       "expectErrorCode": "InvalidValidityPeriod"
     },    
-    {
-      "@id": "#t0007",
+{
+      "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
-        "VeriferTest"
+        "ProofValidationTest"
       ],
-      "name": "invalid verificationMethod property",
-      "input": "verifier/0007-in.jsonld",
-      "expectErrorCode": "UnknownVerificationMethod"
+      "name": "Missing Method Id",
+      "input": "vcdi10/vcdi10-missing-method-id.jsonld",
+      "expectErrorCode": "MissingVerificationMethodId"
     },
+        {
+      "@id": "#t0014",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ProofValidationTest"
+      ],
+      "name": "Invalid Method Id",
+      "input": "vcdi10/vcdi10-invalid-method-id.jsonld",
+      "expectErrorCode": "InvalidVerificationMethodId"
+    },    
     {
       "@id": "#t0008",
       "@type": [
@@ -144,16 +154,6 @@
       ],
       "name": "valid VC with embedded verification method",
       "input": "verifier/0008-in.jsonld"
-    },
-    {
-      "@id": "#t0012",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "invalid verificationMethod property",
-      "input": "verifier/0012-in.jsonld",
-      "expectErrorCode": "MissingVerificationMethodId"
     },
     {
       "@id": "#t0019",

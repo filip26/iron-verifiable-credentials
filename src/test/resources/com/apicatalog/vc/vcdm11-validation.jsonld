@@ -270,6 +270,16 @@
       "name": "Missing issuance date",
       "input": "vcdm11/vcdm11-missing-issuance.jsonld",
       "expectErrorCode": "MissingIssuanceDate"
-    }
+    },
+    {
+      "@id": "#t0026",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ValidationTest"
+      ],
+      "name": "Invalid @id",
+      "input": "vcdm11/vcdm11-invalid-id.jsonld",
+      "expectErrorCode": "InvalidId"
+    }    
   ]
 }
