@@ -49,7 +49,6 @@ public final class EmbeddedProof {
                 .build();
     }
 
-    @Deprecated
     public static final JsonObject setProofs(final JsonObject document, final Collection<JsonObject> proofs) {
 
         final JsonArrayBuilder builder = Json.createArrayBuilder();

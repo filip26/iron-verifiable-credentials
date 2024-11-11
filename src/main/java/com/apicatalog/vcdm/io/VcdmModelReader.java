@@ -10,7 +10,6 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableMaterialReader;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableModelReader;
-import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.Vcdm;
@@ -20,15 +19,12 @@ import com.apicatalog.vcdm.VcdmVocab;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
-/**
- * A W3C Verifiable Credentials Data Model JSON-LD based reader.
- */
-public abstract class VcdmReader implements VerifiableModelReader, VerifiableReader {
+public abstract class VcdmModelReader implements VerifiableModelReader {
 
     protected final VcdmVersion readerVersion;
     protected final VerifiableMaterialReader materialReader;
 
-    protected VcdmReader(VcdmVersion readerVersion) {
+    protected VcdmModelReader(VcdmVersion readerVersion) {
         this.readerVersion = readerVersion;
         this.materialReader = new JsonLdMaterialReader();
     }

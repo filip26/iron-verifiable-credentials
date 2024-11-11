@@ -16,11 +16,12 @@ import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vcdm.CredentialAdapter;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmAdapter;
-import com.apicatalog.vcdm.io.VcdmReader;
+import com.apicatalog.vcdm.io.VcdmModelReader;
 
 import jakarta.json.JsonObject;
 
@@ -29,7 +30,7 @@ import jakarta.json.JsonObject;
  * <a href="https://www.w3.org/TR/vc-data-model-1.1/">Verifiable Credentials
  * Data Model v1.1</a>
  */
-public class Vcdm11Reader extends VcdmReader implements CredentialAdapter {
+public class Vcdm11Reader extends VcdmModelReader implements CredentialAdapter, VerifiableReader {
 
     protected final VerifiableAdapter adapter;
     protected final ProofAdapter proofAdapter;
