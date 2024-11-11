@@ -85,8 +85,8 @@ public interface Proof {
     URI purpose();
 
     /**
-     * Validate the proof data. e.g required properties presence, a match with
-     * parameters, a serialization format, custom properties, etc. 
+     * Validate the proof data. e.g required properties, values range, a match with
+     * parameters, etc.
      * 
      * @param params custom, suite specific parameters to validate against
      * 

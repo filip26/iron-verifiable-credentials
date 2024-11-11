@@ -66,10 +66,10 @@ public class VcTestRunnerJunit {
 
     final static TestSignatureSuite TEST_DI_SUITE = (new TestSignatureSuite());
 
-    final static Verifier VERIFIER = Verifier.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER).methodResolvers(RESOLVERS);
+    final static Verifier VERIFIER = Verifier.with(TEST_DI_SUITE).loader(LOADER).methodResolvers(RESOLVERS);
 
     final static Reader READER = Reader.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER);
-    
+
     final static VerifiableWriter WRITER = new VcdmWriter();
 
     public VcTestRunnerJunit(VcTestCase testCase) {
@@ -155,7 +155,7 @@ public class VcTestRunnerJunit {
                 assertNotNull(verifiable);
 
                 verifiable.validate();
-                
+
                 assertNotNull(verifiable.proofs());
                 assertTrue(verifiable.proofs().isEmpty());
 

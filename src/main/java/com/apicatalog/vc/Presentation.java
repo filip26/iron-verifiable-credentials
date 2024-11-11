@@ -36,7 +36,7 @@ public interface Presentation extends Verifiable {
             }
         }
     }
-
+    
     @Override
     default boolean isPresentation() {
         return true;

@@ -26,7 +26,7 @@ import com.apicatalog.vcdm.v20.Vcdm20Reader;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
-public class Reader extends DocumentProcessor<Reader> {
+public class Reader extends DocumentProcessor<Reader> implements VerifiableReader {
 
     protected final VerifiableReader reader;
 
@@ -91,7 +91,7 @@ public class Reader extends DocumentProcessor<Reader> {
      */
     public Verifiable read(final JsonObject document) throws DocumentError {
         Objects.requireNonNull(document);
-        return read(document, getLoader());
+        return read(document, getLoader(), base);
     }
 
     /**
@@ -121,7 +121,7 @@ public class Reader extends DocumentProcessor<Reader> {
                 throw new DocumentError(ErrorType.Invalid);
             }
 
-            return read(json.asJsonObject(), loader);
+            return read(json.asJsonObject(), loader, base);
 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
@@ -129,8 +129,8 @@ public class Reader extends DocumentProcessor<Reader> {
         }
     }
 
-    protected Verifiable read(final JsonObject document, DocumentLoader loader) throws DocumentError {
-
+    @Override
+    public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
         final Verifiable verifiable = reader.read(document, loader, base);
 
         if (verifiable == null) {

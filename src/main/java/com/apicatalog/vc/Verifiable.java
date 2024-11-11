@@ -43,5 +43,12 @@ public interface Verifiable {
         throw new ClassCastException();
     }
 
+    /**
+     * Validate the verifiable model. e.g. required properties, values range, etc.
+     * 
+     * Does not validate nor verify proofs.
+     * 
+     * @throws DocumentError
+     */
     void validate() throws DocumentError;
 }

@@ -57,6 +57,32 @@
       "expectErrorCode": "InvalidProofPurpose"
     },
     {
+      "@id": "#t0028",
+      "@type": [
+        "PositiveEvaluationTest",
+        "ProofValidationTest"
+      ],
+      "name": "Assert proofPurpose match",
+      "input": "vcdi10/vcdi10-valid-full.jsonld",
+      "options": {
+        "purpose": "https://w3id.org/security#assertionMethod"
+      }
+    },
+    {
+      "@id": "#t0029",
+      "@type": [
+        "NegativeEvaluationTest",
+        "ProofValidationTest"
+      ],
+      "name": "Assert proofPurpose fail",
+      "input": "vcdi10/vcdi10-valid-full.jsonld",
+      "options": {
+        "purpose": "https://w3id.org/security#invalidMethod"
+      },
+      "expectErrorCode": "InvalidProofPurpose"
+    },
+    
+    {
       "@id": "#t0015",
       "@type": [
         "NegativeEvaluationTest",
@@ -105,7 +131,7 @@
       "name": "Invalid Created",
       "input": "vcdi10/vcdi10-invalid-created.jsonld",
       "expectErrorCode": "InvalidCreated"
-    },    
+    },
     {
       "@id": "#t0014",
       "@type": [
@@ -116,7 +142,7 @@
       "input": "vcdi10/vcdi10-invalid-expires.jsonld",
       "expectErrorCode": "InvalidExpires"
     },
-{
+    {
       "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
@@ -125,8 +151,8 @@
       "name": "Invalid Validity Period",
       "input": "vcdi10/vcdi10-invalid-period.jsonld",
       "expectErrorCode": "InvalidValidityPeriod"
-    },    
-{
+    },
+    {
       "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
@@ -136,7 +162,7 @@
       "input": "vcdi10/vcdi10-missing-method-id.jsonld",
       "expectErrorCode": "MissingVerificationMethodId"
     },
-        {
+    {
       "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
@@ -144,56 +170,28 @@
       ],
       "name": "Invalid Method Id",
       "input": "vcdi10/vcdi10-invalid-method-id.jsonld",
-      "expectErrorCode": "InvalidVerificationMethodId"
-    },    
-    {
-      "@id": "#t0008",
-      "@type": [
-        "PositiveEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "valid VC with embedded verification method",
-      "input": "verifier/0008-in.jsonld"
-    },
-    {
-      "@id": "#t0019",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "invalid document using embededed credentials",
-      "input": "verifier/0019-in.jsonld",
-      "expectErrorCode": "UnknownModel"
-    },
-    {
-      "@id": "#t0022",
-      "@type": [
-        "PositiveEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "DID key as a verification method",
-      "input": "verifier/0022-in.jsonld"
+      "expectErrorCode": "InvalidId"
     },
     {
       "@id": "#t0023",
       "@type": [
         "PositiveEvaluationTest",
-        "VeriferTest"
+        "ProofValidationTest"
       ],
-      "name": "valid proof domain property",
-      "input": "verifier/0023-in.jsonld",
+      "name": "Assert domain match",
+      "input": "vcdi10/vcdi10-valid-full.jsonld",
       "options": {
-        "domain": "4jt78h47fh47"
+        "domain": "b31d37d4-dd59-47d3-9dd8-c973da43b63a"
       }
     },
     {
       "@id": "#t0024",
       "@type": [
         "NegativeEvaluationTest",
-        "VeriferTest"
+        "ProofValidationTest"
       ],
-      "name": "invalid proof domain property",
-      "input": "verifier/0023-in.jsonld",
+      "name": "Assert domain fail",
+      "input": "vcdi10/vcdi10-valid-full.jsonld",
       "options": {
         "domain": "4jt"
       },
@@ -203,61 +201,26 @@
       "@id": "#t0025",
       "@type": [
         "PositiveEvaluationTest",
-        "VeriferTest"
+        "ProofValidationTest"
       ],
-      "name": "valid proof challenge property",
-      "input": "verifier/0025-in.jsonld",
+      "name": "Assert challenge match",
+      "input": "vcdi10/vcdi10-valid-full.jsonld",
       "options": {
-        "challenge": "498798779"
+        "challenge": "1235abcd6789"
       }
     },
     {
       "@id": "#t0026",
       "@type": [
         "NegativeEvaluationTest",
-        "VeriferTest"
+        "ProofValidationTest"
       ],
-      "name": "invalid proof challenge property",
-      "input": "verifier/0025-in.jsonld",
+      "name": "Assert challenge fail",
+      "input": "vcdi10/vcdi10-valid-full.jsonld",
       "options": {
         "challenge": "3546568678678"
       },
       "expectErrorCode": "InvalidChallenge"
-    },
-    {
-      "@id": "#t0027",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "Expired proof",
-      "input": "verifier/0027-in.jsonld",
-      "expectErrorCode": "Expired"
-    },
-    {
-      "@id": "#t0028",
-      "@type": [
-        "PositiveEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "assert valid proof purpose",
-      "input": "verifier/0025-in.jsonld",
-      "options": {
-        "purpose": "https://w3id.org/security#assertionMethod"
-      }
-    },
-    {
-      "@id": "#t0029",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "assert invalid proof purpose",
-      "input": "verifier/0025-in.jsonld",
-      "options": {
-        "purpose": "https://w3id.org/security#invalidMethod"
-      },
-      "expectErrorCode": "InvalidProofPurpose"
     }
   ]
 }
