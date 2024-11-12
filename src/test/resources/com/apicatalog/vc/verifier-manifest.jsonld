@@ -10,63 +10,23 @@
   "name": "Verifier Tests",
   "sequence": [
     {
-      "@id": "#t0002",
+      "@id": "#t0003",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
       ],
       "name": "Empty document",
-      "input": "verifier/0301-in.jsonld",
-      "expectErrorCode": "InvalidContext"
-    },
-    {
-      "@id": "#t0002",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "Missing context",
-      "input": "verifier/0301-in.jsonld",
-      "expectErrorCode": "InvalidContext"
-    },
+      "input": "verifier/empty-document.txt",
+      "expectErrorCode": "InvalidDocument"
+    },    
     {
       "@id": "#t0003",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
       ],
-      "name": "NULL @context",
-      "input": "verifier/0301-in.jsonld",
-      "expectErrorCode": "InvalidContext"
-    },
-    {
-      "@id": "#t0003",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "Unknown model",
-      "input": "verifier/0301-in.jsonld",
-      "expectErrorCode": "InvalidContext"
-    },
-    {
-      "@id": "#t0003",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "Missing @type",
-      "input": "verifier/0301-in.jsonld",
-      "expectErrorCode": "InvalidContext"
-    },
-    {
-      "@id": "#t0302",
-      "@type": [
-        "NegativeEvaluationTest",
-        "VeriferTest"
-      ],
-      "name": "NULL @type",
-      "input": "verifier/0302-in.jsonld",
+      "name": "Empty array",
+      "input": "verifier/empty-array.json",
       "expectErrorCode": "InvalidDocument"
     },
     {
@@ -75,9 +35,29 @@
         "NegativeEvaluationTest",
         "VeriferTest"
       ],
-      "name": "Unknown @type",
-      "input": "verifier/0301-in.jsonld",
-      "expectErrorCode": "InvalidContext"
+      "name": "Empty object",
+      "input": "verifier/empty-object.json",
+      "expectErrorCode": "UnknownModel"
+    },    
+    {
+      "@id": "#t0003",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "null @context",
+      "input": "verifier/null-context.jsonld",
+      "expectErrorCode": "UnknownModel"
+    },  
+    {
+      "@id": "#t0003",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Unknown @context",
+      "input": "verifier/unknown-model.jsonld",
+      "expectErrorCode": "UnknownModel"
     },
     {
       "@id": "#t0001",
@@ -85,10 +65,41 @@
         "NegativeEvaluationTest",
         "VeriferTest"
       ],
-      "name": "Missing proof",
-      "input": "verifier/0003-in.jsonld",
+      "name": "VC missing proof VCDM1.1",
+      "input": "vcdm11/vcdm11-valid-unsigned-full-vc.jsonld",
       "expectErrorCode": "MissingProof"
     },
+    {
+      "@id": "#t0001",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "VC missing proof VCDM2.0",
+      "input": "vcdm20/vcdm20-valid-unsigned-full-vc.jsonld",
+      "expectErrorCode": "MissingProof"
+    },
+            {
+      "@id": "#t0001",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "VP missing proof VCDM1.1",
+      "input": "vcdm11/vcdm11-valid-minimal-vp-vc.jsonld",
+      "expectErrorCode": "MissingProof"
+    },
+    {
+      "@id": "#t0001",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "VP missing proof VCDM2.0",
+      "input": "vcdm20/vcdm20-valid-minimal-vp-vc.jsonld",
+      "expectErrorCode": "MissingProof"
+    },    
+        
     {
       "@id": "#t0027",
       "@type": [
@@ -96,7 +107,7 @@
         "VeriferTest"
       ],
       "name": "Expired VCDM1.1",
-      "input": "verifier/0027-in.jsonld",
+      "input": "vcdm11/vcdm11-past-expiration.jsonld",
       "expectErrorCode": "Expired"
     },
     {
@@ -106,7 +117,7 @@
         "VeriferTest"
       ],
       "name": "Not Valid Yet VCDM1.1",
-      "input": "verifier/0027-in.jsonld",
+      "input": "verifier/vcdm11-future-issuance.jsonld",
       "expectErrorCode": "NotValidYet"
     }    
   ]

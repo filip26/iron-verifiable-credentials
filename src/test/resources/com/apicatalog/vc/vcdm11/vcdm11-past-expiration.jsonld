@@ -10,7 +10,7 @@
   "id": "did:key:z6MksFxi8wnHkNq4zgEskSZF45SuWQ4HndWSAVYRRGe9qDks",
   "issuer": "did:key:z6MksFxi8wnHkNq4zgEskSZF45SuWQ4HndWSAVYRRGe9qDks",
   "issuanceDate": "2010-01-01T19:23:24Z",
-  "expirationDate": "2035-01-01T19:23:24Z",  
+  "expirationDate": "2015-01-01T19:23:24Z",
   "credentialSubject": {
     "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
     "type": "AchievementSubject",

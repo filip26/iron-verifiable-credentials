@@ -21,9 +21,11 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
 import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
@@ -31,6 +33,9 @@ import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
+import com.apicatalog.vcdm.VcdmVocab;
+import com.apicatalog.vcdm.v11.Vcdm11Reader;
+import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -53,10 +58,21 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
 
-//        this.readerProvider = VcdmResolver.create(proofAdapter);
-        this.reader = null; // TODO
-
+        this.reader = defaultReaders(proofAdapter);
+        
         this.statusVerifier = null;
+    }
+
+    protected static VerifiableReader defaultReaders(final ProofAdapter proofAdapter) {
+
+        Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
+
+        return new ContextAwareReaderProvider()
+                .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
+                .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
+                        // add VCDM 1.1 credential support
+                        .v11(vcdm11))
+                .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter));
     }
 
     /**
@@ -211,7 +227,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         final Verifiable verifiable = reader.read(document, loader, base);
 
         if (verifiable == null) {
-            throw new DocumentError(ErrorType.Invalid, "DocumentModel");
+            throw new DocumentError(ErrorType.Unknown, "Model");
         }
 
         return verify(verifiable, parameters);
