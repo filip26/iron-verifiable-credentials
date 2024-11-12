@@ -107,7 +107,7 @@
         "VeriferTest"
       ],
       "name": "Expired VCDM1.1",
-      "input": "vcdm11/vcdm11-past-expiration.jsonld",
+      "input": "verifier/vcdm11-past-expiration.jsonld",
       "expectErrorCode": "Expired"
     },
     {

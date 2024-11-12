@@ -5,8 +5,8 @@
   ],
   "type": "VerifiableCredential",
   "issuer": "https://example.com/issuer/1",
-  "issuanceDate": "2030-01-01T19:23:24Z",
-  "expirationDate": "2035-01-01T19:23:24Z",
+  "issuanceDate": "2010-01-01T19:23:24Z",
+  "expirationDate": "2015-01-01T19:23:24Z",
   "credentialSubject": "https://example.com/subject/1",
   "proof": {
     "type": "Ed25519Signature2020",
