@@ -1,5 +1,7 @@
 package com.apicatalog.vcdi;
 
+import java.net.URI;
+
 import com.apicatalog.vc.processor.Parameter;
 
 public class DataIntegrityParam {
@@ -16,7 +18,7 @@ public class DataIntegrityParam {
         return Parameter.of(VcdiVocab.DOMAIN.name(), domain);
     }
 
-    public static final Parameter<String> purpose(String purpose) {
+    public static final Parameter<URI> purpose(URI purpose) {
         return Parameter.of(VcdiVocab.PURPOSE.name(), purpose);
     }
 

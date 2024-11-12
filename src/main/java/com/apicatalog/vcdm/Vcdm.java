@@ -10,6 +10,7 @@ import jakarta.json.JsonObject;
 public record Vcdm(
         VcdmVersion version,
         VerifiableMaterial data,
+//        Collection<VerifiableMaterial> proofs
         Collection<JsonObject> compactedProofs,
         Collection<JsonObject> expandedProofs
         ) implements VerifiableModel {

@@ -11,4 +11,6 @@ public interface VerifiableModel {
     Collection<JsonObject> compactedProofs();
     
     Collection<JsonObject> expandedProofs();
+    
+    //TODO ? Collection<VerifiableMaterial> proofs();
 }

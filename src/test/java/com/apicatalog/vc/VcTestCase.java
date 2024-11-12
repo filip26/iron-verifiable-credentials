@@ -1,7 +1,5 @@
 package com.apicatalog.vc;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
@@ -10,9 +8,6 @@ import java.util.stream.Collectors;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.linkedtree.adapter.NodeAdapterError;
-import com.apicatalog.linkedtree.builder.TreeBuilderError;
-import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -44,7 +39,7 @@ public class VcTestCase {
 
     public String nonce;
 
-    public String purpose;
+    public URI purpose;
 
     public URI context;
 
@@ -144,8 +139,8 @@ public class VcTestCase {
             }
 
             if (options.containsKey(vocab("purpose"))) {
-                testCase.purpose = options.getJsonArray(vocab("purpose")).getJsonObject(0)
-                        .getString(Keywords.VALUE);
+                testCase.purpose = URI.create(options.getJsonArray(vocab("purpose")).getJsonObject(0)
+                        .getString(Keywords.VALUE));
             }
         }
 

@@ -54,7 +54,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
 
 //        this.readerProvider = VcdmResolver.create(proofAdapter);
-        this.reader = null; //TODO
+        this.reader = null; // TODO
 
         this.statusVerifier = null;
     }
@@ -298,7 +298,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         }
     }
 
-    protected static final Map<String, Object> toMap(Parameter<?>... parameters) {
+    static final Map<String, Object> toMap(Parameter<?>... parameters) {
         return parameters != null && parameters.length > 0
                 ? Stream.of(parameters)
                         .filter(p -> p.name() != null && p.value() != null)

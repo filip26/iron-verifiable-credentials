@@ -105,7 +105,7 @@ public interface DataIntegrityProof extends VerifiableProof {
         if (method() != null && method().id() == null) {
             throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
         }
-        
+
         if (created() != null && expires() != null && created().isAfter(expires())) {
             throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
         }

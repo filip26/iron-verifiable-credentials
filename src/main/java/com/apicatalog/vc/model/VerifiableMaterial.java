@@ -15,4 +15,5 @@ public interface VerifiableMaterial {
     JsonObject compacted();
 
     JsonObject expanded();
+    
 }

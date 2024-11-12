@@ -15,15 +15,16 @@ import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vcdm.CredentialAdapter;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
-import com.apicatalog.vcdm.io.VcdmReader;
+import com.apicatalog.vcdm.io.VcdmModelReader;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 
 import jakarta.json.JsonObject;
 
-public class Vcdm20Reader extends VcdmReader implements CredentialAdapter {
+public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, VerifiableReader {
 
     protected VerifiableAdapter v20;
     protected Vcdm11Reader v11;
@@ -114,20 +115,20 @@ public class Vcdm20Reader extends VcdmReader implements CredentialAdapter {
 
     @Override
     protected VcdmVersion modelVersion(Collection<String> context) throws DocumentError {
-        
+
         if (context == null || context.isEmpty()) {
             return null;
         }
-        
+
         final String firstContext = context.iterator().next();
-    
+
         if (VcdmVocab.CONTEXT_MODEL_V2.equals(firstContext)) {
             return VcdmVersion.V20;
         }
         if (VcdmVocab.CONTEXT_MODEL_V1.equals(firstContext)) {
             return VcdmVersion.V11;
         }
-        
+
         return null;
     }
 }

@@ -61,12 +61,7 @@ public class ProofAdapterProvider implements ProofAdapter {
 
         // process as a generic, i.e. an unknown, proof
         try {
-            final Proof generic = reader.read(Proof.class, Json.createArrayBuilder().add(proofMaterial.expanded()).build());
-            
-//            if (generic instanceof PropertyValueConsumer consumer) {
-//                consumer.acceptFragmentPropertyValue("cryptoSuite", new Generic);
-//            }
-            return generic;
+            return reader.read(Proof.class, Json.createArrayBuilder().add(proofMaterial.expanded()).build());
 
         } catch (FragmentPropertyError e) {
             throw DocumentError.of(e);

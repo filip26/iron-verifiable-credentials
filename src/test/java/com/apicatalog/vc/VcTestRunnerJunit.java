@@ -16,7 +16,10 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.SigningError;
@@ -36,6 +39,7 @@ import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.DeprecatedVerificationMethodResolver;
 import com.apicatalog.vc.method.resolver.DidKeyMethodResolver;
 import com.apicatalog.vc.method.resolver.HttpMethodResolver;
+import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.reader.Reader;
@@ -168,7 +172,11 @@ public class VcTestRunnerJunit {
                 assertFalse(verifiable.proofs().isEmpty());
 
                 for (Proof proof : verifiable.proofs()) {
-                    proof.validate(null);
+                    proof.validate(toMap(
+                            challenge(testCase.challenge),
+                            purpose(testCase.purpose),
+                            domain(testCase.domain),
+                            nonce(testCase.nonce)));
                 }
 
             } else if (testCase.type.contains(VcTestCase.vocab("ReaderTest"))) {
@@ -300,4 +308,15 @@ public class VcTestRunnerJunit {
         resolvers.add(HttpMethodResolver.getInstance(loader));
         return resolvers;
     }
+
+    static final Map<String, Object> toMap(Parameter<?>... parameters) {
+        return parameters != null && parameters.length > 0
+                ? Stream.of(parameters)
+                        .filter(p -> p.name() != null && p.value() != null)
+                        .collect(Collectors.toMap(
+                                Parameter::name,
+                                Parameter::value))
+                : Collections.emptyMap();
+    }
+
 }
