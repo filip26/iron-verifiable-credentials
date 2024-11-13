@@ -262,7 +262,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
                     throw new DocumentError(ErrorType.Missing, VcdiVocab.PROOF_VALUE);
                 }
 
-                final VerificationMethod verificationMethod = getMethod(proof)
+                final VerificationMethod verificationMethod = resolveMethod(proof)
                         .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdiVocab.VERIFICATION_METHOD));
 
                 if (verificationMethod instanceof VerificationKey verificationKey) {

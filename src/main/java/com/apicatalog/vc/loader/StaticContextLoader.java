@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.apicatalog.controller.ControllerDocumentLoader;
+import com.apicatalog.controller.loader.ControllerContextLoader;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
@@ -39,8 +39,8 @@ public class StaticContextLoader implements DocumentLoader {
 
     public static Map<String, Document> defaultValues() {
 
-        Map<String, Document> staticCache = new LinkedHashMap<>(ControllerDocumentLoader.defaultValues());
-        
+        Map<String, Document> staticCache = new LinkedHashMap<>(ControllerContextLoader.defaultValues());
+
         staticCache.put("https://www.w3.org/2018/credentials/examples/v1", get("2018-credentials-examples-v1.jsonld"));
         staticCache.put("https://www.w3.org/2018/credentials/v1", get("2018-credentials-v1.jsonld"));
         staticCache.put("https://www.w3.org/ns/credentials/examples/v2", get("2023-credentials-examples-v2.jsonld"));
@@ -49,6 +49,7 @@ public class StaticContextLoader implements DocumentLoader {
         staticCache.put("https://w3id.org/security/data-integrity/v1", get("data-integrity-v1.jsonld"));
         staticCache.put("https://w3id.org/security/data-integrity/v2", get("data-integrity-v2.jsonld"));
         staticCache.put("https://w3id.org/security/suites/ed25519-2020/v1", get("ed25519-2020-v1.jsonld"));
+
         return Collections.unmodifiableMap(staticCache);
     }
 

@@ -4,7 +4,7 @@ import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.proof.Proof;
 
-public interface MethodResolver {
+public interface VerificationKeyProvider {
 
     /**
      * Get {@link VerificationKey} for the given {@link Proof}. 
@@ -15,6 +15,6 @@ public interface MethodResolver {
      * 
      * @throws DocumentError
      */
-    VerificationKey resolve(Proof proof) throws DocumentError;
+    VerificationKey verificationKey(Proof proof) throws DocumentError;
 
 }

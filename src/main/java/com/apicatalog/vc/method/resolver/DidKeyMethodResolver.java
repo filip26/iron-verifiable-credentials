@@ -3,6 +3,7 @@ package com.apicatalog.vc.method.resolver;
 import java.net.URI;
 
 import com.apicatalog.controller.key.VerificationKey;
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.did.DidUrl;
 import com.apicatalog.did.document.DidDocument;
 import com.apicatalog.did.key.DidKey;
@@ -12,7 +13,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.proof.Proof;
 
-public class DidKeyMethodResolver implements DeprecatedVerificationMethodResolver {
+public class DidKeyMethodResolver implements VerificationKeyProvider {
 
     final DidKeyResolver resolver;
 
@@ -25,12 +26,24 @@ public class DidKeyMethodResolver implements DeprecatedVerificationMethodResolve
     }
 
     @Override
-    public VerificationKey resolve(URI uri, Proof proof) throws DocumentError {
-        try {
+    public VerificationKey verificationKey(Proof proof) throws DocumentError {
 
+        final VerificationMethod method = proof.method();
+
+        if (method == null) {
+            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
+        }
+
+        URI uri = method.id();
+
+        if (uri == null) {
+            throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
+        }
+
+        try {
             final DidDocument didDocument = resolver.resolve(DidUrl.of(uri));
 
-            //FIXME must match purpose
+            // FIXME must match purpose
             return didDocument
                     .verification().stream()
                     .filter(VerificationKey.class::isInstance)
@@ -42,8 +55,8 @@ public class DidKeyMethodResolver implements DeprecatedVerificationMethodResolve
         }
     }
 
-    @Override
-    public boolean isAccepted(URI uri) {
-        return DidKey.isDidKey(uri);
-    }
+//    @Override
+//    public boolean isAccepted(URI uri) {
+//        return DidKey.isDidKey(uri);
+//    }
 }
