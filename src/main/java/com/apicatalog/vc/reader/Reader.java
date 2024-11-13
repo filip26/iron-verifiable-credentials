@@ -14,7 +14,9 @@ import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
+import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.VerifiableReaderProvider;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.DocumentProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -26,19 +28,19 @@ import com.apicatalog.vcdm.v20.Vcdm20Reader;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
-public class Reader extends DocumentProcessor<Reader> implements VerifiableReader {
+public class Reader extends DocumentProcessor<Reader> {
 
-    protected final VerifiableReader reader;
+    protected final VerifiableReaderProvider readerProvider;
 
     protected Reader(final SignatureSuite[] suites) {
         super(suites);
 
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
 
-        this.reader = defaultReaders(proofAdapter);
+        this.readerProvider = defaultReaders(proofAdapter);
     }
 
-    protected static VerifiableReader defaultReaders(final ProofAdapter proofAdapter) {
+    protected static VerifiableReaderProvider defaultReaders(final ProofAdapter proofAdapter) {
 
         Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
 
@@ -91,7 +93,7 @@ public class Reader extends DocumentProcessor<Reader> implements VerifiableReade
      */
     public Verifiable read(final JsonObject document) throws DocumentError {
         Objects.requireNonNull(document);
-        return read(document, getLoader(), base);
+        return materialize(document, getLoader(), base);
     }
 
     /**
@@ -121,7 +123,7 @@ public class Reader extends DocumentProcessor<Reader> implements VerifiableReade
                 throw new DocumentError(ErrorType.Invalid);
             }
 
-            return read(json.asJsonObject(), loader, base);
+            return materialize(json.asJsonObject(), loader, base);
 
         } catch (JsonLdError e) {
             DocumentError.failWithJsonLd(e);
@@ -129,14 +131,19 @@ public class Reader extends DocumentProcessor<Reader> implements VerifiableReade
         }
     }
 
-    @Override
-    public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
-        final Verifiable verifiable = reader.read(document, loader, base);
+    public Verifiable materialize(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
-        if (verifiable == null) {
-            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+        final VerifiableReader reader = readerProvider.reader(document);
+
+        if (reader != null) {
+
+            final VerifiableModel model = reader.read(document, loader, base);
+
+            if (model != null) {
+                return reader.materialize(model, loader, base);
+            }
         }
 
-        return verifiable;
+        throw new DocumentError(ErrorType.Unknown, "Model");
     }
 }

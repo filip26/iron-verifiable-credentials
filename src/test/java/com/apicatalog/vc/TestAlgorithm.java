@@ -9,36 +9,23 @@ import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.cryptosuite.algorithm.Signer;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Tag;
-import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.multicodec.key.MulticodecKey;
+import com.apicatalog.multicodec.key.GenericMulticodecKey;
 import com.apicatalog.multikey.GenericMultikey;
+import com.apicatalog.multikey.Multikey;
 
+/**
+ * Simple XOR to test the rest.
+ */
 class TestAlgorithm implements Signer {
 
-    protected static Multicodec PUBLIC_KEY_CODEC = Multicodec.of(
-            "test-pub",
-            Tag.Key,
-            12345l);
-
-    protected static Multicodec PRIVATE_KEY_CODEC = Multicodec.of(
-            "test-priv",
-            Tag.Key,
-            12346l);
-
-    protected static MulticodecDecoder DECODER = MulticodecDecoder.getInstance(
-            PUBLIC_KEY_CODEC,
-            PRIVATE_KEY_CODEC);
-
-    
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
-        final byte[] result = new byte[Math.min(publicKey.length, data.length)];
+        final byte[] result = new byte[data.length];
 
-        for (int i = 0; i < Math.min(publicKey.length, data.length); i++) {
-            result[i] = (byte) (data[i] ^ publicKey[i]);
+        for (int i = 0; i < data.length; i++) {
+            result[i] = (byte) (data[i] ^ publicKey[i % publicKey.length]);
         }
 
         if (!Arrays.equals(result, signature)) {
@@ -49,15 +36,11 @@ class TestAlgorithm implements Signer {
     @Override
     public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
 
-        final byte[] result = new byte[Math.min(privateKey.length, data.length)];
+        final byte[] result = new byte[data.length];
 
-        for (int i = 0; i < Math.min(privateKey.length, data.length); i++) {
-            result[i] = (byte) (data[i] ^ privateKey[i]);
+        for (int i = 0; i < data.length; i++) {
+            result[i] = (byte) (data[i] ^ privateKey[i % privateKey.length]);
         }
-
-//TODO        for (int i = 0; i < Math.min(privateKey.length, data.length); i++) {
-//            result[i] = (byte) (data[i + 32] ^ privateKey[i]);
-//        }
 
         return result;
     }
@@ -69,52 +52,23 @@ class TestAlgorithm implements Signer {
 
         new Random().nextBytes(raw);
 
-        var publicKey = new MulticodecKey() {
+        var publicKey = new GenericMulticodecKey(
+                TestMulticodecKeyAdapter.PUBLIC_KEY_CODEC,
+                Multibase.BASE_58_BTC,
+                raw);
 
-            @Override
-            public String type() {
-                return PUBLIC_KEY_CODEC.name();
-            }
-
-            @Override
-            public byte[] rawBytes() {
-                return raw;
-            }
-
-            @Override
-            public Multicodec codec() {
-                return PUBLIC_KEY_CODEC;
-            }
-
-            @Override
-            public Multibase base() {
-                return Multibase.BASE_58_BTC;
-            }
-        };
-
-        var privateKey = new MulticodecKey() {
-
-            @Override
-            public String type() {
-                return PRIVATE_KEY_CODEC.name();
-            }
-
-            @Override
-            public byte[] rawBytes() {
-                return raw;
-            }
-
-            @Override
-            public Multicodec codec() {
-                return PRIVATE_KEY_CODEC;
-            }
-            
-            @Override
-            public Multibase base() {
-                return Multibase.BASE_58_BTC;
-            }            
-        };
+        var privateKey = new GenericMulticodecKey(
+                TestMulticodecKeyAdapter.PRIVATE_KEY_CODEC,
+                Multibase.BASE_58_BTC,
+                raw);
 
         return GenericMultikey.of(null, null, publicKey, privateKey);
+    }
+
+    public static void main(String[] args) throws KeyGenError {
+        System.out.println(
+                new JsonLdWriter()
+                        .scan(Multikey.class)
+                        .compacted((new TestAlgorithm()).keygen()));
     }
 }

@@ -2,6 +2,7 @@ package com.apicatalog.vcdm.v20;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Objects;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -13,9 +14,9 @@ import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
@@ -63,7 +64,15 @@ public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, 
     }
 
     @Override
-    public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
+    public Verifiable materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+
+        Objects.requireNonNull(model);
+
+        return v20.materialize(model, loader, base);
+    }
+
+    @Override
+    public VerifiableModel read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
         VerifiableMaterial material = materialReader.read(document, loader, base);
 
@@ -71,10 +80,10 @@ public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, 
 
             VerifiableModel model = read(material);
             if (model != null) {
-                return v20.materialize(model, loader, base);
+                return model;
             }
         }
-        throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+        throw new DocumentError(ErrorType.Unknown, "Model");
     }
 
     public Vcdm20Reader v11(Vcdm11Reader v11) {
@@ -88,7 +97,7 @@ public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, 
         VcdmVersion version = modelVersion(data.context());
 
         if (version == null) {
-            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+            throw new DocumentError(ErrorType.Unknown, "Model");
         }
 
         if (v20 != null && VcdmVersion.V20 == version) {
@@ -102,7 +111,7 @@ public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, 
                     return credential;
                 }
             }
-            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+            throw new DocumentError(ErrorType.Unknown, "Model");
 
         }
 

@@ -24,24 +24,23 @@ import java.util.stream.Stream;
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
-import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.json.JsonLdComparison;
-import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
+import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.MethodAdapter;
-import com.apicatalog.vc.method.resolver.DidKeyMethodResolver;
-import com.apicatalog.vc.method.resolver.HttpMethodResolver;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
 import com.apicatalog.vc.writer.VerifiableWriter;
@@ -50,7 +49,6 @@ import com.apicatalog.vcdi.DataIntegritySuite;
 import com.apicatalog.vcdm.io.VcdmWriter;
 
 import jakarta.json.Json;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
@@ -106,16 +104,22 @@ public class VcTestRunnerJunit {
 
                 if (keyPairLocation == null) {
                     // set dummy key pair
-                    keyPairLocation = URI.create(VcTestCase.base("issuer/0001-keys.json"));
+                    keyPairLocation = URI.create(VcTestCase.base("method/multikey-pair.json"));
                 }
-
+                
                 final Issuer issuer = TEST_DI_SUITE.createIssuer(getKeys(keyPairLocation, LOADER, null))
                         .loader(LOADER);
+
+                URI purpose = testCase.purpose;
+                
+                if (purpose == null) {
+                    purpose = URI.create("https://w3id.org/security#assertionMethod");
+                }
 
                 // proof draft
                 final DataIntegrityProofDraft draft = TEST_DI_SUITE.createDraft(
                         testCase.verificationMethod,
-                        URI.create("https://w3id.org/security#assertionMethod"));
+                        purpose);
 
                 draft.created(testCase.created);
                 draft.domain(testCase.domain);
@@ -123,18 +127,6 @@ public class VcTestRunnerJunit {
                 draft.nonce(testCase.nonce);
 
                 final JsonObject signed = issuer.sign(testCase.input, draft);
-
-//                JsonObject signed = null;
-//
-//                if (testCase.context != null) {
-//                    signed = issued.compacted(testCase.context);
-//
-//                } else if (testCase.compacted) {
-//                    signed = issued.compacted();
-//
-//                } else {
-//                    signed = issued.expanded();
-//                }
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 
@@ -286,25 +278,21 @@ public class VcTestRunnerJunit {
     }
 
     static final KeyPair getKeys(final URI keyPairLocation, final DocumentLoader loader, MethodAdapter methodAdapter)
-            throws DocumentError, JsonLdError {
+            throws DocumentError, JsonLdError, TreeBuilderError, NodeAdapterError {
 
-        final JsonArray keys = JsonLd.expand(keyPairLocation).loader(new StaticContextLoader(loader)).get();
+        final DocumentLoader docLoader = new StaticContextLoader(loader);
 
-        for (final JsonValue key : keys) {
+        final JsonObject keys = docLoader.loadDocument(keyPairLocation, new DocumentLoaderOptions()).getJsonContent().map(JsonStructure::asJsonObject).orElseThrow();
 
-            if (JsonUtils.isNotObject(key)) {
-                continue;
-            }
+        JsonLdReader reader = JsonLdReader.of(TreeReaderMapping.createBuilder()
+                .scan(TestMultikey.class).build(), docLoader);
 
-//            return (KeyPair) methodAdapter.read(JsonLdObject.of(key.asJsonObject()));
-
-        }
-        throw new IllegalStateException();
+        return reader.read(KeyPair.class, keys);
     }
 
     static final Collection<VerificationKeyProvider> defaultResolvers(DocumentLoader loader) {
         Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();
-        resolvers.add(new DidKeyMethodResolver(TestAlgorithm.DECODER));
+//        resolvers.add(new DidKeyMethodResolver(TestAlgorithm.DECODER));
 //        resolvers.add(HttpMethodResolver.getInstance(loader));
         return resolvers;
     }

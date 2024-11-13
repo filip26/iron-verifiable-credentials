@@ -1,0 +1,24 @@
+{
+  "@context": "https://www.w3.org/ns/controller/v1",
+  "id": "https://example.com/controller/123",
+  "verificationMethod": [
+    {
+      "id": "https://example.com/controller/123#key-1",
+      "type": "Multikey",
+      "controller": "https://example.com/controller/123",
+      "publicKeyMultibase": "zDnaerx9CtbPJ1q36T5Ln5wYt3MQYeGRG5ehnPAmxcf5mDZpv"
+    },
+    {
+      "id": "https://example.com/controller/123#key-2",
+      "type": "Multikey",
+      "controller": "https://example.com/controller/123",
+      "publicKeyMultibase": "z6Mkf5rGMoatrSj1f4CyvuHBeXJELe9RPdzo2PKGNCKVtZxP"
+    },
+    {
+      "id": "https://example.com/controller/123#key-3",
+      "type": "Multikey",
+      "controller": "https://example.com/controller/123",
+      "publicKeyMultibase": "zUC7EK3ZakmukHhuncwkbySmomv3FmrkmS36E4Ks5rsb6VQSRpoCrx6Hb8e2Nk6UvJFSdyw9NK1scFXJp21gNNYFjVWNgaqyGnkyhtagagCpQb5B7tagJu3HDbjQ8h5ypoHjwBb"
+    }
+  ]
+}

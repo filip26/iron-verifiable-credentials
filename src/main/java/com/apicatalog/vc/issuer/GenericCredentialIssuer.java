@@ -6,12 +6,12 @@ import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.vc.CredentialIssuer;
 
-public record GenericIssuer(
+public record GenericCredentialIssuer(
         URI id,
         LinkedNode ld) implements CredentialIssuer {
 
-    public static GenericIssuer of(LinkedNode fragment) throws NodeAdapterError {
-        return new GenericIssuer(
+    public static GenericCredentialIssuer of(LinkedNode fragment) throws NodeAdapterError {
+        return new GenericCredentialIssuer(
                 fragment.asFragment().uri(),
                 fragment);
     }

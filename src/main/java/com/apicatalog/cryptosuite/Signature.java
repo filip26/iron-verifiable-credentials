@@ -9,8 +9,8 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 public class Signature {
 
     protected final CryptoSuite suite;
-    protected final byte[] signature;
-    
+    protected byte[] signature;
+
     public Signature(CryptoSuite suite, byte[] signature) {
         this.suite = suite;
         this.signature = signature;
@@ -23,7 +23,7 @@ public class Signature {
      *      "https://w3c-ccg.github.io/data-integrity-spec/#proof-verification-algorithm">Verification
      *      Algorithm</a>
      *
-     * @param data        expanded unsigned VC/VP document
+     * @param data            expanded unsigned VC/VP document
      * @param unsignedProof   expanded proof with no proofValue
      * @param verificationKey
      *
@@ -73,7 +73,8 @@ public class Signature {
 
         final byte[] documentHashCode = hashCode(verifiable, proof);
 
-        return suite.sign(privateKey, documentHashCode);
+        signature = suite.sign(privateKey, documentHashCode);
+        return signature;
     }
 
     /**
@@ -101,5 +102,13 @@ public class Signature {
         System.arraycopy(documentHash, 0, result, proofHash.length, documentHash.length);
 
         return result;
+    }
+
+    public byte[] signature() {
+        return signature;
+    }
+
+    public CryptoSuite suite() {
+        return suite;
     }
 }

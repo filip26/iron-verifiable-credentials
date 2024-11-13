@@ -1,5 +1,7 @@
 package com.apicatalog.vc;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
@@ -8,7 +10,13 @@ import java.util.stream.Collectors;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.lang.Keywords;
+import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
+import com.apicatalog.linkedtree.builder.TreeBuilderError;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
@@ -45,7 +53,7 @@ public class VcTestCase {
 
     public boolean compacted;
 
-    public static VcTestCase of(JsonObject test, JsonObject manifest) {
+    public static VcTestCase of(JsonObject test, JsonObject manifest, DocumentLoader loader) {
 
         final VcTestCase testCase = new VcTestCase();
 
@@ -99,23 +107,19 @@ public class VcTestCase {
 
             if (options.containsKey(vocab("verificationMethod"))) {
 
-                final JsonObject method = options.getJsonArray(vocab("verificationMethod"))
-                        .getJsonObject(0);
+                final JsonArray method = options.getJsonArray(vocab("verificationMethod"));
 
-//                try {
-//                JsonLdTreeReader reader = JsonLdTreeReader
-//                        .createBuilder()
-////                        .with(
-////
-////                        )
-//                        .build();
-//
-//                testCase.verificationMethod = reader.read(method)
-//                        .asFragment().type().materialize(VerificationMethod.class);
+                JsonLdTreeReader reader = JsonLdTreeReader.of(TreeReaderMapping.createBuilder()
+                        .scan(TestMultikey.class)
+                        .scan(VerificationMethod.class)
+                        .build());
+                try {
+                    testCase.verificationMethod = reader.read(VerificationMethod.class, method);
 
-//                } catch (NodeAdapterError | TreeBuilderError e) {
-//                    fail(e);
-//                }
+                } catch (NodeAdapterError | TreeBuilderError e) {
+                    e.printStackTrace();
+                    fail(e);
+                }
             }
 
             if (options.containsKey(vocab("created"))) {

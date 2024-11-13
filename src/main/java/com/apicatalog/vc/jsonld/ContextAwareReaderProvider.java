@@ -1,23 +1,21 @@
 package com.apicatalog.vc.jsonld;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.apicatalog.jsonld.json.JsonUtils;
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.VerifiableReaderProvider;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
-public class ContextAwareReaderProvider implements VerifiableReader {
+public class ContextAwareReaderProvider implements VerifiableReaderProvider {
 
     private static final Logger LOGGER = Logger.getLogger(ContextAwareReaderProvider.class.getName());
 
@@ -35,23 +33,19 @@ public class ContextAwareReaderProvider implements VerifiableReader {
         readers.put(context, reader);
         return this;
     }
+    
 
     @Override
-    public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
-
+    public VerifiableReader reader(JsonObject document) throws DocumentError {
         // extract the first context as string value
         final String firstContext = firstContext(document);
 
         if (firstContext != null) {
-            VerifiableReader reader = readers.get(firstContext);
-
-            if (reader != null) {
-                return reader.read(document, loader, base);
-            }
+            return readers.get(firstContext);
         }
         return null;
     }
-
+  
     protected static String firstContext(final JsonObject object) {
 
         final JsonValue contexts = object.get(JsonLdKeyword.CONTEXT);

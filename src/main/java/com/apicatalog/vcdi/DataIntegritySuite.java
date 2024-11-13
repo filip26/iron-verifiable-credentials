@@ -84,13 +84,14 @@ public class DataIntegritySuite implements SignatureSuite {
         if (cryptoName == null) {
             return null;
         }
-        return new CryptoSuite(cryptoName, -1, null, null, null);
+        return new CryptoSuite(cryptosuiteName, -1, null, null, null);
     }
 
-    public DataIntegrityProofDraft createDraft(
-            VerificationMethod method,
+    public DataIntegrityProofDraft createDraft(VerificationMethod method,
             URI purpose) throws DocumentError {
-        return new DataIntegrityProofDraft(this, method, purpose);
+        return new DataIntegrityProofDraft(this,
+                new CryptoSuite(cryptosuiteName, -1, null, null, null),
+                method, purpose);
     }
 
     @Override

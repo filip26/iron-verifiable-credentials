@@ -26,7 +26,7 @@ public class ProofAdapterProvider implements ProofAdapter {
         this.reader = genericReader;
     }
 
-    public static ProofAdapter of(SignatureSuite[] suites) {
+    public static ProofAdapter of(SignatureSuite... suites) {
         return of(suites, new Class<?>[0]);
     }
 

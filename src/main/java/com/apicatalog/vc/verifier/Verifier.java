@@ -24,7 +24,9 @@ import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
+import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.VerifiableReaderProvider;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
@@ -51,19 +53,19 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected StatusVerifier statusVerifier;
 
-    protected final VerifiableReader reader;
+    protected final VerifiableReaderProvider readerProvider;
 
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
 
-        this.reader = defaultReaders(proofAdapter);
+        this.readerProvider = defaultReaders(proofAdapter);
 
         this.statusVerifier = null;
     }
 
-    protected static VerifiableReader defaultReaders(final ProofAdapter proofAdapter) {
+    protected static VerifiableReaderProvider defaultReaders(final ProofAdapter proofAdapter) {
 
         Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
 
@@ -207,30 +209,21 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
     protected Verifiable verify(final JsonObject document, Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
 
-//        // extract context
-//        final Collection<String> context;
-//
-//        try {
-//            context = JsonLdContext.strings(document);
-//
-//        } catch (IllegalArgumentException e) {
-//            throw new DocumentError(e, ErrorType.Invalid, "Context");
-//        }
+        final VerifiableReader reader = readerProvider.reader(document);
 
-//        final VerifiableReader reader = readerProvider.reader(document);
-//
-//        if (reader == null) {
-////            LOGGER.log(Level.INFO, "An unknown document model {0}", context);
-//            throw new DocumentError(ErrorType.Unknown, "DocumentModel");
-//        }
+        if (reader != null) {
+            final VerifiableModel model = reader.read(document, loader, base);
 
-        final Verifiable verifiable = reader.read(document, loader, base);
-
-        if (verifiable == null) {
-            throw new DocumentError(ErrorType.Unknown, "Model");
+            if (model != null) {
+                final Verifiable verifiable = reader.materialize(model, loader, base);
+                
+                if (verifiable != null) {
+                    return verify(verifiable, parameters);
+                }
+            }
         }
 
-        return verify(verifiable, parameters);
+        throw new DocumentError(ErrorType.Unknown, "Model");
     }
 
     public Verifiable verify(final Verifiable verifiable, final Map<String, Object> parameters) throws VerificationError, DocumentError {

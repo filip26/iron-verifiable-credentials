@@ -13,11 +13,12 @@ import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.JsonLdMaterialReader;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableMaterialReader;
 import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableModelReader;
+import com.apicatalog.vc.model.VerifiableModelWriter;
 import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVocab;
@@ -25,7 +26,7 @@ import com.apicatalog.vcdm.VcdmVocab;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
-public class GenericReader implements VerifiableModelReader, VerifiableReader {
+public class GenericReader implements VerifiableModelReader, VerifiableModelWriter, VerifiableReader {
 
     protected final VerifiableModelAdapter adapter;
     protected final VerifiableMaterialReader materialReader;
@@ -59,12 +60,17 @@ public class GenericReader implements VerifiableModelReader, VerifiableReader {
     }
 
     @Override
-    public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
+    public Verifiable materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+        return adapter.materialize(model, loader, base);
+    }
+
+    @Override
+    public VerifiableModel read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
         VerifiableMaterial material = materialReader.read(document, loader, base);
 
         VerifiableModel model = read(material);
 
-        return adapter.materialize(model, loader, base);
+        return model;
     }
 
     @Override
@@ -88,6 +94,21 @@ public class GenericReader implements VerifiableModelReader, VerifiableReader {
                         : Collections.emptyList(),
                 expandedProofs != null
                         ? expandedProofs
-                        : Collections.emptyList());
+                        : Collections.emptyList(),
+                this::write);
+    }
+
+    @Override
+    public VerifiableMaterial write(VerifiableModel model) throws DocumentError {
+
+        JsonObject expanded = model.expandedProofs().isEmpty()
+                ? model.data().expanded()
+                : EmbeddedProof.setProofs(model.data().expanded(), model.expandedProofs());
+        
+        JsonObject compacted = model.compactedProofs().isEmpty() 
+                ? model.data().compacted()
+                : Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), Json.createArrayBuilder(model.compactedProofs())).build();
+                
+        return new GenericMaterial(model.data().context(), compacted, expanded);
     }
 }

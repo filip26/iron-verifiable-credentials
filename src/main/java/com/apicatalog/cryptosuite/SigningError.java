@@ -5,7 +5,7 @@ public class SigningError extends CryptoSuiteError {
     private static final long serialVersionUID = 5560695193588466945L;
 
     public enum SignatureErrorCode {
-        Expired,
+        Expired, Unknown,
         //InvalidKey?
     }
 
@@ -16,7 +16,7 @@ public class SigningError extends CryptoSuiteError {
         this.code = code;
     }
 
-    public SigningError(SignatureErrorCode code, Throwable e) {
+    public SigningError(Throwable e, SignatureErrorCode code) {
         super(CryptoSuiteErrorCode.Signature, code.name(), e);
         this.code = code;
     }

@@ -89,6 +89,7 @@ public interface DataIntegrityProof extends VerifiableProof {
     @Term("cryptosuite")
     @Provided
     @Override
+    @Literal(CryptoSuiteAdapter.class)
     CryptoSuite cryptoSuite();
 
     @Override

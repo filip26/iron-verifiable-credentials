@@ -39,7 +39,7 @@ class TestSignatureSuite extends DataIntegritySuite {
 
     @Override
     public SolidIssuer createIssuer(KeyPair pair) {
-        return new SolidIssuer(CRYPTO, pair, Multibase.BASE_58_BTC);
+        return new SolidIssuer(this, CRYPTO, pair, Multibase.BASE_58_BTC);
     }
 
     @Override

@@ -62,7 +62,7 @@ public class CryptoSuite implements Canonicalizer, Digester, Signer {
 
     @Override
     public byte[] canonicalize(VerifiableMaterial document) throws CryptoSuiteError {
-        if (canonicalizer != null) {
+        if (canonicalizer == null) {
             throw new UnsupportedOperationException();
         }
         return canonicalizer.canonicalize(document);

@@ -14,9 +14,9 @@ import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
@@ -72,13 +72,17 @@ public class Vcdm11Reader extends VcdmModelReader implements CredentialAdapter, 
     }
 
     @Override
-    public Verifiable read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
+    public Verifiable materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+        return adapter.materialize(model, loader, base);
+    }
 
+    @Override
+    public VerifiableModel read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
         VerifiableMaterial material = materialReader.read(document, loader, base);
 
         VerifiableModel model = read(material);
 
-        return adapter.materialize(model, loader, base);
+        return model;
     }
 
     public VerifiableModelAdapter adapter() {
@@ -112,4 +116,5 @@ public class Vcdm11Reader extends VcdmModelReader implements CredentialAdapter, 
                         ? VcdmVersion.V11
                         : null;
     }
+
 }
