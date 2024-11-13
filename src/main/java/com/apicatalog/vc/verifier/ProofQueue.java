@@ -60,18 +60,18 @@ class ProofQueue {
 
         int index = 0;
 
-        for (Proof proof : proofs) {
-            if (removed[index]) {
-                continue;
-            }
-            if (proof.previousProof() == null
-                    || ids.contains(proof.previousProof())) {
+        for (final Proof proof : proofs) {
+            if (!removed[index] &&
+                    (proof.previousProof() == null
+                            || ids.contains(proof.previousProof()))) {
                 if (proof.id() != null) {
+
                     if (ids.contains(proof.id())) {
                         throw new DocumentError(ErrorType.Invalid, "ProofId");
                     }
                     ids.add(proof.id());
                 }
+
                 removed[index] = true;
                 return proof;
             }
