@@ -187,10 +187,20 @@
       ],
       "name": "Empty proof set",
       "input": "verifier/empty-proof-set.jsonld",
-      "expectErrorCode": "InvalidProofChain"
+      "expectErrorCode": "MissingProof"
     },
     {
       "@id": "#n0019",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Duplicated proof @id",
+      "input": "verifier/duplicated-proof-id.jsonld",
+      "expectErrorCode": "InvalidProofId"
+    }    ,
+    {
+      "@id": "#n0020",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
