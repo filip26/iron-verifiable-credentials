@@ -13,6 +13,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.proof.Proof;
 
+@Deprecated
 public class DidKeyMethodResolver implements VerificationKeyProvider {
 
     final DidKeyResolver resolver;

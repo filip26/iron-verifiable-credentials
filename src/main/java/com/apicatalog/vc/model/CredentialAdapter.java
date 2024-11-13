@@ -1,14 +1,13 @@
-package com.apicatalog.vcdm;
+package com.apicatalog.vc.model;
 
 import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.model.VerifiableMaterial;
 
 /**
- * Materialize verifiable presentation credentials.
+ * Materialize a verifiable credential.
  */
 @FunctionalInterface
 public interface CredentialAdapter {

@@ -54,12 +54,16 @@ public class StaticContextLoader implements DocumentLoader {
     }
 
     protected static JsonDocument get(final String name) {
-        try (final InputStream is = Verifiable.class.getResourceAsStream(name)) {
+        return get(Verifiable.class, name);
+    }
+
+    protected static JsonDocument get(Class<?> root, final String name) {
+        try (final InputStream is = root.getResourceAsStream(name)) {
             return JsonDocument.of(is);
 
         } catch (IOException | JsonLdError e) {
             e.printStackTrace();
         }
         return null;
-    }
+    }    
 }

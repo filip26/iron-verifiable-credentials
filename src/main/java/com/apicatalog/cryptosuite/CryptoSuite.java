@@ -1,5 +1,7 @@
 package com.apicatalog.cryptosuite;
 
+import java.util.Objects;
+
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
 import com.apicatalog.cryptosuite.algorithm.Digester;
@@ -10,12 +12,29 @@ import com.apicatalog.vc.model.VerifiableMaterial;
  * A specified set of cryptographic primitives consisting of a canonicalization
  * algorithm, a message digest algorithm, and a signature algorithm.
  */
-public record CryptoSuite(
-        String id,
-        int keyLength,
-        Canonicalizer canonicalizer,
-        Digester digester,
-        Signer signer) implements Canonicalizer, Digester, Signer {
+public class CryptoSuite implements Canonicalizer, Digester, Signer {
+
+    protected final String id;
+    protected final int keyLength;
+    protected final Canonicalizer canonicalizer;
+    protected final Digester digester;
+    protected final Signer signer;
+
+    public CryptoSuite(
+            String id,
+            int keyLength,
+            Canonicalizer canonicalizer,
+            Digester digester,
+            Signer signer) {
+        
+        Objects.requireNonNull(id);
+        
+        this.id = id;
+        this.keyLength = keyLength;
+        this.canonicalizer = canonicalizer;
+        this.digester = digester;
+        this.signer = signer;
+    }
 
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
@@ -61,7 +80,11 @@ public record CryptoSuite(
         return id;
     }
 
+    public int keyLength() {
+        return keyLength;
+    }
+    
     public boolean isUnknown() {
-        return signer == null && canonicalizer == null && digester == null;
+        return canonicalizer == null || digester == null || signer == null;
     }
 }

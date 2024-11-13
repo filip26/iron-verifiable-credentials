@@ -1,20 +1,27 @@
 package com.apicatalog.vc.method.resolver;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import com.apicatalog.controller.ControllerDocument;
 import com.apicatalog.controller.key.VerificationKey;
-import com.apicatalog.controller.resolver.ControllerDocumentResolver;
+import com.apicatalog.controller.resolver.ControllerResolver;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.proof.Proof;
 
 public class ControllableKeyProvider implements VerificationKeyProvider {
 
-    protected final ControllerDocumentResolver resolver;
+    protected final Collection<ControllerResolver> resolvers;
     
-    public ControllableKeyProvider(ControllerDocumentResolver resolver) {
+    public ControllableKeyProvider(Collection<ControllerResolver> resolver) {
         Objects.nonNull(resolver);
-        this.resolver = resolver;
+        this.resolvers = resolver;
+    }
+    
+    public static final ControllableKeyProvider of(ControllerResolver... resolver) {
+        return new ControllableKeyProvider(List.of(resolver));
     }
     
     @Override
@@ -23,6 +30,11 @@ public class ControllableKeyProvider implements VerificationKeyProvider {
         if (proof == null || proof.method() == null || proof.id() == null) {
             return null;
         }
+        
+        ControllerResolver resolver = resolvers.stream()
+                .filter(r -> r.isAccepted(proof.method().id()))
+                .findFirst()
+                .orElseThrow();
         
         ControllerDocument controller = resolver.resolve(proof.method().id());
         
@@ -37,7 +49,12 @@ public class ControllableKeyProvider implements VerificationKeyProvider {
         //FIXME controller + purpose
         
         //FIXME
-        return null;
+        return controller
+                .verification().stream()
+                .filter(VerificationKey.class::isInstance)
+                .map(VerificationKey.class::cast)
+                .findFirst()
+                .orElseThrow(() -> new DocumentError(ErrorType.Unknown, "ProofVerificationMethod"));
     }
 
 }

@@ -24,7 +24,6 @@ import com.apicatalog.linkedtree.LinkedTree;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.reader.ExpandedVerifiable;
 import com.apicatalog.vcdm.VcdmVersion;
 
 import jakarta.json.Json;
@@ -61,13 +60,13 @@ public abstract class AbstractIssuer implements Issuer {
     }
 
     @Override
-    public ExpandedVerifiable sign(URI location, ProofDraft draft) throws SigningError, DocumentError {
+    public JsonObject sign(URI location, ProofDraft draft) throws SigningError, DocumentError {
         final DocumentLoader loader = getLoader();
         return sign(fetchDocument(location, loader), draft, loader);
     }
 
     @Override
-    public ExpandedVerifiable sign(JsonObject document, final ProofDraft draft) throws SigningError, DocumentError {
+    public JsonObject sign(JsonObject document, final ProofDraft draft) throws SigningError, DocumentError {
         return sign(document, draft, getLoader());
     }
 
@@ -89,7 +88,7 @@ public abstract class AbstractIssuer implements Issuer {
         return this;
     }
 
-    protected ExpandedVerifiable sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
+    protected JsonObject sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         try {
             // load the document
@@ -116,7 +115,7 @@ public abstract class AbstractIssuer implements Issuer {
         }
     }
 
-    protected ExpandedVerifiable sign(final VcdmVersion version, final JsonArray context, final JsonObject expanded,
+    protected JsonObject sign(final VcdmVersion version, final JsonArray context, final JsonObject expanded,
             final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         if (keyPair.privateKey() == null 

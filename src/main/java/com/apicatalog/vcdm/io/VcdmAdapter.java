@@ -21,13 +21,13 @@ import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableAdapter;
+import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vcdm.CredentialAdapter;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
@@ -36,7 +36,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
-public class VcdmAdapter implements VerifiableAdapter {
+public class VcdmAdapter implements VerifiableModelAdapter {
 
     protected final ProofAdapter proofAdapter;
     protected final CredentialAdapter credentialAdapter;

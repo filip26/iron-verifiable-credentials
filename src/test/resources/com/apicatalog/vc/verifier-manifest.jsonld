@@ -10,7 +10,7 @@
   "name": "Verifier Tests",
   "sequence": [
     {
-      "@id": "#n0001",
+      "@id": "#t0001",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -20,7 +20,7 @@
       "expectErrorCode": "InvalidDocument"
     },
     {
-      "@id": "#n0002",
+      "@id": "#t0002",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -30,7 +30,7 @@
       "expectErrorCode": "InvalidDocument"
     },
     {
-      "@id": "#n0003",
+      "@id": "#t0003",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -40,7 +40,7 @@
       "expectErrorCode": "UnknownModel"
     },
     {
-      "@id": "#n0004",
+      "@id": "#t0004",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -50,7 +50,7 @@
       "expectErrorCode": "UnknownModel"
     },
     {
-      "@id": "#n0005",
+      "@id": "#t0005",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -60,7 +60,7 @@
       "expectErrorCode": "UnknownModel"
     },
     {
-      "@id": "#n0006",
+      "@id": "#t0006",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -70,7 +70,7 @@
       "expectErrorCode": "MissingProof"
     },
     {
-      "@id": "#n0007",
+      "@id": "#t0007",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -80,7 +80,7 @@
       "expectErrorCode": "MissingProof"
     },
     {
-      "@id": "#n0008",
+      "@id": "#t0008",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -90,7 +90,7 @@
       "expectErrorCode": "MissingProof"
     },
     {
-      "@id": "#n0009",
+      "@id": "#t0009",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -100,7 +100,7 @@
       "expectErrorCode": "MissingProof"
     },
     {
-      "@id": "#n0010",
+      "@id": "#t0010",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -110,7 +110,7 @@
       "expectErrorCode": "Expired"
     },
     {
-      "@id": "#n0011",
+      "@id": "#t0011",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -120,7 +120,7 @@
       "expectErrorCode": "Expired"
     },
     {
-      "@id": "#n0012",
+      "@id": "#t0012",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -130,7 +130,7 @@
       "expectErrorCode": "NotValidYet"
     },
     {
-      "@id": "#n0013",
+      "@id": "#t0013",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -140,7 +140,7 @@
       "expectErrorCode": "NotValidYet"
     },
     {
-      "@id": "#n0014",
+      "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -150,7 +150,7 @@
       "expectErrorCode": "MissingIssuer"
     },
     {
-      "@id": "#n0015",
+      "@id": "#t0015",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -160,7 +160,7 @@
       "expectErrorCode": "MissingIssuer"
     },
     {
-      "@id": "#n0016",
+      "@id": "#t0016",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -170,7 +170,7 @@
       "expectErrorCode": "UnknownProof"
     },
     {
-      "@id": "#n0017",
+      "@id": "#t0017",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -180,7 +180,7 @@
       "expectErrorCode": "UnknownProof"
     },
     {
-      "@id": "#n0018",
+      "@id": "#t0018",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -190,7 +190,7 @@
       "expectErrorCode": "MissingProof"
     },
     {
-      "@id": "#n0019",
+      "@id": "#t0019",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -200,7 +200,7 @@
       "expectErrorCode": "InvalidProofId"
     }    ,
     {
-      "@id": "#n0020",
+      "@id": "#t0020",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"

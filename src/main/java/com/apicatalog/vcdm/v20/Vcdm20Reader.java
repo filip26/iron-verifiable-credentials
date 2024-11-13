@@ -11,12 +11,12 @@ import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableAdapter;
+import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableReader;
-import com.apicatalog.vcdm.CredentialAdapter;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmModelReader;
@@ -26,7 +26,7 @@ import jakarta.json.JsonObject;
 
 public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, VerifiableReader {
 
-    protected VerifiableAdapter v20;
+    protected VerifiableModelAdapter v20;
     protected Vcdm11Reader v11;
 
     protected final ProofAdapter proofAdapter;

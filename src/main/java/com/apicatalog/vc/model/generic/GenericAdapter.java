@@ -17,7 +17,7 @@ import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableAdapter;
+import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.proof.Proof;
@@ -25,7 +25,7 @@ import com.apicatalog.vc.proof.Proof;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
-public class GenericAdapter implements VerifiableAdapter {
+public class GenericAdapter implements VerifiableModelAdapter {
 
     protected final JsonLdTreeReader reader;
     protected final ProofAdapter proofAdapter;

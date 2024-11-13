@@ -122,19 +122,19 @@ public class VcTestRunnerJunit {
                 draft.challenge(testCase.challenge);
                 draft.nonce(testCase.nonce);
 
-                final ExpandedVerifiable issued = issuer.sign(testCase.input, draft);
+                final JsonObject signed = issuer.sign(testCase.input, draft);
 
-                JsonObject signed = null;
-
-                if (testCase.context != null) {
-                    signed = issued.compacted(testCase.context);
-
-                } else if (testCase.compacted) {
-                    signed = issued.compacted();
-
-                } else {
-                    signed = issued.expanded();
-                }
+//                JsonObject signed = null;
+//
+//                if (testCase.context != null) {
+//                    signed = issued.compacted(testCase.context);
+//
+//                } else if (testCase.compacted) {
+//                    signed = issued.compacted();
+//
+//                } else {
+//                    signed = issued.expanded();
+//                }
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 

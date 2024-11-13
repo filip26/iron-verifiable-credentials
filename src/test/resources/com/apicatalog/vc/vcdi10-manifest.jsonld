@@ -37,7 +37,7 @@
       "input": "vcdi10/vcdi10-valid-minimal-vc20.jsonld"
     },
     {
-      "@id": "#t0010",
+      "@id": "#t0004",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -47,7 +47,7 @@
       "expectErrorCode": "MissingProofPurpose"
     },
     {
-      "@id": "#t0014",
+      "@id": "#t0005",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -57,7 +57,7 @@
       "expectErrorCode": "InvalidProofPurpose"
     },
     {
-      "@id": "#t0028",
+      "@id": "#t0006",
       "@type": [
         "PositiveEvaluationTest",
         "ProofValidationTest"
@@ -69,7 +69,7 @@
       }
     },
     {
-      "@id": "#t0029",
+      "@id": "#t0007",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -83,7 +83,7 @@
     },
     
     {
-      "@id": "#t0015",
+      "@id": "#t0008",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -93,7 +93,7 @@
       "expectErrorCode": "MissingProofValue"
     },
     {
-      "@id": "#t0016",
+      "@id": "#t0009",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -103,7 +103,7 @@
       "expectErrorCode": "InvalidProofValue"
     },
     {
-      "@id": "#t0014",
+      "@id": "#t0010",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -113,7 +113,7 @@
       "expectErrorCode": "MissingCryptosuite"
     },
     {
-      "@id": "#t0014",
+      "@id": "#t0011",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -123,7 +123,7 @@
       "expectErrorCode": "UnknownCryptosuite"
     },
     {
-      "@id": "#t0014",
+      "@id": "#t0012",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -133,7 +133,7 @@
       "expectErrorCode": "InvalidCreated"
     },
     {
-      "@id": "#t0014",
+      "@id": "#t0013",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -153,7 +153,7 @@
       "expectErrorCode": "InvalidValidityPeriod"
     },
     {
-      "@id": "#t0014",
+      "@id": "#t0015",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -163,7 +163,7 @@
       "expectErrorCode": "MissingVerificationMethodId"
     },
     {
-      "@id": "#t0014",
+      "@id": "#t0016",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -173,7 +173,7 @@
       "expectErrorCode": "InvalidId"
     },
     {
-      "@id": "#t0023",
+      "@id": "#t0017",
       "@type": [
         "PositiveEvaluationTest",
         "ProofValidationTest"
@@ -185,7 +185,7 @@
       }
     },
     {
-      "@id": "#t0024",
+      "@id": "#t0018",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"
@@ -198,7 +198,7 @@
       "expectErrorCode": "InvalidDomain"
     },
     {
-      "@id": "#t0025",
+      "@id": "#t0019",
       "@type": [
         "PositiveEvaluationTest",
         "ProofValidationTest"
@@ -210,7 +210,7 @@
       }
     },
     {
-      "@id": "#t0026",
+      "@id": "#t0020",
       "@type": [
         "NegativeEvaluationTest",
         "ProofValidationTest"

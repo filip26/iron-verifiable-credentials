@@ -97,7 +97,7 @@ public interface DataIntegrityProof extends VerifiableProof {
         assertNotNull(this::purpose, VcdiVocab.PURPOSE);
         assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
         assertNotNull(this::cryptoSuite, VcdiVocab.CRYPTO_SUITE);
-
+        
         if (cryptoSuite().isUnknown()) {
             throw new DocumentError(ErrorType.Unknown, VcdiVocab.CRYPTO_SUITE);
         }

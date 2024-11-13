@@ -12,12 +12,12 @@ import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableAdapter;
+import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableReader;
-import com.apicatalog.vcdm.CredentialAdapter;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmAdapter;
@@ -32,7 +32,7 @@ import jakarta.json.JsonObject;
  */
 public class Vcdm11Reader extends VcdmModelReader implements CredentialAdapter, VerifiableReader {
 
-    protected final VerifiableAdapter adapter;
+    protected final VerifiableModelAdapter adapter;
     protected final ProofAdapter proofAdapter;
 
     protected Vcdm11Reader(final JsonLdTreeReader reader, ProofAdapter proofAdapter) {
@@ -81,7 +81,7 @@ public class Vcdm11Reader extends VcdmModelReader implements CredentialAdapter, 
         return adapter.materialize(model, loader, base);
     }
 
-    public VerifiableAdapter adapter() {
+    public VerifiableModelAdapter adapter() {
         return adapter;
     }
 

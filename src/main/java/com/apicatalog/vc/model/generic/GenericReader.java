@@ -13,7 +13,7 @@ import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.JsonLdMaterialReader;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableAdapter;
+import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableMaterialReader;
 import com.apicatalog.vc.model.VerifiableModel;
@@ -27,10 +27,10 @@ import jakarta.json.JsonObject;
 
 public class GenericReader implements VerifiableModelReader, VerifiableReader {
 
-    protected final VerifiableAdapter adapter;
+    protected final VerifiableModelAdapter adapter;
     protected final VerifiableMaterialReader materialReader;
 
-    protected GenericReader(final VerifiableAdapter adapter, VerifiableMaterialReader reader) {
+    protected GenericReader(final VerifiableModelAdapter adapter, VerifiableMaterialReader reader) {
         this.adapter = adapter;
         this.materialReader = reader;
     }

@@ -119,7 +119,7 @@
       "input": "vcdm20/vcdm20-valid-unsigned-langmap.jsonld"
     },
     {
-      "@id": "#t0012",
+      "@id": "#t0013",
       "@type": [
         "PositiveEvaluationTest",
         "ValidationTest"
@@ -128,7 +128,7 @@
       "input": "vcdm20/vcdm20-valid-vc-inline-context.jsonld"
     },    
     {
-      "@id": "#t0013",
+      "@id": "#t0014",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -138,7 +138,7 @@
       "expectErrorCode": "InvalidDocument"
     },
     {
-      "@id": "#t0014",
+      "@id": "#t0015",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -148,7 +148,7 @@
       "expectErrorCode": "MissingType"
     },
     {
-      "@id": "#t0015",
+      "@id": "#t0016",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -158,7 +158,7 @@
       "expectErrorCode": "UnknownType"
     },
     {
-      "@id": "#t0016",
+      "@id": "#t0017",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -168,7 +168,7 @@
       "expectErrorCode": "MissingIssuer"
     },
     {
-      "@id": "#t0017",
+      "@id": "#t0018",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -178,7 +178,7 @@
       "expectErrorCode": "MissingVerifiable"
     },
     {
-      "@id": "#t0018",
+      "@id": "#t0019",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -188,7 +188,7 @@
       "expectErrorCode": "MissingCredentialSubject"
     },
     {
-      "@id": "#t0019",
+      "@id": "#t0020",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -198,7 +198,7 @@
       "expectErrorCode": "MissingCredentialSubjectClaims"
     },
     {
-      "@id": "#t0020",
+      "@id": "#t0021",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -208,7 +208,7 @@
       "expectErrorCode": "MissingIssuer"
     },
     {
-      "@id": "#t0021",
+      "@id": "#t0022",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -218,7 +218,7 @@
       "expectErrorCode": "MissingIssuerId"
     },
     {
-      "@id": "#t0022",
+      "@id": "#t0023",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -228,7 +228,7 @@
       "expectErrorCode": "MissingStatusType"
     },
     {
-      "@id": "#t0023",
+      "@id": "#t0024",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -238,7 +238,7 @@
       "expectErrorCode": "MissingSchemaId"
     },
     {
-      "@id": "#t0024",
+      "@id": "#t0025",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -248,7 +248,7 @@
       "expectErrorCode": "MissingSchemaType"
     },
     {
-      "@id": "#t0025",
+      "@id": "#t0026",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -258,7 +258,7 @@
       "expectErrorCode": "MissingRefreshServiceType"
     },
     {
-      "@id": "#t0026",
+      "@id": "#t0027",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -268,7 +268,7 @@
       "expectErrorCode": "MissingEvidenceType"
     },
     {
-      "@id": "#t0027",
+      "@id": "#t0028",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -278,7 +278,7 @@
       "expectErrorCode": "MissingTermsOfUseType"
     },
     {
-      "@id": "#t0028",
+      "@id": "#t0029",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -288,7 +288,7 @@
       "expectErrorCode": "MissingId"
     },
     {
-      "@id": "#t0029",
+      "@id": "#t0030",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -298,7 +298,7 @@
       "expectErrorCode": "InvalidIdScheme"
     },
     {
-      "@id": "#t0030",
+      "@id": "#t0031",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -308,7 +308,7 @@
       "expectErrorCode": "MissingId"
     },
     {
-      "@id": "#t0031",
+      "@id": "#t0032",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
@@ -318,7 +318,7 @@
       "expectErrorCode": "InvalidIdScheme"
     },
     {
-      "@id": "#t0032",
+      "@id": "#t0033",
       "@type": [
         "NegativeEvaluationTest",
         "ValidationTest"
