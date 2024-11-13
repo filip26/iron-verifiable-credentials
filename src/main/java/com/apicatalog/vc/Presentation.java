@@ -23,6 +23,9 @@ public interface Presentation extends Verifiable {
     @Term("verifiableCredential")
     Collection<Credential> credentials();
 
+    @Term
+    Collection<TermsOfUse> termsOfUse();
+    
     @Override
     default void validate() throws DocumentError {
         // @type - mandatory
