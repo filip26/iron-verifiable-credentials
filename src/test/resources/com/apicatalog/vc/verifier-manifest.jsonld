@@ -10,7 +10,7 @@
   "name": "Verifier Tests",
   "sequence": [
     {
-      "@id": "#t0003",
+      "@id": "#n0001",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -18,9 +18,9 @@
       "name": "Empty document",
       "input": "verifier/empty-document.txt",
       "expectErrorCode": "InvalidDocument"
-    },    
+    },
     {
-      "@id": "#t0003",
+      "@id": "#n0002",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -30,7 +30,7 @@
       "expectErrorCode": "InvalidDocument"
     },
     {
-      "@id": "#t0003",
+      "@id": "#n0003",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -38,9 +38,9 @@
       "name": "Empty object",
       "input": "verifier/empty-object.json",
       "expectErrorCode": "UnknownModel"
-    },    
+    },
     {
-      "@id": "#t0003",
+      "@id": "#n0004",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -48,9 +48,9 @@
       "name": "null @context",
       "input": "verifier/null-context.jsonld",
       "expectErrorCode": "UnknownModel"
-    },  
+    },
     {
-      "@id": "#t0003",
+      "@id": "#n0005",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -60,7 +60,7 @@
       "expectErrorCode": "UnknownModel"
     },
     {
-      "@id": "#t0001",
+      "@id": "#n0006",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -70,7 +70,7 @@
       "expectErrorCode": "MissingProof"
     },
     {
-      "@id": "#t0001",
+      "@id": "#n0007",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -79,8 +79,8 @@
       "input": "vcdm20/vcdm20-valid-unsigned-full-vc.jsonld",
       "expectErrorCode": "MissingProof"
     },
-            {
-      "@id": "#t0001",
+    {
+      "@id": "#n0008",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -90,7 +90,7 @@
       "expectErrorCode": "MissingProof"
     },
     {
-      "@id": "#t0001",
+      "@id": "#n0009",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -98,10 +98,9 @@
       "name": "VP missing proof VCDM2.0",
       "input": "vcdm20/vcdm20-valid-minimal-vp-vc.jsonld",
       "expectErrorCode": "MissingProof"
-    },    
-        
+    },
     {
-      "@id": "#t0027",
+      "@id": "#n0010",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -111,7 +110,17 @@
       "expectErrorCode": "Expired"
     },
     {
-      "@id": "#t0027",
+      "@id": "#n0011",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Expired VCDM2.0",
+      "input": "verifier/vcdm20-past-valid-until.jsonld",
+      "expectErrorCode": "Expired"
+    },
+    {
+      "@id": "#n0012",
       "@type": [
         "NegativeEvaluationTest",
         "VeriferTest"
@@ -119,6 +128,76 @@
       "name": "Not Valid Yet VCDM1.1",
       "input": "verifier/vcdm11-future-issuance.jsonld",
       "expectErrorCode": "NotValidYet"
-    }    
+    },
+    {
+      "@id": "#n0013",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Not Valid Yet VCDM2.0",
+      "input": "verifier/vcdm20-future-valid-from.jsonld",
+      "expectErrorCode": "NotValidYet"
+    },
+    {
+      "@id": "#n0014",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Invalid VCDM1.1 VC",
+      "input": "verifier/vcdm11-invalid-vc.jsonld",
+      "expectErrorCode": "MissingIssuer"
+    },
+    {
+      "@id": "#n0015",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Invalid VCDM2.0 VC",
+      "input": "verifier/vcdm20-invalid-vc.jsonld",
+      "expectErrorCode": "MissingIssuer"
+    },
+    {
+      "@id": "#n0016",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "VC unknown proof VCDM1.1",
+      "input": "verifier/vcdm11-unknown-proof.jsonld",
+      "expectErrorCode": "UnknownProof"
+    },
+    {
+      "@id": "#n0017",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "VC unknown proof VCDM2.0",
+      "input": "verifier/vcdm20-unknown-proof.jsonld",
+      "expectErrorCode": "UnknownProof"
+    },
+    {
+      "@id": "#n0018",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Empty proof set",
+      "input": "verifier/empty-proof-set.jsonld",
+      "expectErrorCode": "InvalidProofChain"
+    },
+    {
+      "@id": "#n0019",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Invalid proof chain",
+      "input": "verifier/invalid-proof-chain.jsonld",
+      "expectErrorCode": "InvalidProofChain"
+    }
   ]
 }

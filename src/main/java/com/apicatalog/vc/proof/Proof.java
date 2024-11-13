@@ -10,6 +10,7 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Id;
 import com.apicatalog.linkedtree.orm.Provided;
@@ -94,7 +95,8 @@ public interface Proof {
      *                       future
      */
     default void validate(Map<String, Object> params) throws DocumentError {
-        throw new UnsupportedOperationException("An unknown, generic, proof cannot be validated.");
+        throw new DocumentError(ErrorType.Unknown, "Proof");
+//        throw new UnsupportedOperationException("An unknown, generic, proof cannot be validated.");
     }
 
     /**
@@ -105,7 +107,8 @@ public interface Proof {
      * @throws DocumentError
      */
     default void verify(VerificationKey method) throws VerificationError, DocumentError {
-        throw new UnsupportedOperationException("An unknown, generic, proof cannot be verified.");
+        throw new DocumentError(ErrorType.Unknown, "Proof");
+//        throw new UnsupportedOperationException("An unknown, generic, proof cannot be verified.");
     }
 
     /**

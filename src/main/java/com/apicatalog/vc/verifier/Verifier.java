@@ -59,7 +59,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
 
         this.reader = defaultReaders(proofAdapter);
-        
+
         this.statusVerifier = null;
     }
 
@@ -249,12 +249,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
             }
 
             // sort the proofs in the verification order
-            final ProofQueue queue = ProofQueue.create(verifiable.proofs());
-
-            // verify the proofs' signatures
-            Proof proof = queue.pop();
-
-            while (proof != null) {
+            for (final Proof proof : ProofQueue.sort(verifiable.proofs())) {
 
                 // validate proof properties
                 proof.validate(parameters == null
@@ -271,13 +266,12 @@ public class Verifier extends VerificationProcessor<Verifier> {
                         .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdiVocab.VERIFICATION_METHOD));
 
                 if (verificationMethod instanceof VerificationKey verificationKey) {
+                    // verify the proofs' signatures
                     proof.verify(verificationKey);
 
                 } else {
                     throw new DocumentError(ErrorType.Unknown, VcdiVocab.VERIFICATION_METHOD);
                 }
-
-                proof = queue.pop();
             }
 
             // all good

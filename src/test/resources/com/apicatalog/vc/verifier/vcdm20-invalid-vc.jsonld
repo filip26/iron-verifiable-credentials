@@ -1,0 +1,10 @@
+{
+  "@context": "https://www.w3.org/ns/credentials/v2",
+  "type": "VerifiableCredential",
+  "proof": {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "test-2022",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "zDzvG9arTUkqwTCncUFEkwhYvK9iHefBNAHvhorShoj9M"
+  }
+}
