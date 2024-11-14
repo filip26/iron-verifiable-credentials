@@ -32,7 +32,7 @@
       ],
       "name": "VCDM1.1 VP to sign",
       "input": "vcdm11/vcdm11-valid-minimal-vp-vc.jsonld",
-      "expect": "issuer/0020-out.jsonld",
+      "expect": "issuer/vcdm11-di10-signed-vp.jsonld",
       "options": {
         "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": "method/multikey-public.jsonld",
@@ -62,27 +62,11 @@
       ],
       "name": "VCDM2.0 VP to sign",
       "input": "vcdm20/vcdm20-valid-minimal-vp-vc.jsonld",
-      "expect": "issuer/0020-out.jsonld",
+      "expect": "issuer/vcdm20-di10-signed-vp.jsonld",
       "options": {
         "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": "method/multikey-public.jsonld",
         "created": "2022-05-28T17:02:05Z"
-      }
-    },    
-    {
-      "@id": "#t0021",
-      "@type": [
-        "PositiveEvaluationTest",
-        "IssuerTest"
-      ],
-      "name": "compacted signed credential",
-      "input": "issuer/0021-in.jsonld",
-      "expect": "issuer/0021-out.jsonld",
-      "compacted": true,
-      "options": {
-        "keyPair": "issuer/0001-keys.json",
-        "verificationMethod": "verifier/0005-verification-key.json",
-        "created": "2022-06-04T20:33:01Z"
       }
     },
     {

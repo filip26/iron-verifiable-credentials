@@ -16,7 +16,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
+import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
@@ -34,7 +34,6 @@ import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
@@ -111,9 +110,9 @@ public abstract class AbstractIssuer implements Issuer {
     protected JsonObject sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         draft.validate();
-        
+
         final VerifiableReader reader = readerProvider.reader(document);
-        
+
         if (reader == null) {
             throw new DocumentError(ErrorType.Unknown, "Model");
         }
@@ -133,41 +132,30 @@ public abstract class AbstractIssuer implements Issuer {
         verifiable.validate();
 
         final VerifiableMaterial unsignedData = model.data();
-        
+
         final VerifiableMaterial unsignedDraft = draft.unsigned(loader, base);
-System.out.println("CRYPTO " + crypto.id() + ", " + crypto.keyLength());
-        final Signature ldSignature = new Signature(crypto, null);    
-        
+
+        final Signature ldSignature = new Signature(crypto, null);
+
         try {
             ldSignature.sign(unsignedData, unsignedDraft, keyPair.privateKey().rawBytes());
-            
+
             final VerifiableMaterial signedProof = draft.sign(unsignedDraft, ldSignature.signature());
 
             if (signedProof == null) {
                 throw new IllegalStateException();
             }
-            
+
             final VerifiableMaterial signedDocument = model
                     .withProof(signedProof)
                     .materialize();
-            
-            JsonObject compacted = signedDocument.compacted();
-            
-            if (signedDocument.context() != null && !signedDocument.context().isEmpty()) {
-                if (signedDocument.context().size() == 1) {
-                    compacted = Json.createObjectBuilder(compacted).add(JsonLdKeyword.CONTEXT, signedDocument.context().iterator().next()).build();
-                } else {
-                    compacted = Json.createObjectBuilder(compacted).add(JsonLdKeyword.CONTEXT, Json.createArrayBuilder(signedDocument.context())).build();                    
-                }
-            }
-            
-            return compacted;
-            
+
+            return JsonLdContext.add(signedDocument.context(), signedDocument.compacted());
+
         } catch (CryptoSuiteError e) {
             throw new SigningError(e, SignatureErrorCode.Unknown);
         }
 
-        
 //        VerifiableModelWriter writer;
 //        
 //        writer.write(model);

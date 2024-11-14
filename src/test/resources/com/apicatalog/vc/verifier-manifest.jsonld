@@ -217,6 +217,34 @@
       ],
       "name": "Valid VC VCDM1.1 DI1.0",
       "input": "issuer/vcdm11-di10-signed-vc.jsonld"
-    }    
+    },
+    {
+      "@id": "#t1002",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Valid VP VCDM1.1 DI1.0",
+      "input": "issuer/vcdm11-di10-signed-vp.jsonld"
+    },
+    {
+      "@id": "#t1003",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Valid VC VCDM2.0 DI1.0",
+      "input": "issuer/vcdm20-di10-signed-vc.jsonld"
+    },
+    {
+      "@id": "#t1004",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Valid VP VCDM2.0 DI1.0",
+      "input": "issuer/vcdm20-di10-signed-vp.jsonld"
+    }
+    
   ]
 }

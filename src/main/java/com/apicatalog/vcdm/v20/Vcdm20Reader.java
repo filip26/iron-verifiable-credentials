@@ -30,9 +30,8 @@ import jakarta.json.JsonObject;
 public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, VerifiableReader {
 
     protected final static ContextReducer contextReducer = new ContextReducer()
-            .define("https://www.w3.org/ns/controller/v1",
-                    List.of("https://w3id.org/security/jwk/v1",
-                            "https://w3id.org/security/multikey/v1"));
+            .define("https://www.w3.org/ns/credentials/v2",
+                    List.of("https://w3id.org/security/data-integrity/v2"));
 
     protected VerifiableModelAdapter v20;
     protected Vcdm11Reader v11;
