@@ -44,7 +44,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
-    
+
     protected final URI purpose;
 
     protected Instant created;
@@ -102,14 +102,6 @@ public class DataIntegrityProofDraft extends ProofDraft {
         return this;
     }
 
-//    @Override
-//    public Collection<String> context(VcdmVersion model) {
-//        if (VcdmVersion.V11.equals(model)) {
-//            return V1_CONTEXTS;
-//        }
-//        return V2_CONTEXTS;
-//    }
-
     @Override
     public VerifiableMaterial unsigned(DocumentLoader loader, URI base) throws DocumentError {
 
@@ -134,12 +126,13 @@ public class DataIntegrityProofDraft extends ProofDraft {
             return new GenericMaterial(JsonLdContext.strings(compacted, Collections.emptyList()),
                     compacted,
                     expanded.iterator().next().asJsonObject());
+
         } catch (FragmentPropertyError e) {
-
             throw DocumentError.of(e);
-
+            
         } catch (NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid);
+            
         } catch (JsonLdError e) {
             throw new DocumentError(e, ErrorType.Invalid);
         }
@@ -151,7 +144,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
         JsonValue value = Json.createValue(suite.proofValueBase.encode(signature));
 
         JsonObject compacted = Json.createObjectBuilder(proof.compacted()).add(VcdiVocab.PROOF_VALUE.name(), value).build();
-        JsonObject expanded = proof.expanded();
+        JsonObject expanded = proof.expanded(); //FIXME
 
         return new GenericMaterial(
                 proof.context(),

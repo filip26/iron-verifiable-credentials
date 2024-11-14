@@ -17,29 +17,29 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
 public abstract class VcdmModelWriter implements VerifiableModelWriter {
-
-    protected final VcdmVersion readerVersion;
-    protected final VerifiableMaterialReader materialReader;
-
-    protected VcdmModelWriter(VcdmVersion readerVersion) {
-        this.readerVersion = readerVersion;
-        this.materialReader = new JsonLdMaterialReader();
-    }
-
-    @Override
-    public VerifiableMaterial write(VerifiableModel model) throws DocumentError {
-
-        if (model != null && model instanceof Vcdm vcdm && readerVersion == vcdm.version()) {
-
-            JsonObject expanded = EmbeddedProof.setProofs(model.data().expanded(), model.expandedProofs());
-            JsonObject compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), Json.createArrayBuilder(model.compactedProofs())).build();
-
-            return new GenericMaterial(
-                    model.data().context(), // ? proof contexts?
-                    compacted,
-                    expanded);
-        }
-        throw new DocumentError(ErrorType.Unknown, "DocumentModel");
+//
+//    protected final VcdmVersion readerVersion;
+//    protected final VerifiableMaterialReader materialReader;
+//
+//    protected VcdmModelWriter(VcdmVersion readerVersion) {
+//        this.readerVersion = readerVersion;
+//        this.materialReader = new JsonLdMaterialReader();
+//    }
+//
+//    @Override
+//    public VerifiableMaterial write(VerifiableModel model) throws DocumentError {
+//
+//        if (model != null && model instanceof Vcdm vcdm && readerVersion == vcdm.version()) {
+//
+//            JsonObject expanded = EmbeddedProof.setProofs(model.data().expanded(), model.expandedProofs());
+//            JsonObject compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), Json.createArrayBuilder(model.compactedProofs())).build();
+//
+//            return new GenericMaterial(
+//                    model.data().context(), // ? proof contexts?
+//                    compacted,
+//                    expanded);
+//        }
+//        throw new DocumentError(ErrorType.Unknown, "DocumentModel");
 
 //        VcdmVersion version = modelVersion(data.context());
 //        
@@ -67,7 +67,7 @@ public abstract class VcdmModelWriter implements VerifiableModelWriter {
 //                expandedProofs != null
 //                        ? expandedProofs
 //                        : Collections.emptyList());
-    }
+//    }
 
 //    protected abstract VcdmVersion modelVersion(Collection<String> context) throws DocumentError;
 }

@@ -23,9 +23,9 @@ import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmVocab;
@@ -65,33 +65,17 @@ public class VcdmAdapter implements VerifiableModelAdapter {
 
         Collection<Proof> proofs = Collections.emptyList();
 
-        if (model.expandedProofs() != null && model.compactedProofs() != null) {
+        if (model.proofs() != null && !model.proofs().isEmpty()) {
 
-            if (model.expandedProofs().size() != model.compactedProofs().size()) {
-                throw new IllegalStateException("Inconsistent model - proof size");
-            }
+            proofs = new ArrayList<>(model.proofs().size());
 
-            proofs = new ArrayList<>(model.expandedProofs().size());
-
-            Iterator<JsonObject> itCompactedProofs = model.compactedProofs().iterator();
-
-            for (JsonObject expandedProof : model.expandedProofs()) {
-
-                JsonObject compactedProof = itCompactedProofs.next();
-
+            for (final VerifiableMaterial proof : model.proofs()) {
                 proofs.add(proofAdapter.materialize(
                         model.data(),
-                        new GenericMaterial(
-                                JsonLdContext.strings(compactedProof, model.data().context()),
-                                compactedProof,
-                                expandedProof),
+                        proof,
                         loader,
                         base));
             }
-
-        } else if ((model.expandedProofs() != null && !model.expandedProofs().isEmpty())
-                || (model.compactedProofs() != null && !model.compactedProofs().isEmpty())) {
-            throw new IllegalStateException("Inconsistent model - proofs");
         }
 
         if (isCredential(types)) {
@@ -140,7 +124,7 @@ public class VcdmAdapter implements VerifiableModelAdapter {
     }
 
     protected Credential credential(VerifiableMaterial data, DocumentLoader loader, URI base) throws DocumentError {
-        return credentialAdapter.materialize(data, loader, base);        
+        return credentialAdapter.materialize(data, loader, base);
     }
 
     protected Collection<Credential> credentials(VerifiableMaterial data, DocumentLoader loader, URI base) throws DocumentError {
@@ -249,8 +233,7 @@ public class VcdmAdapter implements VerifiableModelAdapter {
         }
         return Collections.emptySet();
     }
-    
-    
+
 //    final VerifiableModel model = credentialModelReader.read(data);
 //    
 //    if (model == null) {

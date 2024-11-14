@@ -8,14 +8,10 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableModelWriter;
 
-import jakarta.json.JsonObject;
-
 public record Vcdm(
         VcdmVersion version,
         VerifiableMaterial data,
-//        Collection<VerifiableMaterial> proofs
-        Collection<JsonObject> compactedProofs,
-        Collection<JsonObject> expandedProofs,
+        Collection<VerifiableMaterial> proofs,
         VerifiableModelWriter writer) implements VerifiableModel {
 
     @Override
@@ -26,17 +22,13 @@ public record Vcdm(
     @Override
     public VerifiableModel withProof(VerifiableMaterial signedProof) {
 
-        Collection<JsonObject> expanded = new ArrayList<>(expandedProofs);
-        expanded.add(signedProof.expanded());
-
-        Collection<JsonObject> compacted = new ArrayList<>(compactedProofs);
-        compacted.add(signedProof.compacted());
+        Collection<VerifiableMaterial> newProofs = new ArrayList<>(proofs);
+        newProofs.add(signedProof);
 
         return new Vcdm(
                 version,
                 data,
-                compacted,
-                expanded,
+                newProofs,
                 writer);
     }
 

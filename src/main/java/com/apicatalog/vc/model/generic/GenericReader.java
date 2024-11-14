@@ -1,12 +1,15 @@
 package com.apicatalog.vc.model.generic;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
@@ -89,26 +92,59 @@ public class GenericReader implements VerifiableModelReader, VerifiableModelWrit
                         data.context(),
                         compactedUnsigned,
                         expandedUnsigned),
-                compactedProofs != null
-                        ? compactedProofs
-                        : Collections.emptyList(),
-                expandedProofs != null
-                        ? expandedProofs
-                        : Collections.emptyList(),
+                proofs(
+                        data.context(),
+                        compactedProofs != null
+                                ? compactedProofs
+                                : Collections.emptyList(),
+                        expandedProofs != null
+                                ? expandedProofs
+                                : Collections.emptyList()),
                 this::write);
+    }
+
+    protected Collection<VerifiableMaterial> proofs(
+            Collection<String> defaultContext,
+            Collection<JsonObject> compactedProofs,
+            Collection<JsonObject> expandedProofs) {
+
+        if (expandedProofs != null && compactedProofs != null) {
+
+            if (expandedProofs.size() != compactedProofs.size()) {
+                throw new IllegalStateException("Inconsistent model - proof size");
+            }
+
+            Collection<VerifiableMaterial> proofs = new ArrayList<>(expandedProofs.size());
+
+            Iterator<JsonObject> itCompactedProofs = compactedProofs.iterator();
+
+            for (JsonObject expandedProof : expandedProofs) {
+
+                JsonObject compactedProof = itCompactedProofs.next();
+
+                proofs.add(new GenericMaterial(
+                        JsonLdContext.strings(compactedProof, defaultContext),
+                        compactedProof,
+                        expandedProof));
+            }
+
+            return proofs;
+        }
+        throw new IllegalStateException("Inconsistent model - proofs");
     }
 
     @Override
     public VerifiableMaterial write(VerifiableModel model) throws DocumentError {
 
-        JsonObject expanded = model.expandedProofs().isEmpty()
-                ? model.data().expanded()
-                : EmbeddedProof.setProofs(model.data().expanded(), model.expandedProofs());
-        
-        JsonObject compacted = model.compactedProofs().isEmpty() 
-                ? model.data().compacted()
-                : Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), Json.createArrayBuilder(model.compactedProofs())).build();
-                
-        return new GenericMaterial(model.data().context(), compacted, expanded);
+//        JsonObject expanded = model.expandedProofs().isEmpty()
+//                ? model.data().expanded()
+//                : EmbeddedProof.setProofs(model.data().expanded(), model.expandedProofs());
+//
+//        JsonObject compacted = model.compactedProofs().isEmpty()
+//                ? model.data().compacted()
+//                : Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), Json.createArrayBuilder(model.compactedProofs())).build();
+//
+//        return new GenericMaterial(model.data().context(), compacted, expanded);
+        return null;
     }
 }

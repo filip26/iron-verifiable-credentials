@@ -198,7 +198,7 @@
       "name": "Duplicated proof @id",
       "input": "verifier/duplicated-proof-id.jsonld",
       "expectErrorCode": "InvalidProofId"
-    }    ,
+    },
     {
       "@id": "#t0020",
       "@type": [
@@ -208,6 +208,15 @@
       "name": "Invalid proof chain",
       "input": "verifier/invalid-proof-chain.jsonld",
       "expectErrorCode": "InvalidProofChain"
-    }
+    },
+    {
+      "@id": "#t1001",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Valid VC VCDM1.1 DI1.0",
+      "input": "issuer/vcdm11-di10-signed-vc.jsonld"
+    }    
   ]
 }

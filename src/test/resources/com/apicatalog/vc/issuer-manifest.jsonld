@@ -46,11 +46,11 @@
         "IssuerTest"
       ],
       "name": "VCDM2.0 VC to sign",
-      "input": "vcdm11/vcdm11-valid-minimal-vc.jsonld",
+      "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
       "expect": "issuer/0020-out.jsonld",
       "options": {
-        "keyPair": "issuer/0001-keys.json",
-        "verificationMethod": "verifier/0005-verification-key.json",
+        "keyPair": "method/multikey-pair.jsonld",
+        "verificationMethod": "method/multikey-public.jsonld",
         "created": "2022-05-28T17:02:05Z"
       }
     },
@@ -64,8 +64,8 @@
       "input": "vcdm20/vcdm20-valid-minimal-vp-vc.jsonld",
       "expect": "issuer/0020-out.jsonld",
       "options": {
-        "keyPair": "issuer/0001-keys.json",
-        "verificationMethod": "verifier/0005-verification-key.json",
+        "keyPair": "method/multikey-pair.jsonld",
+        "verificationMethod": "method/multikey-public.jsonld",
         "created": "2022-05-28T17:02:05Z"
       }
     },    

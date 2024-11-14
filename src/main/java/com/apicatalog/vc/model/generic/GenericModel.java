@@ -8,12 +8,9 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableModelWriter;
 
-import jakarta.json.JsonObject;
-
 public record GenericModel(
         VerifiableMaterial data,
-        Collection<JsonObject> compactedProofs,
-        Collection<JsonObject> expandedProofs,
+        Collection<VerifiableMaterial> proofs,
         VerifiableModelWriter writer) implements VerifiableModel {
 
     @Override
@@ -24,16 +21,12 @@ public record GenericModel(
     @Override
     public VerifiableModel withProof(VerifiableMaterial signedProof) {
 
-        Collection<JsonObject> expanded = new ArrayList<>(expandedProofs);
-        expanded.add(signedProof.expanded());
-
-        Collection<JsonObject> compacted = new ArrayList<>(compactedProofs);
-        compacted.add(signedProof.compacted());
+        Collection<VerifiableMaterial> newProofs = new ArrayList<>(proofs);
+        newProofs.add(signedProof);
 
         return new GenericModel(
                 data,
-                compacted,
-                expanded,
+                newProofs,
                 writer);
     }
 }

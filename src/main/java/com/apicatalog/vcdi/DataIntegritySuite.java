@@ -84,7 +84,8 @@ public class DataIntegritySuite implements SignatureSuite {
         if (cryptoName == null) {
             return null;
         }
-        return new CryptoSuite(cryptosuiteName, -1, null, null, null);
+        // an unknown crypto suite
+        return new CryptoSuite(cryptoName, -1, null, null, null);
     }
 
     public DataIntegrityProofDraft createDraft(VerificationMethod method,

@@ -2,12 +2,14 @@ package com.apicatalog.vcdm.v11;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
+import com.apicatalog.linkedtree.orm.context.ContextReducer;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.Credential;
@@ -35,8 +37,13 @@ public class Vcdm11Reader extends VcdmModelReader implements CredentialAdapter, 
     protected final VerifiableModelAdapter adapter;
     protected final ProofAdapter proofAdapter;
 
+    protected final static ContextReducer contextReducer = new ContextReducer()
+            .define("https://www.w3.org/ns/controller/v1",
+                    List.of("https://w3id.org/security/jwk/v1",
+                            "https://w3id.org/security/multikey/v1"));
+    
     protected Vcdm11Reader(final JsonLdTreeReader reader, ProofAdapter proofAdapter) {
-        super(VcdmVersion.V11);
+        super(VcdmVersion.V11, contextReducer);
         this.adapter = new VcdmAdapter(reader, this, proofAdapter);
         this.proofAdapter = proofAdapter;
     }
