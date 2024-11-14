@@ -25,9 +25,9 @@ public class ControllableKeyProvider implements VerificationKeyProvider {
     }
     
     @Override
-    public VerificationKey verificationKey(Proof proof) throws DocumentError {
+    public VerificationKey keyFor(Proof proof) throws DocumentError {
 
-        if (proof == null || proof.method() == null || proof.id() == null) {
+        if (proof == null || proof.method() == null || proof.method().id() == null) {
             return null;
         }
         

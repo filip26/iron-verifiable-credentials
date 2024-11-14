@@ -254,7 +254,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
                 
                 
-                final VerificationKey verificationKey = keyProvider.verificationKey(proof);
+                final VerificationKey verificationKey = keyProvider.keyFor(proof);
                 
                 if (verificationKey == null) {
                     throw new DocumentError(ErrorType.Unknown, VcdiVocab.VERIFICATION_METHOD);

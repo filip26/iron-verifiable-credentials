@@ -150,7 +150,7 @@ public abstract class AbstractIssuer implements Issuer {
                     .withProof(signedProof)
                     .materialize();
 
-            return JsonLdContext.add(signedDocument.context(), signedDocument.compacted());
+            return JsonLdContext.set(signedDocument.context(), signedDocument.compacted());
 
         } catch (CryptoSuiteError e) {
             throw new SigningError(e, SignatureErrorCode.Unknown);

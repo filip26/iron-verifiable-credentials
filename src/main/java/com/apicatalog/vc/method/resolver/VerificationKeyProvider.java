@@ -15,6 +15,6 @@ public interface VerificationKeyProvider {
      * 
      * @throws DocumentError
      */
-    VerificationKey verificationKey(Proof proof) throws DocumentError;
+    VerificationKey keyFor(Proof proof) throws DocumentError;
 
 }

@@ -35,7 +35,9 @@ import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.method.resolver.MethodPredicate;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
+import com.apicatalog.vc.method.resolver.MethodSelector;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.Reader;
@@ -59,8 +61,7 @@ public class VcTestRunnerJunit {
 
     final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
             new SchemeRouter().set("classpath", new ClasspathLoader()));
-
-    // FIXME the static loader?
+    
     final static VerificationKeyProvider RESOLVERS = defaultResolvers(new StaticContextLoader((LOADER)));
 
     final static TestSignatureSuite TEST_DI_SUITE = (new TestSignatureSuite());
@@ -103,12 +104,12 @@ public class VcTestRunnerJunit {
                     // set dummy key pair
                     keyPairLocation = URI.create(VcTestCase.base("method/multikey-pair.json"));
                 }
-                
+
                 final Issuer issuer = TEST_DI_SUITE.createIssuer(getKeys(keyPairLocation, LOADER))
                         .loader(LOADER);
 
                 URI purpose = testCase.purpose;
-                
+
                 if (purpose == null) {
                     purpose = URI.create("https://w3id.org/security#assertionMethod");
                 }
@@ -288,10 +289,17 @@ public class VcTestRunnerJunit {
     }
 
     static final VerificationKeyProvider defaultResolvers(DocumentLoader loader) {
+
+        return MethodSelector.create()
+                // accept concrete method
+                .with(MethodPredicate.methodId(
+                        URI.create("https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld")::equals),
+                        new RemoteTestMultiKeyProvider(loader))
+                .build();
+
 //        Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();
 //        resolvers.add(new DidKeyMethodResolver(TestAlgorithm.DECODER));
-        return new RemoteTestMultiKeyProvider(loader);
- //       return resolvers;
+        // return resolvers;
     }
 
     static final Map<String, Object> toMap(Parameter<?>... parameters) {

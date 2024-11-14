@@ -33,19 +33,13 @@ public class RemoteTestMultiKeyProvider implements VerificationKeyProvider {
     public RemoteTestMultiKeyProvider(DocumentLoader loader) {
         this.loader = loader;
     }
-
+    
     @Override
-    public VerificationKey verificationKey(Proof proof) throws DocumentError {
+    public VerificationKey keyFor(Proof proof) throws DocumentError {
         
-        if (proof == null) {
-            throw new DocumentError(ErrorType.Missing, "Proof");
+        if (proof == null || proof.method() == null || proof.method().id() == null) {
+            return null;
         }
-        if (proof.method() == null) {
-            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
-        }
-        if (proof.method().id() == null) {
-            throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
-        }      
         
         try {
             Document doc = loader.loadDocument(proof.method().id(), new DocumentLoaderOptions());

@@ -13,6 +13,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.vc.proof.Proof;
 
+
 @Deprecated
 public class DidKeyMethodResolver implements VerificationKeyProvider {
 
@@ -27,7 +28,7 @@ public class DidKeyMethodResolver implements VerificationKeyProvider {
     }
 
     @Override
-    public VerificationKey verificationKey(Proof proof) throws DocumentError {
+    public VerificationKey keyFor(Proof proof) throws DocumentError {
 
         final VerificationMethod method = proof.method();
 

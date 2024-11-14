@@ -29,10 +29,8 @@ public class Vcdm20Writer implements VerifiableWriter {
             .scan(Vcdm20Presentation.class)
             .scan(Credential.class)
             .scan(Presentation.class)
-            .scan(Verifiable.class)
-            ;
+            .scan(Verifiable.class);
 
-    
     @Override
     public JsonObject write(Verifiable verifiable, DocumentLoader loader, URI base) throws DocumentError {
         return WRITER.compacted(verifiable);
