@@ -10,7 +10,7 @@
   "name": "Verifiable Credentials Issuer Test Suite",
   "sequence": [
     {
-      "@id": "#t0001",
+      "@id": "#t1001",
       "@type": [
         "PositiveEvaluationTest",
         "IssuerTest"
@@ -25,7 +25,7 @@
       }
     },
     {
-      "@id": "#t0002",
+      "@id": "#t1002",
       "@type": [
         "PositiveEvaluationTest",
         "IssuerTest"
@@ -40,7 +40,7 @@
       }
     },
     {
-      "@id": "#t0003",
+      "@id": "#t1003",
       "@type": [
         "PositiveEvaluationTest",
         "IssuerTest"
@@ -55,7 +55,7 @@
       }
     },
     {
-      "@id": "#t0004",
+      "@id": "#t1004",
       "@type": [
         "PositiveEvaluationTest",
         "IssuerTest"
@@ -69,6 +69,36 @@
         "created": "2022-05-28T17:02:05Z"
       }
     },
+    {
+      "@id": "#t1005",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "Co-Sign VC",
+      "input": "issuer/vcdm20-di10-signed-vc.jsonld",
+      "expect": "issuer/co-signed-vc.jsonld",
+      "options": {
+        "keyPair": "method/multikey-pair.jsonld",
+        "verificationMethod": "method/multikey-public.jsonld",
+        "created": "2023-01-01T00:00:01Z"
+      }
+    },        
+    {
+      "@id": "#t1006",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "Co-Sign VP",
+      "input": "issuer/vcdm20-di10-signed-vp.jsonld",
+      "expect": "issuer/co-signed-vp.jsonld",
+      "options": {
+        "keyPair": "method/multikey-pair.jsonld",
+        "verificationMethod": "method/multikey-public.jsonld",
+        "created": "2023-01-01T00:00:01Z"
+      }
+    },    
     {
       "@id": "#t0022",
       "@type": [

@@ -24,6 +24,7 @@ import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 
 public abstract class VcdmModelReader implements VerifiableModelReader, VerifiableModelWriter {
@@ -111,11 +112,7 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
     @Override
     public VerifiableMaterial write(VerifiableModel model) throws DocumentError {
 
-        JsonObject expanded = // model.expandedProofs().isEmpty()
-                // ?
-                model.data().expanded();
-        // : EmbeddedProof.setProofs(model.data().expanded(), model.expandedProofs());
-
+        JsonObject expanded = model.data().expanded();
         JsonObject compacted = model.data().compacted();
 
         Collection<String> context = new LinkedHashSet<>(model.data().context());
@@ -125,13 +122,22 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
 
                 VerifiableMaterial proof = model.proofs().iterator().next();
 
-                compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), proof.compacted()).build();
                 if (proof.context() != null) {
                     context.addAll(proof.context());
                 }
+                
+                compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), proof.compacted()).build();
 
             } else {
-//FIXME                compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), Json.createArrayBuilder(model.compactedProofs)).build();
+                
+                JsonArrayBuilder proofs = Json.createArrayBuilder();
+                
+                for (final VerifiableMaterial proof : model.proofs()) {
+                    proofs.add(proof.compacted());
+                    context.addAll(proof.context());
+                }
+                
+                compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), proofs).build();                
             }
         }
         context = contextReducer.reduce(context);

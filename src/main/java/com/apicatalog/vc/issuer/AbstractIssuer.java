@@ -155,34 +155,6 @@ public abstract class AbstractIssuer implements Issuer {
         } catch (CryptoSuiteError e) {
             throw new SigningError(e, SignatureErrorCode.Unknown);
         }
-
-//        VerifiableModelWriter writer;
-//        
-//        writer.write(model);
-
-//        try {
-//            // load the document
-//            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document))
-//                    .undefinedTermsPolicy(ProcessingPolicy.Fail)
-//                    .loader(loader)
-//                    .base(base).get();
-//
-//            if (expanded.size() == 1) {
-//                final JsonValue object = expanded.iterator().next();
-//                if (JsonUtils.isObject(object)) {
-//
-////                    final ModelVersion version = VerifiableReader.getVersion(document);
-////
-////                    return sign(version, getContext(version, document, draft), object.asJsonObject(), draft, loader);
-//                    return null;
-//                }
-//            }
-//            throw new DocumentError(ErrorType.Invalid); // malformed input, not single object to sign has been found
-//
-//        } catch (JsonLdError e) {
-//            DocumentError.failWithJsonLd(e);
-//            throw new DocumentError(e, ErrorType.Invalid);
-//        }
     }
 
 //    protected JsonObject sign(final VcdmVersion version, final JsonArray context, final JsonObject expanded,
@@ -254,46 +226,6 @@ public abstract class AbstractIssuer implements Issuer {
 //            JsonArray context,
 //            LinkedTree document,
 //            ProofDraft draft) throws SigningError, DocumentError;
-
-//    protected JsonArray getContext(VcdmVersion version, JsonObject document, ProofDraft draft) {
-//
-//        final Collection<String> urls = new HashSet<>();
-//        final JsonArrayBuilder contexts = Json.createArrayBuilder();
-//
-//        // extract origin contexts
-//        if (document != null && document.containsKey(Keywords.CONTEXT)) {
-//            final JsonValue documentContext = document.get(Keywords.CONTEXT);
-//            if (JsonUtils.isString(documentContext)) {
-//                urls.add(((JsonString) documentContext).getString());
-//                contexts.add(documentContext);
-//
-//            } else if (JsonUtils.isObject(documentContext)) {
-//                contexts.add(documentContext);
-//
-//            } else if (JsonUtils.isArray(documentContext)) {
-//                for (final JsonValue context : documentContext.asJsonArray()) {
-//                    if (JsonUtils.isString(context)) {
-//                        urls.add(((JsonString) context).getString());
-//                    }
-//                    contexts.add(context);
-//                }
-//            }
-//        }
-//
-//        final Collection<String> provided = draft.context(version);
-//
-//        if (provided != null) {
-//            // use .stream().filter(Predicate.not(urls::contains))
-//            for (String url : provided) {
-//                if (!urls.contains(url)) {
-//                    urls.add(url);
-//                    contexts.add(Json.createValue(url));
-//                }
-//            }
-//        }
-//
-//        return contexts.build();
-//    }
 
     protected static final JsonObject fetchDocument(URI location, DocumentLoader loader) throws DocumentError, SigningError {
         try {

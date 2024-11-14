@@ -1,0 +1,28 @@
+{
+  "@context": "https://www.w3.org/ns/credentials/v2",
+  "type": "VerifiablePresentation",
+  "verifiableCredential": {
+    "@context": "https://www.w3.org/ns/credentials/v2",
+    "type": "VerifiableCredential",
+    "issuer": "https://example.com/issuer/1",
+    "credentialSubject": "https://example.com/subject/1"
+  },
+  "proof": [
+    {
+      "type": "DataIntegrityProof",
+      "created": "2022-05-28T17:02:05Z",
+      "proofPurpose": "assertionMethod",
+      "cryptosuite": "test-2022",
+      "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld",
+      "proofValue": "zgjpPJ99gWxLtTDKtR6WkqNuk2n7xNuoHn5TMUdyQo5F"
+    },
+    {
+      "type": "DataIntegrityProof",
+      "created": "2023-01-01T00:00:01Z",
+      "proofPurpose": "assertionMethod",
+      "cryptosuite": "test-2022",
+      "verificationMethod": "https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld",
+      "proofValue": "z9BwAURMCexmstemTCQWQu61ovYTLfdTekqkoKKeuz1Ju"
+    }
+  ]
+}
