@@ -1,0 +1,14 @@
+{
+  "@context": "https://www.w3.org/ns/credentials/v2",
+  "type": "VerifiableCredential",
+  "issuer": "https://example.com/issuer/1",
+  "credentialSubject": "https://example.com/subject/1",
+  "proof": {
+    "type": "DataIntegrityProof",
+    "created": "2022-05-28T17:02:05Z",
+    "proofPurpose": "assertionMethod",
+    "cryptosuite": "test-2022",
+    "verificationMethod": "http://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld",
+    "proofValue": "zBwTbU42YQcJcoiX7ALL5R5AK73vHNdtHjc91p266vc3V"
+  }
+}

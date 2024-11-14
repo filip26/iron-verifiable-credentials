@@ -218,7 +218,18 @@
       "name": "Forged VC signature",
       "input": "verifier/forged-vc-signature.jsonld",
       "expectErrorCode": "InvalidSignature"
+    },
+            {
+      "@id": "#t0022",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Unsupported verification method",
+      "input": "verifier/unsupported-method.jsonld",
+      "expectErrorCode": "UnknownVerificationMethod"
     },    
+        
     {
       "@id": "#t1001",
       "@type": [
