@@ -4,12 +4,10 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.apicatalog.controller.key.VerificationKey;
-import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.jsonld.JsonLdError;
@@ -31,7 +29,6 @@ import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.status.Status;
 import com.apicatalog.vc.status.StatusVerifier;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
@@ -49,7 +46,7 @@ import jakarta.json.JsonStructure;
  */
 public class Verifier extends VerificationProcessor<Verifier> {
 
-    private static final Logger LOGGER = Logger.getLogger(Verifier.class.getName());
+//    private static final Logger LOGGER = Logger.getLogger(Verifier.class.getName());
 
     protected StatusVerifier statusVerifier;
 
@@ -216,7 +213,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
             if (model != null) {
                 final Verifiable verifiable = reader.materialize(model, loader, base);
-                
+
                 if (verifiable != null) {
                     return verify(verifiable, parameters);
                 }
@@ -255,16 +252,16 @@ public class Verifier extends VerificationProcessor<Verifier> {
                     throw new DocumentError(ErrorType.Missing, VcdiVocab.PROOF_VALUE);
                 }
 
-                final VerificationMethod verificationMethod = resolveMethod(proof)
-                        .orElseThrow(() -> new DocumentError(ErrorType.Missing, VcdiVocab.VERIFICATION_METHOD));
-
-                if (verificationMethod instanceof VerificationKey verificationKey) {
-                    // verify the proofs' signatures
-                    proof.verify(verificationKey);
-
-                } else {
+                
+                
+                final VerificationKey verificationKey = keyProvider.verificationKey(proof);
+                
+                if (verificationKey == null) {
                     throw new DocumentError(ErrorType.Unknown, VcdiVocab.VERIFICATION_METHOD);
                 }
+
+                // verify the proofs' signatures
+                proof.verify(verificationKey);
             }
 
             // all good
@@ -294,11 +291,11 @@ public class Verifier extends VerificationProcessor<Verifier> {
         }
 
         // status check
-        if (statusVerifier != null && credential.status() != null && !credential.status().isEmpty()) {
-            for (final Status status : credential.status()) {
-                statusVerifier.verify(credential, status);
-            }
-        }
+//        if (statusVerifier != null && credential.status() != null && !credential.status().isEmpty()) {
+//            for (final Status status : credential.status()) {
+//                statusVerifier.verify(credential, status);
+//            }
+//        }
     }
 
     static final Map<String, Object> toMap(Parameter<?>... parameters) {

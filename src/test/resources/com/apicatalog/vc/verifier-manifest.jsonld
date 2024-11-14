@@ -205,10 +205,20 @@
         "NegativeEvaluationTest",
         "VeriferTest"
       ],
-      "name": "Invalid proof chain",
-      "input": "verifier/invalid-proof-chain.jsonld",
-      "expectErrorCode": "InvalidProofChain"
+      "name": "Forged VC content",
+      "input": "verifier/forged-vc-content.jsonld",
+      "expectErrorCode": "InvalidSignature"
     },
+    {
+      "@id": "#t0021",
+      "@type": [
+        "NegativeEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Forged VC signature",
+      "input": "verifier/forged-vc-signature.jsonld",
+      "expectErrorCode": "InvalidSignature"
+    },    
     {
       "@id": "#t1001",
       "@type": [
@@ -244,6 +254,24 @@
       ],
       "name": "Signed VP VCDM2.0 DI1.0",
       "input": "issuer/vcdm20-di10-signed-vp.jsonld"
-    }
+    },
+    {
+      "@id": "#t1005",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Embedded verification method",
+      "input": "issuer/embedded-method-vc.jsonld"
+    },
+    {
+      "@id": "#t1007",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "DID verification method",
+      "input": "issuer/did-method-vc.jsonld"
+    }    
   ]
 }

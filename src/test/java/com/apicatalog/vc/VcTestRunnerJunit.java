@@ -13,9 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -63,11 +61,11 @@ public class VcTestRunnerJunit {
             new SchemeRouter().set("classpath", new ClasspathLoader()));
 
     // FIXME the static loader?
-    final static Collection<VerificationKeyProvider> RESOLVERS = defaultResolvers(new StaticContextLoader((LOADER)));
+    final static VerificationKeyProvider RESOLVERS = defaultResolvers(new StaticContextLoader((LOADER)));
 
     final static TestSignatureSuite TEST_DI_SUITE = (new TestSignatureSuite());
 
-    final static Verifier VERIFIER = Verifier.with(TEST_DI_SUITE).loader(LOADER).methodResolvers(RESOLVERS);
+    final static Verifier VERIFIER = Verifier.with(TEST_DI_SUITE).loader(LOADER).methodResolver(RESOLVERS);
 
     final static Reader READER = Reader.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER);
 
@@ -289,11 +287,11 @@ public class VcTestRunnerJunit {
         return reader.read(KeyPair.class, keys);
     }
 
-    static final Collection<VerificationKeyProvider> defaultResolvers(DocumentLoader loader) {
-        Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();
+    static final VerificationKeyProvider defaultResolvers(DocumentLoader loader) {
+//        Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();
 //        resolvers.add(new DidKeyMethodResolver(TestAlgorithm.DECODER));
-        resolvers.add(new RemoteTestMultiKeyProvider(loader));
-        return resolvers;
+        return new RemoteTestMultiKeyProvider(loader);
+ //       return resolvers;
     }
 
     static final Map<String, Object> toMap(Parameter<?>... parameters) {

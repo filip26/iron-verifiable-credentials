@@ -1,0 +1,14 @@
+{
+  "@context": "https://www.w3.org/ns/credentials/v2",
+  "type": "VerifiableCredential",
+  "issuer": "https://example.com/issuer/1",
+  "credentialSubject": "https://example.com/subject/1",
+  "proof": {
+    "type": "DataIntegrityProof",
+    "created": "1941-11-12T12:00:00Z",
+    "proofPurpose": "assertionMethod",
+    "cryptosuite": "test-2022",
+    "verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
+    "proofValue": "z6pJ2rYnTkeUiqpwftPye5LuZ97DUWiH9kcjd5mDG6foa"
+  }
+}

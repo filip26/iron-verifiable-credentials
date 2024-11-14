@@ -100,40 +100,38 @@
       }
     },
     {
-      "@id": "#t0022",
+      "@id": "#t1007",
       "@type": [
         "PositiveEvaluationTest",
         "IssuerTest"
       ],
-      "name": "signed embedded verificationMethod",
-      "input": "issuer/0022-in.jsonld",
-      "expect": "issuer/0022-out.jsonld",
-      "compacted": true,
+      "name": "VC with embedded method",
+      "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
+      "expect": "issuer/embedded-method-vc.jsonld",
       "options": {
-        "keyPair": "issuer/0001-keys.json",
+        "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": {
-          "id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
+          "id": "https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld#keys-1",
           "type": "Multikey",
-          "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/1",
-          "publicKeyMultibase": "z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA"
+          "controller": "https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld",
+          "publicKeyMultibase": "z5C4SPo8HWx5EYE7nLGYfRqUcPG4eN6vezEsobV622h2danE"
         },
-        "created": "2022-06-04T20:33:01Z"
+        "created": "1989-11-17T18:33:01Z"
       }
     },
     {
-      "@id": "#t0023",
+      "@id": "#t1008",
       "@type": [
         "PositiveEvaluationTest",
         "IssuerTest"
       ],
-      "name": "a credential with DID key as a verification method",
-      "input": "issuer/0023-in.jsonld",
-      "expect": "issuer/0023-out.jsonld",
-      "compacted": true,
+      "name": "VC with DID key method",
+      "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
+      "expect": "issuer/did-method-vc.jsonld",
       "options": {
-        "keyPair": "issuer/0001-keys.json",
+        "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
-        "created": "2022-05-28T17:02:05Z"
+        "created": "1941-11-12T12:00:00Z"
       }
     }
   ]

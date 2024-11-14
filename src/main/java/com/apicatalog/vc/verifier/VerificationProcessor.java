@@ -2,87 +2,58 @@ package com.apicatalog.vc.verifier;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 
-import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.apicatalog.vc.processor.DocumentProcessor;
-import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 public class VerificationProcessor<T extends VerificationProcessor<T>> extends DocumentProcessor<T> {
 
-    protected Collection<VerificationKeyProvider> methodResolvers;
+    protected VerificationKeyProvider keyProvider;
 
     // TODO proof selector -> provider ! no, otherwise, only one provider!
 
     protected VerificationProcessor(final SignatureSuite... suites) {
         super(suites);
-        this.methodResolvers = null;
+        this.keyProvider = null;
     }
 
     // TODO resolvers should be multilevel, per verifier, per proof type, e.g.
     // DidUrlMethodResolver could be different.
     @SuppressWarnings("unchecked")
-    public T methodResolvers(Collection<VerificationKeyProvider> resolvers) {
-        this.methodResolvers = resolvers;
+    public T methodResolver(VerificationKeyProvider keyProvider) {
+        this.keyProvider = keyProvider;
         return (T) this;
     }
 
-    protected static final Collection<VerificationKeyProvider> defaultResolvers(DocumentLoader loader) {
-        Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();
-//        resolvers.add(new DidKeyMethodResolver(MulticodecDecoder.getInstance(Tag.Key)));
-//        resolvers.add(HttpMethodResolver.getInstance(loader, Multikey.class, JsonWebKey.class));
-        return resolvers;
-    }
-
-//    protected Optional<VerificationMethod> getMethod(final Proof proof) throws VerificationError, DocumentError {
+//    protected static final Collection<VerificationKeyProvider> defaultResolvers(DocumentLoader loader) {
+//        Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();
+////        resolvers.add(new DidKeyMethodResolver(MulticodecDecoder.getInstance(Tag.Key)));
+////        resolvers.add(HttpMethodResolver.getInstance(loader, Multikey.class, JsonWebKey.class));
+//        return resolvers;
+//    }
 //
-//        final VerificationMethod method = proof.method();
+//    protected Optional<VerificationKey> resolveMethod(Proof proof) throws DocumentError {
 //
-//        if (method == null) {
-//            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
+//
+//        // find the method id resolver
+//        final Optional<VerificationKeyProvider> resolver = getMethodResolvers().stream()
+////                .filter(r -> r.isAccepted(id))
+//                .findFirst();
+//
+//        // try to resolve the method
+//        if (resolver.isPresent()) {
+//            return Optional.ofNullable(resolver.get().verificationKey(proof));
 //        }
 //
-//        final String methodType = method.type();
-//
-//        if (methodType != null
-//                && method instanceof VerificationKey
-//                && (((VerificationKey) method).publicKey() != null)) {
-//            //TODO accept method
-//            return Optional.of(method);
-//        }
-//
-//        return resolveMethod(method.id(), proof);
+//        throw new DocumentError(ErrorType.Unknown, "VerificationMethod");
 //    }
 
-    protected Optional<VerificationMethod> resolveMethod(
-            Proof proof) throws DocumentError {
-
-//        if (id == null) {
-//            throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
+//    protected Collection<VerificationKeyProvider> getMethodResolvers() {
+//        if (keyProvider == null) {
+//            return defaultResolvers(getLoader());
 //        }
-
-        // find the method id resolver
-        final Optional<VerificationKeyProvider> resolver = getMethodResolvers().stream()
-//                .filter(r -> r.isAccepted(id))
-                .findFirst();
-
-        // try to resolve the method
-        if (resolver.isPresent()) {
-            return Optional.ofNullable(resolver.get().verificationKey(proof));
-        }
-
-        throw new DocumentError(ErrorType.Unknown, "VerificationMethod");
-    }
-
-    protected Collection<VerificationKeyProvider> getMethodResolvers() {
-        if (methodResolvers == null) {
-            return defaultResolvers(getLoader());
-        }
-        return methodResolvers;
-    }
+//        return keyProvider;
+//    }
 }
