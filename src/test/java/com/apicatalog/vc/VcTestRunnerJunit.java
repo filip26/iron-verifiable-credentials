@@ -37,7 +37,6 @@ import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.method.MethodAdapter;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
@@ -107,7 +106,7 @@ public class VcTestRunnerJunit {
                     keyPairLocation = URI.create(VcTestCase.base("method/multikey-pair.json"));
                 }
                 
-                final Issuer issuer = TEST_DI_SUITE.createIssuer(getKeys(keyPairLocation, LOADER, null))
+                final Issuer issuer = TEST_DI_SUITE.createIssuer(getKeys(keyPairLocation, LOADER))
                         .loader(LOADER);
 
                 URI purpose = testCase.purpose;
@@ -277,7 +276,7 @@ public class VcTestRunnerJunit {
         writer.println();
     }
 
-    static final KeyPair getKeys(final URI keyPairLocation, final DocumentLoader loader, MethodAdapter methodAdapter)
+    static final KeyPair getKeys(final URI keyPairLocation, final DocumentLoader loader)
             throws DocumentError, JsonLdError, TreeBuilderError, NodeAdapterError {
 
         final DocumentLoader docLoader = new StaticContextLoader(loader);
@@ -293,7 +292,7 @@ public class VcTestRunnerJunit {
     static final Collection<VerificationKeyProvider> defaultResolvers(DocumentLoader loader) {
         Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();
 //        resolvers.add(new DidKeyMethodResolver(TestAlgorithm.DECODER));
-//        resolvers.add(HttpMethodResolver.getInstance(loader));
+        resolvers.add(new RemoteTestMultiKeyProvider(loader));
         return resolvers;
     }
 
