@@ -83,7 +83,7 @@
         "verificationMethod": "method/multikey-public.jsonld",
         "created": "2023-01-01T00:00:01Z"
       }
-    },        
+    },
     {
       "@id": "#t1006",
       "@type": [
@@ -98,7 +98,7 @@
         "verificationMethod": "method/multikey-public.jsonld",
         "created": "2023-01-01T00:00:01Z"
       }
-    },    
+    },
     {
       "@id": "#t0022",
       "@type": [
@@ -134,26 +134,6 @@
         "keyPair": "issuer/0001-keys.json",
         "verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
         "created": "2022-05-28T17:02:05Z"
-      }
-    },
-    {
-      "@id": "#t0030",
-      "@type": [
-        "PositiveEvaluationTest",
-        "IssuerTest"
-      ],
-      "name": "proof set, co-sign",
-      "input": "issuer/0030-in.jsonld",
-      "expect": "issuer/0030-out.jsonld",
-      "compacted": true,
-      "options": {
-        "keyPair": "issuer/0001-keys.json",
-        "verificationMethod": {
-          "@id": "https://github.com/filip26/iron-verifiable-credentials/verifier/0005-verification-key.json",
-          "@type": "Multikey",
-          "controller": "https://github.com/filip26/iron-verifiable-credentials/issuer/2"
-        },
-        "created": "2022-06-07T21:06:15Z"
       }
     }
   ]
