@@ -18,6 +18,7 @@ import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.FragmentComposer;
 import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.model.VerifiableMaterial;
@@ -123,7 +124,15 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
             JsonArray expanded = JsonLd.expand(JsonDocument.of(compacted)).loader(loader).base(base).get();
 
-            return new GenericMaterial(JsonLdContext.strings(compacted, Collections.emptyList()),
+            Collection<String> context = Collections.emptyList();
+
+            if (compacted.containsKey(JsonLdKeyword.CONTEXT)) {
+                context = JsonLdContext.strings(compacted, context);
+                compacted = Json.createObjectBuilder(compacted).remove(JsonLdKeyword.CONTEXT).build();
+            }
+            
+            return new GenericMaterial(
+                    context,
                     compacted,
                     expanded.iterator().next().asJsonObject());
 

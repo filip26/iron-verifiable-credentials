@@ -22,6 +22,7 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableMaterialReader;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 
+import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -38,7 +39,7 @@ public class JsonLdMaterialReader implements VerifiableMaterialReader {
             final URI base) throws DocumentError {
 
         Collection<String> context = context(document, Collections.emptyList());
-
+        
         try {
             // expand the document
             final ExpansionApi expansion = JsonLd.expand(JsonDocument.of(document))
@@ -53,9 +54,16 @@ public class JsonLdMaterialReader implements VerifiableMaterialReader {
                 final JsonValue item = expanded.iterator().next();
 
                 if (JsonUtils.isObject(item)) {
+                    
+                    JsonObject compacted = document;
+                    
+                    if (compacted.containsKey(JsonLdKeyword.CONTEXT)) {
+                        compacted = Json.createObjectBuilder(compacted).remove(JsonLdKeyword.CONTEXT).build();
+                    }
+                    
                     return new GenericMaterial(
                             context,
-                            document,
+                            compacted,
                             item.asJsonObject());
                 }
             }

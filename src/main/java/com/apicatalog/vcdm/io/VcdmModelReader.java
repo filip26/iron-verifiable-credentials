@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.context.ContextReducer;
 import com.apicatalog.vc.jsonld.JsonLdMaterialReader;
 import com.apicatalog.vc.model.VerifiableMaterial;
@@ -23,7 +25,6 @@ import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 public abstract class VcdmModelReader implements VerifiableModelReader, VerifiableModelWriter {
 
@@ -89,9 +90,15 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
             for (JsonObject expandedProof : expandedProofs) {
 
                 JsonObject compactedProof = itCompactedProofs.next();
+                Collection<String> context = defaultContext;
+
+                if (compactedProof.containsKey(JsonLdKeyword.CONTEXT)) {
+                    context = JsonLdContext.strings(compactedProof, defaultContext);
+                    compactedProof = Json.createObjectBuilder(compactedProof).remove(JsonLdKeyword.CONTEXT).build();
+                }
 
                 proofs.add(new GenericMaterial(
-                        JsonLdContext.strings(compactedProof, defaultContext),
+                        context,
                         compactedProof,
                         expandedProof));
             }
@@ -111,7 +118,7 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
 
         JsonObject compacted = model.data().compacted();
 
-        Collection<String> context = model.data().context();
+        Collection<String> context = new LinkedHashSet<>(model.data().context());
 
         if (model.proofs() != null && !model.proofs().isEmpty()) {
             if (model.proofs().size() == 1) {
@@ -119,14 +126,16 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
                 VerifiableMaterial proof = model.proofs().iterator().next();
 
                 compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), proof.compacted()).build();
+                if (proof.context() != null) {
+                    context.addAll(proof.context());
+                }
 
             } else {
-//                compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), Json.createArrayBuilder(model.compactedProofs)).build();
+//FIXME                compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), Json.createArrayBuilder(model.compactedProofs)).build();
             }
         }
         context = contextReducer.reduce(context);
-
-        System.out.println(">>> " + context);
+        
         return new GenericMaterial(context, compacted, expanded);
     }
 

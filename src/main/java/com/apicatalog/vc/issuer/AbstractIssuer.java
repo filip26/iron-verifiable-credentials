@@ -16,6 +16,7 @@ import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
@@ -33,6 +34,7 @@ import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
@@ -149,7 +151,17 @@ System.out.println("CRYPTO " + crypto.id() + ", " + crypto.keyLength());
                     .withProof(signedProof)
                     .materialize();
             
-            return signedDocument.compacted();
+            JsonObject compacted = signedDocument.compacted();
+            
+            if (signedDocument.context() != null && !signedDocument.context().isEmpty()) {
+                if (signedDocument.context().size() == 1) {
+                    compacted = Json.createObjectBuilder(compacted).add(JsonLdKeyword.CONTEXT, signedDocument.context().iterator().next()).build();
+                } else {
+                    compacted = Json.createObjectBuilder(compacted).add(JsonLdKeyword.CONTEXT, Json.createArrayBuilder(signedDocument.context())).build();                    
+                }
+            }
+            
+            return compacted;
             
         } catch (CryptoSuiteError e) {
             throw new SigningError(e, SignatureErrorCode.Unknown);

@@ -96,7 +96,6 @@ public interface Proof {
      */
     default void validate(Map<String, Object> params) throws DocumentError {
         throw new DocumentError(ErrorType.Unknown, "Proof");
-//        throw new UnsupportedOperationException("An unknown, generic, proof cannot be validated.");
     }
 
     /**
@@ -108,7 +107,6 @@ public interface Proof {
      */
     default void verify(VerificationKey method) throws VerificationError, DocumentError {
         throw new DocumentError(ErrorType.Unknown, "Proof");
-//        throw new UnsupportedOperationException("An unknown, generic, proof cannot be verified.");
     }
 
     /**

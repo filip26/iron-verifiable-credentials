@@ -47,7 +47,7 @@
       ],
       "name": "VCDM2.0 VC to sign",
       "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
-      "expect": "issuer/0020-out.jsonld",
+      "expect": "issuer/vcdm20-di10-signed-vc.jsonld",
       "options": {
         "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": "method/multikey-public.jsonld",

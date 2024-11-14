@@ -22,10 +22,10 @@ class TestAlgorithm implements Signer {
 
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {
-        final byte[] result = new byte[data.length];
+        final byte[] result = new byte[publicKey.length];
 
-        for (int i = 0; i < data.length; i++) {
-            result[i] = (byte) (data[i] ^ publicKey[i % publicKey.length]);
+        for (int i = 0; i <  data.length; i++) {
+            result[i % publicKey.length] = (byte) (data[i] ^ publicKey[i % publicKey.length]);
         }
 
         if (!Arrays.equals(result, signature)) {
@@ -36,10 +36,10 @@ class TestAlgorithm implements Signer {
     @Override
     public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
 
-        final byte[] result = new byte[data.length];
+        final byte[] result = new byte[privateKey.length];
 
-        for (int i = 0; i < data.length; i++) {
-            result[i] = (byte) (data[i] ^ privateKey[i % privateKey.length]);
+        for (int i = 0; i <  data.length; i++) {
+            result[i % privateKey.length] = (byte) (data[i] ^ privateKey[i % privateKey.length]);
         }
 
         return result;

@@ -48,7 +48,7 @@ class TestSignatureSuite extends DataIntegritySuite {
             return null;
         }
 
-        if (proofValue.length != 64) {
+        if (proofValue.length != 32) {
             throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
         }
         return SolidProofValue.of(CRYPTO, data, proof, proofValue);
