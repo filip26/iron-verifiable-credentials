@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -317,18 +318,18 @@ public class VcTestRunnerJunit {
                 Multibase.BASE_58_BTC.decode("z5C4SPo8HWx5EYE7nLGYfRqUcPG4eN6vezEsobV622h2danE"));
 
         return MethodSelector.create()
-                // accept concrete method id
+                // accept specific method id
                 .with(MethodPredicate.methodId(
                         URI.create("https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld")::equals),
                         new RemoteTestMultiKeyProvider(loader))
 
-                // accept method when public key is well-known
+                // accept embedded method when public key is well-known and trusted
                 .with(MethodPredicate.methodType(VerificationKey.class)
-//                        .and(proof -> Arrays.equals(
-//                                wellKnownPublicKey,
-//                                ((VerificationKey) proof.method()).publicKey().rawBytes()))
+                        .and(proof -> Arrays.equals(
+                                wellKnownPublicKey,
+                                ((VerificationKey) proof.method()).publicKey().rawBytes()))
                         ,
-                        // just pass the key if it's known and trusted
+                        // just pass the embedded key back
                         proof -> (VerificationKey) proof.method())
                 
                 .with(i -> true, proof -> {

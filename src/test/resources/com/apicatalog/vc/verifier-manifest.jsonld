@@ -219,7 +219,7 @@
       "input": "verifier/forged-vc-signature.jsonld",
       "expectErrorCode": "InvalidSignature"
     },
-            {
+    {
       "@id": "#t0022",
       "@type": [
         "NegativeEvaluationTest",
@@ -228,8 +228,7 @@
       "name": "Unsupported verification method",
       "input": "verifier/unsupported-method.jsonld",
       "expectErrorCode": "UnknownVerificationMethod"
-    },    
-        
+    },
     {
       "@id": "#t1001",
       "@type": [
@@ -283,6 +282,33 @@
       ],
       "name": "DID verification method",
       "input": "issuer/did-method-vc.jsonld"
-    }    
+    },
+    {
+      "@id": "#t1008",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Proof Set VC",
+      "input": "issuer/co-signed-vc.jsonld"
+    },
+    {
+      "@id": "#t1009",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Proof Set VP",
+      "input": "issuer/co-signed-vp.jsonld"
+    },
+    {
+      "@id": "#t1010",
+      "@type": [
+        "PositiveEvaluationTest",
+        "VeriferTest"
+      ],
+      "name": "Proof Chain VC",
+      "input": "issuer/proof-chain-vc.jsonld"
+    }
   ]
 }

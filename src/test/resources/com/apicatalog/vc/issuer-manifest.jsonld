@@ -49,6 +49,7 @@
       "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
       "expect": "issuer/vcdm20-di10-signed-vc.jsonld",
       "options": {
+        "id": "urn:proof:1",
         "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": "method/multikey-public.jsonld",
         "created": "2022-05-28T17:02:05Z"
@@ -75,7 +76,7 @@
         "PositiveEvaluationTest",
         "IssuerTest"
       ],
-      "name": "Co-Sign VC",
+      "name": "Proof Set VC",
       "input": "issuer/vcdm20-di10-signed-vc.jsonld",
       "expect": "issuer/co-signed-vc.jsonld",
       "options": {
@@ -90,10 +91,26 @@
         "PositiveEvaluationTest",
         "IssuerTest"
       ],
-      "name": "Co-Sign VP",
+      "name": "Proof Set VP",
       "input": "issuer/vcdm20-di10-signed-vp.jsonld",
       "expect": "issuer/co-signed-vp.jsonld",
       "options": {
+        "keyPair": "method/multikey-pair.jsonld",
+        "verificationMethod": "method/multikey-public.jsonld",
+        "created": "2023-01-01T00:00:01Z"
+      }
+    },
+    {
+      "@id": "#t1007",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "Proof Chain VC",
+      "input": "issuer/vcdm20-di10-signed-vc.jsonld",
+      "expect": "issuer/proof-chain-vc.jsonld",
+      "options": {
+        "previousProof": "urn:proof:1",
         "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": "method/multikey-public.jsonld",
         "created": "2023-01-01T00:00:01Z"
