@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,14 +49,16 @@ public class Verifier extends VerificationProcessor<Verifier> {
 
 //    private static final Logger LOGGER = Logger.getLogger(Verifier.class.getName());
 
+    protected final ProofAdapter proofAdapter;
+    
     protected StatusVerifier statusVerifier;
 
-    protected final VerifiableReaderProvider readerProvider;
+    protected VerifiableReaderProvider readerProvider;
 
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
 
-        ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
+        proofAdapter = ProofAdapterProvider.of(suites);
 
         this.readerProvider = defaultReaders(proofAdapter);
 
@@ -84,6 +87,11 @@ public class Verifier extends VerificationProcessor<Verifier> {
         return new Verifier(suites);
     }
 
+    public Verifier modelProvider(Function<ProofAdapter, VerifiableReaderProvider> provider) {
+        this.readerProvider = provider.apply(proofAdapter);
+        return this;
+    }
+    
     /**
      * Set a credential status verifier. If not set then
      * <code>credentialStatus</code> is ignored if present.

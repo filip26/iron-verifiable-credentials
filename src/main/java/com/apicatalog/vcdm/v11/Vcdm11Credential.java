@@ -6,9 +6,9 @@ import java.util.Collection;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
+import com.apicatalog.linkedtree.orm.Adapter;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
-import com.apicatalog.linkedtree.orm.Literal;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
@@ -49,7 +49,7 @@ public interface Vcdm11Credential extends VcdmVerifiable, Credential {
      *         <code>null</code>.
      */
     @Term("issuanceDate")
-    @Literal(XsdDateTimeAdapter.class)
+    @Adapter(XsdDateTimeAdapter.class)
     Instant issuance();
 
     /**
@@ -62,7 +62,7 @@ public interface Vcdm11Credential extends VcdmVerifiable, Credential {
      * @return the expiration date or <code>null</code> if not set
      */
     @Term("expirationDate")
-    @Literal(XsdDateTimeAdapter.class)
+    @Adapter(XsdDateTimeAdapter.class)
     Instant expiration();
 
     /**

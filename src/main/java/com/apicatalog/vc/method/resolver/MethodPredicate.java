@@ -17,4 +17,9 @@ public class MethodPredicate {
     public static Predicate<Proof> methodId(Predicate<URI> id) {
         return methodIdExists.and(proof -> id.test(proof.method().id()));
     }
+    
+    public static Predicate<Proof> methodType(Class<?> type) {
+        return methodIdExists.and(proof -> type.isInstance(proof.method()));
+    }
+
 }

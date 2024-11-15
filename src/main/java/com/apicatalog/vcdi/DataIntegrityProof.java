@@ -13,9 +13,10 @@ import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.VocabTerm;
+import com.apicatalog.linkedtree.orm.Adapter;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
-import com.apicatalog.linkedtree.orm.Literal;
+import com.apicatalog.linkedtree.orm.Mapper;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
@@ -54,10 +55,10 @@ public interface DataIntegrityProof extends VerifiableProof {
      * @return the date time when the proof has been created
      */
     @Vocab("http://purl.org/dc/terms/")
-    @Literal(XsdDateTimeAdapter.class)
+    @Adapter(XsdDateTimeAdapter.class)
     Instant created();
 
-    @Literal(XsdDateTimeAdapter.class)
+    @Adapter(XsdDateTimeAdapter.class)
     @Term(value = "expiration", compact = false)
     Instant expires();
 
@@ -89,7 +90,7 @@ public interface DataIntegrityProof extends VerifiableProof {
     @Term("cryptosuite")
     @Provided
     @Override
-    @Literal(CryptoSuiteAdapter.class)
+    @Mapper(CryptoSuiteMapper.class)
     CryptoSuite cryptoSuite();
 
     @Override

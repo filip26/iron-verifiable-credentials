@@ -6,9 +6,9 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.lang.LangStringSelector;
+import com.apicatalog.linkedtree.orm.Adapter;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
-import com.apicatalog.linkedtree.orm.Literal;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
@@ -34,7 +34,7 @@ public interface Vcdm20Credential extends VcdmVerifiable, Credential {
      * 
      * @return a date time
      */
-    @Literal(XsdDateTimeAdapter.class)
+    @Adapter(XsdDateTimeAdapter.class)
     Instant validFrom();
 
     /**
@@ -45,7 +45,7 @@ public interface Vcdm20Credential extends VcdmVerifiable, Credential {
      * 
      * @return the date and time the credential ceases to be valid
      */
-    @Literal(XsdDateTimeAdapter.class)
+    @Adapter(XsdDateTimeAdapter.class)
     Instant validUntil();
 
     @Term

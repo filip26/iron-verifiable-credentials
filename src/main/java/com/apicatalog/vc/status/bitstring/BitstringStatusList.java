@@ -8,7 +8,7 @@ import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.LinkedNode;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.literal.NumericValue;
-import com.apicatalog.linkedtree.orm.Literal;
+import com.apicatalog.linkedtree.orm.Adapter;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.vc.Subject;
 
@@ -63,7 +63,7 @@ public class BitstringStatusList implements Subject {
     }
 
     @Term(value =  "encodedList", compact = false)
-    @Literal(BitstringAdapter.class)
+    @Adapter(BitstringAdapter.class)
     public Bitstring list() {
         return list;
     }

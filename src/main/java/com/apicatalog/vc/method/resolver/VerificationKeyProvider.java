@@ -4,6 +4,7 @@ import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.proof.Proof;
 
+@FunctionalInterface
 public interface VerificationKeyProvider {
 
     /**

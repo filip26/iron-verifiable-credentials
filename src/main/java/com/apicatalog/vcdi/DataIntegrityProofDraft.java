@@ -2,6 +2,7 @@ package com.apicatalog.vcdi;
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -79,12 +80,16 @@ public class DataIntegrityProofDraft extends ProofDraft {
 //    }
 
     public DataIntegrityProofDraft created(Instant created) {
-        this.created = created;
+        this.created = created == null
+                ? created
+                : created.truncatedTo(ChronoUnit.SECONDS);
         return this;
     }
 
     public DataIntegrityProofDraft expires(Instant expires) {
-        this.expires = expires;
+        this.expires = expires == null
+                ? expires
+                : expires.truncatedTo(ChronoUnit.SECONDS);
         return this;
     }
 
@@ -130,7 +135,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
                 context = JsonLdContext.strings(compacted, context);
                 compacted = Json.createObjectBuilder(compacted).remove(JsonLdKeyword.CONTEXT).build();
             }
-            
+
             return new GenericMaterial(
                     context,
                     compacted,
@@ -138,10 +143,10 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
         } catch (FragmentPropertyError e) {
             throw DocumentError.of(e);
-            
+
         } catch (NodeAdapterError e) {
             throw new DocumentError(e, ErrorType.Invalid);
-            
+
         } catch (JsonLdError e) {
             throw new DocumentError(e, ErrorType.Invalid);
         }
@@ -153,7 +158,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
         JsonValue value = Json.createValue(suite.proofValueBase.encode(signature));
 
         JsonObject compacted = Json.createObjectBuilder(proof.compacted()).add(VcdiVocab.PROOF_VALUE.name(), value).build();
-        JsonObject expanded = proof.expanded(); //FIXME
+        JsonObject expanded = proof.expanded(); // FIXME
 
         return new GenericMaterial(
                 proof.context(),

@@ -2,9 +2,9 @@ package com.apicatalog.vc.status.bitstring;
 
 import com.apicatalog.linkedtree.LinkedLiteral;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
-import com.apicatalog.linkedtree.literal.adapter.DataTypeAdapter;
+import com.apicatalog.linkedtree.literal.adapter.DatatypeAdapter;
 
-public class BitstringAdapter implements DataTypeAdapter {
+public class BitstringAdapter implements DatatypeAdapter {
 
     @Override
     public LinkedLiteral materialize(String source) throws NodeAdapterError {

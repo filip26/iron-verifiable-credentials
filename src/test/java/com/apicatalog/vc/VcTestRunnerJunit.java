@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.apicatalog.controller.key.KeyPair;
+import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.jsonld.JsonLdError;
@@ -33,11 +34,14 @@ import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.resolver.MethodPredicate;
-import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.apicatalog.vc.method.resolver.MethodSelector;
+import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
+import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.Reader;
@@ -45,7 +49,11 @@ import com.apicatalog.vc.verifier.Verifier;
 import com.apicatalog.vc.writer.VerifiableWriter;
 import com.apicatalog.vcdi.DataIntegrityProofDraft;
 import com.apicatalog.vcdi.DataIntegritySuite;
+import com.apicatalog.vcdi.VcdiVocab;
+import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmWriter;
+import com.apicatalog.vcdm.v11.Vcdm11Reader;
+import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -61,12 +69,25 @@ public class VcTestRunnerJunit {
 
     final static DocumentLoader LOADER = new UriBaseRewriter(VcTestCase.BASE, "classpath:",
             new SchemeRouter().set("classpath", new ClasspathLoader()));
-    
+
     final static VerificationKeyProvider RESOLVERS = defaultResolvers(new StaticContextLoader((LOADER)));
 
     final static TestSignatureSuite TEST_DI_SUITE = (new TestSignatureSuite());
 
-    final static Verifier VERIFIER = Verifier.with(TEST_DI_SUITE).loader(LOADER).methodResolver(RESOLVERS);
+    final static Verifier VERIFIER = Verifier
+            .with(TEST_DI_SUITE)
+            .loader(LOADER)
+            .methodResolver(RESOLVERS)
+            .modelProvider(proofAdapter -> {
+                Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter, TestMultikey.class);
+
+                return new ContextAwareReaderProvider()
+                        .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
+                        .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter, TestMultikey.class)
+                                // add VCDM 1.1 credential support
+                                .v11(vcdm11))
+                        .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter, TestMultikey.class));
+            });;
 
     final static Reader READER = Reader.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER);
 
@@ -290,11 +311,23 @@ public class VcTestRunnerJunit {
 
     static final VerificationKeyProvider defaultResolvers(DocumentLoader loader) {
 
+        byte[] wellKnownPublicKey = TestMulticodecKeyMapper.PUBLIC_KEY_CODEC.decode(
+                Multibase.BASE_58_BTC.decode("z5C4SPo8HWx5EYE7nLGYfRqUcPG4eN6vezEsobV622h2danE"));
+
         return MethodSelector.create()
-                // accept concrete method
+                // accept concrete method id
                 .with(MethodPredicate.methodId(
                         URI.create("https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld")::equals),
                         new RemoteTestMultiKeyProvider(loader))
+
+                // accept method when public key is well-known
+                .with(MethodPredicate.methodType(VerificationKey.class)
+//                        .and(proof -> Arrays.equals(
+//                                wellKnownPublicKey,
+//                                ((VerificationKey) proof.method()).publicKey().rawBytes()))
+                        ,
+                        // just pass the key if it's known and trusted
+                        proof -> (VerificationKey) proof.method())
                 .build();
 
 //        Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();

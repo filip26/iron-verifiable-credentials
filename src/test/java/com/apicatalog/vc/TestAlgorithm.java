@@ -55,12 +55,12 @@ class TestAlgorithm implements Signer {
         new Random().nextBytes(raw);
 
         var publicKey = new GenericMulticodecKey(
-                TestMulticodecKeyAdapter.PUBLIC_KEY_CODEC,
+                TestMulticodecKeyMapper.PUBLIC_KEY_CODEC,
                 Multibase.BASE_58_BTC,
                 raw);
 
         var privateKey = new GenericMulticodecKey(
-                TestMulticodecKeyAdapter.PRIVATE_KEY_CODEC,
+                TestMulticodecKeyMapper.PRIVATE_KEY_CODEC,
                 Multibase.BASE_58_BTC,
                 raw);
 
