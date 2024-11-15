@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.controller.key.VerificationKey;
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.jsonld.JsonLdError;
@@ -30,6 +31,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
@@ -79,14 +81,14 @@ public class VcTestRunnerJunit {
             .loader(LOADER)
             .methodResolver(RESOLVERS)
             .modelProvider(proofAdapter -> {
-                Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter, TestMultikey.class);
+                Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
 
                 return new ContextAwareReaderProvider()
                         .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
-                        .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter, TestMultikey.class)
+                        .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
                                 // add VCDM 1.1 credential support
                                 .v11(vcdm11))
-                        .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter, TestMultikey.class));
+                        .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter));
             });;
 
     final static Reader READER = Reader.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER);
@@ -306,7 +308,7 @@ public class VcTestRunnerJunit {
         JsonLdReader reader = JsonLdReader.of(TreeReaderMapping.createBuilder()
                 .scan(TestMultikey.class).build(), docLoader);
 
-        return reader.read(KeyPair.class, keys);
+        return reader.read(TestMultikey.class, keys);
     }
 
     static final VerificationKeyProvider defaultResolvers(DocumentLoader loader) {
@@ -328,6 +330,18 @@ public class VcTestRunnerJunit {
                         ,
                         // just pass the key if it's known and trusted
                         proof -> (VerificationKey) proof.method())
+                
+                .with(i -> true, proof -> {
+                    System.out.println(MethodPredicate.methodType(VerificationKey.class).test(proof));
+                    System.out.println(proof.method());
+                    System.out.println(proof.method().id());
+                    System.out.println(proof.method().type());
+                    System.out.println(proof.method() instanceof VerificationMethod);
+                    System.out.println(proof.method() instanceof VerificationKey);
+                    System.out.println(proof.method() instanceof Linkable);
+                    System.out.println(VerificationKey.class.isInstance(proof.method()));
+                    return null;
+                })
                 .build();
 
 //        Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();

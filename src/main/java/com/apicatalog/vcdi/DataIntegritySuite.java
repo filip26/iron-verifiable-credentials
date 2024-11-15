@@ -2,6 +2,7 @@ package com.apicatalog.vcdi;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 import com.apicatalog.controller.method.VerificationMethod;
@@ -18,6 +19,7 @@ import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
+import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseAdapter;
@@ -41,19 +43,23 @@ public class DataIntegritySuite implements SignatureSuite {
     protected final Multibase proofValueBase;
 
     protected final Class<? extends DataIntegrityProof> proofInterface;
+    
+    protected final Collection<Class<?>> customTypes;
 
     protected DataIntegritySuite(
             String cryptosuiteName,
             Multibase proofValueBase) {
-        this(cryptosuiteName, DataIntegrityProof.class, proofValueBase);
+        this(cryptosuiteName, DataIntegrityProof.class, Collections.emptyList(), proofValueBase);
     }
 
     protected DataIntegritySuite(
             String cryptosuiteName,
             Class<? extends DataIntegrityProof> proofInterface,
+            Collection<Class<?>> customTypes,
             Multibase proofValueBase) {
         this.cryptosuiteName = cryptosuiteName;
         this.proofInterface = proofInterface;
+        this.customTypes = customTypes;
         this.proofValueBase = proofValueBase;
     }
 
@@ -61,21 +67,6 @@ public class DataIntegritySuite implements SignatureSuite {
         return GENERIC;
     }
 
-//    protected static LinkedLiteralAdapter getProofValueAdapter(Multibase proofValueBase) {
-//        //TODO multibase adapter
-//        return new LinkedLiteralAdapter() {
-//            @Override
-//            public LinkedLiteral read(String value, Supplier<LinkedTree> rootSupplier) {
-//                return new MultibaseLiteral(datatype(), value, rootSupplier, proofValueBase.decode(value));
-//            }
-//            
-//            @Override
-//            public String datatype() {
-//                return MultibaseLiteral.TYPE;
-//            }
-//        };
-//    }
-//    
     protected ProofValue getProofValue(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader) throws DocumentError {
         return new GenericSignature();
     }
@@ -114,10 +105,16 @@ public class DataIntegritySuite implements SignatureSuite {
     @Override
     public Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proofMaterial, DocumentLoader loader) throws DocumentError {
 
-        var mapping = TreeReaderMapping.createBuilder()
+        TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder()
                 .scan(proofInterface, true)
-                .with(new MultibaseAdapter()) // TODO supported bases only
-                .build();
+                // TODO supported bases only
+                .with(new MultibaseAdapter());
+
+        if (customTypes != null) {
+            customTypes.forEach(builder::scan);
+        }
+        
+        TreeReaderMapping mapping = builder.build();
 
         var reader = JsonLdTreeReader.of(mapping);
 

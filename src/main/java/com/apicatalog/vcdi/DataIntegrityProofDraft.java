@@ -33,9 +33,7 @@ import jakarta.json.JsonValue;
 
 public class DataIntegrityProofDraft extends ProofDraft {
 
-    protected static final JsonLdWriter WRITER = new JsonLdWriter()
-            .scan(DataIntegrityProof.class)
-            .scan(VerificationMethod.class);
+    protected final JsonLdWriter writer;
 
     protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
             "https://w3id.org/security/data-integrity/v2",
@@ -67,6 +65,19 @@ public class DataIntegrityProofDraft extends ProofDraft {
         this.suite = suite;
         this.crypto = crypto;
         this.purpose = purpose;
+        this.writer = getWriter(suite);
+    }
+
+    protected static JsonLdWriter getWriter(DataIntegritySuite suite) {
+        JsonLdWriter writer = new JsonLdWriter()
+                .scan(DataIntegrityProof.class)
+                .scan(VerificationMethod.class);
+        
+        if (suite.customTypes != null) {
+            suite.customTypes.forEach(writer::scan);
+        }
+        
+        return writer;
     }
 //
 //    public DataIntegrityProofDraft(
@@ -125,7 +136,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
                     .set(VcdiVocab.DOMAIN.name(), domain)
                     .get(DataIntegrityProof.class);
 
-            JsonObject compacted = WRITER.compacted(proof);
+            JsonObject compacted = writer.compacted(proof);
 
             JsonArray expanded = JsonLd.expand(JsonDocument.of(compacted)).loader(loader).base(base).get();
 

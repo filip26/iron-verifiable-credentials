@@ -1,7 +1,7 @@
 package com.apicatalog.vc.method.resolver;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -45,7 +45,7 @@ public class MethodSelector implements VerificationKeyProvider {
         Map<Predicate<Proof>, VerificationKeyProvider> providers;
 
         public Builder() {
-            this.providers = new HashMap<>();
+            this.providers = new LinkedHashMap<>();
         }
 
         public Builder with(Predicate<Proof> test, VerificationKeyProvider provider) {

@@ -1,5 +1,7 @@
 package com.apicatalog.vc;
 
+import java.util.List;
+
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.primitive.MessageDigest;
@@ -26,7 +28,7 @@ class TestSignatureSuite extends DataIntegritySuite {
             new TestAlgorithm());
 
     protected TestSignatureSuite() {
-        super(TEST_CRYPTO_NAME, TestDataIntegrityProof.class, Multibase.BASE_58_BTC);
+        super(TEST_CRYPTO_NAME, TestDataIntegrityProof.class, List.of(TestMultikey.class), Multibase.BASE_58_BTC);
     }
 
     @Override
