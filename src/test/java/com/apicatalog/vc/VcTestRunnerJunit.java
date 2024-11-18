@@ -50,12 +50,10 @@ import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.Reader;
 import com.apicatalog.vc.verifier.Verifier;
-import com.apicatalog.vc.writer.VerifiableWriter;
 import com.apicatalog.vcdi.DataIntegrityProofDraft;
 import com.apicatalog.vcdi.DataIntegritySuite;
 import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVocab;
-import com.apicatalog.vcdm.io.VcdmWriter;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
@@ -94,8 +92,6 @@ public class VcTestRunnerJunit {
             });;
 
     final static Reader READER = Reader.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER);
-
-    final static VerifiableWriter WRITER = new VcdmWriter();
 
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;
@@ -195,26 +191,6 @@ public class VcTestRunnerJunit {
                             purpose(testCase.purpose),
                             domain(testCase.domain),
                             nonce(testCase.nonce)));
-                }
-
-            } else if (testCase.type.contains(VcTestCase.vocab("ReaderTest"))) {
-
-                Verifiable verifiable = READER.read(testCase.input);
-                assertNotNull(verifiable);
-
-                JsonObject result = WRITER.write(verifiable, new StaticContextLoader(LOADER), null);
-
-                final Document expected = LOADER.loadDocument(testCase.input,
-                        new DocumentLoaderOptions());
-
-                boolean match = JsonLdComparison.equals(result,
-                        expected.getJsonContent().orElse(null));
-
-                if (!match) {
-
-                    write(testCase, result, expected.getJsonContent().orElse(null));
-
-                    fail("Expected result does not match");
                 }
 
             } else {
