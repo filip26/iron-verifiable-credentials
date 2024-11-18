@@ -49,7 +49,7 @@
       "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
       "expect": "issuer/vcdm20-di10-signed-vc.jsonld",
       "options": {
-        "id": "urn:proof:1",
+        "@id": "urn:proof:1",
         "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": "method/multikey-public.jsonld",
         "created": "2022-05-28T17:02:05Z"
@@ -68,6 +68,41 @@
         "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": "method/multikey-public.jsonld",
         "created": "2022-05-28T17:02:05Z"
+      }
+    },
+    {
+      "@id": "#t1008",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "VC with embedded method",
+      "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
+      "expect": "issuer/embedded-method-vc.jsonld",
+      "options": {
+        "keyPair": "method/multikey-pair.jsonld",
+        "verificationMethod": {
+          "id": "http://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld#keys-1",
+          "type": "Multikey",
+          "controller": "https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld",
+          "publicKeyMultibase": "z5C4SPo8HWx5EYE7nLGYfRqUcPG4eN6vezEsobV622h2danE"
+        },
+        "created": "1989-11-17T18:33:01Z"
+      }
+    },
+    {
+      "@id": "#t1009",
+      "@type": [
+        "PositiveEvaluationTest",
+        "IssuerTest"
+      ],
+      "name": "VC with DID key method",
+      "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
+      "expect": "issuer/vcdm20-di10-did-signed-vc.jsonld",
+      "options": {
+        "keyPair": "method/multikey-pair.jsonld",
+        "verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
+        "created": "1941-11-12T12:00:00Z"
       }
     },
     {
@@ -114,41 +149,6 @@
         "keyPair": "method/multikey-pair.jsonld",
         "verificationMethod": "method/multikey-public.jsonld",
         "created": "2023-01-01T00:00:01Z"
-      }
-    },
-    {
-      "@id": "#t1007",
-      "@type": [
-        "PositiveEvaluationTest",
-        "IssuerTest"
-      ],
-      "name": "VC with embedded method",
-      "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
-      "expect": "issuer/embedded-method-vc.jsonld",
-      "options": {
-        "keyPair": "method/multikey-pair.jsonld",
-        "verificationMethod": {
-          "id": "http://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld#keys-1",
-          "type": "Multikey",
-          "controller": "https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld",
-          "publicKeyMultibase": "z5C4SPo8HWx5EYE7nLGYfRqUcPG4eN6vezEsobV622h2danE"
-        },
-        "created": "1989-11-17T18:33:01Z"
-      }
-    },
-    {
-      "@id": "#t1008",
-      "@type": [
-        "PositiveEvaluationTest",
-        "IssuerTest"
-      ],
-      "name": "VC with DID key method",
-      "input": "vcdm20/vcdm20-valid-minimal-vc.jsonld",
-      "expect": "issuer/did-method-vc.jsonld",
-      "options": {
-        "keyPair": "method/multikey-pair.jsonld",
-        "verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
-        "created": "1941-11-12T12:00:00Z"
       }
     }
   ]

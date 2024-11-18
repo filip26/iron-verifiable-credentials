@@ -112,7 +112,8 @@ public class VcTestRunnerJunit {
                         challenge(testCase.challenge),
                         purpose(testCase.purpose),
                         domain(testCase.domain),
-                        nonce(testCase.nonce));
+                        nonce(testCase.nonce)
+                        );
 
                 assertFalse(isNegative(), "Expected error " + testCase.result);
 
@@ -147,6 +148,8 @@ public class VcTestRunnerJunit {
                 draft.domain(testCase.domain);
                 draft.challenge(testCase.challenge);
                 draft.nonce(testCase.nonce);
+                draft.id(testCase.proofId);
+                draft.previousProof(testCase.previousProof);
 
                 final JsonObject signed = issuer.sign(testCase.input, draft);
 

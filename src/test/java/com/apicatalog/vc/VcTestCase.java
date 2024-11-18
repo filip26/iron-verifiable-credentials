@@ -51,6 +51,10 @@ public class VcTestCase {
 
     public URI context;
 
+    public URI proofId;
+
+    public URI previousProof;
+
     public boolean compacted;
 
     public static VcTestCase of(JsonObject test, JsonObject manifest, DocumentLoader loader) {
@@ -146,6 +150,16 @@ public class VcTestCase {
                 testCase.purpose = URI.create(options.getJsonArray(vocab("purpose")).getJsonObject(0)
                         .getString(Keywords.VALUE));
             }
+
+            if (options.containsKey("@id")) {
+                testCase.proofId = URI.create(options.getJsonString("@id").getString());
+            }
+
+            if (options.containsKey(vocab("previousProof"))) {
+                testCase.previousProof = URI.create(options.getJsonArray(vocab("previousProof")).getJsonObject(0)
+                        .getString(Keywords.VALUE));
+            }
+
         }
 
         return testCase;
