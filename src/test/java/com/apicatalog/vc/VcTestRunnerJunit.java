@@ -22,9 +22,10 @@ import java.util.stream.Stream;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.controller.key.VerificationKey;
-import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
+import com.apicatalog.did.key.DidKey;
+import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.json.JsonLdComparison;
@@ -32,7 +33,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.linkedtree.Linkable;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
@@ -41,6 +41,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.method.resolver.ControllableKeyProvider;
 import com.apicatalog.vc.method.resolver.MethodPredicate;
 import com.apicatalog.vc.method.resolver.MethodSelector;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
@@ -335,15 +336,13 @@ public class VcTestRunnerJunit {
                         // just pass the embedded key back
                         proof -> (VerificationKey) proof.method())
                 
+                // accept did:key
+                .with(MethodPredicate.methodId(DidKey::isDidKeyUrl),
+                        ControllableKeyProvider.of(new DidKeyResolver(TestMulticodecKeyMapper.CODECS)))
+                
                 .with(i -> true, proof -> {
-                    System.out.println(MethodPredicate.methodType(VerificationKey.class).test(proof));
+                    System.out.println("An unknown method");
                     System.out.println(proof.method());
-                    System.out.println(proof.method().id());
-                    System.out.println(proof.method().type());
-                    System.out.println(proof.method() instanceof VerificationMethod);
-                    System.out.println(proof.method() instanceof VerificationKey);
-                    System.out.println(proof.method() instanceof Linkable);
-                    System.out.println(VerificationKey.class.isInstance(proof.method()));
                     return null;
                 })
                 .build();

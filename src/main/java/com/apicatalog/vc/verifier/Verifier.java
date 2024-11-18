@@ -50,7 +50,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
 //    private static final Logger LOGGER = Logger.getLogger(Verifier.class.getName());
 
     protected final ProofAdapter proofAdapter;
-    
+
     protected StatusVerifier statusVerifier;
 
     protected VerifiableReaderProvider readerProvider;
@@ -91,7 +91,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         this.readerProvider = provider.apply(proofAdapter);
         return this;
     }
-    
+
     /**
      * Set a credential status verifier. If not set then
      * <code>credentialStatus</code> is ignored if present.
@@ -194,6 +194,7 @@ public class Verifier extends VerificationProcessor<Verifier> {
         try {
             // load the document
             final DocumentLoaderOptions options = new DocumentLoaderOptions();
+
             final Document loadedDocument = loader.loadDocument(location, options);
 
             final JsonStructure json = loadedDocument
@@ -260,10 +261,8 @@ public class Verifier extends VerificationProcessor<Verifier> {
                     throw new DocumentError(ErrorType.Missing, VcdiVocab.PROOF_VALUE);
                 }
 
-                
-                
                 final VerificationKey verificationKey = keyProvider.keyFor(proof);
-                
+
                 if (verificationKey == null) {
                     throw new DocumentError(ErrorType.Unknown, VcdiVocab.VERIFICATION_METHOD);
                 }

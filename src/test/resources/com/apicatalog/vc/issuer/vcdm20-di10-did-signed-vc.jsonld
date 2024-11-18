@@ -8,7 +8,7 @@
     "created": "1941-11-12T12:00:00Z",
     "proofPurpose": "assertionMethod",
     "cryptosuite": "test-2022",
-    "verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
-    "proofValue": "z6pJ2rYnTkeUiqpwftPye5LuZ97DUWiH9kcjd5mDG6foa"
+    "verificationMethod": "did:key:z5C4SPo8HWx5EYE7nLGYfRqUcPG4eN6vezEsobV622h2danE#z5C4SPo8HWx5EYE7nLGYfRqUcPG4eN6vezEsobV622h2danE",
+    "proofValue": "zHkmvTzeA5o2VB6rMWEFZZhqyPGdTFF41vMgaP7o355iS"
   }
 }

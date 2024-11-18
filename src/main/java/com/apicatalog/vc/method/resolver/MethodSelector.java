@@ -32,6 +32,7 @@ public class MethodSelector implements VerificationKeyProvider {
         final Optional<VerificationKeyProvider> provider = providers.entrySet().stream()
                 .filter(e -> e.getKey().test(proof))
                 .map(Entry::getValue)
+                .filter(Objects::nonNull)
                 .findFirst();
 
         if (provider.isPresent()) {

@@ -1,9 +1,5 @@
 package com.apicatalog.vc.verifier;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-
-import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.apicatalog.vc.processor.DocumentProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;

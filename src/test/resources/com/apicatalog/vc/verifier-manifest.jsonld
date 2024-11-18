@@ -281,7 +281,7 @@
         "VeriferTest"
       ],
       "name": "DID verification method",
-      "input": "issuer/did-method-vc.jsonld"
+      "input": "issuer/vcdm20-di10-did-signed-vc.jsonld"
     },
     {
       "@id": "#t1008",

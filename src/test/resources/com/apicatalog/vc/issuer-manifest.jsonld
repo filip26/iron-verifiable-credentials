@@ -101,7 +101,7 @@
       "expect": "issuer/vcdm20-di10-did-signed-vc.jsonld",
       "options": {
         "keyPair": "method/multikey-pair.jsonld",
-        "verificationMethod": "did:key:z5C4Wcei5mqrDmzjZaFn93ecfco6CEwqE6t7M9CWjWaLG4BA",
+        "verificationMethod": "did:key:z5C4SPo8HWx5EYE7nLGYfRqUcPG4eN6vezEsobV622h2danE#z5C4SPo8HWx5EYE7nLGYfRqUcPG4eN6vezEsobV622h2danE",
         "created": "1941-11-12T12:00:00Z"
       }
     },
