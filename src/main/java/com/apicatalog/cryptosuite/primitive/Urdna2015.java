@@ -27,7 +27,7 @@ public class Urdna2015 implements Canonicalizer {
 
     @Override
     public byte[] canonicalize(VerifiableMaterial document) throws CryptoSuiteError {
-        // TODO process compacted version
+
         try {
             final JsonObject expanded = document.expanded();
 

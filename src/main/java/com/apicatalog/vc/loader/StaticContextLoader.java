@@ -53,7 +53,7 @@ public class StaticContextLoader implements DocumentLoader {
         return Collections.unmodifiableMap(staticCache);
     }
 
-    protected static JsonDocument get(final String name) {
+    private static JsonDocument get(final String name) {
         return get(Verifiable.class, name);
     }
 

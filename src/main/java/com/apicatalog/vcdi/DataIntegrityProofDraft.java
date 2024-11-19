@@ -22,6 +22,7 @@ import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
 import com.apicatalog.vc.issuer.ProofDraft;
+import com.apicatalog.vc.model.ModelValidation;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.ProofValue;
@@ -79,16 +80,6 @@ public class DataIntegrityProofDraft extends ProofDraft {
         
         return writer;
     }
-//
-//    public DataIntegrityProofDraft(
-//            DataIntegritySuite suite,
-//            CryptoSuite crypto,
-//            URI method,
-//            URI purpose) {
-//        super(method);
-//        this.suite = suite;
-//        this.purpose = purpose;
-//    }
 
     public DataIntegrityProofDraft created(Instant created) {
         this.created = created == null
@@ -181,11 +172,6 @@ public class DataIntegrityProofDraft extends ProofDraft {
         return id;
     }
 
-//    @Override
-//    public Collection<String> type() {
-//        return List.of(VcdiVocab.TYPE.uri());
-//    }
-
     public VerificationMethod method() {
         return method;
     }
@@ -218,38 +204,9 @@ public class DataIntegrityProofDraft extends ProofDraft {
         return nonce;
     }
 
-//    protected LdNodeBuilder unsigned(LdNodeBuilder builder) {
-//
-//        super.unsigned(builder, suite.methodAdapter);
-//        
-//        builder.type(VcdiVocab.TYPE.uri());
-//        builder.set(VcdiVocab.CRYPTO_SUITE).scalar("https://w3id.org/security#cryptosuiteString", suite.cryptosuiteName);
-//        
-//        builder.set(VcdiVocab.PURPOSE).id(purpose);
-//        
-//        builder.set(VcdiVocab.CREATED).xsdDateTime(created != null ? created : Instant.now());
-//
-//        if (domain != null) {
-//            builder.set(VcdiVocab.DOMAIN).string(domain);
-//        }
-//        if (challenge != null) {
-//            builder.set(VcdiVocab.CHALLENGE).string(challenge);
-//        }
-//        if (nonce != null) {
-//            builder.set(VcdiVocab.NONCE).string(nonce);
-//        }
-//
-//        return builder;
-//    }
-
     @Override
     public void validate() throws DocumentError {
-        DataIntegrityProof.assertNotNull(this::purpose, VcdiVocab.PURPOSE);
-//        DataIntegrityProof.assertNotNull(this::cryptoSuite, VcdiVocab.CRYPTO_SUITE);
-//
-//        if (cryptoSuite().isUnknown()) {
-//            throw new DocumentError(ErrorType.Unknown, VcdiVocab.CRYPTO_SUITE);
-//        }
+        ModelValidation.assertNotNull(this::purpose, VcdiVocab.PURPOSE);
 
         if (method() != null && method().id() == null) {
             throw new DocumentError(ErrorType.Missing, "VerificationMethodId");

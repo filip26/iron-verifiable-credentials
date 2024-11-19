@@ -3,30 +3,45 @@ package com.apicatalog.vc.status.bitstring;
 import java.net.URI;
 import java.util.Collection;
 
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
+import com.apicatalog.vc.model.ModelValidation;
 import com.apicatalog.vc.status.Status;
 
 @Fragment
-@Vocab("https://www.w3.org/ns/credentials/status#")
+@Vocab(BitstringVocab.VOCAB)
 public interface BitstringStatusListEntry extends Status {
 
-    @Term
+    @Term("statusPurpose")
     String purpose();
 
-    @Term
+    @Term("statusListIndex")
     long index();
 
-    @Term
+    @Term("statusListCredential")
     URI credential();
 
-    @Term
+    @Term("statusSize")
     int indexBitLength();
 
-    @Term
+    @Term("statusMessage")
     BitstringStatusListMessages messages();
 
-    @Term
+    @Term("statusReference")
     Collection<URI> references();
+    
+    @Override
+    default void validate() throws DocumentError {
+        Status.super.validate();
+        
+        ModelValidation.assertNotNull(this::purpose, BitstringVocab.PURPOSE);
+        ModelValidation.assertNotNull(this::credential, BitstringVocab.CREDENTIAL);
+        
+        if (index() <= 0) {
+            throw new DocumentError(ErrorType.Invalid, BitstringVocab.INDEX);
+        }
+    }
 }

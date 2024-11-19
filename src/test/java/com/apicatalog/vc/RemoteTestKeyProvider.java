@@ -19,7 +19,7 @@ import com.apicatalog.vc.proof.Proof;
 
 import jakarta.json.JsonStructure;
 
-public class RemoteTestMultiKeyProvider implements VerificationKeyProvider {
+public class RemoteTestKeyProvider implements VerificationKeyProvider {
 
     static TreeReaderMapping MAPPING = TreeReaderMapping
             .createBuilder()
@@ -30,7 +30,7 @@ public class RemoteTestMultiKeyProvider implements VerificationKeyProvider {
 
     protected final DocumentLoader loader;
     
-    public RemoteTestMultiKeyProvider(DocumentLoader loader) {
+    public RemoteTestKeyProvider(DocumentLoader loader) {
         this.loader = loader;
     }
     

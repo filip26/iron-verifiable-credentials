@@ -104,7 +104,7 @@ public class Signature {
         return result;
     }
 
-    public byte[] signature() {
+    public byte[] value() {
         return signature;
     }
 

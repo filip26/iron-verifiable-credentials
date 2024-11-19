@@ -4,7 +4,6 @@ import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.issuer.Issuer;
-import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.proof.Proof;
 
@@ -44,7 +43,7 @@ public interface SignatureSuite {
      * @return a new {@link Proof} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    //TODO base
+    // TODO base
     Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proof, DocumentLoader loader) throws DocumentError;
-    
+
 }

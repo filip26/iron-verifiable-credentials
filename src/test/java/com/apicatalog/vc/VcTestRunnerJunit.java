@@ -215,6 +215,7 @@ public class VcTestRunnerJunit {
         } catch (JsonLdError e) {
             e.printStackTrace();
             fail(e);
+            
         } catch (Exception e) {
             assertException(e.getClass().getSimpleName(), e);
         }
@@ -301,7 +302,7 @@ public class VcTestRunnerJunit {
                 // accept specific method id
                 .with(MethodPredicate.methodId(
                         URI.create("https://github.com/filip26/iron-verifiable-credentials/method/multikey-public.jsonld")::equals),
-                        new RemoteTestMultiKeyProvider(loader))
+                        new RemoteTestKeyProvider(loader))
 
                 // accept embedded method when public key is well-known and trusted
                 .with(MethodPredicate.methodType(VerificationKey.class)
@@ -322,10 +323,6 @@ public class VcTestRunnerJunit {
                     return null;
                 })
                 .build();
-
-//        Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();
-//        resolvers.add(new DidKeyMethodResolver(TestAlgorithm.DECODER));
-        // return resolvers;
     }
 
     static final Map<String, Object> toMap(Parameter<?>... parameters) {

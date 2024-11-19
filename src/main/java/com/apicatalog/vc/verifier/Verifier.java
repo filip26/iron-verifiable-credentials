@@ -261,6 +261,10 @@ public class Verifier extends VerificationProcessor<Verifier> {
                     throw new DocumentError(ErrorType.Missing, VcdiVocab.PROOF_VALUE);
                 }
 
+                if (keyProvider == null) {
+                    throw new IllegalStateException("A verification method provider is not set."); 
+                }
+                
                 final VerificationKey verificationKey = keyProvider.keyFor(proof);
 
                 if (verificationKey == null) {

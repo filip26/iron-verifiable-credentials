@@ -7,6 +7,7 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.model.VerifiableMaterial;
 
+@Deprecated
 public abstract class AbstractProofDraft {
     
     protected final VerificationMethod method;

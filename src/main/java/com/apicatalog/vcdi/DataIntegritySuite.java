@@ -68,7 +68,7 @@ public class DataIntegritySuite implements SignatureSuite {
     }
 
     protected ProofValue getProofValue(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader) throws DocumentError {
-        return new GenericSignature();
+        return new GenericSignature();  //FIXME
     }
 
     protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError {

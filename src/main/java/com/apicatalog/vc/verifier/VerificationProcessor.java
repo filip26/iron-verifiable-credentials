@@ -8,15 +8,11 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
 
     protected VerificationKeyProvider keyProvider;
 
-    // TODO proof selector -> provider ! no, otherwise, only one provider!
-
     protected VerificationProcessor(final SignatureSuite... suites) {
         super(suites);
         this.keyProvider = null;
     }
 
-    // TODO resolvers should be multilevel, per verifier, per proof type, e.g.
-    // DidUrlMethodResolver could be different.
     @SuppressWarnings("unchecked")
     public T methodResolver(VerificationKeyProvider keyProvider) {
         this.keyProvider = keyProvider;
