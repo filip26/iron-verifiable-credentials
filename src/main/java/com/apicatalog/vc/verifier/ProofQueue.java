@@ -63,7 +63,8 @@ class ProofQueue {
         for (final Proof proof : proofs) {
             if (!removed[index] &&
                     (proof.previousProof() == null
-                            || ids.contains(proof.previousProof()))) {
+                            || proof.previousProof().isEmpty()
+                            || proof.previousProof().stream().allMatch(ids::contains))) {
                 if (proof.id() != null) {
 
                     if (ids.contains(proof.id())) {

@@ -176,7 +176,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
         return method;
     }
 
-    public URI previousProof() {
+    public Collection<URI> previousProof() {
         return previousProof;
     }
 

@@ -1,6 +1,8 @@
 package com.apicatalog.vc.issuer;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.List;
 
 import com.apicatalog.controller.method.GenericMethodUri;
 import com.apicatalog.controller.method.VerificationMethod;
@@ -13,7 +15,7 @@ public abstract class ProofDraft {
     protected final VerificationMethod method;
 
     protected URI id;
-    protected URI previousProof;
+    protected Collection<URI> previousProof;
 
     protected ProofDraft(VerificationMethod method) {
         this.method = method;
@@ -38,6 +40,11 @@ public abstract class ProofDraft {
     }
 
     public void previousProof(URI previousProof) {
-        this.previousProof = previousProof;
+        this.previousProof = previousProof != null ? List.of(previousProof) : null;
     }
+    
+    public void previousProof(URI... previousProof) {
+        this.previousProof = List.of(previousProof);
+    }
+
 }

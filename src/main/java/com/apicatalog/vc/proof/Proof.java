@@ -66,7 +66,7 @@ public interface Proof {
      * @return {@link URI} uniquely identifying the previous proof
      */
     @Term
-    URI previousProof();
+    Collection<URI> previousProof();
 
     /**
      * Returns a {@link CryptoSuite} used to create and to verify the proof value.
