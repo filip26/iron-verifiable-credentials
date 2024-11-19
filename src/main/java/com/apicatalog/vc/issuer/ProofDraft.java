@@ -2,6 +2,7 @@ package com.apicatalog.vc.issuer;
 
 import java.net.URI;
 
+import com.apicatalog.controller.method.GenericMethodUri;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -10,21 +11,18 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 public abstract class ProofDraft {
 
     protected final VerificationMethod method;
-    protected final URI verificatonUrl;
 
     protected URI id;
     protected URI previousProof;
 
     protected ProofDraft(VerificationMethod method) {
         this.method = method;
-        this.verificatonUrl = null;
         this.id = null;
         this.previousProof = null;
     }
 
     protected ProofDraft(URI verificatonUrl) {
-        this.method = null;
-        this.verificatonUrl = verificatonUrl;
+        this.method = new GenericMethodUri(verificatonUrl);
         this.id = null;
         this.previousProof = null;
     }
