@@ -7,7 +7,8 @@ public class VerificationError extends CryptoSuiteError {
     public enum VerificationErrorCode {
         Expired,
         NotValidYet,
-        InvalidSignature,
+        InvalidSignature, 
+        UnsupportedSignature,
     }
 
     private VerificationErrorCode code;

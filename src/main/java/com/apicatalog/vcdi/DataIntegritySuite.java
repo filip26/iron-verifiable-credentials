@@ -68,7 +68,11 @@ public class DataIntegritySuite implements SignatureSuite {
     }
 
     protected ProofValue getProofValue(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader) throws DocumentError {
-        return new GenericSignature();  //FIXME
+        if (proofValue == null || proofValue.length == 0) {
+            return null;
+        }
+        // an unknown signature
+        return new GenericSignature();
     }
 
     protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError {
@@ -81,9 +85,7 @@ public class DataIntegritySuite implements SignatureSuite {
 
     public DataIntegrityProofDraft createDraft(VerificationMethod method,
             URI purpose) throws DocumentError {
-        return new DataIntegrityProofDraft(this,
-                new CryptoSuite(cryptosuiteName, -1, null, null, null),
-                method, purpose);
+        throw new UnsupportedOperationException("Generic DI suite does not support createDraft method. Use a signature suite of your choice instead.");
     }
 
     @Override
@@ -179,46 +181,6 @@ public class DataIntegritySuite implements SignatureSuite {
         }
 
     }
-
-//    @Override
-//    public DataIntegrityProof getProof(LinkedNode expandedProof, DocumentLoader loader) throws DocumentError {
-//
-//        if (expandedProof == null) {
-//            throw new IllegalArgumentException("The 'document' parameter must not be null.");
-//        }
-//
-//        final LdNode node = LdNode.of(expandedProof);
-//
-//        final String cryptoSuiteName = node.scalar(DataIntegrityVocab.CRYPTO_SUITE).string();
-//
-//        final byte[] signature = node.scalar(DataIntegrityVocab.PROOF_VALUE).multibase(proofValueBase);
-//
-//        final ProofValue proofValue = signature != null ? getProofValue(signature, loader) : null;
-//
-//        CryptoSuite crypto = getCryptoSuite(cryptoSuiteName, proofValue);
-//
-////FIXME        final DataIntegrityProof proof = new DataIntegrityProof(this, crypto, expandedProof);
-//
-////        proof.value = proofValue;
-////
-////        proof.id = node.id();
-////
-////        proof.created = node.scalar(DataIntegrityVocab.CREATED).xsdDateTime();
-////
-////        proof.purpose = node.node(DataIntegrityVocab.PURPOSE).id();
-////
-////        proof.domain = node.scalar(DataIntegrityVocab.DOMAIN).string();
-////
-////        proof.challenge = node.scalar(DataIntegrityVocab.CHALLENGE).string();
-////
-////        proof.nonce = node.scalar(DataIntegrityVocab.NONCE).string();
-////
-////        proof.method = node.node(DataIntegrityVocab.VERIFICATION_METHOD).map(methodAdapter);
-////
-////        proof.previousProof = node.node(DataIntegrityVocab.PREVIOUS_PROOF).id();
-//
-//        return null;
-//    }
 
     protected static String getCryptoSuiteName(final JsonObject expandedProof) {
 
