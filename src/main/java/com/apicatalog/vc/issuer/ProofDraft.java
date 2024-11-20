@@ -46,5 +46,16 @@ public abstract class ProofDraft {
     public void previousProof(URI... previousProof) {
         this.previousProof = List.of(previousProof);
     }
+    
+    public Collection<URI> previousProof() {
+        return previousProof;
+    }
+    
+    public VerificationMethod method() {
+        return method;
+    }
 
+    public URI id() {
+        return id;
+    }
 }

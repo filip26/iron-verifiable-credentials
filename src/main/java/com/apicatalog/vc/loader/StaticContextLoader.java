@@ -17,6 +17,8 @@ import com.apicatalog.vc.Verifiable;
 
 public class StaticContextLoader implements DocumentLoader {
 
+    protected static final StaticContextLoader INSTANCE = new StaticContextLoader(null);
+    
     protected static final Map<String, Document> staticCache = defaultValues();
 
     protected final DocumentLoader defaultLoader;
@@ -66,4 +68,9 @@ public class StaticContextLoader implements DocumentLoader {
         }
         return null;
     }    
+    
+    public static StaticContextLoader resources() {
+        return INSTANCE;
+    }
+
 }

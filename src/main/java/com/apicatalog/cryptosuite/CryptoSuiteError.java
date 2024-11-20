@@ -10,7 +10,7 @@ public class CryptoSuiteError extends Throwable {
         Signature,
     }
 
-    private CryptoSuiteErrorCode code;
+    private final CryptoSuiteErrorCode code;
 
     public CryptoSuiteError(CryptoSuiteErrorCode code) {
         this(code, code.name());

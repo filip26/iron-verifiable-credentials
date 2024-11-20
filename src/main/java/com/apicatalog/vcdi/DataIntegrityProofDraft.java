@@ -69,6 +69,18 @@ public class DataIntegrityProofDraft extends ProofDraft {
         this.writer = getWriter(suite);
     }
 
+    public DataIntegrityProofDraft(
+            DataIntegritySuite suite,
+            CryptoSuite crypto,
+            URI method,
+            URI purpose) {
+        super(method);
+        this.suite = suite;
+        this.crypto = crypto;
+        this.purpose = purpose;
+        this.writer = getWriter(suite);
+    }
+
     protected static JsonLdWriter getWriter(DataIntegritySuite suite) {
         JsonLdWriter writer = new JsonLdWriter()
                 .scan(DataIntegrityProof.class)
