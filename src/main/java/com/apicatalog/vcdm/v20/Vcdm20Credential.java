@@ -5,7 +5,7 @@ import java.time.Instant;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.lang.LangStringSelector;
+import com.apicatalog.linkedtree.lang.LocalizedString;
 import com.apicatalog.linkedtree.orm.Adapter;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
@@ -49,10 +49,10 @@ public interface Vcdm20Credential extends VcdmVerifiable, Credential {
     Instant validUntil();
 
     @Term
-    LangStringSelector description();
+    LocalizedString description();
 
     @Term
-    LangStringSelector name();
+    LocalizedString name();
 
     // TODO
     // relatedResource

@@ -5,7 +5,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
@@ -21,11 +22,13 @@ import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
+import com.apicatalog.linkedtree.orm.context.ContextReducer;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.model.ModelValidation;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.ProofValue;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -36,15 +39,17 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
     protected final JsonLdWriter writer;
 
-    protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
-            "https://w3id.org/security/data-integrity/v2",
-            "https://w3id.org/security/multikey/v1");
-
-    protected static final Collection<String> V2_CONTEXTS = Arrays.asList(
-            "https://www.w3.org/ns/credentials/v2");
+//    protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
+//            "https://w3id.org/security/data-integrity/v2",
+//            "https://w3id.org/security/multikey/v1");
+//
+//    protected static final Collection<String> V2_CONTEXTS = Arrays.asList(
+//            "https://www.w3.org/ns/credentials/v2");
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
+
+//    protected final ContextReducer contextReducer;
 
     protected final URI purpose;
 
@@ -77,6 +82,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
         super(method);
         this.suite = suite;
         this.crypto = crypto;
+//        this.contextReducer = getReducer();
         this.purpose = purpose;
         this.writer = getWriter(suite);
     }
@@ -85,11 +91,14 @@ public class DataIntegrityProofDraft extends ProofDraft {
         JsonLdWriter writer = new JsonLdWriter()
                 .scan(DataIntegrityProof.class)
                 .scan(VerificationMethod.class);
-        
+
         if (suite.customTypes != null) {
             suite.customTypes.forEach(writer::scan);
         }
-        
+
+        writer.context(VcdmVocab.CONTEXT_MODEL_V2,
+                List.of("https://w3id.org/security/data-integrity/v2"));
+
         return writer;
     }
 
@@ -123,7 +132,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
     }
 
     @Override
-    public VerifiableMaterial unsigned(DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableMaterial unsigned(Collection<String> documentContext, DocumentLoader loader, URI base) throws DocumentError {
 
         try {
             DataIntegrityProof proof = FragmentComposer.create()
@@ -143,10 +152,23 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
             JsonArray expanded = JsonLd.expand(JsonDocument.of(compacted)).loader(loader).base(base).get();
 
-            Collection<String> context = Collections.emptyList();
+            Collection<String> context = documentContext;
 
             if (compacted.containsKey(JsonLdKeyword.CONTEXT)) {
-                context = JsonLdContext.strings(compacted, context);
+                Collection<String> proofContext = JsonLdContext.strings(compacted, context);
+
+                if (proofContext != null && !proofContext.isEmpty()) {
+                    if (context.isEmpty()) {
+                        context = proofContext;
+                    } else {
+                        context = writer.contextReducer().reduce(
+                                Stream.concat(
+                                        context.stream(),
+                                        proofContext.stream())
+                                        .toList());
+                    }
+                }
+
                 compacted = Json.createObjectBuilder(compacted).remove(JsonLdKeyword.CONTEXT).build();
             }
 

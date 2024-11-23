@@ -133,7 +133,7 @@ public abstract class AbstractIssuer implements Issuer {
 
         final VerifiableMaterial unsignedData = model.data();
 
-        final VerifiableMaterial unsignedDraft = draft.unsigned(loader, base);
+        final VerifiableMaterial unsignedDraft = draft.unsigned(unsignedData.context(), loader, base);
 
         final Signature ldSignature = new Signature(crypto, null);
 

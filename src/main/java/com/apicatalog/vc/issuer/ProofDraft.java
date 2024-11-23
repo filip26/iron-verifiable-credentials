@@ -29,7 +29,7 @@ public abstract class ProofDraft {
         this.previousProof = null;
     }
 
-    public abstract VerifiableMaterial unsigned(DocumentLoader loader, URI base) throws DocumentError;
+    public abstract VerifiableMaterial unsigned(Collection<String> documentContext, DocumentLoader loader, URI base) throws DocumentError;
 
     protected abstract VerifiableMaterial sign(VerifiableMaterial proof, byte[] signature) throws DocumentError;
 
@@ -43,8 +43,8 @@ public abstract class ProofDraft {
         this.previousProof = previousProof != null ? List.of(previousProof) : null;
     }
     
-    public void previousProof(URI... previousProof) {
-        this.previousProof = List.of(previousProof);
+    public void previousProof(Collection<URI> previousProof) {
+        this.previousProof = previousProof;
     }
     
     public Collection<URI> previousProof() {
