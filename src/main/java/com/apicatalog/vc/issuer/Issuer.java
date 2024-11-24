@@ -14,22 +14,23 @@ import jakarta.json.JsonObject;
 public interface Issuer {
 
     /**
-     * Signs VC/VP document. Returns the provided VC/VP with an new proof
+     * Signs VC/VP document. Returns the provided VC/VP with an new signed proof.
      *
-     * @param documentLocation
-     * @param draft            a draft of the proof to sign and attach
+     * @param location a location of a verifiable document to attach a new signed
+     *                 proof
+     * @param draft    a draft of the proof to sign and attach
      *
      * @return {@link JsonObject} representing the signed document
      *
      * @throws DocumentError
      * @throws SigningError
      */
-    JsonObject sign(URI documentLocation, ProofDraft draft) throws SigningError, DocumentError;
+    JsonObject sign(URI location, ProofDraft draft) throws SigningError, DocumentError;
 
     /**
-     * Signs VC/VP document. Returns the provided VC/VP with a new proof
+     * Signs VC/VP document. Returns the provided VC/VP with a new signed proof.
      *
-     * @param document
+     * @param document a verifiable document to attach a new signed proof
      * @param draft    a draft of the proof to sign and attach
      *
      * @return {@link JsonObject} representing the signed document
@@ -40,7 +41,7 @@ public interface Issuer {
     JsonObject sign(JsonObject document, ProofDraft draft) throws SigningError, DocumentError;
 
     /**
-     * If set, this overrides the input document's IRI.
+     * If set, it overrides the input document base IRI.
      *
      * @param base
      * @return the issuer instance
@@ -48,9 +49,9 @@ public interface Issuer {
     Issuer base(URI base);
 
     /**
-     * Set custom loader.
+     * Set a custom document loader.
      * 
-     * @param loader
+     * @param loader a loader to fetch JSON-LD contexts and documents
      * @return the issuer instance
      */
     Issuer loader(DocumentLoader loader);
@@ -66,7 +67,7 @@ public interface Issuer {
     Issuer useBundledContexts(boolean enable);
 
     /**
-     * A cryptographic suite associated with the issue
+     * A cryptographic suite associated with the issuer.
      * 
      * @return a cryptographic suite, never <code>null</code>
      */
@@ -75,20 +76,18 @@ public interface Issuer {
     /**
      * Create a new proof draft.
      * 
-     * @param method
-     * @param purpose
-     * @return
+     * @param method a verification method to verify the proof signature value
+     * @return a new proof draft instance, never <code>null</code>
      */
     <T extends ProofDraft> T createDraft(VerificationMethod method);
 
     /**
      * Create a new proof draft.
      * 
-     * @param method
-     * @param purpose
-     * @return
+     * @param method a verification method to verify the proof signature value
+     * @return a new proof draft instance, never <code>null</code>
      */
-    default <T extends ProofDraft> T createProofDraft(URI method) {
+    default <T extends ProofDraft> T createDraft(URI method) {
         return createDraft(new GenericMethodUri(method));
     }
 }

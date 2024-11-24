@@ -10,22 +10,7 @@ public interface VerifiableProof extends Proof {
 
     @Override
     default void verify(VerificationKey key) throws VerificationError, DocumentError {
-
         Objects.requireNonNull(key);
-        
-        
-
-//        // a data before issuance - no proof attached
-//        final LinkedTree unsigned = VerifiableTree.unsigned(verifiable);
-//
-//        Objects.requireNonNull(unsigned);
-//
-//        // remove a proof value and get a new unsigned copy
-//        final LinkedTree unsignedProof = unsignedProof(((Linkable)this).ld().asFragment().root());
-
-//        DictionaryWriter.writeToStdOut(unsigned);
-//        DictionaryWriter.writeToStdOut(unsignedProof);
-
         // verify signature
         signature().verify(key);
     }

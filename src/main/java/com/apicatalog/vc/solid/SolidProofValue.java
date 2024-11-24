@@ -25,10 +25,7 @@ public record SolidProofValue(
 
     @Override
     public void verify(VerificationKey key) throws VerificationError {
-
-//        Objects.requireNonNull(data);
         Objects.requireNonNull(key);
-//        Objects.requireNonNull(cryptoSuite);
 
         // TODO check key type
 
