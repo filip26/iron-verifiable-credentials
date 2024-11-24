@@ -2,6 +2,7 @@ package com.apicatalog.vc.issuer;
 
 import java.net.URI;
 
+import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -61,4 +62,6 @@ public interface Issuer {
      * @return the issuer instance
      */
     Issuer useBundledContexts(boolean enable);
+
+    CryptoSuite cyptosuite();
 }

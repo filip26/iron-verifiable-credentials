@@ -80,6 +80,11 @@ public class CryptoSuite implements Canonicalizer, Digester, Signer {
         return id;
     }
 
+    /**
+     * Key length in bites.
+     * 
+     * @return a key length in bites
+     */
     public int keyLength() {
         return keyLength;
     }

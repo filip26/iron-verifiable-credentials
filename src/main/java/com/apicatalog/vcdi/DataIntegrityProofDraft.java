@@ -3,7 +3,6 @@ package com.apicatalog.vcdi;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,7 +21,7 @@ import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
-import com.apicatalog.linkedtree.orm.context.ContextReducer;
+import com.apicatalog.multibase.MultibaseLiteral;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.model.ModelValidation;
 import com.apicatalog.vc.model.VerifiableMaterial;
@@ -39,22 +38,8 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
     protected final JsonLdWriter writer;
 
-//    protected static final Collection<String> V1_CONTEXTS = Arrays.asList(
-//            "https://w3id.org/security/data-integrity/v2",
-//            "https://w3id.org/security/multikey/v1");
-//
-//    protected static final Collection<String> V2_CONTEXTS = Arrays.asList(
-//            "https://www.w3.org/ns/credentials/v2");
-
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
-
-//    protected final ContextReducer contextReducer;
-
-    protected final URI purpose;
-
-    protected Instant created;
-    protected Instant expires;
 
     protected String domain;
     protected String challenge;
@@ -67,10 +52,9 @@ public class DataIntegrityProofDraft extends ProofDraft {
             CryptoSuite crypto,
             VerificationMethod method,
             URI purpose) {
-        super(method);
+        super(VcdiVocab.TYPE.uri(), method, purpose);
         this.suite = suite;
         this.crypto = crypto;
-        this.purpose = purpose;
         this.writer = getWriter(suite);
     }
 
@@ -79,11 +63,9 @@ public class DataIntegrityProofDraft extends ProofDraft {
             CryptoSuite crypto,
             URI method,
             URI purpose) {
-        super(method);
+        super(VcdiVocab.TYPE.uri(), method, purpose);
         this.suite = suite;
         this.crypto = crypto;
-//        this.contextReducer = getReducer();
-        this.purpose = purpose;
         this.writer = getWriter(suite);
     }
 
@@ -100,20 +82,6 @@ public class DataIntegrityProofDraft extends ProofDraft {
                 List.of("https://w3id.org/security/data-integrity/v2"));
 
         return writer;
-    }
-
-    public DataIntegrityProofDraft created(Instant created) {
-        this.created = created == null
-                ? created
-                : created.truncatedTo(ChronoUnit.SECONDS);
-        return this;
-    }
-
-    public DataIntegrityProofDraft expires(Instant expires) {
-        this.expires = expires == null
-                ? expires
-                : expires.truncatedTo(ChronoUnit.SECONDS);
-        return this;
     }
 
     public DataIntegrityProofDraft challenge(String challenge) {
@@ -194,7 +162,13 @@ public class DataIntegrityProofDraft extends ProofDraft {
         JsonValue value = Json.createValue(suite.proofValueBase.encode(signature));
 
         JsonObject compacted = Json.createObjectBuilder(proof.compacted()).add(VcdiVocab.PROOF_VALUE.name(), value).build();
-        JsonObject expanded = proof.expanded(); // FIXME
+        JsonObject expanded = Json.createObjectBuilder(proof.expanded())
+                .add(VcdiVocab.PROOF_VALUE.uri(),
+                        Json.createArrayBuilder().add(
+                                Json.createObjectBuilder()
+                                        .add(JsonLdKeyword.VALUE, value)
+                                        .add(JsonLdKeyword.TYPE, MultibaseLiteral.typeName())))
+                .build();
 
         return new GenericMaterial(
                 proof.context(),
@@ -202,28 +176,18 @@ public class DataIntegrityProofDraft extends ProofDraft {
                 expanded);
     }
 
-    public URI id() {
-        return id;
+    public DataIntegrityProofDraft created(Instant created) {
+        this.created = created == null
+                ? created
+                : created.truncatedTo(ChronoUnit.SECONDS);
+        return this;
     }
 
-    public VerificationMethod method() {
-        return method;
-    }
-
-    public Collection<URI> previousProof() {
-        return previousProof;
-    }
-
-    public URI purpose() {
-        return purpose;
-    }
-
-    public Instant created() {
-        return created;
-    }
-
-    public Instant expires() {
-        return null;
+    public DataIntegrityProofDraft expires(Instant expires) {
+        this.expires = expires == null
+                ? expires
+                : expires.truncatedTo(ChronoUnit.SECONDS);
+        return this;
     }
 
     public String domain() {

@@ -7,7 +7,7 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials</artifactId>
-    <version>0.15.1-SNAPSHOT</version>
+    <version>0.15.6-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 

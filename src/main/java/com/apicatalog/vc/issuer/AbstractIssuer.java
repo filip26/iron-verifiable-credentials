@@ -74,10 +74,6 @@ public abstract class AbstractIssuer implements Issuer {
                 .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter));
     }
 
-    protected CryptoSuite cryptosuite() {
-        return null;
-    }
-
     @Override
     public JsonObject sign(URI location, ProofDraft draft) throws SigningError, DocumentError {
         final DocumentLoader loader = getLoader();
@@ -107,6 +103,11 @@ public abstract class AbstractIssuer implements Issuer {
         return this;
     }
 
+    @Override
+    public CryptoSuite cyptosuite() {
+        return crypto;
+    }
+    
     protected JsonObject sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         draft.validate();
@@ -157,76 +158,6 @@ public abstract class AbstractIssuer implements Issuer {
         }
     }
 
-//    protected JsonObject sign(final VcdmVersion version, final JsonArray context, final JsonObject expanded,
-//            final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
-//
-//        if (keyPair.privateKey() == null
-//                || keyPair.privateKey().rawBytes() == null
-//                || keyPair.privateKey().rawBytes().length == 0) {
-//            throw new IllegalArgumentException("The private key is not provided, is null or an empty array.");
-//        }
-//
-//        JsonObject object = expanded;
-//
-//        final Verifiable verifiable = readerProvider.materialize(object, loader, base);
-//
-//        // TODO do something with exceptions, unify
-//        if (verifiable.isCredential() && verifiable.asCredential().isExpired()) {
-//            throw new SigningError(SignatureErrorCode.Expired);
-//        }
-//
-//        verifiable.validate();
-//
-//        // add issuance date if missing
-////FIXME        if (verifiable.isCredential()
-////                && (verifiable.version() == null
-////                        || VcdmVersion.V11.equals(verifiable.version()))
-////                && verifiable.asCredential().issuanceDate() == null) {
-////
-////            final Instant issuanceDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-////
-////            object = Json.createObjectBuilder(object)
-////                    .add(VcVocab.ISSUANCE_DATE.uri(), issuanceDate.toString())
-////                    .build();
-////        }
-//
-//        // remove proofs
-////        final JsonObject unsigned = EmbeddedProof.removeProofs(object);
-//
-//        // signature - FIXME
-////        final byte[] signature = sign(context,
-////                null,
-//////                unsigned, 
-////                draft);
-//
-////        final JsonObject proofValue = LdScalar.multibase(proofValueBase, signature);
-////
-////        // signed proof
-////        final JsonObject signedProof = DataIntegrityProofDraft.signed(draft.unsigned(), proofValue);
-////
-////        return new ExpandedVerifiable(EmbeddedProof.addProof(object, signedProof), context, loader);
-//        return expanded; // FIXMe
-//    }
-
-//    protected JsonObject signed1Copy(JsonObject unsigned, JsonObject signature) {
-//        return new LdNodeBuilder(unsigned).set(VcdiVocab.PROOF_VALUE).value(signature).build();
-//    }
-
-//    /**
-//     * Returns a signed proof.
-//     * 
-//     * @param context
-//     * @param document
-//     * @param draft
-//     * @return
-//     * @throws SigningError
-//     * @throws DocumentError
-//     */
-//    protected abstract byte[] sign(
-//            JsonArray context,
-//            LinkedTree document,
-//            ProofDraft draft) throws SigningError, DocumentError;
-
     protected static final JsonObject fetchDocument(URI location, DocumentLoader loader) throws DocumentError, SigningError {
         try {
             // load the document
@@ -260,4 +191,6 @@ public abstract class AbstractIssuer implements Issuer {
         }
         return loader;
     }
+    
+
 }
