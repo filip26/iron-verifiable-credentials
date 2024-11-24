@@ -9,7 +9,7 @@ public class GenericSignature implements ProofValue {
 
     @Override
     public void verify(VerificationKey key) throws VerificationError, DocumentError {
-        throw new VerificationError(VerificationErrorCode.UnsupportedSignature);        
+        throw new VerificationError(VerificationErrorCode.UnsupportedSignature);
     }
 
 }

@@ -137,10 +137,9 @@ public class VcTestRunnerJunit {
                 }
 
                 // proof draft
-                final DataIntegrityProofDraft draft = TEST_DI_SUITE.createDraft(
-                        testCase.verificationMethod,
-                        purpose);
+                final DataIntegrityProofDraft draft = issuer.createDraft(testCase.verificationMethod);
 
+                draft.purpose(purpose);
                 draft.created(testCase.created);
                 draft.domain(testCase.domain);
                 draft.challenge(testCase.challenge);

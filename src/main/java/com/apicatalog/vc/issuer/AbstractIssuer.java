@@ -1,8 +1,10 @@
 package com.apicatalog.vc.issuer;
 
 import java.net.URI;
+import java.util.function.Function;
 
 import com.apicatalog.controller.key.KeyPair;
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.Signature;
@@ -43,16 +45,19 @@ public abstract class AbstractIssuer implements Issuer {
     protected final KeyPair keyPair;
     protected final Multibase proofValueBase;
 
+    protected final Function<VerificationMethod, ? extends ProofDraft> proofDraftProvider;
     protected final VerifiableReaderProvider readerProvider;
 
     protected DocumentLoader defaultLoader;
     protected URI base;
     protected boolean bundledContexts;
 
-    protected AbstractIssuer(SignatureSuite suite, CryptoSuite crypto, KeyPair keyPair, Multibase proofValueBase) {
+    protected AbstractIssuer(SignatureSuite suite, CryptoSuite crypto, KeyPair keyPair, Multibase proofValueBase, Function<VerificationMethod, ? extends ProofDraft> proofDraftProvider) {
         this.crypto = crypto;
         this.keyPair = keyPair;
         this.proofValueBase = proofValueBase;
+
+        this.proofDraftProvider = proofDraftProvider;
 
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suite);
         this.readerProvider = defaultReaders(proofAdapter);
@@ -62,16 +67,10 @@ public abstract class AbstractIssuer implements Issuer {
         this.bundledContexts = true;
     }
 
-    protected static VerifiableReaderProvider defaultReaders(final ProofAdapter proofAdapter) {
-
-        Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
-
-        return new ContextAwareReaderProvider()
-                .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
-                .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
-                        // add VCDM 1.1 credential support
-                        .v11(vcdm11))
-                .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter));
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends ProofDraft> T createDraft(VerificationMethod method) {
+        return (T) proofDraftProvider.apply(method);
     }
 
     @Override
@@ -104,10 +103,10 @@ public abstract class AbstractIssuer implements Issuer {
     }
 
     @Override
-    public CryptoSuite cyptosuite() {
+    public CryptoSuite cryptosuite() {
         return crypto;
     }
-    
+
     protected JsonObject sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
 
         draft.validate();
@@ -191,6 +190,16 @@ public abstract class AbstractIssuer implements Issuer {
         }
         return loader;
     }
-    
 
+    protected static VerifiableReaderProvider defaultReaders(final ProofAdapter proofAdapter) {
+
+        Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
+
+        return new ContextAwareReaderProvider()
+                .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
+                .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
+                        // add VCDM 1.1 credential support
+                        .v11(vcdm11))
+                .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter));
+    }
 }

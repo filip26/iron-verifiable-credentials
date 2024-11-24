@@ -2,6 +2,8 @@ package com.apicatalog.vc.issuer;
 
 import java.net.URI;
 
+import com.apicatalog.controller.method.GenericMethodUri;
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
@@ -63,5 +65,30 @@ public interface Issuer {
      */
     Issuer useBundledContexts(boolean enable);
 
-    CryptoSuite cyptosuite();
+    /**
+     * A cryptographic suite associated with the issue
+     * 
+     * @return a cryptographic suite, never <code>null</code>
+     */
+    CryptoSuite cryptosuite();
+
+    /**
+     * Create a new proof draft.
+     * 
+     * @param method
+     * @param purpose
+     * @return
+     */
+    <T extends ProofDraft> T createDraft(VerificationMethod method);
+
+    /**
+     * Create a new proof draft.
+     * 
+     * @param method
+     * @param purpose
+     * @return
+     */
+    default <T extends ProofDraft> T createProofDraft(URI method) {
+        return createDraft(new GenericMethodUri(method));
+    }
 }

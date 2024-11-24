@@ -9,7 +9,6 @@ import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
-import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.suite.SignatureSuite;
 
@@ -52,7 +51,7 @@ public class ProofAdapterProvider implements ProofAdapter {
         // find a suite that can materialize the proof
         for (SignatureSuite suite : suites) {
             if (suite.isSupported(data, proofMaterial)) {
-                proof = suite.getProof(data, proofMaterial, loader);
+                proof = suite.getProof(data, proofMaterial, loader, base);
                 if (proof != null) {
                     return proof;
                 }

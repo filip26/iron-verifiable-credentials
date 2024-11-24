@@ -50,20 +50,8 @@ public class DataIntegrityProofDraft extends ProofDraft {
     public DataIntegrityProofDraft(
             DataIntegritySuite suite,
             CryptoSuite crypto,
-            VerificationMethod method,
-            URI purpose) {
-        super(VcdiVocab.TYPE.uri(), method, purpose);
-        this.suite = suite;
-        this.crypto = crypto;
-        this.writer = getWriter(suite);
-    }
-
-    public DataIntegrityProofDraft(
-            DataIntegritySuite suite,
-            CryptoSuite crypto,
-            URI method,
-            URI purpose) {
-        super(VcdiVocab.TYPE.uri(), method, purpose);
+            VerificationMethod method) {
+        super(VcdiVocab.TYPE.uri(), method);
         this.suite = suite;
         this.crypto = crypto;
         this.writer = getWriter(suite);

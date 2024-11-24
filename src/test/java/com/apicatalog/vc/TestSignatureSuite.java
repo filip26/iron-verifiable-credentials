@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 
 import com.apicatalog.controller.key.KeyPair;
-import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.primitive.MessageDigest;
 import com.apicatalog.cryptosuite.primitive.Urdna2015;
@@ -25,7 +24,7 @@ class TestSignatureSuite extends DataIntegritySuite {
 
     static final CryptoSuite CRYPTO = new CryptoSuite(
             TEST_CRYPTO_NAME,
-            32,
+            256,
             new Urdna2015(),
             new MessageDigest("SHA-256"),
             new TestAlgorithm());
@@ -34,11 +33,6 @@ class TestSignatureSuite extends DataIntegritySuite {
         super(TEST_CRYPTO_NAME, TestDataIntegrityProof.class, List.of(TestMultikey.class), Multibase.BASE_58_BTC);
     }
 
-    @Override
-    public DataIntegrityProofDraft createDraft(VerificationMethod method, URI purpose) throws DocumentError {
-        return new DataIntegrityProofDraft(this, CRYPTO, method, purpose);
-    }
-    
     @Override
     protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) {
         if (TEST_CRYPTO_NAME.equals(cryptoName)) {
@@ -49,11 +43,16 @@ class TestSignatureSuite extends DataIntegritySuite {
 
     @Override
     public SolidIssuer createIssuer(KeyPair pair) {
-        return new SolidIssuer(this, CRYPTO, pair, Multibase.BASE_58_BTC);
+        return new SolidIssuer(
+                this,
+                CRYPTO,
+                pair,
+                Multibase.BASE_58_BTC,
+                method -> new DataIntegrityProofDraft(this, CRYPTO, method));
     }
 
     @Override
-    protected ProofValue getProofValue(VerifiableMaterial data, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader) throws DocumentError {
+    protected ProofValue getProofValue(VerifiableMaterial data, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
         if (proofValue == null) {
             return null;
         }

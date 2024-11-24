@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 
-import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -43,7 +42,7 @@ public class DataIntegritySuite implements SignatureSuite {
     protected final Multibase proofValueBase;
 
     protected final Class<? extends DataIntegrityProof> proofInterface;
-    
+
     protected final Collection<Class<?>> customTypes;
 
     protected DataIntegritySuite(
@@ -67,7 +66,7 @@ public class DataIntegritySuite implements SignatureSuite {
         return GENERIC;
     }
 
-    protected ProofValue getProofValue(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader) throws DocumentError {
+    protected ProofValue getProofValue(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
         if (proofValue == null || proofValue.length == 0) {
             return null;
         }
@@ -81,11 +80,6 @@ public class DataIntegritySuite implements SignatureSuite {
         }
         // an unknown crypto suite
         return new CryptoSuite(cryptoName, -1, null, null, null);
-    }
-
-    public DataIntegrityProofDraft createDraft(VerificationMethod method,
-            URI purpose) throws DocumentError {
-        throw new UnsupportedOperationException("Generic DI suite does not support createDraft method. Use a signature suite of your choice instead.");
     }
 
     @Override
@@ -105,7 +99,7 @@ public class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proofMaterial, DocumentLoader loader) throws DocumentError {
+    public Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proofMaterial, DocumentLoader loader, URI base) throws DocumentError {
 
         TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder()
                 .scan(proofInterface, true)
@@ -115,7 +109,7 @@ public class DataIntegritySuite implements SignatureSuite {
         if (customTypes != null) {
             customTypes.forEach(builder::scan);
         }
-        
+
         TreeReaderMapping mapping = builder.build();
 
         var reader = JsonLdTreeReader.of(mapping);
@@ -142,7 +136,7 @@ public class DataIntegritySuite implements SignatureSuite {
                             Json.createObjectBuilder(proofMaterial.expanded())
                                     .remove(VcdiVocab.PROOF_VALUE.uri()).build());
 
-                    proofValue = getProofValue(verifiable, unsignedProof, signature.byteArrayValue(), loader);
+                    proofValue = getProofValue(verifiable, unsignedProof, signature.byteArrayValue(), loader, base);
                     consumer.acceptFragmentPropertyValue("signature", proofValue);
                 }
 
