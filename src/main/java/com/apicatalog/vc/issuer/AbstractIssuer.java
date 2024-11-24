@@ -29,6 +29,7 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vc.model.VerifiableReaderProvider;
+import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
@@ -131,10 +132,10 @@ public abstract class AbstractIssuer implements Issuer {
 
         verifiable.validate();
 
-        final VerifiableMaterial unsignedData = model.data();
+        final VerifiableMaterial unsignedDraft = draft.unsigned(model.data().context(), loader, base);
 
-        final VerifiableMaterial unsignedDraft = draft.unsigned(unsignedData.context(), loader, base);
-
+        final VerifiableMaterial unsignedData = new GenericMaterial(unsignedDraft.context(), model.data().compacted(), model.data().expanded());
+        
         final Signature ldSignature = new Signature(crypto, null);
 
         try {

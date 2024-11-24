@@ -13,7 +13,7 @@ public interface ProofAdapter {
      * Materialize verifiable material into a proof.
      * 
      * @param data
-     * @param proofs
+     * @param proof
      * @param loader
      * @param base
      * @return a verifiable instance

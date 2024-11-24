@@ -32,7 +32,7 @@ public class CryptoSuiteMapper implements ObjectMapper<LinkedLiteral, CryptoSuit
 
     @Override
     public LinkedLiteral literal(CryptoSuite object) {
-        return new ImmutableLiteral(object.id(), DATATYPE);
+        return new ImmutableLiteral(object.name(), DATATYPE);
     }
 
 }

@@ -14,22 +14,22 @@ import com.apicatalog.vc.model.VerifiableMaterial;
  */
 public class CryptoSuite implements Canonicalizer, Digester, Signer {
 
-    protected final String id;
+    protected final String name;
     protected final int keyLength;
     protected final Canonicalizer canonicalizer;
     protected final Digester digester;
     protected final Signer signer;
 
     public CryptoSuite(
-            String id,
+            String name,
             int keyLength,
             Canonicalizer canonicalizer,
             Digester digester,
             Signer signer) {
-        
-        Objects.requireNonNull(id);
-        
-        this.id = id;
+
+        Objects.requireNonNull(name);
+
+        this.name = name;
         this.keyLength = keyLength;
         this.canonicalizer = canonicalizer;
         this.digester = digester;
@@ -76,8 +76,15 @@ public class CryptoSuite implements Canonicalizer, Digester, Signer {
         return signer.keygen();
     }
 
-    public String id() {
-        return id;
+    /**
+     * A cryptographic suite name used to recognize the suite. Please note the same
+     * name could be used by multiple {@link CryptoSuite} using different key
+     * length.
+     * 
+     * @return a cryptographic suite name
+     */
+    public String name() {
+        return name;
     }
 
     /**
@@ -88,7 +95,13 @@ public class CryptoSuite implements Canonicalizer, Digester, Signer {
     public int keyLength() {
         return keyLength;
     }
-    
+
+    /**
+     * Check if the suite is recognized, i.e. algorithms and configuration is known
+     * to a processor.
+     * 
+     * @return <code>true</code> if the suite cannot be processed, is read only
+     */
     public boolean isUnknown() {
         return canonicalizer == null || digester == null || signer == null;
     }

@@ -3,7 +3,6 @@
  * 
  * Privacy-preserving status information for Verifiable Credentials.
  * 
- * @see <a href="https://www.w3.org/TR/vc-bitstring-status-list/">W3C Candidate
- *      Recommendation Draft</>
+ * @see <a href="https://www.w3.org/TR/vc-bitstring-status-list/">W3C Candidate Recommendation Draft</a>
  */
 package com.apicatalog.vc.status.bitstring;

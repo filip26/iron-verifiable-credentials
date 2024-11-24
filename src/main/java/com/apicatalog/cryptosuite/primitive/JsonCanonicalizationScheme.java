@@ -18,7 +18,7 @@ public class JsonCanonicalizationScheme implements Canonicalizer {
 
         JsonObject compacted = material.compacted();
 
-        if (!compacted.containsKey(Keywords.CONTEXT)) {
+        if (!compacted.containsKey(Keywords.CONTEXT) && material.context() != null && !material.context().isEmpty()) {
             compacted = Json.createObjectBuilder(compacted).add(Keywords.CONTEXT, Json.createArrayBuilder(material.context())).build();
         }
 

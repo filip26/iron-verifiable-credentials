@@ -164,6 +164,19 @@ public class DataIntegrityProofDraft extends ProofDraft {
                 expanded);
     }
 
+    @Override
+    public void validate() throws DocumentError {
+        ModelValidation.assertNotNull(this::purpose, VcdiVocab.PURPOSE);
+
+        if (method() != null && method().id() == null) {
+            throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
+        }
+
+        if (created() != null && expires() != null && created().isAfter(expires())) {
+            throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
+        }
+    }
+
     public DataIntegrityProofDraft created(Instant created) {
         this.created = created == null
                 ? created
@@ -188,18 +201,5 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
     public String nonce() {
         return nonce;
-    }
-
-    @Override
-    public void validate() throws DocumentError {
-        ModelValidation.assertNotNull(this::purpose, VcdiVocab.PURPOSE);
-
-        if (method() != null && method().id() == null) {
-            throw new DocumentError(ErrorType.Missing, "VerificationMethodId");
-        }
-
-        if (created() != null && expires() != null && created().isAfter(expires())) {
-            throw new DocumentError(ErrorType.Invalid, "ValidityPeriod");
-        }
     }
 }
