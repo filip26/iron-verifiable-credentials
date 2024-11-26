@@ -150,7 +150,7 @@ public class VcdmAdapter implements VerifiableModelAdapter {
             JsonObject compactedCredential = itc.next();
 
             credentials.add(credential(new GenericMaterial(
-                    JsonLdContext.strings(compactedCredential, data.context()),
+                    JsonLdContext.of(compactedCredential, data.context()),
                     compactedCredential,
                     expandedCredential),
                     loader,

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -42,7 +41,7 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
     @Override
     public VerifiableModel read(VerifiableMaterial data) throws DocumentError {
 
-        VcdmVersion version = modelVersion(data.context());
+        VcdmVersion version = modelVersion(data.context().strings());
 
         if (version == null || version != readerVersion) {
             throw new DocumentError(ErrorType.Unknown, "DocumentModel");
@@ -74,7 +73,7 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
     }
 
     protected Collection<VerifiableMaterial> proofs(
-            Collection<String> defaultContext,
+            JsonLdContext defaultContext,
             Collection<JsonObject> compactedProofs,
             Collection<JsonObject> expandedProofs) {
 
@@ -91,10 +90,10 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
             for (JsonObject expandedProof : expandedProofs) {
 
                 JsonObject compactedProof = itCompactedProofs.next();
-                Collection<String> context = defaultContext;
+                JsonLdContext context = defaultContext;
 
                 if (compactedProof.containsKey(JsonLdKeyword.CONTEXT)) {
-                    context = JsonLdContext.strings(compactedProof, defaultContext);
+                    context = JsonLdContext.of(compactedProof, defaultContext);
                     compactedProof = Json.createObjectBuilder(compactedProof).remove(JsonLdKeyword.CONTEXT).build();
                 }
 
@@ -112,10 +111,13 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
     @Override
     public VerifiableMaterial write(VerifiableModel model) throws DocumentError {
 
-        JsonObject expanded = model.data().expanded();
+        final JsonObject expanded = model.data().expanded();
         JsonObject compacted = model.data().compacted();
 
-        Collection<String> context = new LinkedHashSet<>(model.data().context());
+        final Collection<JsonLdContext> contexts = new ArrayList<>(1 + (model.proofs() != null ? model.proofs().size() : 0));
+        if (model.data().context() != null) {
+            contexts.add(model.data().context());
+        }
 
         if (model.proofs() != null && !model.proofs().isEmpty()) {
             if (model.proofs().size() == 1) {
@@ -123,26 +125,31 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
                 VerifiableMaterial proof = model.proofs().iterator().next();
 
                 if (proof.context() != null) {
-                    context.addAll(proof.context());
+                    contexts.add(proof.context());
                 }
-                
-                compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), proof.compacted()).build();
+
+                compacted = Json.createObjectBuilder(model.data().compacted())
+                        .add(VcdmVocab.PROOF.name(), proof.compacted())
+                        .build();
 
             } else {
-                
+
                 JsonArrayBuilder proofs = Json.createArrayBuilder();
-                
+
                 for (final VerifiableMaterial proof : model.proofs()) {
                     proofs.add(proof.compacted());
-                    context.addAll(proof.context());
+                    contexts.add(proof.context());
                 }
-                
-                compacted = Json.createObjectBuilder(model.data().compacted()).add(VcdmVocab.PROOF.name(), proofs).build();                
+
+                compacted = Json.createObjectBuilder(model.data().compacted())
+                        .add(VcdmVocab.PROOF.name(), proofs)
+                        .build();
             }
         }
-        context = contextReducer.reduce(context);
-        
-        return new GenericMaterial(context, compacted, expanded);
+        return new GenericMaterial(
+                contextReducer.reduce(contexts.toArray(JsonLdContext[]::new)), 
+                compacted, 
+                expanded);
     }
 
     protected abstract VcdmVersion modelVersion(Collection<String> context) throws DocumentError;

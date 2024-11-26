@@ -104,7 +104,7 @@ public class GenericReader implements VerifiableModelReader, VerifiableModelWrit
     }
 
     protected Collection<VerifiableMaterial> proofs(
-            Collection<String> defaultContext,
+            JsonLdContext defaultContext,
             Collection<JsonObject> compactedProofs,
             Collection<JsonObject> expandedProofs) {
 
@@ -123,7 +123,7 @@ public class GenericReader implements VerifiableModelReader, VerifiableModelWrit
                 JsonObject compactedProof = itCompactedProofs.next();
 
                 proofs.add(new GenericMaterial(
-                        JsonLdContext.strings(compactedProof, defaultContext),
+                        JsonLdContext.of(compactedProof, defaultContext),
                         compactedProof,
                         expandedProof));
             }

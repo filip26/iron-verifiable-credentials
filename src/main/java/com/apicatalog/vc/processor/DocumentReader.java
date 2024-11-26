@@ -81,6 +81,7 @@ public class DocumentReader extends DocumentProcessor<DocumentReader> {
 
         if (reader != null) {
             final VerifiableModel model = reader.read(document, loader, base);
+System.out.println(": " + model.data().compacted());
 
             if (model != null) {
                 return reader.materialize(model, loader, base);
@@ -98,6 +99,7 @@ public class DocumentReader extends DocumentProcessor<DocumentReader> {
                 .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
                         // add VCDM 1.1 credential support
                         .v11(vcdm11))
+                // plain DI proof
                 .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter))
                 ;
     }

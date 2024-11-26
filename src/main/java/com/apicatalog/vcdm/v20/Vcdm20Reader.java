@@ -101,7 +101,7 @@ public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, 
     @Override
     public Credential materialize(VerifiableMaterial data, DocumentLoader loader, URI base) throws DocumentError {
 
-        VcdmVersion version = modelVersion(data.context());
+        VcdmVersion version = modelVersion(data.context().strings());
 
         if (version == null) {
             throw new DocumentError(ErrorType.Unknown, "Model");

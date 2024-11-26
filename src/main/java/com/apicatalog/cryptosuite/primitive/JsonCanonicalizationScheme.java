@@ -19,7 +19,7 @@ public class JsonCanonicalizationScheme implements CanonicalizationMethod {
         JsonObject compacted = material.compacted();
 
         if (!compacted.containsKey(Keywords.CONTEXT) && material.context() != null && !material.context().isEmpty()) {
-            compacted = Json.createObjectBuilder(compacted).add(Keywords.CONTEXT, Json.createArrayBuilder(material.context())).build();
+            compacted = Json.createObjectBuilder(compacted).add(Keywords.CONTEXT, material.context().json()).build();
         }
 
         return JsonCanonicalizer.canonicalize(compacted).getBytes(StandardCharsets.UTF_8);

@@ -3,14 +3,13 @@ package com.apicatalog.vcdi;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.JsonLdOptions.ProcessingPolicy;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -89,7 +88,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
     }
 
     @Override
-    public VerifiableMaterial unsigned(Collection<String> documentContext, DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableMaterial unsigned(JsonLdContext documentContext, DocumentLoader loader, URI base) throws DocumentError {
 
         try {
             DataIntegrityProof proof = FragmentComposer.create()
@@ -107,22 +106,22 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
             JsonObject compacted = writer.compacted(proof);
 
-            JsonArray expanded = JsonLd.expand(JsonDocument.of(compacted)).loader(loader).base(base).get();
+            JsonArray expanded = JsonLd.expand(JsonDocument.of(compacted))
+                    .undefinedTermsPolicy(ProcessingPolicy.Fail)
+                    .loader(loader)
+                    .base(base)
+                    .get();
 
-            Collection<String> context = documentContext;
+            JsonLdContext context = documentContext;
 
             if (compacted.containsKey(JsonLdKeyword.CONTEXT)) {
-                Collection<String> proofContext = JsonLdContext.strings(compacted, context);
+                JsonLdContext proofContext = JsonLdContext.of(compacted, context);
 
                 if (proofContext != null && !proofContext.isEmpty()) {
                     if (context.isEmpty()) {
                         context = proofContext;
                     } else {
-                        context = writer.contextReducer().reduce(
-                                Stream.concat(
-                                        context.stream(),
-                                        proofContext.stream())
-                                        .toList());
+                        context = writer.contextReducer().reduce(context, proofContext);
                     }
                 }
 

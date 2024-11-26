@@ -1,6 +1,6 @@
 package com.apicatalog.vc.model;
 
-import java.util.Collection;
+import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 
 import jakarta.json.JsonObject;
 
@@ -10,7 +10,7 @@ import jakarta.json.JsonObject;
  */
 public interface VerifiableMaterial {
     
-    Collection<String> context();
+    JsonLdContext context();
 
     JsonObject compacted();
 

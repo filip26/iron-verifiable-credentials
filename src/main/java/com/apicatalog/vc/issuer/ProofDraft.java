@@ -8,6 +8,7 @@ import java.util.List;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.model.VerifiableMaterial;
 
 public abstract class ProofDraft {
@@ -32,7 +33,7 @@ public abstract class ProofDraft {
         this.purpose = null;
     }
 
-    public abstract VerifiableMaterial unsigned(Collection<String> documentContext, DocumentLoader loader, URI base) throws DocumentError;
+    public abstract VerifiableMaterial unsigned(JsonLdContext documentContext, DocumentLoader loader, URI base) throws DocumentError;
 
     protected abstract VerifiableMaterial sign(VerifiableMaterial proof, byte[] signature) throws DocumentError;
 
