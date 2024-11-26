@@ -1,16 +1,33 @@
-package com.apicatalog.vc.verifier;
+package com.apicatalog.vc.processor;
 
+import java.util.function.Function;
+
+import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
-import com.apicatalog.vc.processor.DocumentProcessor;
+import com.apicatalog.vc.model.ProofAdapter;
+import com.apicatalog.vc.model.ProofAdapterProvider;
+import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.VerifiableReaderProvider;
 import com.apicatalog.vc.suite.SignatureSuite;
 
-public class VerificationProcessor<T extends VerificationProcessor<T>> extends DocumentProcessor<T> {
+import jakarta.json.JsonObject;
 
+public class SuitesProcessor<T extends SuitesProcessor<T>> extends DocumentProcessor<T> {
+
+    protected VerifiableReaderProvider readerProvider;
     protected VerificationKeyProvider keyProvider;
 
-    protected VerificationProcessor(final SignatureSuite... suites) {
+    protected final ProofAdapter proofAdapter;
+
+    protected SuitesProcessor(final SignatureSuite... suites) {
         super(suites);
+        this.proofAdapter = ProofAdapterProvider.of(suites);
         this.keyProvider = null;
+        this.readerProvider = null;
     }
 
     @SuppressWarnings("unchecked")
@@ -18,6 +35,26 @@ public class VerificationProcessor<T extends VerificationProcessor<T>> extends D
         this.keyProvider = keyProvider;
         return (T) this;
     }
+    
+    @SuppressWarnings("unchecked")
+    public T model(Function<ProofAdapter, VerifiableReaderProvider> provider) {
+        this.readerProvider = provider.apply(proofAdapter);
+        return (T)this;
+    }
+
+    protected Verifiable read(final JsonObject document, DocumentLoader loader) throws DocumentError {
+        final VerifiableReader reader = readerProvider.reader(document);
+
+        if (reader != null) {
+            final VerifiableModel model = reader.read(document, loader, base);
+
+            if (model != null) {
+                return reader.materialize(model, loader, base);
+            }
+        }
+        throw new DocumentError(ErrorType.Unknown, "Model");
+    }
+
 
 //    protected static final Collection<VerificationKeyProvider> defaultResolvers(DocumentLoader loader) {
 //        Collection<VerificationKeyProvider> resolvers = new LinkedHashSet<>();

@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 
 import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.CryptoSuiteError.CryptoSuiteErrorCode;
-import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
+import com.apicatalog.cryptosuite.algorithm.CanonicalizationMethod;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions;
@@ -23,7 +23,7 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import io.setl.rdf.normalization.RdfNormalize;
 import jakarta.json.JsonObject;
 
-public class Urdna2015 implements Canonicalizer {
+public class Urdna2015 implements CanonicalizationMethod {
 
     @Override
     public byte[] canonicalize(VerifiableMaterial document) throws CryptoSuiteError {

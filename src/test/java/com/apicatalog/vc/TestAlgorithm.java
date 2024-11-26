@@ -8,7 +8,7 @@ import com.apicatalog.cryptosuite.KeyGenError;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
-import com.apicatalog.cryptosuite.algorithm.Signer;
+import com.apicatalog.cryptosuite.algorithm.SignatureAlgorithm;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.key.GenericMulticodecKey;
@@ -18,7 +18,7 @@ import com.apicatalog.multikey.Multikey;
 /**
  * Simple XOR to test the rest.
  */
-class TestAlgorithm implements Signer {
+class TestAlgorithm implements SignatureAlgorithm {
 
     @Override
     public void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError {

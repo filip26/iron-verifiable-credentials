@@ -7,7 +7,7 @@ import java.util.Map;
 import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
-import com.apicatalog.cryptosuite.SigningError;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
@@ -19,7 +19,6 @@ import com.apicatalog.linkedtree.orm.Type;
 import com.apicatalog.linkedtree.orm.Vocab;
 
 import jakarta.json.JsonObject;
-import jakarta.json.JsonStructure;
 
 /**
  * Represents generic VC/VP proof.
@@ -74,7 +73,7 @@ public interface Proof {
      * @return {@link CryptoSuite} attached to the proof.
      */
     @Provided
-    CryptoSuite cryptoSuite();
+    CryptoSuite cryptosuite();
 
     /**
      * The intent for the proof, the reason why an entity created it. e.g. an
@@ -110,17 +109,18 @@ public interface Proof {
     }
 
     /**
-     * Derive a new proof from this proof. Supported by selective disclosure proofs
-     * only.
+     * Derive a new selective disclosure document. Supported by selective disclosure
+     * proofs only. {@link UnsupportedOperationException} is thrown otherwise.
      * 
-     * @param context
-     * @param data
      * @param selectors
-     * @return
-     * @throws SigningError
+     * 
+     * @return a new derived document
+     * 
+     * @throws CryptoSuiteError
      * @throws DocumentError
      */
-    default JsonObject derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError {
+
+    default JsonObject derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError {
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
     }
 }

@@ -4,30 +4,23 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
-import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.document.Document;
-import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.ProofAdapterProvider;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableReader;
 import com.apicatalog.vc.model.VerifiableReaderProvider;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.Parameter;
+import com.apicatalog.vc.processor.SuitesProcessor;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.status.StatusVerifier;
@@ -38,27 +31,20 @@ import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
 
 import jakarta.json.JsonObject;
-import jakarta.json.JsonStructure;
 
 /**
  * A configurable set of suites and policies to verify. e.g. a set of allowed
  * signature suites, verification method resolvers, status resolvers, custom
  * validation logic, etc.
  */
-public class Verifier extends VerificationProcessor<Verifier> {
+public class Verifier extends SuitesProcessor<Verifier> {
 
 //    private static final Logger LOGGER = Logger.getLogger(Verifier.class.getName());
 
-    protected final ProofAdapter proofAdapter;
-
     protected StatusVerifier statusVerifier;
-
-    protected VerifiableReaderProvider readerProvider;
 
     protected Verifier(final SignatureSuite... suites) {
         super(suites);
-
-        proofAdapter = ProofAdapterProvider.of(suites);
 
         this.readerProvider = defaultReaders(proofAdapter);
 
@@ -85,11 +71,6 @@ public class Verifier extends VerificationProcessor<Verifier> {
      */
     public static Verifier with(final SignatureSuite... suites) {
         return new Verifier(suites);
-    }
-
-    public Verifier modelProvider(Function<ProofAdapter, VerifiableReaderProvider> provider) {
-        this.readerProvider = provider.apply(proofAdapter);
-        return this;
     }
 
     /**
@@ -191,44 +172,16 @@ public class Verifier extends VerificationProcessor<Verifier> {
     }
 
     protected Verifiable verify(final URI location, final Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
-        try {
-            // load the document
-            final DocumentLoaderOptions options = new DocumentLoaderOptions();
-
-            final Document loadedDocument = loader.loadDocument(location, options);
-
-            final JsonStructure json = loadedDocument
-                    .getJsonContent()
-                    .orElseThrow(() -> new DocumentError(ErrorType.Invalid));
-
-            if (JsonUtils.isNotObject(json)) {
-                throw new DocumentError(ErrorType.Invalid);
-            }
-
-            return verify(json.asJsonObject(), parameters, loader);
-
-        } catch (JsonLdError e) {
-            DocumentError.failWithJsonLd(e);
-            throw new DocumentError(e, ErrorType.Invalid);
-        }
+        return verify(fetch(location), parameters, loader);
     }
 
-    protected Verifiable verify(final JsonObject document, Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected Verifiable verify(final JsonObject document, final Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
 
-        final VerifiableReader reader = readerProvider.reader(document);
+        final Verifiable verifiable = read(document, loader);
 
-        if (reader != null) {
-            final VerifiableModel model = reader.read(document, loader, base);
-
-            if (model != null) {
-                final Verifiable verifiable = reader.materialize(model, loader, base);
-
-                if (verifiable != null) {
-                    return verify(verifiable, parameters);
-                }
-            }
+        if (verifiable != null) {
+            return verify(verifiable, parameters);
         }
-
         throw new DocumentError(ErrorType.Unknown, "Model");
     }
 
@@ -262,9 +215,9 @@ public class Verifier extends VerificationProcessor<Verifier> {
                 }
 
                 if (keyProvider == null) {
-                    throw new IllegalStateException("A verification method provider is not set."); 
+                    throw new IllegalStateException("A verification method provider is not set.");
                 }
-                
+
                 final VerificationKey verificationKey = keyProvider.keyFor(proof);
 
                 if (verificationKey == null) {

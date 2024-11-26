@@ -30,7 +30,7 @@ public class CryptoSuiteError extends Throwable {
         this.code = code;
     }
 
-    public CryptoSuiteErrorCode getCode() {
+    public CryptoSuiteErrorCode code() {
         return code;
     }
 }

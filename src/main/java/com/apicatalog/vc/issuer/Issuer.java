@@ -5,7 +5,7 @@ import java.net.URI;
 import com.apicatalog.controller.method.GenericMethodUri;
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
-import com.apicatalog.cryptosuite.SigningError;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 
@@ -23,9 +23,9 @@ public interface Issuer {
      * @return {@link JsonObject} representing the signed document
      *
      * @throws DocumentError
-     * @throws SigningError
+     * @throws CryptoSuiteError
      */
-    JsonObject sign(URI location, ProofDraft draft) throws SigningError, DocumentError;
+    JsonObject sign(URI location, ProofDraft draft) throws CryptoSuiteError, DocumentError;
 
     /**
      * Signs VC/VP document. Returns the provided VC/VP with a new signed proof.
@@ -36,9 +36,9 @@ public interface Issuer {
      * @return {@link JsonObject} representing the signed document
      *
      * @throws DocumentError
-     * @throws SigningError
+     * @throws CryptoSuiteError
      */
-    JsonObject sign(JsonObject document, ProofDraft draft) throws SigningError, DocumentError;
+    JsonObject sign(JsonObject document, ProofDraft draft) throws CryptoSuiteError, DocumentError;
 
     /**
      * If set, it overrides the input document base IRI.

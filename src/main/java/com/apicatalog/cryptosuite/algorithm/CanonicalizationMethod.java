@@ -8,7 +8,7 @@ import com.apicatalog.vc.model.VerifiableMaterial;
  * representation and always transforms it into a canonical form. This process
  * is sometimes also called normalization.
  */
-public interface Canonicalizer {
+public interface CanonicalizationMethod {
 
     byte[] canonicalize(VerifiableMaterial material) throws CryptoSuiteError;
 

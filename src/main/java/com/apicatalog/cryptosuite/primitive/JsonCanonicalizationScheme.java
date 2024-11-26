@@ -3,7 +3,7 @@ package com.apicatalog.cryptosuite.primitive;
 import java.nio.charset.StandardCharsets;
 
 import com.apicatalog.cryptosuite.CryptoSuiteError;
-import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
+import com.apicatalog.cryptosuite.algorithm.CanonicalizationMethod;
 import com.apicatalog.jsonld.lang.Keywords;
 import com.apicatalog.linkedtree.json.JsonCanonicalizer;
 import com.apicatalog.vc.model.VerifiableMaterial;
@@ -11,7 +11,7 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
-public class JsonCanonicalizationScheme implements Canonicalizer {
+public class JsonCanonicalizationScheme implements CanonicalizationMethod {
 
     @Override
     public byte[] canonicalize(VerifiableMaterial material) throws CryptoSuiteError {

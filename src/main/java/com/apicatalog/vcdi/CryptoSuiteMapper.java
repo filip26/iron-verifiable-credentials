@@ -10,16 +10,6 @@ public class CryptoSuiteMapper implements ObjectMapper<LinkedLiteral, CryptoSuit
 
     public static String DATATYPE = "https://w3id.org/security#cryptosuiteString";
 
-//    @Override
-//    public String datatype() {
-//        return ;
-//    }
-
-//    @Override
-//    public LinkedLiteral literal(CryptoSuite value) {
-//        return value.id();
-//    }
-
     @Override
     public CryptoSuite object(LinkedLiteral literal) throws NodeAdapterError {
 

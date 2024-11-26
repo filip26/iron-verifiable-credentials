@@ -4,9 +4,9 @@ import java.security.NoSuchAlgorithmException;
 
 import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.CryptoSuiteError.CryptoSuiteErrorCode;
-import com.apicatalog.cryptosuite.algorithm.Digester;
+import com.apicatalog.cryptosuite.algorithm.DigestAlgorithm;
 
-public final class MessageDigest implements Digester {
+public final class MessageDigest implements DigestAlgorithm {
 
     private final String type;
 

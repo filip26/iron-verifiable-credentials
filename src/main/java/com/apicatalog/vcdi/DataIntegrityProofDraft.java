@@ -94,7 +94,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
         try {
             DataIntegrityProof proof = FragmentComposer.create()
                     .set("id", id)
-                    .set("cryptoSuite", crypto)
+                    .set("cryptosuite", crypto)
                     .set("purpose", purpose)
                     .set("created", created)
                     .set("expires", expires)

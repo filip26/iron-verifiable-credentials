@@ -14,17 +14,23 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.VocabTerm;
-import com.apicatalog.vc.reader.ExpandedVerifiable;
+import com.apicatalog.linkedtree.jsonld.JsonLdType;
+import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.VerifiableModel;
+import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.processor.SuitesProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vc.verifier.VerificationProcessor;
 import com.apicatalog.vcdm.EmbeddedProof;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 
-public class Holder extends VerificationProcessor<Holder> {
+@Deprecated
+public class Holder extends SuitesProcessor<Holder> {
 
     protected Holder(final SignatureSuite... suites) {
         super(suites);
@@ -34,88 +40,78 @@ public class Holder extends VerificationProcessor<Holder> {
         return new Holder(suites);
     }
 
-    public ExpandedVerifiable derive(JsonObject document, Collection<String> selectors) throws SigningError, DocumentError {
+    public JsonObject derive(JsonObject document, Collection<String> selectors) throws SigningError, DocumentError {
         Objects.requireNonNull(document);
         return derive(document, selectors, getLoader());
     }
 
-    protected ExpandedVerifiable derive(final JsonObject document, Collection<String> selectors, DocumentLoader loader) throws SigningError, DocumentError {
-        try {
-            // extract context
-            final JsonStructure context = document.containsKey(Keywords.CONTEXT)
-                    ? JsonUtils.toJsonArray(document.get(Keywords.CONTEXT))
-                    : null;
+    protected JsonObject derive(final JsonObject document, Collection<String> selectors, DocumentLoader loader) throws SigningError, DocumentError {
 
-            // load the document
-            final JsonArray expanded = JsonLd.expand(JsonDocument.of(document))
-                    .undefinedTermsPolicy(ProcessingPolicy.Fail)
-                    .loader(loader)
-                    .base(base).get();
+//        final Verifiable verifiable = read(document, loader);
+//
+//        if (verifiable != null) {
+//            return derive(verifiable, selectors, loader);
+//        }
+//        throw new DocumentError(ErrorType.Unknown, "Model");
+//    }
+//
+//    protected JsonObject derive(final Verifiable verifiable, Collection<String> selectors) throws SigningError, DocumentError {
+//        return derive(verifiable, selectors, getLoader());
+//    }
+//
+//    protected JsonObject derive(final Verifiable verifiable, Collection<String> selectors, DocumentLoader loader) throws SigningError, DocumentError {
+//        
 
-            return deriveExpanded(document, context, expanded, selectors, loader);
+        final VerifiableReader reader = readerProvider.reader(document);
 
-        } catch (JsonLdError e) {
-            DocumentError.failWithJsonLd(e);
-            throw new DocumentError(e, ErrorType.Invalid);
-        }
-    }
-
-    private ExpandedVerifiable deriveExpanded(final JsonObject document, JsonStructure context, JsonArray expanded, Collection<String> selectors, DocumentLoader loader)
-            throws SigningError, DocumentError {
-
-        if (expanded == null || expanded.isEmpty() || expanded.size() > 1) {
-            throw new DocumentError(ErrorType.Invalid);
+        if (reader == null) {
+            throw new DocumentError(ErrorType.Unknown, "Model");
         }
 
-        final JsonValue verifiable = expanded.iterator().next();
+        final VerifiableModel model = reader.read(document, loader, base);
 
-        if (JsonUtils.isNotObject(verifiable)) {
-            throw new DocumentError(ErrorType.Invalid);
+        if (model == null) {
+            throw new DocumentError(ErrorType.Unknown, "Model");
         }
 
-        return deriveExpanded(document, context, verifiable.asJsonObject(), selectors, loader);
-    }
-
-    private ExpandedVerifiable deriveExpanded(final JsonObject document, JsonStructure context, final JsonObject expanded, Collection<String> selectors,
-            DocumentLoader loader) throws SigningError, DocumentError {
-
-//        if (VerifiableReader.isCredential(expanded)) {
+        
+//        if (verifiable.isCredential()) {
 //            return deriveProof(context, document, expanded, selectors, loader);
 //
-//        } else if (VerifiableReader.isPresentation(expanded)) {
-//            // ?
-//        }
-        throw new DocumentError(ErrorType.Unknown, VocabTerm.TYPE);
-    }
-
-    protected ExpandedVerifiable deriveProof(JsonStructure context, final JsonObject document, JsonObject expanded, Collection<String> selectors, DocumentLoader loader)
-            throws DocumentError, SigningError {
+////        }
+//    }
+//
+//    protected JsonObject deriveProof(
+//            JsonStructure context,
+//            final JsonObject document,
+//            JsonObject expanded,
+//            Collection<String> selectors,
+//            DocumentLoader loader) throws DocumentError, SigningError {
 
         // get proofs - throws an exception if there is no proof, never null nor an
         // empty collection
-        final Collection<JsonObject> expandedProofs = EmbeddedProof.assertProof(expanded);
-
-        if (expandedProofs.size() > 1) {
-            throw new DocumentError(ErrorType.Invalid);
-        }
+//        final Collection<JsonObject> expandedProofs = EmbeddedProof.assertProof(expanded);
+//
+//        if (expandedProofs.size() > 1) {
+//            throw new DocumentError(ErrorType.Invalid);
+//        }
 
         // a data before issuance - no proof attached
 //        final JsonObject unsigned = EmbeddedProof.removeProofs(expanded);
-
-        final JsonObject expandedProof = expandedProofs.iterator().next();
-
-//        final Collection<String> proofTypes = LdType.strings(expandedProof);
+//
+//        final JsonObject expandedProof = expandedProofs.iterator().next();
+//
+//        final Collection<String> proofTypes = JsonLdType.strings(expandedProof);
 //
 //        if (proofTypes == null || proofTypes.isEmpty()) {
-//            throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, Term.TYPE);
+//            throw new DocumentError(ErrorType.Missing, VcdmVocab.PROOF, VocabTerm.TYPE);
 //        }
-        //FIXME
-//        final SignatureSuite signatureSuite = findSuite(proofTypes, expandedProof);
+        // FIXME
+//        final SignatureSuite signatureSuite =  findSuite(proofTypes, expandedProof);
 //
 //        if (signatureSuite == null) {
 //            throw new SigningError(Code.UnsupportedCryptoSuite);
 //        }
-
 
 //        final Proof proof = signatureSuite.getProof(expandedProof, loader);
 //

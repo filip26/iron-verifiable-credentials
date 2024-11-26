@@ -89,16 +89,16 @@ public interface DataIntegrityProof extends VerifiableProof {
     @Provided
     @Override
     @Mapper(CryptoSuiteMapper.class)
-    CryptoSuite cryptoSuite();
+    CryptoSuite cryptosuite();
 
     @Override
     default void validate(Map<String, Object> params) throws DocumentError {
 
         ModelValidation.assertNotNull(this::purpose, VcdiVocab.PURPOSE);
         ModelValidation.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
-        ModelValidation.assertNotNull(this::cryptoSuite, VcdiVocab.CRYPTO_SUITE);
+        ModelValidation.assertNotNull(this::cryptosuite, VcdiVocab.CRYPTO_SUITE);
 
-        if (cryptoSuite().isUnknown()) {
+        if (cryptosuite().isUnknown()) {
             throw new DocumentError(ErrorType.Unknown, VcdiVocab.CRYPTO_SUITE);
         }
 

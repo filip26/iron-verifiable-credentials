@@ -11,7 +11,7 @@ import com.apicatalog.cryptosuite.VerificationError;
  * not been modified in transit and came from someone possessing a particular
  * secret.
  */
-public interface Signer {
+public interface SignatureAlgorithm {
 
     void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError;
 

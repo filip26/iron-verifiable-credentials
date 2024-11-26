@@ -106,7 +106,7 @@ public class DocumentProcessor<T extends DocumentProcessor<T>> {
         }
     }
 
-    protected JsonArray expand(final JsonObject document, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected JsonArray expand(final JsonObject document, final DocumentLoader loader) throws VerificationError, DocumentError {
 
         try {
             // load the document

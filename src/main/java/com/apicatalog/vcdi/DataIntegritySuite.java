@@ -160,7 +160,7 @@ public class DataIntegritySuite implements SignatureSuite {
                             proofValue);
                 }
 
-                consumer.acceptFragmentPropertyValue("cryptoSuite", cryptoSuite);
+                consumer.acceptFragmentPropertyValue("cryptosuite", cryptoSuite);
             }
 
             return proof;

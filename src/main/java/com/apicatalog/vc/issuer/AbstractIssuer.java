@@ -9,7 +9,6 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.Signature;
 import com.apicatalog.cryptosuite.SigningError;
-import com.apicatalog.cryptosuite.SigningError.SignatureErrorCode;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -55,10 +54,10 @@ public abstract class AbstractIssuer implements Issuer {
     protected boolean bundledContexts;
 
     protected AbstractIssuer(
-            SignatureSuite suite, 
-            CryptoSuite crypto, 
-            KeyPair keyPair, 
-            Multibase proofValueBase, 
+            SignatureSuite suite,
+            CryptoSuite crypto,
+            KeyPair keyPair,
+            Multibase proofValueBase,
             Function<VerificationMethod, ? extends ProofDraft> proofDraftProvider) {
         this.suite = suite;
         this.cryptosuite = crypto;
@@ -82,13 +81,13 @@ public abstract class AbstractIssuer implements Issuer {
     }
 
     @Override
-    public JsonObject sign(URI location, ProofDraft draft) throws SigningError, DocumentError {
+    public JsonObject sign(URI location, ProofDraft draft) throws DocumentError, CryptoSuiteError {
         final DocumentLoader loader = getLoader();
         return sign(fetchDocument(location, loader), draft, loader);
     }
 
     @Override
-    public JsonObject sign(JsonObject document, final ProofDraft draft) throws SigningError, DocumentError {
+    public JsonObject sign(JsonObject document, final ProofDraft draft) throws DocumentError, CryptoSuiteError {
         return sign(document, draft, getLoader());
     }
 
@@ -115,7 +114,7 @@ public abstract class AbstractIssuer implements Issuer {
         return cryptosuite;
     }
 
-    protected JsonObject sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
+    protected JsonObject sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws DocumentError, CryptoSuiteError {
 
         draft.validate();
 
@@ -142,33 +141,27 @@ public abstract class AbstractIssuer implements Issuer {
         final VerifiableMaterial unsignedDraft = draft.unsigned(model.data().context(), loader, base);
 
         final VerifiableMaterial unsignedData = new GenericMaterial(unsignedDraft.context(), model.data().compacted(), model.data().expanded());
-        
+
         return sign(model, unsignedData, unsignedDraft, draft);
     }
 
-    protected JsonObject sign(VerifiableModel model, VerifiableMaterial unsignedData, VerifiableMaterial unsignedDraft, ProofDraft draft) throws SigningError, DocumentError {
-
+    protected JsonObject sign(VerifiableModel model, VerifiableMaterial unsignedData, VerifiableMaterial unsignedDraft, ProofDraft draft) throws DocumentError, CryptoSuiteError {
 
         final Signature ldSignature = new Signature(cryptosuite, null);
 
-        try {
-            ldSignature.sign(unsignedData, unsignedDraft, keyPair.privateKey().rawBytes());
+        ldSignature.sign(unsignedData, unsignedDraft, keyPair.privateKey().rawBytes());
 
-            final VerifiableMaterial signedProof = draft.sign(unsignedDraft, ldSignature.value());
+        final VerifiableMaterial signedProof = draft.sign(unsignedDraft, ldSignature.value());
 
-            if (signedProof == null) {
-                throw new IllegalStateException();
-            }
-
-            final VerifiableMaterial signedDocument = model
-                    .withProof(signedProof)
-                    .materialize();
-
-            return JsonLdContext.set(signedDocument.context(), signedDocument.compacted());
-
-        } catch (CryptoSuiteError e) {
-            throw new SigningError(e, SignatureErrorCode.Unknown);
+        if (signedProof == null) {
+            throw new IllegalStateException();
         }
+
+        final VerifiableMaterial signedDocument = model
+                .withProof(signedProof)
+                .materialize();
+
+        return JsonLdContext.set(signedDocument.context(), signedDocument.compacted());
     }
 
     protected static final JsonObject fetchDocument(URI location, DocumentLoader loader) throws DocumentError, SigningError {

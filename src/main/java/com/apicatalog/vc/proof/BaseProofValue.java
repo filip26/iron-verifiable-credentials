@@ -3,33 +3,38 @@ package com.apicatalog.vc.proof;
 import java.util.Collection;
 
 import com.apicatalog.controller.key.VerificationKey;
-import com.apicatalog.cryptosuite.SigningError;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
 
-import jakarta.json.JsonObject;
-import jakarta.json.JsonStructure;
-
 public interface BaseProofValue extends ProofValue {
 
+    /**
+     * Base proof value cannot be verified. It's used to create a derived proof value.
+     * Must throw {@link VerificationError}. 
+     * 
+     * @param publicKey
+     * 
+     * @throws VerificationError
+     * 
+     */
     @Override
-    default void verify(VerificationKey publicKey) throws VerificationError, DocumentError {
+    default void verify(VerificationKey publicKey) throws VerificationError {
         throw new VerificationError(VerificationErrorCode.InvalidSignature);
     }
 
     /**
-     * Derives a new selective disclosure proof from a base proof. 
+     * Derive a new selective disclosure proof value from this base proof value.
      * 
-     * @param context
-     * @param data
      * @param selectors
-     * @return
-     * @throws SigningError
-     * @throws DocumentError 
-     * @throws {@link UnsupportedOperationException} if the suite does not support selective disclosure
+     * 
+     * @return a new derived proof value
+     * 
+     * @throws CryptoSuiteError
+     * @throws DocumentError
      */
-    ProofValue derive(JsonStructure context, JsonObject data, Collection<String> selectors) throws SigningError, DocumentError;
+    ProofValue derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError;
 
     Collection<String> pointers();
 }

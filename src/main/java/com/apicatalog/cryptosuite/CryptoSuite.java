@@ -3,29 +3,29 @@ package com.apicatalog.cryptosuite;
 import java.util.Objects;
 
 import com.apicatalog.controller.key.KeyPair;
-import com.apicatalog.cryptosuite.algorithm.Canonicalizer;
-import com.apicatalog.cryptosuite.algorithm.Digester;
-import com.apicatalog.cryptosuite.algorithm.Signer;
+import com.apicatalog.cryptosuite.algorithm.CanonicalizationMethod;
+import com.apicatalog.cryptosuite.algorithm.DigestAlgorithm;
+import com.apicatalog.cryptosuite.algorithm.SignatureAlgorithm;
 import com.apicatalog.vc.model.VerifiableMaterial;
 
 /**
  * A specified set of cryptographic primitives consisting of a canonicalization
  * algorithm, a message digest algorithm, and a signature algorithm.
  */
-public class CryptoSuite implements Canonicalizer, Digester, Signer {
+public class CryptoSuite implements CanonicalizationMethod, DigestAlgorithm, SignatureAlgorithm {
 
     protected final String name;
     protected final int keyLength;
-    protected final Canonicalizer canonicalizer;
-    protected final Digester digester;
-    protected final Signer signer;
+    protected final CanonicalizationMethod canonicalizer;
+    protected final DigestAlgorithm digester;
+    protected final SignatureAlgorithm signer;
 
     public CryptoSuite(
             String name,
             int keyLength,
-            Canonicalizer canonicalizer,
-            Digester digester,
-            Signer signer) {
+            CanonicalizationMethod canonicalizer,
+            DigestAlgorithm digester,
+            SignatureAlgorithm signer) {
 
         Objects.requireNonNull(name);
 

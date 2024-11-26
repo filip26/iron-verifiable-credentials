@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.controller.key.VerificationKey;
-import com.apicatalog.cryptosuite.SigningError;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.did.key.DidKey;
 import com.apicatalog.did.key.DidKeyResolver;
@@ -80,7 +80,7 @@ public class VcTestRunnerJunit {
             .with(TEST_DI_SUITE)
             .loader(LOADER)
             .methodResolver(RESOLVERS)
-            .modelProvider(proofAdapter -> {
+            .model(proofAdapter -> {
                 Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
 
                 return new ContextAwareReaderProvider()
@@ -203,10 +203,10 @@ public class VcTestRunnerJunit {
             }
 
         } catch (VerificationError e) {
-            assertException(e.verificationErrorCode() != null ? e.verificationErrorCode().name() : null, e);
+            assertException(e.code() != null ? e.code().name() : null, e);
 
-        } catch (SigningError e) {
-            assertException(e.signatureErrorCode() != null ? e.signatureErrorCode().name() : null, e);
+        } catch (CryptoSuiteError e) {
+            assertException(e.code() != null ? e.code().name() : null, e);
 
         } catch (DocumentError e) {
             assertException(e.code(), e);
