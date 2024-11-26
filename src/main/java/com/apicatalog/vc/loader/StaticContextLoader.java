@@ -13,7 +13,7 @@ import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 
 public class StaticContextLoader implements DocumentLoader {
 
@@ -56,7 +56,7 @@ public class StaticContextLoader implements DocumentLoader {
     }
 
     private static JsonDocument get(final String name) {
-        return get(Verifiable.class, name);
+        return get(VerifiableDocument.class, name);
     }
 
     protected static JsonDocument get(Class<?> root, final String name) {

@@ -14,7 +14,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableReaderProvider;
@@ -91,13 +91,13 @@ public class Verifier extends SuitesProcessor<Verifier> {
      *
      * @param verifiable
      * @param parameters custom parameters, e.g. challenge token
-     * @return {@link Verifiable} object representing the verified credentials or a
+     * @return {@link VerifiableDocument} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(Verifiable verifiable, Parameter<?>... parameters) throws VerificationError, DocumentError {
+    public VerifiableDocument verify(VerifiableDocument verifiable, Parameter<?>... parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(verifiable);
         return verify(verifiable, toMap(parameters));
     }
@@ -108,13 +108,13 @@ public class Verifier extends SuitesProcessor<Verifier> {
      *
      * @param document
      * @param parameters custom parameters, e.g. challenge token
-     * @return {@link Verifiable} object representing the verified credentials or a
+     * @return {@link VerifiableDocument} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(JsonObject document, Parameter<?>... parameters) throws VerificationError, DocumentError {
+    public VerifiableDocument verify(JsonObject document, Parameter<?>... parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(document);
         return verify(document, toMap(parameters), getLoader());
     }
@@ -125,14 +125,14 @@ public class Verifier extends SuitesProcessor<Verifier> {
      *
      * @param document
      * @param parameters
-     * @return {@link Verifiable} object representing the verified credentials or a
+     * @return {@link VerifiableDocument} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
      * 
      */
-    public Verifiable verify(final JsonObject document, final Map<String, Object> parameters) throws VerificationError, DocumentError {
+    public VerifiableDocument verify(final JsonObject document, final Map<String, Object> parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(document);
         return verify(document, parameters, getLoader());
     }
@@ -143,13 +143,13 @@ public class Verifier extends SuitesProcessor<Verifier> {
      *
      * @param location
      * @param parameters
-     * @return {@link Verifiable} object representing the verified credentials or a
+     * @return {@link VerifiableDocument} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(final URI location, final Parameter<?>... parameters) throws VerificationError, DocumentError {
+    public VerifiableDocument verify(final URI location, final Parameter<?>... parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(location);
         return verify(location, toMap(parameters), getLoader());
     }
@@ -160,24 +160,24 @@ public class Verifier extends SuitesProcessor<Verifier> {
      *
      * @param location
      * @param parameters
-     * @return {@link Verifiable} object representing the verified credentials or a
+     * @return {@link VerifiableDocument} object representing the verified credentials or a
      *         presentation
      * 
      * @throws VerificationError
      * @throws DocumentError
      */
-    public Verifiable verify(final URI location, final Map<String, Object> parameters) throws VerificationError, DocumentError {
+    public VerifiableDocument verify(final URI location, final Map<String, Object> parameters) throws VerificationError, DocumentError {
         Objects.requireNonNull(location);
         return verify(location, parameters, getLoader());
     }
 
-    protected Verifiable verify(final URI location, final Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected VerifiableDocument verify(final URI location, final Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
         return verify(fetch(location), parameters, loader);
     }
 
-    protected Verifiable verify(final JsonObject document, final Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
+    protected VerifiableDocument verify(final JsonObject document, final Map<String, Object> parameters, DocumentLoader loader) throws VerificationError, DocumentError {
 
-        final Verifiable verifiable = read(document, loader);
+        final VerifiableDocument verifiable = read(document, loader);
 
         if (verifiable != null) {
             return verify(verifiable, parameters);
@@ -185,7 +185,7 @@ public class Verifier extends SuitesProcessor<Verifier> {
         throw new DocumentError(ErrorType.Unknown, "Model");
     }
 
-    public Verifiable verify(final Verifiable verifiable, final Map<String, Object> parameters) throws VerificationError, DocumentError {
+    public VerifiableDocument verify(final VerifiableDocument verifiable, final Map<String, Object> parameters) throws VerificationError, DocumentError {
 
         if (verifiable.proofs() == null || verifiable.proofs().isEmpty()) {
             throw new DocumentError(ErrorType.Missing, "Proof");

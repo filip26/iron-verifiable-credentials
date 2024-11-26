@@ -105,7 +105,7 @@ public class VcTestRunnerJunit {
         try {
             if (testCase.type.contains(VcTestCase.vocab("VeriferTest"))) {
 
-                final Verifiable verifiable = VERIFIER.verify(testCase.input,
+                final VerifiableDocument verifiable = VERIFIER.verify(testCase.input,
                         challenge(testCase.challenge),
                         purpose(testCase.purpose),
                         domain(testCase.domain),
@@ -168,7 +168,7 @@ public class VcTestRunnerJunit {
 
             } else if (testCase.type.contains(VcTestCase.vocab("ValidationTest"))) {
 
-                Verifiable verifiable = READER.read(testCase.input);
+                VerifiableDocument verifiable = READER.read(testCase.input);
                 assertNotNull(verifiable);
 
                 verifiable.validate();
@@ -178,7 +178,7 @@ public class VcTestRunnerJunit {
 
             } else if (testCase.type.contains(VcTestCase.vocab("ProofValidationTest"))) {
 
-                Verifiable verifiable = READER.read(testCase.input);
+                VerifiableDocument verifiable = READER.read(testCase.input);
                 assertNotNull(verifiable);
 
                 assertNotNull(verifiable.proofs());

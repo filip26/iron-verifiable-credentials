@@ -10,7 +10,7 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
@@ -86,12 +86,12 @@ public class Reader extends DocumentProcessor<Reader> {
      * Read VC/VP document.
      *
      * @param document
-     * @return {@link Verifiable} object representing credentials or a presentation
+     * @return {@link VerifiableDocument} object representing credentials or a presentation
      * 
      * @throws DocumentError
      * 
      */
-    public Verifiable read(final JsonObject document) throws DocumentError {
+    public VerifiableDocument read(final JsonObject document) throws DocumentError {
         Objects.requireNonNull(document);
         return materialize(document, getLoader(), base);
     }
@@ -100,11 +100,11 @@ public class Reader extends DocumentProcessor<Reader> {
      * Read VC/VP document.
      * 
      * @param location
-     * @return {@link Verifiable} object representing credentials or a presentation
+     * @return {@link VerifiableDocument} object representing credentials or a presentation
      * 
      * @throws DocumentError
      */
-    public Verifiable read(final URI location) throws DocumentError {
+    public VerifiableDocument read(final URI location) throws DocumentError {
 
         Objects.requireNonNull(location);
 
@@ -131,7 +131,7 @@ public class Reader extends DocumentProcessor<Reader> {
         }
     }
 
-    public Verifiable materialize(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableDocument materialize(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
         final VerifiableReader reader = readerProvider.reader(document);
 

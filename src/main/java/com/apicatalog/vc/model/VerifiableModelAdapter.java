@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 
 @FunctionalInterface
 public interface VerifiableModelAdapter {
@@ -20,5 +20,5 @@ public interface VerifiableModelAdapter {
      * @throws DocumentError
      * 
      */
-    Verifiable materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError;
+    VerifiableDocument materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError;
 }

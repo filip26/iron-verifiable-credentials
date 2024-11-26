@@ -5,7 +5,7 @@ import java.util.function.Function;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
@@ -42,7 +42,7 @@ public class SuitesProcessor<T extends SuitesProcessor<T>> extends DocumentProce
         return (T)this;
     }
 
-    protected Verifiable read(final JsonObject document, DocumentLoader loader) throws DocumentError {
+    protected VerifiableDocument read(final JsonObject document, DocumentLoader loader) throws DocumentError {
         final VerifiableReader reader = readerProvider.reader(document);
 
         if (reader != null) {

@@ -8,7 +8,6 @@ import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.Signature;
-import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.json.JsonUtils;
@@ -19,7 +18,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.model.ProofAdapter;
@@ -130,7 +129,7 @@ public abstract class AbstractIssuer implements Issuer {
             throw new DocumentError(ErrorType.Unknown, "Model");
         }
 
-        final Verifiable verifiable = reader.materialize(model, loader, base);
+        final VerifiableDocument verifiable = reader.materialize(model, loader, base);
 
         if (verifiable == null) {
             throw new DocumentError(ErrorType.Unknown, "Model");
@@ -164,7 +163,7 @@ public abstract class AbstractIssuer implements Issuer {
         return JsonLdContext.set(signedDocument.context(), signedDocument.compacted());
     }
 
-    protected static final JsonObject fetchDocument(URI location, DocumentLoader loader) throws DocumentError, SigningError {
+    protected static final JsonObject fetchDocument(URI location, DocumentLoader loader) throws DocumentError {
         try {
             // load the document
             final DocumentLoaderOptions options = new DocumentLoaderOptions();

@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 
 import jakarta.json.JsonObject;
 
@@ -23,7 +23,7 @@ public interface VerifiableWriter {
      * 
      */
     JsonObject write(
-            Verifiable verifiable,
+            VerifiableDocument verifiable,
             DocumentLoader loader,
             URI base) throws DocumentError;
 

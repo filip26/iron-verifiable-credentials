@@ -13,7 +13,7 @@ import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.jsonld.JsonLdMaterialReader;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
@@ -55,7 +55,7 @@ public class GenericReader implements VerifiableModelReader, VerifiableModelWrit
             builder.scan(type);
         }
 
-        builder.scan(Verifiable.class, true);
+        builder.scan(VerifiableDocument.class, true);
 
         return new GenericReader(
                 new GenericAdapter(JsonLdTreeReader.of(builder.build()), proofAdapter),
@@ -63,7 +63,7 @@ public class GenericReader implements VerifiableModelReader, VerifiableModelWrit
     }
 
     @Override
-    public Verifiable materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableDocument materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
         return adapter.materialize(model, loader, base);
     }
 

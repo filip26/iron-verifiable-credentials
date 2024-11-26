@@ -1,11 +1,11 @@
 package com.apicatalog.vcdm;
 
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 
 /**
  * A common ancestor to all W3C VCDM based verifiables.
  */
-public interface VcdmVerifiable extends Verifiable {
+public interface VcdmVerifiable extends VerifiableDocument {
 
     /**
      * Verifiable credentials data model version.

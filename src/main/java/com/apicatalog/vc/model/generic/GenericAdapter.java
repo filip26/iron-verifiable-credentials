@@ -13,7 +13,7 @@ import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
@@ -33,7 +33,7 @@ public class GenericAdapter implements VerifiableModelAdapter {
     }
 
     @Override
-    public Verifiable materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableDocument materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
         
         Collection<Proof> proofs = Collections.emptyList();
 
@@ -50,7 +50,7 @@ public class GenericAdapter implements VerifiableModelAdapter {
             }
         }
 
-        return read(Verifiable.class, model.data(), proofs);
+        return read(VerifiableDocument.class, model.data(), proofs);
     }
 
     protected <T> T read(Class<T> type, VerifiableMaterial data, Collection<Proof> proofs) throws DocumentError {

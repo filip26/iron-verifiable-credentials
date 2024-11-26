@@ -12,10 +12,10 @@ import com.apicatalog.linkedtree.orm.Type;
 import com.apicatalog.vc.proof.Proof;
 
 /**
- * Represents a common ancestor for verifiable data/material.
+ * A common ancestor to all verifiable documents.
  */
 @Fragment(generic = true)
-public interface Verifiable {
+public interface VerifiableDocument {
 
     @Id
     URI id();

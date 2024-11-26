@@ -14,7 +14,7 @@ import com.apicatalog.vc.holder.PresentationHolder;
  * A generic verifiable presentation.
  */
 @Fragment(generic = true)
-public interface Presentation extends Verifiable {
+public interface Presentation extends VerifiableDocument {
 
     @Term
     PresentationHolder holder();

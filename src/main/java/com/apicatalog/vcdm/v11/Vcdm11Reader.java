@@ -13,7 +13,7 @@ import com.apicatalog.linkedtree.orm.context.ContextReducer;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
@@ -79,7 +79,7 @@ public class Vcdm11Reader extends VcdmModelReader implements CredentialAdapter, 
     }
 
     @Override
-    public Verifiable materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableDocument materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
         return adapter.materialize(model, loader, base);
     }
 
@@ -105,7 +105,7 @@ public class Vcdm11Reader extends VcdmModelReader implements CredentialAdapter, 
             VerifiableModel model = read(data);
 
             if (model != null) {
-                Verifiable verifiable = adapter.materialize(model, loader, base);
+                VerifiableDocument verifiable = adapter.materialize(model, loader, base);
 
                 if (verifiable instanceof Credential credential) {
                     return credential;

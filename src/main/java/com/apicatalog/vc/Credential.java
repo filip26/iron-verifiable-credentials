@@ -16,7 +16,7 @@ import com.apicatalog.vcdm.VcdmVocab;
  */
 @Fragment(generic = true)
 @Vocab("https://www.w3.org/2018/credentials#")
-public interface Credential extends Verifiable {
+public interface Credential extends VerifiableDocument {
 
     /**
      * Check if the credential is expired.

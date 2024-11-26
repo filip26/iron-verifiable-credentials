@@ -20,7 +20,7 @@ import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
@@ -55,7 +55,7 @@ public class VcdmAdapter implements VerifiableModelAdapter {
     }
 
     @Override
-    public Verifiable materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableDocument materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
 
         final Collection<String> types = JsonLdType.strings(model.data().expanded());
 

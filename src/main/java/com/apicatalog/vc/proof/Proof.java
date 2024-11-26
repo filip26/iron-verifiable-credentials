@@ -17,6 +17,8 @@ import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Type;
 import com.apicatalog.linkedtree.orm.Vocab;
+import com.apicatalog.vc.model.ModelValidation;
+import com.apicatalog.vcdi.VcdiVocab;
 
 import jakarta.json.JsonObject;
 
@@ -121,6 +123,16 @@ public interface Proof {
      */
 
     default JsonObject derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError {
+        
+        ModelValidation.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
+        
+        if (signature() instanceof BaseProofValue baseProofValue) {
+            System.out.println("DERIVE " + baseProofValue);
+            System.out.println("     > " + selectors);
+            ProofValue proofValue = baseProofValue.derive(selectors);
+            System.out.println("> " + proofValue); 
+        }
+        
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
     }
 }

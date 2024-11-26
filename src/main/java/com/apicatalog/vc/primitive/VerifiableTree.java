@@ -9,14 +9,14 @@ import com.apicatalog.linkedtree.primitive.GenericContainer;
 import com.apicatalog.linkedtree.traversal.NodePointer;
 import com.apicatalog.linkedtree.traversal.TreeComposer;
 import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 @Deprecated
 public class VerifiableTree {
 
-    public static LinkedTree unsigned(Verifiable verifiable) {
+    public static LinkedTree unsigned(VerifiableDocument verifiable) {
 
         if (verifiable.isCredential()) {
             return ((Linkable)verifiable).ld().asFragment().root();
@@ -89,7 +89,7 @@ public class VerifiableTree {
         return null;
     }
 
-    public static LinkedTree compose(Verifiable verifiable) {
+    public static LinkedTree compose(VerifiableDocument verifiable) {
         if (verifiable.isCredential()) {
             var crendential = new TreeComposer(((Linkable)verifiable).ld().asFragment().root()) {
 
@@ -200,7 +200,7 @@ public class VerifiableTree {
         
     }
     
-    public static LinkedTree complete(Verifiable verifiable) {
+    public static LinkedTree complete(VerifiableDocument verifiable) {
 
         if (verifiable.isCredential()) {
             var crendential = new TreeComposer(((Linkable)verifiable).ld().asFragment().root()) {
