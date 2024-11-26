@@ -66,8 +66,9 @@ public class DataIntegrityProofDraft extends ProofDraft {
             suite.customTypes.forEach(writer::scan);
         }
 
+        // context reducer
         writer.context(VcdmVocab.CONTEXT_MODEL_V2,
-                List.of("https://w3id.org/security/data-integrity/v2"));
+                List.of(VcdiVocab.CONTEXT_MODEL_V2));
 
         return writer;
     }

@@ -281,8 +281,8 @@ public class Verifier extends VerificationProcessor<Verifier> {
         } catch (IllegalArgumentException e) {
             throw new DocumentError(e, ErrorType.Invalid);
 
-        } catch (NullPointerException e) {
-            throw new DocumentError(e, ErrorType.Missing);
+//        } catch (NullPointerException e) {
+//            throw new DocumentError(e, ErrorType.Missing);
 
         } catch (UnsupportedOperationException e) {
             throw new DocumentError(e, ErrorType.Unknown);

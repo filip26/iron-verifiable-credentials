@@ -14,7 +14,12 @@ import com.apicatalog.vc.suite.SignatureSuite;
  * Represent an issuer not supporting a selective disclosure.
  */
 public class SolidIssuer extends AbstractIssuer {
-    public SolidIssuer(SignatureSuite suite, CryptoSuite crypto, KeyPair keyPair, Multibase proofValueBase, Function<VerificationMethod, ? extends ProofDraft> proofDraftProvider) {
+    public SolidIssuer(
+            SignatureSuite suite, 
+            CryptoSuite crypto, 
+            KeyPair keyPair, 
+            Multibase proofValueBase, 
+            Function<VerificationMethod, ? extends ProofDraft> proofDraftProvider) {
         super(suite, crypto, keyPair, proofValueBase, proofDraftProvider);
     }
 }

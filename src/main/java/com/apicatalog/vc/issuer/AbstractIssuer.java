@@ -42,7 +42,8 @@ import jakarta.json.JsonStructure;
 
 public abstract class AbstractIssuer implements Issuer {
 
-    protected final CryptoSuite crypto;
+    protected final SignatureSuite suite;
+    protected final CryptoSuite cryptosuite;
     protected final KeyPair keyPair;
     protected final Multibase proofValueBase;
 
@@ -53,8 +54,14 @@ public abstract class AbstractIssuer implements Issuer {
     protected URI base;
     protected boolean bundledContexts;
 
-    protected AbstractIssuer(SignatureSuite suite, CryptoSuite crypto, KeyPair keyPair, Multibase proofValueBase, Function<VerificationMethod, ? extends ProofDraft> proofDraftProvider) {
-        this.crypto = crypto;
+    protected AbstractIssuer(
+            SignatureSuite suite, 
+            CryptoSuite crypto, 
+            KeyPair keyPair, 
+            Multibase proofValueBase, 
+            Function<VerificationMethod, ? extends ProofDraft> proofDraftProvider) {
+        this.suite = suite;
+        this.cryptosuite = crypto;
         this.keyPair = keyPair;
         this.proofValueBase = proofValueBase;
 
@@ -105,7 +112,7 @@ public abstract class AbstractIssuer implements Issuer {
 
     @Override
     public CryptoSuite cryptosuite() {
-        return crypto;
+        return cryptosuite;
     }
 
     protected JsonObject sign(JsonObject document, final ProofDraft draft, final DocumentLoader loader) throws SigningError, DocumentError {
@@ -136,7 +143,13 @@ public abstract class AbstractIssuer implements Issuer {
 
         final VerifiableMaterial unsignedData = new GenericMaterial(unsignedDraft.context(), model.data().compacted(), model.data().expanded());
         
-        final Signature ldSignature = new Signature(crypto, null);
+        return sign(model, unsignedData, unsignedDraft, draft);
+    }
+
+    protected JsonObject sign(VerifiableModel model, VerifiableMaterial unsignedData, VerifiableMaterial unsignedDraft, ProofDraft draft) throws SigningError, DocumentError {
+
+
+        final Signature ldSignature = new Signature(cryptosuite, null);
 
         try {
             ldSignature.sign(unsignedData, unsignedDraft, keyPair.privateKey().rawBytes());

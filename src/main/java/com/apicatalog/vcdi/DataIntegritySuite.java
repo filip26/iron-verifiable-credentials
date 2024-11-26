@@ -16,12 +16,12 @@ import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseAdapter;
+import com.apicatalog.multibase.MultibaseLiteral;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.GenericSignature;
@@ -123,12 +123,16 @@ public class DataIntegritySuite implements SignatureSuite {
             if (proof instanceof PropertyValueConsumer consumer
                     && proof instanceof Linkable linkable) {
 
-                final ByteArrayValue signature = linkable.ld().asFragment()
-                        .literal(VcdiVocab.PROOF_VALUE.uri(), ByteArrayValue.class);
+                final MultibaseLiteral signature = linkable.ld().asFragment()
+                        .literal(VcdiVocab.PROOF_VALUE.uri(), MultibaseLiteral.class);
 
                 ProofValue proofValue = null;
 
                 if (signature != null) {
+                    if (proofValueBase != null && !proofValueBase.equals(signature.base())) {
+                        throw new DocumentError(ErrorType.Invalid, VcdiVocab.PROOF_VALUE.name() + "Multibase");
+                    }
+                    
                     final VerifiableMaterial unsignedProof = new GenericMaterial(
                             proofMaterial.context(),
                             Json.createObjectBuilder(proofMaterial.compacted())
