@@ -13,6 +13,8 @@ import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.adapter.NodeAdapterError;
+import com.apicatalog.linkedtree.builder.FragmentComposer;
 import com.apicatalog.linkedtree.json.JsonFragment;
 import com.apicatalog.linkedtree.json.JsonNode;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
@@ -30,7 +32,7 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vc.proof.VerifiableProof;
+import com.apicatalog.vc.proof.LinkedProof;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -45,7 +47,7 @@ import jakarta.json.JsonValue;
 @Fragment
 @Context("https://w3id.org/security/data-integrity/v2")
 @Vocab("https://w3id.org/security#")
-public interface DataIntegrityProof extends VerifiableProof {
+public interface DataIntegrityProof extends LinkedProof {
 
     /**
      * The intent for the proof, the reason why an entity created it. Mandatory e.g.
@@ -140,7 +142,7 @@ public interface DataIntegrityProof extends VerifiableProof {
         if (expires() != null && Instant.now().isAfter(expires())) {
             throw new VerificationError(VerificationErrorCode.Expired);
         }
-        VerifiableProof.super.verify(key);
+        LinkedProof.super.verify(key);
     }
 
     @Override
@@ -153,6 +155,29 @@ public interface DataIntegrityProof extends VerifiableProof {
             System.out.println("     > " + selectors);
             ProofValue proofValue = baseProofValue.derive(selectors);
             System.out.println("> " + proofValue);
+            
+            
+            try {
+                DataIntegrityProof proof = FragmentComposer.create()
+                        .set("id", id())
+                        .set("cryptosuite", cryptosuite())
+                        .set("purpose", purpose())
+                        .set("created", created())
+                        .set("expires", expires())
+                        .set("method", method())
+                        .set("signature", baseProofValue)
+                        .set(VcdiVocab.PREVIOUS_PROOF.name(), previousProof())
+                        .set(VcdiVocab.CHALLENGE.name(), challenge())
+                        .set(VcdiVocab.NONCE.name(), nonce())
+                        .set(VcdiVocab.DOMAIN.name(), domain())
+//                    .json(writer::compact)
+                        .get(DataIntegrityProof.class);
+                
+                return proof;
+            } catch (NodeAdapterError e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             
             //TODO clone DI proof and set value, return the proof
 //            System.out.println("> " + baseProofValue.document());

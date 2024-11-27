@@ -5,9 +5,21 @@ import java.util.Objects;
 import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.linkedtree.orm.Fragment;
+import com.apicatalog.linkedtree.orm.Provided;
+import com.apicatalog.vc.VerifiableDocument;
 
-public interface VerifiableProof extends Proof {
+@Fragment(generic = true)
+public interface LinkedProof extends Proof {
 
+    /**
+     * A document to which this proof is bound, linked to.
+     * 
+     * @return a verifiable document instance
+     */
+    @Provided
+    VerifiableDocument document();
+    
     @Override
     default void verify(VerificationKey key) throws VerificationError, DocumentError {
         Objects.requireNonNull(key);

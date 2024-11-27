@@ -48,7 +48,7 @@ import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
-import com.apicatalog.vc.reader.Reader;
+import com.apicatalog.vc.reader.DocumentReader;
 import com.apicatalog.vc.verifier.Verifier;
 import com.apicatalog.vcdi.DataIntegrityProofDraft;
 import com.apicatalog.vcdi.DataIntegritySuite;
@@ -91,7 +91,7 @@ public class VcTestRunnerJunit {
                         .with(VcdiVocab.CONTEXT_MODEL_V2, GenericReader.with(proofAdapter));
             });;
 
-    final static Reader READER = Reader.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER);
+    final static DocumentReader READER = DocumentReader.with(TEST_DI_SUITE, DataIntegritySuite.generic()).loader(LOADER);
 
     public VcTestRunnerJunit(VcTestCase testCase) {
         this.testCase = testCase;

@@ -27,6 +27,7 @@ import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableModel;
 import com.apicatalog.vc.model.VerifiableModelAdapter;
 import com.apicatalog.vc.model.generic.GenericMaterial;
+import com.apicatalog.vc.proof.LinkedProof;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vcdm.VcdmVocab;
 
@@ -111,7 +112,12 @@ public class VcdmAdapter implements VerifiableModelAdapter {
 
             if (verifiable instanceof PropertyValueConsumer consumer) {
                 consumer.acceptFragmentPropertyValue("proofs", proofs);
+                
+                if (verifiable instanceof LinkedProof) {
+                    consumer.acceptFragmentPropertyValue("document", verifiable);
+                }
             }
+            
 
             return verifiable;
 

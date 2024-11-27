@@ -58,8 +58,7 @@ public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, 
                 .scan(Vcdm20Presentation.class, true)
                 .scan(Vcdm20EnvelopedCredential.class, true)
                 .scan(Vcdm20EnvelopedPresentation.class, true)
-                .scan(Credential.class, true)
-                ;
+                .scan(Credential.class, true);
 
         if (types != null) {
             for (Class<?> type : types) {

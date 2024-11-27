@@ -28,11 +28,11 @@ import com.apicatalog.vcdm.v20.Vcdm20Reader;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 
-public class Reader extends DocumentProcessor<Reader> {
+public class DocumentReader extends DocumentProcessor<DocumentReader> {
 
     protected final VerifiableReaderProvider readerProvider;
 
-    protected Reader(final SignatureSuite[] suites) {
+    protected DocumentReader(final SignatureSuite[] suites) {
         super(suites);
 
         ProofAdapter proofAdapter = ProofAdapterProvider.of(suites);
@@ -78,8 +78,8 @@ public class Reader extends DocumentProcessor<Reader> {
      * @param suites
      * @return
      */
-    public static Reader with(final SignatureSuite... suites) {
-        return new Reader(suites);
+    public static DocumentReader with(final SignatureSuite... suites) {
+        return new DocumentReader(suites);
     }
 
     /**
