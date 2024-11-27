@@ -4,8 +4,8 @@ import java.nio.charset.StandardCharsets;
 
 import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.algorithm.CanonicalizationMethod;
+import com.apicatalog.jsonld.json.JsonCanonicalizer;
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.linkedtree.json.JsonCanonicalizer;
 import com.apicatalog.vc.model.VerifiableMaterial;
 
 import jakarta.json.Json;

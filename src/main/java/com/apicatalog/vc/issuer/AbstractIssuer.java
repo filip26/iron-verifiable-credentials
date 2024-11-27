@@ -150,7 +150,7 @@ public abstract class AbstractIssuer implements Issuer {
 
         ldSignature.sign(unsignedData, unsignedDraft, keyPair.privateKey().rawBytes());
 
-        final VerifiableMaterial signedProof = draft.sign(unsignedDraft, ldSignature.value());
+        final VerifiableMaterial signedProof = draft.sign(unsignedDraft, ldSignature.byteArrayValue());
 
         if (signedProof == null) {
             throw new IllegalStateException();

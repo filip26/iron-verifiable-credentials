@@ -81,7 +81,6 @@ public class DocumentReader extends DocumentProcessor<DocumentReader> {
 
         if (reader != null) {
             final VerifiableModel model = reader.read(document, loader, base);
-System.out.println(": " + model.data().compacted());
 
             if (model != null) {
                 return reader.materialize(model, loader, base);

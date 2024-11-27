@@ -2,14 +2,20 @@ package com.apicatalog.vcdi;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.CryptoSuite;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.Linkable;
+import com.apicatalog.linkedtree.json.JsonFragment;
+import com.apicatalog.linkedtree.json.JsonNode;
+import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Adapter;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
@@ -18,9 +24,17 @@ import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
+import com.apicatalog.multibase.MultibaseLiteral;
 import com.apicatalog.vc.model.ModelValidation;
+import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.generic.GenericMaterial;
+import com.apicatalog.vc.proof.BaseProofValue;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.proof.VerifiableProof;
+
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
 /**
  * Represents data integrity proof base class.
@@ -127,5 +141,72 @@ public interface DataIntegrityProof extends VerifiableProof {
             throw new VerificationError(VerificationErrorCode.Expired);
         }
         VerifiableProof.super.verify(key);
+    }
+
+    @Override
+    default DataIntegrityProof derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError {
+
+        ModelValidation.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
+
+        if (signature() instanceof BaseProofValue baseProofValue) {
+            System.out.println("DERIVE " + baseProofValue);
+            System.out.println("     > " + selectors);
+            ProofValue proofValue = baseProofValue.derive(selectors);
+            System.out.println("> " + proofValue);
+            
+            //TODO clone DI proof and set value, return the proof
+//            System.out.println("> " + baseProofValue.document());
+//            System.out.println("> " + baseProofValue.proof());
+        }
+        
+        // JsonFragment resi to ze pak Proof, Verifiable, bude dedit it toto!!!
+//        if (this instanceof JsonFragment) {
+//            
+//        }
+        
+        throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
+//            byte[] signature = proofValue.;
+//            
+//            DataIntegrityProof.sign(
+//                    baseProofValue.proof(),
+//                    Json.createValue(suite.proofValueBase.encode(signature)))
+
+//            sign(baseProofValue.proof(), )
+
+//            final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
+//
+//            return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
+//            
+//            final VerifiableMaterial signedProof = draft.sign(unsignedDraft, ldSignature.value());
+//
+//            if (signedProof == null) {
+//                throw new IllegalStateException();
+//            }
+//
+//            final VerifiableMaterial signedDocument = model
+//                    .withProof(signedProof)
+//                    .materialize();
+//
+//            return JsonLdContext.set(signedDocument.context(), signedDocument.compacted());
+
+    }
+
+    static VerifiableMaterial sign(VerifiableMaterial proof, JsonValue signature) throws DocumentError {
+        JsonObject compacted = Json.createObjectBuilder(proof.compacted())
+                .add(VcdiVocab.PROOF_VALUE.name(), signature)
+                .build();
+
+        JsonObject expanded = Json.createObjectBuilder(proof.expanded())
+                .add(VcdiVocab.PROOF_VALUE.uri(),
+                        Json.createArrayBuilder().add(
+                                Json.createObjectBuilder()
+                                        .add(JsonLdKeyword.VALUE, signature)
+                                        .add(JsonLdKeyword.TYPE, MultibaseLiteral.typeName())))
+                .build();
+
+        return new GenericMaterial(
+                proof.context(),
+                compacted,
+                expanded);
     }
 }

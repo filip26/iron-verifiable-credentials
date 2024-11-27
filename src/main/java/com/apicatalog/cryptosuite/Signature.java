@@ -4,9 +4,10 @@ import java.util.Objects;
 
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
+import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.vc.model.VerifiableMaterial;
 
-public class Signature {
+public class Signature implements ByteArrayValue {
 
     protected final CryptoSuite suite;
     protected byte[] signature;
@@ -104,11 +105,12 @@ public class Signature {
         return result;
     }
 
-    public byte[] value() {
-        return signature;
-    }
-
     public CryptoSuite suite() {
         return suite;
+    }
+
+    @Override
+    public byte[] byteArrayValue() {
+        return signature;
     }
 }

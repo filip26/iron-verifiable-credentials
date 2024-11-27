@@ -71,6 +71,6 @@ class TestAlgorithm implements SignatureAlgorithm {
         System.out.println(
                 new JsonLdWriter()
                         .scan(Multikey.class)
-                        .compacted((new TestAlgorithm()).keygen()));
+                        .compact((new TestAlgorithm()).keygen()));
     }
 }

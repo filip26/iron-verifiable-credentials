@@ -103,7 +103,6 @@ public class DataIntegritySuite implements SignatureSuite {
 
         TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder()
                 .scan(proofInterface, true)
-                // TODO supported bases only
                 .with(new MultibaseAdapter());
 
         if (customTypes != null) {

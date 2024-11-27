@@ -17,10 +17,10 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.FragmentComposer;
 import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
+import com.apicatalog.linkedtree.json.JsonFragment;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
-import com.apicatalog.multibase.MultibaseLiteral;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.model.ModelValidation;
 import com.apicatalog.vc.model.VerifiableMaterial;
@@ -31,7 +31,6 @@ import com.apicatalog.vcdm.VcdmVocab;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 public class DataIntegrityProofDraft extends ProofDraft {
 
@@ -102,9 +101,10 @@ public class DataIntegrityProofDraft extends ProofDraft {
                     .set(VcdiVocab.CHALLENGE.name(), challenge)
                     .set(VcdiVocab.NONCE.name(), nonce)
                     .set(VcdiVocab.DOMAIN.name(), domain)
+                    .json(writer::compact)
                     .get(DataIntegrityProof.class);
 
-            JsonObject compacted = writer.compacted(proof);
+            JsonObject compacted = ((JsonFragment) proof).jsonObject();
 
             JsonArray expanded = JsonLd.expand(JsonDocument.of(compacted))
                     .undefinedTermsPolicy(ProcessingPolicy.Fail)
@@ -112,19 +112,9 @@ public class DataIntegrityProofDraft extends ProofDraft {
                     .base(base)
                     .get();
 
-            JsonLdContext context = documentContext;
-
+            JsonLdContext context = JsonLdContext.of(compacted, documentContext);
             if (compacted.containsKey(JsonLdKeyword.CONTEXT)) {
-                JsonLdContext proofContext = JsonLdContext.of(compacted, context);
-
-                if (proofContext != null && !proofContext.isEmpty()) {
-                    if (context.isEmpty()) {
-                        context = proofContext;
-                    } else {
-                        context = writer.contextReducer().reduce(context, proofContext);
-                    }
-                }
-
+                context = writer.contextReducer().reduce(documentContext, context);
                 compacted = Json.createObjectBuilder(compacted).remove(JsonLdKeyword.CONTEXT).build();
             }
 
@@ -146,22 +136,9 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
     @Override
     protected VerifiableMaterial sign(VerifiableMaterial proof, byte[] signature) throws DocumentError {
-
-        JsonValue value = Json.createValue(suite.proofValueBase.encode(signature));
-
-        JsonObject compacted = Json.createObjectBuilder(proof.compacted()).add(VcdiVocab.PROOF_VALUE.name(), value).build();
-        JsonObject expanded = Json.createObjectBuilder(proof.expanded())
-                .add(VcdiVocab.PROOF_VALUE.uri(),
-                        Json.createArrayBuilder().add(
-                                Json.createObjectBuilder()
-                                        .add(JsonLdKeyword.VALUE, value)
-                                        .add(JsonLdKeyword.TYPE, MultibaseLiteral.typeName())))
-                .build();
-
-        return new GenericMaterial(
-                proof.context(),
-                compacted,
-                expanded);
+        return DataIntegrityProof.sign(
+                proof,
+                Json.createValue(suite.proofValueBase.encode(signature)));
     }
 
     @Override

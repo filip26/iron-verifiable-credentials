@@ -11,8 +11,8 @@ import com.apicatalog.ld.DocumentError;
 public interface BaseProofValue extends ProofValue {
 
     /**
-     * Base proof value cannot be verified. It's used to create a derived proof value.
-     * Must throw {@link VerificationError}. 
+     * Base proof value cannot be verified. It's used to create a derived proof
+     * value. Must throw {@link VerificationError}.
      * 
      * @param publicKey
      * 
@@ -37,4 +37,9 @@ public interface BaseProofValue extends ProofValue {
     ProofValue derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError;
 
     Collection<String> pointers();
+
+//    VerifiableMaterial document();
+//
+//    VerifiableMaterial proof();
+
 }

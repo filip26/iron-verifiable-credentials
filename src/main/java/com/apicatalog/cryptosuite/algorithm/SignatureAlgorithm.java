@@ -1,8 +1,8 @@
 package com.apicatalog.cryptosuite.algorithm;
 
 import com.apicatalog.controller.key.KeyPair;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.KeyGenError;
-import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.cryptosuite.VerificationError;
 
 /**
@@ -15,7 +15,7 @@ public interface SignatureAlgorithm {
 
     void verify(byte[] publicKey, byte[] signature, byte[] data) throws VerificationError;
 
-    byte[] sign(byte[] privateKey, byte[] data) throws SigningError;
+    byte[] sign(byte[] privateKey, byte[] data) throws CryptoSuiteError;
 
     KeyPair keygen() throws KeyGenError;
 }

@@ -45,7 +45,7 @@ public class CryptoSuite implements CanonicalizationMethod, DigestAlgorithm, Sig
     }
 
     @Override
-    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
+    public byte[] sign(byte[] privateKey, byte[] data) throws CryptoSuiteError {
         if (signer == null) {
             throw new UnsupportedOperationException();
         }
