@@ -18,23 +18,23 @@ import com.apicatalog.vc.jsonld.JsonLdMaterialReader;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableMaterialReader;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableModelAdapter;
-import com.apicatalog.vc.model.VerifiableModelReader;
-import com.apicatalog.vc.model.VerifiableModelWriter;
-import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.DocumentModel;
+import com.apicatalog.vc.model.DocumentAdapter;
+import com.apicatalog.vc.model.DocumentModelReader;
+import com.apicatalog.vc.model.DocumentModelWriter;
+import com.apicatalog.vc.model.DocumentModelAdapter;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
-public class GenericReader implements VerifiableModelReader, VerifiableModelWriter, VerifiableReader {
+public class GenericReader implements DocumentModelReader, DocumentModelWriter, DocumentModelAdapter {
 
-    protected final VerifiableModelAdapter adapter;
+    protected final DocumentAdapter adapter;
     protected final VerifiableMaterialReader materialReader;
 
-    protected GenericReader(final VerifiableModelAdapter adapter, VerifiableMaterialReader reader) {
+    protected GenericReader(final DocumentAdapter adapter, VerifiableMaterialReader reader) {
         this.adapter = adapter;
         this.materialReader = reader;
     }
@@ -63,21 +63,21 @@ public class GenericReader implements VerifiableModelReader, VerifiableModelWrit
     }
 
     @Override
-    public VerifiableDocument materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableDocument materialize(DocumentModel model, DocumentLoader loader, URI base) throws DocumentError {
         return adapter.materialize(model, loader, base);
     }
 
     @Override
-    public VerifiableModel read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
+    public DocumentModel read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
         VerifiableMaterial material = materialReader.read(document, loader, base);
 
-        VerifiableModel model = read(material);
+        DocumentModel model = read(material);
 
         return model;
     }
 
     @Override
-    public VerifiableModel read(VerifiableMaterial data) throws DocumentError {
+    public DocumentModel read(VerifiableMaterial data) throws DocumentError {
 
         final JsonObject expandedUnsigned = EmbeddedProof.removeProofs(data.expanded());
 
@@ -134,7 +134,7 @@ public class GenericReader implements VerifiableModelReader, VerifiableModelWrit
     }
 
     @Override
-    public VerifiableMaterial write(VerifiableModel model) throws DocumentError {
+    public VerifiableMaterial write(DocumentModel model) throws DocumentError {
 
 //        JsonObject expanded = model.expandedProofs().isEmpty()
 //                ? model.data().expanded()

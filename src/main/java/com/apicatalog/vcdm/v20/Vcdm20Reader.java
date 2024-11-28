@@ -17,9 +17,9 @@ import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableModelAdapter;
-import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.DocumentModel;
+import com.apicatalog.vc.model.DocumentAdapter;
+import com.apicatalog.vc.model.DocumentModelAdapter;
 import com.apicatalog.vcdm.VcdmVersion;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmModelReader;
@@ -27,13 +27,13 @@ import com.apicatalog.vcdm.v11.Vcdm11Reader;
 
 import jakarta.json.JsonObject;
 
-public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, VerifiableReader {
+public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, DocumentModelAdapter {
 
     protected final static ContextReducer contextReducer = new ContextReducer()
             .define("https://www.w3.org/ns/credentials/v2",
                     List.of("https://w3id.org/security/data-integrity/v2"));
 
-    protected VerifiableModelAdapter v20;
+    protected DocumentAdapter v20;
     protected Vcdm11Reader v11;
 
     protected final ProofAdapter proofAdapter;
@@ -70,7 +70,7 @@ public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, 
     }
 
     @Override
-    public VerifiableDocument materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableDocument materialize(DocumentModel model, DocumentLoader loader, URI base) throws DocumentError {
 
         Objects.requireNonNull(model);
 
@@ -78,13 +78,13 @@ public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, 
     }
 
     @Override
-    public VerifiableModel read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
+    public DocumentModel read(JsonObject document, DocumentLoader loader, URI base) throws DocumentError {
 
         VerifiableMaterial material = materialReader.read(document, loader, base);
 
         if (material != null) {
 
-            VerifiableModel model = read(material);
+            DocumentModel model = read(material);
             if (model != null) {
                 return model;
             }
@@ -108,7 +108,7 @@ public class Vcdm20Reader extends VcdmModelReader implements CredentialAdapter, 
 
         if (v20 != null && VcdmVersion.V20 == version) {
 
-            VerifiableModel model = read(data);
+            DocumentModel model = read(data);
 
             if (model != null) {
                 VerifiableDocument verifiable = v20.materialize(model, loader, base);

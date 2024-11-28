@@ -27,7 +27,7 @@ import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
 import com.apicatalog.multibase.MultibaseLiteral;
-import com.apicatalog.vc.model.ModelValidation;
+import com.apicatalog.vc.model.ModelAssertions;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.BaseProofValue;
@@ -119,9 +119,9 @@ public interface DataIntegrityProof extends LinkedProof {
     @Override
     default void validate(Map<String, Object> params) throws DocumentError {
 
-        ModelValidation.assertNotNull(this::purpose, VcdiVocab.PURPOSE);
-        ModelValidation.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
-        ModelValidation.assertNotNull(this::cryptosuite, VcdiVocab.CRYPTO_SUITE);
+        ModelAssertions.assertNotNull(this::purpose, VcdiVocab.PURPOSE);
+        ModelAssertions.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
+        ModelAssertions.assertNotNull(this::cryptosuite, VcdiVocab.CRYPTO_SUITE);
 
         if (cryptosuite().isUnknown()) {
             throw new DocumentError(ErrorType.Unknown, VcdiVocab.CRYPTO_SUITE);
@@ -136,10 +136,10 @@ public interface DataIntegrityProof extends LinkedProof {
         }
 
         if (params != null) {
-            ModelValidation.assertEquals(params, VcdiVocab.PURPOSE, purpose());
-            ModelValidation.assertEquals(params, VcdiVocab.CHALLENGE, challenge());
-            ModelValidation.assertEquals(params, VcdiVocab.DOMAIN, domain());
-            ModelValidation.assertEquals(params, VcdiVocab.NONCE, nonce());
+            ModelAssertions.assertEquals(params, VcdiVocab.PURPOSE, purpose());
+            ModelAssertions.assertEquals(params, VcdiVocab.CHALLENGE, challenge());
+            ModelAssertions.assertEquals(params, VcdiVocab.DOMAIN, domain());
+            ModelAssertions.assertEquals(params, VcdiVocab.NONCE, nonce());
         }
     }
 
@@ -157,7 +157,7 @@ public interface DataIntegrityProof extends LinkedProof {
     @Override
     default JsonObject derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError {
 
-        ModelValidation.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
+        ModelAssertions.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
 
         if (signature() instanceof BaseProofValue baseProofValue) {
 

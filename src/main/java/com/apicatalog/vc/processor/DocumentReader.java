@@ -10,9 +10,9 @@ import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableReader;
-import com.apicatalog.vc.model.VerifiableReaderProvider;
+import com.apicatalog.vc.model.DocumentModel;
+import com.apicatalog.vc.model.DocumentModelAdapter;
+import com.apicatalog.vc.model.ModelAdapterProvider;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdi.VcdiVocab;
@@ -25,7 +25,7 @@ import jakarta.json.JsonObject;
 public class DocumentReader extends DocumentProcessor<DocumentReader> {
 
     protected final ProofAdapter proofAdapter;
-    protected VerifiableReaderProvider readerProvider;
+    protected ModelAdapterProvider readerProvider;
 
     protected DocumentReader(final SignatureSuite... suites) {
         super(suites);
@@ -49,7 +49,7 @@ public class DocumentReader extends DocumentProcessor<DocumentReader> {
      * @param provider
      * @return
      */
-    public DocumentReader model(final Function<ProofAdapter, VerifiableReaderProvider> provider) {
+    public DocumentReader model(final Function<ProofAdapter, ModelAdapterProvider> provider) {
         this.readerProvider = provider.apply(proofAdapter);
         return this;
     }
@@ -77,10 +77,10 @@ public class DocumentReader extends DocumentProcessor<DocumentReader> {
     }
 
     protected VerifiableDocument read(final JsonObject document, DocumentLoader loader) throws DocumentError {
-        final VerifiableReader reader = readerProvider.reader(document);
+        final DocumentModelAdapter reader = readerProvider.reader(document);
 
         if (reader != null) {
-            final VerifiableModel model = reader.read(document, loader, base);
+            final DocumentModel model = reader.read(document, loader, base);
 
             if (model != null) {
                 return reader.materialize(model, loader, base);
@@ -89,7 +89,7 @@ public class DocumentReader extends DocumentProcessor<DocumentReader> {
         throw new DocumentError(ErrorType.Unknown, "Model");
     }
     
-    protected static VerifiableReaderProvider defaultReaders(final ProofAdapter proofAdapter) {
+    protected static ModelAdapterProvider defaultReaders(final ProofAdapter proofAdapter) {
 
         Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
 

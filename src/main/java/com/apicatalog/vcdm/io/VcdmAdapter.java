@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
@@ -24,8 +25,8 @@ import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.model.CredentialAdapter;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.VerifiableMaterial;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableModelAdapter;
+import com.apicatalog.vc.model.DocumentModel;
+import com.apicatalog.vc.model.DocumentAdapter;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.LinkedProof;
 import com.apicatalog.vc.proof.Proof;
@@ -37,7 +38,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
-public class VcdmAdapter implements VerifiableModelAdapter {
+public class VcdmAdapter implements DocumentAdapter {
 
     protected final ProofAdapter proofAdapter;
     protected final CredentialAdapter credentialAdapter;
@@ -56,7 +57,7 @@ public class VcdmAdapter implements VerifiableModelAdapter {
     }
 
     @Override
-    public VerifiableDocument materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError {
+    public VerifiableDocument materialize(DocumentModel model, DocumentLoader loader, URI base) throws DocumentError {
 
         final Collection<String> types = JsonLdType.strings(model.data().expanded());
 
@@ -72,8 +73,7 @@ public class VcdmAdapter implements VerifiableModelAdapter {
 
             for (final VerifiableMaterial proof : model.proofs()) {
                 proofs.add(proofAdapter.materialize(
-                        model.data(),
-                        proof,
+                        model.of(model.data(), List.of(proof)),
                         loader,
                         base));
             }

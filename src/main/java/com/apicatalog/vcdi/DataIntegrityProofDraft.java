@@ -20,7 +20,7 @@ import com.apicatalog.linkedtree.json.JsonFragment;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.vc.issuer.ProofDraft;
-import com.apicatalog.vc.model.ModelValidation;
+import com.apicatalog.vc.model.ModelAssertions;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.ProofValue;
@@ -121,7 +121,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
     @Override
     public void validate() throws DocumentError {
-        ModelValidation.assertNotNull(this::purpose, VcdiVocab.PURPOSE);
+        ModelAssertions.assertNotNull(this::purpose, VcdiVocab.PURPOSE);
 
         if (method() != null && method().id() == null) {
             throw new DocumentError(ErrorType.Missing, "VerificationMethodId");

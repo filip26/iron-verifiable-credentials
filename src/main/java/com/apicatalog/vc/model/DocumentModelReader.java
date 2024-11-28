@@ -3,7 +3,7 @@ package com.apicatalog.vc.model;
 import com.apicatalog.ld.DocumentError;
 
 @FunctionalInterface
-public interface VerifiableModelReader {
+public interface DocumentModelReader {
 
     /**
      * Extract verifiable data model.
@@ -14,6 +14,6 @@ public interface VerifiableModelReader {
      * @throws DocumentError
      * 
      */
-    VerifiableModel read(VerifiableMaterial data) throws DocumentError;
+    DocumentModel read(VerifiableMaterial data) throws DocumentError;
 
 }

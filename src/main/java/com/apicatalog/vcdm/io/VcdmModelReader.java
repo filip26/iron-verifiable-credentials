@@ -13,9 +13,9 @@ import com.apicatalog.linkedtree.orm.context.ContextReducer;
 import com.apicatalog.vc.jsonld.JsonLdMaterialReader;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.VerifiableMaterialReader;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableModelReader;
-import com.apicatalog.vc.model.VerifiableModelWriter;
+import com.apicatalog.vc.model.DocumentModel;
+import com.apicatalog.vc.model.DocumentModelReader;
+import com.apicatalog.vc.model.DocumentModelWriter;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vcdm.EmbeddedProof;
 import com.apicatalog.vcdm.Vcdm;
@@ -26,7 +26,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 
-public abstract class VcdmModelReader implements VerifiableModelReader, VerifiableModelWriter {
+public abstract class VcdmModelReader implements DocumentModelReader, DocumentModelWriter {
 
     protected final VcdmVersion readerVersion;
     protected final VerifiableMaterialReader materialReader;
@@ -39,7 +39,7 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
     }
 
     @Override
-    public VerifiableModel read(VerifiableMaterial data) throws DocumentError {
+    public DocumentModel read(VerifiableMaterial data) throws DocumentError {
 
         VcdmVersion version = modelVersion(data.context().strings());
 
@@ -109,7 +109,7 @@ public abstract class VcdmModelReader implements VerifiableModelReader, Verifiab
     }
 
     @Override
-    public VerifiableMaterial write(VerifiableModel model) throws DocumentError {
+    public VerifiableMaterial write(DocumentModel model) throws DocumentError {
 
         final JsonObject expanded = model.data().expanded();
         JsonObject compacted = model.data().compacted();

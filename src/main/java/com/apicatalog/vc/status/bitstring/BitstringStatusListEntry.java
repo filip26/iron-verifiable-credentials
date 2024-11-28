@@ -8,7 +8,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
-import com.apicatalog.vc.model.ModelValidation;
+import com.apicatalog.vc.model.ModelAssertions;
 import com.apicatalog.vc.status.Status;
 
 @Fragment
@@ -37,8 +37,8 @@ public interface BitstringStatusListEntry extends Status {
     default void validate() throws DocumentError {
         Status.super.validate();
         
-        ModelValidation.assertNotNull(this::purpose, BitstringVocab.PURPOSE);
-        ModelValidation.assertNotNull(this::credential, BitstringVocab.CREDENTIAL);
+        ModelAssertions.assertNotNull(this::purpose, BitstringVocab.PURPOSE);
+        ModelAssertions.assertNotNull(this::credential, BitstringVocab.CREDENTIAL);
         
         if (index() <= 0) {
             throw new DocumentError(ErrorType.Invalid, BitstringVocab.INDEX);

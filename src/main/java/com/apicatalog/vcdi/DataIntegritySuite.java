@@ -25,6 +25,7 @@ import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseAdapter;
 import com.apicatalog.multibase.MultibaseLiteral;
+import com.apicatalog.vc.model.DocumentModel;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.GenericSignature;
@@ -73,7 +74,7 @@ public class DataIntegritySuite implements SignatureSuite {
         return GENERIC;
     }
 
-    protected ProofValue getProofValue(Proof proof, VerifiableMaterial verifiable, VerifiableMaterial proofMaterial, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
+    protected ProofValue getProofValue(Proof proof, DocumentModel model, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
         if (proofValue == null || proofValue.length == 0) {
             return null;
         }
@@ -106,7 +107,7 @@ public class DataIntegritySuite implements SignatureSuite {
     }
 
     @Override
-    public Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proofMaterial, DocumentLoader loader, URI base) throws DocumentError {
+    public Proof getProof(DocumentModel model, DocumentLoader loader, URI base) throws DocumentError {
 
         TreeReaderMappingBuilder builder = TreeReaderMapping.createBuilder()
                 .scan(proofInterface, true)
@@ -120,6 +121,8 @@ public class DataIntegritySuite implements SignatureSuite {
 
         var reader = JsonLdTreeReader.of(mapping);
 
+        VerifiableMaterial proofMaterial = model.proofs().iterator().next();
+        
         try {
             Proof proof = reader.read(Proof.class, Json.createArrayBuilder().add(proofMaterial.expanded()).build());
             if (proof == null) {
@@ -128,7 +131,9 @@ public class DataIntegritySuite implements SignatureSuite {
 
             if (proof instanceof PropertyValueConsumer consumer) {
 
-                consumer.acceptFragmentPropertyValue("di", this);
+                if (proof instanceof DataIntegrityProof) {
+                    consumer.acceptFragmentPropertyValue("di", this);
+                }
 
                 if (proof instanceof Linkable linkable) {
 
@@ -150,7 +155,7 @@ public class DataIntegritySuite implements SignatureSuite {
                                 Json.createObjectBuilder(proofMaterial.expanded())
                                         .remove(VcdiVocab.PROOF_VALUE.uri()).build());
 
-                        proofValue = getProofValue(proof, verifiable, unsignedProof, signature.byteArrayValue(), loader, base);
+                        proofValue = getProofValue(proof, model.of(model.data(), List.of(unsignedProof)), signature.byteArrayValue(), loader, base);
                         consumer.acceptFragmentPropertyValue("signature", proofValue);
                     }
 

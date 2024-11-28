@@ -9,16 +9,16 @@ import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableReader;
-import com.apicatalog.vc.model.VerifiableReaderProvider;
+import com.apicatalog.vc.model.DocumentModel;
+import com.apicatalog.vc.model.DocumentModelAdapter;
+import com.apicatalog.vc.model.ModelAdapterProvider;
 import com.apicatalog.vc.suite.SignatureSuite;
 
 import jakarta.json.JsonObject;
 
 public class SuitesProcessor<T extends SuitesProcessor<T>> extends DocumentProcessor<T> {
 
-    protected VerifiableReaderProvider readerProvider;
+    protected ModelAdapterProvider readerProvider;
     protected VerificationKeyProvider keyProvider;
 
     protected final ProofAdapter proofAdapter;
@@ -37,16 +37,16 @@ public class SuitesProcessor<T extends SuitesProcessor<T>> extends DocumentProce
     }
     
     @SuppressWarnings("unchecked")
-    public T model(Function<ProofAdapter, VerifiableReaderProvider> provider) {
+    public T model(Function<ProofAdapter, ModelAdapterProvider> provider) {
         this.readerProvider = provider.apply(proofAdapter);
         return (T)this;
     }
 
     protected VerifiableDocument read(final JsonObject document, DocumentLoader loader) throws DocumentError {
-        final VerifiableReader reader = readerProvider.reader(document);
+        final DocumentModelAdapter reader = readerProvider.reader(document);
 
         if (reader != null) {
-            final VerifiableModel model = reader.read(document, loader, base);
+            final DocumentModel model = reader.read(document, loader, base);
 
             if (model != null) {
                 return reader.materialize(model, loader, base);

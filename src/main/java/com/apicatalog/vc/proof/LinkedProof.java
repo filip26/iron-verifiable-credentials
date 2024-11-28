@@ -8,7 +8,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.vc.VerifiableDocument;
-import com.apicatalog.vc.model.ModelValidation;
+import com.apicatalog.vc.model.ModelAssertions;
 import com.apicatalog.vcdi.VcdiVocab;
 
 @Fragment(generic = true)
@@ -25,7 +25,7 @@ public interface LinkedProof extends Proof {
     @Override
     default void verify(VerificationKey key) throws VerificationError, DocumentError {
         Objects.requireNonNull(key);
-        ModelValidation.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
+        ModelAssertions.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
 
         // verify signature
         signature().verify(key);

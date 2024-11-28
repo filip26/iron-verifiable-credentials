@@ -17,8 +17,8 @@ import com.apicatalog.ld.VocabTerm;
 import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.model.VerifiableMaterial;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableReader;
+import com.apicatalog.vc.model.DocumentModel;
+import com.apicatalog.vc.model.DocumentModelAdapter;
 import com.apicatalog.vc.processor.SuitesProcessor;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.apicatalog.vcdm.EmbeddedProof;
@@ -62,13 +62,13 @@ public class Holder extends SuitesProcessor<Holder> {
 //    protected JsonObject derive(final Verifiable verifiable, Collection<String> selectors, DocumentLoader loader) throws SigningError, DocumentError {
 //        
 
-        final VerifiableReader reader = readerProvider.reader(document);
+        final DocumentModelAdapter reader = readerProvider.reader(document);
 
         if (reader == null) {
             throw new DocumentError(ErrorType.Unknown, "Model");
         }
 
-        final VerifiableModel model = reader.read(document, loader, base);
+        final DocumentModel model = reader.read(document, loader, base);
 
         if (model == null) {
             throw new DocumentError(ErrorType.Unknown, "Model");

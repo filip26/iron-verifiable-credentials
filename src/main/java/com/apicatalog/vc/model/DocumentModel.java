@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 
-public interface VerifiableModel {
+public interface DocumentModel {
 
     VerifiableMaterial data();
 
@@ -12,5 +12,5 @@ public interface VerifiableModel {
     
     VerifiableMaterial materialize() throws DocumentError;
 
-    VerifiableModel of(VerifiableMaterial data, Collection<VerifiableMaterial> proofs);
+    DocumentModel of(VerifiableMaterial data, Collection<VerifiableMaterial> proofs);
 }

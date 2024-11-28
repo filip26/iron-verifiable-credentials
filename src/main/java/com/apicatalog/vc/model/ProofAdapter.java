@@ -12,8 +12,7 @@ public interface ProofAdapter {
     /**
      * Materialize verifiable material into a proof.
      * 
-     * @param data
-     * @param proof
+     * @param model
      * @param loader
      * @param base
      * @return a verifiable instance
@@ -21,5 +20,5 @@ public interface ProofAdapter {
      * @throws DocumentError
      * 
      */
-    Proof materialize(VerifiableMaterial data, VerifiableMaterial proof, DocumentLoader loader, URI base) throws DocumentError;
+    Proof materialize(DocumentModel model, DocumentLoader loader, URI base) throws DocumentError;
 }

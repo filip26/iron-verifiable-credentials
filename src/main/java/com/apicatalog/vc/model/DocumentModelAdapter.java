@@ -7,9 +7,9 @@ import com.apicatalog.ld.DocumentError;
 
 import jakarta.json.JsonObject;
 
-public interface VerifiableReader extends VerifiableModelAdapter {
+public interface DocumentModelAdapter extends DocumentAdapter {
 
-    VerifiableModel read(
+    DocumentModel read(
             JsonObject document,
             DocumentLoader loader,
             URI base) throws DocumentError;

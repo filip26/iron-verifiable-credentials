@@ -6,6 +6,7 @@ import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.model.DocumentModel;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.proof.Proof;
 
@@ -38,14 +39,13 @@ public interface SignatureSuite {
     /**
      * Deserialize the given expanded JSON-LD object into a {@link Proof}.
      * 
-     * @param verifiable a verifiable to which the proof is bound to
-     * @param proof
+     * @param model 
      * @param loader
      * @param base
      * 
      * @return a new {@link Proof} instance
      * @throws DocumentError if the given object cannot be deserialized
      */
-    Proof getProof(VerifiableMaterial verifiable, VerifiableMaterial proof, DocumentLoader loader, URI base) throws DocumentError;
+    Proof getProof(DocumentModel model, DocumentLoader loader, URI base) throws DocumentError;
 
 }

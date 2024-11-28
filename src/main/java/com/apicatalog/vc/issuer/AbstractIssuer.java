@@ -27,9 +27,9 @@ import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.model.ProofAdapter;
 import com.apicatalog.vc.model.ProofAdapterProvider;
 import com.apicatalog.vc.model.VerifiableMaterial;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableReader;
-import com.apicatalog.vc.model.VerifiableReaderProvider;
+import com.apicatalog.vc.model.DocumentModel;
+import com.apicatalog.vc.model.DocumentModelAdapter;
+import com.apicatalog.vc.model.ModelAdapterProvider;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -49,7 +49,7 @@ public abstract class AbstractIssuer implements Issuer {
     protected final Multibase proofValueBase;
 
     protected final Function<VerificationMethod, ? extends ProofDraft> proofDraftProvider;
-    protected final VerifiableReaderProvider readerProvider;
+    protected final ModelAdapterProvider readerProvider;
 
     protected DocumentLoader defaultLoader;
     protected URI base;
@@ -120,13 +120,13 @@ public abstract class AbstractIssuer implements Issuer {
 
         draft.validate();
 
-        final VerifiableReader reader = readerProvider.reader(document);
+        final DocumentModelAdapter reader = readerProvider.reader(document);
 
         if (reader == null) {
             throw new DocumentError(ErrorType.Unknown, "Model");
         }
 
-        final VerifiableModel model = reader.read(document, loader, base);
+        final DocumentModel model = reader.read(document, loader, base);
 
         if (model == null) {
             throw new DocumentError(ErrorType.Unknown, "Model");
@@ -147,7 +147,7 @@ public abstract class AbstractIssuer implements Issuer {
         return sign(model, unsignedData, unsignedDraft, draft);
     }
 
-    protected JsonObject sign(VerifiableModel model, VerifiableMaterial unsignedData, VerifiableMaterial unsignedDraft, ProofDraft draft) throws DocumentError, CryptoSuiteError {
+    protected JsonObject sign(DocumentModel model, VerifiableMaterial unsignedData, VerifiableMaterial unsignedDraft, ProofDraft draft) throws DocumentError, CryptoSuiteError {
 
         final Signature ldSignature = new Signature(cryptosuite, null);
 
@@ -203,7 +203,7 @@ public abstract class AbstractIssuer implements Issuer {
         return loader;
     }
 
-    protected static VerifiableReaderProvider defaultReaders(final ProofAdapter proofAdapter) {
+    protected static ModelAdapterProvider defaultReaders(final ProofAdapter proofAdapter) {
 
         Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
 

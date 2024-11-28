@@ -4,14 +4,14 @@ import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.model.VerifiableMaterial;
-import com.apicatalog.vc.model.VerifiableModel;
-import com.apicatalog.vc.model.VerifiableModelWriter;
+import com.apicatalog.vc.model.DocumentModel;
+import com.apicatalog.vc.model.DocumentModelWriter;
 
 public record Vcdm(
         VcdmVersion version,
         VerifiableMaterial data,
         Collection<VerifiableMaterial> proofs,
-        VerifiableModelWriter writer) implements VerifiableModel {
+        DocumentModelWriter writer) implements DocumentModel {
 
     @Override
     public VerifiableMaterial materialize() throws DocumentError {
@@ -19,7 +19,7 @@ public record Vcdm(
     }
 
     @Override
-    public VerifiableModel of(VerifiableMaterial data, Collection<VerifiableMaterial> proofs) {
+    public DocumentModel of(VerifiableMaterial data, Collection<VerifiableMaterial> proofs) {
         return new Vcdm(
                 version,
                 data,

@@ -17,7 +17,7 @@ import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.VerifiableReaderProvider;
+import com.apicatalog.vc.model.ModelAdapterProvider;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.processor.SuitesProcessor;
@@ -51,7 +51,7 @@ public class Verifier extends SuitesProcessor<Verifier> {
         this.statusVerifier = null;
     }
 
-    protected static VerifiableReaderProvider defaultReaders(final ProofAdapter proofAdapter) {
+    protected static ModelAdapterProvider defaultReaders(final ProofAdapter proofAdapter) {
 
         Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
 

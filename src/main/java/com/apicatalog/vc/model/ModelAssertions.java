@@ -9,7 +9,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.VocabTerm;
 
 
-public interface ModelValidation {
+public interface ModelAssertions {
 
     static void assertEquals(Map<String, Object> params, VocabTerm name, Object expected) throws DocumentError {
 

@@ -5,7 +5,7 @@ import com.apicatalog.ld.DocumentError;
 import jakarta.json.JsonObject;
 
 @FunctionalInterface
-public interface VerifiableReaderProvider {
+public interface ModelAdapterProvider {
 
-    VerifiableReader reader(JsonObject document) throws DocumentError;
+    DocumentModelAdapter reader(JsonObject document) throws DocumentError;
 }

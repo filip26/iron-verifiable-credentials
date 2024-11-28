@@ -7,7 +7,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.VerifiableDocument;
 
 @FunctionalInterface
-public interface VerifiableModelAdapter {
+public interface DocumentAdapter {
 
     /**
      * Materialize verifiable material into a verifiable instance.
@@ -20,5 +20,5 @@ public interface VerifiableModelAdapter {
      * @throws DocumentError
      * 
      */
-    VerifiableDocument materialize(VerifiableModel model, DocumentLoader loader, URI base) throws DocumentError;
+    VerifiableDocument materialize(DocumentModel model, DocumentLoader loader, URI base) throws DocumentError;
 }

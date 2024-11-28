@@ -8,20 +8,20 @@ import java.util.logging.Logger;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.vc.model.VerifiableReader;
-import com.apicatalog.vc.model.VerifiableReaderProvider;
+import com.apicatalog.vc.model.DocumentModelAdapter;
+import com.apicatalog.vc.model.ModelAdapterProvider;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
-public class ContextAwareReaderProvider implements VerifiableReaderProvider {
+public class ContextAwareReaderProvider implements ModelAdapterProvider {
 
     private static final Logger LOGGER = Logger.getLogger(ContextAwareReaderProvider.class.getName());
 
-    protected final Map<String, VerifiableReader> readers;
+    protected final Map<String, DocumentModelAdapter> readers;
 
-    protected ContextAwareReaderProvider(Map<String, VerifiableReader> readers) {
+    protected ContextAwareReaderProvider(Map<String, DocumentModelAdapter> readers) {
         this.readers = readers;
     }
 
@@ -29,14 +29,14 @@ public class ContextAwareReaderProvider implements VerifiableReaderProvider {
         this(new HashMap<>());
     }
 
-    public ContextAwareReaderProvider with(String context, VerifiableReader reader) {
+    public ContextAwareReaderProvider with(String context, DocumentModelAdapter reader) {
         readers.put(context, reader);
         return this;
     }
     
 
     @Override
-    public VerifiableReader reader(JsonObject document) throws DocumentError {
+    public DocumentModelAdapter reader(JsonObject document) throws DocumentError {
         // extract the first context as string value
         final String firstContext = firstContext(document);
 

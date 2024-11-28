@@ -44,14 +44,17 @@ public class ProofAdapterProvider implements ProofAdapter {
     }
 
     @Override
-    public Proof materialize(VerifiableMaterial data, VerifiableMaterial proofMaterial, DocumentLoader loader, URI base) throws DocumentError {
+    public Proof materialize(DocumentModel model, DocumentLoader loader, URI base) throws DocumentError {
 
         Proof proof = null;
+        
+        VerifiableMaterial data = model.data();
+        VerifiableMaterial proofMaterial = model.proofs().iterator().next();
 
         // find a suite that can materialize the proof
         for (SignatureSuite suite : suites) {
             if (suite.isSupported(data, proofMaterial)) {
-                proof = suite.getProof(data, proofMaterial, loader, base);
+                proof = suite.getProof(model, loader, base);
                 if (proof != null) {
                     return proof;
                 }

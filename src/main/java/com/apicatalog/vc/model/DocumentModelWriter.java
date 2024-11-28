@@ -3,7 +3,7 @@ package com.apicatalog.vc.model;
 import com.apicatalog.ld.DocumentError;
 
 @FunctionalInterface
-public interface VerifiableModelWriter {
+public interface DocumentModelWriter {
 
     /**
      * Serializes verifiable data model into a verifiable material.
@@ -14,6 +14,6 @@ public interface VerifiableModelWriter {
      * @throws DocumentError
      * 
      */
-    VerifiableMaterial write(VerifiableModel model) throws DocumentError;
+    VerifiableMaterial write(DocumentModel model) throws DocumentError;
 
 }
