@@ -1,6 +1,5 @@
 package com.apicatalog.vc.model.generic;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
@@ -19,14 +18,7 @@ public record GenericModel(
     }
 
     @Override
-    public VerifiableModel withProof(VerifiableMaterial signedProof) {
-
-        Collection<VerifiableMaterial> newProofs = new ArrayList<>(proofs);
-        newProofs.add(signedProof);
-
-        return new GenericModel(
-                data,
-                newProofs,
-                writer);
+    public VerifiableModel of(VerifiableMaterial data, Collection<VerifiableMaterial> proofs) {
+        return new GenericModel(data, proofs, writer);
     }
 }

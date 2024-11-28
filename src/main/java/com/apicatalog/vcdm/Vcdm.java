@@ -1,6 +1,5 @@
 package com.apicatalog.vcdm;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import com.apicatalog.ld.DocumentError;
@@ -20,16 +19,11 @@ public record Vcdm(
     }
 
     @Override
-    public VerifiableModel withProof(VerifiableMaterial signedProof) {
-
-        Collection<VerifiableMaterial> newProofs = new ArrayList<>(proofs);
-        newProofs.add(signedProof);
-
+    public VerifiableModel of(VerifiableMaterial data, Collection<VerifiableMaterial> proofs) {
         return new Vcdm(
                 version,
                 data,
-                newProofs,
+                proofs,
                 writer);
     }
-
 }

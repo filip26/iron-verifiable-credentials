@@ -34,7 +34,7 @@ public interface BaseProofValue extends ProofValue {
      * @throws CryptoSuiteError
      * @throws DocumentError
      */
-    ProofValue derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError;
+    DerivedProofValue derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError;
 
     Collection<String> pointers();
 

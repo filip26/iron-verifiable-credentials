@@ -1,6 +1,9 @@
 package com.apicatalog.vc.issuer;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.function.Function;
 
 import com.apicatalog.controller.key.KeyPair;
@@ -156,8 +159,11 @@ public abstract class AbstractIssuer implements Issuer {
             throw new IllegalStateException();
         }
 
+        final Collection<VerifiableMaterial> proofs = new LinkedList<>(model.proofs());
+        proofs.add(signedProof);
+
         final VerifiableMaterial signedDocument = model
-                .withProof(signedProof)
+                .of(model.data(), proofs)
                 .materialize();
 
         return JsonLdContext.set(signedDocument.context(), signedDocument.compacted());

@@ -3,7 +3,6 @@ package com.apicatalog.vcdi;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
@@ -20,21 +19,17 @@ import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.json.JsonFragment;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
-import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.model.ModelValidation;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.ProofValue;
-import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
 public class DataIntegrityProofDraft extends ProofDraft {
-
-    protected final JsonLdWriter writer;
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
@@ -52,23 +47,6 @@ public class DataIntegrityProofDraft extends ProofDraft {
         super(VcdiVocab.TYPE.uri(), method);
         this.suite = suite;
         this.crypto = crypto;
-        this.writer = getWriter(suite);
-    }
-
-    protected static JsonLdWriter getWriter(DataIntegritySuite suite) {
-        JsonLdWriter writer = new JsonLdWriter()
-                .scan(DataIntegrityProof.class)
-                .scan(VerificationMethod.class);
-
-        if (suite.customTypes != null) {
-            suite.customTypes.forEach(writer::scan);
-        }
-
-        // context reducer
-        writer.context(VcdmVocab.CONTEXT_MODEL_V2,
-                List.of(VcdiVocab.CONTEXT_MODEL_V2));
-
-        return writer;
     }
 
     public DataIntegrityProofDraft challenge(String challenge) {
@@ -90,7 +68,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
     public VerifiableMaterial unsigned(JsonLdContext documentContext, DocumentLoader loader, URI base) throws DocumentError {
 
         try {
-            DataIntegrityProof proof = FragmentComposer.create()
+            DataIntegrityProof unsginedProof = FragmentComposer.create()
                     .set("id", id)
                     .set("cryptosuite", crypto)
                     .set("purpose", purpose)
@@ -101,10 +79,10 @@ public class DataIntegrityProofDraft extends ProofDraft {
                     .set(VcdiVocab.CHALLENGE.name(), challenge)
                     .set(VcdiVocab.NONCE.name(), nonce)
                     .set(VcdiVocab.DOMAIN.name(), domain)
-                    .json(writer::compact)
+                    .json(suite.writer::compact)
                     .get(DataIntegrityProof.class);
 
-            JsonObject compacted = ((JsonFragment) proof).jsonObject();
+            JsonObject compacted = ((JsonFragment) unsginedProof).jsonObject();
 
             JsonArray expanded = JsonLd.expand(JsonDocument.of(compacted))
                     .undefinedTermsPolicy(ProcessingPolicy.Fail)
@@ -114,7 +92,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
             JsonLdContext context = JsonLdContext.of(compacted, documentContext);
             if (compacted.containsKey(JsonLdKeyword.CONTEXT)) {
-                context = writer.contextReducer().reduce(documentContext, context);
+                context = suite.writer.contextReducer().reduce(documentContext, context);
                 compacted = Json.createObjectBuilder(compacted).remove(JsonLdKeyword.CONTEXT).build();
             }
 

@@ -12,5 +12,5 @@ public interface VerifiableModel {
     
     VerifiableMaterial materialize() throws DocumentError;
 
-    VerifiableModel withProof(VerifiableMaterial signedProof);
+    VerifiableModel of(VerifiableMaterial data, Collection<VerifiableMaterial> proofs);
 }

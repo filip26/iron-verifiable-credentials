@@ -112,13 +112,14 @@ public class VcdmAdapter implements VerifiableModelAdapter {
 
             if (verifiable instanceof PropertyValueConsumer consumer) {
                 consumer.acceptFragmentPropertyValue("proofs", proofs);
-                
-                if (verifiable instanceof LinkedProof) {
-                    consumer.acceptFragmentPropertyValue("document", verifiable);
-                }
-            }
-            
 
+                proofs.stream()
+                        .filter(LinkedProof.class::isInstance)
+                        .filter(PropertyValueConsumer.class::isInstance)
+                        .map(PropertyValueConsumer.class::cast)
+                        .forEach(proof -> proof.acceptFragmentPropertyValue("document", verifiable));
+
+            }
             return verifiable;
 
         } catch (FragmentPropertyError e) {

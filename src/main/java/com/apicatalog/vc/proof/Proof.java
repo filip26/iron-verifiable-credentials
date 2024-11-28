@@ -18,6 +18,8 @@ import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Type;
 import com.apicatalog.linkedtree.orm.Vocab;
 
+import jakarta.json.JsonObject;
+
 /**
  * Represents generic VC/VP proof.
  */
@@ -110,16 +112,19 @@ public interface Proof {
      * Derive a new selective disclosure document. Supported by selective disclosure
      * proofs only. {@link UnsupportedOperationException} is thrown otherwise.
      * 
+     * @implNote {@link JsonObject} is a temporary return value, will be replace
+     *           with full {@link Proof} in the next version.
+     * 
      * @param selectors
      * 
-     * @return an origin document with a new derived proof attached
+     * @return a new document with a new derived proof attached
      * 
      * @throws CryptoSuiteError
      * @throws DocumentError
      * @throws UnsupportedOperationException
      */
 
-    default Proof derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError {
+    default JsonObject derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError {
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
     }
 }

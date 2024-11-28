@@ -3,8 +3,10 @@ package com.apicatalog.vcdi;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
+import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
@@ -16,6 +18,7 @@ import com.apicatalog.linkedtree.fragment.FragmentPropertyError;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.jsonld.JsonLdType;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
+import com.apicatalog.linkedtree.jsonld.io.JsonLdWriter;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMappingBuilder;
 import com.apicatalog.linkedtree.orm.proxy.PropertyValueConsumer;
@@ -28,6 +31,7 @@ import com.apicatalog.vc.proof.GenericSignature;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.suite.SignatureSuite;
+import com.apicatalog.vcdm.VcdmVocab;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -45,6 +49,8 @@ public class DataIntegritySuite implements SignatureSuite {
 
     protected final Collection<Class<?>> customTypes;
 
+    protected final JsonLdWriter writer;
+    
     protected DataIntegritySuite(
             String cryptosuiteName,
             Multibase proofValueBase) {
@@ -60,6 +66,7 @@ public class DataIntegritySuite implements SignatureSuite {
         this.proofInterface = proofInterface;
         this.customTypes = customTypes;
         this.proofValueBase = proofValueBase;
+        this.writer = getWriter(customTypes);
     }
 
     public static DataIntegritySuite generic() {
@@ -119,48 +126,52 @@ public class DataIntegritySuite implements SignatureSuite {
                 return null;
             }
 
-            if (proof instanceof PropertyValueConsumer consumer
-                    && proof instanceof Linkable linkable) {
+            if (proof instanceof PropertyValueConsumer consumer) {
 
-                final MultibaseLiteral signature = linkable.ld().asFragment()
-                        .literal(VcdiVocab.PROOF_VALUE.uri(), MultibaseLiteral.class);
+                consumer.acceptFragmentPropertyValue("di", this);
 
-                ProofValue proofValue = null;
+                if (proof instanceof Linkable linkable) {
 
-                if (signature != null) {
+                    final MultibaseLiteral signature = linkable.ld().asFragment()
+                            .literal(VcdiVocab.PROOF_VALUE.uri(), MultibaseLiteral.class);
 
-                    if (proofValueBase != null && !proofValueBase.equals(signature.base())) {
-                        throw new DocumentError(ErrorType.Invalid, VcdiVocab.PROOF_VALUE.name() + "Multibase");
+                    ProofValue proofValue = null;
+
+                    if (signature != null) {
+
+                        if (proofValueBase != null && !proofValueBase.equals(signature.base())) {
+                            throw new DocumentError(ErrorType.Invalid, VcdiVocab.PROOF_VALUE.name() + "Multibase");
+                        }
+
+                        final VerifiableMaterial unsignedProof = new GenericMaterial(
+                                proofMaterial.context(),
+                                Json.createObjectBuilder(proofMaterial.compacted())
+                                        .remove(VcdiVocab.PROOF_VALUE.name()).build(),
+                                Json.createObjectBuilder(proofMaterial.expanded())
+                                        .remove(VcdiVocab.PROOF_VALUE.uri()).build());
+
+                        proofValue = getProofValue(proof, verifiable, unsignedProof, signature.byteArrayValue(), loader, base);
+                        consumer.acceptFragmentPropertyValue("signature", proofValue);
                     }
-                    
-                    final VerifiableMaterial unsignedProof = new GenericMaterial(
-                            proofMaterial.context(),
-                            Json.createObjectBuilder(proofMaterial.compacted())
-                                    .remove(VcdiVocab.PROOF_VALUE.name()).build(),
-                            Json.createObjectBuilder(proofMaterial.expanded())
-                                    .remove(VcdiVocab.PROOF_VALUE.uri()).build());
 
-                    proofValue = getProofValue(proof, verifiable, unsignedProof, signature.byteArrayValue(), loader, base);
-                    consumer.acceptFragmentPropertyValue("signature", proofValue);
+                    CryptoSuite cryptoSuite = null;
+
+                    if (proofValue == null) {
+                        cryptoSuite = DataIntegritySuite.this.getCryptoSuite(
+                                cryptosuiteName == null
+                                        ? getCryptoSuiteName(proofMaterial.expanded())
+                                        : cryptosuiteName,
+                                proofValue);
+                    } else {
+                        cryptoSuite = getCryptoSuite(
+                                cryptosuiteName == null
+                                        ? getCryptoSuiteName(proofMaterial.expanded())
+                                        : cryptosuiteName,
+                                proofValue);
+                    }
+
+                    consumer.acceptFragmentPropertyValue("cryptosuite", cryptoSuite);
                 }
-
-                CryptoSuite cryptoSuite = null;
-
-                if (proofValue == null) {
-                    cryptoSuite = DataIntegritySuite.this.getCryptoSuite(
-                            cryptosuiteName == null
-                                    ? getCryptoSuiteName(proofMaterial.expanded())
-                                    : cryptosuiteName,
-                            proofValue);
-                } else {
-                    cryptoSuite = getCryptoSuite(
-                            cryptosuiteName == null
-                                    ? getCryptoSuiteName(proofMaterial.expanded())
-                                    : cryptosuiteName,
-                            proofValue);
-                }
-
-                consumer.acceptFragmentPropertyValue("cryptosuite", cryptoSuite);
             }
 
             return proof;
@@ -200,5 +211,21 @@ public class DataIntegritySuite implements SignatureSuite {
             }
         }
         return null;
+    }
+    
+    protected static JsonLdWriter getWriter(Collection<Class<?>> customTypes) {
+        JsonLdWriter writer = new JsonLdWriter()
+                .scan(DataIntegrityProof.class)
+                .scan(VerificationMethod.class);
+
+        if (customTypes != null) {
+            customTypes.forEach(writer::scan);
+        }
+
+        // context reducer
+        writer.context(VcdmVocab.CONTEXT_MODEL_V2,
+                List.of(VcdiVocab.CONTEXT_MODEL_V2));
+
+        return writer;
     }
 }

@@ -3,6 +3,7 @@ package com.apicatalog.vcdi;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
 
 import com.apicatalog.controller.key.VerificationKey;
@@ -14,7 +15,9 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.FragmentComposer;
+import com.apicatalog.linkedtree.json.JsonFragment;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
+import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.orm.Adapter;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
@@ -28,6 +31,7 @@ import com.apicatalog.vc.model.ModelValidation;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.proof.BaseProofValue;
+import com.apicatalog.vc.proof.DerivedProofValue;
 import com.apicatalog.vc.proof.LinkedProof;
 import com.apicatalog.vc.proof.ProofValue;
 
@@ -104,6 +108,14 @@ public interface DataIntegrityProof extends LinkedProof {
     @Mapper(CryptoSuiteMapper.class)
     CryptoSuite cryptosuite();
 
+    /**
+     * Get data integrity suite bound to this proof.
+     * 
+     * @return a data integrity suite
+     */
+    @Provided
+    DataIntegritySuite di();
+    
     @Override
     default void validate(Map<String, Object> params) throws DocumentError {
 
@@ -143,16 +155,28 @@ public interface DataIntegrityProof extends LinkedProof {
     }
 
     @Override
-    default DataIntegrityProof derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError {
+    default JsonObject derive(Collection<String> selectors) throws CryptoSuiteError, DocumentError {
 
         ModelValidation.assertNotNull(this::signature, VcdiVocab.PROOF_VALUE);
 
         if (signature() instanceof BaseProofValue baseProofValue) {
+
             System.out.println("DERIVE " + baseProofValue);
             System.out.println("     > " + selectors);
-            ProofValue proofValue = baseProofValue.derive(selectors);
+            DerivedProofValue proofValue = baseProofValue.derive(selectors);
             System.out.println("> " + proofValue);
+            System.out.println("> " + proofValue.getClass());
             
+            if (proofValue instanceof ByteArrayValue byteArrayValue) {
+                System.out.println("> " + di().proofValueBase.encode(byteArrayValue.byteArrayValue()));
+            }
+
+//            final Collection<VerifiableMaterial> proofs = new LinkedList<>(model.proofs());
+//            proofs.add(signedProof);
+
+            
+//            proofValue.documentModel().of(null, null);
+            System.out.println("D: " + document());
             
             try {
                 DataIntegrityProof proof = FragmentComposer.create()
@@ -162,15 +186,15 @@ public interface DataIntegrityProof extends LinkedProof {
                         .set("created", created())
                         .set("expires", expires())
                         .set("method", method())
-                        .set("signature", baseProofValue)
+                        .set("di", di())
                         .set(VcdiVocab.PREVIOUS_PROOF.name(), previousProof())
                         .set(VcdiVocab.CHALLENGE.name(), challenge())
                         .set(VcdiVocab.NONCE.name(), nonce())
                         .set(VcdiVocab.DOMAIN.name(), domain())
-//                    .json(writer::compact)
+                        .json(di().writer::compact)
                         .get(DataIntegrityProof.class);
-                
-                return proof;
+               return null; 
+//                return ((JsonFragment)proof);
             } catch (NodeAdapterError e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
