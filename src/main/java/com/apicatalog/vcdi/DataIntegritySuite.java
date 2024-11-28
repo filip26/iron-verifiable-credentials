@@ -66,12 +66,12 @@ public class DataIntegritySuite implements SignatureSuite {
         return GENERIC;
     }
 
-    protected ProofValue getProofValue(VerifiableMaterial verifiable, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
+    protected ProofValue getProofValue(Proof proof, VerifiableMaterial verifiable, VerifiableMaterial proofMaterial, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
         if (proofValue == null || proofValue.length == 0) {
             return null;
         }
         // an unknown signature
-        return new GenericSignature();
+        return new GenericSignature(proof);
     }
 
     protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError {
@@ -128,6 +128,7 @@ public class DataIntegritySuite implements SignatureSuite {
                 ProofValue proofValue = null;
 
                 if (signature != null) {
+
                     if (proofValueBase != null && !proofValueBase.equals(signature.base())) {
                         throw new DocumentError(ErrorType.Invalid, VcdiVocab.PROOF_VALUE.name() + "Multibase");
                     }
@@ -139,7 +140,7 @@ public class DataIntegritySuite implements SignatureSuite {
                             Json.createObjectBuilder(proofMaterial.expanded())
                                     .remove(VcdiVocab.PROOF_VALUE.uri()).build());
 
-                    proofValue = getProofValue(verifiable, unsignedProof, signature.byteArrayValue(), loader, base);
+                    proofValue = getProofValue(proof, verifiable, unsignedProof, signature.byteArrayValue(), loader, base);
                     consumer.acceptFragmentPropertyValue("signature", proofValue);
                 }
 

@@ -12,6 +12,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
@@ -52,7 +53,7 @@ class TestSignatureSuite extends DataIntegritySuite {
     }
 
     @Override
-    protected ProofValue getProofValue(VerifiableMaterial data, VerifiableMaterial proof, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
+    protected ProofValue getProofValue(Proof proof, VerifiableMaterial data, VerifiableMaterial proofMaterial, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
         if (proofValue == null) {
             return null;
         }
@@ -60,6 +61,6 @@ class TestSignatureSuite extends DataIntegritySuite {
         if (proofValue.length != 32) {
             throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
         }
-        return SolidProofValue.of(CRYPTO, data, proof, proofValue);
+        return SolidProofValue.of(CRYPTO, data, proofMaterial, proofValue, proof);
     }
 }

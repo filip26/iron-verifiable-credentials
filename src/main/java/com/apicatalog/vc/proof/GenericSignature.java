@@ -7,9 +7,20 @@ import com.apicatalog.ld.DocumentError;
 
 public class GenericSignature implements ProofValue {
 
+    protected final Proof proof;
+    
+    public GenericSignature(final Proof proof) {
+        this.proof = proof;
+    }
+    
     @Override
     public void verify(VerificationKey key) throws VerificationError, DocumentError {
         throw new VerificationError(VerificationErrorCode.UnsupportedSignature);
+    }
+
+    @Override
+    public Proof proof() {
+        return proof;
     }
 
 }

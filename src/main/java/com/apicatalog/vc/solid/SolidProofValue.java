@@ -7,6 +7,7 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.Signature;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 
 /**
@@ -16,11 +17,12 @@ import com.apicatalog.vc.proof.ProofValue;
 public record SolidProofValue(
         Signature signature,
         VerifiableMaterial data,
-        VerifiableMaterial unsignedProof
+        VerifiableMaterial unsignedProof,
+        Proof proof
         ) implements ProofValue {
 
-    public static SolidProofValue of(CryptoSuite cryptoSuite, VerifiableMaterial data, VerifiableMaterial unsignedProof, byte[] signature) {
-        return new SolidProofValue(new Signature(cryptoSuite, signature), data, unsignedProof);
+    public static SolidProofValue of(CryptoSuite cryptoSuite, VerifiableMaterial data, VerifiableMaterial unsignedProof, byte[] signature, Proof proof) {
+        return new SolidProofValue(new Signature(cryptoSuite, signature), data, unsignedProof, proof);
     }
 
     @Override
