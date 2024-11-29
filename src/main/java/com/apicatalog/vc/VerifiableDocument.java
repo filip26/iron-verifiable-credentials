@@ -1,4 +1,4 @@
-package com.apicatalog.vc.model;
+package com.apicatalog.vc;
 
 import java.net.URI;
 import java.util.Collection;
@@ -8,8 +8,7 @@ import com.apicatalog.linkedtree.orm.Id;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Type;
-import com.apicatalog.vc.Credential;
-import com.apicatalog.vc.Presentation;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.proof.Proof;
 
 /**

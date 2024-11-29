@@ -3,12 +3,12 @@ package com.apicatalog.vc.processor;
 import java.util.function.Function;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.adapter.ProofAdapter;
 import com.apicatalog.vc.adapter.ProofAdapterProvider;
 import com.apicatalog.vc.method.VerificationKeyProvider;
 import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.DocumentModel;
-import com.apicatalog.vc.model.VerifiableDocument;
 import com.apicatalog.vc.model.DocumentError.ErrorType;
 import com.apicatalog.vc.model.adapter.DocumentModelAdapter;
 import com.apicatalog.vc.model.provider.ModelAdapterProvider;

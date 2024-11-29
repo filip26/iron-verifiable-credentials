@@ -3,9 +3,9 @@ package com.apicatalog.vc.model.adapter;
 import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.DocumentModel;
-import com.apicatalog.vc.model.VerifiableDocument;
 
 @FunctionalInterface
 public interface DocumentAdapter {

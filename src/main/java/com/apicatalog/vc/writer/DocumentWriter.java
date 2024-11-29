@@ -3,8 +3,8 @@ package com.apicatalog.vc.writer;
 import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.model.DocumentError;
-import com.apicatalog.vc.model.VerifiableDocument;
 
 import jakarta.json.JsonObject;
 

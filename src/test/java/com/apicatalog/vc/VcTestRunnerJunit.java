@@ -48,7 +48,6 @@ import com.apicatalog.vc.method.MethodPredicate;
 import com.apicatalog.vc.method.MethodSelector;
 import com.apicatalog.vc.method.VerificationKeyProvider;
 import com.apicatalog.vc.model.DocumentError;
-import com.apicatalog.vc.model.VerifiableDocument;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;

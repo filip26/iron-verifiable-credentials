@@ -7,7 +7,6 @@ import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.vc.model.DocumentError;
-import com.apicatalog.vc.model.VerifiableDocument;
 import com.apicatalog.vc.model.DocumentError.ErrorType;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vcdm.VcdmVocab;

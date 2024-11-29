@@ -13,7 +13,7 @@ import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
-import com.apicatalog.vc.model.VerifiableDocument;
+import com.apicatalog.vc.VerifiableDocument;
 
 public class StaticContextLoader implements DocumentLoader {
 
