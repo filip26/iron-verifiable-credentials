@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.vc.model.DocumentError;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 import com.apicatalog.vc.proof.Proof;
 
 class ProofQueue {

@@ -1,7 +1,7 @@
 package com.apicatalog.vc.status;
 
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.Credential;
+import com.apicatalog.vc.model.DocumentError;
 
 /**
  * Allows to implement a custom verifiable credential status verifier

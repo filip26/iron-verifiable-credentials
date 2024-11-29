@@ -4,9 +4,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.VocabTerm;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 
 
 public interface ModelAssertions {

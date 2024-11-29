@@ -3,12 +3,12 @@ package com.apicatalog.vc.status.bitstring;
 import java.net.URI;
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.ModelAssertions;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 import com.apicatalog.vc.status.Status;
 
 @Fragment

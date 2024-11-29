@@ -3,10 +3,10 @@ package com.apicatalog.vc;
 import java.net.URI;
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Id;
 import com.apicatalog.linkedtree.orm.Type;
+import com.apicatalog.vc.model.DocumentError;
 
 @Fragment(generic = true)
 public interface CredentialSchema {

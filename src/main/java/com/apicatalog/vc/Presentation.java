@@ -2,12 +2,13 @@ package com.apicatalog.vc;
 
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
+import com.apicatalog.vc.model.DocumentError;
+import com.apicatalog.vc.model.VerifiableDocument;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 
 /**
  * A generic verifiable presentation.

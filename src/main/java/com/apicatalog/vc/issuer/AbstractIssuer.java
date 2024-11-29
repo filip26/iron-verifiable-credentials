@@ -16,23 +16,23 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.vc.VerifiableDocument;
-import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
+import com.apicatalog.vc.adapter.ProofAdapter;
+import com.apicatalog.vc.adapter.ProofAdapterProvider;
+import com.apicatalog.vc.di.VcdiVocab;
+import com.apicatalog.vc.jsonld.ContextAwareModelProvider;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.DocumentModel;
-import com.apicatalog.vc.model.DocumentModelAdapter;
-import com.apicatalog.vc.model.ModelAdapterProvider;
-import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.ProofAdapterProvider;
+import com.apicatalog.vc.model.VerifiableDocument;
 import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
+import com.apicatalog.vc.model.adapter.DocumentModelAdapter;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.model.generic.GenericReader;
+import com.apicatalog.vc.model.provider.ModelAdapterProvider;
 import com.apicatalog.vc.suite.SignatureSuite;
-import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
@@ -211,7 +211,7 @@ public abstract class AbstractIssuer implements Issuer {
 
         Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
 
-        return new ContextAwareReaderProvider()
+        return new ContextAwareModelProvider()
                 .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
                 .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
                         // add VCDM 1.1 credential support

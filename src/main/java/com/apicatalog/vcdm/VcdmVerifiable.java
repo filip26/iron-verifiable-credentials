@@ -1,6 +1,6 @@
 package com.apicatalog.vcdm;
 
-import com.apicatalog.vc.VerifiableDocument;
+import com.apicatalog.vc.model.VerifiableDocument;
 
 /**
  * A common ancestor to all W3C VCDM based verifiables.

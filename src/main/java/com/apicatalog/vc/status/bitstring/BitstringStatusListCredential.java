@@ -4,10 +4,10 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.orm.Id;
 import com.apicatalog.linkedtree.orm.Type;
+import com.apicatalog.vc.model.DocumentError;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 
 public interface BitstringStatusListCredential {
 

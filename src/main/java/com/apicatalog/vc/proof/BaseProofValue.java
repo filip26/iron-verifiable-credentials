@@ -6,7 +6,7 @@ import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
-import com.apicatalog.ld.DocumentError;
+import com.apicatalog.vc.model.DocumentError;
 
 public interface BaseProofValue extends ProofValue {
 

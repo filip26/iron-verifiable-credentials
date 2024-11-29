@@ -9,13 +9,13 @@ import com.apicatalog.jsonld.api.ExpansionApi;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.VerifiableMaterial;
-import com.apicatalog.vc.model.VerifiableMaterialReader;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 import com.apicatalog.vc.model.generic.GenericMaterial;
+import com.apicatalog.vc.model.io.VerifiableMaterialReader;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;

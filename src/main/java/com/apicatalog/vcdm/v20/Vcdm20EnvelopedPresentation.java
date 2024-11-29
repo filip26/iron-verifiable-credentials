@@ -3,8 +3,6 @@ package com.apicatalog.vcdm.v20;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Context;
 import com.apicatalog.linkedtree.orm.Fragment;
@@ -13,6 +11,8 @@ import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
 import com.apicatalog.vc.PresentationHolder;
+import com.apicatalog.vc.model.DocumentError;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 import com.apicatalog.vc.proof.Proof;
 
 @Fragment

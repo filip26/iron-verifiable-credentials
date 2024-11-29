@@ -2,10 +2,10 @@ package com.apicatalog.vc.model.generic;
 
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.DocumentModel;
-import com.apicatalog.vc.model.DocumentModelWriter;
+import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.io.DocumentModelWriter;
 
 public record GenericModel(
         VerifiableMaterial data,

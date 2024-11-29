@@ -2,10 +2,10 @@ package com.apicatalog.vcdm;
 
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.DocumentModel;
-import com.apicatalog.vc.model.DocumentModelWriter;
+import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.io.DocumentModelWriter;
 
 public record Vcdm(
         VcdmVersion version,

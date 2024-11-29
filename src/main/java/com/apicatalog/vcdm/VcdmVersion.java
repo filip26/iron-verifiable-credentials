@@ -3,8 +3,8 @@ package com.apicatalog.vcdm;
 import java.util.Collection;
 
 import com.apicatalog.jsonld.lang.Keywords;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.vc.model.DocumentError;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 
 /**
  * W3C Verifiable Credentials Data Model Version (VCDM)

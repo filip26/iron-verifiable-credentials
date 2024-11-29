@@ -3,8 +3,8 @@ package com.apicatalog.vcdm.v20;
 import java.util.Collection;
 
 import com.apicatalog.linkedtree.jsonld.io.JsonLdTreeReader;
-import com.apicatalog.vc.model.CredentialAdapter;
-import com.apicatalog.vc.model.ProofAdapter;
+import com.apicatalog.vc.adapter.CredentialAdapter;
+import com.apicatalog.vc.adapter.ProofAdapter;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.io.VcdmAdapter;
 

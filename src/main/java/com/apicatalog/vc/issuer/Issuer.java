@@ -7,7 +7,7 @@ import com.apicatalog.controller.method.VerificationMethod;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.DocumentError;
+import com.apicatalog.vc.model.DocumentError;
 
 import jakarta.json.JsonObject;
 

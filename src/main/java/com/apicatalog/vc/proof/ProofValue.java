@@ -2,7 +2,7 @@ package com.apicatalog.vc.proof;
 
 import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.VerificationError;
-import com.apicatalog.ld.DocumentError;
+import com.apicatalog.vc.model.DocumentError;
 
 public interface ProofValue {
 

@@ -4,12 +4,12 @@ import java.util.Objects;
 
 import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.VerificationError;
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Provided;
-import com.apicatalog.vc.VerifiableDocument;
+import com.apicatalog.vc.di.VcdiVocab;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.ModelAssertions;
-import com.apicatalog.vcdi.VcdiVocab;
+import com.apicatalog.vc.model.VerifiableDocument;
 
 @Fragment(generic = true)
 public interface LinkedProof extends Proof {

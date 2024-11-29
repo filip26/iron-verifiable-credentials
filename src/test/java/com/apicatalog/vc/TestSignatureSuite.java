@@ -8,17 +8,17 @@ import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.primitive.MessageDigest;
 import com.apicatalog.cryptosuite.primitive.Urdna2015;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.vc.di.DataIntegrityDraft;
+import com.apicatalog.vc.di.DataIntegritySuite;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.DocumentModel;
 import com.apicatalog.vc.model.VerifiableMaterial;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
-import com.apicatalog.vcdi.DataIntegrityDraft;
-import com.apicatalog.vcdi.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
 

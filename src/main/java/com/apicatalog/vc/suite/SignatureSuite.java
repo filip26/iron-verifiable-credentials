@@ -4,8 +4,8 @@ import java.net.URI;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.jsonld.loader.DocumentLoader;
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.DocumentModel;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.proof.Proof;

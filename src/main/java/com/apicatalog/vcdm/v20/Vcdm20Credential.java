@@ -2,8 +2,6 @@ package com.apicatalog.vcdm.v20;
 
 import java.time.Instant;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.lang.LocalizedString;
 import com.apicatalog.linkedtree.orm.Adapter;
@@ -18,6 +16,8 @@ import com.apicatalog.vc.Evidence;
 import com.apicatalog.vc.RefreshService;
 import com.apicatalog.vc.Subject;
 import com.apicatalog.vc.TermsOfUse;
+import com.apicatalog.vc.model.DocumentError;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 import com.apicatalog.vc.status.Status;
 import com.apicatalog.vcdm.VcdmVerifiable;
 import com.apicatalog.vcdm.VcdmVersion;

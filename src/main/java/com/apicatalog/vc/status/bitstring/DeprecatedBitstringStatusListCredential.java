@@ -4,10 +4,10 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 
-import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.linkedtree.LinkedFragment;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
+import com.apicatalog.vc.model.DocumentError;
+import com.apicatalog.vc.model.DocumentError.ErrorType;
 import com.apicatalog.vcdm.VcdmVocab;
 
 public class DeprecatedBitstringStatusListCredential {

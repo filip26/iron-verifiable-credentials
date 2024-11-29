@@ -1,9 +1,9 @@
 package com.apicatalog.vc;
 
-import static com.apicatalog.vcdi.DataIntegrityParam.challenge;
-import static com.apicatalog.vcdi.DataIntegrityParam.domain;
-import static com.apicatalog.vcdi.DataIntegrityParam.nonce;
-import static com.apicatalog.vcdi.DataIntegrityParam.purpose;
+import static com.apicatalog.vc.di.DataIntegrityParam.challenge;
+import static com.apicatalog.vc.di.DataIntegrityParam.domain;
+import static com.apicatalog.vc.di.DataIntegrityParam.nonce;
+import static com.apicatalog.vc.di.DataIntegrityParam.purpose;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,27 +32,28 @@ import com.apicatalog.jsonld.json.JsonLdComparison;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.adapter.NodeAdapterError;
 import com.apicatalog.linkedtree.builder.TreeBuilderError;
 import com.apicatalog.linkedtree.jsonld.io.JsonLdReader;
 import com.apicatalog.linkedtree.orm.mapper.TreeReaderMapping;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.vc.di.DataIntegrityDraft;
+import com.apicatalog.vc.di.DataIntegritySuite;
+import com.apicatalog.vc.di.VcdiVocab;
 import com.apicatalog.vc.issuer.Issuer;
-import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
+import com.apicatalog.vc.jsonld.ContextAwareModelProvider;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.method.resolver.ControllableKeyProvider;
-import com.apicatalog.vc.method.resolver.MethodPredicate;
-import com.apicatalog.vc.method.resolver.MethodSelector;
-import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
+import com.apicatalog.vc.method.ControllableKeyProvider;
+import com.apicatalog.vc.method.MethodPredicate;
+import com.apicatalog.vc.method.MethodSelector;
+import com.apicatalog.vc.method.VerificationKeyProvider;
+import com.apicatalog.vc.model.DocumentError;
+import com.apicatalog.vc.model.VerifiableDocument;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.DocumentReader;
 import com.apicatalog.vc.verifier.Verifier;
-import com.apicatalog.vcdi.DataIntegrityDraft;
-import com.apicatalog.vcdi.DataIntegritySuite;
-import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVocab;
 import com.apicatalog.vcdm.v11.Vcdm11Reader;
 import com.apicatalog.vcdm.v20.Vcdm20Reader;
@@ -83,7 +84,7 @@ public class VcTestRunnerJunit {
             .model(proofAdapter -> {
                 Vcdm11Reader vcdm11 = Vcdm11Reader.with(proofAdapter);
 
-                return new ContextAwareReaderProvider()
+                return new ContextAwareModelProvider()
                         .with(VcdmVocab.CONTEXT_MODEL_V1, vcdm11)
                         .with(VcdmVocab.CONTEXT_MODEL_V2, Vcdm20Reader.with(proofAdapter)
                                 // add VCDM 1.1 credential support

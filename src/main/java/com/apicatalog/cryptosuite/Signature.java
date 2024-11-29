@@ -3,8 +3,8 @@ package com.apicatalog.cryptosuite;
 import java.util.Objects;
 
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.model.VerifiableMaterial;
 
 public class Signature implements ByteArrayValue {
