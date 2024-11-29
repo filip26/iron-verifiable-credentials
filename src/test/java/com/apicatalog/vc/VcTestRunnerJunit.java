@@ -50,7 +50,7 @@ import com.apicatalog.vc.processor.Parameter;
 import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.reader.DocumentReader;
 import com.apicatalog.vc.verifier.Verifier;
-import com.apicatalog.vcdi.DataIntegrityProofDraft;
+import com.apicatalog.vcdi.DataIntegrityDraft;
 import com.apicatalog.vcdi.DataIntegritySuite;
 import com.apicatalog.vcdi.VcdiVocab;
 import com.apicatalog.vcdm.VcdmVocab;
@@ -137,7 +137,7 @@ public class VcTestRunnerJunit {
                 }
 
                 // proof draft
-                final DataIntegrityProofDraft draft = issuer.createDraft(testCase.verificationMethod);
+                final DataIntegrityDraft draft = issuer.createDraft(testCase.verificationMethod);
 
                 draft.purpose(purpose);
                 draft.created(testCase.created);

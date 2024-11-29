@@ -1,7 +1,6 @@
 package com.apicatalog.vc.issuer;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Function;
@@ -24,12 +23,12 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.VerifiableDocument;
 import com.apicatalog.vc.jsonld.ContextAwareReaderProvider;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.model.ProofAdapter;
-import com.apicatalog.vc.model.ProofAdapterProvider;
-import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.DocumentModel;
 import com.apicatalog.vc.model.DocumentModelAdapter;
 import com.apicatalog.vc.model.ModelAdapterProvider;
+import com.apicatalog.vc.model.ProofAdapter;
+import com.apicatalog.vc.model.ProofAdapterProvider;
+import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
 import com.apicatalog.vc.model.generic.GenericReader;
 import com.apicatalog.vc.suite.SignatureSuite;
@@ -153,7 +152,12 @@ public abstract class AbstractIssuer implements Issuer {
 
         ldSignature.sign(unsignedData, unsignedDraft, keyPair.privateKey().rawBytes());
 
-        final VerifiableMaterial signedProof = draft.sign(unsignedDraft, ldSignature.byteArrayValue());
+        return sign(model, unsignedDraft, draft, ldSignature.byteArrayValue());
+    }
+
+    protected JsonObject sign(DocumentModel model, VerifiableMaterial unsignedDraft, ProofDraft draft, byte[] signature) throws DocumentError {
+
+        final VerifiableMaterial signedProof = draft.sign(unsignedDraft, signature);
 
         if (signedProof == null) {
             throw new IllegalStateException();

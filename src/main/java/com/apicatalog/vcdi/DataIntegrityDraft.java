@@ -29,7 +29,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
-public class DataIntegrityProofDraft extends ProofDraft {
+public class DataIntegrityDraft extends ProofDraft {
 
     protected final DataIntegritySuite suite;
     protected final CryptoSuite crypto;
@@ -40,7 +40,7 @@ public class DataIntegrityProofDraft extends ProofDraft {
 
     ProofValue signature;
 
-    public DataIntegrityProofDraft(
+    public DataIntegrityDraft(
             DataIntegritySuite suite,
             CryptoSuite crypto,
             VerificationMethod method) {
@@ -49,17 +49,17 @@ public class DataIntegrityProofDraft extends ProofDraft {
         this.crypto = crypto;
     }
 
-    public DataIntegrityProofDraft challenge(String challenge) {
+    public DataIntegrityDraft challenge(String challenge) {
         this.challenge = challenge;
         return this;
     }
 
-    public DataIntegrityProofDraft domain(String domain) {
+    public DataIntegrityDraft domain(String domain) {
         this.domain = domain;
         return this;
     }
 
-    public DataIntegrityProofDraft nonce(String nonce) {
+    public DataIntegrityDraft nonce(String nonce) {
         this.nonce = nonce;
         return this;
     }
@@ -132,14 +132,14 @@ public class DataIntegrityProofDraft extends ProofDraft {
         }
     }
 
-    public DataIntegrityProofDraft created(Instant created) {
+    public DataIntegrityDraft created(Instant created) {
         this.created = created == null
                 ? created
                 : created.truncatedTo(ChronoUnit.SECONDS);
         return this;
     }
 
-    public DataIntegrityProofDraft expires(Instant expires) {
+    public DataIntegrityDraft expires(Instant expires) {
         this.expires = expires == null
                 ? expires
                 : expires.truncatedTo(ChronoUnit.SECONDS);

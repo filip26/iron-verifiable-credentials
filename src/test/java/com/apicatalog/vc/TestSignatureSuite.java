@@ -17,7 +17,7 @@ import com.apicatalog.vc.proof.Proof;
 import com.apicatalog.vc.proof.ProofValue;
 import com.apicatalog.vc.solid.SolidIssuer;
 import com.apicatalog.vc.solid.SolidProofValue;
-import com.apicatalog.vcdi.DataIntegrityProofDraft;
+import com.apicatalog.vcdi.DataIntegrityDraft;
 import com.apicatalog.vcdi.DataIntegritySuite;
 
 class TestSignatureSuite extends DataIntegritySuite {
@@ -50,7 +50,7 @@ class TestSignatureSuite extends DataIntegritySuite {
                 CRYPTO,
                 pair,
                 Multibase.BASE_58_BTC,
-                method -> new DataIntegrityProofDraft(this, CRYPTO, method));
+                method -> new DataIntegrityDraft(this, CRYPTO, method));
     }
 
     @Override
