@@ -3,7 +3,7 @@ package com.apicatalog.vcdi;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import com.apicatalog.controller.key.VerificationKey;
@@ -13,9 +13,6 @@ import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
-import com.apicatalog.linkedtree.adapter.NodeAdapterError;
-import com.apicatalog.linkedtree.builder.FragmentComposer;
-import com.apicatalog.linkedtree.json.JsonFragment;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.orm.Adapter;
@@ -115,7 +112,7 @@ public interface DataIntegrityProof extends LinkedProof {
      */
     @Provided
     DataIntegritySuite di();
-    
+
     @Override
     default void validate(Map<String, Object> params) throws DocumentError {
 
@@ -161,55 +158,25 @@ public interface DataIntegrityProof extends LinkedProof {
 
         if (signature() instanceof BaseProofValue baseProofValue) {
 
-            System.out.println("DERIVE " + baseProofValue);
-            System.out.println("     > " + selectors);
             DerivedProofValue proofValue = baseProofValue.derive(selectors);
-            System.out.println("> " + proofValue);
-            System.out.println("> " + proofValue.getClass());
-            
+
+            VerifiableMaterial proof = proofValue.documentModel().proofs().iterator().next();
+
             if (proofValue instanceof ByteArrayValue byteArrayValue) {
-                System.out.println("> " + di().proofValueBase.encode(byteArrayValue.byteArrayValue()));
+
+                proof = sign(proof,
+                        Json.createValue(
+                                di().proofValueBase.encode(byteArrayValue.byteArrayValue())));
             }
 
-//            final Collection<VerifiableMaterial> proofs = new LinkedList<>(model.proofs());
-//            proofs.add(signedProof);
-
-            
-//            proofValue.documentModel().of(null, null);
-            System.out.println("D: " + document());
-            
-            try {
-                DataIntegrityProof proof = FragmentComposer.create()
-                        .set("id", id())
-                        .set("cryptosuite", cryptosuite())
-                        .set("purpose", purpose())
-                        .set("created", created())
-                        .set("expires", expires())
-                        .set("method", method())
-                        .set("di", di())
-                        .set(VcdiVocab.PREVIOUS_PROOF.name(), previousProof())
-                        .set(VcdiVocab.CHALLENGE.name(), challenge())
-                        .set(VcdiVocab.NONCE.name(), nonce())
-                        .set(VcdiVocab.DOMAIN.name(), domain())
-                        .json(di().writer::compact)
-                        .get(DataIntegrityProof.class);
-               return null; 
-//                return ((JsonFragment)proof);
-            } catch (NodeAdapterError e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            
-            //TODO clone DI proof and set value, return the proof
-//            System.out.println("> " + baseProofValue.document());
-//            System.out.println("> " + baseProofValue.proof());
+            return proofValue.documentModel()
+                    .of(
+                            proofValue.documentModel().data(),
+                            List.of(proof))
+                    .materialize()
+                    .compacted();
         }
-        
-        // JsonFragment resi to ze pak Proof, Verifiable, bude dedit it toto!!!
-//        if (this instanceof JsonFragment) {
-//            
-//        }
-        
+
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
 //            byte[] signature = proofValue.;
 //            
