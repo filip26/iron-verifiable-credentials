@@ -19,11 +19,13 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * [W3C Data Integrity](https://www.w3.org/TR/vc-data-integrity/)
     * :package: [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
     * :package: [EdDSA-JCS-2022](https://github.com/filip26/iron-eddsa-jcs-2022)
-    * :package: [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023) [selective disclosure]
     * :package: [ECDSA-RDFC-2019](https://github.com/filip26/iron-ecdsa-rdfc-2019) [P-256, P-384]
-    * :package: [ECDSA-JCS-2019](https://github.com/filip26/iron-ecdsa-jcs-2019) [P-256, P-384]    
-    * :package: [ECDSA-XI-2023](https://github.com/filip26/ircon-ecdsa-xi-2023)
-    * :soon: [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023)
+    * :package: [ECDSA-JCS-2019](https://github.com/filip26/iron-ecdsa-jcs-2019) [P-256, P-384]
+    * Selective Disclosure
+      * :package: [ECDSA-SD-2023](https://github.com/filip26/iron-ecdsa-sd-2023) [P-256, P-384]
+      * :soon: [BBS-2023](https://github.com/filip26/iron-bbs-cryptosuite-2023)
+    * Optical Barcodes
+      * :soon: [ECDSA-XI-2023](https://github.com/filip26/ircon-ecdsa-xi-2023)
   * :package: [Ed25519Signature2020](https://github.com/filip26/iron-ed25519-cryptosuite-2020)
   * Have you implemented a signature suite? List it here, open PR.
 * Status Verification
