@@ -69,7 +69,7 @@ public class CryptoSuite implements CanonicalizationMethod, DigestAlgorithm, Sig
     }
 
     @Override
-    public KeyPair keygen() throws KeyGenError {
+    public KeyPair keygen() throws CryptoSuiteError {
         if (signer == null) {
             throw new UnsupportedOperationException();
         }

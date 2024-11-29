@@ -1,4 +1,4 @@
-package com.apicatalog.vc.holder;
+package com.apicatalog.vc;
 
 import java.net.URI;
 

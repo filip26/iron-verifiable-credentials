@@ -12,7 +12,7 @@ import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.vc.Credential;
 import com.apicatalog.vc.Presentation;
-import com.apicatalog.vc.holder.PresentationHolder;
+import com.apicatalog.vc.PresentationHolder;
 import com.apicatalog.vc.proof.Proof;
 
 @Fragment

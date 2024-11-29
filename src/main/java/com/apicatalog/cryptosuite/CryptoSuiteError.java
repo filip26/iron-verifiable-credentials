@@ -7,7 +7,8 @@ public class CryptoSuiteError extends Throwable {
     public enum CryptoSuiteErrorCode {
         Canonicalization, 
         Digest, 
-        Signature,
+        Signature, 
+        KeyGenerator,
     }
 
     private final CryptoSuiteErrorCode code;

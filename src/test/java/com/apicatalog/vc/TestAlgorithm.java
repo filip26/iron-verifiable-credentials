@@ -4,8 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import com.apicatalog.controller.key.KeyPair;
-import com.apicatalog.cryptosuite.KeyGenError;
-import com.apicatalog.cryptosuite.SigningError;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.cryptosuite.algorithm.SignatureAlgorithm;
@@ -35,7 +34,7 @@ class TestAlgorithm implements SignatureAlgorithm {
     }
 
     @Override
-    public byte[] sign(byte[] privateKey, byte[] data) throws SigningError {
+    public byte[] sign(byte[] privateKey, byte[] data) throws CryptoSuiteError {
 
         final byte[] result = new byte[privateKey.length];
         Arrays.fill(result, (byte) 0);
@@ -48,7 +47,7 @@ class TestAlgorithm implements SignatureAlgorithm {
     }
 
     @Override
-    public KeyPair keygen() throws KeyGenError {
+    public KeyPair keygen() throws CryptoSuiteError {
 
         byte[] raw = new byte[32];
 
@@ -67,7 +66,7 @@ class TestAlgorithm implements SignatureAlgorithm {
         return GenericMultikey.of(null, null, publicKey, privateKey);
     }
 
-    public static void main(String[] args) throws KeyGenError {
+    public static void main(String[] args) throws CryptoSuiteError {
         System.out.println(
                 new JsonLdWriter()
                         .scan(Multikey.class)

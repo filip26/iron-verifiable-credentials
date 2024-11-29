@@ -2,7 +2,7 @@ package com.apicatalog.vc.keygen;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.CryptoSuite;
-import com.apicatalog.cryptosuite.KeyGenError;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 
 public class KeysGenerator {
 
@@ -16,9 +16,9 @@ public class KeysGenerator {
      * Get generated keys
      *
      * @return the generated key pair instance
-     * @throws KeyGenError
+     * @throws CryptoSuiteError
      */
-    public KeyPair get() throws KeyGenError {
+    public KeyPair get() throws CryptoSuiteError {
         return suite.keygen();
     }
     
@@ -29,9 +29,9 @@ public class KeysGenerator {
      *
      * @return {@link KeyGenError} allowing to set options and to generate key pair
      *
-     * @throws KeyGenError
+     * @throws CryptoSuiteError
      */
-    public static KeysGenerator with(final CryptoSuite suite) throws KeyGenError {
+    public static KeysGenerator with(final CryptoSuite suite) throws CryptoSuiteError {
         if (suite == null) {
             throw new IllegalArgumentException("The cryptoSuite parameter must not be null.");
         }

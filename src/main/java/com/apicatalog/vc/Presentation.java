@@ -8,7 +8,6 @@ import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.orm.Fragment;
 import com.apicatalog.linkedtree.orm.Provided;
 import com.apicatalog.linkedtree.orm.Term;
-import com.apicatalog.vc.holder.PresentationHolder;
 
 /**
  * A generic verifiable presentation.
