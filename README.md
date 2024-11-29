@@ -37,6 +37,8 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
   * :soon: `did:web`
   * :soon: `JsonWebKey` 
   * `custom`
+* :gear: [VC HTTP API Google Run Functions](https://github.com/filip26/iron-vc-api)
+  * an example implementation exposing VC HTTP API as Google Run Functions
 
 [Community compatibility dashboard for Verifiable Credentials](https://canivc.com/)
 
@@ -161,7 +163,7 @@ Fork and clone the project repository.
 
 ## Extensions
 * :package: [Iridium](https://github.com/filip26/iridium-cbor-ld) - A CBOR-based Processor for Linked Data
-* :gear: [VC HTTP API & Service](https://github.com/filip26/iron-vc-api)
+* :gear: [VC HTTP API Google Run Functions](https://github.com/filip26/iron-vc-api)
 * :hammer_and_wrench: [LEXREX](https://lexrex.web.app/) - Semantic vocabularies visual builder and manager
 
 ## Resources
