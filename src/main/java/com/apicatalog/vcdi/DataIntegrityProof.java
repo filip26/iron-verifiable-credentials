@@ -3,16 +3,21 @@ package com.apicatalog.vcdi;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.apicatalog.controller.key.VerificationKey;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.cryptosuite.VerificationError;
 import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
+import com.apicatalog.cryptosuite.sd.DocumentSelector;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.linkedtree.jsonld.JsonLdKeyword;
 import com.apicatalog.linkedtree.literal.ByteArrayValue;
 import com.apicatalog.linkedtree.orm.Adapter;
@@ -24,6 +29,7 @@ import com.apicatalog.linkedtree.orm.Term;
 import com.apicatalog.linkedtree.orm.Vocab;
 import com.apicatalog.linkedtree.xsd.XsdDateTimeAdapter;
 import com.apicatalog.multibase.MultibaseLiteral;
+import com.apicatalog.vc.model.DocumentModel;
 import com.apicatalog.vc.model.ModelAssertions;
 import com.apicatalog.vc.model.VerifiableMaterial;
 import com.apicatalog.vc.model.generic.GenericMaterial;
@@ -160,48 +166,32 @@ public interface DataIntegrityProof extends LinkedProof {
 
             DerivedProofValue proofValue = baseProofValue.derive(selectors);
 
-            VerifiableMaterial proof = proofValue.documentModel().proofs().iterator().next();
+            DocumentModel model = proofValue.documentModel();
+
+            VerifiableMaterial proof = model.proofs().iterator().next();
 
             if (proofValue instanceof ByteArrayValue byteArrayValue) {
-
                 proof = sign(proof,
                         Json.createValue(
                                 di().proofValueBase.encode(byteArrayValue.byteArrayValue())));
             }
 
-            return proofValue.documentModel()
-                    .of(
-                            proofValue.documentModel().data(),
-                            List.of(proof))
-                    .materialize()
-                    .compacted();
+            final Collection<String> combinedPointers = Stream.of(
+                    baseProofValue.pointers(),
+                    (selectors != null ? selectors : Collections.<String>emptyList()))
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+
+            final JsonObject reveal = DocumentSelector.of(combinedPointers).getNodes(model.data().compacted());
+
+            return JsonLdContext.set(
+                    model.data().context(),
+                    model.of(new GenericMaterial(model.data().context(), reveal, null), List.of(proof))
+                            .materialize()
+                            .compacted());
         }
 
         throw new UnsupportedOperationException("The proof does not support a selective disclosure.");
-//            byte[] signature = proofValue.;
-//            
-//            DataIntegrityProof.sign(
-//                    baseProofValue.proof(),
-//                    Json.createValue(suite.proofValueBase.encode(signature)))
-
-//            sign(baseProofValue.proof(), )
-
-//            final JsonObject signature = LdScalar.multibase(suite.proofValueBase, derivedProofValue.toByteArray());
-//
-//            return DataIntegrityProofDraft.signed(unsignedCopy(), signature);
-//            
-//            final VerifiableMaterial signedProof = draft.sign(unsignedDraft, ldSignature.value());
-//
-//            if (signedProof == null) {
-//                throw new IllegalStateException();
-//            }
-//
-//            final VerifiableMaterial signedDocument = model
-//                    .withProof(signedProof)
-//                    .materialize();
-//
-//            return JsonLdContext.set(signedDocument.context(), signedDocument.compacted());
-
     }
 
     static VerifiableMaterial sign(VerifiableMaterial proof, JsonValue signature) throws DocumentError {
