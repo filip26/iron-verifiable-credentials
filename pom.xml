@@ -7,7 +7,7 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-verifiable-credentials</artifactId>
-    <version>0.15.19-SNAPSHOT</version>
+    <version>0.15.21-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -62,7 +62,7 @@
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
         <titanium.version>1.4.1</titanium.version>
-        <titanium.rdfc.version>1.0.0-SNAPSHOT</titanium.rdfc.version>
+        <titanium.rdfc.version>1.0.0</titanium.rdfc.version>
         <linked-tree.version>0.0.68-SNAPSHOT</linked-tree.version>
         <carbon.version>0.10.0-SNAPSHOT</carbon.version>
         
@@ -84,13 +84,13 @@
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
-            <artifactId>linked-tree</artifactId>
-            <version>${linked-tree.version}</version>
+            <artifactId>titanium-rdfc</artifactId>
+            <version>${titanium.rdfc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
-            <artifactId>titanium-rdfc</artifactId>
-            <version>${titanium.rdfc.version}</version>
+            <artifactId>linked-tree</artifactId>
+            <version>${linked-tree.version}</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
