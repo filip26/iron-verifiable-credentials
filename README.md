@@ -14,7 +14,6 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 
 ## Features
 
-* Issuer, Verifier, Holder
 * Signature Suites
   * [W3C Data Integrity](https://www.w3.org/TR/vc-data-integrity/)
     * :package: [EdDSA-RDFC-2022](https://github.com/filip26/iron-eddsa-rdfc-2022)
@@ -36,9 +35,11 @@ An implementation of the [W3C Verifiable Credentials](https://www.w3.org/TR/vc-d
 * Verification Methods
   * `did:key` 
   * `Multikey`
-  * :soon: `did:web`
   * :soon: `JsonWebKey` 
-  * `custom`
+  * `Controller Document`
+  * :soon: `did:web`
+  * :soon: `did:twd`
+  * `Custom`
 * :gear: [VC HTTP API Google Run Functions](https://github.com/filip26/iron-vc-api)
   * an example implementation exposing VC HTTP API as Google Run Functions
 

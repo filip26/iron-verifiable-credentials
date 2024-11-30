@@ -6,7 +6,7 @@ import java.util.List;
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.CryptoSuite;
 import com.apicatalog.cryptosuite.primitive.MessageDigest;
-import com.apicatalog.cryptosuite.primitive.Urdna2015;
+import com.apicatalog.cryptosuite.primitive.RDFC;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.vc.di.DataIntegrityDraft;
@@ -27,7 +27,7 @@ class TestSignatureSuite extends DataIntegritySuite {
     static final CryptoSuite CRYPTO = new CryptoSuite(
             TEST_CRYPTO_NAME,
             256,
-            new Urdna2015(),
+            new RDFC(),
             new MessageDigest("SHA-256"),
             new TestAlgorithm());
 
