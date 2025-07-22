@@ -1,0 +1,20 @@
+# Verifiable Credentials: State vs Status (Including Selective Disclosure)
+
+|                        | **State**                                                                                                                         | **Status**                                                              |
+|------------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| **Definition**         | The immutable set of claims, metadata, and cryptographic proof that make up the credential as issued. <br>For selective disclosure: the state of any cryptographically-verifiable presentation is the exact set of claims and proof shown, derived from the original VC (but does not modify the VC itself). | An *optional* external property indicating the current validity or standing of the credential (e.g., revoked, suspended), usually managed by the issuer or a delegated authority. |
+| **Where Managed**      | Embedded in the credential as issued and in each derived presentation.<br>Selective disclosure: The holder creates a verifiable presentation that contains only selected claims, using cryptographic proofs (the original VC remains unchanged). | Outside the credential, in a status registry, service, or revocation list referenced (optionally) by the VC.   |
+| **Materialization**    | Not a formal field; “state” refers to the credential’s full data structure and proof as issued, or the revealed claims and proof in a presentation. | Optional (`credentialStatus` property) in the W3C VC model.              |
+| **Purpose**            | Defines what is being asserted and proven at a specific moment—whether as the full credential or a selective disclosure presentation. | Allows verifiers to check if a credential remains valid after issuance, such as not revoked or suspended.      |
+| **Who Controls It**    | The issuer (at issuance, for the original VC);<br>The holder (when generating presentations with selective disclosure, but cannot change the original VC). | Issuer or status authority (can update the external status service or registry).                               |
+| **Can It Change?**     | The credential: **No**—immutable after issuance.<br>Selective disclosure presentations: **Yes**—each presentation can reveal a different subset of claims, but always derived from the original VC. | **Yes**—status can change at any time (e.g., "valid" to "revoked") through updates to the status service.      |
+| **Typical Values**     | All fields of the credential as issued, or any verifiable subset of claims in a presentation.                                      | "valid", "revoked", "suspended", etc.—according to the status method used.                                    |
+| **Is It Always Present?** | Yes, the credential’s data is always present; derived presentations can always be created if supported by the VC.               | `credentialStatus` is optional.                                            |
+| **Verifiable By Whom?** | Any party with access to the credential or presentation and to the issuer’s verification method.                                  | Any party that follows the status mechanism specified (if present) in the VC.                                 |
+
+## Notes
+- **VC State:** The original VC is immutable after issuance; each selective disclosure presentation is a new, cryptographically-verifiable view derived from the original, but does not alter the original VC.
+- **VC Status:** When present, lets verifiers check ongoing validity (e.g., via revocation lists or status registries).
+- **Selective Disclosure:** Supported by cryptographic methods, enabling privacy-preserving presentations of only the needed claims, but not creating new credentials—only new presentations.
+- **Verification Method:** Any mechanism (such as a public key, cryptographic proof, or other means) specified by the issuer that enables verification of the credential or presentation.
+
