@@ -85,7 +85,7 @@ public class VerifierTest {
 
     static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
             .proof(DataIntegrityProof.TYPE_NAME)
-            //TODO allow list concrete DI cryptosuites only
+            //TODO allow list concrete DI cryptosuites only OR list models and configurations
             .proof(Ed25519Signature2020.TYPE_NAME)
             .resolver(DID_KEY_RESOLVER)
             .verifier("Ed25519", BcEd25519Verifier.getInstance()::verify)
