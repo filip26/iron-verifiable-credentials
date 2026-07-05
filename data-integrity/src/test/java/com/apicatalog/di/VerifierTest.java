@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.apicatalog.crypto.bc.BcEcdsaVerifier;
 import com.apicatalog.crypto.bc.BcEd25519Verifier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
@@ -83,8 +84,12 @@ public class VerifierTest {
     };
 
     static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
-            .proof(DataIntegrityProof.TYPE_NAME, DID_KEY_RESOLVER, BcEd25519Verifier.getInstance()::verify)
-            .proof(Ed25519Signature2020.TYPE_NAME, DID_KEY_RESOLVER, BcEd25519Verifier.getInstance()::verify)
+            .proof(DataIntegrityProof.TYPE_NAME)
+            .proof(Ed25519Signature2020.TYPE_NAME)
+            .resolver(DID_KEY_RESOLVER)
+            .verifier("Ed25519", BcEd25519Verifier.getInstance()::verify)
+            .verifier("P-256", BcEcdsaVerifier.getP256Instance()::verify)
+            .verifier("P-384", BcEcdsaVerifier.getP256Instance()::verify)
             .build();
 
     @ParameterizedTest
