@@ -79,6 +79,8 @@ public class VerifierTest {
 
         var codec = MulticodecDecoder.getInstance().getCodec(key).orElseThrow();
 
+        //TODO check the key codec vs         proof.signature().algorithm()
+        
         return codec.decode(key);
 
     };

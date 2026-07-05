@@ -52,6 +52,23 @@ public final class CryptoSuites {
             Multibase.BASE_58_BTC,
             96);
 
+    public static AtomicCryptoSuite MLDSA44_RDFC_2024 = new AtomicCryptoSuite(
+            "mldsa44-rdfc-2024",
+            "ML-DSA-44",
+            "RDFC",
+            "SHA-256",
+            Multibase.BASE_64_URL,
+            2420);
+
+    public static AtomicCryptoSuite MLDSA44_JCS_2024 = new AtomicCryptoSuite(
+            "mldsa44-jcs-2024",
+            "ML-DSA-44",
+            "JCS",
+            "SHA-256",
+            Multibase.BASE_64_URL,
+            2420);
+
+
     public static AtomicCryptoSuite getInstance(String id, String algorithm) {
 
         return switch (id) {
