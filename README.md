@@ -17,16 +17,16 @@
 The following cryptographic suites are supported out-of-the-box.
 
 | Name | Algorithm | C14N | ⚛️ Quantum Resistant |
-| :--- | :---: | :---: | :---: |
-| ecdsa-rdfc-2019 | P-256 | RDFC | |
-| ecdsa-rdfc-2019 | P-384 | RDFC | |
-| ecdsa-jcs-2019 | P-256 | JCS | |
-| ecdsa-jcs-2019 | P-384 | JCS | |
-| eddsa-rdfc-2022 | Ed25519 | RDFC | |
-| eddsa-jcs-2022 | Ed25519 | JCS | |
-| Ed25519Signature2020 | Ed25519 | RDFC | |
-| mldsa44-rdfc-2024 | ML-DSA-44 | RDFC | ✅ |
-| mldsa44-jcs-2024 | ML-DSA-44 | JCS | ✅ |
+| :--- | :--- | :--- | :---: |
+| `ecdsa-rdfc-2019` | P-256 | RDFC | |
+| `ecdsa-rdfc-2019` | P-384 | RDFC | |
+| `ecdsa-jcs-2019` | P-256 | JCS | |
+| `ecdsa-jcs-2019` | P-384 | JCS | |
+| `eddsa-rdfc-2022` | Ed25519 | RDFC | |
+| `eddsa-jcs-2022` | Ed25519 | JCS | |
+| `mldsa44-rdfc-2024` | ML-DSA-44 | RDFC | ✅ |
+| `mldsa44-jcs-2024` | ML-DSA-44 | JCS | ✅ |
+| `Ed25519Signature2020` | Ed25519 | RDFC | |
 
 ## 🤝 Contributing
 
