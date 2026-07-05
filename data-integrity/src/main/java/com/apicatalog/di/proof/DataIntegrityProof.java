@@ -842,18 +842,22 @@ public final class DataIntegrityProof implements Proof {
         @Override
         public boolean isAccepted(Collection<String[]> proof) {
 
+            boolean algomatch = false;
             boolean typematch = false;
             boolean cryptomatch = false;
 
             for (var statement : proof) {
 
+                algomatch = algomatch || DataIntegrityProof.URI_PROOF_VALUE.equals(statement[1])
+                        && cryptosuite.isSignature(statement[2]);
+                
                 typematch = typematch || "http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(statement[1])
                         && URI_TYPE_VALUE.equals(statement[2]);
 
                 cryptomatch = cryptomatch || "https://w3id.org/security#cryptosuite".equals(statement[1])
                         && cryptosuite.id().equals(statement[2]);
 
-                if (typematch && cryptomatch) {
+                if (typematch && cryptomatch && algomatch) {
                     return true;
                 }
             }

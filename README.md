@@ -12,7 +12,7 @@
 > Your feedback is essential to the improvement of this library. Please share any concerns, primary use cases, areas for enhancement, or challenges you have encountered. Your insights help refine and optimize the library to better meet user needs. Thank you for your time and contributions.
 
 
-## Supported Data Integrity Cryptosuites
+## 🔐 Supported Data Integrity Cryptosuites
 
 The following cryptographic suites are supported out-of-the-box.
 
