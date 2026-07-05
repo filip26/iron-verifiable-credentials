@@ -1,10 +1,12 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: CodeQL Coverrage
+name: Java 25 CI
+permissions:
+  contents: read
 
 on:
-  push:
+  pull_request:
     branches: [ main ]
 
 jobs:
@@ -20,9 +22,4 @@ jobs:
         java-version: 25
         distribution: 'temurin'
     - name: Build with Maven
-      run: mvn -B package jacoco:report --file pom.xml
-    - name: Run codacy-coverage-reporter
-      uses: codacy/codacy-coverage-reporter-action@master
-      with:
-        project-token: ${{secrets.CODACY_PROJECT_TOKEN}}
-        coverage-reports: ./target/site/jacoco/jacoco.xml
+      run: mvn package 

@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.apicatalog</groupId>
+    <artifactId>iron-crypto-gcloud-kms</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+
+    <name>Iron Crypto GC KMS</name>
+    <description>
+        Google Cloud KMS-based asymmetric cryptography implementation for W3C
+        Data Integrity specifications.
+    </description>
+
+    <url>https://github.com/filip26/iron-did-cel</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/filip26/iron-did-cel/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:git://github.com/filip26/iron-did-cel.git</connection>
+        <developerConnection>
+            scm:git:git://github.com/filip26/iron-did-cel.git</developerConnection>
+        <url>https://github.com/filip26/iron-did-cel/tree/main</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>filip26</id>
+            <name>Filip Kolarik</name>
+            <email>filip26@gmail.com</email>
+            <roles>
+                <role>author</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <inceptionYear>2026</inceptionYear>
+
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <argLine>-Dfile.encoding=UTF-8</argLine>
+
+        <multibase.version>4.1.0</multibase.version>
+        <multicodec.version>3.0.0</multicodec.version>
+        <!-- Tests -->
+        <junit.version>6.0.3</junit.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>26.78.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-kms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>copper-multibase</artifactId>
+            <version>${multibase.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>copper-multicodec</artifactId>
+            <version>${multicodec.version}</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.5</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

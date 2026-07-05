@@ -1,0 +1,8 @@
+{
+  "type": "DataIntegrityProof",
+  "cryptosuite": "eddsa-rdfc-2022",
+  "created": "2023-02-26T22:16:38Z",
+  "verificationMethod": "did:key:z6Mkm1S51iPHJvDEkJ9MRtxJmT8Pqo6wHipAFwBAjN83vntT#z6Mkm1S51iPHJvDEkJ9MRtxJmT8Pqo6wHipAFwBAjN83vntT",
+  "proofPurpose": "assertionMethod",
+  "previousProof": "urn:uuid:d94f792a-c546-4d06-b38a-da070ab56c23"
+}
