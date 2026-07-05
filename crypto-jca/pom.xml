@@ -54,7 +54,7 @@
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
         <multibase.version>4.1.0</multibase.version>
-        <multicodec.version>3.0.0</multicodec.version>
+        <multicodec.version>3.1.0</multicodec.version>
         <junit.version>6.0.3</junit.version>
     </properties>
 
