@@ -80,6 +80,10 @@ public class IssuerTest {
             keyAlgorithm = "P-256";
             signer = BcEcdsaSigner.getP256Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
+        case "p384-priv":
+            keyAlgorithm = "P-384";
+            signer = BcEcdsaSigner.getP384Instance(privateKeyCodec.decode(privateKey))::sign;
+            break;
 
         default:
             throw new IllegalArgumentException(

@@ -85,11 +85,12 @@ public class VerifierTest {
 
     static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
             .proof(DataIntegrityProof.TYPE_NAME)
+            //TODO allow list concrete DI cryptosuites only
             .proof(Ed25519Signature2020.TYPE_NAME)
             .resolver(DID_KEY_RESOLVER)
             .verifier("Ed25519", BcEd25519Verifier.getInstance()::verify)
             .verifier("P-256", BcEcdsaVerifier.getP256Instance()::verify)
-            .verifier("P-384", BcEcdsaVerifier.getP256Instance()::verify)
+            .verifier("P-384", BcEcdsaVerifier.getP384Instance()::verify)
             .build();
 
     @ParameterizedTest
