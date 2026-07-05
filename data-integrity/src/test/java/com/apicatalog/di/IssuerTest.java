@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.apicatalog.crypto.bc.BcEcdsaSigner;
 import com.apicatalog.crypto.bc.BcEd25519Signer;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
@@ -75,11 +76,15 @@ public class IssuerTest {
             keyAlgorithm = "Ed25519";
             signer = BcEd25519Signer.getInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
+        case "p256-priv":
+            keyAlgorithm = "P-256";
+            signer = BcEcdsaSigner.getP256Instance(privateKeyCodec.decode(privateKey))::sign;
+            break;
 
         default:
             throw new IllegalArgumentException(
                     """
-                    Unsupported secret key algorithm
+                    Unsupported secret key algorithm %s.
                     """
                             .formatted(privateKeyCodec.name()));
         }
@@ -120,7 +125,7 @@ public class IssuerTest {
                     Unsupported c14n = %s.
                     """.formatted(proofDraft.cryptosuite().c14n()));
             };
-System.out.println(new String(canonicalPayload));
+
             var data = new MapData(document, proofDraft.c14n());
             data.digestiblePayload(proofDraft.previous(), new GenericPayload(canonicalPayload));
 
@@ -128,7 +133,7 @@ System.out.println(new String(canonicalPayload));
                     signer,
                     proofDraft,
                     data);
-            System.out.println(new String(proof.canonicalPayload()));
+
             DataIntegrityProof.write((DataIntegrityProof) proof, composer);
 
             if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {

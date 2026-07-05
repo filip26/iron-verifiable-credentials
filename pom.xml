@@ -6,8 +6,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.apicatalog</groupId>
-    <artifactId>iron</artifactId>
-    <version>1.0.0-M1</version>
+    <artifactId>iron-di-vc</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
