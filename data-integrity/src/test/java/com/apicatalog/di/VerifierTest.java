@@ -71,7 +71,7 @@ public class VerifierTest {
 
     static MethodResolver DID_KEY_RESOLVER = proof -> {
         if (!proof.verificationMethod().startsWith("did:key:")) {
-            return null; // TODO
+            throw new IllegalArgumentException();
         }
 
         var key = MultibaseDecoder.getInstance().decode(
