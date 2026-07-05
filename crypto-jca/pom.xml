@@ -5,9 +5,9 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-crypto-jca</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0.0-M1</version>
 
-    <name>Iron Crypto</name>
+    <name>Iron Crypto JCA</name>
     <description>
         JCA-based asymmetric cryptography implementation for W3C Data Integrity
         specifications.
