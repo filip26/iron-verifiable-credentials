@@ -58,8 +58,8 @@ public class IssuerTest {
             KeyCodec.ED25519_PRIVATE_KEY,
             KeyCodec.MLDSA_44_PUBLIC_KEY,
             KeyCodec.MLDSA_44_PRIVATE_KEY,
-            Multicodec.of("slhdsa-sha2-128-priv", Tag.Key, 464000000), // FIXME temporary, there is not private key code
-                                                                       // yet
+            //TODO remove when multicodec is updated
+            Multicodec.of("slhdsa-sha2-128s-priv", Tag.Key, 0x131e),
             Multicodec.of("falcon-512-pub", Tag.Key, 4652));
 
     @ParameterizedTest
@@ -95,7 +95,7 @@ public class IssuerTest {
             keyAlgorithm = "ML-DSA-44";
             signer = BCMLDSASigner.new44Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
-        case "slhdsa-sha2-128-priv":
+        case "slhdsa-sha2-128s-priv":
             keyAlgorithm = "SLH-DSA-SHA2-128s";
             signer = BCSLHDSASigner.new128SInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
@@ -255,12 +255,11 @@ public class IssuerTest {
     }
 
     public static void main(String[] args) {
-
-        var c = Multicodec.of("slhdsa-sha2-128-priv", Tag.Key, 464000000); // FIXME temporary, there is not private key
-                                                                           // code yet
+        
+        var c = Multicodec.of("slhdsa-sha2-128s-priv", Tag.Key, 0x131e);
         var d = Multibase.BASE_16.decode(
                 "f765d610794caa0dd67472ed92b8ec0b23c1d57c8ed25a9147be7dcd5dca241fb4834a55ff26a17f3947a265bc421093a629d2e863381f8f9f6d64f707cf2e95b");
-        IO.println(Multibase.BASE_64_URL_PAD.encode(c.encode(d)));
+        IO.println(Multibase.BASE_64_URL.encode(c.encode(d)));
     }
 
 }
