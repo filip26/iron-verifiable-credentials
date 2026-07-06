@@ -108,7 +108,7 @@ public class VerifierTest {
             .verifier("P-256", BCECDSAVerifier.getP256Instance()::verify)
             .verifier("P-384", BCECDSAVerifier.getP384Instance()::verify)
             .verifier("ML-DSA-44", BCMLDSAVerifier.get44Instance()::verify)
-            .verifier("SLH-DSA-SHA2-128s", BCSLHDSAVerifier.get128SInstance()::verify)
+            .verifier("SLH-DSA-SHA2-128s", BCSLHDSAVerifier.get128sInstance()::verify)
             .build();
 
     @ParameterizedTest

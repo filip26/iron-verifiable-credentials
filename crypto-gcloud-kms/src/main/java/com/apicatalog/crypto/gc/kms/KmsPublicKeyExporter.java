@@ -21,29 +21,29 @@ public class KmsPublicKeyExporter {
 
         return switch (publicKey.getAlgorithm()) {
         case EC_SIGN_P256_SHA256 -> Multibase.BASE_58_BTC.encode(
-                KeyCodec.P256_PUBLIC_KEY.encode(
+                KeyCodec.P256_PUBLIC.encode(
                         KmsPublicKeyExporter.exportRawECKey(publicKey)));
 
         case EC_SIGN_P384_SHA384 -> Multibase.BASE_58_BTC.encode(
-                KeyCodec.P384_PUBLIC_KEY.encode(
+                KeyCodec.P384_PUBLIC.encode(
                         KmsPublicKeyExporter.exportRawECKey(publicKey)));
 
         case EC_SIGN_ED25519 -> Multibase.BASE_58_BTC.encode(
-                KeyCodec.ED25519_PUBLIC_KEY.encode(
+                KeyCodec.ED25519_PUBLIC.encode(
                         KmsPublicKeyExporter.exportRawEDKey(publicKey)));
 
         // PQC Cases: These return raw bytes directly from the KMS response
         case PQ_SIGN_SLH_DSA_SHA2_128S -> Multibase.BASE_64_URL.encode(
-                KeyCodec.SLHDSA_SHA2_128S_PUBLIC_KEY.encode(
+                KeyCodec.SLHDSA_SHA2_128S_PUBLIC.encode(
                         publicKey.getPublicKey().getData().toByteArray()));
 
         case PQ_SIGN_ML_DSA_44 -> Multibase.BASE_64_URL.encode(
-                KeyCodec.MLDSA_44_PUBLIC_KEY.encode(
+                KeyCodec.MLDSA_44_PUBLIC.encode(
                         publicKey.getPublicKey().getData().toByteArray()));
 //            yield Map.entry("#" + fingerprint(publicKey.getPublicKey().getData().toByteArray()), publicKeyMultibase);
 
         case PQ_SIGN_ML_DSA_87 -> Multibase.BASE_64_URL.encode(
-                KeyCodec.MLDSA_87_PUBLIC_KEY.encode(
+                KeyCodec.MLDSA_87_PUBLIC.encode(
                         publicKey.getPublicKey().getData().toByteArray()));
 
         default ->

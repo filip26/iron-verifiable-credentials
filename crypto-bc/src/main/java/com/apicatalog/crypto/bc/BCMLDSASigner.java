@@ -20,10 +20,10 @@ public final class BCMLDSASigner {
     }
 
     public static BCMLDSASigner new44Instance(byte[] privateKey) {
-        return newInstance(privateKey, null);
+        return new44Instance(privateKey, null);
     }
 
-    public static BCMLDSASigner newInstance(byte[] privateKey, SecureRandom randon) {
+    public static BCMLDSASigner new44Instance(byte[] privateKey, SecureRandom randon) {
         return new BCMLDSASigner(toPrivateKeyParams(privateKey), randon);
     }
 

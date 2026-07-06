@@ -102,7 +102,7 @@ public class IssuerTest {
             break;
         case KeyCodec.SLHDSA_SHA2_128S_PRIVATE_CODE:
             keyAlgorithm = "SLH-DSA-SHA2-128s";
-            signer = BCSLHDSASigner.new128SInstance(privateKeyCodec.decode(privateKey))::sign;
+            signer = BCSLHDSASigner.new128sInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
 
         default:
