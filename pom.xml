@@ -6,12 +6,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.apicatalog</groupId>
-    <artifactId>iron</artifactId>
-    <version>1.0.0-M1</version>
+    <artifactId>iron-trust</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
-    <name>Iron</name>
+    <name>Iron Trust</name>
 
     <inceptionYear>2022</inceptionYear>
 

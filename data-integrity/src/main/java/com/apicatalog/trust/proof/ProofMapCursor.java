@@ -21,7 +21,7 @@ public class ProofMapCursor implements ProofCursor {
     }
 
     final TypeSpecificModel model;
-    final Map<String, Object> data;
+    final Map<String, Object> payload;
     final Collection<Entry<Map<String, Object>, ProofMapReader>> proofs;
 
     Data document;
@@ -33,10 +33,10 @@ public class ProofMapCursor implements ProofCursor {
 
     public ProofMapCursor(
             TypeSpecificModel model,
-            Map<String, Object> data,
+            Map<String, Object> payload,
             Collection<Entry<Map<String, Object>, ProofMapReader>> proofs) {
         this.model = model;
-        this.data = data;
+        this.payload = payload;
         this.proofs = proofs;
         this.iterator = proofs.iterator();
 
@@ -48,10 +48,9 @@ public class ProofMapCursor implements ProofCursor {
     public Data data() {
 
         if (document == null) {
-            var canonical = model.canonize(data);
+
             // TODO add custom document reader
-            document = new MapData(data, model.c14n());
-            document.digestiblePayload(new GenericPayload(canonical));
+            document = new MapData(payload, model.c14n());
         }
 
         return document;
@@ -75,7 +74,7 @@ public class ProofMapCursor implements ProofCursor {
 
             var canonicalProof = model.canonize(unsignedProof);
 
-            currentProof = reader.read(null, proof, canonicalProof, data());
+            currentProof = reader.read(null, proof, canonicalProof, this::data);
         }
 
         return currentProof;
@@ -92,5 +91,21 @@ public class ProofMapCursor implements ProofCursor {
         currentIndex++;
         currentProof = null;
         return true;
+    }
+
+    Data data(Collection<String> previous) {
+        var data = data();
+
+        if (data.digestiblePayload(previous) == null) {
+
+//TODO select proofs for proof chain
+//            var canonizer = model.newCanonizer();
+//            var consumer = canonizer.consumer();
+
+            var canonical = model.canonize(payload);
+            data.digestiblePayload(new GenericPayload(canonical));
+
+        }
+        return data;
     }
 }

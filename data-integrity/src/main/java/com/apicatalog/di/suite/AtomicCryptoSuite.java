@@ -19,6 +19,7 @@ public class AtomicCryptoSuite implements CryptoSuite {
     String c14n; // JCS, RDFC, ..
     String digestName;
 
+    int signatureLength;
     Multibase multibase;
 
     public AtomicCryptoSuite(
@@ -26,12 +27,14 @@ public class AtomicCryptoSuite implements CryptoSuite {
             String algorithm,
             String c14n,
             String digestName,
-            Multibase multibase) {
+            Multibase multibase,
+            int signatureLength) {
         this.id = id;
         this.algorithm = algorithm;
         this.c14n = c14n;
         this.digestName = digestName;
         this.multibase = multibase;
+        this.signatureLength = signatureLength;
     }
 
     public DataIntegrityProof generateProof(
@@ -138,5 +141,10 @@ public class AtomicCryptoSuite implements CryptoSuite {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public boolean isSignature(String value) {
+        return multibase.isEncoded(value) && signatureLength == multibase.decode(value).length;
     }
 }

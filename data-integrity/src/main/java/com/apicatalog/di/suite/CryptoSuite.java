@@ -19,4 +19,6 @@ public interface CryptoSuite {
     byte[] decode(String value);
 
     Signature newSignature(String value, Proof proof, Data data);
+
+    boolean isSignature(String value);
 }

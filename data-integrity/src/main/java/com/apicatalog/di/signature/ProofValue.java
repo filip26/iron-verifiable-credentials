@@ -3,7 +3,6 @@ package com.apicatalog.di.signature;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.SignatureException;
-import java.util.Set;
 
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;

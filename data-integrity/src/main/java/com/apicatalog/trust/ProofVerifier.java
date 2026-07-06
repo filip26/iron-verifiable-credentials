@@ -2,20 +2,29 @@ package com.apicatalog.trust;
 
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.proof.Proof;
 
 public class ProofVerifier {
 
-    final Map<String, Map.Entry<MethodResolver, AsymmetricVerifier>> verifiers;
+    Collection<String> proofTypes;
+    MethodResolver methodResolver;
+    Map<String, AsymmetricVerifier> signatureVerifiers;
 
-    protected ProofVerifier(Map<String, Map.Entry<MethodResolver, AsymmetricVerifier>> verifiers) {
-        this.verifiers = verifiers;
+    private ProofVerifier(Set<String> proofTypes, MethodResolver methodResolver,
+            Map<String, AsymmetricVerifier> signatureVerifiers) {
+        this.proofTypes = proofTypes;
+        this.methodResolver = methodResolver;
+        this.signatureVerifiers = signatureVerifiers;
     }
-    
+
     public static Builder newBuilder() {
 
         return new Builder();
@@ -23,27 +32,32 @@ public class ProofVerifier {
 
     public boolean verify(Proof proof) throws InvalidKeyException, SignatureException {
 
-        assert(proof != null);
-        
+        assert (proof != null);
+
         if (proof.signature() == null) {
             return false;
         }
-        
-        var entry = verifiers.get(proof.type());
-        
-        var publicKey = entry.getKey().resolve(proof);
 
-        return verify(proof, publicKey, entry.getValue());
+        if (!proofTypes.contains(proof.type())) {
+            throw new IllegalArgumentException();
+        }
+
+        var publicKey = methodResolver.resolve(proof);
+
+        return verify(proof, publicKey);
     }
-    
+
     public boolean verify(Proof proof, byte[] publicKey) throws InvalidKeyException, SignatureException {
-        return verify(proof, publicKey, verifiers.get(proof.signature().algorithm()).getValue());
+        return verify(proof, publicKey, signatureVerifiers.get(proof.signature().algorithm()));
     }
-    
-    public static boolean verify(Proof proof, byte[] publicKey, AsymmetricVerifier verifier) throws InvalidKeyException, SignatureException {
 
-        assert(proof != null);
-        
+    public static boolean verify(Proof proof, byte[] publicKey, AsymmetricVerifier verifier)
+            throws InvalidKeyException, SignatureException {
+
+        Objects.requireNonNull(proof);
+        Objects.requireNonNull(publicKey);
+        Objects.requireNonNull(verifier, "Asymmetric verifier for " + proof.signature().algorithm() + " is null.");
+
         if (proof.signature() == null) {
             return false;
         }
@@ -51,25 +65,38 @@ public class ProofVerifier {
         if (proof.signature() instanceof AtomicSignature atomic) {
             return atomic.verify(verifier, publicKey);
         }
-        
+
         throw new SignatureException();
     }
-    
+
     public static class Builder {
-        
-        Map<String, Map.Entry<MethodResolver, AsymmetricVerifier>> verifiers;
-        
+
+        Collection<String> proofTypes;
+        Map<String, AsymmetricVerifier> verifiers;
+        MethodResolver resolver;
+
         private Builder() {
+            this.proofTypes = new HashSet<String>();
             this.verifiers = new HashMap<>();
         }
-        
-        public Builder proof(String proofType, MethodResolver resolver, AsymmetricVerifier verifier) {
-            verifiers.put(proofType, Map.entry(resolver, verifier));
+
+        public Builder proof(String proofType) {
+            proofTypes.add(proofType);
             return this;
         }
-        
+
+        public Builder resolver(MethodResolver resolver) {
+            this.resolver = resolver;
+            return this;
+        }
+
+        public Builder verifier(String publicKeyAlgorithm, AsymmetricVerifier verifier) {
+            verifiers.put(publicKeyAlgorithm, verifier);
+            return this;
+        }
+
         public ProofVerifier build() {
-            return new ProofVerifier(Map.copyOf(verifiers));
+            return new ProofVerifier(Set.copyOf(proofTypes), resolver, Map.copyOf(verifiers));
         }
     }
 }

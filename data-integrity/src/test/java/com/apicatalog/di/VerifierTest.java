@@ -18,7 +18,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.apicatalog.crypto.bc.BcEcdsaVerifier;
 import com.apicatalog.crypto.bc.BcEd25519Verifier;
+import com.apicatalog.crypto.bc.BcMlDsaVerifier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuites;
@@ -50,6 +52,7 @@ public class VerifierTest {
             .proof(CryptoSuites.EDDSA_JCS_2022)
             .proof(CryptoSuites.ECDSA_JCS_2019_P256)
             .proof(CryptoSuites.ECDSA_JCS_2019_P384)
+            .proof(CryptoSuites.MLDSA44_JCS_2024)
             .c14n(Jcs::canonize)
             .processor(ProofMapCursor::new)
             .build();
@@ -58,6 +61,7 @@ public class VerifierTest {
             .proof(CryptoSuites.EDDSA_RDFC_2022)
             .proof(CryptoSuites.ECDSA_RDFC_2019_P256)
             .proof(CryptoSuites.ECDSA_RDFC_2019_P384)
+            .proof(CryptoSuites.MLDSA44_RDFC_2024)
             .proof(Ed25519Signature2020::newReader)
             .tordf(VerifierTest::tordfc)
             .processor(ProofGraphCursor::new)
@@ -70,21 +74,36 @@ public class VerifierTest {
 
     static MethodResolver DID_KEY_RESOLVER = proof -> {
         if (!proof.verificationMethod().startsWith("did:key:")) {
-            return null; // TODO
+            throw new IllegalArgumentException();
         }
 
-        var key = MultibaseDecoder.getInstance().decode(
-                proof.verificationMethod().substring("did:key:".length(), proof.verificationMethod().indexOf('#')));
+        String based = null;
+        var fragmentIndex = proof.verificationMethod().indexOf('#');
+        if (fragmentIndex != -1) {
+            based = proof.verificationMethod().substring("did:key:".length(), fragmentIndex);
+        } else {
+            based = proof.verificationMethod().substring("did:key:".length());
+        }
+
+        var key = MultibaseDecoder.getInstance().decode(based);
 
         var codec = MulticodecDecoder.getInstance().getCodec(key).orElseThrow();
 
+        //TODO check the key codec vs         proof.signature().algorithm()
+        
         return codec.decode(key);
 
     };
 
     static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
-            .proof(DataIntegrityProof.TYPE_NAME, DID_KEY_RESOLVER, BcEd25519Verifier.getInstance()::verify)
-            .proof(Ed25519Signature2020.TYPE_NAME, DID_KEY_RESOLVER, BcEd25519Verifier.getInstance()::verify)
+            .proof(DataIntegrityProof.TYPE_NAME)
+            //TODO allow list concrete DI cryptosuites only OR list models and configurations
+            .proof(Ed25519Signature2020.TYPE_NAME)
+            .resolver(DID_KEY_RESOLVER)
+            .verifier("Ed25519", BcEd25519Verifier.getInstance()::verify)
+            .verifier("P-256", BcEcdsaVerifier.getP256Instance()::verify)
+            .verifier("P-384", BcEcdsaVerifier.getP384Instance()::verify)
+            .verifier("ML-DSA-44", BcMlDsaVerifier.getInstance()::verify)
             .build();
 
     @ParameterizedTest
@@ -126,7 +145,13 @@ public class VerifierTest {
                 }
 
                 var proof = cursor.proof();
-
+//                IO.println(((DataIntegrityProof)proof).cryptosuite().algorithm());
+//                IO.println(new String(cursor.data().digestiblePayload().canonicalPayload()));
+//                IO.println("D: " + HexFormat.of().formatHex(cursor.data().digestiblePayload().digest("SHA-384")));
+                
+//                var x = MessageDigest.getInstance("SHA-384");
+//                x.update(proof.canonicalPayload());
+//IO.println("P: " +  HexFormat.of().formatHex(x.digest()));
                 var verified = PROOF_VERIFIER.verify(proof);
 
                 assertTrue(verified);

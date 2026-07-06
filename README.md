@@ -1,5 +1,5 @@
 
-# Iron Verifiable Credentials Processor &amp; Primitives
+# Iron Verifiable Credentials
 
 [![Java 25 CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.apicatalog%20AND%20a:iron-verifiable-credentials)
@@ -11,6 +11,22 @@
 > [!NOTE]
 > Your feedback is essential to the improvement of this library. Please share any concerns, primary use cases, areas for enhancement, or challenges you have encountered. Your insights help refine and optimize the library to better meet user needs. Thank you for your time and contributions.
 
+
+## 🔐 Supported Data Integrity Cryptosuites
+
+The following cryptographic suites are supported out-of-the-box.
+
+| Name | Algorithm | C14N | ⚛️ Quantum Resistant |
+| :--- | :--- | :--- | :---: |
+| `ecdsa-rdfc-2019` | P-256 | RDFC | |
+| `ecdsa-rdfc-2019` | P-384 | RDFC | |
+| `ecdsa-jcs-2019` | P-256 | JCS | |
+| `ecdsa-jcs-2019` | P-384 | JCS | |
+| `eddsa-rdfc-2022` | Ed25519 | RDFC | |
+| `eddsa-jcs-2022` | Ed25519 | JCS | |
+| `mldsa44-rdfc-2024` | ML-DSA-44 | RDFC | ✅ |
+| `mldsa44-jcs-2024` | ML-DSA-44 | JCS | ✅ |
+| `Ed25519Signature2020` | Ed25519 | RDFC | |
 
 ## 🤝 Contributing
 
