@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.apicatalog.crypto.bc.BCECDSAVerifier;
 import com.apicatalog.crypto.bc.BCEd25519Verifier;
 import com.apicatalog.crypto.bc.BCMLDSAVerifier;
+import com.apicatalog.crypto.bc.BCSLHDSAVerifier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuites;
@@ -53,6 +54,7 @@ public class VerifierTest {
             .proof(CryptoSuites.ECDSA_JCS_2019_P256)
             .proof(CryptoSuites.ECDSA_JCS_2019_P384)
             .proof(CryptoSuites.MLDSA44_JCS_2024)
+            .proof(CryptoSuites.SLHDSA128_JCS_2024)
             .c14n(Jcs::canonize)
             .processor(ProofMapCursor::new)
             .build();
@@ -62,6 +64,7 @@ public class VerifierTest {
             .proof(CryptoSuites.ECDSA_RDFC_2019_P256)
             .proof(CryptoSuites.ECDSA_RDFC_2019_P384)
             .proof(CryptoSuites.MLDSA44_RDFC_2024)
+            .proof(CryptoSuites.SLHDSA128_RDFC_2024)
             .proof(Ed25519Signature2020::newReader)
             .tordf(VerifierTest::tordfc)
             .processor(ProofGraphCursor::new)
@@ -89,21 +92,23 @@ public class VerifierTest {
 
         var codec = MulticodecDecoder.getInstance().getCodec(key).orElseThrow();
 
-        //TODO check the key codec vs         proof.signature().algorithm()
-        
+        // TODO check the key codec vs proof.signature().algorithm()
+
         return codec.decode(key);
 
     };
 
     static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
             .proof(DataIntegrityProof.TYPE_NAME)
-            //TODO allow list concrete DI cryptosuites only OR list models and configurations
+            // TODO allow list concrete DI cryptosuites only OR list models and
+            // configurations
             .proof(Ed25519Signature2020.TYPE_NAME)
             .resolver(DID_KEY_RESOLVER)
             .verifier("Ed25519", BCEd25519Verifier.getInstance()::verify)
             .verifier("P-256", BCECDSAVerifier.getP256Instance()::verify)
             .verifier("P-384", BCECDSAVerifier.getP384Instance()::verify)
             .verifier("ML-DSA-44", BCMLDSAVerifier.getInstance()::verify)
+            .verifier("SLH-DSA-SHA2-128s", BCSLHDSAVerifier.get128SInstance()::verify)
             .build();
 
     @ParameterizedTest
@@ -148,7 +153,7 @@ public class VerifierTest {
 //                IO.println(((DataIntegrityProof)proof).cryptosuite().algorithm());
 //                IO.println(new String(cursor.data().digestiblePayload().canonicalPayload()));
 //                IO.println("D: " + HexFormat.of().formatHex(cursor.data().digestiblePayload().digest("SHA-384")));
-                
+
 //                var x = MessageDigest.getInstance("SHA-384");
 //                x.update(proof.canonicalPayload());
 //IO.println("P: " +  HexFormat.of().formatHex(x.digest()));
