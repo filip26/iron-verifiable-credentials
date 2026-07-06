@@ -10,6 +10,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -27,6 +28,7 @@ import com.apicatalog.jcs.Jcs;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
@@ -143,6 +145,8 @@ public class IssuerTest {
             if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
                 document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
             }
+            
+            IO.println("P: " + Multibase.BASE_58_BTC.encode(proof.signature().toByteArray()));
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 

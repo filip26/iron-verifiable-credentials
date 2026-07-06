@@ -741,7 +741,7 @@ public final class DataIntegrityProof implements Proof {
                 Collection<String> contexts,
                 Map<String, Object> proof,
                 byte[] proofPayload,
-                Data data) {
+                Function<Collection<String>, Data> data) {
 
             final var di = new DataIntegrityProof(cryptosuite);
             di.canonicalPayload = proofPayload;
@@ -806,7 +806,7 @@ public final class DataIntegrityProof implements Proof {
                 di.signature = value(proofValue, value -> cryptosuite.newSignature(
                         value,
                         di,
-                        data));
+                        data.apply(di.previousProof)));
             }
             return di;
         }

@@ -9,8 +9,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -134,7 +136,12 @@ public class VerifierTest {
                 }
 
                 var proof = cursor.proof();
-
+                IO.println(new String(cursor.data().digestiblePayload().canonicalPayload()));
+                IO.println("D: " + HexFormat.of().formatHex(cursor.data().digestiblePayload().digest("SHA-384")));
+                
+                var x = MessageDigest.getInstance("SHA-384");
+                x.update(proof.canonicalPayload());
+IO.println("P: " +  HexFormat.of().formatHex(x.digest()));
                 var verified = PROOF_VERIFIER.verify(proof);
 
                 assertTrue(verified);

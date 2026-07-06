@@ -2,6 +2,7 @@ package com.apicatalog.trust.proof;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.apicatalog.trust.data.Data;
 
@@ -14,7 +15,7 @@ public interface ProofMapReader {
             Collection<String> contexts,
             Map<String, Object> proof,
             byte[] proofPayload,
-            Data data);
+            Function<Collection<String>, Data> data);
 
     String signatureProperty();
 

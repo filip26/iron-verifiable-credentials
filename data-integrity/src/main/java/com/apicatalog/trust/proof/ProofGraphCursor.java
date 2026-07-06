@@ -29,7 +29,6 @@ public class ProofGraphCursor implements ProofCursor {
     Iterator<Entry<String, Collection<String[]>>> iterator;
 
     Proof currentProof;
-    int currentIndex;
     Map.Entry<String, Collection<String[]>> currentEntry;
 
     @FunctionalInterface
@@ -50,7 +49,6 @@ public class ProofGraphCursor implements ProofCursor {
 
         this.iterator = graphs.entrySet().stream().filter(entry -> !"@default".equals(entry.getKey())).iterator();
         this.currentProof = null;
-        this.currentIndex = -1;
         this.currentEntry = null;
     }
 
@@ -61,17 +59,6 @@ public class ProofGraphCursor implements ProofCursor {
 
             var data = graphs.get("@default");
 
-//            var canonizer = model.newCanonizer();
-//            var consumer = canonizer.consumer();
-//            for (var quad : data) {
-//                if (!"https://w3id.org/security#proof".equals(quad[1])) {
-//                    consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], null);
-//                }
-//            }
-//
-//            var canonical = canonizer.canonize();
-//            IO.println("DOCUMENT:");
-//IO.println(new String(canonical));
             payload = new GraphData(data, model.c14n());
         }
 
@@ -90,7 +77,6 @@ public class ProofGraphCursor implements ProofCursor {
         }
 
         currentEntry = iterator.next();
-        currentIndex++;
         currentProof = null;
         return true;
     }
@@ -116,10 +102,10 @@ public class ProofGraphCursor implements ProofCursor {
             var canonizer = model.newCanonizer();
             var consumer = canonizer.consumer();
 
-            Set<String> selected = Set.of();
+            Set<String> selectedGraph = Set.of();
 
             if (previous != null && !previous.isEmpty()) {
-                selected = new HashSet<String>();
+                selectedGraph = new HashSet<String>();
 
                 // select proofs
                 for (var graph : graphs.entrySet()) {
@@ -127,7 +113,7 @@ public class ProofGraphCursor implements ProofCursor {
                         continue;
                     }
                     if (previous.contains(graph.getValue().iterator().next()[0])) {
-                        selected.add(graph.getKey());
+                        selectedGraph.add(graph.getKey());
                         for (var quad : graph.getValue()) {
                             consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], quad[6]);
                         }
@@ -136,7 +122,8 @@ public class ProofGraphCursor implements ProofCursor {
             }
 
             for (var quad : graphs.get("@default")) {
-                if (selected.contains(quad[2]) || !"https://w3id.org/security#proof".equals(quad[1])) {
+                if (!"https://w3id.org/security#proof".equals(quad[1])
+                        || selectedGraph.contains(quad[2])) {
                     consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], null);
                 }
             }

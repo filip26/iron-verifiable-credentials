@@ -88,6 +88,8 @@ public final class CryptoSuites {
             case "P-384" -> ECDSA_JCS_2019_P384;
             default -> throw new IllegalArgumentException();
             };
+        case "mldsa44-rdfc-2024" -> MLDSA44_RDFC_2024;
+        case "mldsa44-jcs-2024" -> MLDSA44_JCS_2024;
 
         default -> throw new IllegalArgumentException();
         };
