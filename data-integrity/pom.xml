@@ -5,11 +5,13 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-data-integrity</artifactId>
-    <version>1.0.0-M2</version>
+    <version>1.0.0-M1</version>
 
     <name>Iron Data Integrity</name>
     <description>
-        Standards-compliant, modular W3C Verifiable Credentials Data Integrity.
+        Standards-compliant, modular library for W3C Verifiable Credentials Data
+        Integrity. Built-in support for Ed25519, P-256, P-384, and ML-DSA-44
+        cryptographical suites, alongside RDFC and JCS canonicalization.
     </description>
 
     <url>https://github.com/filip26/iron-did-cel</url>
