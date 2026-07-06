@@ -90,7 +90,7 @@ public class VerifierTest {
 
         var key = MultibaseDecoder.getInstance().decode(based);
 
-        var codec = MulticodecDecoder.getInstance().getCodec(key).orElseThrow();
+        var codec = MulticodecDecoder.newInstance().getCodec(key).orElseThrow();
 
         // TODO check the key codec vs proof.signature().algorithm()
 

@@ -57,7 +57,7 @@
 
         <tree-io.version>1.0.0-M2</tree-io.version>
         <multibase.version>4.1.0</multibase.version>
-        <multicodec.version>3.1.0</multicodec.version>
+        <multicodec.version>4.0.0</multicodec.version>
 
         <!-- Tests -->
         <jcs.version>3.0.0-M4</jcs.version>

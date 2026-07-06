@@ -49,17 +49,22 @@ public class IssuerTest {
 
     static final MultibaseDecoder MULTIBASE = MultibaseDecoder.getInstance();
 
-    static final MulticodecDecoder MULTICODEC = MulticodecDecoder.getInstance(
-            KeyCodec.P256_PUBLIC_KEY,
-            KeyCodec.P256_PRIVATE_KEY,
-            KeyCodec.P384_PUBLIC_KEY,
-            KeyCodec.P384_PRIVATE_KEY,
-            KeyCodec.ED25519_PUBLIC_KEY,
-            KeyCodec.ED25519_PRIVATE_KEY,
-            KeyCodec.MLDSA_44_PUBLIC_KEY,
-            KeyCodec.MLDSA_44_PRIVATE_KEY,
-            //TODO remove when multicodec is updated
-            Multicodec.of("slhdsa-sha2-128s-priv", Tag.Key, 0x131e),
+    static record XY(int b) {
+    };
+
+    static final int XXXXXX = 10;
+
+    static final MulticodecDecoder MULTICODEC = MulticodecDecoder.newInstance(
+            KeyCodec.P256_PUBLIC,
+            KeyCodec.P256_PRIVATE,
+            KeyCodec.P384_PUBLIC,
+            KeyCodec.P384_PRIVATE,
+            KeyCodec.ED25519_PUBLIC,
+            KeyCodec.ED25519_PRIVATE,
+            KeyCodec.MLDSA_44_PUBLIC,
+            KeyCodec.MLDSA_44_PRIVATE,
+            KeyCodec.SLHDSA_SHA2_128S_PRIVATE,
+            // TODO remove when multicodec is updated
             Multicodec.of("falcon-512-pub", Tag.Key, 4652));
 
     @ParameterizedTest
@@ -76,26 +81,26 @@ public class IssuerTest {
         final String keyAlgorithm;
         final AsymmetricSigner signer;
 
-        switch (privateKeyCodec.name()) {
-        case "ed25519-priv":
+        switch (privateKeyCodec.code()) {
+        case KeyCodec.ED25519_PRIVATE_CODE:
             keyAlgorithm = "Ed25519";
             signer = BCEd25519Signer.newInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
         // Use a secure random number generator to create non-deterministic signatures
         // for the algorithms below in production environments.
-        case "p256-priv":
+        case KeyCodec.P256_PRIVATE_CODE:
             keyAlgorithm = "P-256";
             signer = BCECDSASigner.newP256Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
-        case "p384-priv":
+        case KeyCodec.P384_PRIVATE_CODE:
             keyAlgorithm = "P-384";
             signer = BCECDSASigner.newP384Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
-        case "mldsa-44-priv":
+        case KeyCodec.MLDSA_44_PRIVATE_CODE:
             keyAlgorithm = "ML-DSA-44";
             signer = BCMLDSASigner.new44Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
-        case "slhdsa-sha2-128s-priv":
+        case KeyCodec.SLHDSA_SHA2_128S_PRIVATE_CODE:
             keyAlgorithm = "SLH-DSA-SHA2-128s";
             signer = BCSLHDSASigner.new128SInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
@@ -103,9 +108,9 @@ public class IssuerTest {
         default:
             throw new IllegalArgumentException(
                     """
-                    Unsupported secret key algorithm %s.
+                    Unsupported secret key algorithm %s (%d).
                     """
-                            .formatted(privateKeyCodec.name()));
+                            .formatted(privateKeyCodec.name(), privateKeyCodec.code()));
         }
         ;
 
@@ -255,8 +260,8 @@ public class IssuerTest {
     }
 
     public static void main(String[] args) {
-        
-        var c = Multicodec.of("slhdsa-sha2-128s-priv", Tag.Key, 0x131e);
+
+        var c = KeyCodec.SLHDSA_SHA2_128S_PRIVATE;
         var d = Multibase.BASE_16.decode(
                 "f765d610794caa0dd67472ed92b8ec0b23c1d57c8ed25a9147be7dcd5dca241fb4834a55ff26a17f3947a265bc421093a629d2e863381f8f9f6d64f707cf2e95b");
         IO.println(Multibase.BASE_64_URL.encode(c.encode(d)));
