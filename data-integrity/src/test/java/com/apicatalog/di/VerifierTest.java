@@ -9,10 +9,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HexFormat;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -22,6 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.apicatalog.crypto.bc.BcEcdsaVerifier;
 import com.apicatalog.crypto.bc.BcEd25519Verifier;
+import com.apicatalog.crypto.bc.BcMlDsaVerifier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuites;
@@ -53,6 +52,7 @@ public class VerifierTest {
             .proof(CryptoSuites.EDDSA_JCS_2022)
             .proof(CryptoSuites.ECDSA_JCS_2019_P256)
             .proof(CryptoSuites.ECDSA_JCS_2019_P384)
+            .proof(CryptoSuites.MLDSA44_JCS_2024)
             .c14n(Jcs::canonize)
             .processor(ProofMapCursor::new)
             .build();
@@ -61,6 +61,7 @@ public class VerifierTest {
             .proof(CryptoSuites.EDDSA_RDFC_2022)
             .proof(CryptoSuites.ECDSA_RDFC_2019_P256)
             .proof(CryptoSuites.ECDSA_RDFC_2019_P384)
+            .proof(CryptoSuites.MLDSA44_RDFC_2024)
             .proof(Ed25519Signature2020::newReader)
             .tordf(VerifierTest::tordfc)
             .processor(ProofGraphCursor::new)
@@ -76,8 +77,15 @@ public class VerifierTest {
             throw new IllegalArgumentException();
         }
 
-        var key = MultibaseDecoder.getInstance().decode(
-                proof.verificationMethod().substring("did:key:".length(), proof.verificationMethod().indexOf('#')));
+        String based = null;
+        var fragmentIndex = proof.verificationMethod().indexOf('#');
+        if (fragmentIndex != -1) {
+            based = proof.verificationMethod().substring("did:key:".length(), fragmentIndex);
+        } else {
+            based = proof.verificationMethod().substring("did:key:".length());
+        }
+
+        var key = MultibaseDecoder.getInstance().decode(based);
 
         var codec = MulticodecDecoder.getInstance().getCodec(key).orElseThrow();
 
@@ -95,6 +103,7 @@ public class VerifierTest {
             .verifier("Ed25519", BcEd25519Verifier.getInstance()::verify)
             .verifier("P-256", BcEcdsaVerifier.getP256Instance()::verify)
             .verifier("P-384", BcEcdsaVerifier.getP384Instance()::verify)
+            .verifier("ML-DSA-44", BcMlDsaVerifier.getInstance()::verify)
             .build();
 
     @ParameterizedTest

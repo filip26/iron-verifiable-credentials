@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.apicatalog.security.AsymmetricVerifier;
@@ -53,7 +54,9 @@ public class ProofVerifier {
     public static boolean verify(Proof proof, byte[] publicKey, AsymmetricVerifier verifier)
             throws InvalidKeyException, SignatureException {
 
-        assert (proof != null);
+        Objects.requireNonNull(proof);
+        Objects.requireNonNull(publicKey);
+        Objects.requireNonNull(verifier, "Asymmetric verifier for " + proof.signature().algorithm() + " is null.");
 
         if (proof.signature() == null) {
             return false;
