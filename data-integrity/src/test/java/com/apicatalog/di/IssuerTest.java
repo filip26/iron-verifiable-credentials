@@ -146,7 +146,7 @@ public class IssuerTest {
                 document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
             }
             
-            IO.println("P: " + Multibase.BASE_58_BTC.encode(proof.signature().toByteArray()));
+//            IO.println("P: " + Multibase.BASE_58_BTC.encode(proof.signature().toByteArray()));
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 

@@ -732,8 +732,9 @@ public final class DataIntegrityProof implements Proof {
 
         @Override
         public boolean isAccepted(Map<String, Object> proof) {
-            return TYPE_NAME.equals(proof.get("type"))
-                    && cryptosuite.id().equals(proof.get("cryptosuite"));
+            return TYPE_NAME.equals(proof.get(KEY_TYPE))
+                    && cryptosuite.id().equals(proof.get(KEY_CRYPTOSUITE))
+                    && cryptosuite.isSignature((String) proof.get(KEY_PROOF_VALUE));
         }
 
         @Override
