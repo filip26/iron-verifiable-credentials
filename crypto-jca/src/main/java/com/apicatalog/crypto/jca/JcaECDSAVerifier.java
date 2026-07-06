@@ -16,15 +16,15 @@ import java.security.spec.EllipticCurve;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 
-public final class JcaEcdsaVerifier {
+public final class JcaECDSAVerifier {
 
-    private static final JcaEcdsaVerifier P256_INSTANCE = new JcaEcdsaVerifier(
+    private static final JcaECDSAVerifier P256_INSTANCE = new JcaECDSAVerifier(
             "SHA256withECDSA",
-            JcaEcdsaVerifier::toP256PublicKey);
+            JcaECDSAVerifier::toP256PublicKey);
 
-    private static final JcaEcdsaVerifier P384_INSTANCE = new JcaEcdsaVerifier(
+    private static final JcaECDSAVerifier P384_INSTANCE = new JcaECDSAVerifier(
             "SHA384withECDSA",
-            JcaEcdsaVerifier::toP384PublicKey);
+            JcaECDSAVerifier::toP384PublicKey);
 
     @FunctionalInterface
     public interface PublicKeyAdapter {
@@ -34,16 +34,16 @@ public final class JcaEcdsaVerifier {
     private String algorithm;
     private PublicKeyAdapter keyAdapter;
 
-    private JcaEcdsaVerifier(String algorithm, PublicKeyAdapter keyAdapter) {
+    private JcaECDSAVerifier(String algorithm, PublicKeyAdapter keyAdapter) {
         this.algorithm = algorithm;
         this.keyAdapter = keyAdapter;
     }
 
-    public static JcaEcdsaVerifier getP256Instance() {
+    public static JcaECDSAVerifier getP256Instance() {
         return P256_INSTANCE;
     }
 
-    public static JcaEcdsaVerifier getP384Instance() {
+    public static JcaECDSAVerifier getP384Instance() {
         return P384_INSTANCE;
     }
 

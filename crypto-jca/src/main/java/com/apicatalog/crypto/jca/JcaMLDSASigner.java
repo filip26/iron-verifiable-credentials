@@ -12,30 +12,30 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
-public final class JcaMlDsaSigner {
+public final class JcaMLDSASigner {
     
     private static final String ALGORITHM = "ML-DSA-44";
 
     private final PrivateKey privateKey;
     private SecureRandom random;
 
-    public JcaMlDsaSigner(
+    public JcaMLDSASigner(
             final PrivateKey privateKey,
             final SecureRandom random) {
         this.privateKey = privateKey;
         this.random = random;
     }
 
-    public static JcaMlDsaSigner getInstance(final byte[] privateKey)
+    public static JcaMLDSASigner new44Instance(final byte[] privateKey)
             throws InvalidKeySpecException {
-        return getInstance(privateKey, null);
+        return new44Instance(privateKey, null);
     }
 
-    public static JcaMlDsaSigner getInstance(
+    public static JcaMLDSASigner new44Instance(
             final byte[] privateKey,
             final SecureRandom random) throws InvalidKeySpecException {
 
-        return new JcaMlDsaSigner(
+        return new JcaMLDSASigner(
                 toPrivateKey(privateKey),
                 random);
     }
@@ -67,7 +67,7 @@ public final class JcaMlDsaSigner {
         }
     }
 
-    public JcaMlDsaSigner random(final SecureRandom random) {
+    public JcaMLDSASigner random(final SecureRandom random) {
         this.random = random;
         return this;
     }

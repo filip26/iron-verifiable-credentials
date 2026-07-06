@@ -14,29 +14,29 @@ import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 
-public final class JcaEcdsaSigner {
+public final class JcaECDSASigner {
 
     private String algorithm;
     private PrivateKey privateKey;
 
-    public JcaEcdsaSigner(String algorithm, PrivateKey privateKey) {
+    public JcaECDSASigner(String algorithm, PrivateKey privateKey) {
         this.algorithm = algorithm;
         this.privateKey = privateKey;
     }
 
-    public static JcaEcdsaSigner getP256Instance(byte[] privateKey)
+    public static JcaECDSASigner newP256Instance(byte[] privateKey)
             throws InvalidKeySpecException {
-        return new JcaEcdsaSigner(
+        return new JcaECDSASigner(
                 "SHA256withECDSA",
-                JcaEcdsaSigner.toP256PrivateKey(privateKey));
+                JcaECDSASigner.toP256PrivateKey(privateKey));
 
     }
 
-    public static JcaEcdsaSigner getP384Instance(byte[] privateKey)
+    public static JcaECDSASigner newP384Instance(byte[] privateKey)
             throws InvalidKeySpecException {
-        return new JcaEcdsaSigner(
+        return new JcaECDSASigner(
                 "SHA384withECDSA",
-                JcaEcdsaSigner.toP384PrivateKey(privateKey));
+                JcaECDSASigner.toP384PrivateKey(privateKey));
     }
 
     public byte[] sign(byte[] data) throws SignatureException {

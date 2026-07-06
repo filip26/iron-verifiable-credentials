@@ -9,13 +9,13 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
-public final class JcaMlDsaVerifier {
+public final class JcaMLDSAVerifier {
 
     private static final String ALGORITHM = "ML-DSA-44";
 
-    private static JcaMlDsaVerifier INSTANCE = new JcaMlDsaVerifier();
+    private static JcaMLDSAVerifier INSTANCE = new JcaMLDSAVerifier();
 
-    public static JcaMlDsaVerifier getInstance() {
+    public static JcaMLDSAVerifier get44Instance() {
         return INSTANCE;
     }
 

@@ -81,6 +81,8 @@ public class IssuerTest {
             keyAlgorithm = "Ed25519";
             signer = BCEd25519Signer.newInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
+        // Use a secure random number generator to create non-deterministic signatures
+        // for the algorithms below in production environments.
         case "p256-priv":
             keyAlgorithm = "P-256";
             signer = BCECDSASigner.newP256Instance(privateKeyCodec.decode(privateKey))::sign;

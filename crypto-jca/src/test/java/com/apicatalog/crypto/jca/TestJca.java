@@ -38,10 +38,10 @@ class TestJca {
             KeyCodec.MLDSA_44_PRIVATE_KEY);
 
     static final Map<String, AsymmetricVerifier> VERIFIERS = Map.of(
-            "P-256", JcaEcdsaVerifier.getP256Instance()::verify,
-            "P-384", JcaEcdsaVerifier.getP384Instance()::verify,
+            "P-256", JcaECDSAVerifier.getP256Instance()::verify,
+            "P-384", JcaECDSAVerifier.getP384Instance()::verify,
             "Ed25519", JcaEd25519Verifier.getInstance()::verify,
-            "ML-DSA-44", JcaMlDsaVerifier.getInstance()::verify);
+            "ML-DSA-44", JcaMLDSAVerifier.get44Instance()::verify);
 
     @ParameterizedTest
     @MethodSource("vectors")
@@ -108,7 +108,7 @@ class TestJca {
 
     static AsymmetricSigner getDeterministicSigner(String algo, byte[] privateKey) throws Throwable {
         return switch (algo) {
-        case "Ed25519" -> JcaEd25519Signer.getInstance(privateKey)::sign;
+        case "Ed25519" -> JcaEd25519Signer.newInstance(privateKey)::sign;
         default -> throw new IllegalArgumentException("Unsupported algorithm " + algo);
         };
     }
@@ -118,9 +118,9 @@ class TestJca {
         var random = SecureRandom.getInstanceStrong();
 
         return switch (algo) {
-        case "P-256" -> JcaEcdsaSigner.getP256Instance(privateKey)::sign;
-        case "P-384" -> JcaEcdsaSigner.getP384Instance(privateKey)::sign;
-        case "ML-DSA-44" -> JcaMlDsaSigner.getInstance(privateKey, random)::sign;
+        case "P-256" -> JcaECDSASigner.newP256Instance(privateKey)::sign;
+        case "P-384" -> JcaECDSASigner.newP384Instance(privateKey)::sign;
+        case "ML-DSA-44" -> JcaMLDSASigner.new44Instance(privateKey, random)::sign;
         default -> throw new IllegalArgumentException("Unsupported algorithm " + algo);
         };
     }
