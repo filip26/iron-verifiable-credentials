@@ -7,11 +7,11 @@ import org.bouncycastle.crypto.params.MLDSAParameters;
 import org.bouncycastle.crypto.params.MLDSAPublicKeyParameters;
 import org.bouncycastle.crypto.signers.MLDSASigner;
 
-public final class BcMlDsaVerifier {
+public final class BCMLDSAVerifier {
 
-    private static final BcMlDsaVerifier INSTANCE = new BcMlDsaVerifier();
+    private static final BCMLDSAVerifier INSTANCE = new BCMLDSAVerifier();
 
-    public static BcMlDsaVerifier getInstance() {
+    public static BCMLDSAVerifier getInstance() {
         return INSTANCE;
     }
 

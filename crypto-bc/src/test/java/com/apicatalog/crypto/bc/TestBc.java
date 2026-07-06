@@ -41,11 +41,11 @@ class TestBc {
             Multicodec.of("falcon-512-pub", Tag.Key, 4652));
 
     static final Map<String, AsymmetricVerifier> VERIFIERS = Map.of(
-            "P-256", BcEcdsaVerifier.getP256Instance()::verify,
-            "P-384", BcEcdsaVerifier.getP384Instance()::verify,
-            "Ed25519", BcEd25519Verifier.getInstance()::verify,
-            "ML-DSA-44", BcMlDsaVerifier.getInstance()::verify,
-            "FALCON-512", BcFalconVerifier.get512Instance()::verify);
+            "P-256", BCECDSAVerifier.getP256Instance()::verify,
+            "P-384", BCECDSAVerifier.getP384Instance()::verify,
+            "Ed25519", BCEd25519Verifier.getInstance()::verify,
+            "ML-DSA-44", BCMLDSAVerifier.getInstance()::verify,
+            "FALCON-512", BCFalconVerifier.get512Instance()::verify);
 
     @ParameterizedTest
     @MethodSource("vectors")
@@ -121,9 +121,9 @@ class TestBc {
     static AsymmetricSigner getDetermisticSigner(String algo, byte[] privateKey)
             throws Throwable {
         return switch (algo) {
-        case "P-256" -> BcEcdsaSigner.getP256Instance(privateKey)::sign;
-        case "P-384" -> BcEcdsaSigner.getP384Instance(privateKey)::sign;
-        case "Ed25519" -> BcEd25519Signer.getInstance(privateKey)::sign;
+        case "P-256" -> BCECDSASigner.newP256Instance(privateKey)::sign;
+        case "P-384" -> BCECDSASigner.newP384Instance(privateKey)::sign;
+        case "Ed25519" -> BCEd25519Signer.newInstance(privateKey)::sign;
         default -> throw new IllegalArgumentException("Unsupported algorithm " + algo);
         };
     }
@@ -134,9 +134,9 @@ class TestBc {
         var random = SecureRandom.getInstanceStrong();
 
         return switch (algo) {
-        case "P-256" -> BcEcdsaSigner.getP256Instance(privateKey, random)::sign;
-        case "P-384" -> BcEcdsaSigner.getP384Instance(privateKey, random)::sign;
-        case "ML-DSA-44" -> BcMlDsaSigner.getInstance(privateKey, random)::sign;
+        case "P-256" -> BCECDSASigner.newP256Instance(privateKey, random)::sign;
+        case "P-384" -> BCECDSASigner.newP384Instance(privateKey, random)::sign;
+        case "ML-DSA-44" -> BCMLDSASigner.newInstance(privateKey, random)::sign;
         default -> throw new IllegalArgumentException("Unsupported algorithm " + algo);
         };
     }

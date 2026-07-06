@@ -68,6 +68,21 @@ public final class CryptoSuites {
             Multibase.BASE_64_URL,
             2420);
 
+    public static AtomicCryptoSuite SLHDSA128_RDFC_2024 = new AtomicCryptoSuite(
+            "slhdsa128-rdfc-2024",
+            "SLH-DSA-SHA2-128s",
+            "RDFC",
+            "SHA-256",
+            Multibase.BASE_64_URL,
+            7856);
+
+    public static AtomicCryptoSuite SLHDSA128_JCS_2024 = new AtomicCryptoSuite(
+            "slhdsa128-jcs-2024",
+            "SLH-DSA-SHA2-128s",
+            "JCS",
+            "SHA-256",
+            Multibase.BASE_64_URL,
+            7856);
 
     public static AtomicCryptoSuite getInstance(String id, String algorithm) {
 
@@ -88,8 +103,12 @@ public final class CryptoSuites {
             case "P-384" -> ECDSA_JCS_2019_P384;
             default -> throw new IllegalArgumentException();
             };
+
         case "mldsa44-rdfc-2024" -> MLDSA44_RDFC_2024;
         case "mldsa44-jcs-2024" -> MLDSA44_JCS_2024;
+
+        case "slhdsa128-rdfc-2024" -> SLHDSA128_RDFC_2024;
+        case "slhdsa128-jcs-2024" -> SLHDSA128_JCS_2024;
 
         default -> throw new IllegalArgumentException();
         };

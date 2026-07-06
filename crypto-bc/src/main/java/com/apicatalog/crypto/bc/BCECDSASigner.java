@@ -17,14 +17,14 @@ import org.bouncycastle.crypto.signers.RandomDSAKCalculator;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.util.BigIntegers;
 
-public final class BcEcdsaSigner {
+public final class BCECDSASigner {
 
     private final ECPrivateKeyParameters privateKeyParams;
     private final Supplier<ExtendedDigest> digestFactory;
 
     private SecureRandom random;
 
-    public BcEcdsaSigner(
+    public BCECDSASigner(
             ECPrivateKeyParameters privateKeyParams,
             Supplier<ExtendedDigest> digestFactory,
             SecureRandom random) {
@@ -33,24 +33,24 @@ public final class BcEcdsaSigner {
         this.random = random;
     }
 
-    public static BcEcdsaSigner getP256Instance(byte[] privateKey) throws InvalidKeySpecException {
-        return getP256Instance(privateKey, null);
+    public static BCECDSASigner newP256Instance(byte[] privateKey) throws InvalidKeySpecException {
+        return newP256Instance(privateKey, null);
     }
 
-    public static BcEcdsaSigner getP256Instance(byte[] privateKey, SecureRandom random) throws InvalidKeySpecException {
-        return new BcEcdsaSigner(
-                BcEcdsaSigner.getPrivateKeyFromBytes("secp256r1", privateKey),
+    public static BCECDSASigner newP256Instance(byte[] privateKey, SecureRandom random) throws InvalidKeySpecException {
+        return new BCECDSASigner(
+                BCECDSASigner.getPrivateKeyFromBytes("secp256r1", privateKey),
                 SHA256Digest::new,
                 random);
     }
 
-    public static BcEcdsaSigner getP384Instance(byte[] privateKey) throws InvalidKeySpecException {
-        return getP384Instance(privateKey, null);
+    public static BCECDSASigner newP384Instance(byte[] privateKey) throws InvalidKeySpecException {
+        return newP384Instance(privateKey, null);
     }
 
-    public static BcEcdsaSigner getP384Instance(byte[] privateKey, SecureRandom random) throws InvalidKeySpecException {
-        return new BcEcdsaSigner(
-                BcEcdsaSigner.getPrivateKeyFromBytes("secp384r1", privateKey),
+    public static BCECDSASigner newP384Instance(byte[] privateKey, SecureRandom random) throws InvalidKeySpecException {
+        return new BCECDSASigner(
+                BCECDSASigner.getPrivateKeyFromBytes("secp384r1", privateKey),
                 SHA384Digest::new,
                 random);
     }
@@ -76,7 +76,7 @@ public final class BcEcdsaSigner {
         return toByteArray(signer.generateSignature(hash));
     }
 
-    public BcEcdsaSigner random(SecureRandom random) {
+    public BCECDSASigner random(SecureRandom random) {
         this.random = random;
         return this;
     }

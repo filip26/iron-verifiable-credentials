@@ -4,16 +4,16 @@ import org.bouncycastle.pqc.crypto.falcon.FalconParameters;
 import org.bouncycastle.pqc.crypto.falcon.FalconPublicKeyParameters;
 import org.bouncycastle.pqc.crypto.falcon.FalconSigner;
 
-class BcFalconVerifier {
-    private static final BcFalconVerifier FALCON_512_VERIFIER = new BcFalconVerifier(FalconParameters.falcon_512);
+class BCFalconVerifier {
+    private static final BCFalconVerifier FALCON_512_VERIFIER = new BCFalconVerifier(FalconParameters.falcon_512);
 
     private final FalconParameters parameters;
 
-    public BcFalconVerifier(FalconParameters parameters) {
+    public BCFalconVerifier(FalconParameters parameters) {
         this.parameters = parameters;
     }
 
-    public static BcFalconVerifier get512Instance() {
+    public static BCFalconVerifier get512Instance() {
         return FALCON_512_VERIFIER;
     }
 

@@ -26,6 +26,8 @@ The following cryptographic suites are supported out-of-the-box.
 | `eddsa-jcs-2022` | Ed25519 | JCS | |
 | `mldsa44-rdfc-2024` | ML-DSA-44 | RDFC | ✅ |
 | `mldsa44-jcs-2024` | ML-DSA-44 | JCS | ✅ |
+| `slhdsa128-rdfc-2024` | SLH-DSA-SHA2-128s | RDFC  | ✅ |
+| `slhdsa128-jcs-2024` | SLH-DSA-SHA2-128s | JCS  | ✅ |
 | `Ed25519Signature2020` | Ed25519 | RDFC | |
 
 ## 🤝 Contributing
