@@ -18,9 +18,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.apicatalog.crypto.bc.BcEcdsaSigner;
-import com.apicatalog.crypto.bc.BcEd25519Signer;
-import com.apicatalog.crypto.bc.BcMlDsaSigner;
+import com.apicatalog.crypto.bc.BCECDSASigner;
+import com.apicatalog.crypto.bc.BCEd25519Signer;
+import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuites;
@@ -76,19 +76,19 @@ public class IssuerTest {
         switch (privateKeyCodec.name()) {
         case "ed25519-priv":
             keyAlgorithm = "Ed25519";
-            signer = BcEd25519Signer.getInstance(privateKeyCodec.decode(privateKey))::sign;
+            signer = BCEd25519Signer.newInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case "p256-priv":
             keyAlgorithm = "P-256";
-            signer = BcEcdsaSigner.getP256Instance(privateKeyCodec.decode(privateKey))::sign;
+            signer = BCECDSASigner.newP256Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case "p384-priv":
             keyAlgorithm = "P-384";
-            signer = BcEcdsaSigner.getP384Instance(privateKeyCodec.decode(privateKey))::sign;
+            signer = BCECDSASigner.newP384Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case "mldsa-44-priv":
             keyAlgorithm = "ML-DSA-44";
-            signer = BcMlDsaSigner.getInstance(privateKeyCodec.decode(privateKey))::sign;
+            signer = BCMLDSASigner.newInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
         default:
             throw new IllegalArgumentException(

@@ -13,17 +13,17 @@ import java.security.spec.NamedParameterSpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public final class BcEd25519Signer {
+public final class BCEd25519Signer {
 
     private final PrivateKey privateKey;
 
-    public BcEd25519Signer(PrivateKey privateKey) {
+    public BCEd25519Signer(PrivateKey privateKey) {
         this.privateKey = privateKey;
     }
 
-    public static BcEd25519Signer getInstance(byte[] privateKey) {
+    public static BCEd25519Signer newInstance(byte[] privateKey) {
         try {
-            return new BcEd25519Signer(getPrivateKey(privateKey));
+            return new BCEd25519Signer(getPrivateKey(privateKey));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidParameterSpecException e) {
             throw new IllegalStateException(e);
         }

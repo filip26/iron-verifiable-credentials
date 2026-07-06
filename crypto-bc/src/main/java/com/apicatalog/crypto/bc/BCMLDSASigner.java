@@ -9,22 +9,22 @@ import org.bouncycastle.crypto.params.MLDSAPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.signers.MLDSASigner;
 
-public final class BcMlDsaSigner {
+public final class BCMLDSASigner {
 
     private final MLDSAPrivateKeyParameters privateKeyParams;
     private SecureRandom random;
 
-    public BcMlDsaSigner(MLDSAPrivateKeyParameters privateKeyParams, SecureRandom random) {
+    public BCMLDSASigner(MLDSAPrivateKeyParameters privateKeyParams, SecureRandom random) {
         this.privateKeyParams = privateKeyParams;
         this.random = random;
     }
 
-    public static BcMlDsaSigner getInstance(byte[] privateKey) {
-        return getInstance(privateKey, null);
+    public static BCMLDSASigner newInstance(byte[] privateKey) {
+        return newInstance(privateKey, null);
     }
 
-    public static BcMlDsaSigner getInstance(byte[] privateKey, SecureRandom randon) {
-        return new BcMlDsaSigner(toPrivateKeyParams(privateKey), randon);
+    public static BCMLDSASigner newInstance(byte[] privateKey, SecureRandom randon) {
+        return new BCMLDSASigner(toPrivateKeyParams(privateKey), randon);
     }
 
     public byte[] sign(final byte[] data) throws SignatureException {
@@ -48,7 +48,7 @@ public final class BcMlDsaSigner {
         }
     }
     
-    public BcMlDsaSigner random(SecureRandom random) {
+    public BCMLDSASigner random(SecureRandom random) {
         this.random = random;
         return this;
     }

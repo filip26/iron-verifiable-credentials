@@ -15,11 +15,11 @@ import java.security.spec.NamedParameterSpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public final class BcEd25519Verifier {
+public final class BCEd25519Verifier {
 
-    private static final BcEd25519Verifier INSTANCE = new BcEd25519Verifier();
+    private static final BCEd25519Verifier INSTANCE = new BCEd25519Verifier();
 
-    public static BcEd25519Verifier getInstance() {
+    public static BCEd25519Verifier getInstance() {
         return INSTANCE;
     }
 

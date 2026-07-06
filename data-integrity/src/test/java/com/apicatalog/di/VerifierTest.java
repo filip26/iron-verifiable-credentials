@@ -18,9 +18,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.apicatalog.crypto.bc.BcEcdsaVerifier;
-import com.apicatalog.crypto.bc.BcEd25519Verifier;
-import com.apicatalog.crypto.bc.BcMlDsaVerifier;
+import com.apicatalog.crypto.bc.BCECDSAVerifier;
+import com.apicatalog.crypto.bc.BCEd25519Verifier;
+import com.apicatalog.crypto.bc.BCMLDSAVerifier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuites;
@@ -100,10 +100,10 @@ public class VerifierTest {
             //TODO allow list concrete DI cryptosuites only OR list models and configurations
             .proof(Ed25519Signature2020.TYPE_NAME)
             .resolver(DID_KEY_RESOLVER)
-            .verifier("Ed25519", BcEd25519Verifier.getInstance()::verify)
-            .verifier("P-256", BcEcdsaVerifier.getP256Instance()::verify)
-            .verifier("P-384", BcEcdsaVerifier.getP384Instance()::verify)
-            .verifier("ML-DSA-44", BcMlDsaVerifier.getInstance()::verify)
+            .verifier("Ed25519", BCEd25519Verifier.getInstance()::verify)
+            .verifier("P-256", BCECDSAVerifier.getP256Instance()::verify)
+            .verifier("P-384", BCECDSAVerifier.getP384Instance()::verify)
+            .verifier("ML-DSA-44", BCMLDSAVerifier.getInstance()::verify)
             .build();
 
     @ParameterizedTest
