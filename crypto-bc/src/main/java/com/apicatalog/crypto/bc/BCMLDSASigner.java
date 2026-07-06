@@ -19,7 +19,7 @@ public final class BCMLDSASigner {
         this.random = random;
     }
 
-    public static BCMLDSASigner newInstance(byte[] privateKey) {
+    public static BCMLDSASigner new44Instance(byte[] privateKey) {
         return newInstance(privateKey, null);
     }
 

@@ -11,7 +11,7 @@ public final class BCMLDSAVerifier {
 
     private static final BCMLDSAVerifier INSTANCE = new BCMLDSAVerifier();
 
-    public static BCMLDSAVerifier getInstance() {
+    public static BCMLDSAVerifier get44Instance() {
         return INSTANCE;
     }
 

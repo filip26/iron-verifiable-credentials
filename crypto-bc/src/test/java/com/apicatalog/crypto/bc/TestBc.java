@@ -44,7 +44,7 @@ class TestBc {
             "P-256", BCECDSAVerifier.getP256Instance()::verify,
             "P-384", BCECDSAVerifier.getP384Instance()::verify,
             "Ed25519", BCEd25519Verifier.getInstance()::verify,
-            "ML-DSA-44", BCMLDSAVerifier.getInstance()::verify,
+            "ML-DSA-44", BCMLDSAVerifier.get44Instance()::verify,
             "FALCON-512", BCFalconVerifier.get512Instance()::verify);
 
     @ParameterizedTest

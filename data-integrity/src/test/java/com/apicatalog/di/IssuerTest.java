@@ -93,7 +93,7 @@ public class IssuerTest {
             break;
         case "mldsa-44-priv":
             keyAlgorithm = "ML-DSA-44";
-            signer = BCMLDSASigner.newInstance(privateKeyCodec.decode(privateKey))::sign;
+            signer = BCMLDSASigner.new44Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case "slhdsa-sha2-128-priv":
             keyAlgorithm = "SLH-DSA-SHA2-128s";
