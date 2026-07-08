@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.signature.ProofValue;
@@ -20,20 +19,22 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
-import com.apicatalog.trust.Signature;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.model.GraphModel.C14nFactory;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.proof.ProofGraphCursor;
 import com.apicatalog.trust.proof.ProofGraphReader;
+import com.apicatalog.trust.signature.Signature;
 
 public final class Ed25519Signature2020 implements Proof {
 
+    public static final String TYPE_URI = "https://w3id.org/security#Ed25519Signature2020";
     public static String TYPE_NAME = "Ed25519Signature2020";
+
     public static String KEY_ALGORITHM = "Ed25519";
     public static String HASH_ALGORITHM = "SHA-256";
     public static String C14N = "RDFC";
 
-    private static final String URI_TYPE_VALUE = "https://w3id.org/security#Ed25519Signature2020";
     private static final String URI_CREATED = "http://purl.org/dc/terms/created";
     private static final String URI_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
     private static final String URI_PURPOSE = "https://w3id.org/security#proofPurpose";
@@ -70,24 +71,24 @@ public final class Ed25519Signature2020 implements Proof {
             AsymmetricSigner signer,
             Ed25519Signature2020.Draft proofDraft,
             Data data) throws SignatureException {
+//FIXME
+//        try {
+        proofDraft.canonize();
 
-        try {
-            proofDraft.canonize();
+//            var signature = ProofValue.generateSignature(
+//                    signer,
+//                    Ed25519Signature2020.KEY_ALGORITHM,
+//                    MessageDigest.getInstance(HASH_ALGORITHM),
+//                    proofDraft.get(),
+//                    data);
+//
+//            proofDraft.signature(signature);
 
-            var signature = ProofValue.generateSignature(
-                    signer,
-                    Ed25519Signature2020.KEY_ALGORITHM,
-                    MessageDigest.getInstance(HASH_ALGORITHM),
-                    proofDraft.get(),
-                    data);
+        return proofDraft.get();
 
-            proofDraft.signature(signature);
-
-            return proofDraft.get();
-
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
+//        } catch (NoSuchAlgorithmException e) {
+//            throw new IllegalStateException(e);
+//        }
     }
 
     public static Draft newDraft() {
@@ -278,17 +279,11 @@ public final class Ed25519Signature2020 implements Proof {
 
         @Override
         public boolean isAccepted(Collection<String[]> proof) {
-            for (var statement : proof) {
-                if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(statement[1])
-                        && URI_TYPE_VALUE.equals(statement[2])) {
-                    return true;
-                }
-            }
-            return false;
+            return true;
         }
 
         @Override
-        public Proof read(Collection<String[]> proof, Function<Collection<String>, Data> data) {
+        public Proof read(Collection<String[]> proof, ProofGraphCursor cursor) {
 
             final var di = new Ed25519Signature2020();
 
@@ -329,7 +324,7 @@ public final class Ed25519Signature2020 implements Proof {
                             MessageDigest.getInstance(HASH_ALGORITHM),
                             proofValue,
                             di,
-                            data.apply(Set.of()));
+                            cursor.data(Set.of()));
                 } catch (NoSuchAlgorithmException e) {
                     throw new IllegalStateException(e);
                 }

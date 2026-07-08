@@ -4,6 +4,7 @@ import java.security.InvalidKeyException;
 import java.security.SignatureException;
 
 import com.apicatalog.security.AsymmetricVerifier;
+import com.apicatalog.trust.signature.Signature;
 
 public interface AtomicSignature extends Signature {
 

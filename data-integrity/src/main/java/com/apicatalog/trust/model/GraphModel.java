@@ -1,8 +1,10 @@
 package com.apicatalog.trust.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -41,14 +43,14 @@ public class GraphModel implements Model {
     private final String c14n;
     private final BiConsumer<Map<String, Object>, QuadConsumer> tordf;
     private final C14nFactory canonizeFactory;
-    private final Collection<ProofGraphReader> readers;
+    private final Map<String, ProofGraphReader> readers;
 
     public GraphModel(
             Factory factory,
             String c14n,
             BiConsumer<Map<String, Object>, QuadConsumer> tordf,
             C14nFactory canonizeFactory,
-            Collection<ProofGraphReader> readers) {
+            Map<String, ProofGraphReader> readers) {
         this.cursorFactory = factory;
         this.c14n = c14n;
         this.tordf = tordf;
@@ -64,54 +66,61 @@ public class GraphModel implements Model {
     @Override
     public ProofCursor createCursor(Collection<String> context, Map<String, Object> document) {
 
-        var graphBuilder = new GraphBuilder();
+        var dataset = new DatasetProvider(readers);
 
-        tordf.accept(document, graphBuilder);
+        tordf.accept(document, dataset);
 
-        var graphs = graphBuilder.get();
-
-//        var canonized = rdfc.canonize();
-
-//        IO.println(canonized);
-
-        // identify proofs
-        var proofGraphs = graphs.get("@default").stream()
-                .filter(statement -> "https://w3id.org/security#proof".equals(statement[1]))
-                .map(statement -> statement[2]).toList();
-
-//        IO.println(proofGraphs);
-
-        if (proofGraphs.isEmpty()) {
+        if (dataset.noProofsFound() || dataset.noProofReaders()) {
             return null;
         }
 
-        var graphReaders = new HashMap<String, ProofGraphReader>(proofGraphs.size());
+        var graphs = dataset.graphs();
 
-        for (var proofGraph : proofGraphs) {
+        var proofReaders = new HashMap<String, ProofGraphReader>(dataset.mapping);
 
-            var proof = graphs.get(proofGraph);
+        for (var entry : dataset.mapping.entrySet()) {
 
-            for (var proofReader : readers) {
-                if (proofReader.isAccepted(proof)) {
-                    graphReaders.put(proofGraph, proofReader);
-                    break;
-                }
+            var proof = graphs.get(entry.getKey());
+
+            var reader = entry.getValue();
+            if (reader.isAccepted(proof)) {
+                proofReaders.put(entry.getKey(), reader);
             }
         }
 
-        if (graphReaders.isEmpty()) {
+        if (proofReaders.isEmpty()) {
             return null;
         }
 
-        return cursorFactory.newInstance(this, graphs, graphReaders);
+        return cursorFactory.newInstance(this, graphs, proofReaders);
     }
 
-    private static class GraphBuilder implements QuadConsumer {
+    private static class DatasetProvider implements QuadConsumer {
 
-        private Map<String, Collection<String[]>> graphMap = new HashMap<>();
+        private final Map<String, ProofGraphReader> readers;
 
-        public Map<String, Collection<String[]>> get() {
-            return graphMap;
+        private Map<String, Collection<String[]>> dataset = new HashMap<>();
+
+        private Collection<String> proofGraphs = new HashSet<>();
+
+        private Map<String, ProofGraphReader> mapping = new HashMap<>();
+
+        public DatasetProvider(Map<String, ProofGraphReader> readers) {
+            this.readers = readers;
+        }
+
+        public boolean noProofReaders() {
+            IO.println("M: " + mapping);
+            return mapping.isEmpty();
+        }
+
+        public Map<String, Collection<String[]>> graphs() {
+            return dataset;
+        }
+
+        public boolean noProofsFound() {
+            IO.println("Y: " + proofGraphs);
+            return proofGraphs.isEmpty();
         }
 
         @Override
@@ -128,9 +137,27 @@ public class GraphModel implements Model {
 
             if (key == null) {
                 key = "@default";
+
+                if ("https://w3id.org/security#proof".equals(predicate)) {
+                    proofGraphs.add(object);
+                }
+
+            } else if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
+                var reader = readers.get(object);
+                if (reader != null) {
+                    mapping.put(graph, reader);
+                }
             }
 
-            graphMap.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
+            IO.println("X " + Arrays.toString(new String[] {
+                    subject, predicate, object, datatype, language, direction, graph
+            }));
+
+//var proofGraphs = graphs.get("@default").stream()
+//.filter(statement -> "https://w3id.org/security#proof".equals(statement[1]))
+//.map(statement -> statement[2]).toList();
+
+            dataset.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
                     .add(new String[] {
                             subject, predicate, object, datatype, language, direction, graph
                     });

@@ -2,6 +2,7 @@ package com.apicatalog.di;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -11,6 +12,20 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
+    static final Map<String, MessageDigest> DIGEST_FACTORY;
+
+    static {
+        try {
+            DIGEST_FACTORY = Map.of(
+                    "SHA-256", MessageDigest.getInstance("SHA-256"),
+                    "SHA-384", MessageDigest.getInstance("SHA-384")
+                    );
+            
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+    
     static JsonFactory FACTORY = JsonFactory.builder().build();
     
     static <T> Map<String, T> getMap(String name) throws IOException {

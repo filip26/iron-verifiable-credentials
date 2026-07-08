@@ -1,24 +1,20 @@
 package com.apicatalog.di.suite;
 
-import com.apicatalog.trust.Signature;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.signature.Signature;
 
 public interface CryptoSuite {
 
     String id();
 
-    String algorithm();
 
     String c14n();
 
-    String digest();
-
     String encode(Signature signature);
 
-    byte[] decode(String value);
-
-    Signature newSignature(String value, Proof proof, Data data);
-
-    boolean isSignature(String value);
+    Signature decode(String encoded, Proof proof, Data data);
+//TODO replace with    SignatureDecoder decodeSignature(MessageDigest digestor);
+//                 default    SignatureDecoder decodeSignature() {
+// }    
 }

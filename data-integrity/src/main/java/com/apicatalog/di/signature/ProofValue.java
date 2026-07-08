@@ -52,8 +52,8 @@ public final class ProofValue implements AtomicSignature {
     }
 
     public static ProofValue generateSignature(
-            AsymmetricSigner signer,
             String algorithm,
+            AsymmetricSigner signer,
             MessageDigest messageDigest,
             Proof proof,
             Data data) throws SignatureException {

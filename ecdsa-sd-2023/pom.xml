@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.apicatalog</groupId>
+    <artifactId>iron-selective-disclosure</artifactId>
+    <version>1.0.0-M1</version>
+
+    <packaging>jar</packaging>
+
+    <name>Iron ECDSA SD 2023 Signature Suite</name>
+
+    <description>
+        Verifiable Credentials ECDSA SD 2023 Signature Suite
+    </description>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/filip26/iron-verifiable-credentials/issues</url>
+    </issueManagement>
+
+    <url>https://github.com/filip26/iron-verifiable-credentials</url>
+
+    <scm>
+        <connection>
+            scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
+        <developerConnection>
+            scm:git:git://github.com/filip26/iron-verifiable-credentials.git</developerConnection>
+        <url>https://github.com/filip26/iron-verifiable-credentials/tree/main</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>filip26</id>
+            <name>Filip Kolarik</name>
+            <email>filip26@gmail.com</email>
+            <roles>
+                <role>author</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <inceptionYear>2023</inceptionYear>
+
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <argLine>-Dfile.encoding=UTF-8</argLine>
+
+        <cbor-java.version>0.9</cbor-java.version>
+
+        <!-- test resources -->
+        <junit.version>6.0.0</junit.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-data-integrity</artifactId>
+            <version>1.0.0-M1</version>
+        </dependency>   
+        <dependency>
+            <groupId>co.nstant.in</groupId>
+            <artifactId>cbor</artifactId>
+            <version>${cbor-java.version}</version>
+        </dependency>
+<!-- tests -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

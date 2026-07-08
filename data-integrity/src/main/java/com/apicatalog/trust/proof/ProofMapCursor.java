@@ -57,7 +57,7 @@ public class ProofMapCursor implements ProofCursor {
     }
 
     @Override
-    public boolean isUnknown() {
+    public boolean isAccepted() {
         return currentEntry == null || currentEntry.getValue() == null || currentEntry.getKey() == null;
     }
 
@@ -108,4 +108,5 @@ public class ProofMapCursor implements ProofCursor {
         }
         return data;
     }
+
 }

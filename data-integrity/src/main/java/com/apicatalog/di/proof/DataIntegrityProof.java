@@ -16,21 +16,24 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.apicatalog.di.Term;
 import com.apicatalog.di.suite.AtomicCryptoSuite;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
-import com.apicatalog.trust.Signature;
 import com.apicatalog.trust.data.Data;
-import com.apicatalog.trust.model.GraphModel.C14nFactory;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.proof.ProofGraphCursor;
 import com.apicatalog.trust.proof.ProofGraphReader;
 import com.apicatalog.trust.proof.ProofMapReader;
+import com.apicatalog.trust.signature.Signature;
 
 public final class DataIntegrityProof implements Proof {
 
-    public static String TYPE_NAME = "DataIntegrityProof";
+    public static final Term TYPE = new Term("DataIntegrityProof", "https://w3id.org/security#DataIntegrityProof");
+
+//    public static String TYPE_NAME = "DataIntegrityProof";
 
     private static final String KEY_ID = "id";
     private static final String KEY_TYPE = "type";
@@ -59,7 +62,7 @@ public final class DataIntegrityProof implements Proof {
     private static final String URI_PROOF_VALUE = "https://w3id.org/security#proofValue";
     private static final String URI_PREVIOUS_PROOF = "https://w3id.org/security#previousProof";
 
-    private final CryptoSuite cryptosuite;
+    private CryptoSuite cryptosuite;
 
     private Collection<String> context;
 
@@ -76,14 +79,8 @@ public final class DataIntegrityProof implements Proof {
 
     private byte[] canonicalPayload;
 
-    private DataIntegrityProof(CryptoSuite cryptosuite) {
-        this.cryptosuite = cryptosuite;
+    private DataIntegrityProof() {
     }
-
-//    public static Proof newProof(Map<String, String> map, Function<String, DigestiblePayload> canonicalDocument) {
-//
-//        return null;
-//    }
 
     public static void write(DataIntegrityProof proof, TreeEmitter emitter) {
 
@@ -134,16 +131,20 @@ public final class DataIntegrityProof implements Proof {
     }
 
     public static Draft newDraft(CryptoSuite cryptosuite) {
-        return new Draft(new DataIntegrityProof(cryptosuite));
+        var di = new DataIntegrityProof();
+        di.cryptosuite = cryptosuite;
+        return new Draft(di);
     }
 
     public static Draft newDraft(Map<String, Object> options, Function<String, CryptoSuite> suiteProvider) {
 
         var cryptosuite = (String) options.get("cryptosuite");
 
-        var draft = new Draft(new DataIntegrityProof(suiteProvider.apply(cryptosuite)));
+        var di = new DataIntegrityProof();
+        di.cryptosuite = suiteProvider.apply(cryptosuite);
+        var draft = new Draft(di);
         draft.previousProof(Set.of());
-        
+
         for (var entry : options.entrySet()) {
             switch (entry.getKey()) {
             case "@context":
@@ -193,9 +194,11 @@ public final class DataIntegrityProof implements Proof {
     public static final class Draft {
 
         private final DataIntegrityProof proof;
+//        private Function<String, MessageDigest> digestFactory;
 
         private Draft(DataIntegrityProof proof) {
             this.proof = proof;
+//            this.digestFactory = null;
         }
 
         public byte[] canonize(String c14n) {
@@ -269,6 +272,11 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
+//        public Draft digestFactory(Function<String, MessageDigest> digestFactory) {
+//            this.digestFactory = digestFactory;
+//            return this;
+//        }
+
         public CryptoSuite cryptosuite() {
             return proof.cryptosuite;
         }
@@ -279,11 +287,12 @@ public final class DataIntegrityProof implements Proof {
                     : null;
         }
 
-        public Proof generateProof(AsymmetricSigner signer, Draft proofDraft, Data genericDocument)
+        public Proof generateProof(String keyAlgorithm, AsymmetricSigner signer, Draft proofDraft, Data genericDocument)
                 throws SignatureException {
 
             if (proof.cryptosuite instanceof AtomicCryptoSuite atomic) {
-                return atomic.generateProof(signer, proofDraft, genericDocument);
+
+                return atomic.generateProof(keyAlgorithm, signer, proofDraft, genericDocument);
             }
 
             throw new IllegalStateException();
@@ -732,9 +741,17 @@ public final class DataIntegrityProof implements Proof {
 
         @Override
         public boolean isAccepted(Map<String, Object> proof) {
-            return TYPE_NAME.equals(proof.get(KEY_TYPE))
-                    && cryptosuite.id().equals(proof.get(KEY_CRYPTOSUITE))
-                    && cryptosuite.isSignature((String) proof.get(KEY_PROOF_VALUE));
+
+            String ty = "";
+            switch (ty) {
+            case "1":
+                break;
+            }
+
+            return TYPE.key().equals(proof.get(KEY_TYPE))
+                    && cryptosuite.id().equals(proof.get(KEY_CRYPTOSUITE));
+            // FIXME && cryptosuite.isSignature((String) proof.get(KEY_PROOF_VALUE));
+
         }
 
         @Override
@@ -744,11 +761,12 @@ public final class DataIntegrityProof implements Proof {
                 byte[] proofPayload,
                 Function<Collection<String>, Data> data) {
 
-            final var di = new DataIntegrityProof(cryptosuite);
+            final var di = new DataIntegrityProof();
+            di.cryptosuite = cryptosuite;
             di.canonicalPayload = proofPayload;
 
             Object proofValue = null;
-            
+
             for (var entry : proof.entrySet()) {
                 switch (entry.getKey()) {
                 case KEY_ID:
@@ -804,10 +822,11 @@ public final class DataIntegrityProof implements Proof {
             }
 
             if (proofValue != null) {
-                di.signature = value(proofValue, value -> cryptosuite.newSignature(
-                        value,
-                        di,
-                        data.apply(di.previousProof)));
+                di.signature = value(proofValue, value -> cryptosuite
+                        .decode(
+                                value,
+                                di,
+                                data.apply(di.previousProof)));
             }
             return di;
         }
@@ -830,35 +849,33 @@ public final class DataIntegrityProof implements Proof {
         }
     }
 
+//    public static class GraphReaderSupplier implements ProofGraphReader.Supplier {
+//
+//        private final Map<String, CryptoSuite> cryptosuites;
+//
+//        public GraphReaderSupplier(Map<String, CryptoSuite> cryptosuites) {
+//            this.cryptosuites = cryptosuites;
+//        }
+//
+//        @Override
+//        public ProofGraphReader newInstance(Collection<String[]> proof, ProofGraphCursor cursor) {
+//            return new GraphReader(proof, cursor, cryptosuites);
+//        }
+//    }
+
     public static class GraphReader implements ProofGraphReader {
 
-        private final CryptoSuite cryptosuite;
-        private final C14nFactory canonizeFactory;
+        private final Map<String, CryptoSuite> cryptosuites;
 
-        public GraphReader(CryptoSuite cryptosuite, C14nFactory canonizeFactory) {
-            this.cryptosuite = cryptosuite;
-            this.canonizeFactory = canonizeFactory;
+        public GraphReader(Map<String, CryptoSuite> cryptosuites) {
+            this.cryptosuites = cryptosuites;
         }
 
         @Override
         public boolean isAccepted(Collection<String[]> proof) {
 
-            boolean algomatch = false;
-            boolean typematch = false;
-            boolean cryptomatch = false;
-
             for (var statement : proof) {
-
-                algomatch = algomatch || DataIntegrityProof.URI_PROOF_VALUE.equals(statement[1])
-                        && cryptosuite.isSignature(statement[2]);
-                
-                typematch = typematch || "http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(statement[1])
-                        && URI_TYPE_VALUE.equals(statement[2]);
-
-                cryptomatch = cryptomatch || "https://w3id.org/security#cryptosuite".equals(statement[1])
-                        && cryptosuite.id().equals(statement[2]);
-
-                if (typematch && cryptomatch && algomatch) {
+                if (URI_CRYPTOSUITE.equals(statement[1]) && cryptosuites.containsKey(statement[2])) {
                     return true;
                 }
             }
@@ -866,17 +883,21 @@ public final class DataIntegrityProof implements Proof {
         }
 
         @Override
-        public Proof read(Collection<String[]> proof, Function<Collection<String>, Data> data) {
-            final var di = new DataIntegrityProof(cryptosuite);
+        public Proof read(Collection<String[]> proof, ProofGraphCursor cursor) {
+            final var di = new DataIntegrityProof();
 
-            var canonizer = canonizeFactory.newInstance();
-            
+            var canonizer = cursor.newCanonizer();
+
             var consumer = canonizer.consumer();
-            
+
             String proofValue = null;
 
             for (var statement : proof) {
                 switch (statement[1]) {
+                case URI_CRYPTOSUITE:
+                    IO.println(">>>>>>>>>>> " + statement[2] + "," + cryptosuites.keySet());
+                    di.cryptosuite = cryptosuites.get(statement[2]);
+                    break;
                 case URI_CREATED:
                     di.created = Instant.parse(statement[2]);
                     break;
@@ -896,11 +917,12 @@ public final class DataIntegrityProof implements Proof {
                     di.previousProof.add(statement[2]);
                     break;
                 }
-                if (!URI_PROOF_VALUE.equals(statement[1])) {    //TODO better
-                    consumer.accept(statement[0], statement[1], statement[2], statement[3], statement[4], statement[5], null);
+                if (!URI_PROOF_VALUE.equals(statement[1])) { // TODO better
+                    consumer.accept(statement[0], statement[1], statement[2], statement[3], statement[4], statement[5],
+                            null);
                 }
             }
-            
+
             if (di.previousProof == null) {
                 di.previousProof = Set.of();
             }
@@ -908,10 +930,11 @@ public final class DataIntegrityProof implements Proof {
             di.canonicalPayload = canonizer.canonize();
 
             if (proofValue != null) {
-                di.signature = cryptosuite.newSignature(
-                        proofValue,
-                        di,
-                        data.apply(di.previous()));
+                di.signature = di.cryptosuite
+                        .decode(
+                                proofValue,
+                                di,
+                                cursor.data(di.previous()));
             }
 
             return di;

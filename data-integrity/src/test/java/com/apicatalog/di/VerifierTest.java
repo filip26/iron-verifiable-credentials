@@ -24,7 +24,9 @@ import com.apicatalog.crypto.bc.BCMLDSAVerifier;
 import com.apicatalog.crypto.bc.BCSLHDSAVerifier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.suite.CryptoSuites;
+import com.apicatalog.di.suite.ECDSASuite;
+import com.apicatalog.di.suite.EdDSASuite;
+import com.apicatalog.di.suite.MLDSA44Suite;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -50,29 +52,30 @@ import com.fasterxml.jackson.core.JsonFactory;
 public class VerifierTest {
 
     static Model MODEL_1 = DataIntegrity.newTypeModelBuilder("JCS")
-            .proof(CryptoSuites.EDDSA_JCS_2022)
-            .proof(CryptoSuites.ECDSA_JCS_2019_P256)
-            .proof(CryptoSuites.ECDSA_JCS_2019_P384)
-            .proof(CryptoSuites.MLDSA44_JCS_2024)
-            .proof(CryptoSuites.SLHDSA128_JCS_2024)
+//            .proof(Resources.EDDSA_JCS_2022)
+//            .proof(CryptoSuites.ECDSA_JCS_2019_P256)
+//            .proof(CryptoSuites.ECDSA_JCS_2019_P384)
+//            .proof(CryptoSuites.MLDSA44_JCS_2024)
+//            .proof(CryptoSuites.SLHDSA128_JCS_2024)
             .c14n(Jcs::canonize)
             .processor(ProofMapCursor::new)
             .build();
 
     static Model MODEL_2 = DataIntegrity.newGraphModelBuilder("RDFC", VerifierTest::newRdfc)
-            .proof(CryptoSuites.EDDSA_RDFC_2022)
-            .proof(CryptoSuites.ECDSA_RDFC_2019_P256)
-            .proof(CryptoSuites.ECDSA_RDFC_2019_P384)
-            .proof(CryptoSuites.MLDSA44_RDFC_2024)
-            .proof(CryptoSuites.SLHDSA128_RDFC_2024)
-            .proof(Ed25519Signature2020::newReader)
+            .proof(EdDSASuite.newRDFC2022(Resources.DIGEST_FACTORY::get))
+            .proof(ECDSASuite.newRDFC2019(Resources.DIGEST_FACTORY::get))
+            .proof(MLDSA44Suite.newRDFC2024(Resources.DIGEST_FACTORY::get))
+//            .proof(CryptoSuites.SLHDSA128_RDFC_2024)
+            .Ed25519Signature2020()            
             .tordf(VerifierTest::tordfc)
             .processor(ProofGraphCursor::new)
             .build();
 
     static ModelResolver MODEL_RESOLVER = ModelResolver.newBuilder()
             // accept any context - for test purposes only
-            .model(Predicate.not(Collection::isEmpty), MODEL_1, MODEL_2)
+            .model(Predicate.not(Collection::isEmpty),
+//                    MODEL_1,
+                    MODEL_2)
             .build();
 
     static MethodResolver DID_KEY_RESOLVER = proof -> {
@@ -99,7 +102,7 @@ public class VerifierTest {
     };
 
     static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
-            .proof(DataIntegrityProof.TYPE_NAME)
+            .proof(DataIntegrityProof.TYPE.key())
             // TODO allow list concrete DI cryptosuites only OR list models and
             // configurations
             .proof(Ed25519Signature2020.TYPE_NAME)
@@ -145,7 +148,7 @@ public class VerifierTest {
             do {
                 count++;
 
-                if (cursor.isUnknown()) {
+                if (!cursor.isAccepted()) {
                     continue;
                 }
 
@@ -222,7 +225,7 @@ public class VerifierTest {
     static class RdfcPrcessor implements Canonizer {
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final RdfCanon canon = RdfCanon.create("SHA-256");
+        final RdfCanon canon = RdfCanon.create(Resources.DIGEST_FACTORY.get("SHA-256"));
 
         @Override
         public byte[] canonize() {

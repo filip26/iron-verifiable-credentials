@@ -2,6 +2,8 @@ package com.apicatalog.di;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -32,16 +34,18 @@ public class DataIntegrity {
 
         private final String c14n;
         private final C14nFactory c14nFactory;
-        
+
         private ProofGraphCursor.Factory factory;
 
         private BiConsumer<Map<String, Object>, QuadConsumer> tordf;
 
-        private Collection<ProofGraphReader> readers;
+        Map<String, CryptoSuite> cryptosuites;
+        Map<String, ProofGraphReader> readers;
 
         private GraphModelBuilder(String c14n, C14nFactory c14nFactory) {
             this.c14n = c14n;
             this.c14nFactory = c14nFactory;
+            this.readers = new LinkedHashMap<>();
         }
 
         public GraphModelBuilder tordf(BiConsumer<Map<String, Object>, QuadConsumer> tordf) {
@@ -58,27 +62,35 @@ public class DataIntegrity {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
             }
-            proof(new DataIntegrityProof.GraphReader(cryptosuite, c14nFactory));
+            if (cryptosuites == null) {
+                cryptosuites = new HashMap<>();
+            }
+            cryptosuites.put(cryptosuite.id(), cryptosuite);
             return this;
         }
 
-        public GraphModelBuilder proof(Function<C14nFactory, ProofGraphReader> reader) {
-            if (readers == null) {
-                readers = new ArrayList<ProofGraphReader>();
-            }
-            readers.add(reader.apply(c14nFactory));
+        public GraphModelBuilder proof(String proofType, ProofGraphReader reader) {
+            readers.put(proofType, reader);
             return this;
         }
 
-        public GraphModelBuilder proof(ProofGraphReader reader) {
-            if (readers == null) {
-                readers = new ArrayList<ProofGraphReader>();
-            }
-            readers.add(reader);
+        public GraphModelBuilder Ed25519Signature2020() {
+//            proof(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newReader);
             return this;
         }
 
         public Model build() {
+
+            if (cryptosuites != null && !cryptosuites.isEmpty()) {
+                readers.put(
+                        DataIntegrityProof.TYPE.uri(),
+                        new DataIntegrityProof.GraphReader(cryptosuites));
+            }
+
+            if (readers.isEmpty()) {
+                throw new IllegalStateException();
+            }
+
             return new GraphModel(factory, c14n, tordf, c14nFactory, readers);
         }
     }

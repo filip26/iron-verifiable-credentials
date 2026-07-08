@@ -35,13 +35,17 @@ public interface DigestiblePayload {
      * @param algorithm the cryptographic hash algorithm
      * @return the digest value, or null if caching is ignored or no digest exists
      */
+    @Deprecated
     byte[] digest(String algorithm);
 
+    //TODO just return immutable map<String, byte[]> and use IDENTITY for c14n
+    
     /**
      * Returns the collection of all algorithms currently associated with cached
      * digests in this payload.
      * 
      * @return a collection of algorithm identifiers
      */
+    @Deprecated
     Collection<String> digestAlgorithms();
 }

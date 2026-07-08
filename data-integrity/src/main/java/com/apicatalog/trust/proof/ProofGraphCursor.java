@@ -11,6 +11,7 @@ import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.data.GenericPayload;
 import com.apicatalog.trust.data.GraphData;
 import com.apicatalog.trust.model.GraphModel;
+import com.apicatalog.trust.model.GraphModel.Canonizer;
 
 /*
  * 1. JSON-LD expansion + type, uri map
@@ -30,6 +31,7 @@ public class ProofGraphCursor implements ProofCursor {
 
     Proof currentProof;
     Map.Entry<String, Collection<String[]>> currentEntry;
+    ProofGraphReader currentProofReader;
 
     @FunctionalInterface
     public interface Factory {
@@ -66,10 +68,10 @@ public class ProofGraphCursor implements ProofCursor {
     }
 
     @Override
-    public boolean isUnknown() {
-        return currentEntry == null || currentEntry.getValue() == null || currentEntry.getKey() == null;
+    public boolean isAccepted() {
+        return currentProofReader != null && currentProofReader.isAccepted(currentEntry.getValue());
     }
-
+    
     @Override
     public boolean next() {
         if (!iterator.hasNext()) {
@@ -78,23 +80,19 @@ public class ProofGraphCursor implements ProofCursor {
 
         currentEntry = iterator.next();
         currentProof = null;
+        currentProofReader = readers.get(currentEntry.getKey());
         return true;
     }
 
     @Override
     public Proof proof() {
-        if (currentProof == null && currentEntry != null) {
-
-            var reader = readers.get(currentEntry.getKey());
-
-            var proof = currentEntry.getValue();
-
-            currentProof = reader.read(proof, this::data);
+        if (currentProof == null && currentProofReader != null) {
+            currentProof = currentProofReader.read(currentEntry.getValue(), this);
         }
         return currentProof;
     }
 
-    Data data(Collection<String> previous) {
+    public Data data(Collection<String> previous) {
         var data = data();
 
         if (data.digestiblePayload(previous) == null) {
@@ -133,5 +131,9 @@ public class ProofGraphCursor implements ProofCursor {
             data.digestiblePayload(previous, new GenericPayload(canonical));
         }
         return data;
+    }
+
+    public Canonizer newCanonizer() {
+        return model.newCanonizer();
     }
 }

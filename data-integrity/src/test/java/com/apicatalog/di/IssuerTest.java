@@ -8,11 +8,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +26,10 @@ import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.crypto.bc.BCSLHDSASigner;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.suite.CryptoSuites;
+import com.apicatalog.di.suite.CryptoSuite;
+import com.apicatalog.di.suite.ECDSASuite;
+import com.apicatalog.di.suite.EdDSASuite;
+import com.apicatalog.di.suite.MLDSA44Suite;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -49,19 +54,14 @@ public class IssuerTest {
 
     static final MultibaseDecoder MULTIBASE = MultibaseDecoder.getInstance();
 
-    static record XY(int b) {
-    };
-
-    static final int XXXXXX = 10;
-
     static final MulticodecDecoder MULTICODEC = MulticodecDecoder.newInstance(
-            KeyCodec.P256_PUBLIC,
+//            KeyCodec.P256_PUBLIC,
             KeyCodec.P256_PRIVATE,
-            KeyCodec.P384_PUBLIC,
+//            KeyCodec.P384_PUBLIC,
             KeyCodec.P384_PRIVATE,
-            KeyCodec.ED25519_PUBLIC,
+//            KeyCodec.ED25519_PUBLIC,
             KeyCodec.ED25519_PRIVATE,
-            KeyCodec.MLDSA_44_PUBLIC,
+//            KeyCodec.MLDSA_44_PUBLIC,
             KeyCodec.MLDSA_44_PRIVATE,
             KeyCodec.SLHDSA_SHA2_128S_PRIVATE,
             // TODO remove when multicodec is updated
@@ -120,11 +120,11 @@ public class IssuerTest {
 
         var composer = new NativeComposer<Map<String, ? extends Object>>();
 
-        if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
+        if (DataIntegrityProof.TYPE.key().equals(options.get("type"))) {
 
             var proofDraft = DataIntegrityProof.newDraft(
                     options,
-                    cryptosuite -> CryptoSuites.getInstance(cryptosuite, keyAlgorithm));
+                    cryptosuite -> getInstance(cryptosuite, Resources.DIGEST_FACTORY::get));
 
             var c14nData = document;
 
@@ -154,7 +154,8 @@ public class IssuerTest {
             data.digestiblePayload(proofDraft.previous(), new GenericPayload(canonicalPayload));
 
             proof = proofDraft.generateProof(
-                    signer,
+                    keyAlgorithm,
+                    signer,                    
                     proofDraft,
                     data);
 
@@ -216,6 +217,25 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
+    public static CryptoSuite getInstance(String id, Function<String, MessageDigest> digestFactory) {
+
+        return switch (id) {
+        case "eddsa-rdfc-2022" -> EdDSASuite.newRDFC2022(digestFactory);
+        case "eddsa-jcs-2022" -> EdDSASuite.newJCS2022(digestFactory);
+
+        case "ecdsa-rdfc-2019" -> ECDSASuite.newRDFC2019(digestFactory);
+        case "ecdsa-jcs-2019" ->  ECDSASuite.newJCS2019(digestFactory);
+
+        case "mldsa44-rdfc-2024" -> MLDSA44Suite.newRDFC2024(digestFactory);
+        case "mldsa44-jcs-2024" -> MLDSA44Suite.newJCS2024(digestFactory);
+
+//        case "slhdsa128-rdfc-2024" -> newSLHDSA128RDFC2024(digestFactory);
+//        case "slhdsa128-jcs-2024" -> newSLHDSA128JCS2024(digestFactory);
+
+        default -> throw new IllegalArgumentException();
+        };
+    }
+    
     static final Stream<String> resources() throws IOException {
         return Resources.stream()
                 .filter(name -> name.endsWith("unsigned.json"))
@@ -234,7 +254,7 @@ public class IssuerTest {
         var toRdf = JsonLd.toRdf(JsonDocument.of(new ByteArrayInputStream(bos.toByteArray())))
                 .loader(ContextLoader.getInstance());
 
-        var canon = RdfCanon.create("SHA-256");
+        var canon = RdfCanon.create(Resources.DIGEST_FACTORY.get("SHA-256"));
         toRdf.provide(canon);
 
         bos.reset();
