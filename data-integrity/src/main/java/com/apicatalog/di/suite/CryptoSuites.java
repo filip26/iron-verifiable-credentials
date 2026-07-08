@@ -1,11 +1,7 @@
 package com.apicatalog.di.suite;
 
-import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.function.Function;
 
-import com.apicatalog.di.signature.ProofValueDecoder;
-import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
 
 @Deprecated

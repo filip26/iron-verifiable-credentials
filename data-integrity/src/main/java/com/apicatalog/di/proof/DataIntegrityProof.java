@@ -288,12 +288,12 @@ public final class DataIntegrityProof implements Proof {
                     : null;
         }
 
-        public Proof generateProof(String keyAlgorithm, AsymmetricSigner signer, Function<String, MessageDigest> digestFactory, Draft proofDraft, Data genericDocument)
+        public Proof generateProof(String keyAlgorithm, AsymmetricSigner signer, Function<String, MessageDigest> digestFactory, Draft proofDraft, Data data)
                 throws SignatureException {
 
             if (proof.cryptosuite instanceof AtomicCryptoSuite atomic) {
 
-                return atomic.generateProof(keyAlgorithm, signer, digestFactory, proofDraft, genericDocument);
+                return atomic.generateProof(keyAlgorithm, signer, digestFactory, proofDraft, data);
             }
 
             throw new IllegalStateException();

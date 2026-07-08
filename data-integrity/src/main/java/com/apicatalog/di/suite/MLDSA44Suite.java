@@ -1,8 +1,11 @@
 package com.apicatalog.di.suite;
 
-import com.apicatalog.di.signature.ProofValueDecoder;
+import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.trust.data.Data;
+import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.signature.Signature;
 
 public class MLDSA44Suite {
 
@@ -15,8 +18,8 @@ public class MLDSA44Suite {
                 "mldsa44-rdfc-2024",
                 "RDFC",
                 Multibase.BASE_64_URL,
-                new ProofValueDecoder(ALGORITHM, "SHA-256", Multibase.BASE_64_URL, SIGNATURE_LENGTH),
-                new ProofValueGenerator("SHA-256"));
+                MLDSA44Suite::decode,
+                ProofValueGenerator::generateWithSHA256);
     }
 
     public static CryptoSuite newJCS2024() {
@@ -24,7 +27,26 @@ public class MLDSA44Suite {
                 "mldsa44-jcs-2024",
                 "JCS",
                 Multibase.BASE_64_URL,
-                new ProofValueDecoder(ALGORITHM, "SHA-256", Multibase.BASE_64_URL, SIGNATURE_LENGTH),
-                new ProofValueGenerator("SHA-256"));
+                MLDSA44Suite::decode,
+                ProofValueGenerator::generateWithSHA256);
+    }
+    
+    static Signature decode(String value, Proof proof, Data data) {
+
+        var signature = Multibase.BASE_64_URL.decode(value);
+
+        if (signature.length != SIGNATURE_LENGTH) {
+            throw new IllegalArgumentException(
+                    """
+                    ... invalid signature size ... %d bytes, expected %d bytes.
+                    """.formatted(signature.length, SIGNATURE_LENGTH));
+        }
+
+        return ProofValue.newSignature(
+                ALGORITHM,
+                "SHA-256",
+                signature,
+                proof,
+                data);
     }
 }

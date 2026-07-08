@@ -11,7 +11,6 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
-import com.apicatalog.trust.signature.SignatureDecoder;
 
 public class ECDSASuite {
 
@@ -20,7 +19,7 @@ public class ECDSASuite {
                 "ecdsa-rdfc-2019",
                 "RDFC",
                 Multibase.BASE_58_BTC,
-                new Decoder(Multibase.BASE_58_BTC),
+                ECDSASuite::decode,
                 ECDSASuite::generate);
     }
 
@@ -29,46 +28,36 @@ public class ECDSASuite {
                 "ecdsa-jcs-2019",
                 "JCS",
                 Multibase.BASE_58_BTC,
-                new Decoder(Multibase.BASE_58_BTC),
+                ECDSASuite::decode,
                 ECDSASuite::generate);
     }
 
-    private static class Decoder implements SignatureDecoder {
+    private static Signature decode(String value, Proof proof, Data data) {
 
-        private final Multibase multibase;
+        var signature = Multibase.BASE_58_BTC.decode(value);
 
-        public Decoder(Multibase multibase) {
-            this.multibase = multibase;
+        String algorithm = null;
+        String digest = null;
+
+        switch (signature.length) {
+        case 64:
+            algorithm = "P-256";
+            digest = "SHA-256";
+            break;
+        case 96:
+            algorithm = "P-384";
+            digest = "SHA-384";
+            break;
+        default:
+            throw new IllegalArgumentException();
         }
 
-        @Override
-        public Signature decode(String value, Proof proof, Data data) {
-
-            var signature = multibase.decode(value);
-
-            String algorithm = null;
-            String digest = null;
-
-            switch (signature.length) {
-            case 64:
-                algorithm = "P-256";
-                digest = "SHA-256";
-                break;
-            case 96:
-                algorithm = "P-384";
-                digest = "SHA-384";
-                break;
-            default:
-                throw new IllegalArgumentException();
-            }
-
-            return ProofValue.newSignature(
-                    algorithm,
-                    digest,
-                    signature,
-                    proof,
-                    data);
-        }
+        return ProofValue.newSignature(
+                algorithm,
+                digest,
+                signature,
+                proof,
+                data);
     }
 
     private static Signature generate(

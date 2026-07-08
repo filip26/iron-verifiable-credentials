@@ -8,20 +8,33 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.signature.Signature;
-import com.apicatalog.trust.signature.SignatureGenerator;
 
-public class ProofValueGenerator implements SignatureGenerator<DataIntegrityProof> {
+public class ProofValueGenerator {
 
-    private final String digestAlgorithm;
-
-    public ProofValueGenerator(String digestAlgorithm) {
-        this.digestAlgorithm = digestAlgorithm;
-    }
-
-    @Override
-    public Signature generate(
+    public static Signature generateWithSHA256(
             String algorithm,
             AsymmetricSigner signer,
+            Function<String, MessageDigest> digestFactory,
+            DataIntegrityProof proof,
+            Data data)
+            throws SignatureException {
+        return generate(algorithm, signer, "SHA-256", digestFactory, proof, data);
+    }
+    
+    public static Signature generateWithSHA384(
+            String algorithm,
+            AsymmetricSigner signer,
+            Function<String, MessageDigest> digestFactory,
+            DataIntegrityProof proof,
+            Data data)
+            throws SignatureException {
+        return generate(algorithm, signer, "SHA-384", digestFactory, proof, data);
+    }
+    
+    public static Signature generate(
+            String algorithm,
+            AsymmetricSigner signer,
+            String digestAlgorithm,
             Function<String, MessageDigest> digestFactory,
             DataIntegrityProof proof,
             Data data)

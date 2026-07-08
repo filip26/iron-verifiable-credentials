@@ -58,34 +58,9 @@ public class AtomicCryptoSuite implements CryptoSuite {
                 unsigned,
                 data);
 
-//        var signature = ProofValue.generateSignature(
-//                signer,
-//                algorithm,
-//                digestorFactory,
-//                unsigned,
-//                data);
-//
         proofDraft.signature(signature);
         return proofDraft.get();
     }
-
-//    //TODO deprecate?
-//    @Override
-//    public Signature newSignature(String value, Proof proof, Data data) {
-//        return ProofValue.newSignature(
-//                algorithm,
-//                digestor,
-//                decode(value),
-//                proof,
-//                data);
-//    }
-
-//    @Override
-//    public boolean isSignature(String value) {
-//        return multibase.isEncoded(value) && 
-//                (value.length() >= 65 && value.length() <= 89);
-    //// signatureLength == multibase.decode(value).length;
-//    }
 
     @Override
     @Deprecated
@@ -93,35 +68,14 @@ public class AtomicCryptoSuite implements CryptoSuite {
         return multibase.encode(signature.toByteArray());
     }
 
-//    @Override
-//    public byte[] decode(String value) {
-//        return multibase.decode(value);
-//    }
-
     @Override
     public String id() {
         return id;
     }
 
-//    @Override
-//    public String algorithm() {
-//        return algorithm;
-//    }
-
     @Override
     public String c14n() {
         return c14n;
     }
-
-//    @Override
-//    public String digest(String keyAlgorithm) {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
-
-//    @Override
-//    public String digest() {
-//        return digestName;
-//    }
 
 }
