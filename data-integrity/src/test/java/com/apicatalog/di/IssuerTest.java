@@ -155,7 +155,8 @@ public class IssuerTest {
 
             proof = proofDraft.generateProof(
                     keyAlgorithm,
-                    signer,                    
+                    signer,          
+                    Resources.DIGEST_FACTORY::get,
                     proofDraft,
                     data);
 
@@ -220,14 +221,14 @@ public class IssuerTest {
     public static CryptoSuite getInstance(String id, Function<String, MessageDigest> digestFactory) {
 
         return switch (id) {
-        case "eddsa-rdfc-2022" -> EdDSASuite.newRDFC2022(digestFactory);
-        case "eddsa-jcs-2022" -> EdDSASuite.newJCS2022(digestFactory);
+        case "eddsa-rdfc-2022" -> EdDSASuite.newRDFC2022();
+        case "eddsa-jcs-2022" -> EdDSASuite.newJCS2022();
 
-        case "ecdsa-rdfc-2019" -> ECDSASuite.newRDFC2019(digestFactory);
-        case "ecdsa-jcs-2019" ->  ECDSASuite.newJCS2019(digestFactory);
+        case "ecdsa-rdfc-2019" -> ECDSASuite.newRDFC2019();
+        case "ecdsa-jcs-2019" ->  ECDSASuite.newJCS2019();
 
-        case "mldsa44-rdfc-2024" -> MLDSA44Suite.newRDFC2024(digestFactory);
-        case "mldsa44-jcs-2024" -> MLDSA44Suite.newJCS2024(digestFactory);
+        case "mldsa44-rdfc-2024" -> MLDSA44Suite.newRDFC2024();
+        case "mldsa44-jcs-2024" -> MLDSA44Suite.newJCS2024();
 
 //        case "slhdsa128-rdfc-2024" -> newSLHDSA128RDFC2024(digestFactory);
 //        case "slhdsa128-jcs-2024" -> newSLHDSA128JCS2024(digestFactory);

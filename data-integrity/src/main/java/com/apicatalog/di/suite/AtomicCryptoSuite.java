@@ -1,6 +1,8 @@
 package com.apicatalog.di.suite;
 
+import java.security.MessageDigest;
 import java.security.SignatureException;
+import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.multibase.Multibase;
@@ -41,6 +43,7 @@ public class AtomicCryptoSuite implements CryptoSuite {
     public DataIntegrityProof generateProof(
             String algorithm,
             AsymmetricSigner signer,
+            Function<String, MessageDigest> digestFactory,
             DataIntegrityProof.Draft proofDraft,
             Data data) throws SignatureException {
 
@@ -51,6 +54,7 @@ public class AtomicCryptoSuite implements CryptoSuite {
         var signature = signatureGenerator.generate(
                 algorithm,
                 signer,
+                digestFactory,
                 unsigned,
                 data);
 

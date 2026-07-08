@@ -52,9 +52,9 @@ import com.fasterxml.jackson.core.JsonFactory;
 public class VerifierTest {
 
     static Model MODEL_1 = DataIntegrity.newTypeModelBuilder("JCS")
-            .proof(EdDSASuite.newJCS2022(Resources.DIGEST_FACTORY::get))
-            .proof(ECDSASuite.newJCS2019(Resources.DIGEST_FACTORY::get))
-            .proof(MLDSA44Suite.newJCS2024(Resources.DIGEST_FACTORY::get))
+            .proof(EdDSASuite.newJCS2022())
+            .proof(ECDSASuite.newJCS2019())
+            .proof(MLDSA44Suite.newJCS2024())
 
 //            .proof(CryptoSuites.SLHDSA128_JCS_2024)
             .c14n(Jcs::canonize)
@@ -62,9 +62,9 @@ public class VerifierTest {
             .build();
 
     static Model MODEL_2 = DataIntegrity.newGraphModelBuilder("RDFC", VerifierTest::newRdfc)
-            .proof(EdDSASuite.newRDFC2022(Resources.DIGEST_FACTORY::get))
-            .proof(ECDSASuite.newRDFC2019(Resources.DIGEST_FACTORY::get))
-            .proof(MLDSA44Suite.newRDFC2024(Resources.DIGEST_FACTORY::get))
+            .proof(EdDSASuite.newRDFC2022())
+            .proof(ECDSASuite.newRDFC2019())
+            .proof(MLDSA44Suite.newRDFC2024())
 //            .proof(CryptoSuites.SLHDSA128_RDFC_2024)
             .Ed25519Signature2020()            
             .tordf(VerifierTest::tordfc)

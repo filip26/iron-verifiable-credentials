@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SignatureException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -23,10 +24,10 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.trust.data.Data;
-import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.MapProofReader;
+import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
 public final class DataIntegrityProof implements Proof {
@@ -287,12 +288,12 @@ public final class DataIntegrityProof implements Proof {
                     : null;
         }
 
-        public Proof generateProof(String keyAlgorithm, AsymmetricSigner signer, Draft proofDraft, Data genericDocument)
+        public Proof generateProof(String keyAlgorithm, AsymmetricSigner signer, Function<String, MessageDigest> digestFactory, Draft proofDraft, Data genericDocument)
                 throws SignatureException {
 
             if (proof.cryptosuite instanceof AtomicCryptoSuite atomic) {
 
-                return atomic.generateProof(keyAlgorithm, signer, proofDraft, genericDocument);
+                return atomic.generateProof(keyAlgorithm, signer, digestFactory, proofDraft, genericDocument);
             }
 
             throw new IllegalStateException();

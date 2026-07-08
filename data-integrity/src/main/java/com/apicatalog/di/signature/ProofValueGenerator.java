@@ -2,6 +2,7 @@ package com.apicatalog.di.signature;
 
 import java.security.MessageDigest;
 import java.security.SignatureException;
+import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.security.AsymmetricSigner;
@@ -11,20 +12,23 @@ import com.apicatalog.trust.signature.SignatureGenerator;
 
 public class ProofValueGenerator implements SignatureGenerator<DataIntegrityProof> {
 
-    private final MessageDigest digestor;
+    private final String digestAlgorithm;
 
-    public ProofValueGenerator(MessageDigest digestor) {
-        this.digestor = digestor;
+    public ProofValueGenerator(String digestAlgorithm) {
+        this.digestAlgorithm = digestAlgorithm;
     }
 
     @Override
     public Signature generate(
             String algorithm,
             AsymmetricSigner signer,
+            Function<String, MessageDigest> digestFactory,
             DataIntegrityProof proof,
             Data data)
             throws SignatureException {
 
+        var digestor = digestFactory.apply(digestAlgorithm);
+        
         return ProofValue.generateSignature(
                 algorithm,
                 signer,
