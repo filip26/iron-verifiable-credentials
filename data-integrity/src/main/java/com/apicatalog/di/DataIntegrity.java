@@ -15,10 +15,10 @@ import com.apicatalog.trust.model.GraphModel.C14nFactory;
 import com.apicatalog.trust.model.GraphModel.QuadConsumer;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.model.TypeSpecificModel;
-import com.apicatalog.trust.proof.ProofGraphCursor;
-import com.apicatalog.trust.proof.ProofGraphReader;
-import com.apicatalog.trust.proof.ProofMapCursor;
-import com.apicatalog.trust.proof.ProofMapReader;
+import com.apicatalog.trust.proof.GraphProofCursor;
+import com.apicatalog.trust.proof.GraphProofReader;
+import com.apicatalog.trust.proof.MapProofCursor;
+import com.apicatalog.trust.proof.MapProofReader;
 
 public class DataIntegrity {
 
@@ -35,12 +35,12 @@ public class DataIntegrity {
         private final String c14n;
         private final C14nFactory c14nFactory;
 
-        private ProofGraphCursor.Factory factory;
+        private GraphProofCursor.Factory factory;
 
         private BiConsumer<Map<String, Object>, QuadConsumer> tordf;
 
         Map<String, CryptoSuite> cryptosuites;
-        Map<String, ProofGraphReader> readers;
+        Map<String, GraphProofReader> readers;
 
         private GraphModelBuilder(String c14n, C14nFactory c14nFactory) {
             this.c14n = c14n;
@@ -53,7 +53,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public GraphModelBuilder processor(ProofGraphCursor.Factory factory) {
+        public GraphModelBuilder processor(GraphProofCursor.Factory factory) {
             this.factory = factory;
             return this;
         }
@@ -69,7 +69,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public GraphModelBuilder proof(String proofType, ProofGraphReader reader) {
+        public GraphModelBuilder proof(String proofType, GraphProofReader reader) {
             readers.put(proofType, reader);
             return this;
         }
@@ -99,11 +99,11 @@ public class DataIntegrity {
 
         final String c14n;
 
-        ProofMapCursor.Factory factory;
+        MapProofCursor.Factory factory;
 
         Function<Map<String, Object>, byte[]> canonize;
 
-        Collection<ProofMapReader> readers;
+        Collection<MapProofReader> readers;
 
         private TypeModelBuilder(String c14n) {
             this.c14n = c14n;
@@ -114,7 +114,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public TypeModelBuilder processor(ProofMapCursor.Factory factory) {
+        public TypeModelBuilder processor(MapProofCursor.Factory factory) {
             this.factory = factory;
             return this;
         }
@@ -127,9 +127,9 @@ public class DataIntegrity {
             return this;
         }
 
-        public TypeModelBuilder proof(ProofMapReader reader) {
+        public TypeModelBuilder proof(MapProofReader reader) {
             if (readers == null) {
-                readers = new ArrayList<ProofMapReader>();
+                readers = new ArrayList<MapProofReader>();
             }
             readers.add(reader);
             return this;

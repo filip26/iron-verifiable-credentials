@@ -3,6 +3,7 @@ package com.apicatalog.di.signature;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.SignatureException;
+import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
@@ -14,8 +15,9 @@ import com.apicatalog.trust.proof.Proof;
 public final class ProofValue implements AtomicSignature {
 
     private final String algorithm;
-
-    private byte[] digest;
+    private final String digestAlgorithm;
+    
+//    private byte[] digest;
     private final byte[] value;
 
     private final Data data;
@@ -23,12 +25,12 @@ public final class ProofValue implements AtomicSignature {
 
     private ProofValue(
             String algorithm,
-            byte[] digest,
+            String digestAlgorithm,
             byte[] value,
             Proof proof,
             Data data) {
         this.algorithm = algorithm;
-        this.digest = digest;
+        this.digestAlgorithm = digestAlgorithm;
         this.value = value;
         this.data = data;
         this.proof = proof;
@@ -36,16 +38,16 @@ public final class ProofValue implements AtomicSignature {
 
     public static ProofValue newSignature(
             String algorithm,
-            MessageDigest messageDigest,
+            String digestAlgorithm,
             byte[] value,
             Proof proof,
             Data data) {
 
-        var digest = digest(messageDigest, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
+//        var digest = digest(messageDigest, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
 
         return new ProofValue(
                 algorithm,
-                digest,
+                digestAlgorithm,
                 value,
                 proof,
                 data);
@@ -62,15 +64,23 @@ public final class ProofValue implements AtomicSignature {
 
         return new ProofValue(
                 algorithm,
-                digest,
+                messageDigest.getAlgorithm(),
                 signer.sign(digest),
                 proof,
                 data);
     }
 
     @Override
-    public boolean verify(AsymmetricVerifier verifier, byte[] publicKey)
+    public boolean verify(
+            AsymmetricVerifier verifier, 
+            Function<String, MessageDigest> digestFactory,
+            byte[] publicKey)
             throws InvalidKeyException, SignatureException {
+        
+        var digestor = digestFactory.apply(digestAlgorithm);
+        
+        var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
+
         return verifier.verify(publicKey, digest, toByteArray());
     }
 

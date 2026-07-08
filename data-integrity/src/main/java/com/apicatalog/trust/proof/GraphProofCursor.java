@@ -13,38 +13,32 @@ import com.apicatalog.trust.data.GraphData;
 import com.apicatalog.trust.model.GraphModel;
 import com.apicatalog.trust.model.GraphModel.Canonizer;
 
-/*
- * 1. JSON-LD expansion + type, uri map
- * 2. separating proof
- * 3. instantiate document function -> out
- * 4. instantiate proof(index) function -> out
- */
-public class ProofGraphCursor implements ProofCursor {
+public class GraphProofCursor implements ProofCursor {
 
     private final GraphModel model;
 
     Map<String, Collection<String[]>> graphs;
-    Map<String, ProofGraphReader> readers;
+    Map<String, GraphProofReader> readers;
 
     GraphData payload;
     Iterator<Entry<String, Collection<String[]>>> iterator;
 
     Proof currentProof;
     Map.Entry<String, Collection<String[]>> currentEntry;
-    ProofGraphReader currentProofReader;
+    GraphProofReader currentProofReader;
 
     @FunctionalInterface
     public interface Factory {
-        ProofGraphCursor newInstance(
+        GraphProofCursor newInstance(
                 GraphModel model,
                 Map<String, Collection<String[]>> graphs,
-                Map<String, ProofGraphReader> readers);
+                Map<String, GraphProofReader> readers);
     }
 
-    public ProofGraphCursor(
+    public GraphProofCursor(
             GraphModel model,
             Map<String, Collection<String[]>> graphs,
-            Map<String, ProofGraphReader> readers) {
+            Map<String, GraphProofReader> readers) {
         this.model = model;
         this.graphs = graphs;
         this.readers = readers;

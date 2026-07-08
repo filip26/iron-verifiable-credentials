@@ -6,7 +6,9 @@ import java.util.Collection;
 import com.apicatalog.trust.data.CanonicalPayload;
 import com.apicatalog.trust.signature.Signature;
 
-public interface Proof extends CanonicalPayload {
+public interface Proof 
+extends CanonicalPayload
+{
 
     String type();
 

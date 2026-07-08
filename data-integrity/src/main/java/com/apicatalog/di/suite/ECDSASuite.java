@@ -6,8 +6,6 @@ import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.signature.ProofValue;
-import com.apicatalog.di.signature.ProofValueDecoder;
-import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.data.Data;
@@ -19,16 +17,12 @@ import com.apicatalog.trust.signature.SignatureGenerator;
 public class ECDSASuite {
 
     public static CryptoSuite newRDFC2019(Function<String, MessageDigest> digestFactory) {
-
-        var digestor = digestFactory.apply("SHA-256");
-
         return new AtomicCryptoSuite(
                 "ecdsa-rdfc-2019",
                 "RDFC",
                 Multibase.BASE_58_BTC,
-                new Decoder(Multibase.BASE_58_BTC, digestFactory),
-                new Generator(digestFactory),
-                64);
+                new Decoder(Multibase.BASE_58_BTC),
+                new Generator(digestFactory));
     }
 
     public static CryptoSuite newJCS2019(Function<String, MessageDigest> digestFactory) {
@@ -36,48 +30,46 @@ public class ECDSASuite {
                 "ecdsa-jcs-2019",
                 "JCS",
                 Multibase.BASE_58_BTC,
-                new Decoder(Multibase.BASE_58_BTC, digestFactory),
-                new Generator(digestFactory),
-                96);
+                new Decoder(Multibase.BASE_58_BTC),
+                new Generator(digestFactory));
     }
 
     private static class Decoder implements SignatureDecoder {
 
         private final Multibase multibase;
-        private final Function<String, MessageDigest> digestFactory;
 
-        public Decoder(Multibase multibase, Function<String, MessageDigest> digestFactory) {
+        public Decoder(Multibase multibase) {
             this.multibase = multibase;
-            this.digestFactory = digestFactory;
         }
 
         @Override
         public Signature decode(String value, Proof proof, Data data) {
 
+            var signature = multibase.decode(value);
+
             String algorithm = null;
-            MessageDigest digest = null;
+            String digest = null;
 
-            // BTC58: 64 = 64-88, 96 = 96-132
-            if (value.length() >= 65 && value.length() <= 89) {
+            switch (signature.length) {
+            case 64:
                 algorithm = "P-256";
-                digest = digestFactory.apply("SHA-256");
-
-            } else if (value.length() >= 97 && value.length() <= 133) {
+                digest = "SHA-256";
+                break;
+            case 96:
                 algorithm = "P-384";
-                digest = digestFactory.apply("SHA-384");
-
-            } else {
+                digest = "SHA-384";
+                break;
+            default:
                 throw new IllegalArgumentException();
             }
 
             return ProofValue.newSignature(
                     algorithm,
                     digest,
-                    multibase.decode(value),
+                    signature,
                     proof,
                     data);
         }
-
     }
 
     private static class Generator implements SignatureGenerator<DataIntegrityProof> {
@@ -109,7 +101,5 @@ public class ECDSASuite {
                     proof,
                     data);
         }
-
     }
-
 }

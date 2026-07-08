@@ -12,26 +12,24 @@ import com.apicatalog.trust.signature.SignatureGenerator;
 public class ProofValueGenerator implements SignatureGenerator<DataIntegrityProof> {
 
     private final MessageDigest digestor;
-    
+
     public ProofValueGenerator(MessageDigest digestor) {
         this.digestor = digestor;
     }
-    
+
     @Override
     public Signature generate(
-            String algorithm, 
+            String algorithm,
             AsymmetricSigner signer,
-            DataIntegrityProof proof, 
+            DataIntegrityProof proof,
             Data data)
             throws SignatureException {
 
         return ProofValue.generateSignature(
-                algorithm, 
-                signer, 
-                digestor, 
-                proof, 
+                algorithm,
+                signer,
+                digestor,
+                proof,
                 data);
     }
-    
-
 }

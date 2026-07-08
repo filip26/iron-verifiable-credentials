@@ -17,9 +17,8 @@ public class EdDSASuite {
                 "eddsa-rdfc-2022",
                 "RDFC",
                 Multibase.BASE_58_BTC,
-                new ProofValueDecoder("Ed25519", Multibase.BASE_58_BTC, digestor, 64),
-                new ProofValueGenerator(digestor),
-                64);
+                new ProofValueDecoder("Ed25519", "SHA-256", Multibase.BASE_58_BTC, 64),
+                new ProofValueGenerator(digestor));
     }
 
     public static CryptoSuite newJCS2022(Function<String, MessageDigest> digestFactory) {
@@ -30,8 +29,7 @@ public class EdDSASuite {
                 "eddsa-jcs-2022",
                 "JCS",
                 Multibase.BASE_58_BTC,
-                new ProofValueDecoder("Ed25519", Multibase.BASE_58_BTC, digestor, 64),
-                new ProofValueGenerator(digestor),
-                64);
+                new ProofValueDecoder("Ed25519", "SHA-256", Multibase.BASE_58_BTC, 64),
+                new ProofValueGenerator(digestor));
     }
 }

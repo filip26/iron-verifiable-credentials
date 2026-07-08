@@ -1,7 +1,9 @@
 package com.apicatalog.trust;
 
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.SignatureException;
+import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.signature.Signature;
@@ -18,5 +20,5 @@ public interface AtomicSignature extends Signature {
      * @throws InvalidKeyException if the public key is invalid
      * @throws SignatureException  if the signature verification process fails
      */
-    boolean verify(AsymmetricVerifier verifier, byte[] publicKey) throws InvalidKeyException, SignatureException;
+    boolean verify(AsymmetricVerifier verifier, Function<String, MessageDigest> digestFactory, byte[] publicKey) throws InvalidKeyException, SignatureException;
 }

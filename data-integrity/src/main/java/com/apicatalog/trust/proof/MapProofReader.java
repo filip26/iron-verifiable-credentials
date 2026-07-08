@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import com.apicatalog.trust.data.Data;
 
-public interface ProofMapReader {
+public interface MapProofReader {
     
     boolean isAccepted(Map<String, Object> proof);
 

@@ -45,20 +45,20 @@ import com.apicatalog.trust.model.GraphModel.QuadConsumer;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.model.ModelResolver;
 import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.proof.ProofGraphCursor;
-import com.apicatalog.trust.proof.ProofMapCursor;
+import com.apicatalog.trust.proof.GraphProofCursor;
+import com.apicatalog.trust.proof.MapProofCursor;
 import com.fasterxml.jackson.core.JsonFactory;
 
 public class VerifierTest {
 
     static Model MODEL_1 = DataIntegrity.newTypeModelBuilder("JCS")
-//            .proof(Resources.EDDSA_JCS_2022)
-//            .proof(CryptoSuites.ECDSA_JCS_2019_P256)
-//            .proof(CryptoSuites.ECDSA_JCS_2019_P384)
-//            .proof(CryptoSuites.MLDSA44_JCS_2024)
+            .proof(EdDSASuite.newJCS2022(Resources.DIGEST_FACTORY::get))
+            .proof(ECDSASuite.newJCS2019(Resources.DIGEST_FACTORY::get))
+            .proof(MLDSA44Suite.newJCS2024(Resources.DIGEST_FACTORY::get))
+
 //            .proof(CryptoSuites.SLHDSA128_JCS_2024)
             .c14n(Jcs::canonize)
-            .processor(ProofMapCursor::new)
+            .processor(MapProofCursor::new)
             .build();
 
     static Model MODEL_2 = DataIntegrity.newGraphModelBuilder("RDFC", VerifierTest::newRdfc)
@@ -68,13 +68,13 @@ public class VerifierTest {
 //            .proof(CryptoSuites.SLHDSA128_RDFC_2024)
             .Ed25519Signature2020()            
             .tordf(VerifierTest::tordfc)
-            .processor(ProofGraphCursor::new)
+            .processor(GraphProofCursor::new)
             .build();
 
     static ModelResolver MODEL_RESOLVER = ModelResolver.newBuilder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty),
-//                    MODEL_1,
+                    MODEL_1,
                     MODEL_2)
             .build();
 
@@ -112,6 +112,7 @@ public class VerifierTest {
             .verifier("P-384", BCECDSAVerifier.getP384Instance()::verify)
             .verifier("ML-DSA-44", BCMLDSAVerifier.get44Instance()::verify)
             .verifier("SLH-DSA-SHA2-128s", BCSLHDSAVerifier.get128sInstance()::verify)
+            .digestFactory(Resources.DIGEST_FACTORY::get)
             .build();
 
     @ParameterizedTest

@@ -11,13 +11,13 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 
 import com.apicatalog.trust.proof.ProofCursor;
-import com.apicatalog.trust.proof.ProofMapReader;
-import com.apicatalog.trust.proof.ProofMapCursor.Factory;
+import com.apicatalog.trust.proof.MapProofReader;
+import com.apicatalog.trust.proof.MapProofCursor.Factory;
 
 public class TypeSpecificModel implements Model {
 
     private final Factory factory;
-    private final Collection<ProofMapReader> proofReaders;
+    private final Collection<MapProofReader> proofReaders;
 
     private final String c14n;
     private final Function<Map<String, Object>, byte[]> canonize;
@@ -26,7 +26,7 @@ public class TypeSpecificModel implements Model {
             Factory factory,
             String c14n,
             Function<Map<String, Object>, byte[]> canonize,
-            Collection<ProofMapReader> proofReaders) {
+            Collection<MapProofReader> proofReaders) {
         this.factory = factory;
         this.proofReaders = proofReaders;
         this.c14n = c14n;
@@ -54,14 +54,14 @@ public class TypeSpecificModel implements Model {
             proofs = col;
         }
 
-        var mapping = new ArrayList<Entry<Map<String, Object>, ProofMapReader>>(proofs.size());
+        var mapping = new ArrayList<Entry<Map<String, Object>, MapProofReader>>(proofs.size());
 
         boolean cursor = false;
         
         for (var proof : proofs) {
             if (proof instanceof Map proofMap) {
 
-                ProofMapReader reader = null;
+                MapProofReader reader = null;
 
                 for (var proofReader : proofReaders) {
                     if (proofReader.isAccepted((Map<String, Object>) proofMap)) {

@@ -14,37 +14,23 @@ import com.apicatalog.trust.signature.SignatureGenerator;
 public class AtomicCryptoSuite implements CryptoSuite {
 
     String id;
-//    String algorithm; // P-256, P-384, Ed25519, ML-DSA-44, ...
     String c14n; // JCS, RDFC, ..
-//    String digestName;
-
-    int signatureLength;
-
     Multibase multibase;
-//    MessageDigest digestor;
-
     SignatureDecoder signatureDecoder;
     SignatureGenerator<DataIntegrityProof> signatureGenerator;
-//    Selector selector;
 
     public AtomicCryptoSuite(
             String id,
-//            String algorithm,
             String c14n,
-//            String digestName,
             Multibase multibase,
             SignatureDecoder signatureDecoder,
-            SignatureGenerator<DataIntegrityProof> signatureGenerator,
-            int signatureLength) {
+            SignatureGenerator<DataIntegrityProof> signatureGenerator) {
         this.id = id;
-//        this.algorithm = algorithm;
         this.c14n = c14n;
-//        this.digestName = digestName;
         this.multibase = multibase;
 
         this.signatureGenerator = signatureGenerator;
         this.signatureDecoder = signatureDecoder;
-        this.signatureLength = signatureLength;
     }
 
     @Override

@@ -11,30 +11,30 @@ import com.apicatalog.trust.data.GenericPayload;
 import com.apicatalog.trust.data.MapData;
 import com.apicatalog.trust.model.TypeSpecificModel;
 
-public class ProofMapCursor implements ProofCursor {
+public class MapProofCursor implements ProofCursor {
 
     public interface Factory {
-        ProofMapCursor newInstance(
+        MapProofCursor newInstance(
                 TypeSpecificModel model,
                 Map<String, Object> document,
-                Collection<Entry<Map<String, Object>, ProofMapReader>> proofReaders);
+                Collection<Entry<Map<String, Object>, MapProofReader>> proofReaders);
     }
 
     final TypeSpecificModel model;
     final Map<String, Object> payload;
-    final Collection<Entry<Map<String, Object>, ProofMapReader>> proofs;
+    final Collection<Entry<Map<String, Object>, MapProofReader>> proofs;
 
     Data document;
-    Iterator<Entry<Map<String, Object>, ProofMapReader>> iterator;
+    Iterator<Entry<Map<String, Object>, MapProofReader>> iterator;
 
     Proof currentProof;
     int currentIndex;
-    Entry<Map<String, Object>, ProofMapReader> currentEntry;
+    Entry<Map<String, Object>, MapProofReader> currentEntry;
 
-    public ProofMapCursor(
+    public MapProofCursor(
             TypeSpecificModel model,
             Map<String, Object> payload,
-            Collection<Entry<Map<String, Object>, ProofMapReader>> proofs) {
+            Collection<Entry<Map<String, Object>, MapProofReader>> proofs) {
         this.model = model;
         this.payload = payload;
         this.proofs = proofs;

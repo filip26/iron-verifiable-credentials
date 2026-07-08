@@ -22,8 +22,8 @@ import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.model.GraphModel.C14nFactory;
 import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.proof.ProofGraphCursor;
-import com.apicatalog.trust.proof.ProofGraphReader;
+import com.apicatalog.trust.proof.GraphProofCursor;
+import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.signature.Signature;
 
 public final class Ed25519Signature2020 implements Proof {
@@ -265,11 +265,11 @@ public final class Ed25519Signature2020 implements Proof {
         }
     }
 
-    public static ProofGraphReader newReader(C14nFactory factory) {
+    public static GraphProofReader newReader(C14nFactory factory) {
         return new GraphReader(factory);
     }
 
-    public static class GraphReader implements ProofGraphReader {
+    public static class GraphReader implements GraphProofReader {
 
         private final C14nFactory factory;
 
@@ -283,7 +283,7 @@ public final class Ed25519Signature2020 implements Proof {
         }
 
         @Override
-        public Proof read(Collection<String[]> proof, ProofGraphCursor cursor) {
+        public Proof read(Collection<String[]> proof, GraphProofCursor cursor) {
 
             final var di = new Ed25519Signature2020();
 
@@ -318,16 +318,17 @@ public final class Ed25519Signature2020 implements Proof {
 
             if (proofValue != null) {
 
-                try {
+//                try {
                     di.signature = ProofValue.newSignature(
                             Ed25519Signature2020.KEY_ALGORITHM,
-                            MessageDigest.getInstance(HASH_ALGORITHM),
+//                            MessageDigest.getInstance(HASH_ALGORITHM),
+                            HASH_ALGORITHM,
                             proofValue,
                             di,
                             cursor.data(Set.of()));
-                } catch (NoSuchAlgorithmException e) {
-                    throw new IllegalStateException(e);
-                }
+//                } catch (NoSuchAlgorithmException e) {
+//                    throw new IllegalStateException(e);
+//                }
             }
 
             return di;

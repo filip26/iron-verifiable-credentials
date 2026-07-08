@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import com.apicatalog.trust.proof.ProofCursor;
-import com.apicatalog.trust.proof.ProofGraphCursor.Factory;
-import com.apicatalog.trust.proof.ProofGraphReader;
+import com.apicatalog.trust.proof.GraphProofCursor.Factory;
+import com.apicatalog.trust.proof.GraphProofReader;
 
 public class GraphModel implements Model {
 
@@ -43,14 +43,14 @@ public class GraphModel implements Model {
     private final String c14n;
     private final BiConsumer<Map<String, Object>, QuadConsumer> tordf;
     private final C14nFactory canonizeFactory;
-    private final Map<String, ProofGraphReader> readers;
+    private final Map<String, GraphProofReader> readers;
 
     public GraphModel(
             Factory factory,
             String c14n,
             BiConsumer<Map<String, Object>, QuadConsumer> tordf,
             C14nFactory canonizeFactory,
-            Map<String, ProofGraphReader> readers) {
+            Map<String, GraphProofReader> readers) {
         this.cursorFactory = factory;
         this.c14n = c14n;
         this.tordf = tordf;
@@ -76,7 +76,7 @@ public class GraphModel implements Model {
 
         var graphs = dataset.graphs();
 
-        var proofReaders = new HashMap<String, ProofGraphReader>(dataset.mapping);
+        var proofReaders = new HashMap<String, GraphProofReader>(dataset.mapping);
 
         for (var entry : dataset.mapping.entrySet()) {
 
@@ -97,15 +97,15 @@ public class GraphModel implements Model {
 
     private static class DatasetProvider implements QuadConsumer {
 
-        private final Map<String, ProofGraphReader> readers;
+        private final Map<String, GraphProofReader> readers;
 
         private Map<String, Collection<String[]>> dataset = new HashMap<>();
 
         private Collection<String> proofGraphs = new HashSet<>();
 
-        private Map<String, ProofGraphReader> mapping = new HashMap<>();
+        private Map<String, GraphProofReader> mapping = new HashMap<>();
 
-        public DatasetProvider(Map<String, ProofGraphReader> readers) {
+        public DatasetProvider(Map<String, GraphProofReader> readers) {
             this.readers = readers;
         }
 

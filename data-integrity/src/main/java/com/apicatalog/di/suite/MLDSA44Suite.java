@@ -9,6 +9,10 @@ import com.apicatalog.multibase.Multibase;
 
 public class MLDSA44Suite {
 
+    public static final String ALGORITHM = "ML-DSA-44";
+    public static final int SIGNATURE_LENGTH = 2420;
+    public static final int PUBLIC_KEY_SIZE = 1312;
+
     public static CryptoSuite newRDFC2024(Function<String, MessageDigest> digestFactory) {
 
         var digestor = digestFactory.apply("SHA-256");
@@ -17,9 +21,8 @@ public class MLDSA44Suite {
                 "mldsa44-rdfc-2024",
                 "RDFC",
                 Multibase.BASE_64_URL,
-                new ProofValueDecoder("ML-DSA-44", Multibase.BASE_64_URL, digestor, 2420),
-                new ProofValueGenerator(digestor),
-                2420);
+                new ProofValueDecoder(ALGORITHM, "SHA-256",  Multibase.BASE_64_URL, SIGNATURE_LENGTH),
+                new ProofValueGenerator(digestor));
     }
 
     public static CryptoSuite newJCS2024(Function<String, MessageDigest> digestFactory) {
@@ -30,8 +33,7 @@ public class MLDSA44Suite {
                 "mldsa44-jcs-2024",
                 "JCS",
                 Multibase.BASE_64_URL,
-                new ProofValueDecoder("ML-DSA-44", Multibase.BASE_64_URL, digestor, 2420),
-                new ProofValueGenerator(digestor),
-                2420);
+                new ProofValueDecoder(ALGORITHM, "SHA-256", Multibase.BASE_64_URL, SIGNATURE_LENGTH),
+                new ProofValueGenerator(digestor));
     }
 }

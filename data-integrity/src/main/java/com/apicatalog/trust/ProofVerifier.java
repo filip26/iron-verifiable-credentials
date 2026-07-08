@@ -1,6 +1,7 @@
 package com.apicatalog.trust;
 
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.SignatureException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.proof.Proof;
@@ -17,12 +19,17 @@ public class ProofVerifier {
     Collection<String> proofTypes;
     MethodResolver methodResolver;
     Map<String, AsymmetricVerifier> signatureVerifiers;
+    Function<String, MessageDigest> digestFactory;
 
-    private ProofVerifier(Set<String> proofTypes, MethodResolver methodResolver,
-            Map<String, AsymmetricVerifier> signatureVerifiers) {
+    private ProofVerifier(
+            Set<String> proofTypes,
+            MethodResolver methodResolver,
+            Map<String, AsymmetricVerifier> signatureVerifiers,
+            Function<String, MessageDigest> digestFactory) {
         this.proofTypes = proofTypes;
         this.methodResolver = methodResolver;
         this.signatureVerifiers = signatureVerifiers;
+        this.digestFactory = digestFactory;
     }
 
     public static Builder newBuilder() {
@@ -51,7 +58,7 @@ public class ProofVerifier {
         return verify(proof, publicKey, signatureVerifiers.get(proof.signature().algorithm()));
     }
 
-    public static boolean verify(Proof proof, byte[] publicKey, AsymmetricVerifier verifier)
+    public boolean verify(Proof proof, byte[] publicKey, AsymmetricVerifier verifier)
             throws InvalidKeyException, SignatureException {
 
         Objects.requireNonNull(proof);
@@ -63,7 +70,7 @@ public class ProofVerifier {
         }
 
         if (proof.signature() instanceof AtomicSignature atomic) {
-            return atomic.verify(verifier, publicKey);
+            return atomic.verify(verifier, digestFactory,  publicKey);
         }
 
         throw new SignatureException();
@@ -74,6 +81,7 @@ public class ProofVerifier {
         Collection<String> proofTypes;
         Map<String, AsymmetricVerifier> verifiers;
         MethodResolver resolver;
+        Function<String, MessageDigest> digestFactory;
 
         private Builder() {
             this.proofTypes = new HashSet<String>();
@@ -94,9 +102,14 @@ public class ProofVerifier {
             verifiers.put(publicKeyAlgorithm, verifier);
             return this;
         }
+        
+        public Builder digestFactory(Function<String, MessageDigest> digestFactory) {
+            this.digestFactory = digestFactory;
+            return this;
+        }
 
         public ProofVerifier build() {
-            return new ProofVerifier(Set.copyOf(proofTypes), resolver, Map.copyOf(verifiers));
+            return new ProofVerifier(Set.copyOf(proofTypes), resolver, Map.copyOf(verifiers), digestFactory);
         }
     }
 }

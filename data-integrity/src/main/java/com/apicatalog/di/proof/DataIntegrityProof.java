@@ -24,9 +24,9 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.proof.ProofGraphCursor;
-import com.apicatalog.trust.proof.ProofGraphReader;
-import com.apicatalog.trust.proof.ProofMapReader;
+import com.apicatalog.trust.proof.GraphProofCursor;
+import com.apicatalog.trust.proof.GraphProofReader;
+import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.signature.Signature;
 
 public final class DataIntegrityProof implements Proof {
@@ -731,7 +731,7 @@ public final class DataIntegrityProof implements Proof {
         return out.toByteArray();
     }
 
-    public static class MapReader implements ProofMapReader {
+    public static class MapReader implements MapProofReader {
 
         private final CryptoSuite cryptosuite;
 
@@ -863,7 +863,7 @@ public final class DataIntegrityProof implements Proof {
 //        }
 //    }
 
-    public static class GraphReader implements ProofGraphReader {
+    public static class GraphReader implements GraphProofReader {
 
         private final Map<String, CryptoSuite> cryptosuites;
 
@@ -883,7 +883,7 @@ public final class DataIntegrityProof implements Proof {
         }
 
         @Override
-        public Proof read(Collection<String[]> proof, ProofGraphCursor cursor) {
+        public Proof read(Collection<String[]> proof, GraphProofCursor cursor) {
             final var di = new DataIntegrityProof();
 
             var canonizer = cursor.newCanonizer();
@@ -895,7 +895,6 @@ public final class DataIntegrityProof implements Proof {
             for (var statement : proof) {
                 switch (statement[1]) {
                 case URI_CRYPTOSUITE:
-                    IO.println(">>>>>>>>>>> " + statement[2] + "," + cryptosuites.keySet());
                     di.cryptosuite = cryptosuites.get(statement[2]);
                     break;
                 case URI_CREATED:
