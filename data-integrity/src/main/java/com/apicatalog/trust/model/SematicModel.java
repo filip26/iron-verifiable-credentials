@@ -12,11 +12,13 @@ import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.proof.GraphProofCursor.Factory;
 import com.apicatalog.trust.proof.GraphProofReader;
 
-public class SematicModel implements Model {
+public class SematicModel implements DataModel {
 
+    // use just Supplier
     @FunctionalInterface
+    @Deprecated
     public interface C14nFactory {
-        Canonizer newInstance();
+        GraphCanonizer newInstance();
     }
 
     @FunctionalInterface
@@ -31,13 +33,11 @@ public class SematicModel implements Model {
                 String graph);
     }
 
-    public interface Canonizer {
+    public interface GraphCanonizer {
         QuadConsumer consumer();
 
         byte[] canonize();
     }
-
-    // Map<String, Collection<String[]
 
     private final Factory cursorFactory;
     private final String c14n;
@@ -64,7 +64,7 @@ public class SematicModel implements Model {
     }
 
     @Override
-    public ProofCursor createCursor(Collection<String> context, Map<String, Object> document) {
+    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
 
         var dataset = new DatasetProvider(readers);
 
@@ -163,7 +163,7 @@ public class SematicModel implements Model {
 
     }
 
-    public Canonizer newCanonizer() {
+    public GraphCanonizer newCanonizer() {
         return canonizeFactory.newInstance();
     }
 }

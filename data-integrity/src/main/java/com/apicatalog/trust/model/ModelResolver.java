@@ -10,9 +10,9 @@ import java.util.function.Predicate;
 
 public class ModelResolver {
 
-    Collection<Entry<Predicate<Collection<String>>, Collection<Model>>> models;
+    Collection<Entry<Predicate<Collection<String>>, Collection<DataModel>>> models;
 
-    private ModelResolver(Collection<Entry<Predicate<Collection<String>>, Collection<Model>>> models) {
+    private ModelResolver(Collection<Entry<Predicate<Collection<String>>, Collection<DataModel>>> models) {
         this.models = models;
     }
 
@@ -38,7 +38,7 @@ public class ModelResolver {
         };
     }
 
-    public Collection<Model> resolve(Collection<String> contexts, Map<String, Object> document) {
+    public Collection<DataModel> resolve(Collection<String> contexts, Map<String, Object> document) {
         for (var entry : models) {
             if (entry.getKey().test(contexts)) {
                 return entry.getValue();
@@ -49,11 +49,11 @@ public class ModelResolver {
 
     public static class Builder {
 
-        Collection<Entry<Predicate<Collection<String>>, Collection<Model>>> models;
+        Collection<Entry<Predicate<Collection<String>>, Collection<DataModel>>> models;
 
         public Builder model(
                 Predicate<Collection<String>> selector,
-                Model... model) {
+                DataModel... model) {
 
             if (this.models == null) {
                 this.models = new ArrayList<>();

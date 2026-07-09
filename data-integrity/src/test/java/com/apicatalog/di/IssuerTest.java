@@ -46,6 +46,7 @@ import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.data.GenericPayload;
 import com.apicatalog.trust.data.MapData;
+import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.proof.Proof;
 import com.fasterxml.jackson.core.JsonFactory;
 
@@ -115,11 +116,11 @@ public class IssuerTest {
 
         var composer = new NativeComposer<Map<String, ? extends Object>>();
 
-        if (DataIntegrityProof.TYPE.key().equals(options.get("type"))) {
+        if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
             var proofDraft = DataIntegrityProof.newDraft(
                     options,
-                    cryptosuite -> getInstance(cryptosuite));
+                    IssuerTest::getInstance);
 
             var c14nData = document;
 
@@ -137,8 +138,8 @@ public class IssuerTest {
             }
 
             var canonicalPayload = switch (proofDraft.c14n()) {
-            case "JCS" -> Jcs.canonize(c14nData);
-            case "RDFC" -> rdfc(c14nData);
+            case DataModel.C14N_JCS -> Jcs.canonize(c14nData);
+            case DataModel.C14N_RDFC -> rdfc(c14nData);
             default -> throw new IllegalStateException(
                     """
                     Unsupported c14n = %s.
@@ -150,7 +151,7 @@ public class IssuerTest {
 
             proof = proofDraft.generateProof(
                     keyAlgorithm,
-                    signer,          
+                    signer,
                     Resources.DIGEST_FACTORY::get,
                     proofDraft,
                     data);
@@ -160,8 +161,6 @@ public class IssuerTest {
             if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
                 document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
             }
-
-//            IO.println("P: " + Multibase.BASE_58_BTC.encode(proof.signature().toByteArray()));
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 
@@ -221,7 +220,7 @@ public class IssuerTest {
         case "eddsa-jcs-2022" -> EdDSA2022.withJCS();
 
         case "ecdsa-rdfc-2019" -> ECDSA2019.withRDFC();
-        case "ecdsa-jcs-2019" ->  ECDSA2019.withJCS();
+        case "ecdsa-jcs-2019" -> ECDSA2019.withJCS();
 
         case "mldsa44-rdfc-2024" -> MLDSA2024.get44withRDFC();
         case "mldsa44-jcs-2024" -> MLDSA2024.get44withJCS();
@@ -232,7 +231,7 @@ public class IssuerTest {
         default -> throw new IllegalArgumentException();
         };
     }
-    
+
     static final Stream<String> resources() throws IOException {
         return Resources.stream()
                 .filter(name -> name.endsWith("unsigned.json"))

@@ -40,11 +40,11 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
-import com.apicatalog.trust.model.SematicModel;
-import com.apicatalog.trust.model.SematicModel.Canonizer;
-import com.apicatalog.trust.model.SematicModel.QuadConsumer;
-import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.model.ModelResolver;
+import com.apicatalog.trust.model.SematicModel;
+import com.apicatalog.trust.model.SematicModel.GraphCanonizer;
+import com.apicatalog.trust.model.SematicModel.QuadConsumer;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.MapProofCursor;
 import com.apicatalog.trust.proof.Proof;
@@ -52,7 +52,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 public class VerifierTest {
 
-    static Model MODEL_1 = DataIntegrity.newLexicalModelBuilder(Model.C14N_JCS)
+    static DataModel MODEL_1 = DataIntegrity.newLexicalModelBuilder(DataModel.C14N_JCS)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
@@ -61,7 +61,7 @@ public class VerifierTest {
             .processor(MapProofCursor::new)
             .build();
 
-    static Model MODEL_2 = DataIntegrity.newSematicModelBuilder(Model.C14N_RDFC)
+    static DataModel MODEL_2 = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
             .proof(EdDSA2022::get)
             .proof(ECDSA2019.withRDFC())
             .proof(MLDSA2024::get44)
@@ -103,10 +103,8 @@ public class VerifierTest {
     };
 
     static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
-            .proof(DataIntegrityProof.TYPE.key())
             // TODO allow list concrete DI cryptosuites only OR list models and
             // configurations
-            .proof(Ed25519Signature2020.TYPE_NAME)
             .resolver(DID_KEY_RESOLVER)
             .verifier(EdDSA2022.ALGORITHM, BCEd25519Verifier.getInstance()::verify)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
@@ -134,7 +132,7 @@ public class VerifierTest {
 
         for (var model : models) {
 
-            var cursor = model.createCursor(contexts, signed);
+            var cursor = model.createProofCursor(contexts, signed);
 
             if (cursor == null) {
                 continue;
@@ -224,7 +222,7 @@ public class VerifierTest {
         return new RdfcPrcessor(); // TODO reuse one instance across
     }
 
-    static class RdfcPrcessor implements Canonizer {
+    static class RdfcPrcessor implements GraphCanonizer {
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         final RdfCanon canon = RdfCanon.create(Resources.DIGEST_FACTORY.get("SHA-256"));

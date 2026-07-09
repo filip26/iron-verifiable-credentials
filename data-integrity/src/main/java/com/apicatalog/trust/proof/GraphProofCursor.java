@@ -11,7 +11,7 @@ import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.data.GenericPayload;
 import com.apicatalog.trust.data.GraphData;
 import com.apicatalog.trust.model.SematicModel;
-import com.apicatalog.trust.model.SematicModel.Canonizer;
+import com.apicatalog.trust.model.SematicModel.GraphCanonizer;
 
 public class GraphProofCursor implements ProofCursor {
 
@@ -127,7 +127,7 @@ public class GraphProofCursor implements ProofCursor {
         return data;
     }
 
-    public Canonizer newCanonizer() {
+    public GraphCanonizer newCanonizer() {
         return model.newCanonizer();
     }
 }

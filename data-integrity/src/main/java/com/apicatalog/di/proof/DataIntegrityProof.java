@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.apicatalog.di.Term;
 import com.apicatalog.di.suite.AtomicCryptoSuite;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.security.AsymmetricSigner;
@@ -32,9 +31,9 @@ import com.apicatalog.trust.signature.Signature;
 
 public final class DataIntegrityProof implements Proof {
 
-    public static final Term TYPE = new Term("DataIntegrityProof", "https://w3id.org/security#DataIntegrityProof");
+    public static final String TYPE_URI = "https://w3id.org/security#DataIntegrityProof";
 
-    public static String TYPE_NAME = "DataIntegrityProof";
+    public static final String TYPE_NAME = "DataIntegrityProof";
 
     private static final String KEY_ID = "id";
     private static final String KEY_TYPE = "type";
@@ -743,7 +742,7 @@ public final class DataIntegrityProof implements Proof {
 
         @Override
         public boolean isAccepted(Map<String, Object> proof) {
-            return TYPE.key().equals(proof.get(KEY_TYPE))
+            return TYPE_NAME.equals(proof.get(KEY_TYPE))
                     && cryptosuites.containsKey(proof.get(KEY_CRYPTOSUITE));
         }
 

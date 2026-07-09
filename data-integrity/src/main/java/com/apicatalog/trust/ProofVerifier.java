@@ -34,7 +34,6 @@ public class ProofVerifier {
     }
 
     public static Builder newBuilder() {
-
         return new Builder();
     }
 
@@ -89,10 +88,11 @@ public class ProofVerifier {
             this.verifiers = new HashMap<>();
         }
 
-        public Builder proof(String proofType) {
-            proofTypes.add(proofType);
-            return this;
-        }
+//TODO
+//        public Builder proof(String proofType) {
+//            proofTypes.add(proofType);
+//            return this;
+//        }
 
         public Builder resolver(MethodResolver resolver) {
             this.resolver = resolver;

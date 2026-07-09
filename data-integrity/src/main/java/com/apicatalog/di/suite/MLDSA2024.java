@@ -4,7 +4,7 @@ import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.data.Data;
-import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -30,8 +30,8 @@ public class MLDSA2024 {
 
     public static CryptoSuite get44(String c14n) {
         return switch (c14n) {
-        case Model.C14N_RDFC -> MLDSA_44_RDFC_2024;
-        case Model.C14N_JCS -> MLDSA_44_JCS_2024;
+        case DataModel.C14N_RDFC -> MLDSA_44_RDFC_2024;
+        case DataModel.C14N_JCS -> MLDSA_44_JCS_2024;
         default -> throw new IllegalArgumentException();
         };
     }

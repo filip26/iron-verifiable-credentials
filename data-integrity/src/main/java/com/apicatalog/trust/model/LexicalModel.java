@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
-import com.apicatalog.trust.proof.ProofCursor;
-import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.MapProofCursor.Factory;
+import com.apicatalog.trust.proof.MapProofReader;
+import com.apicatalog.trust.proof.ProofCursor;
 
-public class LexicalModel implements Model {
+public class LexicalModel implements DataModel {
 
     private final Factory factory;
     private final Map<String, MapProofReader> proofReaders;
@@ -34,7 +34,7 @@ public class LexicalModel implements Model {
     }
 
     @Override
-    public ProofCursor createCursor(Collection<String> context, Map<String, Object> document) {
+    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
 
         var proofProperty = document.get("proof");
 
@@ -55,8 +55,6 @@ public class LexicalModel implements Model {
         }
 
         var mapping = new ArrayList<Entry<Map<String, Object>, MapProofReader>>(proofs.size());
-
-//        boolean cursor = false;
 
         for (var proof : proofs) {
             if (proof instanceof Map proofMap) {
