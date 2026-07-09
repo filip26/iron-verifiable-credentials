@@ -40,9 +40,9 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
-import com.apicatalog.trust.model.GraphModel;
-import com.apicatalog.trust.model.GraphModel.Canonizer;
-import com.apicatalog.trust.model.GraphModel.QuadConsumer;
+import com.apicatalog.trust.model.SematicModel;
+import com.apicatalog.trust.model.SematicModel.Canonizer;
+import com.apicatalog.trust.model.SematicModel.QuadConsumer;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.model.ModelResolver;
 import com.apicatalog.trust.proof.GraphProofCursor;
@@ -52,7 +52,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 public class VerifierTest {
 
-    static Model MODEL_1 = DataIntegrity.newTypeModelBuilder(Model.C14N_JCS)
+    static Model MODEL_1 = DataIntegrity.newLexicalModelBuilder(Model.C14N_JCS)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
@@ -61,7 +61,7 @@ public class VerifierTest {
             .processor(MapProofCursor::new)
             .build();
 
-    static Model MODEL_2 = DataIntegrity.newGraphModelBuilder(Model.C14N_RDFC)
+    static Model MODEL_2 = DataIntegrity.newSematicModelBuilder(Model.C14N_RDFC)
             .proof(EdDSA2022::get)
             .proof(ECDSA2019.withRDFC())
             .proof(MLDSA2024::get44)
@@ -191,7 +191,7 @@ public class VerifierTest {
                 .sorted();
     }
 
-    static final void toRDF(Map<String, Object> document, final GraphModel.QuadConsumer consumer) {
+    static final void toRDF(Map<String, Object> document, final SematicModel.QuadConsumer consumer) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();
@@ -248,7 +248,7 @@ public class VerifierTest {
         @Override
         public QuadConsumer consumer() {
             // TODO remove with rdf-api 2.0.0
-            return new GraphModel.QuadConsumer() {
+            return new SematicModel.QuadConsumer() {
                 @Override
                 public void accept(
                         String subject,

@@ -14,23 +14,23 @@ import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.MapProofCursor.Factory;
 
-public class TypeSpecificModel implements Model {
+public class LexicalModel implements Model {
 
     private final Factory factory;
-    private final Collection<MapProofReader> proofReaders;
+    private final Map<String, MapProofReader> proofReaders;
 
     private final String c14n;
     private final Function<Map<String, Object>, byte[]> canonize;
 
-    public TypeSpecificModel(
+    public LexicalModel(
             Factory factory,
             String c14n,
             Function<Map<String, Object>, byte[]> canonize,
-            Collection<MapProofReader> proofReaders) {
+            Map<String, MapProofReader> proofReaders) {
         this.factory = factory;
-        this.proofReaders = proofReaders;
         this.c14n = c14n;
         this.canonize = canonize;
+        this.proofReaders = proofReaders;
     }
 
     @Override
@@ -56,20 +56,12 @@ public class TypeSpecificModel implements Model {
 
         var mapping = new ArrayList<Entry<Map<String, Object>, MapProofReader>>(proofs.size());
 
-        boolean cursor = false;
-        
+//        boolean cursor = false;
+
         for (var proof : proofs) {
             if (proof instanceof Map proofMap) {
 
-                MapProofReader reader = null;
-
-                for (var proofReader : proofReaders) {
-                    if (proofReader.isAccepted((Map<String, Object>) proofMap)) {
-                        reader = proofReader;
-                        cursor = true;
-                        break;
-                    }
-                }
+                MapProofReader reader = proofReaders.get(proofMap.get("type"));
 
                 Map<String, Object> map = proofMap;
 
@@ -82,7 +74,7 @@ public class TypeSpecificModel implements Model {
             }
         }
 
-        if (!cursor) {
+        if (mapping.isEmpty()) {
             return null;
         }
 

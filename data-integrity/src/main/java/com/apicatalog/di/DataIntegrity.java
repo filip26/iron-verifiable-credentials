@@ -1,7 +1,5 @@
 package com.apicatalog.di;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,11 +9,11 @@ import java.util.function.Function;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.model.GraphModel;
-import com.apicatalog.trust.model.GraphModel.C14nFactory;
-import com.apicatalog.trust.model.GraphModel.QuadConsumer;
+import com.apicatalog.trust.model.SematicModel;
+import com.apicatalog.trust.model.SematicModel.C14nFactory;
+import com.apicatalog.trust.model.SematicModel.QuadConsumer;
 import com.apicatalog.trust.model.Model;
-import com.apicatalog.trust.model.TypeSpecificModel;
+import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.MapProofCursor;
@@ -23,52 +21,52 @@ import com.apicatalog.trust.proof.MapProofReader;
 
 public class DataIntegrity {
 
-    public static GraphModelBuilder newGraphModelBuilder(String c14n) {
-        return new GraphModelBuilder(c14n);
+    public static SemanticModelBuilder newSematicModelBuilder(String c14n) {
+        return new SemanticModelBuilder(c14n);
     }
 
-    public static TypeModelBuilder newTypeModelBuilder(String c14n) {
-        return new TypeModelBuilder(c14n);
+    public static LexicalModelBuilder newLexicalModelBuilder(String c14n) {
+        return new LexicalModelBuilder(c14n);
     }
 
-    public static class GraphModelBuilder {
+    public static class SemanticModelBuilder {
 
         private final String c14n;
-        
+
         private C14nFactory c14nFactory;
 
         private GraphProofCursor.Factory factory;
 
         private BiConsumer<Map<String, Object>, QuadConsumer> tordf;
 
-        Map<String, CryptoSuite> cryptosuites;
-        Map<String, GraphProofReader> readers;
+        private Map<String, CryptoSuite> cryptosuites;
+        private Map<String, GraphProofReader> readers;
 
-        private GraphModelBuilder(String c14n) {
+        private SemanticModelBuilder(String c14n) {
             this.c14n = c14n;
             this.readers = new LinkedHashMap<>();
         }
 
-        public GraphModelBuilder c14n(C14nFactory c14nFactory) {
+        public SemanticModelBuilder c14n(C14nFactory c14nFactory) {
             this.c14nFactory = c14nFactory;
             return this;
         }
-        
-        public GraphModelBuilder tordf(BiConsumer<Map<String, Object>, QuadConsumer> tordf) {
+
+        public SemanticModelBuilder tordf(BiConsumer<Map<String, Object>, QuadConsumer> tordf) {
             this.tordf = tordf;
             return this;
         }
 
-        public GraphModelBuilder processor(GraphProofCursor.Factory factory) {
+        public SemanticModelBuilder processor(GraphProofCursor.Factory factory) {
             this.factory = factory;
             return this;
         }
 
-        public GraphModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
+        public SemanticModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
             return proof(cryptosuite.apply(c14n));
         }
-        
-        public GraphModelBuilder proof(CryptoSuite cryptosuite) {
+
+        public SemanticModelBuilder proof(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
             }
@@ -79,13 +77,13 @@ public class DataIntegrity {
             return this;
         }
 
-        public GraphModelBuilder proof(String proofType, GraphProofReader reader) {
+        public SemanticModelBuilder proof(String proofType, GraphProofReader reader) {
             readers.put(proofType, reader);
             return this;
         }
 
         // legacy support
-        public GraphModelBuilder Ed25519Signature2020() {
+        public SemanticModelBuilder Ed25519Signature2020() {
             proof(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020.newReader());
             return this;
         }
@@ -101,57 +99,72 @@ public class DataIntegrity {
             if (readers.isEmpty()) {
                 throw new IllegalStateException();
             }
-            
+
             if (c14nFactory == null) {
                 throw new IllegalStateException();
             }
 
-            return new GraphModel(factory, c14n, tordf, c14nFactory, readers);
+            return new SematicModel(factory, c14n, tordf, c14nFactory, readers);
         }
     }
 
-    public static class TypeModelBuilder {
+    public static class LexicalModelBuilder {
 
-        final String c14n;
+        final private String c14n;
 
-        MapProofCursor.Factory factory;
+        private Function<Map<String, Object>, byte[]> canonize;
 
-        Function<Map<String, Object>, byte[]> canonize;
+        private MapProofCursor.Factory factory;
 
-        Collection<MapProofReader> readers;
+        private Map<String, CryptoSuite> cryptosuites;
+        private Map<String, MapProofReader> readers;
 
-        private TypeModelBuilder(String c14n) {
+        private LexicalModelBuilder(String c14n) {
             this.c14n = c14n;
+            this.readers = new LinkedHashMap<>();
         }
 
-        public TypeModelBuilder c14n(Function<Map<String, Object>, byte[]> canonize) {
+        public LexicalModelBuilder c14n(Function<Map<String, Object>, byte[]> canonize) {
             this.canonize = canonize;
             return this;
         }
 
-        public TypeModelBuilder processor(MapProofCursor.Factory factory) {
+        public LexicalModelBuilder processor(MapProofCursor.Factory factory) {
             this.factory = factory;
             return this;
         }
 
-        public TypeModelBuilder proof(CryptoSuite cryptosuite) {
+        public LexicalModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
+            return proof(cryptosuite.apply(c14n));
+        }
+
+        public LexicalModelBuilder proof(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
             }
-            proof(new DataIntegrityProof.MapReader(cryptosuite));
-            return this;
-        }
-
-        public TypeModelBuilder proof(MapProofReader reader) {
-            if (readers == null) {
-                readers = new ArrayList<MapProofReader>();
+            if (cryptosuites == null) {
+                cryptosuites = new HashMap<>();
             }
-            readers.add(reader);
+            cryptosuites.put(cryptosuite.id(), cryptosuite);
             return this;
         }
 
         public Model build() {
-            return new TypeSpecificModel(factory, c14n, canonize, readers);
+            if (cryptosuites != null && !cryptosuites.isEmpty()) {
+                readers.put(
+                        DataIntegrityProof.TYPE_NAME,
+                        new DataIntegrityProof.MapReader(cryptosuites));
+            }
+
+            if (readers.isEmpty()) {
+                throw new IllegalStateException();
+            }
+
+            if (canonize == null) {
+                throw new IllegalStateException();
+            }
+
+            return new LexicalModel(factory, c14n, canonize, readers);
         }
     }
 

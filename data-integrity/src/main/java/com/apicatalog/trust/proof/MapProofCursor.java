@@ -9,18 +9,18 @@ import java.util.Map.Entry;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.data.GenericPayload;
 import com.apicatalog.trust.data.MapData;
-import com.apicatalog.trust.model.TypeSpecificModel;
+import com.apicatalog.trust.model.LexicalModel;
 
 public class MapProofCursor implements ProofCursor {
 
     public interface Factory {
         MapProofCursor newInstance(
-                TypeSpecificModel model,
+                LexicalModel model,
                 Map<String, Object> document,
                 Collection<Entry<Map<String, Object>, MapProofReader>> proofReaders);
     }
 
-    final TypeSpecificModel model;
+    final LexicalModel model;
     final Map<String, Object> payload;
     final Collection<Entry<Map<String, Object>, MapProofReader>> proofs;
 
@@ -32,7 +32,7 @@ public class MapProofCursor implements ProofCursor {
     Entry<Map<String, Object>, MapProofReader> currentEntry;
 
     public MapProofCursor(
-            TypeSpecificModel model,
+            LexicalModel model,
             Map<String, Object> payload,
             Collection<Entry<Map<String, Object>, MapProofReader>> proofs) {
         this.model = model;

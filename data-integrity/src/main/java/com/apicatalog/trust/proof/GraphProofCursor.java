@@ -10,12 +10,12 @@ import java.util.Set;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.data.GenericPayload;
 import com.apicatalog.trust.data.GraphData;
-import com.apicatalog.trust.model.GraphModel;
-import com.apicatalog.trust.model.GraphModel.Canonizer;
+import com.apicatalog.trust.model.SematicModel;
+import com.apicatalog.trust.model.SematicModel.Canonizer;
 
 public class GraphProofCursor implements ProofCursor {
 
-    private final GraphModel model;
+    private final SematicModel model;
 
     Map<String, Collection<String[]>> graphs;
     Map<String, GraphProofReader> readers;
@@ -30,13 +30,13 @@ public class GraphProofCursor implements ProofCursor {
     @FunctionalInterface
     public interface Factory {
         GraphProofCursor newInstance(
-                GraphModel model,
+                SematicModel model,
                 Map<String, Collection<String[]>> graphs,
                 Map<String, GraphProofReader> readers);
     }
 
     public GraphProofCursor(
-            GraphModel model,
+            SematicModel model,
             Map<String, Collection<String[]>> graphs,
             Map<String, GraphProofReader> readers) {
         this.model = model;

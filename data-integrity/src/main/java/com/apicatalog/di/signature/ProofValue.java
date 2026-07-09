@@ -17,7 +17,6 @@ public final class ProofValue implements AtomicSignature {
     private final String algorithm;
     private final String digestAlgorithm;
 
-//    private byte[] digest;
     private final byte[] value;
 
     private final Data data;
@@ -42,7 +41,6 @@ public final class ProofValue implements AtomicSignature {
             byte[] value,
             Proof proof,
             Data data) {
-
         return new ProofValue(
                 algorithm,
                 digestAlgorithm,
@@ -111,7 +109,7 @@ public final class ProofValue implements AtomicSignature {
             document.digest(digest.getAlgorithm(), docHash);
         }
 
-        return digestFromHashes(proofHash, docHash);
+        return digestFromHash(proofHash, docHash);
     }
 
     /**
@@ -126,11 +124,10 @@ public final class ProofValue implements AtomicSignature {
      *         hashes
      * @throws NullPointerException if proofHash or docHash is null
      */
-    private static byte[] digestFromHashes(byte[] proofHash, byte[] docHash) {
+    private static byte[] digestFromHash(byte[] proofHash, byte[] docHash) {
         var digest = new byte[proofHash.length + docHash.length];
         System.arraycopy(proofHash, 0, digest, 0, proofHash.length);
         System.arraycopy(docHash, 0, digest, proofHash.length, docHash.length);
-//        System.out.println("Digest: " + HexFormat.of().formatHex(digest));
         return digest;
     }
 

@@ -12,7 +12,7 @@ import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.proof.GraphProofCursor.Factory;
 import com.apicatalog.trust.proof.GraphProofReader;
 
-public class GraphModel implements Model {
+public class SematicModel implements Model {
 
     @FunctionalInterface
     public interface C14nFactory {
@@ -45,7 +45,7 @@ public class GraphModel implements Model {
     private final C14nFactory canonizeFactory;
     private final Map<String, GraphProofReader> readers;
 
-    public GraphModel(
+    public SematicModel(
             Factory factory,
             String c14n,
             BiConsumer<Map<String, Object>, QuadConsumer> tordf,

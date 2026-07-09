@@ -34,7 +34,7 @@ public final class DataIntegrityProof implements Proof {
 
     public static final Term TYPE = new Term("DataIntegrityProof", "https://w3id.org/security#DataIntegrityProof");
 
-//    public static String TYPE_NAME = "DataIntegrityProof";
+    public static String TYPE_NAME = "DataIntegrityProof";
 
     private static final String KEY_ID = "id";
     private static final String KEY_TYPE = "type";
@@ -288,7 +288,8 @@ public final class DataIntegrityProof implements Proof {
                     : null;
         }
 
-        public Proof generateProof(String keyAlgorithm, AsymmetricSigner signer, Function<String, MessageDigest> digestFactory, Draft proofDraft, Data data)
+        public Proof generateProof(String keyAlgorithm, AsymmetricSigner signer,
+                Function<String, MessageDigest> digestFactory, Draft proofDraft, Data data)
                 throws SignatureException {
 
             if (proof.cryptosuite instanceof AtomicCryptoSuite atomic) {
@@ -734,25 +735,16 @@ public final class DataIntegrityProof implements Proof {
 
     public static class MapReader implements MapProofReader {
 
-        private final CryptoSuite cryptosuite;
+        private final Map<String, CryptoSuite> cryptosuites;
 
-        public MapReader(CryptoSuite cryptosuite) {
-            this.cryptosuite = cryptosuite;
+        public MapReader(Map<String, CryptoSuite> cryptosuites) {
+            this.cryptosuites = cryptosuites;
         }
 
         @Override
         public boolean isAccepted(Map<String, Object> proof) {
-
-            String ty = "";
-            switch (ty) {
-            case "1":
-                break;
-            }
-
             return TYPE.key().equals(proof.get(KEY_TYPE))
-                    && cryptosuite.id().equals(proof.get(KEY_CRYPTOSUITE));
-            // FIXME && cryptosuite.isSignature((String) proof.get(KEY_PROOF_VALUE));
-
+                    && cryptosuites.containsKey(proof.get(KEY_CRYPTOSUITE));
         }
 
         @Override
@@ -763,15 +755,21 @@ public final class DataIntegrityProof implements Proof {
                 Function<Collection<String>, Data> data) {
 
             final var di = new DataIntegrityProof();
-            di.cryptosuite = cryptosuite;
             di.canonicalPayload = proofPayload;
 
-            Object proofValue = null;
+//            var canonizer = cursor.newCanonizer();
+//
+//            var consumer = canonizer.consumer();
+
+            String proofValue = null;
 
             for (var entry : proof.entrySet()) {
                 switch (entry.getKey()) {
                 case KEY_ID:
                     di.id = stringValue(entry.getValue());
+                    break;
+                case KEY_CRYPTOSUITE:
+                    di.cryptosuite = cryptosuites.get(entry.getValue());
                     break;
                 case KEY_CREATED:
                     di.created = value(entry.getValue(), Instant::parse);
@@ -803,7 +801,7 @@ public final class DataIntegrityProof implements Proof {
                     di.verificationMethod = stringValue(entry.getValue());
                     break;
                 case KEY_PROOF_VALUE:
-                    proofValue = entry.getValue();
+                    proofValue = stringValue(entry.getValue());
                     break;
                 case KEY_PREVIOUS_PROOF:
                     if (entry.getValue() instanceof String value) {
@@ -816,6 +814,8 @@ public final class DataIntegrityProof implements Proof {
                         throw new IllegalArgumentException();
                     }
                     break;
+                default:
+                    throw new IllegalArgumentException();
                 }
             }
             if (di.previousProof == null) {
@@ -823,12 +823,13 @@ public final class DataIntegrityProof implements Proof {
             }
 
             if (proofValue != null) {
-                di.signature = value(proofValue, value -> cryptosuite
+                di.signature = di.cryptosuite
                         .decode(
-                                value,
+                                proofValue,
                                 di,
-                                data.apply(di.previousProof)));
+                                data.apply(Set.of()));
             }
+
             return di;
         }
 
@@ -849,20 +850,6 @@ public final class DataIntegrityProof implements Proof {
             return KEY_PROOF_VALUE;
         }
     }
-
-//    public static class GraphReaderSupplier implements ProofGraphReader.Supplier {
-//
-//        private final Map<String, CryptoSuite> cryptosuites;
-//
-//        public GraphReaderSupplier(Map<String, CryptoSuite> cryptosuites) {
-//            this.cryptosuites = cryptosuites;
-//        }
-//
-//        @Override
-//        public ProofGraphReader newInstance(Collection<String[]> proof, ProofGraphCursor cursor) {
-//            return new GraphReader(proof, cursor, cryptosuites);
-//        }
-//    }
 
     public static class GraphReader implements GraphProofReader {
 
