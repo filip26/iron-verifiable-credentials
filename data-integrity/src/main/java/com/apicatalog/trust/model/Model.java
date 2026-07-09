@@ -7,6 +7,9 @@ import com.apicatalog.trust.proof.ProofCursor;
 
 public interface Model {
 
+    static final String C14N_RDFC = "RDFC";
+    static final String C14N_JCS = "JCS";
+    
     ProofCursor createCursor(Collection<String> context, Map<String, Object> document);
 
     String c14n();

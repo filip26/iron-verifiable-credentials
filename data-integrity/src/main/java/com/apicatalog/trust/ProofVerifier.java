@@ -13,6 +13,7 @@ import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.signature.AtomicSignature;
 
 public class ProofVerifier {
 

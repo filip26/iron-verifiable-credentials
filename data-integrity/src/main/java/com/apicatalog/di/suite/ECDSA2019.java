@@ -12,24 +12,27 @@ import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
-public class ECDSASuite {
+public class ECDSA2019 {
 
-    public static CryptoSuite newRDFC2019() {
+    public static final String P256 = "P-256";
+    public static final String P384 = "P-384";
+    
+    public static CryptoSuite withRDFC() {
         return new AtomicCryptoSuite(
                 "ecdsa-rdfc-2019",
                 "RDFC",
                 Multibase.BASE_58_BTC,
-                ECDSASuite::decode,
-                ECDSASuite::generate);
+                ECDSA2019::decode,
+                ECDSA2019::generate);
     }
 
-    public static CryptoSuite newJCS2019() {
+    public static CryptoSuite withJCS() {
         return new AtomicCryptoSuite(
                 "ecdsa-jcs-2019",
                 "JCS",
                 Multibase.BASE_58_BTC,
-                ECDSASuite::decode,
-                ECDSASuite::generate);
+                ECDSA2019::decode,
+                ECDSA2019::generate);
     }
 
     private static Signature decode(String value, Proof proof, Data data) {
@@ -41,11 +44,11 @@ public class ECDSASuite {
 
         switch (signature.length) {
         case 64:
-            algorithm = "P-256";
+            algorithm = P256;
             digest = "SHA-256";
             break;
         case 96:
-            algorithm = "P-384";
+            algorithm = P384;
             digest = "SHA-384";
             break;
         default:
@@ -69,8 +72,8 @@ public class ECDSASuite {
             throws SignatureException {
 
         var digestor = switch (algorithm) {
-        case "P-256" -> digestFactory.apply("SHA-256");
-        case "P-384" -> digestFactory.apply("SHA-384");
+        case P256 -> digestFactory.apply("SHA-256");
+        case P384 -> digestFactory.apply("SHA-384");
         default -> throw new IllegalArgumentException();
         };
 

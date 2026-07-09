@@ -8,13 +8,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,9 +25,10 @@ import com.apicatalog.crypto.bc.BCSLHDSASigner;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.di.suite.ECDSASuite;
-import com.apicatalog.di.suite.EdDSASuite;
-import com.apicatalog.di.suite.MLDSA44Suite;
+import com.apicatalog.di.suite.ECDSA2019;
+import com.apicatalog.di.suite.EdDSA2022;
+import com.apicatalog.di.suite.MLDSA2024;
+import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -55,13 +54,9 @@ public class IssuerTest {
     static final MultibaseDecoder MULTIBASE = MultibaseDecoder.getInstance();
 
     static final MulticodecDecoder MULTICODEC = MulticodecDecoder.newInstance(
-//            KeyCodec.P256_PUBLIC,
             KeyCodec.P256_PRIVATE,
-//            KeyCodec.P384_PUBLIC,
             KeyCodec.P384_PRIVATE,
-//            KeyCodec.ED25519_PUBLIC,
             KeyCodec.ED25519_PRIVATE,
-//            KeyCodec.MLDSA_44_PUBLIC,
             KeyCodec.MLDSA_44_PRIVATE,
             KeyCodec.SLHDSA_SHA2_128S_PRIVATE,
             // TODO remove when multicodec is updated
@@ -83,25 +78,25 @@ public class IssuerTest {
 
         switch (privateKeyCodec.code()) {
         case KeyCodec.ED25519_PRIVATE_CODE:
-            keyAlgorithm = "Ed25519";
+            keyAlgorithm = EdDSA2022.ALGORITHM;
             signer = BCEd25519Signer.newInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
         // Use a secure random number generator to create non-deterministic signatures
         // for the algorithms below in production environments.
         case KeyCodec.P256_PRIVATE_CODE:
-            keyAlgorithm = "P-256";
+            keyAlgorithm = ECDSA2019.P256;
             signer = BCECDSASigner.newP256Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case KeyCodec.P384_PRIVATE_CODE:
-            keyAlgorithm = "P-384";
+            keyAlgorithm = ECDSA2019.P384;
             signer = BCECDSASigner.newP384Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case KeyCodec.MLDSA_44_PRIVATE_CODE:
-            keyAlgorithm = "ML-DSA-44";
+            keyAlgorithm = MLDSA2024.ALGORITHM_44;
             signer = BCMLDSASigner.new44Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case KeyCodec.SLHDSA_SHA2_128S_PRIVATE_CODE:
-            keyAlgorithm = "SLH-DSA-SHA2-128s";
+            keyAlgorithm = SLHDSA2024.ALGORITHM_SHA2_128s;
             signer = BCSLHDSASigner.new128sInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
 
@@ -124,7 +119,7 @@ public class IssuerTest {
 
             var proofDraft = DataIntegrityProof.newDraft(
                     options,
-                    cryptosuite -> getInstance(cryptosuite, Resources.DIGEST_FACTORY::get));
+                    cryptosuite -> getInstance(cryptosuite));
 
             var c14nData = document;
 
@@ -181,6 +176,7 @@ public class IssuerTest {
 
             proof = Ed25519Signature2020.generateProof(
                     signer,
+                    Resources.DIGEST_FACTORY::get,
                     proofDraft,
                     data);
 
@@ -218,20 +214,20 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
-    public static CryptoSuite getInstance(String id, Function<String, MessageDigest> digestFactory) {
+    public static CryptoSuite getInstance(String id) {
 
         return switch (id) {
-        case "eddsa-rdfc-2022" -> EdDSASuite.newRDFC2022();
-        case "eddsa-jcs-2022" -> EdDSASuite.newJCS2022();
+        case "eddsa-rdfc-2022" -> EdDSA2022.withRDFC();
+        case "eddsa-jcs-2022" -> EdDSA2022.withJCS();
 
-        case "ecdsa-rdfc-2019" -> ECDSASuite.newRDFC2019();
-        case "ecdsa-jcs-2019" ->  ECDSASuite.newJCS2019();
+        case "ecdsa-rdfc-2019" -> ECDSA2019.withRDFC();
+        case "ecdsa-jcs-2019" ->  ECDSA2019.withJCS();
 
-        case "mldsa44-rdfc-2024" -> MLDSA44Suite.newRDFC2024();
-        case "mldsa44-jcs-2024" -> MLDSA44Suite.newJCS2024();
+        case "mldsa44-rdfc-2024" -> MLDSA2024.get44withRDFC();
+        case "mldsa44-jcs-2024" -> MLDSA2024.get44withJCS();
 
-//        case "slhdsa128-rdfc-2024" -> newSLHDSA128RDFC2024(digestFactory);
-//        case "slhdsa128-jcs-2024" -> newSLHDSA128JCS2024(digestFactory);
+        case "slhdsa128-rdfc-2024" -> SLHDSA2024.get128withRDFC();
+        case "slhdsa128-jcs-2024" -> SLHDSA2024.get128withJCS();
 
         default -> throw new IllegalArgumentException();
         };

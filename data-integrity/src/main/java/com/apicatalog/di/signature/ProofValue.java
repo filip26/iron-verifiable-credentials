@@ -7,10 +7,10 @@ import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
-import com.apicatalog.trust.AtomicSignature;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.data.DigestiblePayload;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.signature.AtomicSignature;
 
 public final class ProofValue implements AtomicSignature {
 
@@ -80,7 +80,7 @@ public final class ProofValue implements AtomicSignature {
         var digestor = digestFactory.apply(digestAlgorithm);
         
         var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
-
+System.out.println("#### " + algorithm + ", " + digestAlgorithm + "," + publicKey.length);
         return verifier.verify(publicKey, digest, toByteArray());
     }
 

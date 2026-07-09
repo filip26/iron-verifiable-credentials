@@ -24,9 +24,10 @@ import com.apicatalog.crypto.bc.BCMLDSAVerifier;
 import com.apicatalog.crypto.bc.BCSLHDSAVerifier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.suite.ECDSASuite;
-import com.apicatalog.di.suite.EdDSASuite;
-import com.apicatalog.di.suite.MLDSA44Suite;
+import com.apicatalog.di.suite.ECDSA2019;
+import com.apicatalog.di.suite.EdDSA2022;
+import com.apicatalog.di.suite.MLDSA2024;
+import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -44,30 +45,30 @@ import com.apicatalog.trust.model.GraphModel.Canonizer;
 import com.apicatalog.trust.model.GraphModel.QuadConsumer;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.model.ModelResolver;
-import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.MapProofCursor;
+import com.apicatalog.trust.proof.Proof;
 import com.fasterxml.jackson.core.JsonFactory;
 
 public class VerifierTest {
 
-    static Model MODEL_1 = DataIntegrity.newTypeModelBuilder("JCS")
-            .proof(EdDSASuite.newJCS2022())
-            .proof(ECDSASuite.newJCS2019())
-            .proof(MLDSA44Suite.newJCS2024())
-
-//            .proof(CryptoSuites.SLHDSA128_JCS_2024)
+    static Model MODEL_1 = DataIntegrity.newTypeModelBuilder(Model.C14N_JCS)
+            .proof(EdDSA2022.withJCS())
+            .proof(ECDSA2019.withJCS())
+            .proof(MLDSA2024.get44withJCS())
+            .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
             .processor(MapProofCursor::new)
             .build();
 
-    static Model MODEL_2 = DataIntegrity.newGraphModelBuilder("RDFC", VerifierTest::newRdfc)
-            .proof(EdDSASuite.newRDFC2022())
-            .proof(ECDSASuite.newRDFC2019())
-            .proof(MLDSA44Suite.newRDFC2024())
-//            .proof(CryptoSuites.SLHDSA128_RDFC_2024)
-            .Ed25519Signature2020()            
-            .tordf(VerifierTest::tordfc)
+    static Model MODEL_2 = DataIntegrity.newGraphModelBuilder(Model.C14N_RDFC)
+            .proof(EdDSA2022::get)
+            .proof(ECDSA2019.withRDFC())
+            .proof(MLDSA2024::get44)
+            .proof(SLHDSA2024::get128s)
+            .Ed25519Signature2020()
+            .tordf(VerifierTest::toRDF)
+            .c14n(VerifierTest::newRDFC)
             .processor(GraphProofCursor::new)
             .build();
 
@@ -107,11 +108,11 @@ public class VerifierTest {
             // configurations
             .proof(Ed25519Signature2020.TYPE_NAME)
             .resolver(DID_KEY_RESOLVER)
-            .verifier("Ed25519", BCEd25519Verifier.getInstance()::verify)
-            .verifier("P-256", BCECDSAVerifier.getP256Instance()::verify)
-            .verifier("P-384", BCECDSAVerifier.getP384Instance()::verify)
-            .verifier("ML-DSA-44", BCMLDSAVerifier.get44Instance()::verify)
-            .verifier("SLH-DSA-SHA2-128s", BCSLHDSAVerifier.get128sInstance()::verify)
+            .verifier(EdDSA2022.ALGORITHM, BCEd25519Verifier.getInstance()::verify)
+            .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
+            .verifier(ECDSA2019.P384, BCECDSAVerifier.getP384Instance()::verify)
+            .verifier(MLDSA2024.ALGORITHM_44, BCMLDSAVerifier.get44Instance()::verify)
+            .verifier(SLHDSA2024.ALGORITHM_SHA2_128s, BCSLHDSAVerifier.get128sInstance()::verify)
             .digestFactory(Resources.DIGEST_FACTORY::get)
             .build();
 
@@ -190,7 +191,7 @@ public class VerifierTest {
                 .sorted();
     }
 
-    static final void tordfc(Map<String, Object> document, final GraphModel.QuadConsumer consumer) {
+    static final void toRDF(Map<String, Object> document, final GraphModel.QuadConsumer consumer) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();
@@ -219,7 +220,7 @@ public class VerifierTest {
         }
     }
 
-    static final RdfcPrcessor newRdfc() {
+    static final RdfcPrcessor newRDFC() {
         return new RdfcPrcessor(); // TODO reuse one instance across
     }
 

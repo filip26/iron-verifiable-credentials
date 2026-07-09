@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.model.GraphModel;
 import com.apicatalog.trust.model.GraphModel.C14nFactory;
@@ -22,8 +23,8 @@ import com.apicatalog.trust.proof.MapProofReader;
 
 public class DataIntegrity {
 
-    public static GraphModelBuilder newGraphModelBuilder(String c14n, C14nFactory c14nFactory) {
-        return new GraphModelBuilder(c14n, c14nFactory);
+    public static GraphModelBuilder newGraphModelBuilder(String c14n) {
+        return new GraphModelBuilder(c14n);
     }
 
     public static TypeModelBuilder newTypeModelBuilder(String c14n) {
@@ -33,7 +34,8 @@ public class DataIntegrity {
     public static class GraphModelBuilder {
 
         private final String c14n;
-        private final C14nFactory c14nFactory;
+        
+        private C14nFactory c14nFactory;
 
         private GraphProofCursor.Factory factory;
 
@@ -42,12 +44,16 @@ public class DataIntegrity {
         Map<String, CryptoSuite> cryptosuites;
         Map<String, GraphProofReader> readers;
 
-        private GraphModelBuilder(String c14n, C14nFactory c14nFactory) {
+        private GraphModelBuilder(String c14n) {
             this.c14n = c14n;
-            this.c14nFactory = c14nFactory;
             this.readers = new LinkedHashMap<>();
         }
 
+        public GraphModelBuilder c14n(C14nFactory c14nFactory) {
+            this.c14nFactory = c14nFactory;
+            return this;
+        }
+        
         public GraphModelBuilder tordf(BiConsumer<Map<String, Object>, QuadConsumer> tordf) {
             this.tordf = tordf;
             return this;
@@ -58,6 +64,10 @@ public class DataIntegrity {
             return this;
         }
 
+        public GraphModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
+            return proof(cryptosuite.apply(c14n));
+        }
+        
         public GraphModelBuilder proof(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
@@ -74,8 +84,9 @@ public class DataIntegrity {
             return this;
         }
 
+        // legacy support
         public GraphModelBuilder Ed25519Signature2020() {
-//            proof(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newReader);
+            proof(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020.newReader());
             return this;
         }
 
@@ -88,6 +99,10 @@ public class DataIntegrity {
             }
 
             if (readers.isEmpty()) {
+                throw new IllegalStateException();
+            }
+            
+            if (c14nFactory == null) {
                 throw new IllegalStateException();
             }
 
