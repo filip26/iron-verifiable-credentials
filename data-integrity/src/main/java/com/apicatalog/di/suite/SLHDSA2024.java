@@ -15,14 +15,14 @@ public class SLHDSA2024 {
     public static final int PUBLIC_KEY_SIZE = 32;
     public static final int PRIVATE_KEY_SIZE = 64;
 
-    private static CryptoSuite SLHDSA_128s_RDFC_2024 = new AtomicCryptoSuite(
+    private static CryptoSuite SLHDSA_128s_RDFC_2024 = new CryptoSuite(
             "slhdsa128-rdfc-2024",
             "RDFC",
             Multibase.BASE_64_URL,
             SLHDSA2024::decode128s,
             ProofValueGenerator::generateWithSHA256);
 
-    private static CryptoSuite SLHDSA_128s_JCS_2024 = new AtomicCryptoSuite(
+    private static CryptoSuite SLHDSA_128s_JCS_2024 = new CryptoSuite(
             "slhdsa128-jcs-2024",
             "JCS",
             Multibase.BASE_64_URL,

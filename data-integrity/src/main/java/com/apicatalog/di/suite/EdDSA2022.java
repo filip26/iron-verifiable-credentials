@@ -13,14 +13,14 @@ public class EdDSA2022 {
     public static final String ALGORITHM = "Ed25519";
     public static final int SIGNATURE_LENGTH = 64;
 
-    private static final CryptoSuite MLDSA_44_RDFC_2024 = new AtomicCryptoSuite(
+    private static final CryptoSuite MLDSA_44_RDFC_2024 = new CryptoSuite(
             "eddsa-rdfc-2022",
             "RDFC",
             Multibase.BASE_58_BTC,
             EdDSA2022::decode,
             ProofValueGenerator::generateWithSHA256);
 
-    private static final CryptoSuite MLDSA_44_JCS_2024 = new AtomicCryptoSuite(
+    private static final CryptoSuite MLDSA_44_JCS_2024 = new CryptoSuite(
             "eddsa-jcs-2022",
             "JCS",
             Multibase.BASE_58_BTC,

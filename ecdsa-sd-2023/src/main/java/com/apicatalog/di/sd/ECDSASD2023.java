@@ -6,9 +6,7 @@ import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.signature.ProofValue;
-import com.apicatalog.di.suite.AtomicCryptoSuite;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.data.Data;
@@ -24,10 +22,10 @@ public final class ECDSASD2023 {
     public static final String P384 = "P-384";
 
     public static CryptoSuite getInstance() {
-        return new AtomicCryptoSuite(
+        return new CryptoSuite(
                 CRYPTOSUITE_NAME,
                 DataModel.C14N_RDFC,
-                Multibase.BASE_58_BTC,
+                Multibase.BASE_64_URL,
                 ECDSASD2023::decode,
                 ECDSASD2023::generate);
     }

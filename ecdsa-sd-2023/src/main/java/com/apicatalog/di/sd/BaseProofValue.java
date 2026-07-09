@@ -116,17 +116,42 @@ public class BaseProofValue implements Signature {
             }
             IO.println("> signatures: " + proofValue.signatures.size());
             proofValue.pointers = new ArrayList<>(((Array) top.getDataItems().get(4)).getDataItems().size());
-            IO.println("> mandatory pointers: " + proofValue.pointers);
+
             for (final DataItem item : ((Array) top.getDataItems().get(4)).getDataItems()) {
                 proofValue.pointers.add(string(item));
             }
-
+            IO.println("> mandatory pointers: " + proofValue.pointers);
             return proofValue;
 
         } catch (CborException e) {
             throw new IllegalArgumentException(e);
 //          throw new DocumentError(e, ErrorType.Invalid, "ProofValue");
         }
+    }
+    
+    @Override
+    public boolean verify(
+            AsymmetricVerifier verifier,
+            Function<String, MessageDigest> digestFactory,
+            byte[] publicKey)
+            throws InvalidKeyException, SignatureException {
+
+        var digestor = digestFactory.apply(digestAlgorithm);
+
+        var proofDigest = digestor.digest(proof.canonicalPayload());
+        var dataDigest = digestor.digest(data.digestiblePayload(Set.of()).canonicalPayload());
+System.out.println(new String(proof.canonicalPayload()));
+        var digest = hash(
+                proofDigest,
+                proofPublicKey,
+                dataDigest); // FIXME pass mandatory pointers
+IO.println("> digest:" + digest.length);
+//        var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
+//System.out.println(new String(data.digestiblePayload(Set.of()).canonicalPayload()));
+IO.println(HexFormat.of().formatHex(proofDigest));
+IO.println(HexFormat.of().formatHex(dataDigest));
+
+        return verifier.verify(publicKey, digest, toByteArray());
     }
 
     @Override
@@ -163,32 +188,7 @@ public class BaseProofValue implements Signature {
         return ((UnicodeString) item).getString();
     }
 
-    @Override
-    public boolean verify(
-            AsymmetricVerifier verifier,
-            Function<String, MessageDigest> digestFactory,
-            byte[] publicKey)
-            throws InvalidKeyException, SignatureException {
-
-        var digestor = digestFactory.apply(digestAlgorithm);
-
-        var proofDigest = digestor.digest(proof.canonicalPayload());
-        var dataDigest = digestor.digest(data.digestiblePayload(Set.of()).canonicalPayload());
-System.out.println(new String(proof.canonicalPayload()));
-        var digest = hash(
-                proofDigest,
-                proofPublicKey,
-                dataDigest); // FIXME pass mandatory pointers
-IO.println("> digest:" + digest.length);
-//        var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
-//System.out.println(new String(data.digestiblePayload(Set.of()).canonicalPayload()));
-IO.println(HexFormat.of().formatHex(proofDigest));
-IO.println(HexFormat.of().formatHex(dataDigest));
-
-        return verifier.verify(publicKey, digest, toByteArray());
-    }
-
-    public static byte[] hash(
+    private static byte[] hash(
             final byte[] proofHash,
             final byte[] proofPublicKey,
             byte[] mandatoryHash) {

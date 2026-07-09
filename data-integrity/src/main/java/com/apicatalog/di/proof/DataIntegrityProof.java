@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.apicatalog.di.suite.AtomicCryptoSuite;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
@@ -291,12 +290,7 @@ public final class DataIntegrityProof implements Proof {
                 Function<String, MessageDigest> digestFactory, Draft proofDraft, Data data)
                 throws SignatureException {
 
-            if (proof.cryptosuite instanceof AtomicCryptoSuite atomic) {
-
-                return atomic.generateProof(keyAlgorithm, signer, digestFactory, proofDraft, data);
-            }
-
-            throw new IllegalStateException();
+            return proof.cryptosuite.generateProof(keyAlgorithm, signer, digestFactory, proofDraft, data);
         }
 
         public Collection<String> context() {

@@ -32,7 +32,7 @@ public interface Signature {
 
     Proof proof();
 
-    byte[] toByteArray();
+    byte[] toByteArray();   //TODO ?! this could be encoders task
 
     String algorithm();
 }

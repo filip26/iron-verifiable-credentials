@@ -14,14 +14,14 @@ public class MLDSA2024 {
     public static final int SIGNATURE_LENGTH = 2420;
     public static final int PUBLIC_KEY_SIZE = 1312;
 
-    private static CryptoSuite MLDSA_44_RDFC_2024 = new AtomicCryptoSuite(
+    private static CryptoSuite MLDSA_44_RDFC_2024 = new CryptoSuite(
             "mldsa44-rdfc-2024",
             "RDFC",
             Multibase.BASE_64_URL,
             MLDSA2024::decode44,
             ProofValueGenerator::generateWithSHA256);
 
-    private static CryptoSuite MLDSA_44_JCS_2024 = new AtomicCryptoSuite(
+    private static CryptoSuite MLDSA_44_JCS_2024 = new CryptoSuite(
             "mldsa44-jcs-2024",
             "JCS",
             Multibase.BASE_64_URL,

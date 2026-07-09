@@ -17,22 +17,26 @@ public class ECDSA2019 {
     public static final String P256 = "P-256";
     public static final String P384 = "P-384";
 
+    private static final CryptoSuite ECDSA_RDFC_2019 = new CryptoSuite(
+            "ecdsa-rdfc-2019",
+            "RDFC",
+            Multibase.BASE_58_BTC,
+            ECDSA2019::decode,
+            ECDSA2019::generate);
+
+    private static final CryptoSuite ECDSA_JCS_2019 = new CryptoSuite(
+            "ecdsa-jcs-2019",
+            "JCS",
+            Multibase.BASE_58_BTC,
+            ECDSA2019::decode,
+            ECDSA2019::generate);
+
     public static CryptoSuite withRDFC() {
-        return new AtomicCryptoSuite(
-                "ecdsa-rdfc-2019",
-                "RDFC",
-                Multibase.BASE_58_BTC,
-                ECDSA2019::decode,
-                ECDSA2019::generate);
+        return ECDSA_RDFC_2019;
     }
 
     public static CryptoSuite withJCS() {
-        return new AtomicCryptoSuite(
-                "ecdsa-jcs-2019",
-                "JCS",
-                Multibase.BASE_58_BTC,
-                ECDSA2019::decode,
-                ECDSA2019::generate);
+        return ECDSA_JCS_2019;
     }
 
     private static Signature decode(String value, Proof proof, Data data) {
