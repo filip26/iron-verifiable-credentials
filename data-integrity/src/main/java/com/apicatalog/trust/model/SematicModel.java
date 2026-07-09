@@ -1,16 +1,15 @@
 package com.apicatalog.trust.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.proof.GraphProofCursor.Factory;
 import com.apicatalog.trust.proof.GraphProofReader;
+import com.apicatalog.trust.proof.ProofCursor;
 
 public class SematicModel implements DataModel {
 

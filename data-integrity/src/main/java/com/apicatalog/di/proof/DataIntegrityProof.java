@@ -353,7 +353,7 @@ public final class DataIntegrityProof implements Proof {
 
     @Override
     public String type() {
-        return "DataIntegrityProof";
+        return TYPE_NAME;
     }
 
     @Override
@@ -767,6 +767,9 @@ public final class DataIntegrityProof implements Proof {
                 case KEY_ID:
                     di.id = stringValue(entry.getValue());
                     break;
+                case KEY_TYPE, "@context":
+                    // skip, already processed
+                    break;
                 case KEY_CRYPTOSUITE:
                     di.cryptosuite = cryptosuites.get(entry.getValue());
                     break;
@@ -814,7 +817,10 @@ public final class DataIntegrityProof implements Proof {
                     }
                     break;
                 default:
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException(
+                            """
+                            Unsupported DI proof property %s.
+                            """.formatted(entry.getKey()));
                 }
             }
             if (di.previousProof == null) {
@@ -844,10 +850,6 @@ public final class DataIntegrityProof implements Proof {
             throw new IllegalArgumentException();
         }
 
-        @Override
-        public String signatureProperty() {
-            return KEY_PROOF_VALUE;
-        }
     }
 
     public static class GraphReader implements GraphProofReader {

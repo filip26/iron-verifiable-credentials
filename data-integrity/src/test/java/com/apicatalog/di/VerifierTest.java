@@ -22,8 +22,6 @@ import com.apicatalog.crypto.bc.BCECDSAVerifier;
 import com.apicatalog.crypto.bc.BCEd25519Verifier;
 import com.apicatalog.crypto.bc.BCMLDSAVerifier;
 import com.apicatalog.crypto.bc.BCSLHDSAVerifier;
-import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;

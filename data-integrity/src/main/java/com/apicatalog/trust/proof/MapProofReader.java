@@ -17,6 +17,6 @@ public interface MapProofReader {
             byte[] proofPayload,
             Function<Collection<String>, Data> data);
 
-    String signatureProperty();
+//    String signatureProperty();
 
 }

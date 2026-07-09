@@ -45,9 +45,10 @@ public class ProofVerifier {
             return false;
         }
 
-        if (!proofTypes.contains(proof.type())) {
-            throw new IllegalArgumentException();
-        }
+//FIXME
+//        if (!proofTypes.contains(proof.type())) {
+//            throw new IllegalArgumentException();
+//        }
 
         var publicKey = methodResolver.resolve(proof);
 

@@ -58,7 +58,8 @@ public class MapProofCursor implements ProofCursor {
 
     @Override
     public boolean isAccepted() {
-        return currentEntry == null || currentEntry.getValue() == null || currentEntry.getKey() == null;
+        return currentEntry != null && currentEntry.getValue() != null && currentEntry.getKey() != null
+                && currentEntry.getValue().isAccepted(currentEntry.getKey());
     }
 
     @Override
@@ -70,7 +71,7 @@ public class MapProofCursor implements ProofCursor {
             var proof = currentEntry.getKey();
 
             var unsignedProof = new HashMap<>(proof);
-            unsignedProof.remove(reader.signatureProperty());
+            unsignedProof.remove("proofValue");
 
             var canonicalProof = model.canonize(unsignedProof);
 
