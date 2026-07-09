@@ -16,7 +16,7 @@ public class ECDSA2019 {
 
     public static final String P256 = "P-256";
     public static final String P384 = "P-384";
-    
+
     public static CryptoSuite withRDFC() {
         return new AtomicCryptoSuite(
                 "ecdsa-rdfc-2019",
@@ -84,5 +84,4 @@ public class ECDSA2019 {
                 proof,
                 data);
     }
-
 }

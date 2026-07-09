@@ -1,0 +1,46 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://w3id.org/citizenship/v4rc1"
+  ],
+  "type": [
+    "VerifiableCredential",
+    "EmploymentAuthorizationDocumentCredential"
+  ],
+  "issuer": {
+    "id": "did:key:zDnaegE6RR3atJtHKwTRTWHsJ3kNHqFwv7n9YjTgmU7TyfU76",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NgUPr/HwADaAIhG61j/AAAAABJRU5ErkJggg=="
+  },
+  "credentialSubject": {
+    "type": [
+      "Person",
+      "EmployablePerson"
+    ],
+    "givenName": "JOHN",
+    "additionalName": "JACOB",
+    "familyName": "SMITH",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2Ng+M/wHwAEAQH/7yMK/gAAAABJRU5ErkJggg==",
+    "gender": "Male",
+    "residentSince": "2015-01-01",
+    "birthCountry": "Bahamas",
+    "birthDate": "1999-07-17",
+    "employmentAuthorizationDocument": {
+      "type": "EmploymentAuthorizationDocument",
+      "identifier": "83627465",
+      "lprCategory": "C09",
+      "lprNumber": "999-999-999"
+    }
+  },
+  "name": "Employment Authorization Document",
+  "description": "Example Employment Authorization Document.",
+  "validFrom": "2019-12-03T00:00:00Z",
+  "validUntil": "2029-12-03T00:00:00Z",
+  "proof": {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "ecdsa-sd-2023",
+    "created": "2023-08-15T23:36:38Z",
+    "verificationMethod": "did:key:zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP#zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "u2V0AhVhAuNxVr-tkJ6mQ6dYMDTY7ZUMG2ScD5QNiEMopYZ2O0gQZS6PYbjHNvJn07p1fJfDMHB9E9fo5q-yaUM31GbRX4FgjgCQCKnLOGbY_FuM-ASpSkkOxsIR2E8n7Ml2q1UQ6tEwzi5NYIAARIjNEVWZ3iJmqu8zd7v8AESIzRFVmd4iZqrvM3e7_lFhA_ZHsSLNSSWX3oUU-n_oGcFTspvfWM4qEUl6zKIuwyvepZR8C_uFNbTPuFnmqiCg0jMxXThlNf1f8qL41TBsw91hAyS5upfZTQ8cErJRQ2k1V-HNCgpubrXr6zoMAoIebyZcuxIee67qv_ZrZ4_kdKRlxyP_l12hJfWL6JyVqfgO_mVhAXZj32ACuKqYpJ6ZeA0WlrgLfBByc0m3hUlpjQxuTYMJCFnN9I3TQeJ1OQKzdC_dbB3wGU0ptJYCErYvrFJmA1lhAyNcO3meGSzIZ3LPDgxQBygaaxfjbnicU1fV_Nnx2Mg0eCp-kkXVRrdgRpBXhm8wywBfvW6Augf7WcscnESMLEFhAOmJjWQq3-8Tl73vGw_a5zdipbHxNmh8SBhIhPKOaUPOde1bWNl6tYFS9vkuXGydp1hhBo_cjanQ05fGw9uLo_FhA9fH-KZCvWTYczUhjNZQFFkzmoIB9_t0tGXKCbmt57gUd8W9d_EPVftDVd0O5TE9X3VeE-7BKm_K2tyWPXFlVJFhARLaDMNGxLO7GwH7VYFh7a_1JyDH6kMGoclpBo-MkfylQvP5RoLJr9CLpT4EQAdwXsbk7P4JCNFesxcGfIU2l4VhAwpdEub-2iiUOsXqvSUFqinel7tAb4YwyeKN4Tbj2cxvaPalWhVvCfzvJHj-DMTceEAci_CI77LRwcqRbdlO-CFhAK2bSlvLQn_KA1M3sHQK2w4Bl7TbJm220CpqAD0-upGGHx7QsbLIytRA7yIRF9eHzLIlpIHFUbzFqg2zTGpefjVhAAW_fJBia3vp3PCatLgSCrr90p7uNWhQnI9Q9GK3AScQI-q_c74uxHNycco2PdGrjLgMZd2e7Gqkf1hqPxJk6vlhA5-5CCqAnukZxuSbCnixXT5RGFmCgs9bIKMzlAxTZ4eTDRu0Rk1Kt9hQcZuL85KLLdIbD-BzELjiKX5IShWd9lFhA_1FuHFme8jd5zdWmrjSn2xodJEUU0yMIqAl1LmwtES5ae0czYMC4yvJ5SaoWHRCHbRnHe1DnYWBzbx6kz976olhAyFNzACx3-yXniAwbLfLi-mwl3s9WOwqIMy5GVHc7CLkoa2Xv_gD4aJ3wPfbi381Fde_yOgjJK9Ng4oXCK_orXVhACekfid_QolL3mpcMrsVYFM1XCo5B7CrCXDO9iv5HmnC450TTY7x9qjE2JdDLTB6oxkyHV3g16bdBa0YVu4Le-VhAsYGYbvLPt3tx8nz7Q2W4hgeZ2ehMPfYrOGMxklDVepHUKcsVEnEiw2_TSpLqB0W0pkFFTFYcVcN3Qe4keoZiZFhAE9AqnK8Nlrn77Dl9T6rZDnjFbQy9kzIk1YtcgWI-NXGyKqFbxK0gHDZONWZ5PJ3anJg-mWX0fHzl_24bQkhN1FhAkcyVJLSqNG_G5AnpSyi4qYkUka5ifkfmDwzTbZADTrl6hZX8s1oH0_ql_CE-dZsL6gPLgsWKNxHJ3imbfneQS1hAItlRwgLNLb-Spf0gSD9hgXfxbAiqeY_W6KBjH7ptBZ4wTB7ZajeFqhviU56x-sIsqs4fRQtaOkhgLH-0xo8te1hA0PvPUY7BXD8Q2NKydZY4BwMK1-SwPmx6bKDmtz1h8VqU12CX_JHhqCjH2ScrF4uM7WQi2zbpoahc4qGOORFVQlhAvmNmrOxVc3anGkUPhil59g5kK47a_BBOr0aReEu0gkXz158JPNH2MdVSF64vnzDxfZuhuYquReAkYeHbm94SH4FnL2lzc3Vlcg"
+  }
+}

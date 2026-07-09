@@ -56,7 +56,15 @@ public class ProofVerifier {
     }
 
     public boolean verify(Proof proof, byte[] publicKey) throws InvalidKeyException, SignatureException {
-        return verify(proof, publicKey, signatureVerifiers.get(proof.signature().algorithm()));
+        
+        Objects.requireNonNull(proof.signature());
+        Objects.requireNonNull(proof.signature().algorithm());
+        
+        var asymmetricVerifier = signatureVerifiers.get(proof.signature().algorithm());
+        
+        Objects.requireNonNull(asymmetricVerifier);
+        
+        return verify(proof, publicKey, asymmetricVerifier);
     }
 
     public boolean verify(Proof proof, byte[] publicKey, AsymmetricVerifier verifier)

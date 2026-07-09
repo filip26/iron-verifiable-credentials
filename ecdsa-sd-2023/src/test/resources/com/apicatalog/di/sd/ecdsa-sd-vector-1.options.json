@@ -1,0 +1,12 @@
+{
+  "type": "DataIntegrityProof",
+  "cryptosuite": "ecdsa-sd-2023",
+  "created": "2023-08-15T23:36:38Z",
+  "verificationMethod": "did:key:zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP#zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP",
+  "proofPurpose": "assertionMethod",
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://w3id.org/citizenship/v4rc1"
+  ],
+  "mandatoryPointers": ["/issuer"] 
+}

@@ -58,24 +58,66 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
+        <di.version>1.0.0-M1</di.version>
         <cbor-java.version>0.9</cbor-java.version>
 
         <!-- test resources -->
-        <junit.version>6.0.0</junit.version>
+        <tree-io.version>1.0.0-M2</tree-io.version>
+        <jcs.version>3.0.0-M4</jcs.version>
+        <rdfc.version>3.0.0</rdfc.version>
+        <jsonld.version>1.7.0</jsonld.version>
+        <junit.version>6.0.3</junit.version>       
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-data-integrity</artifactId>
-            <version>1.0.0-M1</version>
+            <version>${di.version}</version>
         </dependency>   
         <dependency>
             <groupId>co.nstant.in</groupId>
             <artifactId>cbor</artifactId>
             <version>${cbor-java.version}</version>
         </dependency>
-<!-- tests -->
+        <!-- Tests -->
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-crypto-bc</artifactId>
+            <version>1.0.0-M1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>titanium-jcs</artifactId>
+            <version>${jcs.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>titanium-json-ld</artifactId>
+            <version>${jsonld.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- remove, not needed with Titanium JSON-LD 2.x.x -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>2.0.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>titanium-rdfc</artifactId>
+            <version>${rdfc.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>tree-io-jackson2</artifactId>
+            <version>${tree-io.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
