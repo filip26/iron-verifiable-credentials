@@ -13,7 +13,6 @@ import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.signature.AtomicSignature;
 
 public class ProofVerifier {
 
@@ -78,11 +77,8 @@ public class ProofVerifier {
             return false;
         }
 
-        if (proof.signature() instanceof AtomicSignature atomic) {
-            return atomic.verify(verifier, digestFactory,  publicKey);
-        }
 
-        throw new SignatureException();
+        return proof.signature().verify(verifier, digestFactory,  publicKey);
     }
 
     public static class Builder {

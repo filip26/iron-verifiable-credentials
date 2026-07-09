@@ -6,15 +6,14 @@ import java.security.MessageDigest;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HexFormat;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.data.Data;
-import com.apicatalog.trust.data.DigestiblePayload;
 import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.signature.AtomicSignature;
 import com.apicatalog.trust.signature.Signature;
 
 import co.nstant.in.cbor.CborDecoder;
@@ -25,7 +24,7 @@ import co.nstant.in.cbor.model.DataItem;
 import co.nstant.in.cbor.model.MajorType;
 import co.nstant.in.cbor.model.UnicodeString;
 
-public class BaseProofValue implements AtomicSignature {
+public class BaseProofValue implements Signature {
 
     static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x00 };
 
@@ -174,13 +173,17 @@ public class BaseProofValue implements AtomicSignature {
         var digestor = digestFactory.apply(digestAlgorithm);
 
         var proofDigest = digestor.digest(proof.canonicalPayload());
+        var dataDigest = digestor.digest(data.digestiblePayload(Set.of()).canonicalPayload());
 System.out.println(new String(proof.canonicalPayload()));
         var digest = hash(
                 proofDigest,
                 proofPublicKey,
-                digestor.digest(data.digestiblePayload(Set.of()).canonicalPayload())); // FIXME pass mandatory pointers
+                dataDigest); // FIXME pass mandatory pointers
 IO.println("> digest:" + digest.length);
 //        var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
+//System.out.println(new String(data.digestiblePayload(Set.of()).canonicalPayload()));
+IO.println(HexFormat.of().formatHex(proofDigest));
+IO.println(HexFormat.of().formatHex(dataDigest));
 
         return verifier.verify(publicKey, digest, toByteArray());
     }

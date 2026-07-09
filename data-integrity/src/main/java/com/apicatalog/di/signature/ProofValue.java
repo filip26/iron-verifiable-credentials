@@ -10,9 +10,9 @@ import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.data.DigestiblePayload;
 import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.signature.AtomicSignature;
+import com.apicatalog.trust.signature.Signature;
 
-public final class ProofValue implements AtomicSignature {
+public final class ProofValue implements Signature {
 
     private final String algorithm;
     private final String digestAlgorithm;
