@@ -16,7 +16,7 @@ public final class ProofValue implements AtomicSignature {
 
     private final String algorithm;
     private final String digestAlgorithm;
-    
+
 //    private byte[] digest;
     private final byte[] value;
 
@@ -42,8 +42,6 @@ public final class ProofValue implements AtomicSignature {
             byte[] value,
             Proof proof,
             Data data) {
-
-//        var digest = digest(messageDigest, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
 
         return new ProofValue(
                 algorithm,
@@ -72,15 +70,15 @@ public final class ProofValue implements AtomicSignature {
 
     @Override
     public boolean verify(
-            AsymmetricVerifier verifier, 
+            AsymmetricVerifier verifier,
             Function<String, MessageDigest> digestFactory,
             byte[] publicKey)
             throws InvalidKeyException, SignatureException {
-        
+
         var digestor = digestFactory.apply(digestAlgorithm);
-        
+
         var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
-System.out.println("#### " + algorithm + ", " + digestAlgorithm + "," + publicKey.length);
+
         return verifier.verify(publicKey, digest, toByteArray());
     }
 
@@ -113,7 +111,6 @@ System.out.println("#### " + algorithm + ", " + digestAlgorithm + "," + publicKe
             document.digest(digest.getAlgorithm(), docHash);
         }
 
-//        System.out.println("Doc Digest: " + HexFormat.of().formatHex(docHash));
         return digestFromHashes(proofHash, docHash);
     }
 

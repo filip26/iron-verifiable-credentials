@@ -110,7 +110,6 @@ public class GraphModel implements Model {
         }
 
         public boolean noProofReaders() {
-            IO.println("M: " + mapping);
             return mapping.isEmpty();
         }
 
@@ -119,7 +118,6 @@ public class GraphModel implements Model {
         }
 
         public boolean noProofsFound() {
-            IO.println("Y: " + proofGraphs);
             return proofGraphs.isEmpty();
         }
 
@@ -149,9 +147,9 @@ public class GraphModel implements Model {
                 }
             }
 
-            IO.println("X " + Arrays.toString(new String[] {
-                    subject, predicate, object, datatype, language, direction, graph
-            }));
+//            IO.println("X " + Arrays.toString(new String[] {
+//                    subject, predicate, object, datatype, language, direction, graph
+//            }));
 
 //var proofGraphs = graphs.get("@default").stream()
 //.filter(statement -> "https://w3id.org/security#proof".equals(statement[1]))

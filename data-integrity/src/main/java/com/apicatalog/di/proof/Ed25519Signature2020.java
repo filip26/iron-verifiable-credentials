@@ -304,10 +304,9 @@ public final class Ed25519Signature2020 implements Proof {
                         throw new IllegalArgumentException(
                                 """
                                 Proof type mismatch; %s for proof %s.
-                                """.formatted(statement[2], TYPE_URI));                        
+                                """.formatted(statement[2], TYPE_URI));
                     }
                     break;
-
                 default:
                     throw new IllegalArgumentException(
                             """
