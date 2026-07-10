@@ -7,11 +7,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.apicatalog.trust.data.Data;
-import com.apicatalog.trust.data.GenericPayload;
 import com.apicatalog.trust.data.MapData;
 import com.apicatalog.trust.model.LexicalModel;
+import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.trust.payload.GenericPayload;
+import com.apicatalog.trust.payload.PayloadSelector;
+import com.apicatalog.trust.payload.RedactablePayload;
 
-public class MapProofCursor implements ProofCursor {
+public class MapProofCursor implements ProofCursor, PayloadSelector {
 
     public interface Factory {
         MapProofCursor newInstance(
@@ -75,7 +78,7 @@ public class MapProofCursor implements ProofCursor {
 
             var canonicalProof = model.canonize(unsignedProof);
 
-            currentProof = reader.read(null, proof, canonicalProof, this::data);
+            currentProof = reader.read(null, proof, canonicalProof, this);
         }
 
         return currentProof;
@@ -94,20 +97,35 @@ public class MapProofCursor implements ProofCursor {
         return true;
     }
 
-    Data data(Collection<String> previous) {
-        var data = data();
+//    Data data(Collection<String> previous) {
+//        var data = data();
+//
+//        if (data.digestiblePayload(previous) == null) {
+//
+////TODO select proofs for proof chain
+////            var canonizer = model.newCanonizer();
+////            var consumer = canonizer.consumer();
+//
+//
+//        }
+//        return data;
+//    }
 
-        if (data.digestiblePayload(previous) == null) {
+    @Override
+    public void withProofs(Collection<String> ids) {
+        // TODO Auto-generated method stub
+        
+    }
 
-//TODO select proofs for proof chain
-//            var canonizer = model.newCanonizer();
-//            var consumer = canonizer.consumer();
+    @Override
+    public DigestiblePayload digestible() {
+        var canonical = model.canonize(payload);
+        return new GenericPayload(canonical);
+    }
 
-            var canonical = model.canonize(payload);
-            data.digestiblePayload(new GenericPayload(canonical));
-
-        }
-        return data;
+    @Override
+    public RedactablePayload filter(Collection<String> pointers) {
+        throw new UnsupportedOperationException();
     }
 
 }

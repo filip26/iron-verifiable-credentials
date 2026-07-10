@@ -2,9 +2,8 @@ package com.apicatalog.trust.proof;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Function;
 
-import com.apicatalog.trust.data.Data;
+import com.apicatalog.trust.payload.PayloadSelector;
 
 public interface MapProofReader {
     
@@ -15,7 +14,7 @@ public interface MapProofReader {
             Collection<String> contexts,
             Map<String, Object> proof,
             byte[] proofPayload,
-            Function<Collection<String>, Data> data);
+            PayloadSelector payload);
 
 //    String signatureProperty();
 

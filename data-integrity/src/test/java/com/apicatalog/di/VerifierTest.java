@@ -40,9 +40,9 @@ import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.model.ModelResolver;
-import com.apicatalog.trust.model.SematicModel;
-import com.apicatalog.trust.model.SematicModel.GraphCanonizer;
-import com.apicatalog.trust.model.SematicModel.QuadConsumer;
+import com.apicatalog.trust.model.SemanticModel;
+import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
+import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.MapProofCursor;
 import com.apicatalog.trust.proof.Proof;
@@ -160,6 +160,8 @@ public class VerifierTest {
 //IO.println("P: " +  HexFormat.of().formatHex(x.digest()));
                 var verified = PROOF_VERIFIER.verify(proof);
 
+                IO.println(new String(proof.signature().payload().canonicalPayload()));
+                
                 assertTrue(verified);
 
                 proofs.add(proof);
@@ -187,7 +189,7 @@ public class VerifierTest {
                 .sorted();
     }
 
-    static final void toRDF(Map<String, Object> document, final SematicModel.QuadConsumer consumer) {
+    static final void toRDF(Map<String, Object> document, final SemanticModel.QuadConsumer consumer) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();
@@ -244,7 +246,7 @@ public class VerifierTest {
         @Override
         public QuadConsumer consumer() {
             // TODO remove with rdf-api 2.0.0
-            return new SematicModel.QuadConsumer() {
+            return new SemanticModel.QuadConsumer() {
                 @Override
                 public void accept(
                         String subject,

@@ -11,6 +11,8 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.trust.payload.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -30,10 +32,10 @@ public final class ECDSASD2023 {
                 ECDSASD2023::generate);
     }
 
-    private static Signature decode(String value, Proof proof, Data data) {
+    private static Signature decode(String value, Proof proof, PayloadSelector data) {
 
         var signature = Multibase.BASE_64_URL.decode(value);
-        IO.println("SD sig length: " + signature.length);
+//        IO.println("SD sig length: " + signature.length);
         String signatureAlgorithm = null;
         String digestAlgorithm = null;
 
@@ -68,7 +70,7 @@ public final class ECDSASD2023 {
             AsymmetricSigner signer,
             Function<String, MessageDigest> digestFactory,
             DataIntegrityProof proof,
-            Data data)
+            DigestiblePayload data)
             throws SignatureException {
 
         var digestor = switch (algorithm) {
@@ -84,45 +86,7 @@ public final class ECDSASD2023 {
                 proof,
                 data);
     }
-//    static final CryptoSuite CRYPTO_256 = new CryptoSuite(
-//            CRYPTOSUITE_NAME,
-//            256,
-//            new RDFC(),
-//            new MessageDigest("SHA-256"),
-//            new BCECDSASignatureProvider(CurveType.P256));
-//
-//    static final CryptoSuite CRYPTO_384 = new CryptoSuite(
-//            CRYPTOSUITE_NAME,
-//            384,
-//            new RDFC(),
-//            new MessageDigest("SHA-384"),
-//            new BCECDSASignatureProvider(CurveType.P384));
-//
-//    public static final MulticodecDecoder CODECS = MulticodecDecoder.getInstance(
-//            KeyCodec.P256_PUBLIC_KEY,
-//            KeyCodec.P256_PRIVATE_KEY,
-//            KeyCodec.P384_PUBLIC_KEY,
-//            KeyCodec.P384_PRIVATE_KEY);
-//
-//    public ECDSASD2023() {
-//        super(CRYPTOSUITE_NAME, Multibase.BASE_64_URL);
-//    }
-//
-//    @Override
-//    public ECDSASD2023Issuer createIssuer(KeyPair keyPair) {
-//
-//        byte[] privateKey = keyPair.privateKey().rawBytes();
-//
-//        if (privateKey.length == 32) {
-//            return new ECDSASD2023Issuer(this, CurveType.P256, CRYPTO_256, keyPair, proofValueBase);
-//        }
-//        if (privateKey.length == 48) {
-//            return new ECDSASD2023Issuer(this, CurveType.P384, CRYPTO_384, keyPair, proofValueBase);
-//        }
-//        throw new IllegalArgumentException("Usupported key length " + privateKey.length + " bytes, expected 32 bytes (256 bits) or 48 bytes (384 bits).");
-//    }
-//
-//    @Override
+    
 //    protected ProofValue getProofValue(Proof proof, DocumentModel model, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
 //        if (ECDSASDBaseProofValue.is(proofValue)) {
 //            return ECDSASDBaseProofValue.of(proof, model, proofValue, loader);
@@ -132,7 +96,7 @@ public final class ECDSASD2023 {
 //        }
 //        throw new DocumentError(ErrorType.Unknown, "ProofValue");
 //    }
-//
+
 //    @Override
 //    protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError {
 //        if (!CRYPTOSUITE_NAME.equals(cryptoName)) {

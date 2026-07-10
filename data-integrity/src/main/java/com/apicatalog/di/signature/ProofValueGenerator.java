@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.trust.data.Data;
+import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.signature.Signature;
 
 public class ProofValueGenerator {
@@ -16,7 +16,7 @@ public class ProofValueGenerator {
             AsymmetricSigner signer,
             Function<String, MessageDigest> digestFactory,
             DataIntegrityProof proof,
-            Data data)
+            DigestiblePayload data)
             throws SignatureException {
         return generate(algorithm, signer, "SHA-256", digestFactory, proof, data);
     }
@@ -26,7 +26,7 @@ public class ProofValueGenerator {
             AsymmetricSigner signer,
             Function<String, MessageDigest> digestFactory,
             DataIntegrityProof proof,
-            Data data)
+            DigestiblePayload data)
             throws SignatureException {
         return generate(algorithm, signer, "SHA-384", digestFactory, proof, data);
     }
@@ -37,7 +37,7 @@ public class ProofValueGenerator {
             String digestAlgorithm,
             Function<String, MessageDigest> digestFactory,
             DataIntegrityProof proof,
-            Data data)
+            DigestiblePayload payload)
             throws SignatureException {
 
         var digestor = digestFactory.apply(digestAlgorithm);
@@ -47,6 +47,6 @@ public class ProofValueGenerator {
                 signer,
                 digestor,
                 proof,
-                data);
+                payload);
     }
 }

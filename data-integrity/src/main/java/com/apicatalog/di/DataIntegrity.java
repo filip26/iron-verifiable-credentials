@@ -11,9 +11,9 @@ import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.model.LexicalModel;
-import com.apicatalog.trust.model.SematicModel;
-import com.apicatalog.trust.model.SematicModel.C14nFactory;
-import com.apicatalog.trust.model.SematicModel.QuadConsumer;
+import com.apicatalog.trust.model.SemanticModel;
+import com.apicatalog.trust.model.SemanticModel.C14nFactory;
+import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.MapProofCursor;
@@ -104,7 +104,7 @@ public class DataIntegrity {
                 throw new IllegalStateException();
             }
 
-            return new SematicModel(factory, c14n, tordf, c14nFactory, readers);
+            return new SemanticModel(factory, c14n, tordf, c14nFactory, readers);
         }
     }
 

@@ -3,8 +3,8 @@ package com.apicatalog.di.suite;
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.payload.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -17,14 +17,14 @@ public class SLHDSA2024 {
 
     private static CryptoSuite SLHDSA_128s_RDFC_2024 = new CryptoSuite(
             "slhdsa128-rdfc-2024",
-            "RDFC",
+            DataModel.C14N_RDFC,
             Multibase.BASE_64_URL,
             SLHDSA2024::decode128s,
             ProofValueGenerator::generateWithSHA256);
 
     private static CryptoSuite SLHDSA_128s_JCS_2024 = new CryptoSuite(
             "slhdsa128-jcs-2024",
-            "JCS",
+            DataModel.C14N_JCS,
             Multibase.BASE_64_URL,
             SLHDSA2024::decode128s,
             ProofValueGenerator::generateWithSHA256);
@@ -45,7 +45,7 @@ public class SLHDSA2024 {
         return SLHDSA_128s_JCS_2024;
     }
 
-    private static Signature decode128s(String value, Proof proof, Data data) {
+    private static Signature decode128s(String value, Proof proof, PayloadSelector payload) {
 
         var signature = Multibase.BASE_64_URL.decode(value);
 
@@ -56,11 +56,11 @@ public class SLHDSA2024 {
                     """.formatted(signature.length, SIGNATURE_LENGTH));
         }
 
-        return ProofValue.newSignature(
+        return ProofValue.newInstance(
                 ALGORITHM_SHA2_128s,
                 "SHA-256",
                 signature,
                 proof,
-                data);
+                payload);
     }
 }

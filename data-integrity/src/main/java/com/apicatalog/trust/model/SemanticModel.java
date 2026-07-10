@@ -11,7 +11,7 @@ import com.apicatalog.trust.proof.GraphProofCursor.Factory;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class SematicModel implements DataModel {
+public class SemanticModel implements DataModel {
 
     // use just Supplier
     @FunctionalInterface
@@ -44,7 +44,7 @@ public class SematicModel implements DataModel {
     private final C14nFactory canonizeFactory;
     private final Map<String, GraphProofReader> readers;
 
-    public SematicModel(
+    public SemanticModel(
             Factory factory,
             String c14n,
             BiConsumer<Map<String, Object>, QuadConsumer> tordf,
@@ -145,14 +145,6 @@ public class SematicModel implements DataModel {
                     mapping.put(graph, reader);
                 }
             }
-
-//            IO.println("X " + Arrays.toString(new String[] {
-//                    subject, predicate, object, datatype, language, direction, graph
-//            }));
-
-//var proofGraphs = graphs.get("@default").stream()
-//.filter(statement -> "https://w3id.org/security#proof".equals(statement[1]))
-//.map(statement -> statement[2]).toList();
 
             dataset.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
                     .add(new String[] {

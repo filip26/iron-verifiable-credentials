@@ -3,12 +3,10 @@ package com.apicatalog.trust.proof;
 import java.time.Instant;
 import java.util.Collection;
 
-import com.apicatalog.trust.data.CanonicalPayload;
+import com.apicatalog.trust.payload.CanonicalPayload;
 import com.apicatalog.trust.signature.Signature;
 
-public interface Proof 
-extends CanonicalPayload
-{
+public interface Proof extends CanonicalPayload {
 
     String type();
 
@@ -25,8 +23,9 @@ extends CanonicalPayload
     String verificationMethod();
 
     String purpose();
-    
+
     Instant created();
 
+    @Deprecated
     Collection<String> previous();
 }

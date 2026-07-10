@@ -8,11 +8,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HexFormat;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricVerifier;
-import com.apicatalog.trust.data.Data;
+import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.trust.payload.PayloadSelector;
+import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -32,14 +33,14 @@ public class BaseProofValue implements Signature {
     private String digestAlgorithm;
 
     private Proof proof;
-    private Data data;
+    private RedactablePayload payload;
 
     private byte[] baseSignature;
     private byte[] proofPublicKey;
     private byte[] hmacKey;
 
     private Collection<byte[]> signatures;
-    private ArrayList<String> pointers;
+    private ArrayList<String> mandatoryPointers;
 
     public static boolean isAccepted(byte[] signature) {
         return signature.length > 2
@@ -53,7 +54,7 @@ public class BaseProofValue implements Signature {
             String digestAlgorithm,
             byte[] signature,
             Proof proof,
-            Data data) {
+            PayloadSelector data) {
 
 //  public static ECDSASDBaseProofValue of(Proof proof, DocumentModel model, byte[] signature, DocumentLoader loader) throws DocumentError {
 //
@@ -94,7 +95,6 @@ public class BaseProofValue implements Signature {
             proofValue.signatureAlgorithm = signatureAlgorithm;
             proofValue.digestAlgorithm = digestAlgorithm;
 
-            proofValue.data = data;
             proofValue.proof = proof;
 
             proofValue.baseSignature = byteArray(top.getDataItems().get(0));
@@ -115,12 +115,15 @@ public class BaseProofValue implements Signature {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
             }
             IO.println("> signatures: " + proofValue.signatures.size());
-            proofValue.pointers = new ArrayList<>(((Array) top.getDataItems().get(4)).getDataItems().size());
+            proofValue.mandatoryPointers = new ArrayList<>(((Array) top.getDataItems().get(4)).getDataItems().size());
 
             for (final DataItem item : ((Array) top.getDataItems().get(4)).getDataItems()) {
-                proofValue.pointers.add(string(item));
+                proofValue.mandatoryPointers.add(string(item));
             }
-            IO.println("> mandatory pointers: " + proofValue.pointers);
+            IO.println("> mandatory pointers: " + proofValue.mandatoryPointers);
+            
+            proofValue.payload = data.filter(proofValue.mandatoryPointers);
+            
             return proofValue;
 
         } catch (CborException e) {
@@ -139,24 +142,19 @@ public class BaseProofValue implements Signature {
         var digestor = digestFactory.apply(digestAlgorithm);
 
         var proofDigest = digestor.digest(proof.canonicalPayload());
-        var dataDigest = digestor.digest(data.digestiblePayload(Set.of()).canonicalPayload());
-System.out.println(new String(proof.canonicalPayload()));
+        var dataDigest = digestor.digest(payload.canonicalPayload());
+System.out.println(new String(payload.canonicalPayload()));
         var digest = hash(
                 proofDigest,
                 proofPublicKey,
                 dataDigest); // FIXME pass mandatory pointers
-IO.println("> digest:" + digest.length);
-//        var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
-//System.out.println(new String(data.digestiblePayload(Set.of()).canonicalPayload()));
+//IO.println("> digest:" + digest.length);
+////        var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
+////System.out.println(new String(data.digestiblePayload(Set.of()).canonicalPayload()));
 IO.println(HexFormat.of().formatHex(proofDigest));
 IO.println(HexFormat.of().formatHex(dataDigest));
 
         return verifier.verify(publicKey, digest, toByteArray());
-    }
-
-    @Override
-    public Data data() {
-        return data;
     }
 
     @Override
@@ -201,6 +199,11 @@ IO.println(HexFormat.of().formatHex(dataDigest));
         System.arraycopy(proofPublicKey, 0, hash, proofHash.length, proofPublicKey.length);
         System.arraycopy(mandatoryHash, 0, hash, proofHash.length + proofPublicKey.length, mandatoryHash.length);
         return hash;
+    }
+
+    @Override
+    public DigestiblePayload payload() {
+        return payload;
     }
 
 }

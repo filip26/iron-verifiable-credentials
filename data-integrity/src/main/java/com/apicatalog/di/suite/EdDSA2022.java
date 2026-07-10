@@ -3,8 +3,8 @@ package com.apicatalog.di.suite;
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.payload.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -15,14 +15,14 @@ public class EdDSA2022 {
 
     private static final CryptoSuite MLDSA_44_RDFC_2024 = new CryptoSuite(
             "eddsa-rdfc-2022",
-            "RDFC",
+            DataModel.C14N_RDFC,
             Multibase.BASE_58_BTC,
             EdDSA2022::decode,
             ProofValueGenerator::generateWithSHA256);
 
     private static final CryptoSuite MLDSA_44_JCS_2024 = new CryptoSuite(
             "eddsa-jcs-2022",
-            "JCS",
+            DataModel.C14N_JCS,
             Multibase.BASE_58_BTC,
             EdDSA2022::decode,
             ProofValueGenerator::generateWithSHA256);
@@ -43,7 +43,7 @@ public class EdDSA2022 {
         };
     }
 
-    static Signature decode(String value, Proof proof, Data data) {
+    static Signature decode(String value, Proof proof, PayloadSelector payload) {
 
         var signature = Multibase.BASE_58_BTC.decode(value);
 
@@ -54,11 +54,11 @@ public class EdDSA2022 {
                     """.formatted(signature.length, SIGNATURE_LENGTH));
         }
 
-        return ProofValue.newSignature(
+        return ProofValue.newInstance(
                 ALGORITHM,
                 "SHA-256",
                 signature,
                 proof,
-                data);
+                payload);
     }
 }

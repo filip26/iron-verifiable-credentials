@@ -7,8 +7,8 @@ import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
-import com.apicatalog.trust.data.Data;
-import com.apicatalog.trust.data.DigestiblePayload;
+import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.trust.payload.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -19,7 +19,7 @@ public final class ProofValue implements Signature {
 
     private final byte[] value;
 
-    private final Data data;
+    private final DigestiblePayload payload;
     private final Proof proof;
 
     private ProofValue(
@@ -27,26 +27,26 @@ public final class ProofValue implements Signature {
             String digestAlgorithm,
             byte[] value,
             Proof proof,
-            Data data) {
+            DigestiblePayload payload) {
         this.algorithm = algorithm;
         this.digestAlgorithm = digestAlgorithm;
         this.value = value;
-        this.data = data;
+        this.payload = payload;
         this.proof = proof;
     }
 
-    public static ProofValue newSignature(
+    public static ProofValue newInstance(
             String algorithm,
             String digestAlgorithm,
             byte[] value,
             Proof proof,
-            Data data) {
+            PayloadSelector payload) {
         return new ProofValue(
                 algorithm,
                 digestAlgorithm,
                 value,
                 proof,
-                data);
+                payload.digestible());
     }
 
     public static ProofValue generateSignature(
@@ -54,16 +54,16 @@ public final class ProofValue implements Signature {
             AsymmetricSigner signer,
             MessageDigest messageDigest,
             Proof proof,
-            Data data) throws SignatureException {
+            DigestiblePayload payload) throws SignatureException {
 
-        var digest = digest(messageDigest, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
+        var digest = digest(messageDigest, proof.canonicalPayload(), payload);
 
         return new ProofValue(
                 algorithm,
                 messageDigest.getAlgorithm(),
                 signer.sign(digest),
                 proof,
-                data);
+                payload);
     }
 
     @Override
@@ -75,7 +75,7 @@ public final class ProofValue implements Signature {
 
         var digestor = digestFactory.apply(digestAlgorithm);
 
-        var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
+        var digest = digest(digestor, proof.canonicalPayload(), payload);
 
         return verifier.verify(publicKey, digest, toByteArray());
     }
@@ -97,19 +97,20 @@ public final class ProofValue implements Signature {
     private static byte[] digest(
             MessageDigest digest,
             byte[] canonicalProof,
-            DigestiblePayload document) {
+            DigestiblePayload payload) {
 
         digest.update(canonicalProof);
         var proofHash = digest.digest();
 
-        var docHash = document.digest(digest.getAlgorithm());
-        if (docHash == null) {
-            digest.update(document.canonicalPayload());
-            docHash = digest.digest();
-            document.digest(digest.getAlgorithm(), docHash);
+        var payloadHash = payload.digest(digest.getAlgorithm());
+        
+        if (payloadHash == null) {
+            digest.update(payload.canonicalPayload());
+            payloadHash = digest.digest();
+            payload.digest(digest.getAlgorithm(), payloadHash);
         }
 
-        return digestFromHash(proofHash, docHash);
+        return digestFromHash(proofHash, payloadHash);
     }
 
     /**
@@ -119,26 +120,21 @@ public final class ProofValue implements Signature {
      * The output is structured as H(canonicalProof) || H(canonicalDocument).
      *
      * @param proofHash the cryptographic hash of the canonical proof
-     * @param docHash   the cryptographic hash of the canonical document
+     * @param payloadHash   the cryptographic hash of the canonical document
      * @return the signing or verification data block containing the concatenated
      *         hashes
      * @throws NullPointerException if proofHash or docHash is null
      */
-    private static byte[] digestFromHash(byte[] proofHash, byte[] docHash) {
-        var digest = new byte[proofHash.length + docHash.length];
+    private static byte[] digestFromHash(byte[] proofHash, byte[] payloadHash) {
+        var digest = new byte[proofHash.length + payloadHash.length];
         System.arraycopy(proofHash, 0, digest, 0, proofHash.length);
-        System.arraycopy(docHash, 0, digest, proofHash.length, docHash.length);
+        System.arraycopy(payloadHash, 0, digest, proofHash.length, payloadHash.length);
         return digest;
     }
 
     @Override
     public byte[] toByteArray() {
         return value;
-    }
-
-    @Override
-    public Data data() {
-        return data;
     }
 
     @Override
@@ -149,5 +145,10 @@ public final class ProofValue implements Signature {
     @Override
     public String algorithm() {
         return algorithm;
+    }
+
+    @Override
+    public DigestiblePayload payload() {
+        return payload;
     }
 }

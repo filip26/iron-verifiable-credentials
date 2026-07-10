@@ -8,7 +8,9 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.trust.data.Data;
+import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.trust.payload.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -19,14 +21,14 @@ public class ECDSA2019 {
 
     private static final CryptoSuite ECDSA_RDFC_2019 = new CryptoSuite(
             "ecdsa-rdfc-2019",
-            "RDFC",
+            DataModel.C14N_RDFC,
             Multibase.BASE_58_BTC,
             ECDSA2019::decode,
             ECDSA2019::generate);
 
     private static final CryptoSuite ECDSA_JCS_2019 = new CryptoSuite(
             "ecdsa-jcs-2019",
-            "JCS",
+            DataModel.C14N_JCS,
             Multibase.BASE_58_BTC,
             ECDSA2019::decode,
             ECDSA2019::generate);
@@ -39,7 +41,7 @@ public class ECDSA2019 {
         return ECDSA_JCS_2019;
     }
 
-    private static Signature decode(String value, Proof proof, Data data) {
+    private static Signature decode(String value, Proof proof, PayloadSelector payload) {
 
         var signature = Multibase.BASE_58_BTC.decode(value);
 
@@ -59,12 +61,12 @@ public class ECDSA2019 {
             throw new IllegalArgumentException();
         }
 
-        return ProofValue.newSignature(
+        return ProofValue.newInstance(
                 algorithm,
                 digest,
                 signature,
                 proof,
-                data);
+                payload);
     }
 
     private static Signature generate(
@@ -72,7 +74,7 @@ public class ECDSA2019 {
             AsymmetricSigner signer,
             Function<String, MessageDigest> digestFactory,
             DataIntegrityProof proof,
-            Data data)
+            DigestiblePayload payload)
             throws SignatureException {
 
         var digestor = switch (algorithm) {
@@ -86,6 +88,6 @@ public class ECDSA2019 {
                 signer,
                 digestor,
                 proof,
-                data);
+                payload);
     }
 }

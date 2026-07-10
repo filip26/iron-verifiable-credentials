@@ -44,9 +44,9 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.data.GenericPayload;
 import com.apicatalog.trust.data.MapData;
 import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.payload.GenericPayload;
 import com.apicatalog.trust.proof.Proof;
 import com.fasterxml.jackson.core.JsonFactory;
 
@@ -146,15 +146,14 @@ public class IssuerTest {
                     """.formatted(proofDraft.cryptosuite().c14n()));
             };
 
-            var data = new MapData(document, proofDraft.c14n());
-            data.digestiblePayload(proofDraft.previous(), new GenericPayload(canonicalPayload));
-
+//            payload.withProofs(proof.previous());
+                        
             proof = proofDraft.generateProof(
                     keyAlgorithm,
                     signer,
                     Resources.DIGEST_FACTORY::get,
                     proofDraft,
-                    data);
+                    new GenericPayload(canonicalPayload));
 
             DataIntegrityProof.write((DataIntegrityProof) proof, composer);
 
@@ -164,20 +163,17 @@ public class IssuerTest {
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 
-            assertEquals(Ed25519Signature2020.KEY_ALGORITHM, keyAlgorithm);
+            assertEquals(Ed25519Signature2020.SIGNATURE_ALGORITHM, keyAlgorithm);
 
             var proofDraft = Ed25519Signature2020.newDraft((Map) options);
 
             byte[] canonicalPayload = rdfc(document);
 
-            var data = new MapData(document, Ed25519Signature2020.C14N);
-            data.digestiblePayload(new GenericPayload(canonicalPayload));
-
             proof = Ed25519Signature2020.generateProof(
                     signer,
                     Resources.DIGEST_FACTORY::get,
                     proofDraft,
-                    data);
+                    new GenericPayload(canonicalPayload));
 
             Ed25519Signature2020.write((Ed25519Signature2020) proof, composer);
 

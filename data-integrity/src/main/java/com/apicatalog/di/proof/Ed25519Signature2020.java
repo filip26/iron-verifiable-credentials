@@ -19,8 +19,9 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
-import com.apicatalog.trust.data.Data;
-import com.apicatalog.trust.proof.GraphProofCursor;
+import com.apicatalog.trust.model.SemanticModel;
+import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.trust.payload.PayloadSelector;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
@@ -30,15 +31,15 @@ public final class Ed25519Signature2020 implements Proof {
     public static final String TYPE_URI = "https://w3id.org/security#Ed25519Signature2020";
     public static String TYPE_NAME = "Ed25519Signature2020";
 
-    public static String KEY_ALGORITHM = "Ed25519";
+    public static String SIGNATURE_ALGORITHM = "Ed25519";
     public static String HASH_ALGORITHM = "SHA-256";
     public static String C14N = "RDFC";
 
-    private static final String URI_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-    private static final String URI_CREATED = "http://purl.org/dc/terms/created";
-    private static final String URI_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
-    private static final String URI_PURPOSE = "https://w3id.org/security#proofPurpose";
-    private static final String URI_PROOF_VALUE = "https://w3id.org/security#proofValue";
+    private static final String PREDICATE_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+    private static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
+    private static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
+    private static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
+    private static final String PREDICATE_PROOF_VALUE = "https://w3id.org/security#proofValue";
 
     private Instant created;
     private String purpose;
@@ -71,18 +72,18 @@ public final class Ed25519Signature2020 implements Proof {
             AsymmetricSigner signer,
             Function<String, MessageDigest> digestFactory,
             Ed25519Signature2020.Draft proofDraft,
-            Data data) throws SignatureException {
+            DigestiblePayload payload) throws SignatureException {
 
         proofDraft.canonize();
 
         var digestor = digestFactory.apply(HASH_ALGORITHM);
 
         var signature = ProofValue.generateSignature(
-                Ed25519Signature2020.KEY_ALGORITHM,
+                Ed25519Signature2020.SIGNATURE_ALGORITHM,
                 signer,
                 digestor,
                 proofDraft.get(),
-                data);
+                payload);
 
         proofDraft.signature(signature);
 
@@ -275,11 +276,14 @@ public final class Ed25519Signature2020 implements Proof {
         }
 
         @Override
-        public Proof read(Collection<String[]> proof, GraphProofCursor cursor) {
+        public Proof read(
+                Collection<String[]> proof,
+                SemanticModel model,
+                PayloadSelector payload) {
 
             final var di = new Ed25519Signature2020();
 
-            var canonizer = cursor.newCanonizer();
+            var canonizer = model.newCanonizer();
 
             var consumer = canonizer.consumer();
 
@@ -287,19 +291,19 @@ public final class Ed25519Signature2020 implements Proof {
 
             for (var statement : proof) {
                 switch (statement[1]) {
-                case URI_CREATED:
+                case PREDICATE_CREATED:
                     di.created = Instant.parse(statement[2]);
                     break;
-                case URI_PURPOSE:
+                case PREDICATE_PROOF_PURPOSE:
                     di.purpose = statement[2];
                     break;
-                case URI_VERIFICATION_METHOD:
+                case PREDICATE_VERIFICATION_METHOD:
                     di.verificationMethod = statement[2];
                     break;
-                case URI_PROOF_VALUE:
+                case PREDICATE_PROOF_VALUE:
                     proofValue = Multibase.BASE_58_BTC.decode(statement[2]);
                     break;
-                case URI_TYPE:
+                case PREDICATE_TYPE:
                     if (!TYPE_URI.equals(statement[2])) {
                         throw new IllegalArgumentException(
                                 """
@@ -314,8 +318,14 @@ public final class Ed25519Signature2020 implements Proof {
                             """.formatted(statement[1], TYPE_URI));
 
                 }
-                if (!URI_PROOF_VALUE.equals(statement[1])) { // TODO better
-                    consumer.accept(statement[0], statement[1], statement[2], statement[3], statement[4], statement[5],
+                if (!PREDICATE_PROOF_VALUE.equals(statement[1])) { // TODO better
+                    consumer.accept(
+                            statement[0],   // subject 
+                            statement[1],   // predicate
+                            statement[2],   // object
+                            statement[3],   // datatype
+                            statement[4],   // language
+                            statement[5],   // direction
                             null);
                 }
             }
@@ -323,12 +333,12 @@ public final class Ed25519Signature2020 implements Proof {
             di.canonicalPayload = canonizer.canonize();
 
             if (proofValue != null) {
-                di.signature = ProofValue.newSignature(
-                        Ed25519Signature2020.KEY_ALGORITHM,
+                di.signature = ProofValue.newInstance(
+                        SIGNATURE_ALGORITHM,
                         HASH_ALGORITHM,
                         proofValue,
                         di,
-                        cursor.data(Set.of()));
+                        payload);
             }
 
             return di;

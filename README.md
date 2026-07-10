@@ -16,12 +16,10 @@
 
 The following cryptographic suites are supported out-of-the-box.
 
-| Name | Algorithm | C14N | ⚛️ Quantum Resistant |
+| Name | Algorithm(s) | C14N | ⚛️ Quantum Resistant |
 | :--- | :--- | :--- | :---: |
-| `ecdsa-rdfc-2019` | P-256 | RDFC | |
-| `ecdsa-rdfc-2019` | P-384 | RDFC | |
-| `ecdsa-jcs-2019` | P-256 | JCS | |
-| `ecdsa-jcs-2019` | P-384 | JCS | |
+| `ecdsa-rdfc-2019` | P-256, P-384 | RDFC | |
+| `ecdsa-jcs-2019` | P-256, P-384 | JCS | |
 | `eddsa-rdfc-2022` | Ed25519 | RDFC | |
 | `eddsa-jcs-2022` | Ed25519 | JCS | |
 | `mldsa44-rdfc-2024` | ML-DSA-44 | RDFC | ✅ |

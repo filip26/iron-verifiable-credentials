@@ -16,13 +16,14 @@ import java.util.Objects;
  * supports optional, thread-safe caching of cryptographic digests.
  * </p>
  */
+//TODO make record
 public class GraphData implements Data {
 
     private final Collection<String[]> data;
     private final String c14n;
     
-    private DigestiblePayload payload;
-    private Map<Collection<String>, DigestiblePayload> payloads;
+//    private DigestiblePayload payload;
+//    private Map<Collection<String>, DigestiblePayload> payloads;
 
     /**
      * Constructs a new {@code DigestibleDocument}.
@@ -46,31 +47,31 @@ public class GraphData implements Data {
         return data;
     }
 
-    @Override
-    public DigestiblePayload digestiblePayload(Collection<String> withProofs) {
-        if (withProofs.isEmpty()) {
-            return payload;
-        }
-        if (payloads != null) {
-            return payloads.get(withProofs);
-        }
-        return null;
-    }
+//    @Override
+//    public DigestiblePayload digestiblePayload(Collection<String> withProofs) {
+//        if (withProofs.isEmpty()) {
+//            return payload;
+//        }
+//        if (payloads != null) {
+//            return payloads.get(withProofs);
+//        }
+//        return null;
+//    }
     
     @Override
     public String c14n() {
         return c14n;
     }
 
-    @Override
-    public void digestiblePayload(Collection<String> withProofs, DigestiblePayload payload) {
-        if (withProofs.isEmpty()) {
-            this.payload = payload; 
-            return;
-        }        
-        if (payloads == null) {
-            payloads = new HashMap<>();
-        }
-        payloads.put(withProofs, payload);
-    }
+//    @Override
+//    public void digestiblePayload(Collection<String> withProofs, DigestiblePayload payload) {
+//        if (withProofs.isEmpty()) {
+//            this.payload = payload; 
+//            return;
+//        }        
+//        if (payloads == null) {
+//            payloads = new HashMap<>();
+//        }
+//        payloads.put(withProofs, payload);
+//    }
 }

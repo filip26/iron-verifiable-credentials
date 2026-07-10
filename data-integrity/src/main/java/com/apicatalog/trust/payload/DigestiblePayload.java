@@ -1,4 +1,4 @@
-package com.apicatalog.trust.data;
+package com.apicatalog.trust.payload;
 
 import java.util.Collection;
 

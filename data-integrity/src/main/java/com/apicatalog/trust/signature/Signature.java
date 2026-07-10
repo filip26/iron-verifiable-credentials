@@ -6,7 +6,7 @@ import java.security.SignatureException;
 import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricVerifier;
-import com.apicatalog.trust.data.Data;
+import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.proof.Proof;
 
 public interface Signature {
@@ -27,12 +27,12 @@ public interface Signature {
             Function<String, MessageDigest> digestFactory,
             byte[] publicKey)
             throws InvalidKeyException, SignatureException;
-    
-    Data data();
+
+    DigestiblePayload payload();
 
     Proof proof();
 
-    byte[] toByteArray();   //TODO ?! this could be encoders task
+    byte[] toByteArray(); // TODO ?! this could be encoders task
 
     String algorithm();
 }

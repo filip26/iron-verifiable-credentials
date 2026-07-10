@@ -124,4 +124,9 @@ class BaseDocument {
 //    public Map<RdfResource, RdfResource> labelMap() {
 //        return labelMap;
 //    }
+    
+    public static void main(String[] args) {
+        IO.println("CMP < _ " + "<".compareTo("_"));
+    }
+    
 }

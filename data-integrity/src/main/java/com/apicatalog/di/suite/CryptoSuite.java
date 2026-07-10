@@ -8,6 +8,8 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.data.Data;
+import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.trust.payload.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 import com.apicatalog.trust.signature.SignatureDecoder;
@@ -35,8 +37,8 @@ public class CryptoSuite {
         this.signatureDecoder = signatureDecoder;
     }
 
-    public Signature decode(String encoded, Proof proof, Data data) {
-        return signatureDecoder.decode(encoded, proof, data);
+    public Signature decode(String encoded, Proof proof, PayloadSelector payload) {
+        return signatureDecoder.decode(encoded, proof, payload);
     }
 
     public DataIntegrityProof generateProof(
@@ -44,7 +46,7 @@ public class CryptoSuite {
             AsymmetricSigner signer,
             Function<String, MessageDigest> digestFactory,
             DataIntegrityProof.Draft proofDraft,
-            Data data) throws SignatureException {
+            DigestiblePayload payload) throws SignatureException {
 
         proofDraft.canonize(c14n);
 
@@ -55,7 +57,7 @@ public class CryptoSuite {
                 signer,
                 digestFactory,
                 unsigned,
-                data);
+                payload);
 
         proofDraft.signature(signature);
         return proofDraft.get();
