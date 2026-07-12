@@ -6,10 +6,10 @@ import java.security.MessageDigest;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HexFormat;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.RedactablePayload;
@@ -121,9 +121,9 @@ public class BaseProofValue implements Signature {
                 proofValue.mandatoryPointers.add(string(item));
             }
 //            IO.println("> mandatory pointers: " + proofValue.mandatoryPointers);
-            
+
             proofValue.payload = data.redactable(proofValue, proofValue.mandatoryPointers);
-            
+
             return proofValue;
 
         } catch (CborException e) {
@@ -131,7 +131,7 @@ public class BaseProofValue implements Signature {
 //          throw new DocumentError(e, ErrorType.Invalid, "ProofValue");
         }
     }
-    
+
     @Override
     public boolean verify(
             AsymmetricVerifier verifier,
@@ -139,6 +139,10 @@ public class BaseProofValue implements Signature {
             byte[] publicKey)
             throws InvalidKeyException, SignatureException {
 
+        if (signatures.size() != payload.redactablePayload().size()) {
+            return false;
+        }
+        
         var digestor = digestFactory.apply(digestAlgorithm);
 
         var proofDigest = digestor.digest(proof.canonicalPayload());
@@ -154,7 +158,31 @@ public class BaseProofValue implements Signature {
 //IO.println(HexFormat.of().formatHex(proofDigest));
 //IO.println(HexFormat.of().formatHex(dataDigest));
 
-        return verifier.verify(publicKey, digest, toByteArray());
+        var isBaseSignatureVerified = verifier.verify(publicKey, digest, toByteArray());
+        
+        if (!isBaseSignatureVerified) {
+            return false;
+        }
+        
+        var proofKeyCodec = MulticodecDecoder.newInstance().getCodec(proofPublicKey)
+                .orElseThrow();
+        
+        //TODO must match signature algo -> limitation because of verifier ...
+        
+        var decodedProofPublicKey = proofKeyCodec.decode(proofPublicKey);
+        
+        var redactableIterator = payload.redactablePayload().iterator();
+        
+        for (var signature :signatures) {
+            
+            var redactable = redactableIterator.next();
+            
+            if (!verifier.verify(decodedProofPublicKey, redactable.getValue(), signature)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     @Override
