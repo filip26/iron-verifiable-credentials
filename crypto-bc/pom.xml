@@ -7,11 +7,10 @@
     <artifactId>iron-crypto-bc</artifactId>
     <version>1.0.0-M1</version>
 
-    <name>Iron Crypto BC</name>
+    <name>Iron: Crypto BC</name>
     <description>
         Bouncy Castle based asymmetric cryptography implementation for W3C Data
-        Integrity
-        specifications.
+        Integrity specifications.
     </description>
 
     <url>https://github.com/filip26/iron-did-cel</url>
@@ -56,7 +55,7 @@
 
         <!-- Tests -->
         <multibase.version>4.1.0</multibase.version>
-        <multicodec.version>3.1.0</multicodec.version>
+        <multicodec.version>4.0.0</multicodec.version>
         <junit.version>6.0.3</junit.version>
     </properties>
 

@@ -24,7 +24,11 @@ import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.crypto.bc.BCSLHDSASigner;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.suite.CryptoSuites;
+import com.apicatalog.di.suite.CryptoSuite;
+import com.apicatalog.di.suite.ECDSA2019;
+import com.apicatalog.di.suite.EdDSA2022;
+import com.apicatalog.di.suite.MLDSA2024;
+import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -40,8 +44,9 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.data.GenericPayload;
 import com.apicatalog.trust.data.MapData;
+import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.payload.GenericPayload;
 import com.apicatalog.trust.proof.Proof;
 import com.fasterxml.jackson.core.JsonFactory;
 
@@ -49,17 +54,13 @@ public class IssuerTest {
 
     static final MultibaseDecoder MULTIBASE = MultibaseDecoder.getInstance();
 
-    static final MulticodecDecoder MULTICODEC = MulticodecDecoder.getInstance(
-            KeyCodec.P256_PUBLIC_KEY,
-            KeyCodec.P256_PRIVATE_KEY,
-            KeyCodec.P384_PUBLIC_KEY,
-            KeyCodec.P384_PRIVATE_KEY,
-            KeyCodec.ED25519_PUBLIC_KEY,
-            KeyCodec.ED25519_PRIVATE_KEY,
-            KeyCodec.MLDSA_44_PUBLIC_KEY,
-            KeyCodec.MLDSA_44_PRIVATE_KEY,
-            Multicodec.of("slhdsa-sha2-128-priv", Tag.Key, 464000000), // FIXME temporary, there is not private key code
-                                                                       // yet
+    static final MulticodecDecoder MULTICODEC = MulticodecDecoder.newInstance(
+            KeyCodec.P256_PRIVATE,
+            KeyCodec.P384_PRIVATE,
+            KeyCodec.ED25519_PRIVATE,
+            KeyCodec.MLDSA_44_PRIVATE,
+            KeyCodec.SLHDSA_SHA2_128S_PRIVATE,
+            // TODO remove when multicodec is updated
             Multicodec.of("falcon-512-pub", Tag.Key, 4652));
 
     @ParameterizedTest
@@ -76,34 +77,36 @@ public class IssuerTest {
         final String keyAlgorithm;
         final AsymmetricSigner signer;
 
-        switch (privateKeyCodec.name()) {
-        case "ed25519-priv":
-            keyAlgorithm = "Ed25519";
+        switch (privateKeyCodec.code()) {
+        case KeyCodec.ED25519_PRIVATE_CODE:
+            keyAlgorithm = EdDSA2022.ALGORITHM;
             signer = BCEd25519Signer.newInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
-        case "p256-priv":
-            keyAlgorithm = "P-256";
+        // Use a secure random number generator to create non-deterministic signatures
+        // for the algorithms below in production environments.
+        case KeyCodec.P256_PRIVATE_CODE:
+            keyAlgorithm = ECDSA2019.P256;
             signer = BCECDSASigner.newP256Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
-        case "p384-priv":
-            keyAlgorithm = "P-384";
+        case KeyCodec.P384_PRIVATE_CODE:
+            keyAlgorithm = ECDSA2019.P384;
             signer = BCECDSASigner.newP384Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
-        case "mldsa-44-priv":
-            keyAlgorithm = "ML-DSA-44";
-            signer = BCMLDSASigner.newInstance(privateKeyCodec.decode(privateKey))::sign;
+        case KeyCodec.MLDSA_44_PRIVATE_CODE:
+            keyAlgorithm = MLDSA2024.ALGORITHM_44;
+            signer = BCMLDSASigner.new44Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
-        case "slhdsa-sha2-128-priv":
-            keyAlgorithm = "SLH-DSA-SHA2-128s";
-            signer = BCSLHDSASigner.new128SInstance(privateKeyCodec.decode(privateKey))::sign;
+        case KeyCodec.SLHDSA_SHA2_128S_PRIVATE_CODE:
+            keyAlgorithm = SLHDSA2024.ALGORITHM_SHA2_128s;
+            signer = BCSLHDSASigner.new128sInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
 
         default:
             throw new IllegalArgumentException(
                     """
-                    Unsupported secret key algorithm %s.
+                    Unsupported secret key algorithm %s (%d).
                     """
-                            .formatted(privateKeyCodec.name()));
+                            .formatted(privateKeyCodec.name(), privateKeyCodec.code()));
         }
         ;
 
@@ -117,7 +120,7 @@ public class IssuerTest {
 
             var proofDraft = DataIntegrityProof.newDraft(
                     options,
-                    cryptosuite -> CryptoSuites.getInstance(cryptosuite, keyAlgorithm));
+                    IssuerTest::getInstance);
 
             var c14nData = document;
 
@@ -135,21 +138,22 @@ public class IssuerTest {
             }
 
             var canonicalPayload = switch (proofDraft.c14n()) {
-            case "JCS" -> Jcs.canonize(c14nData);
-            case "RDFC" -> rdfc(c14nData);
+            case DataModel.C14N_JCS -> Jcs.canonize(c14nData);
+            case DataModel.C14N_RDFC -> rdfc(c14nData);
             default -> throw new IllegalStateException(
                     """
                     Unsupported c14n = %s.
                     """.formatted(proofDraft.cryptosuite().c14n()));
             };
 
-            var data = new MapData(document, proofDraft.c14n());
-            data.digestiblePayload(proofDraft.previous(), new GenericPayload(canonicalPayload));
-
+//            payload.withProofs(proof.previous());
+                        
             proof = proofDraft.generateProof(
+                    keyAlgorithm,
                     signer,
+                    Resources.DIGEST_FACTORY::get,
                     proofDraft,
-                    data);
+                    new GenericPayload(canonicalPayload));
 
             DataIntegrityProof.write((DataIntegrityProof) proof, composer);
 
@@ -157,23 +161,19 @@ public class IssuerTest {
                 document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
             }
 
-//            IO.println("P: " + Multibase.BASE_58_BTC.encode(proof.signature().toByteArray()));
-
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 
-            assertEquals(Ed25519Signature2020.KEY_ALGORITHM, keyAlgorithm);
+            assertEquals(Ed25519Signature2020.SIGNATURE_ALGORITHM, keyAlgorithm);
 
             var proofDraft = Ed25519Signature2020.newDraft((Map) options);
 
             byte[] canonicalPayload = rdfc(document);
 
-            var data = new MapData(document, Ed25519Signature2020.C14N);
-            data.digestiblePayload(new GenericPayload(canonicalPayload));
-
             proof = Ed25519Signature2020.generateProof(
                     signer,
+                    Resources.DIGEST_FACTORY::get,
                     proofDraft,
-                    data);
+                    new GenericPayload(canonicalPayload));
 
             Ed25519Signature2020.write((Ed25519Signature2020) proof, composer);
 
@@ -209,6 +209,25 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
+    public static CryptoSuite getInstance(String id) {
+
+        return switch (id) {
+        case "eddsa-rdfc-2022" -> EdDSA2022.withRDFC();
+        case "eddsa-jcs-2022" -> EdDSA2022.withJCS();
+
+        case "ecdsa-rdfc-2019" -> ECDSA2019.withRDFC();
+        case "ecdsa-jcs-2019" -> ECDSA2019.withJCS();
+
+        case "mldsa44-rdfc-2024" -> MLDSA2024.get44withRDFC();
+        case "mldsa44-jcs-2024" -> MLDSA2024.get44withJCS();
+
+        case "slhdsa128-rdfc-2024" -> SLHDSA2024.get128withRDFC();
+        case "slhdsa128-jcs-2024" -> SLHDSA2024.get128withJCS();
+
+        default -> throw new IllegalArgumentException();
+        };
+    }
+
     static final Stream<String> resources() throws IOException {
         return Resources.stream()
                 .filter(name -> name.endsWith("unsigned.json"))
@@ -227,7 +246,7 @@ public class IssuerTest {
         var toRdf = JsonLd.toRdf(JsonDocument.of(new ByteArrayInputStream(bos.toByteArray())))
                 .loader(ContextLoader.getInstance());
 
-        var canon = RdfCanon.create("SHA-256");
+        var canon = RdfCanon.create(Resources.DIGEST_FACTORY.get("SHA-256"));
         toRdf.provide(canon);
 
         bos.reset();
@@ -254,11 +273,10 @@ public class IssuerTest {
 
     public static void main(String[] args) {
 
-        var c = Multicodec.of("slhdsa-sha2-128-priv", Tag.Key, 464000000); // FIXME temporary, there is not private key
-                                                                           // code yet
+        var c = KeyCodec.SLHDSA_SHA2_128S_PRIVATE;
         var d = Multibase.BASE_16.decode(
                 "f765d610794caa0dd67472ed92b8ec0b23c1d57c8ed25a9147be7dcd5dca241fb4834a55ff26a17f3947a265bc421093a629d2e863381f8f9f6d64f707cf2e95b");
-        IO.println(Multibase.BASE_64_URL_PAD.encode(c.encode(d)));
+        IO.println(Multibase.BASE_64_URL.encode(c.encode(d)));
     }
 
 }

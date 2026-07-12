@@ -1,0 +1,18 @@
+package com.apicatalog.trust.model;
+
+import java.util.Collection;
+import java.util.Map;
+
+import com.apicatalog.trust.proof.ProofCursor;
+
+public interface DataModel {
+
+    static final String C14N_RDFC = "RDFC";
+    static final String C14N_JCS = "JCS";
+
+    String c14n();
+
+    ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document);
+    
+    //TODO accepted proof types, for configuration dump
+}

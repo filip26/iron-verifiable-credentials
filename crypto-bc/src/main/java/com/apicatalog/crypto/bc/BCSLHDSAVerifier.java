@@ -11,7 +11,7 @@ public final class BCSLHDSAVerifier {
 
     private static final BCSLHDSAVerifier INSTANCE_128S = new BCSLHDSAVerifier();
 
-    public static BCSLHDSAVerifier get128SInstance() {
+    public static BCSLHDSAVerifier get128sInstance() {
         return INSTANCE_128S;
     }
 

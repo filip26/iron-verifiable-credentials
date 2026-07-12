@@ -29,22 +29,22 @@ class TestBc {
 
     static final MultibaseDecoder MULTIBASE = MultibaseDecoder.getInstance();
 
-    static final MulticodecDecoder MULTICODEC = MulticodecDecoder.getInstance(
-            KeyCodec.P256_PUBLIC_KEY,
-            KeyCodec.P256_PRIVATE_KEY,
-            KeyCodec.P384_PUBLIC_KEY,
-            KeyCodec.P384_PRIVATE_KEY,
-            KeyCodec.ED25519_PUBLIC_KEY,
-            KeyCodec.ED25519_PRIVATE_KEY,
-            KeyCodec.MLDSA_44_PUBLIC_KEY,
-            KeyCodec.MLDSA_44_PRIVATE_KEY,
+    static final MulticodecDecoder MULTICODEC = MulticodecDecoder.newInstance(
+            KeyCodec.P256_PUBLIC,
+            KeyCodec.P256_PRIVATE,
+            KeyCodec.P384_PUBLIC,
+            KeyCodec.P384_PRIVATE,
+            KeyCodec.ED25519_PUBLIC,
+            KeyCodec.ED25519_PRIVATE,
+            KeyCodec.MLDSA_44_PUBLIC,
+            KeyCodec.MLDSA_44_PRIVATE,
             Multicodec.of("falcon-512-pub", Tag.Key, 4652));
 
     static final Map<String, AsymmetricVerifier> VERIFIERS = Map.of(
             "P-256", BCECDSAVerifier.getP256Instance()::verify,
             "P-384", BCECDSAVerifier.getP384Instance()::verify,
             "Ed25519", BCEd25519Verifier.getInstance()::verify,
-            "ML-DSA-44", BCMLDSAVerifier.getInstance()::verify,
+            "ML-DSA-44", BCMLDSAVerifier.get44Instance()::verify,
             "FALCON-512", BCFalconVerifier.get512Instance()::verify);
 
     @ParameterizedTest
@@ -136,7 +136,7 @@ class TestBc {
         return switch (algo) {
         case "P-256" -> BCECDSASigner.newP256Instance(privateKey, random)::sign;
         case "P-384" -> BCECDSASigner.newP384Instance(privateKey, random)::sign;
-        case "ML-DSA-44" -> BCMLDSASigner.newInstance(privateKey, random)::sign;
+        case "ML-DSA-44" -> BCMLDSASigner.new44Instance(privateKey, random)::sign;
         default -> throw new IllegalArgumentException("Unsupported algorithm " + algo);
         };
     }

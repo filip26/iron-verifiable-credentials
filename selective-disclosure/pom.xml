@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.apicatalog</groupId>
+    <artifactId>iron-selective-disclosure</artifactId>
+    <version>1.0.0-M1</version>
+
+    <packaging>jar</packaging>
+
+    <name>Iron: Selective Disclosure Proofs</name>
+
+    <description>
+        A modular, high-performance implementation of W3C VC Data Integrity
+        Selective Disclosure Proofs. Built-in support for ecdsa-sd-2023
+        cryptographical suite.
+    </description>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/filip26/iron-verifiable-credentials/issues</url>
+    </issueManagement>
+
+    <url>https://github.com/filip26/iron-verifiable-credentials</url>
+
+    <scm>
+        <connection>
+            scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
+        <developerConnection>
+            scm:git:git://github.com/filip26/iron-verifiable-credentials.git</developerConnection>
+        <url>https://github.com/filip26/iron-verifiable-credentials/tree/main</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>filip26</id>
+            <name>Filip Kolarik</name>
+            <email>filip26@gmail.com</email>
+            <roles>
+                <role>author</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <inceptionYear>2023</inceptionYear>
+
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <argLine>-Dfile.encoding=UTF-8</argLine>
+
+        <di.version>1.0.0-M1</di.version>
+        <cbor-java.version>0.9</cbor-java.version>
+
+        <!-- test resources -->
+        <tree-io.version>1.0.0-M2</tree-io.version>
+        <jcs.version>3.0.0-M4</jcs.version>
+        <rdfc.version>3.0.0</rdfc.version>
+        <jsonld.version>1.7.0</jsonld.version>
+        <junit.version>6.0.3</junit.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-data-integrity</artifactId>
+            <version>${di.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>co.nstant.in</groupId>
+            <artifactId>cbor</artifactId>
+            <version>${cbor-java.version}</version>
+        </dependency>
+        <!-- Tests -->
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-crypto-bc</artifactId>
+            <version>1.0.0-M1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>titanium-jcs</artifactId>
+            <version>${jcs.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>titanium-json-ld</artifactId>
+            <version>${jsonld.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- remove, not needed with Titanium JSON-LD 2.x.x -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>2.0.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>titanium-rdfc</artifactId>
+            <version>${rdfc.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>tree-io-jackson2</artifactId>
+            <version>${tree-io.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

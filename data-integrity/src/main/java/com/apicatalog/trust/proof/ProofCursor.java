@@ -4,11 +4,13 @@ import com.apicatalog.trust.data.Data;
 
 public interface ProofCursor {
 
-    boolean isUnknown();
-
     boolean next();
 
     Data data();
+
+    boolean isAccepted();
     
+// ???   String proofType();
+
     Proof proof();
 }

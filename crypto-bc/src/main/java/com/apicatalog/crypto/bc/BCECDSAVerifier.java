@@ -89,7 +89,10 @@ public final class BCECDSAVerifier {
             throw new IllegalArgumentException("'signature' parameter must not be null.");
         }
         if (signature.length != 64 && signature.length != 96) {
-            throw new IllegalArgumentException("'signature' must be exactly 64 or 96 bytes long.");
+            throw new IllegalArgumentException(
+                    """
+                    A signature length must be exactly 64 or 96 bytes long, but was %d bytes.
+                    """.formatted(signature.length));
         }
 
         final byte[] rBytes = Arrays.copyOfRange(signature, 0, signature.length / 2);

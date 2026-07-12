@@ -18,11 +18,11 @@ public final class BCSLHDSASigner {
         this.random = random;
     }
 
-    public static BCSLHDSASigner new128SInstance(byte[] privateKey) {
-        return new128SInstance(privateKey, null);
+    public static BCSLHDSASigner new128sInstance(byte[] privateKey) {
+        return new128sInstance(privateKey, null);
     }
 
-    public static BCSLHDSASigner new128SInstance(byte[] privateKey, SecureRandom randon) {
+    public static BCSLHDSASigner new128sInstance(byte[] privateKey, SecureRandom randon) {
         return new BCSLHDSASigner(toPrivateKeyParams(SLHDSAParameters.sha2_128s, privateKey), randon);
     }
 

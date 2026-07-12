@@ -18,7 +18,7 @@ public final class JcaEd25519Signer {
         this.privateKey = privateKey;
     }
 
-    public static JcaEd25519Signer getInstance(byte[] privateKey) throws InvalidKeySpecException {
+    public static JcaEd25519Signer newInstance(byte[] privateKey) throws InvalidKeySpecException {
         return new JcaEd25519Signer(toPrivateKey(privateKey));
     }
 
