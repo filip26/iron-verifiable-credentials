@@ -7,11 +7,12 @@ import com.apicatalog.trust.payload.RedactablePayload;
 
 public class BasePayload implements RedactablePayload {
 
-    byte[] mandatory;
+    byte[] base;
+    Collection<Entry<Integer, byte[]>> redactable;
     
     @Override
     public byte[] canonicalPayload() {
-        return mandatory;
+        return base;
     }
 
     @Override
@@ -34,8 +35,7 @@ public class BasePayload implements RedactablePayload {
 
     @Override
     public Collection<Entry<Integer, byte[]>> redactablePayload() {
-        // TODO Auto-generated method stub
-        return null;
+        return redactable;
     }
 
 }

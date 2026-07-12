@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.apicatalog.rdf.nquads.NQuadsWriter;
-
 class Skolemizer {
 
     static final String URN_PREFIX = "urn:xyz:";
@@ -89,26 +87,4 @@ class Skolemizer {
         }
         return node;
     }
-    
-    public static String deskolemize(
-            String subject, 
-            String predicate, 
-            String object, 
-            String datatype, 
-            String language, 
-            String direction,
-            String graph
-            ) {
-        
-        var s = subject;
-        if (s.startsWith(URN_PREFIX)) {
-            s = "_:" + s.substring(URN_PREFIX.length());
-        }
-        var o = object;
-        if (o.startsWith(URN_PREFIX)) {
-            o = "_:" + o.substring(URN_PREFIX.length());
-        }        
-        return NQuadsWriter.nquad(s, predicate, o, datatype, language, direction, graph);
-    }
-
 }

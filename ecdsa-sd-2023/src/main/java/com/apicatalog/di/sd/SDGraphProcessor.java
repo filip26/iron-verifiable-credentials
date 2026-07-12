@@ -1,15 +1,14 @@
 package com.apicatalog.di.sd;
 
-import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.apicatalog.rdf.nquads.NQuadsWriter;
 import com.apicatalog.trust.model.SemanticModel;
@@ -78,11 +77,11 @@ public class SDGraphProcessor implements GraphProcessor {
 
         var compacted = model.compact().apply(context, skolemized);
 
-        IO.println("compacted > " + compacted);
+//        IO.println("compacted > " + compacted);
 
         var selection = Selection.select(compacted, mandatoryPointers);
 
-        IO.println("selection > " + selection);
+//        IO.println("selection > " + selection);
 
         var canonizer = model.newCanonizer();
 
@@ -146,13 +145,16 @@ public class SDGraphProcessor implements GraphProcessor {
         var mandatory = new int[selectedNQuads.size()];
         int mandatoryIndex = 0;
 
-        var canonicalBaseWriter = new StringWriter(mandatory.length * 256); 
+        var optional = new ArrayList<Entry<Integer, byte[]>>(canonized.size() - mandatory.length);
+        var baseWriter = new StringWriter(mandatory.length * 256); 
 
         for (var nquad : canonized) {
             if (selectedNQuads.contains(nquad)) {
                 selectedNQuads.remove(nquad);
                 mandatory[mandatoryIndex++] = index;
-                canonicalBaseWriter.write(nquad);
+                baseWriter.write(nquad);
+            } else {
+                optional.add(Map.entry(index, nquad.getBytes(StandardCharsets.UTF_8)));
             }
             index++;
         }
@@ -162,13 +164,14 @@ public class SDGraphProcessor implements GraphProcessor {
         }
 
         var base = new BasePayload();
-        base.mandatory = canonicalBaseWriter.toString().getBytes(StandardCharsets.UTF_8);
+        base.base = baseWriter.toString().getBytes(StandardCharsets.UTF_8);
+        base.redactable = optional;
         
-        IO.println("c14n > " + canonized);
-        IO.println("mandatory > " + Arrays.toString(mandatory));
-        IO.println("labels > " + canonizer.labels());
-        IO.println("mapping > " + hmac.mapping);
-        IO.println("base > " + new String(base.mandatory));
+//        IO.println("c14n > " + canonized);
+//        IO.println("mandatory > " + Arrays.toString(mandatory));
+//        IO.println("labels > " + canonizer.labels());
+//        IO.println("mapping > " + hmac.mapping);
+//        IO.println("base > " + new String(base.base));
 
         return base;
     }
@@ -192,7 +195,7 @@ public class SDGraphProcessor implements GraphProcessor {
         }
 
         var expanded = model.expand().apply(document);
-        IO.println("expanded > " + expanded);
+//        IO.println("expanded > " + expanded);
 
         Object expandedProofs = null;
 
@@ -252,7 +255,7 @@ public class SDGraphProcessor implements GraphProcessor {
             } else if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
                 proofTypes.put(graph, object);
             }
-            IO.println(graph);
+//            IO.println(graph);
             graphs.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
                     .add(new String[] {
                             subject, predicate, object, datatype, language, direction, graph

@@ -114,13 +114,13 @@ public class BaseProofValue implements Signature {
             if (!MajorType.ARRAY.equals(top.getDataItems().get(4).getMajorType())) {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
             }
-            IO.println("> signatures: " + proofValue.signatures.size());
+//            IO.println("> signatures: " + proofValue.signatures.size());
             proofValue.mandatoryPointers = new ArrayList<>(((Array) top.getDataItems().get(4)).getDataItems().size());
 
             for (final DataItem item : ((Array) top.getDataItems().get(4)).getDataItems()) {
                 proofValue.mandatoryPointers.add(string(item));
             }
-            IO.println("> mandatory pointers: " + proofValue.mandatoryPointers);
+//            IO.println("> mandatory pointers: " + proofValue.mandatoryPointers);
             
             proofValue.payload = data.redactable(proofValue, proofValue.mandatoryPointers);
             
@@ -143,16 +143,16 @@ public class BaseProofValue implements Signature {
 
         var proofDigest = digestor.digest(proof.canonicalPayload());
         var dataDigest = digestor.digest(payload.canonicalPayload());
-IO.println(new String(payload.canonicalPayload()));
+//IO.println(new String(payload.canonicalPayload()));
         var digest = hash(
                 proofDigest,
                 proofPublicKey,
-                dataDigest); // FIXME pass mandatory pointers
+                dataDigest);
 //IO.println("> digest:" + digest.length);
 ////        var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
 ////System.out.println(new String(data.digestiblePayload(Set.of()).canonicalPayload()));
-IO.println(HexFormat.of().formatHex(proofDigest));
-IO.println(HexFormat.of().formatHex(dataDigest));
+//IO.println(HexFormat.of().formatHex(proofDigest));
+//IO.println(HexFormat.of().formatHex(dataDigest));
 
         return verifier.verify(publicKey, digest, toByteArray());
     }
