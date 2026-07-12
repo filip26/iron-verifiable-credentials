@@ -27,15 +27,15 @@ import com.apicatalog.multicodec.codec.KeyCodec;
 class TestJca {
 
     static final MultibaseDecoder MULTIBASE = MultibaseDecoder.getInstance();
-    static final MulticodecDecoder MULTICODEC = MulticodecDecoder.getInstance(
-            KeyCodec.P256_PUBLIC_KEY,
-            KeyCodec.P256_PRIVATE_KEY,
-            KeyCodec.P384_PUBLIC_KEY,
-            KeyCodec.P384_PRIVATE_KEY,
-            KeyCodec.ED25519_PUBLIC_KEY,
-            KeyCodec.ED25519_PRIVATE_KEY,
-            KeyCodec.MLDSA_44_PUBLIC_KEY,
-            KeyCodec.MLDSA_44_PRIVATE_KEY);
+    static final MulticodecDecoder MULTICODEC = MulticodecDecoder.newInstance(
+            KeyCodec.P256_PUBLIC,
+            KeyCodec.P256_PRIVATE,
+            KeyCodec.P384_PUBLIC,
+            KeyCodec.P384_PRIVATE,
+            KeyCodec.ED25519_PUBLIC,
+            KeyCodec.ED25519_PRIVATE,
+            KeyCodec.MLDSA_44_PUBLIC,
+            KeyCodec.MLDSA_44_PRIVATE);
 
     static final Map<String, AsymmetricVerifier> VERIFIERS = Map.of(
             "P-256", JcaECDSAVerifier.getP256Instance()::verify,
