@@ -33,7 +33,6 @@ import com.apicatalog.jcs.Jcs;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
@@ -44,7 +43,6 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.data.MapData;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.payload.GenericPayload;
 import com.apicatalog.trust.proof.Proof;
@@ -147,7 +145,7 @@ public class IssuerTest {
             };
 
 //            payload.withProofs(proof.previous());
-                        
+
             proof = proofDraft.generateProof(
                     keyAlgorithm,
                     signer,
@@ -270,13 +268,4 @@ public class IssuerTest {
 
         return result;
     }
-
-    public static void main(String[] args) {
-
-        var c = KeyCodec.SLHDSA_SHA2_128S_PRIVATE;
-        var d = Multibase.BASE_16.decode(
-                "f765d610794caa0dd67472ed92b8ec0b23c1d57c8ed25a9147be7dcd5dca241fb4834a55ff26a17f3947a265bc421093a629d2e863381f8f9f6d64f707cf2e95b");
-        IO.println(Multibase.BASE_64_URL.encode(c.encode(d)));
-    }
-
 }
