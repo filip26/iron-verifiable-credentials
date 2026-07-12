@@ -11,8 +11,9 @@ import com.apicatalog.trust.data.MapData;
 import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.GenericPayload;
-import com.apicatalog.trust.payload.PayloadSelector;
 import com.apicatalog.trust.payload.RedactablePayload;
+import com.apicatalog.trust.processor.PayloadSelector;
+import com.apicatalog.trust.signature.Signature;
 
 public class MapProofCursor implements ProofCursor, PayloadSelector {
 
@@ -124,7 +125,7 @@ public class MapProofCursor implements ProofCursor, PayloadSelector {
     }
 
     @Override
-    public RedactablePayload filter(Collection<String> pointers) {
+    public RedactablePayload redactable(Signature signature, Collection<String> pointers) {
         throw new UnsupportedOperationException();
     }
 

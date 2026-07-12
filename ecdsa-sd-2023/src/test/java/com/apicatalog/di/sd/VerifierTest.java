@@ -19,23 +19,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.apicatalog.crypto.bc.BCECDSAVerifier;
-import com.apicatalog.crypto.bc.BCEd25519Verifier;
-import com.apicatalog.crypto.bc.BCMLDSAVerifier;
-import com.apicatalog.crypto.bc.BCSLHDSAVerifier;
 import com.apicatalog.di.DataIntegrity;
 import com.apicatalog.di.suite.ECDSA2019;
-import com.apicatalog.di.suite.EdDSA2022;
-import com.apicatalog.di.suite.MLDSA2024;
-import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
 import com.apicatalog.rdf.canon.RdfCanon;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
+import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
 import com.apicatalog.trust.model.DataModel;
@@ -47,12 +43,18 @@ import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.Proof;
 import com.fasterxml.jackson.core.JsonFactory;
 
+import jakarta.json.Json;
+
 public class VerifierTest {
 
     static DataModel MODEL = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
             .proof(ECDSASD2023.getInstance())
+            .expand(VerifierTest::expand)
+            .compact(VerifierTest::compact)
             .tordf(VerifierTest::toRDF)
             .c14n(VerifierTest::newRDFC)
+//TODO            .hmac()
+            .processor(SDGraphProcessor::new)
             .processor(GraphProofCursor::new)
             .build();
 
@@ -168,7 +170,7 @@ public class VerifierTest {
                 .sorted();
     }
 
-    static final void toRDF(Map<String, Object> document, final SemanticModel.QuadConsumer consumer) {
+    static final void toRDF(Object document, final SemanticModel.QuadConsumer consumer) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();
@@ -197,6 +199,54 @@ public class VerifierTest {
         }
     }
 
+    static final Collection<Object> expand(Map<String, Object> document) {
+        try {
+            // TODO temporary, remove with Titanium v2.x.x
+            var bos = new ByteArrayOutputStream();
+            try (var emitter = Jackson2Emitter.newEmitter(bos, JsonFactory.builder().build())) {
+                Tree.write(document, emitter);
+            }
+
+            var expanded = JsonLd.expand(JsonDocument.of(new ByteArrayInputStream(bos.toByteArray())))
+                    .loader(ContextLoader.getInstance()).get();
+
+            try (var parser = Jackson2Parser.newParser(new ByteArrayInputStream(expanded.toString().getBytes()),
+                    JsonFactory.builder().build())) {
+                return Tree.read(parser);
+            }
+
+        } catch (IOException | JsonLdError e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    static final Map<String, Object> compact(Collection<String> context, Map<String, Object> document) {
+        try {
+            // TODO temporary, remove with Titanium v2.x.x
+            var bos = new ByteArrayOutputStream();
+            try (var emitter = Jackson2Emitter.newEmitter(bos, JsonFactory.builder().build())) {
+                Tree.write(document, emitter);
+            }
+
+            var ctx = Json.createArrayBuilder();
+            context.forEach(ctx::add);
+            var ctxx = ctx.build();
+
+            var compacted = JsonLd.compact(JsonDocument.of(new ByteArrayInputStream(bos.toByteArray())),
+                    JsonDocument.of(ctxx))
+                    .loader(ContextLoader.getInstance())
+                    .get();
+
+            try (var parser = Jackson2Parser.newParser(new ByteArrayInputStream(compacted.toString().getBytes()),
+                    JsonFactory.builder().build())) {
+                return Tree.read(parser);
+            }
+
+        } catch (IOException | JsonLdError e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     static final RdfcPrcessor newRDFC() {
         return new RdfcPrcessor(); // TODO reuse one instance across
     }
@@ -219,7 +269,21 @@ public class VerifierTest {
                 }
             });
 
+//            IO.println("C14N mapping > " + canon.mapping());
+
             return bos.toByteArray();
+        }
+
+        @Override
+        public void canonize(QuadConsumer consumer) {
+            try {
+                canon.provide(((subject, predicate, object, datatype, language, direction, graph) -> {
+                    consumer.accept(subject, predicate, object, datatype, language, direction, graph);
+                    return null;
+                }));
+            } catch (RdfConsumerException e) {
+                throw new IllegalArgumentException(e);
+            }
         }
 
         @Override
@@ -240,53 +304,10 @@ public class VerifierTest {
                 }
             };
         }
-    }
 
-//    public final static DocumentLoader LOADER = new StaticContextLoader(new SchemeRouter());
-    //// public final static DocumentLoader LOADER = new StaticContextLoader( / new
-    /// UriBaseRewriter( / VcTestCase.BASE, / "classpath:", / new
-    /// SchemeRouter().set("classpath", new ClasspathLoader())));
-//
-//    static final Verifier VERIFIER = Verifier.with(new ECDSASD2023())
-//            .methodResolver(defaultResolvers(LOADER));
-//
-//    @Test
-//    void testVerifyBase() throws IOException, VerificationError, DocumentError {
-//        JsonObject sdoc = fetchResource("tv-01-sdoc.jsonld");
-//        assertThrows(VerificationError.class, () -> VERIFIER.verify(sdoc));
-//    }
-//
-//    @Test
-//    void testVerifyDerived() throws IOException, VerificationError, DocumentError {
-//
-//        JsonObject ddoc = fetchResource("tv-01-ddoc.jsonld");
-//
-//        VerifiableDocument verifiable = VERIFIER.verify(ddoc);
-//
-//        assertNotNull(verifiable);
-//    }
-//
-//    @Test
-//    void testVerifyDerivedMandatory() throws IOException, VerificationError, DocumentError {
-//
-//        JsonObject ddoc = fetchResource("tv-01-mdoc.jsonld");
-//
-//        VerifiableDocument verifiable = VERIFIER.verify(ddoc);
-//
-//        assertNotNull(verifiable);
-//    }
-//
-//    JsonObject fetchResource(String name) throws IOException {
-//        try (InputStream is = getClass().getResourceAsStream(name)) {
-//            return Json.createReader(is).readObject();
-//        }
-//    }
-//
-//    public static final VerificationKeyProvider defaultResolvers(DocumentLoader loader) {
-//        return MethodSelector.create()
-//                // accept did:key
-//                .with(MethodPredicate.methodId(DidKey::isDidKeyUrl),
-//                        ControllableKeyProvider.of(new DidKeyResolver(ECDSASD2023.CODECS)))
-//                .build();
-//    }
+        @Override
+        public Map<String, String> labels() {
+            return canon.mapping();
+        }
+    }
 }

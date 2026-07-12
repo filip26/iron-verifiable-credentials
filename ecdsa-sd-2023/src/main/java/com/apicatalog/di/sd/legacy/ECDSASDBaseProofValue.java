@@ -12,7 +12,7 @@ public class ECDSASDBaseProofValue
 //
 //    protected final DocumentModel model;
 //
-//    protected byte[] baseSignature;
+//    protected byte[] baseSignature; 
 //    protected byte[] proofPublicKey;
 //    protected byte[] hmacKey;
 //

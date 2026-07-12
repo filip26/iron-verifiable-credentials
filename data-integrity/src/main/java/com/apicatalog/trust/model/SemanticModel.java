@@ -1,13 +1,14 @@
 package com.apicatalog.trust.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
-import com.apicatalog.trust.proof.GraphProofCursor.Factory;
+import com.apicatalog.trust.processor.GraphProcessor;
+import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
@@ -36,23 +37,42 @@ public class SemanticModel implements DataModel {
         QuadConsumer consumer();
 
         byte[] canonize();
+        
+        void canonize(QuadConsumer consumer);
+        
+        Map<String, String> labels();
+        
+        //TODO void reset();
     }
 
-    private final Factory cursorFactory;
-    private final String c14n;
-    private final BiConsumer<Map<String, Object>, QuadConsumer> tordf;
-    private final C14nFactory canonizeFactory;
+    private final GraphProcessor.Factory processorFactory;
+    private final GraphProofCursor.Factory cursorFactory;
     private final Map<String, GraphProofReader> readers;
 
+    private final String c14n;
+    private final C14nFactory canonizeFactory;
+
+    private final Function<Map<String, Object>, Collection<Object>> expand;
+    private final BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
+    private final BiConsumer<Object, QuadConsumer> tordf;
+
     public SemanticModel(
-            Factory factory,
+            GraphProcessor.Factory processorFactory,
+            GraphProofCursor.Factory cursorFactory,
             String c14n,
-            BiConsumer<Map<String, Object>, QuadConsumer> tordf,
+            Function<Map<String, Object>, Collection<Object>> expand,
+            BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact,
+            BiConsumer<Object, QuadConsumer> tordf,
             C14nFactory canonizeFactory,
             Map<String, GraphProofReader> readers) {
-        this.cursorFactory = factory;
+        this.processorFactory = processorFactory;
+        this.cursorFactory = cursorFactory;
         this.c14n = c14n;
+
+        this.expand = expand;
+        this.compact = compact;
         this.tordf = tordf;
+
         this.canonizeFactory = canonizeFactory;
         this.readers = readers;
     }
@@ -65,25 +85,28 @@ public class SemanticModel implements DataModel {
     @Override
     public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
 
-        var dataset = new DatasetProvider(readers);
+        var processor = processorFactory.newInstance(
+                this,
+                context,
+                document);
 
-        tordf.accept(document, dataset);
+        var proofs = processor.proofs();
 
-        if (dataset.noProofsFound() || dataset.noProofReaders()) {
+        if (proofs == null || proofs.isEmpty()) {
             return null;
         }
 
-        var graphs = dataset.graphs();
+        var proofReaders = new HashMap<String, GraphProofReader>(proofs.size());
 
-        var proofReaders = new HashMap<String, GraphProofReader>(dataset.mapping);
+        for (var proofGraph : proofs) {
 
-        for (var entry : dataset.mapping.entrySet()) {
+            var proof = processor.proof(proofGraph);
+            var proofType = processor.proofType(proofGraph);
 
-            var proof = graphs.get(entry.getKey());
+            var reader = readers.get(proofType);
 
-            var reader = entry.getValue();
-            if (reader.isAccepted(proof)) {
-                proofReaders.put(entry.getKey(), reader);
+            if (reader != null && reader.isAccepted(proof)) {
+                proofReaders.put(proofGraph, reader);
             }
         }
 
@@ -91,70 +114,22 @@ public class SemanticModel implements DataModel {
             return null;
         }
 
-        return cursorFactory.newInstance(this, graphs, proofReaders);
-    }
-
-    private static class DatasetProvider implements QuadConsumer {
-
-        private final Map<String, GraphProofReader> readers;
-
-        private Map<String, Collection<String[]>> dataset = new HashMap<>();
-
-        private Collection<String> proofGraphs = new HashSet<>();
-
-        private Map<String, GraphProofReader> mapping = new HashMap<>();
-
-        public DatasetProvider(Map<String, GraphProofReader> readers) {
-            this.readers = readers;
-        }
-
-        public boolean noProofReaders() {
-            return mapping.isEmpty();
-        }
-
-        public Map<String, Collection<String[]>> graphs() {
-            return dataset;
-        }
-
-        public boolean noProofsFound() {
-            return proofGraphs.isEmpty();
-        }
-
-        @Override
-        public void accept(
-                String subject,
-                String predicate,
-                String object,
-                String datatype,
-                String language,
-                String direction,
-                String graph) {
-
-            var key = graph;
-
-            if (key == null) {
-                key = "@default";
-
-                if ("https://w3id.org/security#proof".equals(predicate)) {
-                    proofGraphs.add(object);
-                }
-
-            } else if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
-                var reader = readers.get(object);
-                if (reader != null) {
-                    mapping.put(graph, reader);
-                }
-            }
-
-            dataset.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
-                    .add(new String[] {
-                            subject, predicate, object, datatype, language, direction, graph
-                    });
-        }
-
+        return cursorFactory.newInstance(this, processor, proofReaders);
     }
 
     public GraphCanonizer newCanonizer() {
         return canonizeFactory.newInstance();
+    }
+
+    public BiConsumer<Object, QuadConsumer> tordf() {
+        return tordf;
+    }
+
+    public Function<Map<String, Object>, Collection<Object>> expand() {
+        return expand;
+    }
+
+    public BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact() {
+        return compact;
     }
 }

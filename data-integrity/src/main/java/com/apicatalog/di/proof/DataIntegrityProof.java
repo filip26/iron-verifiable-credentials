@@ -25,7 +25,7 @@ import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadSelector;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.Proof;

@@ -8,7 +8,7 @@ import java.util.function.Function;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 

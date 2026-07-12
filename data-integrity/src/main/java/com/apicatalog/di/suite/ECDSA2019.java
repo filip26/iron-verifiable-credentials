@@ -10,7 +10,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 

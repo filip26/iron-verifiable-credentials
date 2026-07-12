@@ -12,8 +12,8 @@ import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.PayloadSelector;
 import com.apicatalog.trust.payload.RedactablePayload;
+import com.apicatalog.trust.processor.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -122,7 +122,7 @@ public class BaseProofValue implements Signature {
             }
             IO.println("> mandatory pointers: " + proofValue.mandatoryPointers);
             
-            proofValue.payload = data.filter(proofValue.mandatoryPointers);
+            proofValue.payload = data.redactable(proofValue, proofValue.mandatoryPointers);
             
             return proofValue;
 
@@ -143,7 +143,7 @@ public class BaseProofValue implements Signature {
 
         var proofDigest = digestor.digest(proof.canonicalPayload());
         var dataDigest = digestor.digest(payload.canonicalPayload());
-System.out.println(new String(payload.canonicalPayload()));
+IO.println(new String(payload.canonicalPayload()));
         var digest = hash(
                 proofDigest,
                 proofPublicKey,
@@ -204,6 +204,10 @@ IO.println(HexFormat.of().formatHex(dataDigest));
     @Override
     public DigestiblePayload payload() {
         return payload;
+    }
+
+    public byte[] hmacKey() {
+        return hmacKey;
     }
 
 }

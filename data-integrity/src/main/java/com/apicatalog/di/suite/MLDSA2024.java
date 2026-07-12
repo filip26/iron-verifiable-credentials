@@ -4,7 +4,7 @@ import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.payload.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadSelector;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 

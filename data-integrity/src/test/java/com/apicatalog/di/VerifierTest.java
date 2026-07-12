@@ -32,10 +32,12 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
 import com.apicatalog.rdf.canon.RdfCanon;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
+import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
 import com.apicatalog.trust.model.DataModel;
@@ -43,6 +45,7 @@ import com.apicatalog.trust.model.ModelResolver;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
+import com.apicatalog.trust.processor.StandardGraphProcessor;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.MapProofCursor;
 import com.apicatalog.trust.proof.Proof;
@@ -50,7 +53,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 public class VerifierTest {
 
-    static DataModel MODEL_1 = DataIntegrity.newLexicalModelBuilder(DataModel.C14N_JCS)
+    static DataModel LEXICAL_MODEL_1 = DataIntegrity.newLexicalModelBuilder(DataModel.C14N_JCS)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
@@ -59,22 +62,24 @@ public class VerifierTest {
             .processor(MapProofCursor::new)
             .build();
 
-    static DataModel MODEL_2 = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
+    static DataModel SEMANTIC_MODEL_1 = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
             .proof(EdDSA2022::get)
             .proof(ECDSA2019.withRDFC())
             .proof(MLDSA2024::get44)
             .proof(SLHDSA2024::get128s)
             .Ed25519Signature2020()
+            .expand(VerifierTest::expand)
             .tordf(VerifierTest::toRDF)
             .c14n(VerifierTest::newRDFC)
+            .processor(StandardGraphProcessor::new)
             .processor(GraphProofCursor::new)
             .build();
 
     static ModelResolver MODEL_RESOLVER = ModelResolver.newBuilder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty),
-                    MODEL_1,
-                    MODEL_2)
+                    LEXICAL_MODEL_1,
+                    SEMANTIC_MODEL_1)
             .build();
 
     static MethodResolver DID_KEY_RESOLVER = proof -> {
@@ -161,7 +166,7 @@ public class VerifierTest {
                 var verified = PROOF_VERIFIER.verify(proof);
 
                 IO.println(new String(proof.signature().payload().canonicalPayload()));
-                
+
                 assertTrue(verified);
 
                 proofs.add(proof);
@@ -189,7 +194,7 @@ public class VerifierTest {
                 .sorted();
     }
 
-    static final void toRDF(Map<String, Object> document, final SemanticModel.QuadConsumer consumer) {
+    static final void toRDF(Object document, final SemanticModel.QuadConsumer consumer) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();
@@ -212,6 +217,27 @@ public class VerifierTest {
                     return this;
                 }
             });
+
+        } catch (IOException | JsonLdError e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    static final Collection<Object> expand(Map<String, Object> document) {
+        try {
+            // TODO temporary, remove with Titanium v2.x.x
+            var bos = new ByteArrayOutputStream();
+            try (var emitter = Jackson2Emitter.newEmitter(bos, JsonFactory.builder().build())) {
+                Tree.write(document, emitter);
+            }
+
+            var expanded = JsonLd.expand(JsonDocument.of(new ByteArrayInputStream(bos.toByteArray())))
+                    .loader(ContextLoader.getInstance()).get();
+
+            try (var parser = Jackson2Parser.newParser(new ByteArrayInputStream(expanded.toString().getBytes()),
+                    JsonFactory.builder().build())) {
+                return Tree.read(parser);
+            }
 
         } catch (IOException | JsonLdError e) {
             throw new IllegalStateException(e);
@@ -242,6 +268,18 @@ public class VerifierTest {
 
             return bos.toByteArray();
         }
+        
+        @Override
+        public void canonize(QuadConsumer consumer) {
+            try {
+                canon.provide(((subject, predicate, object, datatype, language, direction, graph) -> {
+                    consumer.accept(subject, predicate, object, datatype, language, direction, graph);
+                    return null;
+                }));
+            } catch (RdfConsumerException e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
 
         @Override
         public QuadConsumer consumer() {
@@ -260,6 +298,11 @@ public class VerifierTest {
                     canon.quad(subject, predicate, object, datatype, language, direction, graph);
                 }
             };
+        }
+
+        @Override
+        public Map<String, String> labels() {
+            return canon.mapping();
         }
     }
 }
