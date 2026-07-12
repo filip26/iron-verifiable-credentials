@@ -11,7 +11,7 @@
 > [!NOTE]
 > Your feedback is essential to the improvement of this library. Please share any concerns, primary use cases, areas for enhancement, or challenges you have encountered. Your insights help refine and optimize the library to better meet user needs. Thank you for your time and contributions.
 
-### ✨ Features
+## ✨ Features
 
 - Deliberate engineering; zero vibe coding.
 - Full conformance with specifications.
@@ -24,8 +24,8 @@
 
 The following cryptographic suites are supported out-of-the-box.
 
-| Name | Algorithm(s) | C14N | ⚛️ Post-Quantum<br>Resistant | Selective<br>Disclosure |
-| :--- | :--- | :--- | :---: |
+| Name | Algorithm(s) | C14N | ⚛️ Quantum<br>Resistant | Selective<br>Disclosure |
+| :--- | :--- | :--- | :---: | :---: |
 | `ecdsa-rdfc-2019` | `P-256`, `P-384` | `RDFC` | | |
 | `ecdsa-jcs-2019` | `P-256`, `P-384` | `JCS` | | |
 | `ecdsa-sd-2023` | `P-256`, `P-384` | `RDFC` | |  ✅ |
