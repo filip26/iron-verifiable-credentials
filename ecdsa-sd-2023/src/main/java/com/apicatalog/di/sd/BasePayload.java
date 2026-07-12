@@ -7,10 +7,11 @@ import com.apicatalog.trust.payload.RedactablePayload;
 
 public class BasePayload implements RedactablePayload {
 
+    byte[] mandatory;
+    
     @Override
     public byte[] canonicalPayload() {
-        // TODO Auto-generated method stub
-        return null;
+        return mandatory;
     }
 
     @Override

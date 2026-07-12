@@ -38,7 +38,7 @@ public class HmacIdProvider {
 
         if (hmacId == null) {
             hmacId = "_:" + Multibase.BASE_64_URL
-                    .encode(hmac.doFinal(resource.getBytes(StandardCharsets.UTF_8)));
+                    .encode(hmac.doFinal(resource.substring(2).getBytes(StandardCharsets.UTF_8)));
             hmac.reset();
             mapping.put(resource, hmacId);
         }
