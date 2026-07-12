@@ -7,7 +7,7 @@
     <artifactId>iron-data-integrity</artifactId>
     <version>1.0.0-M1</version>
 
-    <name>Iron Data Integrity</name>
+    <name>Iron: Data Integrity</name>
     <description>
         Standards-compliant, modular library for W3C Verifiable Credentials Data
         Integrity. Built-in support for Ed25519, P-256, P-384,

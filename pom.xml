@@ -27,7 +27,7 @@
         <module>crypto-jca</module>
         <module>crypto-gcloud-kms</module>
         <module>data-integrity</module>
-        <module>selective-discosure</module>
+        <module>selective-disclosure</module>
     </modules>
     
     <build>

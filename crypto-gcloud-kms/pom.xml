@@ -7,7 +7,7 @@
     <artifactId>iron-crypto-gcloud-kms</artifactId>
     <version>1.0.0-M1</version>
 
-    <name>Iron Crypto GC KMS</name>
+    <name>Iron: Crypto GC KMS</name>
     <description>
         Google Cloud KMS-based asymmetric cryptography implementation for W3C
         Data Integrity specifications.
