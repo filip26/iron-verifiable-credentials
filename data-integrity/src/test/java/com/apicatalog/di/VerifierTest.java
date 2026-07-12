@@ -35,6 +35,7 @@ import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
 import com.apicatalog.rdf.canon.RdfCanon;
+import com.apicatalog.rdf.nquads.NQuadsWriter;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
@@ -303,6 +304,12 @@ public class VerifierTest {
         @Override
         public Map<String, String> labels() {
             return canon.mapping();
+        }
+
+        @Override
+        public String toNQuad(String subject, String predicate, String object, String datatype, String language,
+                String direction, String graph) {
+            return NQuadsWriter.nquad(subject, predicate, object, datatype, language, direction, graph);
         }
     }
 }

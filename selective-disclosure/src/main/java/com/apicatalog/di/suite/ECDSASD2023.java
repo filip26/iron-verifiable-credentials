@@ -1,15 +1,14 @@
-package com.apicatalog.di.sd;
+package com.apicatalog.di.suite;
 
 import java.security.MessageDigest;
 import java.security.SignatureException;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.sd.SDBaseProofValue;
 import com.apicatalog.di.signature.ProofValue;
-import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.trust.data.Data;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadSelector;
@@ -53,8 +52,8 @@ public final class ECDSASD2023 {
 //            throw new IllegalArgumentException();
 //        }
 
-        if (BaseProofValue.isAccepted(signature)) {
-            return BaseProofValue.decode(
+        if (SDBaseProofValue.isAccepted(signature)) {
+            return SDBaseProofValue.decode(
                     signatureAlgorithm,
                     digestAlgorithm,
                     signature,

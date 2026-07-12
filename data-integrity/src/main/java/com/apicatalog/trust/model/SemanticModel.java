@@ -37,12 +37,21 @@ public class SemanticModel implements DataModel {
         QuadConsumer consumer();
 
         byte[] canonize();
-        
+
         void canonize(QuadConsumer consumer);
-        
+
         Map<String, String> labels();
-        
-        //TODO void reset();
+
+        String toNQuad(
+                String subject,
+                String predicate,
+                String object,
+                String datatype,
+                String language,
+                String direction,
+                String graph);
+
+        // TODO void reset();
     }
 
     private final GraphProcessor.Factory processorFactory;

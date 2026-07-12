@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 
 import com.apicatalog.trust.payload.RedactablePayload;
 
-public class BasePayload implements RedactablePayload {
+class BasePayload implements RedactablePayload {
 
     byte[] base;
     Collection<Entry<Integer, byte[]>> redactable;

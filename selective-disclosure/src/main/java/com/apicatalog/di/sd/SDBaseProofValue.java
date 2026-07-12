@@ -25,7 +25,7 @@ import co.nstant.in.cbor.model.DataItem;
 import co.nstant.in.cbor.model.MajorType;
 import co.nstant.in.cbor.model.UnicodeString;
 
-public class BaseProofValue implements Signature {
+public class SDBaseProofValue implements Signature {
 
     static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x00 };
 
@@ -91,7 +91,7 @@ public class BaseProofValue implements Signature {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
             }
 
-            final var proofValue = new BaseProofValue();
+            final var proofValue = new SDBaseProofValue();
             proofValue.signatureAlgorithm = signatureAlgorithm;
             proofValue.digestAlgorithm = digestAlgorithm;
 

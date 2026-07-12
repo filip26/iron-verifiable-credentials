@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class Selection {
+class Selection {
 
     public static String[] toSegments(String pointer) {
 

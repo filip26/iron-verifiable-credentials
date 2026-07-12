@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.apicatalog.rdf.nquads.NQuadsWriter;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.payload.DigestiblePayload;
@@ -104,7 +103,7 @@ public class SDGraphProcessor implements GraphProcessor {
         var canonized = new ArrayList<String>();
 
         // TODO read from model
-        var hmac = HmacIdProvider.newInstance(((BaseProofValue) signature).hmacKey());
+        var hmac = HmacIdProvider.newInstance(((SDBaseProofValue) signature).hmacKey());
 
         canonizer.canonize((subject, predicate, object, datatype, language, direction, graph) -> {
 
@@ -117,7 +116,7 @@ public class SDGraphProcessor implements GraphProcessor {
                 o = hmac.getHmacId(o);
             }
 
-            canonized.add(NQuadsWriter.nquad(s, predicate, o, datatype, language, direction, graph));
+            canonized.add(canonizer.toNQuad(s, predicate, o, datatype, language, direction, graph));
         });
 
         Collections.sort(canonized);
@@ -135,7 +134,7 @@ public class SDGraphProcessor implements GraphProcessor {
                 o = hmac.mapping.get(canonizer.labels().get("_:" + o.substring(Skolemizer.URN_PREFIX.length())));
             }
 
-            var nquad = NQuadsWriter.nquad(s, predicate, o, datatype, language, direction, graph);
+            var nquad = canonizer.toNQuad(s, predicate, o, datatype, language, direction, graph);
 
             selectedNQuads.add(nquad);
         }));

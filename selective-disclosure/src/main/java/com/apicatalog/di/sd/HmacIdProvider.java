@@ -11,7 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.apicatalog.multibase.Multibase;
 
-public class HmacIdProvider {
+class HmacIdProvider {
 
     final Map<String, String> mapping = new HashMap<>();
     final Mac hmac;

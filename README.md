@@ -11,22 +11,31 @@
 > [!NOTE]
 > Your feedback is essential to the improvement of this library. Please share any concerns, primary use cases, areas for enhancement, or challenges you have encountered. Your insights help refine and optimize the library to better meet user needs. Thank you for your time and contributions.
 
+### ✨ Features
+
+- Deliberate engineering; zero vibe coding.
+- Full conformance with specifications.
+- Secure, stable, and high-performance.
+  - ⚛️ Post-Quantum (PQ) resistance ready.
+- Modular, fully configurable, and extensible.
+- Minimal external dependencies.
 
 ## 🔐 Supported Data Integrity Cryptosuites
 
 The following cryptographic suites are supported out-of-the-box.
 
-| Name | Algorithm(s) | C14N | ⚛️ Quantum Resistant |
+| Name | Algorithm(s) | C14N | ⚛️ Post-Quantum<br>Resistant | Selective<br>Disclosure |
 | :--- | :--- | :--- | :---: |
-| `ecdsa-rdfc-2019` | P-256, P-384 | RDFC | |
-| `ecdsa-jcs-2019` | P-256, P-384 | JCS | |
-| `eddsa-rdfc-2022` | Ed25519 | RDFC | |
-| `eddsa-jcs-2022` | Ed25519 | JCS | |
-| `mldsa44-rdfc-2024` | ML-DSA-44 | RDFC | ✅ |
-| `mldsa44-jcs-2024` | ML-DSA-44 | JCS | ✅ |
-| `slhdsa128-rdfc-2024` | SLH-DSA-SHA2-128s | RDFC  | ✅ |
-| `slhdsa128-jcs-2024` | SLH-DSA-SHA2-128s | JCS  | ✅ |
-| `Ed25519Signature2020` | Ed25519 | RDFC | |
+| `ecdsa-rdfc-2019` | `P-256`, `P-384` | `RDFC` | | |
+| `ecdsa-jcs-2019` | `P-256`, `P-384` | `JCS` | | |
+| `ecdsa-sd-2023` | `P-256`, `P-384` | `RDFC` | |  ✅ |
+| `eddsa-rdfc-2022` | `Ed25519` | `RDFC` | | |
+| `eddsa-jcs-2022` | `Ed25519` | `JCS` | | |
+| `mldsa44-rdfc-2024` | `ML-DSA-44` | `RDFC` | ✅ | |
+| `mldsa44-jcs-2024` | `ML-DSA-44` | `JCS` | ✅ | |
+| `slhdsa128-rdfc-2024` | `SLH-DSA-SHA2-128s` | `RDFC`  | ✅ | |
+| `slhdsa128-jcs-2024` | `SLH-DSA-SHA2-128s` | `JCS`  | ✅ | |
+| `Ed25519Signature2020` | `Ed25519` | `RDFC` | | |
 
 ## 🤝 Contributing
 
