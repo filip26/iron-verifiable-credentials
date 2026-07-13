@@ -10,7 +10,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -343,10 +342,5 @@ public final class Ed25519Signature2020 implements Proof {
 
             return di;
         }
-    }
-
-    @Override
-    public Collection<String> previous() {
-        return Set.of();
     }
 }

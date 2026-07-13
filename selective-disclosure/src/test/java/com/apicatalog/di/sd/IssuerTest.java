@@ -112,31 +112,6 @@ public class IssuerTest {
                 document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
             }
 
-//            
-//            if (proofDraft.previous() != null && !proofDraft.previous().isEmpty()) {
-//                // TODO better, use model
-//                var previousProofs = new ArrayList<>(proofDraft.previous().size());
-//                for (var p : (Collection<Map<String, Object>>) proofs) {
-//                    if (proofDraft.previous().contains(p.get("id"))) {
-//                        previousProofs.add(p);
-//                    }
-//                }
-//
-//                c14nData = new LinkedHashMap<String, Object>(document);
-//                c14nData.put("proof", previousProofs);
-//            }
-//
-//            var canonicalPayload = switch (proofDraft.c14n()) {
-//            case DataModel.C14N_JCS -> Jcs.canonize(c14nData);
-//            case DataModel.C14N_RDFC -> rdfc(c14nData);
-//            default -> throw new IllegalStateException(
-//                    """
-//                    Unsupported c14n = %s.
-//                    """.formatted(proofDraft.cryptosuite().c14n()));
-//            };
-
-//            payload.withProofs(proof.previous());
-
         } else {
             fail("An unsupported proof type " + options.get("type"));
         }

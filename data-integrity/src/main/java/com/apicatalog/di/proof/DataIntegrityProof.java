@@ -212,7 +212,6 @@ public final class DataIntegrityProof implements Proof {
         return nonce;
     }
 
-    @Override
     public Collection<String> previous() {
         return previousProof;
     }
@@ -702,7 +701,7 @@ public final class DataIntegrityProof implements Proof {
 
         public Collection<String> previous() {
             return proof.previous() != null ? proof.previous() : Set.of();
-        }        
+        }
     }
 
     public static class MapReader implements MapProofReader {
@@ -845,7 +844,7 @@ public final class DataIntegrityProof implements Proof {
 
         @Override
         public Proof read(
-                Collection<String[]> proof, 
+                Collection<String[]> proof,
                 SemanticModel model,
                 PayloadProcessor payload) {
             final var di = new DataIntegrityProof();
