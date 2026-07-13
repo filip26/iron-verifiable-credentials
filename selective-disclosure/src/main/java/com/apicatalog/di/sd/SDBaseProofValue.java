@@ -147,7 +147,8 @@ public final class SDBaseProofValue implements BaseSignature {
     }
     
     public static SDBaseProofValue generateSignature(
-            String algorithm, 
+            String signatureAlgorithm,
+            String digestAlgorithm,
             AsymmetricSigner baseSigner, 
             byte[] proofPublicKey,
             AsymmetricSigner proofSigner,
@@ -165,8 +166,8 @@ public final class SDBaseProofValue implements BaseSignature {
 
        var proofValue = new SDBaseProofValue();
        proofValue.proof = unsignedProof;
-       proofValue.signatureAlgorithm = algorithm;
-       proofValue.digestAlgorithm = "SHA-256";  //FIXME
+       proofValue.signatureAlgorithm = signatureAlgorithm;
+       proofValue.digestAlgorithm = digestor.getAlgorithm();
        
        proofValue.baseSignature = baseSigner.sign(digest);
        proofValue.hmacKey = ((PayloadWithHmac)payload).hmacKey();
