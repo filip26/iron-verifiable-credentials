@@ -6,12 +6,27 @@ import java.security.MessageDigest;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.apicatalog.di.DataIntegrity;
+import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
+import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.proof.GraphProofCursor;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
+    static DataModel MODEL = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
+            .proof(ECDSASD2023.getInstance())
+            .expand(VerifierTest::expand)
+            .compact(VerifierTest::compact)
+            .tordf(VerifierTest::toRDF)
+            .c14n(VerifierTest::newRDFC)
+//TODO            .hmac()
+            .processor(SDGraphProcessor::new)
+            .processor(GraphProofCursor::new)
+            .build();
+    
     static final Map<String, MessageDigest> DIGEST_FACTORY;
 
     static {

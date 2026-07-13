@@ -10,7 +10,6 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.function.Function;
@@ -119,40 +118,10 @@ public class IssuerTest {
 
             var proofDraft = DataIntegrityProof.newBuilder(
                     options,
-                    IssuerTest::getInstance);
+                    IssuerTest::getCryptosuite);
 
-            Function<Map<String, Object>, PayloadProcessor> processorFactory = switch (proofDraft.c14n()) {
-            case DataModel.C14N_RDFC -> VerifierTest.SEMANTIC_MODEL_1::createProcessor;
-            case DataModel.C14N_JCS -> VerifierTest.LEXICAL_MODEL_1::createProcessor;
-            default -> throw new IllegalArgumentException();
-            };
+            var processor = getProcessor(proofDraft.c14n()).apply(document);
 
-            var processor = processorFactory.apply(document);
-            
-//            var c14nData = document;
-//
-//            if (proofDraft.previous() != null && !proofDraft.previous().isEmpty()) {
-//                // TODO better, use model
-//                var previousProofs = new ArrayList<>(proofDraft.previous().size());
-//                for (var p : (Collection<Map<String, Object>>) proofs) {
-//                    if (proofDraft.previous().contains(p.get("id"))) {
-//                        previousProofs.add(p);
-//                    }
-//                }
-//
-//                c14nData = new LinkedHashMap<String, Object>(document);
-//                c14nData.put("proof", previousProofs);
-//            }
-//
-//            var canonicalPayload = switch (proofDraft.c14n()) {
-//            case DataModel.C14N_JCS -> Jcs.canonize(c14nData);
-//            case DataModel.C14N_RDFC -> rdfc(c14nData);
-//            default -> throw new IllegalStateException(
-//                    """
-//                    Unsupported c14n = %s.
-//                    """.formatted(proofDraft.cryptosuite().c14n()));
-//            };
-//
             processor.withProofs(proofDraft.previous());
 
             if (proofDraft.cryptosuite() instanceof StandardCryptoSuite suite) {
@@ -220,7 +189,18 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
-    public static StandardCryptoSuite getInstance(String id) {
+    static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
+        return switch (c14n) {
+        case DataModel.C14N_RDFC -> Resources.SEMANTIC_MODEL_1::createProcessor;
+        case DataModel.C14N_JCS -> Resources.LEXICAL_MODEL_1::createProcessor;
+        default -> throw new IllegalStateException(
+                """
+                Unsupported c14n = %s.
+                """.formatted(c14n));
+        };
+    }
+
+    static StandardCryptoSuite getCryptosuite(String id) {
 
         return switch (id) {
         case "eddsa-rdfc-2022" -> EdDSA2022.withRDFC();

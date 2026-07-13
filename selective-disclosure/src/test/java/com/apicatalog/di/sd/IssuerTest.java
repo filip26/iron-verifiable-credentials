@@ -10,7 +10,6 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -21,7 +20,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.apicatalog.crypto.bc.BCECDSASigner;
 import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.crypto.bc.BCSLHDSASigner;
-import com.apicatalog.di.DataIntegrity;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.di.suite.ECDSA2019;
@@ -38,22 +36,9 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.payload.GenericPayload;
-import com.apicatalog.trust.proof.GraphProofCursor;
 import com.fasterxml.jackson.core.JsonFactory;
 
 public class IssuerTest {
-
-    static DataModel MODEL = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
-            .expand(VerifierTest::expand)
-            .compact(VerifierTest::compact)
-            .tordf(VerifierTest::toRDF)
-            .c14n(VerifierTest::newRDFC)
-//TODO            .hmac()
-            .processor(SDGraphProcessor::new)
-            .processor(GraphProofCursor::new)
-            .build();
 
     @ParameterizedTest
     @MethodSource({ "resources" })
@@ -111,8 +96,10 @@ public class IssuerTest {
                     options,
                     IssuerTest::getCryptoSuite);
 
-            var processor = MODEL.createProcessor(document);
+            var processor = Resources.MODEL.createProcessor(document);
 
+            processor.withProofs(proofDraft.previous());
+            
             if (proofDraft.cryptosuite() instanceof ECDSASD2023 suite) {
 
                 proof = suite.sign(

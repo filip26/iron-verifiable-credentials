@@ -19,9 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.apicatalog.crypto.bc.BCECDSAVerifier;
-import com.apicatalog.di.DataIntegrity;
 import com.apicatalog.di.suite.ECDSA2019;
-import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
@@ -36,12 +34,10 @@ import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
-import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.model.ModelResolver;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.Proof;
 import com.fasterxml.jackson.core.JsonFactory;
 
@@ -49,20 +45,9 @@ import jakarta.json.Json;
 
 public class VerifierTest {
 
-    static DataModel MODEL = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
-            .proof(ECDSASD2023.getInstance())
-            .expand(VerifierTest::expand)
-            .compact(VerifierTest::compact)
-            .tordf(VerifierTest::toRDF)
-            .c14n(VerifierTest::newRDFC)
-//TODO            .hmac()
-            .processor(SDGraphProcessor::new)
-            .processor(GraphProofCursor::new)
-            .build();
-
     static ModelResolver MODEL_RESOLVER = ModelResolver.newBuilder()
             // accept any context - for test purposes only
-            .model(Predicate.not(Collection::isEmpty), MODEL)
+            .model(Predicate.not(Collection::isEmpty), Resources.MODEL)
             .build();
 
     static MethodResolver DID_KEY_RESOLVER = proof -> {
