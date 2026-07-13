@@ -8,7 +8,7 @@ import java.util.function.Function;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -40,7 +40,7 @@ public final class ProofValue implements Signature {
             String digestAlgorithm,
             byte[] value,
             Proof proof,
-            PayloadSelector payload) {
+            PayloadProcessor payload) {
         return new ProofValue(
                 algorithm,
                 digestAlgorithm,

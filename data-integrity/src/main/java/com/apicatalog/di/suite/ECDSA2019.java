@@ -10,40 +10,46 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
+import com.apicatalog.trust.signature.SignatureGenerator;
 
-public class ECDSA2019 {
+public final class ECDSA2019 extends StandardCryptoSuite {
 
     public static final String P256 = "P-256";
     public static final String P384 = "P-384";
 
-    private static final CryptoSuite ECDSA_RDFC_2019 = new CryptoSuite(
+    private static final ECDSA2019 ECDSA_RDFC_2019 = new ECDSA2019(
             "ecdsa-rdfc-2019",
             DataModel.C14N_RDFC,
-            Multibase.BASE_58_BTC,
-            ECDSA2019::decode,
             ECDSA2019::generate);
 
-    private static final CryptoSuite ECDSA_JCS_2019 = new CryptoSuite(
+    private static final ECDSA2019 ECDSA_JCS_2019 = new ECDSA2019(
             "ecdsa-jcs-2019",
             DataModel.C14N_JCS,
-            Multibase.BASE_58_BTC,
-            ECDSA2019::decode,
             ECDSA2019::generate);
 
-    public static CryptoSuite withRDFC() {
+    private ECDSA2019(String id, String c14n, SignatureGenerator<DataIntegrityProof> signatureGenerator) {
+        super(id, c14n, signatureGenerator);
+    }
+
+    public static ECDSA2019 withRDFC() {
         return ECDSA_RDFC_2019;
     }
 
-    public static CryptoSuite withJCS() {
+    public static ECDSA2019 withJCS() {
         return ECDSA_JCS_2019;
     }
 
-    private static Signature decode(String value, Proof proof, PayloadSelector payload) {
+    public String encode(Signature signature) {
+        return Multibase.BASE_58_BTC.encode(signature.toByteArray());
+    }
+    
+    @Override
+    public Signature decode(String encoded, Proof proof, PayloadProcessor payload) {
 
-        var signature = Multibase.BASE_58_BTC.decode(value);
+        var signature = Multibase.BASE_58_BTC.decode(encoded);
 
         String algorithm = null;
         String digest = null;

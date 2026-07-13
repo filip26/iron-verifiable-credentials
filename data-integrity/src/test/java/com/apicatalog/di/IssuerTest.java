@@ -24,11 +24,11 @@ import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.crypto.bc.BCSLHDSASigner;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
 import com.apicatalog.di.suite.SLHDSA2024;
+import com.apicatalog.di.suite.StandardCryptoSuite;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -116,7 +116,7 @@ public class IssuerTest {
 
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
-            var proofDraft = DataIntegrityProof.newDraft(
+            var proofDraft = DataIntegrityProof.newBuilder(
                     options,
                     IssuerTest::getInstance);
 
@@ -146,12 +146,16 @@ public class IssuerTest {
 
 //            payload.withProofs(proof.previous());
 
-            proof = proofDraft.generateProof(
-                    keyAlgorithm,
-                    signer,
-                    Resources.DIGEST_FACTORY::get,
-                    proofDraft,
-                    new GenericPayload(canonicalPayload));
+            if (proofDraft.cryptosuite() instanceof StandardCryptoSuite suite) {
+                proof = suite.sign(
+                        keyAlgorithm,
+                        signer,
+                        Resources.DIGEST_FACTORY::get,
+                        proofDraft,
+                        new GenericPayload(canonicalPayload));
+            } else {
+                fail();
+            }
 
             DataIntegrityProof.write((DataIntegrityProof) proof, composer);
 
@@ -207,7 +211,7 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
-    public static CryptoSuite getInstance(String id) {
+    public static StandardCryptoSuite getInstance(String id) {
 
         return switch (id) {
         case "eddsa-rdfc-2022" -> EdDSA2022.withRDFC();

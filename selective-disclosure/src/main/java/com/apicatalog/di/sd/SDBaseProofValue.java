@@ -9,11 +9,13 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.RedactablePayload;
-import com.apicatalog.trust.processor.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -54,7 +56,7 @@ public class SDBaseProofValue implements Signature {
             String digestAlgorithm,
             byte[] signature,
             Proof proof,
-            PayloadSelector data) {
+            PayloadProcessor data) {
 
 //  public static ECDSASDBaseProofValue of(Proof proof, DocumentModel model, byte[] signature, DocumentLoader loader) throws DocumentError {
 //
@@ -130,6 +132,17 @@ public class SDBaseProofValue implements Signature {
             throw new IllegalArgumentException(e);
 //          throw new DocumentError(e, ErrorType.Invalid, "ProofValue");
         }
+    }
+    
+    public static SDBaseProofValue generateSignature(
+            String algorithm, 
+            AsymmetricSigner baseSigner, 
+            AsymmetricSigner proofSigner,
+            MessageDigest digestor, 
+            DataIntegrityProof unsignedProof, 
+            RedactablePayload payload) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -237,5 +250,4 @@ public class SDBaseProofValue implements Signature {
     public byte[] hmacKey() {
         return hmacKey;
     }
-
 }

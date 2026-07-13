@@ -1,5 +1,6 @@
-package com.apicatalog.trust.data;
+package com.apicatalog.trust.document;
 
+@Deprecated
 public interface Data {
 
     String c14n();

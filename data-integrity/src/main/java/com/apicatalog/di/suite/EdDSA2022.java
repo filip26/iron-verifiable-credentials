@@ -1,37 +1,39 @@
 package com.apicatalog.di.suite;
 
+import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.processor.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
+import com.apicatalog.trust.signature.SignatureGenerator;
 
-public class EdDSA2022 {
+public final class EdDSA2022 extends StandardCryptoSuite {
 
     public static final String ALGORITHM = "Ed25519";
     public static final int SIGNATURE_LENGTH = 64;
 
-    private static final CryptoSuite MLDSA_44_RDFC_2024 = new CryptoSuite(
+    private static final EdDSA2022 MLDSA_44_RDFC_2024 = new EdDSA2022(
             "eddsa-rdfc-2022",
             DataModel.C14N_RDFC,
-            Multibase.BASE_58_BTC,
-            EdDSA2022::decode,
             ProofValueGenerator::generateWithSHA256);
 
-    private static final CryptoSuite MLDSA_44_JCS_2024 = new CryptoSuite(
+    private static final EdDSA2022 MLDSA_44_JCS_2024 = new EdDSA2022(
             "eddsa-jcs-2022",
             DataModel.C14N_JCS,
-            Multibase.BASE_58_BTC,
-            EdDSA2022::decode,
             ProofValueGenerator::generateWithSHA256);
 
-    public static CryptoSuite withRDFC() {
+    private EdDSA2022(String id, String c14n, SignatureGenerator<DataIntegrityProof> signatureGenerator) {
+        super(id, c14n, signatureGenerator);
+    }
+
+    public static EdDSA2022 withRDFC() {
         return MLDSA_44_RDFC_2024;
     }
 
-    public static CryptoSuite withJCS() {
+    public static EdDSA2022 withJCS() {
         return MLDSA_44_JCS_2024;
     }
 
@@ -43,9 +45,14 @@ public class EdDSA2022 {
         };
     }
 
-    static Signature decode(String value, Proof proof, PayloadSelector payload) {
+    public String encode(Signature signature) {
+        return Multibase.BASE_58_BTC.encode(signature.toByteArray());
+    }
 
-        var signature = Multibase.BASE_58_BTC.decode(value);
+    @Override
+    public Signature decode(String encoded, Proof proof, PayloadProcessor payload) {
+
+        var signature = Multibase.BASE_58_BTC.decode(encoded);
 
         if (signature.length != SIGNATURE_LENGTH) {
             throw new IllegalArgumentException(

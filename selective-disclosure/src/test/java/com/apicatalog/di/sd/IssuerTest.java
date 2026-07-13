@@ -39,7 +39,6 @@ import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.payload.GenericPayload;
-import com.apicatalog.trust.proof.Proof;
 import com.fasterxml.jackson.core.JsonFactory;
 
 public class IssuerTest {
@@ -84,7 +83,7 @@ public class IssuerTest {
                             .formatted(keys.codec().name(), keys.codec().code()));
         }
 
-        Proof proof = null;
+        DataIntegrityProof proof = null;
 
         var proofs = document.remove("proof");
 
@@ -92,9 +91,9 @@ public class IssuerTest {
 
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
-            var proofDraft = DataIntegrityProof.newDraft(
+            var proofDraft = DataIntegrityProof.newBuilder(
                     options,
-                    IssuerTest::getInstance);
+                    IssuerTest::getCryptoSuite);
 
             var c14nData = document;
 
@@ -122,14 +121,14 @@ public class IssuerTest {
 
 //            payload.withProofs(proof.previous());
 
-            proof = proofDraft.generateProof(
+            proof = proofDraft.sign(
                     keyAlgorithm,
                     signer,
                     Resources.DIGEST_FACTORY::get,
                     proofDraft,
                     new GenericPayload(canonicalPayload));
 
-            DataIntegrityProof.write((DataIntegrityProof) proof, composer);
+            DataIntegrityProof.write(proof, composer);
 
             if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
                 document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
@@ -163,7 +162,7 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
-    public static CryptoSuite getInstance(String id) {
+    public static CryptoSuite getCryptoSuite(String id) {
 
         return switch (id) {
         case "ecdsa-sd-2023" -> ECDSASD2023.getInstance();
@@ -214,34 +213,7 @@ public class IssuerTest {
 
         return result;
     }
-
-//    final static ECDSASD2023 SUITE = new ECDSASD2023();
-//    
-//    final static byte[] HMACK_KEY = Hex.decode("00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF");
-//
-//    final static Multikey KEYS = GenericMultikey.of(null, null, null,
-//            GenericMulticodecKey.of(
-//                    KeyCodec.P256_PRIVATE_KEY,
-//                    Multibase.BASE_58_BTC,
-//                    "z42twTcNeSYcnqg1FLuSFs2bsGH3ZqbRHFmvS9XMsYhjxvHN"));
-//
-//    final static Multikey PROOF_KEYS = GenericMultikey.of(null, null,
-//            GenericMulticodecKey.of(
-//                    KeyCodec.P256_PUBLIC_KEY,
-//                    Multibase.BASE_58_BTC,
-//                    "zDnaeTHfhmSaQKBc7CmdL3K7oYg3D6SC7yowe2eBeVd2DH32r"),
-//            GenericMulticodecKey.of(
-//                    KeyCodec.P256_PRIVATE_KEY,
-//                    Multibase.BASE_58_BTC,
-//                    "z42tqvNGyzyXRzotAYn43UhcFtzDUVdxJ7461fwrfhBPLmfY"));
-//
-//    final static ECDSASD2023Issuer ISSUER = SUITE.createIssuer(KEYS);
-//    
-//    static {
-//        ISSUER.loader(VerifierTest.LOADER);
-//    }
-//
-//    
+    
 //    final static Collection<String> MP_TV = Arrays.asList(
 //            "/issuer",
 //            "/credentialSubject/sailNumber",

@@ -6,16 +6,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.apicatalog.trust.data.Data;
-import com.apicatalog.trust.data.MapData;
+import com.apicatalog.trust.document.Data;
+import com.apicatalog.trust.document.MapData;
 import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.GenericPayload;
 import com.apicatalog.trust.payload.RedactablePayload;
-import com.apicatalog.trust.processor.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.signature.Signature;
 
-public class MapProofCursor implements ProofCursor, PayloadSelector {
+public class MapProofCursor implements ProofCursor, PayloadProcessor {
 
     public interface Factory {
         MapProofCursor newInstance(

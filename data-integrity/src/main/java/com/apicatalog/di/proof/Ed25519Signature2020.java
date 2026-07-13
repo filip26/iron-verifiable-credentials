@@ -21,7 +21,7 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
@@ -279,7 +279,7 @@ public final class Ed25519Signature2020 implements Proof {
         public Proof read(
                 Collection<String[]> proof,
                 SemanticModel model,
-                PayloadSelector payload) {
+                PayloadProcessor payload) {
 
             final var di = new Ed25519Signature2020();
 

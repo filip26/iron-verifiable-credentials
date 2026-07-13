@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.SignatureException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -19,13 +17,11 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.Proof;
@@ -127,19 +123,19 @@ public final class DataIntegrityProof implements Proof {
         }
     }
 
-    public static Draft newDraft(CryptoSuite cryptosuite) {
+    public static Builder newDraft(CryptoSuite cryptosuite) {
         var di = new DataIntegrityProof();
         di.cryptosuite = cryptosuite;
-        return new Draft(di);
+        return new Builder(di);
     }
 
-    public static Draft newDraft(Map<String, Object> options, Function<String, CryptoSuite> suiteProvider) {
+    public static Builder newBuilder(Map<String, Object> options, Function<String, CryptoSuite> suiteProvider) {
 
         var cryptosuite = (String) options.get("cryptosuite");
 
         var di = new DataIntegrityProof();
         di.cryptosuite = suiteProvider.apply(cryptosuite);
-        var draft = new Draft(di);
+        var draft = new Builder(di);
         draft.previousProof(Set.of());
 
         for (var entry : options.entrySet()) {
@@ -612,23 +608,13 @@ public final class DataIntegrityProof implements Proof {
         return out.toByteArray();
     }
 
-    public static final class Draft {
+    public static final class Builder {
 
         private final DataIntegrityProof proof;
+        private Collection<String> mandatoryPointers;
 
-        private Draft(DataIntegrityProof proof) {
+        private Builder(DataIntegrityProof proof) {
             this.proof = proof;
-        }
-
-        public Proof generateProof(
-                String keyAlgorithm,
-                AsymmetricSigner signer,
-                Function<String, MessageDigest> digestFactory,
-                Draft proofDraft,
-                DigestiblePayload payload)
-                throws SignatureException {
-
-            return proof.cryptosuite.generateProof(keyAlgorithm, signer, digestFactory, proofDraft, payload);
         }
 
         public byte[] canonize(String c14n) {
@@ -643,62 +629,66 @@ public final class DataIntegrityProof implements Proof {
             return proof.canonicalPayload;
         }
 
-        public DataIntegrityProof get() {
+        public DataIntegrityProof snapshot() {
             return proof;
         }
 
-        public Draft created(Instant created) {
+        public Builder created(Instant created) {
             proof.created = created != null
                     ? created.truncatedTo(ChronoUnit.SECONDS)
                     : null;
             return this;
         }
 
-        public Draft expires(Instant expires) {
+        public Builder expires(Instant expires) {
             proof.expires = expires != null
                     ? expires.truncatedTo(ChronoUnit.SECONDS)
                     : null;
             return this;
         }
 
-        public Draft purpose(String purpose) {
+        public Builder purpose(String purpose) {
             proof.purpose = purpose;
             return this;
         }
 
-        public Draft verificationMethod(String verificationMethod) {
+        public Builder verificationMethod(String verificationMethod) {
             proof.verificationMethod = verificationMethod;
             return this;
         }
 
-        public Draft id(String id) {
+        public Builder id(String id) {
             proof.id = id;
             return this;
         }
 
-        public Draft challenge(String challenge) {
+        public Builder challenge(String challenge) {
             proof.challenge = challenge;
             return this;
         }
 
-        public Draft nonce(String nonce) {
+        public Builder nonce(String nonce) {
             proof.nonce = nonce;
             return this;
         }
 
-        public Draft previousProof(Collection<String> previousProof) {
+        public Builder previousProof(Collection<String> previousProof) {
             proof.previousProof = previousProof;
             return this;
         }
 
-        public Draft signature(Signature signature) {
+        public DataIntegrityProof build(Signature signature) {
             proof.signature = signature;
-            return this;
-
+            return proof;
         }
 
-        public Draft context(Collection<String> context) {
+        public Builder context(Collection<String> context) {
             proof.context = context;
+            return this;
+        }
+        
+        public Builder mandatoryPointers(Collection<String> mandatoryPointers) {
+            this.mandatoryPointers = mandatoryPointers;
             return this;
         }
 
@@ -718,6 +708,10 @@ public final class DataIntegrityProof implements Proof {
 
         public Collection<String> previous() {
             return proof.previous() != null ? proof.previous() : Set.of();
+        }
+        
+        public Collection<String> mandatoryPointers() {
+            return mandatoryPointers;
         }
     }
 
@@ -740,7 +734,7 @@ public final class DataIntegrityProof implements Proof {
                 Collection<String> contexts,
                 Map<String, Object> proof,
                 byte[] proofPayload,
-                PayloadSelector payload) {
+                PayloadProcessor payload) {
 
             final var di = new DataIntegrityProof();
             di.canonicalPayload = proofPayload;
@@ -863,7 +857,7 @@ public final class DataIntegrityProof implements Proof {
         public Proof read(
                 Collection<String[]> proof, 
                 SemanticModel model,
-                PayloadSelector payload) {
+                PayloadProcessor payload) {
             final var di = new DataIntegrityProof();
 
             var canonizer = model.newCanonizer();

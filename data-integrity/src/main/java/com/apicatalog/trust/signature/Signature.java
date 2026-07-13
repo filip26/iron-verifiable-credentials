@@ -28,11 +28,11 @@ public interface Signature {
             byte[] publicKey)
             throws InvalidKeyException, SignatureException;
 
+    String algorithm();
+    
     DigestiblePayload payload();
 
     Proof proof();
 
     byte[] toByteArray(); // TODO ?! this could be encoders task
-
-    String algorithm();
 }
