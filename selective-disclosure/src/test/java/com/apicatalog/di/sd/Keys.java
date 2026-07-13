@@ -1,5 +1,6 @@
 package com.apicatalog.di.sd;
 
+import java.util.HexFormat;
 import java.util.Map;
 
 import com.apicatalog.multibase.MultibaseDecoder;
@@ -25,14 +26,26 @@ public record Keys(
 
         var baseKeys = (Map<String, String>) keysMap.get("baseKeyPair");
 
-        var privateKey = MULTIBASE.decode(baseKeys.get("secretKeyMultibase"));
-        var privateKeyCodec = MULTICODEC.getCodec(privateKey).orElseThrow();
+        var basePrivateKey = MULTIBASE.decode(baseKeys.get("secretKeyMultibase"));
+        var basePrivateKeyCodec = MULTICODEC.getCodec(basePrivateKey).orElseThrow();
 
-        //FIXME
+        var proofKeys = (Map<String, String>) keysMap.get("proofKeyPair");
+
+        var proofPrivateKey = MULTIBASE.decode(proofKeys.get("secretKeyMultibase"));
+        var proofPrivateKeyCodec = MULTICODEC.getCodec(proofPrivateKey).orElseThrow();
+
+        if (!basePrivateKeyCodec.equals(proofPrivateKeyCodec)) {
+            throw new IllegalStateException("Unsupported");
+        }
+
+        // FIXME
         return new Keys(
-                privateKeyCodec, 
-                null, 
-                privateKeyCodec.decode(privateKey), null, null, null);
+                basePrivateKeyCodec,
+                null,
+                basePrivateKeyCodec.decode(basePrivateKey),
+                null,
+                proofPrivateKeyCodec.decode(proofPrivateKey),
+                HexFormat.of().parseHex((String) keysMap.get("hmacKeyString")));
     }
 
 }

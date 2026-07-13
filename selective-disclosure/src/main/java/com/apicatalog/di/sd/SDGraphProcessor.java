@@ -15,7 +15,6 @@ import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.processor.GraphProcessor;
-import com.apicatalog.trust.signature.Signature;
 
 public class SDGraphProcessor implements GraphProcessor {
 
@@ -68,7 +67,9 @@ public class SDGraphProcessor implements GraphProcessor {
     }
 
     @Override
-    public RedactablePayload redactable(Signature signature, Collection<String> mandatoryPointers) {
+    public RedactablePayload redactable(Collection<String> mandatoryPointers, Map<String, Object> options) {
+
+        var hmacKey = (byte[]) options.get("HMAC_KEY"); // FIXME
 
         lazyInit();
 
@@ -103,7 +104,7 @@ public class SDGraphProcessor implements GraphProcessor {
         var canonized = new ArrayList<String>();
 
         // TODO read from model
-        var hmac = HmacIdProvider.newInstance(((SDBaseProofValue) signature).hmacKey());
+        var hmac = HmacIdProvider.newInstance(hmacKey);
 
         canonizer.canonize((subject, predicate, object, datatype, language, direction, graph) -> {
 
@@ -145,7 +146,7 @@ public class SDGraphProcessor implements GraphProcessor {
         int mandatoryIndex = 0;
 
         var optional = new ArrayList<Entry<Integer, byte[]>>(canonized.size() - mandatory.length);
-        var baseWriter = new StringWriter(mandatory.length * 256); 
+        var baseWriter = new StringWriter(mandatory.length * 256);
 
         for (var nquad : canonized) {
             if (selectedNQuads.contains(nquad)) {
@@ -165,7 +166,7 @@ public class SDGraphProcessor implements GraphProcessor {
         var base = new BasePayload();
         base.base = baseWriter.toString().getBytes(StandardCharsets.UTF_8);
         base.redactable = optional;
-        
+
 //        IO.println("c14n > " + canonized);
 //        IO.println("mandatory > " + Arrays.toString(mandatory));
 //        IO.println("labels > " + canonizer.labels());
@@ -189,7 +190,7 @@ public class SDGraphProcessor implements GraphProcessor {
 
     private void lazyInit() {
 
-        if (dataset != null) {
+        if (expandedDocument != null || dataset != null) {
             return;
         }
 
@@ -202,23 +203,23 @@ public class SDGraphProcessor implements GraphProcessor {
             throw new IllegalArgumentException();
         }
 
-        if (expanded.iterator().next() instanceof Map map
-                && map.containsKey("https://w3id.org/security#proof")) {
+        if (expanded.iterator().next() instanceof Map map) {
+            if (map.containsKey("https://w3id.org/security#proof")) {
 
-            expandedDocument = new HashMap<String, Object>(map);
-//                expandedProofs = expandedDocument.remove("https://w3id.org/security#proof");
-            expandedProofs = Map.of("https://w3id.org/security#proof",
-                    expandedDocument.remove("https://w3id.org/security#proof"));
+                expandedDocument = new HashMap<String, Object>(map);
+//FIXME?!                expandedProofs = expandedDocument.remove("https://w3id.org/security#proof");
+                expandedProofs = Map.of("https://w3id.org/security#proof",
+                        expandedDocument.remove("https://w3id.org/security#proof"));
+            } else {
+                expandedDocument = new HashMap<String, Object>(map);
+            }
         }
 
-        if (expandedProofs == null || expandedDocument == null) {
-            return;
+        if (expandedProofs != null) {
+            dataset = new Dataset();
+
+            model.tordf().accept(expandedProofs, dataset);
         }
-
-        dataset = new Dataset();
-
-        model.tordf().accept(expandedProofs, dataset);
-
 //        IO.println(dataset.graphs);
 //        IO.println(dataset.proofGraphs);
 

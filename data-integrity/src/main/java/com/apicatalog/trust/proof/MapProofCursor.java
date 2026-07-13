@@ -123,10 +123,4 @@ public class MapProofCursor implements ProofCursor, PayloadProcessor {
         var canonical = model.canonize(payload);
         return new GenericPayload(canonical);
     }
-
-    @Override
-    public RedactablePayload redactable(Signature signature, Collection<String> pointers) {
-        throw new UnsupportedOperationException();
-    }
-
 }

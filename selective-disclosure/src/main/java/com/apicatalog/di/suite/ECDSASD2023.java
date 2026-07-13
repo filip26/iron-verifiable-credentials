@@ -10,7 +10,6 @@ import com.apicatalog.di.sd.SDBaseProofValue;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
@@ -78,17 +77,6 @@ public final class ECDSASD2023 implements CryptoSuite {
     @Override
     public String c14n() {
         return DataModel.C14N_RDFC;
-    }
-
-    @Override
-    @Deprecated
-    public DataIntegrityProof generateProof(
-            String algorithm,
-            AsymmetricSigner signer,
-            Function<String, MessageDigest> digestFactory,
-            Builder proofDraft,
-            DigestiblePayload payload) throws SignatureException {
-        throw new UnsupportedOperationException();
     }
 
     @Override

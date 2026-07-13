@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.MapProofCursor.Factory;
 import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
@@ -89,5 +90,11 @@ public class LexicalModel implements DataModel {
     @Override
     public String c14n() {
         return c14n;
+    }
+
+    @Override
+    public PayloadProcessor createProcessor(Map<String, Object> document) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Yet, Not Supported");
     }
 }

@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.apicatalog.crypto.bc.BCECDSASigner;
 import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.crypto.bc.BCSLHDSASigner;
+import com.apicatalog.di.DataIntegrity;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.di.suite.ECDSA2019;
@@ -39,9 +40,20 @@ import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.payload.GenericPayload;
+import com.apicatalog.trust.proof.GraphProofCursor;
 import com.fasterxml.jackson.core.JsonFactory;
 
 public class IssuerTest {
+
+    static DataModel MODEL = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
+            .expand(VerifierTest::expand)
+            .compact(VerifierTest::compact)
+            .tordf(VerifierTest::toRDF)
+            .c14n(VerifierTest::newRDFC)
+//TODO            .hmac()
+            .processor(SDGraphProcessor::new)
+            .processor(GraphProofCursor::new)
+            .build();
 
     @ParameterizedTest
     @MethodSource({ "resources" })
@@ -54,26 +66,31 @@ public class IssuerTest {
         var keys = Keys.from(keysMap);
 
         final String keyAlgorithm;
-        final AsymmetricSigner signer;
+        final AsymmetricSigner baseSigner;
+        final AsymmetricSigner proofSigner;
 
         switch (keys.codec().code()) {
         // Use a secure random number generator to create non-deterministic signatures
         // for the algorithms below in production environments.
         case KeyCodec.P256_PRIVATE_CODE:
             keyAlgorithm = ECDSA2019.P256;
-            signer = BCECDSASigner.newP256Instance(keys.baseSecretKey())::sign;
+            baseSigner = BCECDSASigner.newP256Instance(keys.baseSecretKey())::sign;
+            proofSigner = BCECDSASigner.newP256Instance(keys.proofSecretKey())::sign;
             break;
         case KeyCodec.P384_PRIVATE_CODE:
             keyAlgorithm = ECDSA2019.P384;
-            signer = BCECDSASigner.newP384Instance(keys.baseSecretKey())::sign;
+            baseSigner = BCECDSASigner.newP384Instance(keys.baseSecretKey())::sign;
+            proofSigner = BCECDSASigner.newP384Instance(keys.proofSecretKey())::sign;
             break;
         case KeyCodec.MLDSA_44_PRIVATE_CODE:
             keyAlgorithm = MLDSA2024.ALGORITHM_44;
-            signer = BCMLDSASigner.new44Instance(keys.baseSecretKey())::sign;
+            baseSigner = BCMLDSASigner.new44Instance(keys.baseSecretKey())::sign;
+            proofSigner = BCMLDSASigner.new44Instance(keys.proofSecretKey())::sign;
             break;
         case KeyCodec.SLHDSA_SHA2_128S_PRIVATE_CODE:
             keyAlgorithm = SLHDSA2024.ALGORITHM_SHA2_128s;
-            signer = BCSLHDSASigner.new128sInstance(keys.baseSecretKey())::sign;
+            baseSigner = BCSLHDSASigner.new128sInstance(keys.baseSecretKey())::sign;
+            proofSigner = BCSLHDSASigner.new128sInstance(keys.proofSecretKey())::sign;
             break;
         default:
             throw new IllegalArgumentException(
@@ -84,8 +101,7 @@ public class IssuerTest {
         }
 
         DataIntegrityProof proof = null;
-
-        var proofs = document.remove("proof");
+        var proofs = document.get("proof");
 
         var composer = new NativeComposer<Map<String, ? extends Object>>();
 
@@ -95,44 +111,54 @@ public class IssuerTest {
                     options,
                     IssuerTest::getCryptoSuite);
 
-            var c14nData = document;
+            var processor = MODEL.createProcessor(document);
 
-            if (proofDraft.previous() != null && !proofDraft.previous().isEmpty()) {
-                // TODO better, use model
-                var previousProofs = new ArrayList<>(proofDraft.previous().size());
-                for (var p : (Collection<Map<String, Object>>) proofs) {
-                    if (proofDraft.previous().contains(p.get("id"))) {
-                        previousProofs.add(p);
-                    }
-                }
+            if (proofDraft.cryptosuite() instanceof ECDSASD2023 suite) {
 
-                c14nData = new LinkedHashMap<String, Object>(document);
-                c14nData.put("proof", previousProofs);
+                proof = suite.sign(
+                        keyAlgorithm,
+                        baseSigner,
+                        proofSigner,
+                        Resources.DIGEST_FACTORY::get,
+                        proofDraft,
+                        processor.redactable(
+                                (Collection<String>) options.get("mandatoryPointers"), // TODO separate it from draft
+                                Map.of("HMAC_KEY", keys.hmacKey())));
+
+            } else {
+                fail();
             }
-
-            var canonicalPayload = switch (proofDraft.c14n()) {
-            case DataModel.C14N_JCS -> Jcs.canonize(c14nData);
-            case DataModel.C14N_RDFC -> rdfc(c14nData);
-            default -> throw new IllegalStateException(
-                    """
-                    Unsupported c14n = %s.
-                    """.formatted(proofDraft.cryptosuite().c14n()));
-            };
-
-//            payload.withProofs(proof.previous());
-
-            proof = proofDraft.sign(
-                    keyAlgorithm,
-                    signer,
-                    Resources.DIGEST_FACTORY::get,
-                    proofDraft,
-                    new GenericPayload(canonicalPayload));
 
             DataIntegrityProof.write(proof, composer);
 
             if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
                 document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
             }
+
+//            
+//            if (proofDraft.previous() != null && !proofDraft.previous().isEmpty()) {
+//                // TODO better, use model
+//                var previousProofs = new ArrayList<>(proofDraft.previous().size());
+//                for (var p : (Collection<Map<String, Object>>) proofs) {
+//                    if (proofDraft.previous().contains(p.get("id"))) {
+//                        previousProofs.add(p);
+//                    }
+//                }
+//
+//                c14nData = new LinkedHashMap<String, Object>(document);
+//                c14nData.put("proof", previousProofs);
+//            }
+//
+//            var canonicalPayload = switch (proofDraft.c14n()) {
+//            case DataModel.C14N_JCS -> Jcs.canonize(c14nData);
+//            case DataModel.C14N_RDFC -> rdfc(c14nData);
+//            default -> throw new IllegalStateException(
+//                    """
+//                    Unsupported c14n = %s.
+//                    """.formatted(proofDraft.cryptosuite().c14n()));
+//            };
+
+//            payload.withProofs(proof.previous());
 
         } else {
             fail("An unsupported proof type " + options.get("type"));
@@ -213,7 +239,7 @@ public class IssuerTest {
 
         return result;
     }
-    
+
 //    final static Collection<String> MP_TV = Arrays.asList(
 //            "/issuer",
 //            "/credentialSubject/sailNumber",

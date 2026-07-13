@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,6 +46,7 @@ import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.payload.GenericPayload;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.fasterxml.jackson.core.JsonFactory;
 
@@ -106,11 +108,10 @@ public class IssuerTest {
                     """
                             .formatted(privateKeyCodec.name(), privateKeyCodec.code()));
         }
-        ;
 
         Proof proof = null;
 
-        var proofs = document.remove("proof");
+        var proofs = document.get("proof");
 
         var composer = new NativeComposer<Map<String, ? extends Object>>();
 
@@ -120,31 +121,39 @@ public class IssuerTest {
                     options,
                     IssuerTest::getInstance);
 
-            var c14nData = document;
-
-            if (proofDraft.previous() != null && !proofDraft.previous().isEmpty()) {
-                // TODO better, use model
-                var previousProofs = new ArrayList<>(proofDraft.previous().size());
-                for (var p : (Collection<Map<String, Object>>) proofs) {
-                    if (proofDraft.previous().contains(p.get("id"))) {
-                        previousProofs.add(p);
-                    }
-                }
-
-                c14nData = new LinkedHashMap<String, Object>(document);
-                c14nData.put("proof", previousProofs);
-            }
-
-            var canonicalPayload = switch (proofDraft.c14n()) {
-            case DataModel.C14N_JCS -> Jcs.canonize(c14nData);
-            case DataModel.C14N_RDFC -> rdfc(c14nData);
-            default -> throw new IllegalStateException(
-                    """
-                    Unsupported c14n = %s.
-                    """.formatted(proofDraft.cryptosuite().c14n()));
+            Function<Map<String, Object>, PayloadProcessor> processorFactory = switch (proofDraft.c14n()) {
+            case DataModel.C14N_RDFC -> VerifierTest.SEMANTIC_MODEL_1::createProcessor;
+            case DataModel.C14N_JCS -> VerifierTest.LEXICAL_MODEL_1::createProcessor;
+            default -> throw new IllegalArgumentException();
             };
 
-//            payload.withProofs(proof.previous());
+            var processor = processorFactory.apply(document);
+            
+//            var c14nData = document;
+//
+//            if (proofDraft.previous() != null && !proofDraft.previous().isEmpty()) {
+//                // TODO better, use model
+//                var previousProofs = new ArrayList<>(proofDraft.previous().size());
+//                for (var p : (Collection<Map<String, Object>>) proofs) {
+//                    if (proofDraft.previous().contains(p.get("id"))) {
+//                        previousProofs.add(p);
+//                    }
+//                }
+//
+//                c14nData = new LinkedHashMap<String, Object>(document);
+//                c14nData.put("proof", previousProofs);
+//            }
+//
+//            var canonicalPayload = switch (proofDraft.c14n()) {
+//            case DataModel.C14N_JCS -> Jcs.canonize(c14nData);
+//            case DataModel.C14N_RDFC -> rdfc(c14nData);
+//            default -> throw new IllegalStateException(
+//                    """
+//                    Unsupported c14n = %s.
+//                    """.formatted(proofDraft.cryptosuite().c14n()));
+//            };
+//
+            processor.withProofs(proofDraft.previous());
 
             if (proofDraft.cryptosuite() instanceof StandardCryptoSuite suite) {
                 proof = suite.sign(
@@ -152,7 +161,7 @@ public class IssuerTest {
                         signer,
                         Resources.DIGEST_FACTORY::get,
                         proofDraft,
-                        new GenericPayload(canonicalPayload));
+                        processor.digestible());
             } else {
                 fail();
             }

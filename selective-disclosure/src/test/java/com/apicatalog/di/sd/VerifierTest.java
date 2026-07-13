@@ -173,7 +173,7 @@ public class VerifierTest {
     }
 
     static final void toRDF(Object document, final SemanticModel.QuadConsumer consumer) {
-        try {
+        try {            
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();
             try (var emitter = Jackson2Emitter.newEmitter(bos, JsonFactory.builder().build())) {

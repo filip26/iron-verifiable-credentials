@@ -611,7 +611,6 @@ public final class DataIntegrityProof implements Proof {
     public static final class Builder {
 
         private final DataIntegrityProof proof;
-        private Collection<String> mandatoryPointers;
 
         private Builder(DataIntegrityProof proof) {
             this.proof = proof;
@@ -686,11 +685,6 @@ public final class DataIntegrityProof implements Proof {
             proof.context = context;
             return this;
         }
-        
-        public Builder mandatoryPointers(Collection<String> mandatoryPointers) {
-            this.mandatoryPointers = mandatoryPointers;
-            return this;
-        }
 
         public CryptoSuite cryptosuite() {
             return proof.cryptosuite;
@@ -708,11 +702,7 @@ public final class DataIntegrityProof implements Proof {
 
         public Collection<String> previous() {
             return proof.previous() != null ? proof.previous() : Set.of();
-        }
-        
-        public Collection<String> mandatoryPointers() {
-            return mandatoryPointers;
-        }
+        }        
     }
 
     public static class MapReader implements MapProofReader {

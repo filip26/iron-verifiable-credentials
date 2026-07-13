@@ -118,9 +118,9 @@ public class DataIntegrity {
                         new DataIntegrityProof.GraphReader(cryptosuites));
             }
 
-            if (readers.isEmpty()) {
-                throw new IllegalStateException();
-            }
+//            if (readers.isEmpty()) {
+//                throw new IllegalStateException();
+//            }
 
             if (c14nFactory == null) {
                 throw new IllegalStateException();

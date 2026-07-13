@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -124,7 +125,10 @@ public class SDBaseProofValue implements Signature {
             }
 //            IO.println("> mandatory pointers: " + proofValue.mandatoryPointers);
 
-            proofValue.payload = data.redactable(proofValue, proofValue.mandatoryPointers);
+            proofValue.payload = data.redactable(
+                    proofValue.mandatoryPointers,
+                    Map.of("HMAC_KEY", proofValue.hmacKey)
+                    );
 
             return proofValue;
 
