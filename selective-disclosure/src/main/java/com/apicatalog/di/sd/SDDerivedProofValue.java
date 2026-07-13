@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
-import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
@@ -97,7 +96,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
             proofValue.baseSignature = SDBaseProofValue.byteArray(top.getDataItems().get(0));
             proofValue.proofPublicKey = SDBaseProofValue.byteArray(top.getDataItems().get(1));
 
-            final var algorithms = algorithmProvider.apply(signature.length);
+            final var algorithms = algorithmProvider.apply(proofValue.baseSignature.length);
 
             proofValue.signatureAlgorithm = algorithms.signature();
             proofValue.digestAlgorithm = algorithms.digest();

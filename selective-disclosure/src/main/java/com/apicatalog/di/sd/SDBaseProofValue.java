@@ -14,7 +14,6 @@ import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
-import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
@@ -101,19 +100,18 @@ public final class SDBaseProofValue implements BaseSignature {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
             }
 
-            final var proofValue = new SDBaseProofValue();
-            
-            final var algorithms = algorithmProvider.apply(signature.length);
-
-            proofValue.signatureAlgorithm = algorithms.signature();
-            proofValue.digestAlgorithm = algorithms.digest();
-
+            final var proofValue = new SDBaseProofValue();            
             proofValue.proof = proof;
 
             proofValue.baseSignature = byteArray(top.getDataItems().get(0));
             proofValue.proofPublicKey = byteArray(top.getDataItems().get(1));
             proofValue.hmacKey = byteArray(top.getDataItems().get(2));
 
+            final var algorithms = algorithmProvider.apply(proofValue.baseSignature.length);
+
+            proofValue.signatureAlgorithm = algorithms.signature();
+            proofValue.digestAlgorithm = algorithms.digest();
+            
             if (!MajorType.ARRAY.equals(top.getDataItems().get(3).getMajorType())) {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
             }
