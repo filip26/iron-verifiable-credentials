@@ -34,6 +34,7 @@ public final class ECDSASD2023 implements CryptoSuite {
     public DataIntegrityProof sign(
             String algorithm,
             AsymmetricSigner baseSigner,
+            byte[] proofPublicKey,
             AsymmetricSigner proofSigner,
             Function<String, MessageDigest> digestFactory,
             Builder proofDraft,
@@ -52,6 +53,7 @@ public final class ECDSASD2023 implements CryptoSuite {
         var signature = SDBaseProofValue.generateSignature(
                 algorithm,
                 baseSigner,
+                proofPublicKey,
                 proofSigner,
                 digestor,
                 unsignedProof,

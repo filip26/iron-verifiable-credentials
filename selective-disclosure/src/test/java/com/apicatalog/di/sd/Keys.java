@@ -31,6 +31,7 @@ public record Keys(
 
         var proofKeys = (Map<String, String>) keysMap.get("proofKeyPair");
 
+        var proofPublicKey = MULTIBASE.decode(proofKeys.get("publicKeyMultibase"));
         var proofPrivateKey = MULTIBASE.decode(proofKeys.get("secretKeyMultibase"));
         var proofPrivateKeyCodec = MULTICODEC.getCodec(proofPrivateKey).orElseThrow();
 
@@ -43,7 +44,7 @@ public record Keys(
                 basePrivateKeyCodec,
                 null,
                 basePrivateKeyCodec.decode(basePrivateKey),
-                null,
+                proofPublicKey,
                 proofPrivateKeyCodec.decode(proofPrivateKey),
                 HexFormat.of().parseHex((String) keysMap.get("hmacKeyString")));
     }

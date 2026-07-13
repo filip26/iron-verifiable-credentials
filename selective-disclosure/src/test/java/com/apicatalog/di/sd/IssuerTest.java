@@ -3,11 +3,7 @@ package com.apicatalog.di.sd;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -27,16 +23,9 @@ import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.di.suite.MLDSA2024;
 import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jcs.Jcs;
-import com.apicatalog.jsonld.JsonLd;
-import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.multicodec.codec.KeyCodec;
-import com.apicatalog.rdf.canon.RdfCanon;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.tree.io.Tree;
-import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.fasterxml.jackson.core.JsonFactory;
 
 public class IssuerTest {
 
@@ -105,6 +94,7 @@ public class IssuerTest {
                 proof = suite.sign(
                         keyAlgorithm,
                         baseSigner,
+                        keys.proofPublicKey(),
                         proofSigner,
                         Resources.DIGEST_FACTORY::get,
                         proofDraft,
@@ -189,33 +179,6 @@ public class IssuerTest {
                 .filter(name -> name.endsWith("unsigned.json"))
                 .map(name -> name.substring(0, name.indexOf('.')))
                 .sorted();
-    }
-
-    static final byte[] rdfc(Map<String, ?> document) throws IOException, JsonLdError {
-
-        // TODO temporary, remove with Titanium v2.x.x
-        var bos = new ByteArrayOutputStream();
-        try (var emitter = Jackson2Emitter.newEmitter(bos, JsonFactory.builder().build())) {
-            Tree.write(document, emitter);
-        }
-
-        var toRdf = JsonLd.toRdf(JsonDocument.of(new ByteArrayInputStream(bos.toByteArray())))
-                .loader(ContextLoader.getInstance());
-
-        var canon = RdfCanon.create(Resources.DIGEST_FACTORY.get("SHA-256"));
-        toRdf.provide(canon);
-
-        bos.reset();
-
-        canon.provide(s -> {
-            try {
-                bos.write(s.getBytes(StandardCharsets.UTF_8));
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        });
-//        System.out.println(new String(bos.toByteArray()));
-        return bos.toByteArray();
     }
 
     static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {

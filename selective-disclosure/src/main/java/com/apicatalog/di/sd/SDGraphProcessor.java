@@ -166,7 +166,8 @@ public class SDGraphProcessor implements GraphProcessor {
         var base = new BasePayload();
         base.base = baseWriter.toString().getBytes(StandardCharsets.UTF_8);
         base.redactable = optional;
-
+        base.pointers = mandatoryPointers;
+        base.hmacKey = hmacKey;
 //        IO.println("c14n > " + canonized);
 //        IO.println("mandatory > " + Arrays.toString(mandatory));
 //        IO.println("labels > " + canonizer.labels());
@@ -262,4 +263,53 @@ public class SDGraphProcessor implements GraphProcessor {
                     });
         }
     }
+    
+
+    private static class BasePayload implements RedactablePayload, PayloadWithHMAC {
+
+        byte[] base;
+        Collection<Entry<Integer, byte[]>> redactable;
+        Collection<String> pointers;
+        byte[] hmacKey;
+        
+        @Override
+        public byte[] canonicalPayload() {
+            return base;
+        }
+
+        @Override
+        public void digest(String algorithm, byte[] value) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public byte[] digest(String algorithm) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection<String> digestAlgorithms() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection<Entry<Integer, byte[]>> redactablePayload() {
+            return redactable;
+        }
+
+        @Override
+        public Collection<String> pointers() {
+            return pointers;
+        }
+
+        @Override
+        public byte[] hmacKey() {
+            return hmacKey;
+        }
+
+    }
+
 }

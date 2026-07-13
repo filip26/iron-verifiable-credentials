@@ -1,6 +1,8 @@
 package com.apicatalog.di.sd;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.SignatureException;
@@ -20,8 +22,11 @@ import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
+import co.nstant.in.cbor.CborBuilder;
 import co.nstant.in.cbor.CborDecoder;
+import co.nstant.in.cbor.CborEncoder;
 import co.nstant.in.cbor.CborException;
+import co.nstant.in.cbor.builder.ArrayBuilder;
 import co.nstant.in.cbor.model.Array;
 import co.nstant.in.cbor.model.ByteString;
 import co.nstant.in.cbor.model.DataItem;
@@ -37,13 +42,13 @@ public class SDBaseProofValue implements Signature {
 
     private Proof proof;
     private RedactablePayload payload;
-
+    
     private byte[] baseSignature;
     private byte[] proofPublicKey;
     private byte[] hmacKey;
 
     private Collection<byte[]> signatures;
-    private ArrayList<String> mandatoryPointers;
+    private Collection<String> mandatoryPointers;
 
     public static boolean isAccepted(byte[] signature) {
         return signature.length > 2
@@ -141,14 +146,83 @@ public class SDBaseProofValue implements Signature {
     public static SDBaseProofValue generateSignature(
             String algorithm, 
             AsymmetricSigner baseSigner, 
+            byte[] proofPublicKey,
             AsymmetricSigner proofSigner,
             MessageDigest digestor, 
             DataIntegrityProof unsignedProof, 
-            RedactablePayload payload) {
-        // TODO Auto-generated method stub
-        return null;
+            RedactablePayload payload) throws SignatureException {
+       
+       var proofDigest = digestor.digest(unsignedProof.canonicalPayload());
+       var dataDigest = digestor.digest(payload.canonicalPayload());
+
+       var digest = hash(
+               proofDigest,
+               proofPublicKey,
+               dataDigest);
+
+       var proofValue = new SDBaseProofValue();
+       proofValue.proof = unsignedProof;
+       proofValue.signatureAlgorithm = algorithm;
+       proofValue.digestAlgorithm = "SHA-256";  //FIXME
+       
+       proofValue.baseSignature = baseSigner.sign(digest);
+       proofValue.hmacKey = ((PayloadWithHMAC)payload).hmacKey();
+       proofValue.proofPublicKey = proofPublicKey;
+       proofValue.mandatoryPointers = payload.pointers();
+        
+       if (payload.redactablePayload() != null && !payload.redactablePayload().isEmpty()) {
+        
+           proofValue.signatures = new ArrayList<byte[]>(payload.redactablePayload().size());
+           
+           for (var optional : payload.redactablePayload()) {
+               proofValue.signatures.add(proofSigner.sign(optional.getValue()));
+           }
+       }
+       
+       proofValue.payload = payload;
+       
+       return proofValue;
     }
 
+    public static byte[] toByteArray(
+            byte[] baseSignature,
+            byte[] proofPublicKey,
+            byte[] hmacKey,
+            Collection<byte[]> signatures,
+            Collection<String> pointers) {
+
+        final CborBuilder cbor = new CborBuilder();
+
+        final ArrayBuilder<CborBuilder> top = cbor.addArray();
+
+        top.add(baseSignature);
+        top.add(proofPublicKey);
+        top.add(hmacKey);
+
+        final ArrayBuilder<ArrayBuilder<CborBuilder>> cborSigs = top.addArray();
+
+        if (signatures != null) {
+            signatures.forEach(m -> cborSigs.add(m));
+        }
+
+        final ArrayBuilder<ArrayBuilder<CborBuilder>> cborPointers = top.addArray();
+
+        if (pointers != null) {
+            pointers.forEach(cborPointers::add);
+        }
+
+        try {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            out.write(BYTE_PREFIX);
+
+            (new CborEncoder(out)).encode(cbor.build());
+
+            return out.toByteArray();
+        } catch (IOException | CborException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+    
     @Override
     public boolean verify(
             AsymmetricVerifier verifier,
@@ -175,7 +249,7 @@ public class SDBaseProofValue implements Signature {
 //IO.println(HexFormat.of().formatHex(proofDigest));
 //IO.println(HexFormat.of().formatHex(dataDigest));
 
-        var isBaseSignatureVerified = verifier.verify(publicKey, digest, toByteArray());
+        var isBaseSignatureVerified = verifier.verify(publicKey, digest, baseSignature);
         
         if (!isBaseSignatureVerified) {
             return false;
@@ -209,7 +283,7 @@ public class SDBaseProofValue implements Signature {
 
     @Override
     public byte[] toByteArray() {
-        return baseSignature;
+        return toByteArray(baseSignature, proofPublicKey, hmacKey, signatures, mandatoryPointers);
     }
 
     @Override

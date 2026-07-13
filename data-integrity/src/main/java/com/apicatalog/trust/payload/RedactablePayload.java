@@ -7,5 +7,7 @@ import java.util.Map.Entry;
 public interface RedactablePayload extends DigestiblePayload {
 
     Collection<Entry<Integer, byte[]>> redactablePayload();
+
+    Collection<String> pointers();
     
 }
