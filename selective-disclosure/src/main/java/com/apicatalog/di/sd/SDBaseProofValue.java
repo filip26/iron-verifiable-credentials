@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
+import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
@@ -20,6 +22,7 @@ import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.signature.BaseSignature;
 import com.apicatalog.trust.signature.Signature;
 
 import co.nstant.in.cbor.CborBuilder;
@@ -33,9 +36,9 @@ import co.nstant.in.cbor.model.DataItem;
 import co.nstant.in.cbor.model.MajorType;
 import co.nstant.in.cbor.model.UnicodeString;
 
-public class SDBaseProofValue implements Signature {
+public final class SDBaseProofValue implements BaseSignature {
 
-    static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x00 };
+    private static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x00 };
 
     private String signatureAlgorithm;
     private String digestAlgorithm;
@@ -58,9 +61,8 @@ public class SDBaseProofValue implements Signature {
     }
 
     public static Signature decode(
-            String signatureAlgorithm,
-            String digestAlgorithm,
             byte[] signature,
+            Function<Integer, SignatureAlgorithm> algorithmProvider,
             Proof proof,
             PayloadProcessor data) {
 
@@ -100,8 +102,11 @@ public class SDBaseProofValue implements Signature {
             }
 
             final var proofValue = new SDBaseProofValue();
-            proofValue.signatureAlgorithm = signatureAlgorithm;
-            proofValue.digestAlgorithm = digestAlgorithm;
+            
+            final var algorithms = algorithmProvider.apply(signature.length);
+
+            proofValue.signatureAlgorithm = algorithms.signature();
+            proofValue.digestAlgorithm = algorithms.digest();
 
             proofValue.proof = proof;
 
@@ -166,7 +171,7 @@ public class SDBaseProofValue implements Signature {
        proofValue.digestAlgorithm = "SHA-256";  //FIXME
        
        proofValue.baseSignature = baseSigner.sign(digest);
-       proofValue.hmacKey = ((PayloadWithHMAC)payload).hmacKey();
+       proofValue.hmacKey = ((PayloadWithHmac)payload).hmacKey();
        proofValue.proofPublicKey = proofPublicKey;
        proofValue.mandatoryPointers = payload.pointers();
         
@@ -291,14 +296,14 @@ public class SDBaseProofValue implements Signature {
         return signatureAlgorithm;
     }
 
-    private static byte[] byteArray(DataItem item) {
+    static byte[] byteArray(DataItem item) {
         if (!MajorType.BYTE_STRING.equals(item.getMajorType())) {
 //      throw new DocumentError(ErrorType.Invalid, "ProofValue");
         }
         return ((ByteString) item).getBytes();
     }
 
-    private static String string(DataItem item) {
+    static String string(DataItem item) {
         if (!MajorType.UNICODE_STRING.equals(item.getMajorType())) {
 //      throw new DocumentError(ErrorType.Invalid, "ProofValue");
         }
@@ -325,6 +330,11 @@ public class SDBaseProofValue implements Signature {
         return payload;
     }
 
+    @Override
+    public Collection<String> mandatoryPointers() {
+        return mandatoryPointers;
+    }
+    
     public byte[] hmacKey() {
         return hmacKey;
     }

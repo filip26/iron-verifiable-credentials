@@ -7,6 +7,8 @@ import java.util.function.Function;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.DataIntegrityProof.Builder;
 import com.apicatalog.di.sd.SDBaseProofValue;
+import com.apicatalog.di.sd.SDDerivedProofValue;
+import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.model.DataModel;
@@ -22,7 +24,10 @@ public final class ECDSASD2023 implements CryptoSuite {
 
     private static final String CRYPTOSUITE_NAME = "ecdsa-sd-2023";
 
-    private static ECDSASD2023 INSTANCE = new ECDSASD2023();
+    private static final SignatureAlgorithm P256_ALGORITHM = new SignatureAlgorithm(P256, "SHA-256");
+    private static final SignatureAlgorithm P384_ALGORITHM = new SignatureAlgorithm(P384, "SHA-384");
+
+    private static final ECDSASD2023 INSTANCE = new ECDSASD2023();
 
     private ECDSASD2023() {
     }
@@ -30,7 +35,7 @@ public final class ECDSASD2023 implements CryptoSuite {
     public static ECDSASD2023 getInstance() {
         return INSTANCE;
     }
-    
+
     public DataIntegrityProof sign(
             String algorithm,
             AsymmetricSigner baseSigner,
@@ -39,7 +44,7 @@ public final class ECDSASD2023 implements CryptoSuite {
             Function<String, MessageDigest> digestFactory,
             Builder proofDraft,
             RedactablePayload payload) throws SignatureException {
-        
+
         proofDraft.canonize(DataModel.C14N_RDFC);
 
         var unsignedProof = proofDraft.snapshot();
@@ -90,37 +95,33 @@ public final class ECDSASD2023 implements CryptoSuite {
     public Signature decode(String value, Proof proof, PayloadProcessor data) {
 
         var signature = Multibase.BASE_64_URL.decode(value);
-//        IO.println("SD sig length: " + signature.length);
-        String signatureAlgorithm = null;
-        String digestAlgorithm = null;
-
-//TODO
-//        switch (signature.length) {
-//        case 64:
-        signatureAlgorithm = P256;
-        digestAlgorithm = "SHA-256";
-//            break;
-//        case 96:
-//            algorithm = P384;
-//            digest = "SHA-384";
-//            break;
-//        default:
-//            throw new IllegalArgumentException();
-//        }
 
         if (SDBaseProofValue.isAccepted(signature)) {
             return SDBaseProofValue.decode(
-                    signatureAlgorithm,
-                    digestAlgorithm,
                     signature,
+                    ECDSASD2023::getAlgorithm,
+                    proof,
+                    data);
+        }
+        if (SDDerivedProofValue.isAccepted(signature)) {
+            return SDDerivedProofValue.decode(
+                    signature,
+                    ECDSASD2023::getAlgorithm,
                     proof,
                     data);
         }
 
         throw new IllegalArgumentException();
     }
-    
-    
+
+    static SignatureAlgorithm getAlgorithm(int signatureLength) {
+        return switch (signatureLength) {
+        case 64 -> P256_ALGORITHM;
+        case 96 -> P384_ALGORITHM;
+        default -> throw new IllegalArgumentException();
+        };
+    }
+
 //    public 
 //    
 //    public static class ProofDraft {

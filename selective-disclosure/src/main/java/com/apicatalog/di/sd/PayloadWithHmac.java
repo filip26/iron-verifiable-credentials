@@ -1,6 +1,6 @@
 package com.apicatalog.di.sd;
 
-public interface PayloadWithHMAC {
+public interface PayloadWithHmac {
 
     byte[] hmacKey();
     

@@ -163,17 +163,11 @@ public class SDGraphProcessor implements GraphProcessor {
             throw new IllegalArgumentException();
         }
 
-        var base = new BasePayload();
+        var base = new BaseDocument();
         base.base = baseWriter.toString().getBytes(StandardCharsets.UTF_8);
         base.redactable = optional;
         base.pointers = mandatoryPointers;
         base.hmacKey = hmacKey;
-//        IO.println("c14n > " + canonized);
-//        IO.println("mandatory > " + Arrays.toString(mandatory));
-//        IO.println("labels > " + canonizer.labels());
-//        IO.println("mapping > " + hmac.mapping);
-//        IO.println("base > " + new String(base.base));
-
         return base;
     }
 
@@ -196,23 +190,18 @@ public class SDGraphProcessor implements GraphProcessor {
         }
 
         var expanded = model.expand().apply(document);
-//        IO.println("expanded > " + expanded);
-
-        Object expandedProofs = null;
 
         if (expanded.size() != 1) {
             throw new IllegalArgumentException();
         }
 
-        if (expanded.iterator().next() instanceof Map map) {
-            if (map.containsKey("https://w3id.org/security#proof")) {
+        Object expandedProofs = null;
 
-                expandedDocument = new HashMap<String, Object>(map);
-//FIXME?!                expandedProofs = expandedDocument.remove("https://w3id.org/security#proof");
+        if (expanded.iterator().next() instanceof Map map) {
+            expandedDocument = new HashMap<String, Object>(map);
+            if (map.containsKey("https://w3id.org/security#proof")) {
                 expandedProofs = Map.of("https://w3id.org/security#proof",
                         expandedDocument.remove("https://w3id.org/security#proof"));
-            } else {
-                expandedDocument = new HashMap<String, Object>(map);
             }
         }
 
@@ -221,9 +210,6 @@ public class SDGraphProcessor implements GraphProcessor {
 
             model.tordf().accept(expandedProofs, dataset);
         }
-//        IO.println(dataset.graphs);
-//        IO.println(dataset.proofGraphs);
-
     }
 
     private static class Dataset implements QuadConsumer {
@@ -263,15 +249,14 @@ public class SDGraphProcessor implements GraphProcessor {
                     });
         }
     }
-    
 
-    private static class BasePayload implements RedactablePayload, PayloadWithHMAC {
+    private static class BaseDocument implements RedactablePayload, PayloadWithHmac {
 
         byte[] base;
         Collection<Entry<Integer, byte[]>> redactable;
         Collection<String> pointers;
         byte[] hmacKey;
-        
+
         @Override
         public byte[] canonicalPayload() {
             return base;
@@ -280,7 +265,7 @@ public class SDGraphProcessor implements GraphProcessor {
         @Override
         public void digest(String algorithm, byte[] value) {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
@@ -312,4 +297,6 @@ public class SDGraphProcessor implements GraphProcessor {
 
     }
 
+    public static record SignatureAlgorithm(String signature, String digest) {
+    };
 }
