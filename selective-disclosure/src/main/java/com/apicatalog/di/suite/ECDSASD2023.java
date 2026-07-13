@@ -10,6 +10,8 @@ import com.apicatalog.di.sd.SDBaseProofValue;
 import com.apicatalog.di.sd.SDDerivedProofValue;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.payload.RedactablePayload;
@@ -29,10 +31,31 @@ public final class ECDSASD2023 implements CryptoSuite {
 
     private static final ECDSASD2023 INSTANCE = new ECDSASD2023();
 
+    private final Function<byte[], Multicodec> proofPublicKeyDecoder;
+
     private ECDSASD2023() {
+        this(key -> {
+
+            if (KeyCodec.P256_PUBLIC.isEncoded(key)) {
+                return KeyCodec.P256_PUBLIC;
+            }
+            if (KeyCodec.P384_PUBLIC.isEncoded(key)) {
+                return KeyCodec.P384_PUBLIC;
+            }
+
+            throw new IllegalArgumentException();
+        });
+    }
+
+    private ECDSASD2023(Function<byte[], Multicodec> proofPublicKeyDecoder) {
+        this.proofPublicKeyDecoder = proofPublicKeyDecoder;
     }
 
     public static ECDSASD2023 getInstance() {
+        return INSTANCE;
+    }
+
+    public static ECDSASD2023 newInstance(Function<byte[], Multicodec> proofPublicKeyDecoder) {
         return INSTANCE;
     }
 
@@ -64,16 +87,39 @@ public final class ECDSASD2023 implements CryptoSuite {
                 unsignedProof,
                 payload);
 
-//        var signature = signatureGenerator.generate(
-//                algorithm,
-//                signer,
-//                digestFactory,
-//                unsigned,
-//                payload);
-
         proofDraft.build(signature);
         return proofDraft.snapshot();
 
+    }
+
+    @Override
+    public Signature decode(String value, Proof proof, PayloadProcessor data) {
+
+        var signature = Multibase.BASE_64_URL.decode(value);
+        IO.println(proofPublicKeyDecoder);
+        if (SDBaseProofValue.isAccepted(signature)) {
+            return SDBaseProofValue.decode(
+                    signature,
+                    ECDSASD2023::getAlgorithm,
+                    proofPublicKeyDecoder,
+                    proof,
+                    data);
+        }
+        if (SDDerivedProofValue.isAccepted(signature)) {
+            return SDDerivedProofValue.decode(
+                    signature,
+                    ECDSASD2023::getAlgorithm,
+                    proofPublicKeyDecoder,
+                    proof,
+                    data);
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    @Override
+    public String encode(Signature signature) {
+        return Multibase.BASE_64_URL.encode(signature.toByteArray());
     }
 
     @Override
@@ -86,34 +132,6 @@ public final class ECDSASD2023 implements CryptoSuite {
         return DataModel.C14N_RDFC;
     }
 
-    @Override
-    public String encode(Signature signature) {
-        return Multibase.BASE_64_URL.encode(signature.toByteArray());
-    }
-
-    @Override
-    public Signature decode(String value, Proof proof, PayloadProcessor data) {
-
-        var signature = Multibase.BASE_64_URL.decode(value);
-
-        if (SDBaseProofValue.isAccepted(signature)) {
-            return SDBaseProofValue.decode(
-                    signature,
-                    ECDSASD2023::getAlgorithm,
-                    proof,
-                    data);
-        }
-        if (SDDerivedProofValue.isAccepted(signature)) {
-            return SDDerivedProofValue.decode(
-                    signature,
-                    ECDSASD2023::getAlgorithm,
-                    proof,
-                    data);
-        }
-
-        throw new IllegalArgumentException();
-    }
-
     static SignatureAlgorithm getAlgorithm(int signatureLength) {
         return switch (signatureLength) {
         case 64 -> P256_ALGORITHM;
@@ -121,51 +139,4 @@ public final class ECDSASD2023 implements CryptoSuite {
         default -> throw new IllegalArgumentException();
         };
     }
-
-//    public 
-//    
-//    public static class ProofDraft {
-//        
-//    }
-
-//    protected ProofValue getProofValue(Proof proof, DocumentModel model, byte[] proofValue, DocumentLoader loader, URI base) throws DocumentError {
-//        if (ECDSASDBaseProofValue.is(proofValue)) {
-//            return ECDSASDBaseProofValue.of(proof, model, proofValue, loader);
-//        }
-//        if (ECDSASDDerivedProofValue.is(proofValue)) {
-//            return ECDSASDDerivedProofValue.of(proof, model, proofValue, loader);
-//        }
-//        throw new DocumentError(ErrorType.Unknown, "ProofValue");
-//    }
-
-//    @Override
-//    protected CryptoSuite getCryptoSuite(String cryptoName, ProofValue proofValue) throws DocumentError {
-//        if (!CRYPTOSUITE_NAME.equals(cryptoName)) {
-//            return null;
-//        }
-//
-//        if (proofValue != null) {
-//            if (proofValue instanceof ECDSASDBaseProofValue baseValue) {
-//                return getCryptoSuite(baseValue.baseSignature);
-//            }
-//            if (proofValue instanceof ECDSASDDerivedProofValue derivedValue) {
-//                return getCryptoSuite(derivedValue.baseSignature);
-//            }
-//        }
-//        throw new DocumentError(ErrorType.Unknown, "ProofValue");
-//    }
-//
-//    protected static final CryptoSuite getCryptoSuite(byte[] proofValue) throws DocumentError {
-//
-//        if (proofValue != null) {
-//            if (proofValue.length == 64) {
-//                return CRYPTO_256;
-//            }
-//            if (proofValue.length == 96) {
-//                return CRYPTO_384;
-//            }
-//            throw new DocumentError(ErrorType.Invalid, "ProofValueLength");
-//        }
-//        throw new DocumentError(ErrorType.Unknown, "ProofValue");
-//    }
 }

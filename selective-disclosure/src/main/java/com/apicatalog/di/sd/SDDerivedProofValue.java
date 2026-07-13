@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
+import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
@@ -43,6 +44,8 @@ public final class SDDerivedProofValue implements DerivedSignature {
     private Map<Integer, byte[]> labels;
     private int[] indices;
 
+    private Multicodec proofPublicKeyCodec;
+
     private SDDerivedProofValue() {
         // TODO Auto-generated constructor stub
     }
@@ -57,6 +60,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
     public static SDDerivedProofValue decode(
             byte[] signature,
             Function<Integer, SignatureAlgorithm> algorithmProvider,
+            Function<byte[], Multicodec> proofPublicKeyDecoder,
             Proof proof,
             PayloadProcessor data) {
 
@@ -95,7 +99,8 @@ public final class SDDerivedProofValue implements DerivedSignature {
             proofValue.proof = proof;
             proofValue.baseSignature = SDBaseProofValue.byteArray(top.getDataItems().get(0));
             proofValue.proofPublicKey = SDBaseProofValue.byteArray(top.getDataItems().get(1));
-
+            proofValue.proofPublicKeyCodec = proofPublicKeyDecoder.apply(proofValue.proofPublicKey);
+            
             final var algorithms = algorithmProvider.apply(proofValue.baseSignature.length);
 
             proofValue.signatureAlgorithm = algorithms.signature();
@@ -145,9 +150,38 @@ public final class SDDerivedProofValue implements DerivedSignature {
     }
 
     @Override
-    public boolean verify(AsymmetricVerifier verifier, Function<String, MessageDigest> digestFactory, byte[] publicKey)
-            throws InvalidKeyException, SignatureException {
-        // TODO Auto-generated method stub
+    public boolean verify(
+            AsymmetricVerifier verifier,
+            Function<String, MessageDigest> digestFactory,
+            byte[] publicKey) throws InvalidKeyException, SignatureException {
+
+        var digestor = digestFactory.apply(digestAlgorithm);
+        
+      final byte[] proofHash = digestor.digest(proof.canonicalPayload());
+//
+//      // unsignedProof.context()
+//      final RecoveredIndices verifyData = RecoveredIndices.of(model.data().expanded(), loader, labels, indices);
+//
+//      final byte[] mandatoryHash = signer.hash(verifyData.mandatory);
+//
+//      if (signatures.size() != verifyData.nonMandatory.size()) {
+//          throw new VerificationError(VerificationErrorCode.InvalidSignature);
+//      }
+//
+//      final byte[] signature = SDProofValue.hash(proofHash, proofPublicKey, mandatoryHash);
+//
+//      signer.verify(key.publicKey().rawBytes(), baseSignature, signature);
+//
+//      final byte[] decodedProofPublicKey = ECDSASD2023.CODECS.decode(proofPublicKey);
+//
+//      int i = 0;
+//      for (byte[] sig : signatures) {
+//          signer.verify(decodedProofPublicKey, sig, (verifyData.nonMandatory.get(i).toString() + '\n').getBytes(StandardCharsets.UTF_8));
+//          i++;
+//      }
+//      // all good
+//
+
         return false;
     }
 

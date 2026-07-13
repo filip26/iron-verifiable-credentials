@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
-import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.trust.payload.DigestiblePayload;
@@ -52,6 +52,8 @@ public final class SDBaseProofValue implements BaseSignature {
     private Collection<byte[]> signatures;
     private Collection<String> mandatoryPointers;
 
+    private Multicodec proofPublicKeyCodec;
+
     public static boolean isAccepted(byte[] signature) {
         return signature.length > 2
                 && signature[0] == BYTE_PREFIX[0]
@@ -62,18 +64,16 @@ public final class SDBaseProofValue implements BaseSignature {
     public static Signature decode(
             byte[] signature,
             Function<Integer, SignatureAlgorithm> algorithmProvider,
+            Function<byte[], Multicodec> proofPublicKeyDecoder,
             Proof proof,
             PayloadProcessor data) {
 
-//  public static ECDSASDBaseProofValue of(Proof proof, DocumentModel model, byte[] signature, DocumentLoader loader) throws DocumentError {
-//
         Objects.requireNonNull(signature);
 
-        // TODO validate signature size
-//      if (signature.length < 3) {
+        if (signature.length < 3) {
 //          throw new DocumentError(ErrorType.Invalid, "ProofValue");
-//      }
-//
+        }
+
         var is = new ByteArrayInputStream(signature);
 
         if ((byte) is.read() != BYTE_PREFIX[0] || is.read() != BYTE_PREFIX[1] || is.read() != BYTE_PREFIX[2]) {
@@ -90,48 +90,58 @@ public final class SDBaseProofValue implements BaseSignature {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
             }
 
-            if (!MajorType.ARRAY.equals(cbor.get(0).getMajorType())) {
-//              throw new DocumentError(ErrorType.Invalid, "ProofValue");
-            }
+            final Array top;
 
-            final var top = (Array) cbor.get(0);
+            if (cbor.get(0) instanceof Array array) {
+                top = array;
+
+            } else {
+//              throw new DocumentError(ErrorType.Invalid, "ProofValue");
+                throw new IllegalArgumentException();
+            }
 
             if (top.getDataItems().size() != 5) {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
+                throw new IllegalArgumentException();
             }
 
             final var proofValue = new SDBaseProofValue();
             proofValue.proof = proof;
-
             proofValue.baseSignature = byteArray(top.getDataItems().get(0));
-            proofValue.proofPublicKey = byteArray(top.getDataItems().get(1));
-            proofValue.hmacKey = byteArray(top.getDataItems().get(2));
 
             final var algorithms = algorithmProvider.apply(proofValue.baseSignature.length);
-
             proofValue.signatureAlgorithm = algorithms.signature();
             proofValue.digestAlgorithm = algorithms.digest();
 
-            if (!MajorType.ARRAY.equals(top.getDataItems().get(3).getMajorType())) {
+            proofValue.proofPublicKey = byteArray(top.getDataItems().get(1));
+            proofValue.proofPublicKeyCodec = proofPublicKeyDecoder.apply(proofValue.proofPublicKey);
+
+            proofValue.hmacKey = byteArray(top.getDataItems().get(2));
+
+            if (top.getDataItems().get(3) instanceof Array signatures) {
+                proofValue.signatures = new ArrayList<>(signatures.getDataItems().size());
+
+                for (final var item : signatures.getDataItems()) {
+                    proofValue.signatures.add(byteArray(item));
+                }
+
+            } else {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
+                throw new IllegalArgumentException();
             }
 
-            proofValue.signatures = new ArrayList<>(((Array) top.getDataItems().get(3)).getDataItems().size());
+            if (top.getDataItems().get(4) instanceof Array pointers) {
 
-            for (final DataItem item : ((Array) top.getDataItems().get(3)).getDataItems()) {
-                proofValue.signatures.add(byteArray(item));
-            }
+                proofValue.mandatoryPointers = new ArrayList<>(pointers.getDataItems().size());
 
-            if (!MajorType.ARRAY.equals(top.getDataItems().get(4).getMajorType())) {
+                for (final var item : pointers.getDataItems()) {
+                    proofValue.mandatoryPointers.add(string(item));
+                }
+
+            } else {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
+                throw new IllegalArgumentException();
             }
-//            IO.println("> signatures: " + proofValue.signatures.size());
-            proofValue.mandatoryPointers = new ArrayList<>(((Array) top.getDataItems().get(4)).getDataItems().size());
-
-            for (final DataItem item : ((Array) top.getDataItems().get(4)).getDataItems()) {
-                proofValue.mandatoryPointers.add(string(item));
-            }
-//            IO.println("> mandatory pointers: " + proofValue.mandatoryPointers);
 
             proofValue.payload = data.redactable(
                     proofValue.mandatoryPointers,
@@ -261,10 +271,7 @@ public final class SDBaseProofValue implements BaseSignature {
             return false;
         }
 
-        var proofKeyCodec = MulticodecDecoder.newInstance().getCodec(proofPublicKey)
-                .orElseThrow();
-
-        var decodedProofPublicKey = proofKeyCodec.decode(proofPublicKey);
+        var decodedProofPublicKey = proofPublicKeyCodec.decode(proofPublicKey);
 
         var redactableIterator = payload.redactablePayload().iterator();
 
