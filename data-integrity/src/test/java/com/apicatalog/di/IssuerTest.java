@@ -1,6 +1,7 @@
 package com.apicatalog.di;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
@@ -152,6 +153,9 @@ public class IssuerTest {
         } else {
             fail("An unsupported proof type " + options.get("type"));
         }
+
+        var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
+        assertTrue(verified);
 
         var proofMap = composer.compose();
 

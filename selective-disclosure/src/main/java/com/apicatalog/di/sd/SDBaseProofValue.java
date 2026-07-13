@@ -159,6 +159,7 @@ public final class SDBaseProofValue implements BaseSignature {
             String signatureAlgorithm,
             AsymmetricSigner baseSigner,
             byte[] proofPublicKey,
+            Multicodec proofPublicKeyCodec,
             AsymmetricSigner proofSigner,
             MessageDigest digestor,
             DataIntegrityProof unsignedProof,
@@ -180,6 +181,7 @@ public final class SDBaseProofValue implements BaseSignature {
         proofValue.baseSignature = baseSigner.sign(digest);
         proofValue.hmacKey = ((PayloadWithHmac) payload).hmacKey();
         proofValue.proofPublicKey = proofPublicKey;
+        proofValue.proofPublicKeyCodec = proofPublicKeyCodec;
         proofValue.mandatoryPointers = payload.pointers();
 
         if (payload.redactablePayload() != null && !payload.redactablePayload().isEmpty()) {

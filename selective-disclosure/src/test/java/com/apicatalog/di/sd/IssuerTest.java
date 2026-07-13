@@ -1,6 +1,7 @@
 package com.apicatalog.di.sd;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
@@ -88,7 +89,7 @@ public class IssuerTest {
             var processor = Resources.MODEL.createProcessor(document);
 
             processor.withProofs(proofDraft.previous());
-            
+
             if (proofDraft.cryptosuite() instanceof ECDSASD2023 suite) {
 
                 proof = suite.sign(
@@ -115,6 +116,9 @@ public class IssuerTest {
         } else {
             fail("An unsupported proof type " + options.get("type"));
         }
+
+        var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
+        assertTrue(verified);
 
         var proofMap = composer.compose();
 

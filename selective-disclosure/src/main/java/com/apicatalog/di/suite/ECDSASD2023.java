@@ -82,6 +82,7 @@ public final class ECDSASD2023 implements CryptoSuite {
                 algorithm,
                 baseSigner,
                 proofPublicKey,
+                proofPublicKeyDecoder.apply(proofPublicKey),
                 proofSigner,
                 digestor,
                 unsignedProof,
