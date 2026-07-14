@@ -6,6 +6,7 @@ import java.util.function.Function;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.sd.SDBaseProofValue;
 import com.apicatalog.di.sd.SDDerivedProofValue;
+import com.apicatalog.di.sd.SDGraphProcessor;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
@@ -66,7 +67,7 @@ public final class ECDSASD2023 implements CryptoSuite {
     public Signature decode(String value, Proof proof, PayloadProcessor data) {
 
         var signature = Multibase.BASE_64_URL.decode(value);
-        IO.println(proofPublicKeyDecoder);
+
         if (SDBaseProofValue.isAccepted(signature)) {
             return SDBaseProofValue.decode(
                     signature,
@@ -75,13 +76,14 @@ public final class ECDSASD2023 implements CryptoSuite {
                     proof,
                     data);
         }
+        
         if (SDDerivedProofValue.isAccepted(signature)) {
             return SDDerivedProofValue.decode(
                     signature,
                     ECDSASD2023::getAlgorithm,
                     proofPublicKeyDecoder,
                     proof,
-                    data);
+                    (SDGraphProcessor)data);
         }
 
         throw new IllegalArgumentException();

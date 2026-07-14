@@ -2,9 +2,9 @@ package com.apicatalog.di.sd;
 
 import java.io.ByteArrayInputStream;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,8 +16,9 @@ import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
+import com.apicatalog.trust.payload.DerivedPayload;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.DerivedSignature;
 
@@ -35,17 +36,17 @@ public final class SDDerivedProofValue implements DerivedSignature {
     private String signatureAlgorithm;
     private String digestAlgorithm;
 
-    private DigestiblePayload payload;
+    private DerivedPayload payload;
     private Proof proof;
 
     private byte[] baseSignature;
+
     private byte[] proofPublicKey;
+    private Multicodec proofPublicKeyCodec;
 
     private Collection<byte[]> signatures;
     private Map<Integer, byte[]> labels;
     private int[] indices;
-
-    private Multicodec proofPublicKeyCodec;
 
     private SDDerivedProofValue() {
         // TODO Auto-generated constructor stub
@@ -63,7 +64,8 @@ public final class SDDerivedProofValue implements DerivedSignature {
             Function<Integer, SignatureAlgorithm> algorithmProvider,
             Function<byte[], Multicodec> proofPublicKeyDecoder,
             Proof proof,
-            PayloadProcessor data) {
+            // TODO DerivedPayload?
+            SDGraphProcessor processor) {
 
         Objects.requireNonNull(signature);
 
@@ -101,7 +103,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
             proofValue.baseSignature = SDBaseProofValue.byteArray(top.getDataItems().get(0));
             proofValue.proofPublicKey = SDBaseProofValue.byteArray(top.getDataItems().get(1));
             proofValue.proofPublicKeyCodec = proofPublicKeyDecoder.apply(proofValue.proofPublicKey);
-            
+
             final var algorithms = algorithmProvider.apply(proofValue.baseSignature.length);
 
             proofValue.signatureAlgorithm = algorithms.signature();
@@ -142,6 +144,10 @@ public final class SDDerivedProofValue implements DerivedSignature {
                 proofValue.indices[i] = toUInt(item);
             }
 
+            proofValue.payload = processor.derived(Map.of(
+                    "LABELS", proofValue.labels,
+                    "INDICES", proofValue.indices));
+
             return proofValue;
 
         } catch (CborException e) {
@@ -156,22 +162,39 @@ public final class SDDerivedProofValue implements DerivedSignature {
             Digestor.Factory digestFactory,
             byte[] publicKey) throws InvalidKeyException, SignatureException {
 
+//        IO.println(expanded);
+        IO.println(labels);
+        IO.println(Arrays.toString(indices));
+
         var digestor = digestFactory.newDigestor(digestAlgorithm);
-        
-      final byte[] proofHash = digestor.digest(proof.canonicalPayload());
+
+        final byte[] proofHash = digestor.digest(proof.canonicalPayload());
 //
 //      // unsignedProof.context()
-//      final RecoveredIndices verifyData = RecoveredIndices.of(model.data().expanded(), loader, labels, indices);
 //
 //      final byte[] mandatoryHash = signer.hash(verifyData.mandatory);
-//
-//      if (signatures.size() != verifyData.nonMandatory.size()) {
+// final byte[] mandatoryHash = digestor.digest(payload.mandatory);
+        var proofDigest = digestor.digest(proof.canonicalPayload());
+        var mandatoryDigest = digestor.digest(payload.canonicalPayload());
+
+        if (signatures.size() != payload.disclosedPayload().size()) {
 //          throw new VerificationError(VerificationErrorCode.InvalidSignature);
-//      }
-//
+            throw new SignatureException();
+        }
+
+        //
 //      final byte[] signature = SDProofValue.hash(proofHash, proofPublicKey, mandatoryHash);
-//
-//      signer.verify(key.publicKey().rawBytes(), baseSignature, signature);
+
+        var baseDigest = SDBaseProofValue.hash(
+                proofDigest,
+                proofPublicKey,
+                mandatoryDigest);
+
+        var isBaseSignatureVerified = verifier.verify(publicKey, baseDigest, baseSignature);
+
+        if (!isBaseSignatureVerified) {
+            return false;
+        }
 //
 //      final byte[] decodedProofPublicKey = ECDSASD2023.CODECS.decode(proofPublicKey);
 //
@@ -180,10 +203,8 @@ public final class SDDerivedProofValue implements DerivedSignature {
 //          signer.verify(decodedProofPublicKey, sig, (verifyData.nonMandatory.get(i).toString() + '\n').getBytes(StandardCharsets.UTF_8));
 //          i++;
 //      }
-//      // all good
-//
-
-        return false;
+        // all good
+        return true;
     }
 
     @Override

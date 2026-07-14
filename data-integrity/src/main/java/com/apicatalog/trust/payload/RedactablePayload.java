@@ -9,5 +9,4 @@ public interface RedactablePayload extends DigestiblePayload {
     Collection<Entry<Integer, byte[]>> redactablePayload();
 
     Collection<String> pointers();
-    
 }

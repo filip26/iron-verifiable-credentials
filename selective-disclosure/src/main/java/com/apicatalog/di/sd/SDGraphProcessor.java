@@ -3,6 +3,7 @@ package com.apicatalog.di.sd;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,8 +11,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
+import com.apicatalog.trust.payload.DerivedPayload;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.processor.GraphProcessor;
@@ -172,6 +175,89 @@ public class SDGraphProcessor implements GraphProcessor {
     }
 
     @Override
+    public DerivedPayload derived(Map<String, Object> options) {
+     
+        var labels = (Map<Integer, byte[]>)options.get("LABELS");
+        var indices = (int[])options.get("INDICES");
+        
+        lazyInit();
+
+        var expanded = expandedDocument;
+
+        var canonizer = model.newCanonizer();
+
+        var consumer = canonizer.consumer();
+
+        model.tordf().accept(expanded, consumer);
+
+        var canonized = new ArrayList<String[]>();
+
+        canonizer.canonize(((subject, predicate, object, datatype, language, direction, graph) -> {
+            canonized.add(
+                    new String[] {
+                            subject, predicate, object, datatype, language, direction, graph
+                    });
+
+        }));
+
+        var labelMap = canonizer.labels().values().stream()
+                .sorted()
+                .toList();
+
+        var map = HashMap.<String, String>newHashMap(labels.size());
+
+        for (int i = 0; i < labelMap.size(); i++) {
+            map.put(labelMap.get(i), "_:" + Multibase.BASE_64_URL.encode(labels.get(i)));
+        }
+
+        IO.println(map);
+
+        var nquads = new ArrayList<String>(canonized.size());
+
+        // relabel blank nodes
+        for (var quad : canonized) {
+            if (quad[0].startsWith("_:") && map.containsKey(quad[0])) {
+                quad[0] = map.get(quad[0]);
+            }
+            if (quad[2].startsWith("_:") && map.containsKey(quad[2])) {
+                quad[2] = map.get(quad[2]);
+            }
+            var nquad = canonizer.toNQuad(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], quad[6]);
+            nquads.add(nquad);
+        }
+
+        Collections.sort(nquads);
+
+        var mandatory = new StringWriter(indices.length * 256);
+        var nonMandatory = new ArrayList<byte[]>();
+
+        Arrays.sort(indices);
+
+        int index = 0;
+        for (var nquad : nquads) {
+
+            if (Arrays.binarySearch(indices, index) >= 0) {
+                mandatory.write(nquad);
+            } else {
+                nonMandatory.add(nquad.getBytes(StandardCharsets.UTF_8));
+            }
+
+            index++;
+        }
+
+        IO.println("mandatory > ");
+        IO.print(mandatory);
+        IO.println("optional > ");
+        nonMandatory.stream().map(String::new).forEach(IO::print);
+
+        
+        var derived = new DerivedDocument();
+        derived.base = mandatory.toString().getBytes(StandardCharsets.UTF_8);
+        derived.disclosed = nonMandatory;
+        return derived;
+    }
+
+    @Override
     public DigestiblePayload digestible() {
         // TODO Auto-generated method stub
         return null;
@@ -250,7 +336,7 @@ public class SDGraphProcessor implements GraphProcessor {
         }
     }
 
-    private static class BaseDocument implements RedactablePayload, PayloadWithHmac {
+    public static class BaseDocument implements RedactablePayload, PayloadWithHmac {
 
         byte[] base;
         Collection<Entry<Integer, byte[]>> redactable;
@@ -294,7 +380,50 @@ public class SDGraphProcessor implements GraphProcessor {
         public byte[] hmacKey() {
             return hmacKey;
         }
+    }
 
+    public static class DerivedDocument implements DerivedPayload {
+
+        byte[] base;
+        Collection<byte[]> disclosed;
+
+        @Override
+        public byte[] canonicalPayload() {
+            return base;
+        }
+
+        @Override
+        public void digest(String algorithm, byte[] value) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public byte[] digest(String algorithm) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection<String> digestAlgorithms() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection<byte[]> disclosedPayload() {
+            return disclosed;
+        }
+
+    }
+
+    public Map<String, Object> expanded() {
+        return expandedDocument;
+    }
+
+    @Override
+    public SemanticModel model() {
+        return model;
     }
 
     public static record SignatureAlgorithm(String signature, String digest) {

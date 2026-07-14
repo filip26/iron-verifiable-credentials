@@ -66,7 +66,7 @@ public final class SDBaseProofValue implements BaseSignature {
             Function<Integer, SignatureAlgorithm> algorithmProvider,
             Function<byte[], Multicodec> proofPublicKeyDecoder,
             Proof proof,
-            PayloadProcessor data) {
+            PayloadProcessor processor) {
 
         Objects.requireNonNull(signature);
 
@@ -143,7 +143,7 @@ public final class SDBaseProofValue implements BaseSignature {
                 throw new IllegalArgumentException();
             }
 
-            proofValue.payload = data.redactable(
+            proofValue.payload = processor.redactable(
                     proofValue.mandatoryPointers,
                     Map.of("HMAC_KEY", proofValue.hmacKey));
 
@@ -261,14 +261,14 @@ public final class SDBaseProofValue implements BaseSignature {
         var digestor = digestFactory.newDigestor(digestAlgorithm);
 
         var proofDigest = digestor.digest(proof.canonicalPayload());
-        var dataDigest = digestor.digest(payload.canonicalPayload());
+        var mandatoryDigest = digestor.digest(payload.canonicalPayload());
 
-        var digest = hash(
+        var baseDigest = hash(
                 proofDigest,
                 proofPublicKey,
-                dataDigest);
+                mandatoryDigest);
 
-        var isBaseSignatureVerified = baseVerifier.verify(publicKey, digest, baseSignature);
+        var isBaseSignatureVerified = baseVerifier.verify(publicKey, baseDigest, baseSignature);
 
         if (!isBaseSignatureVerified) {
             return false;
@@ -319,7 +319,7 @@ public final class SDBaseProofValue implements BaseSignature {
         return ((UnicodeString) item).getString();
     }
 
-    private static byte[] hash(
+    static final byte[] hash(
             final byte[] proofHash,
             final byte[] proofPublicKey,
             byte[] mandatoryHash) {
