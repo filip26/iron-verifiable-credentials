@@ -31,7 +31,7 @@ public final class SLHDSA2024 extends StandardCryptoSuite {
             String id,
             String c14n,
             SignatureGenerator<DataIntegrityProof> signatureGenerator) {
-        super(id, c14n, signatureGenerator);
+        super(id, c14n, Multibase.BASE_64_URL, signatureGenerator);
     }
 
     public static CryptoSuite get128s(String c14n) {
@@ -50,19 +50,15 @@ public final class SLHDSA2024 extends StandardCryptoSuite {
         return SLHDSA_128s_JCS_2024;
     }
 
-    @Override
-    public Signature decode(String encoded, Proof proof, PayloadProcessor payload) {
-        return decode128s(encoded, proof, payload);
+    protected Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
+        return decode128s(signature, proof, payload);
     }
 
     public String encode(Signature signature) {
         return Multibase.BASE_64_URL.encode(signature.toByteArray());
     }
 
-    private static Signature decode128s(String value, Proof proof, PayloadProcessor payload) {
-
-        var signature = Multibase.BASE_64_URL.decode(value);
-
+    private static Signature decode128s(byte[] signature, Proof proof, PayloadProcessor payload) {
         if (signature.length != SIGNATURE_LENGTH) {
             throw new IllegalArgumentException(
                     """

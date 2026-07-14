@@ -27,10 +27,10 @@ public final class MLDSA2024 extends StandardCryptoSuite {
             ProofValueGenerator::generateWithSHA256);
 
     private MLDSA2024(
-            String id, 
+            String id,
             String c14n,
             SignatureGenerator<DataIntegrityProof> signatureGenerator) {
-        super(id, c14n, signatureGenerator);
+        super(id, c14n, Multibase.BASE_64_URL, signatureGenerator);
     }
 
     public static MLDSA2024 get44(String c14n) {
@@ -48,21 +48,13 @@ public final class MLDSA2024 extends StandardCryptoSuite {
     public static MLDSA2024 get44withJCS() {
         return MLDSA_44_JCS_2024;
     }
-    
 
     @Override
-    public Signature decode(String encoded, Proof proof, PayloadProcessor payload) {
-        return decode44(encoded, proof, payload);
+    public Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
+        return decode44(signature, proof, payload);
     }
 
-    public String encode(Signature signature) {
-        return Multibase.BASE_64_URL.encode(signature.toByteArray());
-    }
-
-    private Signature decode44(String value, Proof proof, PayloadProcessor payload) {
-
-        var signature = Multibase.BASE_64_URL.decode(value);
-
+    private Signature decode44(byte[] signature, Proof proof, PayloadProcessor payload) {
         if (signature.length != SIGNATURE_LENGTH) {
             throw new IllegalArgumentException(
                     """

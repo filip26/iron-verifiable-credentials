@@ -26,7 +26,7 @@ public final class EdDSA2022 extends StandardCryptoSuite {
             ProofValueGenerator::generateWithSHA256);
 
     private EdDSA2022(String id, String c14n, SignatureGenerator<DataIntegrityProof> signatureGenerator) {
-        super(id, c14n, signatureGenerator);
+        super(id, c14n, Multibase.BASE_58_BTC, signatureGenerator);
     }
 
     public static EdDSA2022 withRDFC() {
@@ -45,15 +45,8 @@ public final class EdDSA2022 extends StandardCryptoSuite {
         };
     }
 
-    public String encode(Signature signature) {
-        return Multibase.BASE_58_BTC.encode(signature.toByteArray());
-    }
-
     @Override
-    public Signature decode(String encoded, Proof proof, PayloadProcessor payload) {
-
-        var signature = Multibase.BASE_58_BTC.decode(encoded);
-
+    public Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
         if (signature.length != SIGNATURE_LENGTH) {
             throw new IllegalArgumentException(
                     """

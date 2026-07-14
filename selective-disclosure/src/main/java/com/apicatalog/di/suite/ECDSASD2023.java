@@ -21,10 +21,10 @@ import com.apicatalog.trust.signature.Signature;
 
 public final class ECDSASD2023 implements CryptoSuite {
 
+    public static final String ID = "ecdsa-sd-2023";
+
     public static final String P256 = "P-256";
     public static final String P384 = "P-384";
-
-    private static final String CRYPTOSUITE_NAME = "ecdsa-sd-2023";
 
     private static final SignatureAlgorithm P256_ALGORITHM = new SignatureAlgorithm(P256, "SHA-256");
     private static final SignatureAlgorithm P384_ALGORITHM = new SignatureAlgorithm(P384, "SHA-384");
@@ -125,7 +125,7 @@ public final class ECDSASD2023 implements CryptoSuite {
 
     @Override
     public String id() {
-        return CRYPTOSUITE_NAME;
+        return ID;
     }
 
     @Override
