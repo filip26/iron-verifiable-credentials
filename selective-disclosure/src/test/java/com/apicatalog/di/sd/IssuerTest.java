@@ -98,7 +98,7 @@ public class IssuerTest {
                         baseSigner,
                         keys.proofPublicKey(),
                         proofSigner,
-                        Resources.DIGEST_FACTORY::get,
+                        Resources.DIGEST_FACTORY,
                         processor.redactable(
                                 (Collection<String>) options.get("mandatoryPointers"), // TODO separate it from draft
                                 Map.of("HMAC_KEY", keys.hmacKey())));

@@ -11,9 +11,7 @@ import com.apicatalog.trust.document.MapData;
 import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.GenericPayload;
-import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
-import com.apicatalog.trust.signature.Signature;
 
 public class MapProofCursor implements ProofCursor, PayloadProcessor {
 

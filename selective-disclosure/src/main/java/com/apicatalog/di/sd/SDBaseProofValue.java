@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -158,11 +157,12 @@ public final class SDBaseProofValue implements BaseSignature {
 
     public static SDBaseProofValue generateSignature(
             String signatureAlgorithm,
+            String digestAlgorithm,
             AsymmetricSigner baseSigner,
             byte[] proofPublicKey,
             Multicodec proofPublicKeyCodec,
             AsymmetricSigner proofSigner,
-            MessageDigest digestor,
+            Digestor digestor,
             DataIntegrityProof unsignedProof,
             RedactablePayload payload) throws SignatureException {
 
@@ -177,7 +177,7 @@ public final class SDBaseProofValue implements BaseSignature {
         var proofValue = new SDBaseProofValue();
         proofValue.proof = unsignedProof;
         proofValue.signatureAlgorithm = signatureAlgorithm;
-        proofValue.digestAlgorithm = digestor.getAlgorithm();
+        proofValue.digestAlgorithm = digestAlgorithm;
 
         proofValue.baseSignature = baseSigner.sign(digest);
         proofValue.hmacKey = ((PayloadWithHmac) payload).hmacKey();

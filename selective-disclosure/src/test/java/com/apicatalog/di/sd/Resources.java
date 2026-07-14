@@ -20,6 +20,7 @@ import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
 import com.apicatalog.rdf.canon.RdfCanon;
 import com.apicatalog.rdf.nquads.NQuadsWriter;
+import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
@@ -45,19 +46,22 @@ class Resources {
             .processor(GraphProofCursor::new)
             .build();
 
-    static final Map<String, MessageDigest> DIGEST_FACTORY;
+    static final Digestor.Factory DIGEST_FACTORY;
+
+    static final MessageDigest SHA_256;
 
     static {
         try {
-            DIGEST_FACTORY = Map.of(
-                    "SHA-256", MessageDigest.getInstance("SHA-256"),
-                    "SHA-384", MessageDigest.getInstance("SHA-384"));
+            SHA_256 = MessageDigest.getInstance("SHA-256");
+
+            DIGEST_FACTORY = (Map.<String, Digestor>of(
+                    "SHA-256", SHA_256::digest,
+                    "SHA-384", MessageDigest.getInstance("SHA-384")::digest))::get;
 
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }
     }
-
     static JsonFactory FACTORY = JsonFactory.builder().build();
 
     static <T> Map<String, T> getMap(String name) throws IOException {
@@ -156,7 +160,7 @@ class Resources {
     static class RdfcPrcessor implements GraphCanonizer {
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final RdfCanon canon = RdfCanon.create(Resources.DIGEST_FACTORY.get("SHA-256"));
+        final RdfCanon canon = RdfCanon.create(SHA_256);
 
         @Override
         public byte[] canonize() {

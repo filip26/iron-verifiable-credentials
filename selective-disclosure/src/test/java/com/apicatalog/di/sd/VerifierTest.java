@@ -57,7 +57,7 @@ public class VerifierTest {
             .resolver(DID_KEY_RESOLVER)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
             .verifier(ECDSA2019.P384, BCECDSAVerifier.getP384Instance()::verify)
-            .digestFactory(Resources.DIGEST_FACTORY::get)
+            .digestFactory(Resources.DIGEST_FACTORY)
             .build();
 
     @ParameterizedTest
@@ -131,7 +131,7 @@ public class VerifierTest {
     static final Stream<String> resources() {
         return Resources
                 .stream()
-                .filter(name -> name.endsWith(".signed.json"))
+                .filter(name -> name.endsWith(".signed.json") || name.endsWith(".derived.json"))
                 .sorted();
     }
 }
