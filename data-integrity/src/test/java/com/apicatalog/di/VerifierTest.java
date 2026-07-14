@@ -68,7 +68,7 @@ public class VerifierTest {
             .verifier(ECDSA2019.P384, BCECDSAVerifier.getP384Instance()::verify)
             .verifier(MLDSA2024.ALGORITHM_44, BCMLDSAVerifier.get44Instance()::verify)
             .verifier(SLHDSA2024.ALGORITHM_SHA2_128s, BCSLHDSAVerifier.get128sInstance()::verify)
-            .digestFactory(Resources.DIGEST_FACTORY::get)
+            .digestFactory(Resources.DIGEST_FACTORY)
             .build();
 
     @ParameterizedTest

@@ -29,7 +29,7 @@ public final class MLDSA2024 extends StandardCryptoSuite {
         super(id, c14n, Multibase.BASE_64_URL, ProofValueGenerator::generateWithSHA256);
     }
 
-    public static MLDSA2024 get44(String c14n) {
+    public static MLDSA2024 get44Instance(String c14n) {
         return switch (c14n) {
         case DataModel.C14N_RDFC -> MLDSA_44_RDFC_2024;
         case DataModel.C14N_JCS -> MLDSA_44_JCS_2024;

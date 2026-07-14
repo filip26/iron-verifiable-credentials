@@ -1,12 +1,11 @@
 package com.apicatalog.di.signature;
 
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.SignatureException;
-import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
+import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
@@ -50,17 +49,18 @@ public final class ProofValue implements Signature {
     }
 
     public static ProofValue generateSignature(
-            String algorithm,
+            String signatureAlgorithm,
+            String digestAlgorithm,
             AsymmetricSigner signer,
-            MessageDigest messageDigest,
+            Digestor digestor,
             Proof proof,
             DigestiblePayload payload) throws SignatureException {
 
-        var digest = digest(messageDigest, proof.canonicalPayload(), payload);
+        var digest = digest(digestAlgorithm, digestor, proof.canonicalPayload(), payload);
 
         return new ProofValue(
-                algorithm,
-                messageDigest.getAlgorithm(),
+                signatureAlgorithm,
+                digestAlgorithm,
                 signer.sign(digest),
                 proof,
                 payload);
@@ -69,13 +69,13 @@ public final class ProofValue implements Signature {
     @Override
     public boolean verify(
             AsymmetricVerifier verifier,
-            Function<String, MessageDigest> digestFactory,
+            Digestor.Factory digestFactory,
             byte[] publicKey)
             throws InvalidKeyException, SignatureException {
 
-        var digestor = digestFactory.apply(digestAlgorithm);
+        var digestor = digestFactory.newDigestor(digestAlgorithm);
 
-        var digest = digest(digestor, proof.canonicalPayload(), payload);
+        var digest = digest(digestAlgorithm, digestor, proof.canonicalPayload(), payload);
 
         return verifier.verify(publicKey, digest, toByteArray());
     }
@@ -87,6 +87,7 @@ public final class ProofValue implements Signature {
      * The output is structured as H(canonicalProof) || H(canonicalDocument) and is
      * utilized as signing or verification data.
      * 
+     * @param digestAlgorithm
      * @param digest
      * @param canonicalProof    the byte array representing the canonicalized proof
      * @param canonicalDocument the byte array representing the canonicalized
@@ -95,19 +96,18 @@ public final class ProofValue implements Signature {
      *         order
      */
     private static byte[] digest(
-            MessageDigest digest,
+            String digestAlgorithm,
+            Digestor digest,
             byte[] canonicalProof,
             DigestiblePayload payload) {
 
-        digest.update(canonicalProof);
-        var proofHash = digest.digest();
+        var proofHash = digest.digest(canonicalProof);
 
-        var payloadHash = payload.digest(digest.getAlgorithm());
-        
+        var payloadHash = payload.digest(digestAlgorithm);
+
         if (payloadHash == null) {
-            digest.update(payload.canonicalPayload());
-            payloadHash = digest.digest();
-            payload.digest(digest.getAlgorithm(), payloadHash);
+            payloadHash = digest.digest(payload.canonicalPayload());
+            payload.digest(digestAlgorithm, payloadHash);
         }
 
         return digestFromHash(proofHash, payloadHash);
@@ -119,8 +119,8 @@ public final class ProofValue implements Signature {
      * <p>
      * The output is structured as H(canonicalProof) || H(canonicalDocument).
      *
-     * @param proofHash the cryptographic hash of the canonical proof
-     * @param payloadHash   the cryptographic hash of the canonical document
+     * @param proofHash   the cryptographic hash of the canonical proof
+     * @param payloadHash the cryptographic hash of the canonical document
      * @return the signing or verification data block containing the concatenated
      *         hashes
      * @throws NullPointerException if proofHash or docHash is null

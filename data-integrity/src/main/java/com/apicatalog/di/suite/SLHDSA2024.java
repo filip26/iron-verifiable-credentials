@@ -30,7 +30,7 @@ public final class SLHDSA2024 extends StandardCryptoSuite {
         super(id, c14n, Multibase.BASE_64_URL, ProofValueGenerator::generateWithSHA256);
     }
 
-    public static CryptoSuite get128s(String c14n) {
+    public static CryptoSuite get128sInstance(String c14n) {
         return switch (c14n) {
         case DataModel.C14N_RDFC -> SLHDSA_128s_RDFC_2024;
         case DataModel.C14N_JCS -> SLHDSA_128s_JCS_2024;

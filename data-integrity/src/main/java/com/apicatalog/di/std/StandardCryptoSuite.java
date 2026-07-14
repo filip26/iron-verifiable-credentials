@@ -8,6 +8,7 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
+import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
@@ -35,7 +36,7 @@ public abstract class StandardCryptoSuite implements CryptoSuite {
     public DataIntegrityProof sign(
             String algorithm,
             AsymmetricSigner signer,
-            Function<String, MessageDigest> digestFactory,
+            Digestor.Factory digestFactory,
             DataIntegrityProof.Builder proofDraft,
             DigestiblePayload payload) throws SignatureException {
 

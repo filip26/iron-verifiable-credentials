@@ -3,19 +3,18 @@ package com.apicatalog.di.proof;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.SignatureException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
+import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.trust.model.SemanticModel;
@@ -69,16 +68,17 @@ public final class Ed25519Signature2020 implements Proof {
 
     public static Ed25519Signature2020 generateProof(
             AsymmetricSigner signer,
-            Function<String, MessageDigest> digestFactory,
+            Digestor.Factory digestFactory,
             Ed25519Signature2020.Draft proofDraft,
             DigestiblePayload payload) throws SignatureException {
 
         proofDraft.canonize();
 
-        var digestor = digestFactory.apply(HASH_ALGORITHM);
+        var digestor = digestFactory.newDigestor(HASH_ALGORITHM);
 
         var signature = ProofValue.generateSignature(
                 Ed25519Signature2020.SIGNATURE_ALGORITHM,
+                Ed25519Signature2020.HASH_ALGORITHM,
                 signer,
                 digestor,
                 proofDraft.get(),
@@ -319,12 +319,12 @@ public final class Ed25519Signature2020 implements Proof {
                 }
                 if (!PREDICATE_PROOF_VALUE.equals(statement[1])) { // TODO better
                     consumer.accept(
-                            statement[0],   // subject 
-                            statement[1],   // predicate
-                            statement[2],   // object
-                            statement[3],   // datatype
-                            statement[4],   // language
-                            statement[5],   // direction
+                            statement[0], // subject
+                            statement[1], // predicate
+                            statement[2], // object
+                            statement[3], // datatype
+                            statement[4], // language
+                            statement[5], // direction
                             null);
                 }
             }

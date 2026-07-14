@@ -34,7 +34,7 @@ public final class EdDSA2022 extends StandardCryptoSuite {
         return MLDSA_44_JCS_2024;
     }
 
-    public static CryptoSuite get(String c14n) {
+    public static CryptoSuite getInstance(String c14n) {
         return switch (c14n) {
         case DataModel.C14N_RDFC -> MLDSA_44_RDFC_2024;
         case DataModel.C14N_JCS -> MLDSA_44_JCS_2024;

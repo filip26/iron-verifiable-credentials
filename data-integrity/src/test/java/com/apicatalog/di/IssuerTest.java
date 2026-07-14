@@ -117,7 +117,7 @@ public class IssuerTest {
                 proof = suite.sign(
                         keyAlgorithm,
                         signer,
-                        Resources.DIGEST_FACTORY::get,
+                        Resources.DIGEST_FACTORY,
                         proofDraft,
                         processor.digestible());
             } else {
@@ -140,7 +140,7 @@ public class IssuerTest {
 
             proof = Ed25519Signature2020.generateProof(
                     signer,
-                    Resources.DIGEST_FACTORY::get,
+                    Resources.DIGEST_FACTORY,
                     proofDraft,
                     processor.digestible());
 

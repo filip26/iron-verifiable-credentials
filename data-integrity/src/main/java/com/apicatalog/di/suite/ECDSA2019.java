@@ -1,14 +1,13 @@
 package com.apicatalog.di.suite;
 
-import java.security.MessageDigest;
 import java.security.SignatureException;
-import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
+import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
@@ -68,21 +67,24 @@ public final class ECDSA2019 extends StandardCryptoSuite {
     }
 
     private static Signature generate(
-            String algorithm,
+            String signatureAlgorithm,
             AsymmetricSigner signer,
-            Function<String, MessageDigest> digestFactory,
+            Digestor.Factory digestFactory,
             DataIntegrityProof proof,
             DigestiblePayload payload)
             throws SignatureException {
 
-        var digestor = switch (algorithm) {
-        case P256 -> digestFactory.apply("SHA-256");
-        case P384 -> digestFactory.apply("SHA-384");
+        var digestAlgorithm = switch (signatureAlgorithm) {
+        case P256 -> Digestor.SHA_256;
+        case P384 -> Digestor.SHA_384;
         default -> throw new IllegalArgumentException();
         };
 
+        var digestor = digestFactory.newDigestor(digestAlgorithm);
+
         return ProofValue.generateSignature(
-                algorithm,
+                signatureAlgorithm,
+                digestAlgorithm,
                 signer,
                 digestor,
                 proof,
