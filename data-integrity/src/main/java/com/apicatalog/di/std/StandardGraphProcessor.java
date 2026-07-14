@@ -1,4 +1,4 @@
-package com.apicatalog.trust.processor;
+package com.apicatalog.di.std;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +11,7 @@ import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.GenericPayload;
+import com.apicatalog.trust.processor.GraphProcessor;
 
 public class StandardGraphProcessor implements GraphProcessor {
 

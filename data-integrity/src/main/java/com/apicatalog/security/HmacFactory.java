@@ -3,8 +3,8 @@ package com.apicatalog.security;
 import java.util.function.Function;
 
 @FunctionalInterface
-public interface DigestFactory {
+public interface HmacFactory {
 
-    Function<byte[], byte[]> newDigest(String algorithm);
+    Function<byte[], byte[]> newHmac(byte[] hmacKey);
 
 }

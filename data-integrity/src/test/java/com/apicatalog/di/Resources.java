@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.apicatalog.di.std.StandardGraphProcessor;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
@@ -30,7 +31,6 @@ import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.processor.StandardGraphProcessor;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.MapProofCursor;
 import com.fasterxml.jackson.core.JsonFactory;
