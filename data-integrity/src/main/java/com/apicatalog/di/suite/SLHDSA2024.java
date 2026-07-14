@@ -1,6 +1,5 @@
 package com.apicatalog.di.suite;
 
-import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
@@ -8,7 +7,6 @@ import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
-import com.apicatalog.trust.signature.SignatureGenerator;
 
 public final class SLHDSA2024 extends StandardCryptoSuite {
 
@@ -19,19 +17,16 @@ public final class SLHDSA2024 extends StandardCryptoSuite {
 
     private static SLHDSA2024 SLHDSA_128s_RDFC_2024 = new SLHDSA2024(
             "slhdsa128-rdfc-2024",
-            DataModel.C14N_RDFC,
-            ProofValueGenerator::generateWithSHA256);
+            DataModel.C14N_RDFC);
 
     private static SLHDSA2024 SLHDSA_128s_JCS_2024 = new SLHDSA2024(
             "slhdsa128-jcs-2024",
-            DataModel.C14N_JCS,
-            ProofValueGenerator::generateWithSHA256);
+            DataModel.C14N_JCS);
 
     private SLHDSA2024(
             String id,
-            String c14n,
-            SignatureGenerator<DataIntegrityProof> signatureGenerator) {
-        super(id, c14n, Multibase.BASE_64_URL, signatureGenerator);
+            String c14n) {
+        super(id, c14n, Multibase.BASE_64_URL, ProofValueGenerator::generateWithSHA256);
     }
 
     public static CryptoSuite get128s(String c14n) {
@@ -52,10 +47,6 @@ public final class SLHDSA2024 extends StandardCryptoSuite {
 
     protected Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
         return decode128s(signature, proof, payload);
-    }
-
-    public String encode(Signature signature) {
-        return Multibase.BASE_64_URL.encode(signature.toByteArray());
     }
 
     private static Signature decode128s(byte[] signature, Proof proof, PayloadProcessor payload) {

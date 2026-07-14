@@ -1,6 +1,5 @@
 package com.apicatalog.di.suite;
 
-import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
@@ -8,7 +7,6 @@ import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
-import com.apicatalog.trust.signature.SignatureGenerator;
 
 public final class EdDSA2022 extends StandardCryptoSuite {
 
@@ -17,16 +15,14 @@ public final class EdDSA2022 extends StandardCryptoSuite {
 
     private static final EdDSA2022 MLDSA_44_RDFC_2024 = new EdDSA2022(
             "eddsa-rdfc-2022",
-            DataModel.C14N_RDFC,
-            ProofValueGenerator::generateWithSHA256);
+            DataModel.C14N_RDFC);
 
     private static final EdDSA2022 MLDSA_44_JCS_2024 = new EdDSA2022(
             "eddsa-jcs-2022",
-            DataModel.C14N_JCS,
-            ProofValueGenerator::generateWithSHA256);
+            DataModel.C14N_JCS);
 
-    private EdDSA2022(String id, String c14n, SignatureGenerator<DataIntegrityProof> signatureGenerator) {
-        super(id, c14n, Multibase.BASE_58_BTC, signatureGenerator);
+    private EdDSA2022(String id, String c14n) {
+        super(id, c14n, Multibase.BASE_58_BTC, ProofValueGenerator::generateWithSHA256);
     }
 
     public static EdDSA2022 withRDFC() {

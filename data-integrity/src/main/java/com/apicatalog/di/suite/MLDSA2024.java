@@ -1,6 +1,5 @@
 package com.apicatalog.di.suite;
 
-import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.multibase.Multibase;
@@ -8,7 +7,6 @@ import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
-import com.apicatalog.trust.signature.SignatureGenerator;
 
 public final class MLDSA2024 extends StandardCryptoSuite {
 
@@ -18,19 +16,16 @@ public final class MLDSA2024 extends StandardCryptoSuite {
 
     private static MLDSA2024 MLDSA_44_RDFC_2024 = new MLDSA2024(
             "mldsa44-rdfc-2024",
-            DataModel.C14N_RDFC,
-            ProofValueGenerator::generateWithSHA256);
+            DataModel.C14N_RDFC);
 
     private static MLDSA2024 MLDSA_44_JCS_2024 = new MLDSA2024(
             "mldsa44-jcs-2024",
-            DataModel.C14N_JCS,
-            ProofValueGenerator::generateWithSHA256);
+            DataModel.C14N_JCS);
 
     private MLDSA2024(
             String id,
-            String c14n,
-            SignatureGenerator<DataIntegrityProof> signatureGenerator) {
-        super(id, c14n, Multibase.BASE_64_URL, signatureGenerator);
+            String c14n) {
+        super(id, c14n, Multibase.BASE_64_URL, ProofValueGenerator::generateWithSHA256);
     }
 
     public static MLDSA2024 get44(String c14n) {

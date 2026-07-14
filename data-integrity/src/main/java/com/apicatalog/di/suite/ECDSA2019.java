@@ -13,7 +13,6 @@ import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
-import com.apicatalog.trust.signature.SignatureGenerator;
 
 public final class ECDSA2019 extends StandardCryptoSuite {
 
@@ -22,16 +21,14 @@ public final class ECDSA2019 extends StandardCryptoSuite {
 
     private static final ECDSA2019 ECDSA_RDFC_2019 = new ECDSA2019(
             "ecdsa-rdfc-2019",
-            DataModel.C14N_RDFC,
-            ECDSA2019::generate);
+            DataModel.C14N_RDFC);
 
     private static final ECDSA2019 ECDSA_JCS_2019 = new ECDSA2019(
             "ecdsa-jcs-2019",
-            DataModel.C14N_JCS,
-            ECDSA2019::generate);
+            DataModel.C14N_JCS);
 
-    private ECDSA2019(String id, String c14n, SignatureGenerator<DataIntegrityProof> signatureGenerator) {
-        super(id, c14n, Multibase.BASE_58_BTC, signatureGenerator);
+    private ECDSA2019(String id, String c14n) {
+        super(id, c14n, Multibase.BASE_58_BTC, ECDSA2019::generate);
     }
 
     public static ECDSA2019 withRDFC() {
