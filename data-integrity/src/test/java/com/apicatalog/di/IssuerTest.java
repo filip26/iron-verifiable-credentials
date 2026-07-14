@@ -105,24 +105,20 @@ public class IssuerTest {
 
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
-            var proofDraft = DataIntegrityProof.newBuilder(
-                    options,
-                    IssuerTest::getCryptosuite);
+            var cryptosuite = getCryptosuite((String) options.get("cryptosuite"));
+
+            var proofDraft = cryptosuite.createProofDraft();
+            proofDraft.options(options);
 
             var processor = getProcessor(proofDraft.c14n()).apply(document);
 
             processor.withProofs(proofDraft.previous());
 
-            if (proofDraft.cryptosuite() instanceof StandardCryptoSuite suite) {
-                proof = suite.sign(
-                        keyAlgorithm,
-                        signer,
-                        Resources.DIGEST_FACTORY,
-                        proofDraft,
-                        processor.digestible());
-            } else {
-                fail();
-            }
+            proof = proofDraft.sign(
+                    keyAlgorithm,
+                    signer,
+                    Resources.DIGEST_FACTORY,
+                    processor.digestible());
 
             DataIntegrityProof.write((DataIntegrityProof) proof, composer);
 

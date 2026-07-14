@@ -5,7 +5,6 @@ import java.security.SignatureException;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.proof.DataIntegrityProof.Builder;
 import com.apicatalog.di.sd.SDBaseProofValue;
 import com.apicatalog.di.sd.SDDerivedProofValue;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
@@ -59,38 +58,8 @@ public final class ECDSASD2023 implements CryptoSuite {
         return INSTANCE;
     }
 
-    public DataIntegrityProof sign(
-            String algorithm,
-            AsymmetricSigner baseSigner,
-            byte[] proofPublicKey,
-            AsymmetricSigner proofSigner,
-            Function<String, MessageDigest> digestFactory,
-            Builder proofDraft,
-            RedactablePayload payload) throws SignatureException {
-
-        proofDraft.canonize(DataModel.C14N_RDFC);
-
-        var unsignedProof = proofDraft.snapshot();
-
-        var digestor = switch (algorithm) {
-        case P256 -> digestFactory.apply("SHA-256");
-        case P384 -> digestFactory.apply("SHA-384");
-        default -> throw new IllegalArgumentException();
-        };
-
-        var signature = SDBaseProofValue.generateSignature(
-                algorithm,
-                baseSigner,
-                proofPublicKey,
-                proofPublicKeyDecoder.apply(proofPublicKey),
-                proofSigner,
-                digestor,
-                unsignedProof,
-                payload);
-
-        proofDraft.build(signature);
-        return proofDraft.snapshot();
-
+    public ProofDraft createProofDraft() throws SignatureException {
+        return new ProofDraft(this);
     }
 
     @Override
@@ -131,6 +100,47 @@ public final class ECDSASD2023 implements CryptoSuite {
     @Override
     public String c14n() {
         return DataModel.C14N_RDFC;
+    }
+
+    public static class ProofDraft extends DataIntegrityProof.Draft {
+
+        final Function<byte[], Multicodec> proofPublicKeyDecoder;
+
+        public ProofDraft(ECDSASD2023 cryptosuite) {
+            super(cryptosuite);
+            this.proofPublicKeyDecoder = cryptosuite.proofPublicKeyDecoder;
+        }
+
+        public DataIntegrityProof sign(
+                String algorithm,
+                AsymmetricSigner baseSigner,
+                byte[] proofPublicKey,
+                AsymmetricSigner proofSigner,
+                Function<String, MessageDigest> digestFactory,
+                RedactablePayload payload) throws SignatureException {
+
+            canonize(DataModel.C14N_RDFC);
+
+            var unsignedProof = unsigned();
+
+            var digestor = switch (algorithm) {
+            case P256 -> digestFactory.apply("SHA-256");
+            case P384 -> digestFactory.apply("SHA-384");
+            default -> throw new IllegalArgumentException();
+            };
+
+            var signature = SDBaseProofValue.generateSignature(
+                    algorithm,
+                    baseSigner,
+                    proofPublicKey,
+                    proofPublicKeyDecoder.apply(proofPublicKey),
+                    proofSigner,
+                    digestor,
+                    unsignedProof,
+                    payload);
+
+            return signed(signature);
+        }
     }
 
     static SignatureAlgorithm getAlgorithm(int signatureLength) {

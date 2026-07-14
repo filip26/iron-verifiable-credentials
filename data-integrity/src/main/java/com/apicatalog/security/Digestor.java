@@ -14,6 +14,4 @@ public interface Digestor {
 
     byte[] digest(byte[] data);
 
-//    String getAlgorithm();
-
 }

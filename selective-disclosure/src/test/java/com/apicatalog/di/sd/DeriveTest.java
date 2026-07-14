@@ -1,6 +1,6 @@
 package com.apicatalog.di.sd;
 
-public class DeriveTest {
+class DeriveTest {
 
 //    static final DocumentReader READER = DocumentReader.with(new ECDSASD2023());
 //

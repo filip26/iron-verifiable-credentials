@@ -17,6 +17,7 @@ import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
+import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
@@ -240,7 +241,7 @@ public final class SDBaseProofValue implements BaseSignature {
     @Override
     public boolean verify(
             AsymmetricVerifier verifier,
-            Function<String, MessageDigest> digestFactory,
+            Digestor.Factory digestFactory,
             byte[] publicKey)
             throws InvalidKeyException, SignatureException {
         return verify(verifier, verifier, digestFactory, publicKey);
@@ -249,7 +250,7 @@ public final class SDBaseProofValue implements BaseSignature {
     public boolean verify(
             AsymmetricVerifier baseVerifier,
             AsymmetricVerifier proofVerifier,
-            Function<String, MessageDigest> digestFactory,
+            Digestor.Factory digestFactory,
             byte[] publicKey)
             throws InvalidKeyException, SignatureException {
 
@@ -257,7 +258,7 @@ public final class SDBaseProofValue implements BaseSignature {
             return false;
         }
 
-        var digestor = digestFactory.apply(digestAlgorithm);
+        var digestor = digestFactory.newDigestor(digestAlgorithm);
 
         var proofDigest = digestor.digest(proof.canonicalPayload());
         var dataDigest = digestor.digest(payload.canonicalPayload());

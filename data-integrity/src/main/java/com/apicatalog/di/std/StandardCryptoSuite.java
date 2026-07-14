@@ -1,8 +1,6 @@
 package com.apicatalog.di.std;
 
-import java.security.MessageDigest;
 import java.security.SignatureException;
-import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.CryptoSuite;
@@ -33,25 +31,8 @@ public abstract class StandardCryptoSuite implements CryptoSuite {
         this.signatureGenerator = signatureGenerator;
     }
 
-    public DataIntegrityProof sign(
-            String algorithm,
-            AsymmetricSigner signer,
-            Digestor.Factory digestFactory,
-            DataIntegrityProof.Builder proofDraft,
-            DigestiblePayload payload) throws SignatureException {
-
-        proofDraft.canonize(c14n);
-
-        var unsigned = proofDraft.snapshot();
-
-        var signature = signatureGenerator.generate(
-                algorithm,
-                signer,
-                digestFactory,
-                unsigned,
-                payload);
-
-        return proofDraft.build(signature);
+    public ProofDraft createProofDraft() throws SignatureException {
+        return new ProofDraft(this);
     }
 
     @Override
@@ -75,4 +56,33 @@ public abstract class StandardCryptoSuite implements CryptoSuite {
         return c14n;
     }
 
+    public static class ProofDraft extends DataIntegrityProof.Draft {
+
+        final SignatureGenerator<DataIntegrityProof> signatureGenerator;
+
+        public ProofDraft(StandardCryptoSuite cryptosuite) {
+            super(cryptosuite);
+            this.signatureGenerator = cryptosuite.signatureGenerator;
+        }
+
+        public DataIntegrityProof sign(
+                String algorithm,
+                AsymmetricSigner signer,
+                Digestor.Factory digestFactory,
+                DigestiblePayload payload) throws SignatureException {
+
+            canonize(proof.cryptosuite().c14n());
+
+            var unsigned = unsigned();
+
+            var signature = signatureGenerator.generate(
+                    algorithm,
+                    signer,
+                    digestFactory,
+                    unsigned,
+                    payload);
+
+            return signed(signature);
+        }
+    }
 }

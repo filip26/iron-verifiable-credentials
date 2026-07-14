@@ -82,9 +82,10 @@ public class IssuerTest {
 
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
-            var proofDraft = DataIntegrityProof.newBuilder(
-                    options,
-                    IssuerTest::getCryptoSuite);
+            var cryptosuite = getCryptoSuite((String) options.get("cryptosuite"));
+
+            var proofDraft = cryptosuite.createProofDraft();
+            proofDraft.options(options);
 
             var processor = Resources.MODEL.createProcessor(document);
 
@@ -92,13 +93,12 @@ public class IssuerTest {
 
             if (proofDraft.cryptosuite() instanceof ECDSASD2023 suite) {
 
-                proof = suite.sign(
+                proof = proofDraft.sign(
                         keyAlgorithm,
                         baseSigner,
                         keys.proofPublicKey(),
                         proofSigner,
                         Resources.DIGEST_FACTORY::get,
-                        proofDraft,
                         processor.redactable(
                                 (Collection<String>) options.get("mandatoryPointers"), // TODO separate it from draft
                                 Map.of("HMAC_KEY", keys.hmacKey())));
@@ -144,7 +144,7 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
-    public static CryptoSuite getCryptoSuite(String id) {
+    public static ECDSASD2023 getCryptoSuite(String id) {
 
         return switch (id) {
         case "ecdsa-sd-2023" -> ECDSASD2023.getInstance();

@@ -15,6 +15,7 @@ import java.util.function.Function;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricVerifier;
+import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
@@ -152,10 +153,10 @@ public final class SDDerivedProofValue implements DerivedSignature {
     @Override
     public boolean verify(
             AsymmetricVerifier verifier,
-            Function<String, MessageDigest> digestFactory,
+            Digestor.Factory digestFactory,
             byte[] publicKey) throws InvalidKeyException, SignatureException {
 
-        var digestor = digestFactory.apply(digestAlgorithm);
+        var digestor = digestFactory.newDigestor(digestAlgorithm);
         
       final byte[] proofHash = digestor.digest(proof.canonicalPayload());
 //

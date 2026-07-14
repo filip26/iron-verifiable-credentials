@@ -123,67 +123,6 @@ public final class DataIntegrityProof implements Proof {
         }
     }
 
-    public static Builder newDraft(CryptoSuite cryptosuite) {
-        var di = new DataIntegrityProof();
-        di.cryptosuite = cryptosuite;
-        return new Builder(di);
-    }
-
-    public static Builder newBuilder(Map<String, Object> options, Function<String, CryptoSuite> suiteProvider) {
-
-        var cryptosuite = (String) options.get("cryptosuite");
-
-        var di = new DataIntegrityProof();
-        di.cryptosuite = suiteProvider.apply(cryptosuite);
-        var draft = new Builder(di);
-        draft.previousProof(Set.of());
-
-        for (var entry : options.entrySet()) {
-            switch (entry.getKey()) {
-            case "@context":
-                if (entry.getValue() instanceof Collection<?> col) {
-                    draft.context(col.stream().map(String.class::cast).toList());
-
-                } else if (entry.getValue() instanceof String uri) {
-                    draft.context(List.of(uri));
-
-                } else {
-                    throw new IllegalArgumentException();
-                }
-                break;
-            case KEY_ID:
-                draft.id((String) entry.getValue());
-                break;
-            case KEY_CREATED:
-                draft.created(Instant.parse((String) entry.getValue()));
-                break;
-            case KEY_EXPIRES:
-                draft.expires(Instant.parse((String) entry.getValue()));
-                break;
-            case KEY_PURPOSE:
-                draft.purpose((String) entry.getValue());
-                break;
-            case KEY_VERIFICATION_METHOD:
-                draft.verificationMethod((String) entry.getValue());
-                break;
-            case KEY_PREVIOUS_PROOF:
-                if (entry.getValue() instanceof Collection<?> col) {
-                    draft.previousProof(col.stream().map(String.class::cast).toList());
-
-                } else if (entry.getValue() instanceof String uri) {
-                    draft.previousProof(List.of(uri));
-
-                } else {
-                    throw new IllegalArgumentException();
-                }
-
-                break;
-            }
-        }
-
-        return draft;
-    }
-
     public String id() {
         return id;
     }
@@ -607,19 +546,20 @@ public final class DataIntegrityProof implements Proof {
         return out.toByteArray();
     }
 
-    public static final class Builder {
+    public static class Draft {
 
-        private final DataIntegrityProof proof;
+        protected final DataIntegrityProof proof;
 
-        private Builder(DataIntegrityProof proof) {
-            this.proof = proof;
+        protected Draft(CryptoSuite cryptosuite) {
+            this.proof = new DataIntegrityProof();
+            this.proof.cryptosuite = cryptosuite;
         }
 
-        public byte[] canonize(String c14n) {
+        protected byte[] canonize(String c14n) {
             return canonize(DataIntegrityProof.getSignTemplate(c14n));
         }
 
-        public byte[] canonize(Function<DataIntegrityProof, byte[]> canonizer) {
+        protected byte[] canonize(Function<DataIntegrityProof, byte[]> canonizer) {
 
             Objects.requireNonNull(canonizer);
 
@@ -627,60 +567,110 @@ public final class DataIntegrityProof implements Proof {
             return proof.canonicalPayload;
         }
 
-        public DataIntegrityProof snapshot() {
-            return proof;
+        // TODO ?!?!
+        public Draft options(Map<String, Object> options) {
+
+            previousProof(Set.of());
+
+            for (var entry : options.entrySet()) {
+                switch (entry.getKey()) {
+                case "@context":
+                    if (entry.getValue() instanceof Collection<?> col) {
+                        context(col.stream().map(String.class::cast).toList());
+
+                    } else if (entry.getValue() instanceof String uri) {
+                        context(List.of(uri));
+
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                    break;
+                case KEY_ID:
+                    id((String) entry.getValue());
+                    break;
+                case KEY_CREATED:
+                    created(Instant.parse((String) entry.getValue()));
+                    break;
+                case KEY_EXPIRES:
+                    expires(Instant.parse((String) entry.getValue()));
+                    break;
+                case KEY_PURPOSE:
+                    purpose((String) entry.getValue());
+                    break;
+                case KEY_VERIFICATION_METHOD:
+                    verificationMethod((String) entry.getValue());
+                    break;
+                case KEY_PREVIOUS_PROOF:
+                    if (entry.getValue() instanceof Collection<?> col) {
+                        previousProof(col.stream().map(String.class::cast).toList());
+
+                    } else if (entry.getValue() instanceof String uri) {
+                        previousProof(List.of(uri));
+
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+
+                    break;
+                }
+            }
+            return this;
         }
 
-        public Builder created(Instant created) {
+        public Draft created(Instant created) {
             proof.created = created != null
                     ? created.truncatedTo(ChronoUnit.SECONDS)
                     : null;
             return this;
         }
 
-        public Builder expires(Instant expires) {
+        public Draft expires(Instant expires) {
             proof.expires = expires != null
                     ? expires.truncatedTo(ChronoUnit.SECONDS)
                     : null;
             return this;
         }
 
-        public Builder purpose(String purpose) {
+        public Draft purpose(String purpose) {
             proof.purpose = purpose;
             return this;
         }
 
-        public Builder verificationMethod(String verificationMethod) {
+        public Draft verificationMethod(String verificationMethod) {
             proof.verificationMethod = verificationMethod;
             return this;
         }
 
-        public Builder id(String id) {
+        public Draft id(String id) {
             proof.id = id;
             return this;
         }
 
-        public Builder challenge(String challenge) {
+        public Draft challenge(String challenge) {
             proof.challenge = challenge;
             return this;
         }
 
-        public Builder nonce(String nonce) {
+        public Draft nonce(String nonce) {
             proof.nonce = nonce;
             return this;
         }
 
-        public Builder previousProof(Collection<String> previousProof) {
+        public Draft previousProof(Collection<String> previousProof) {
             proof.previousProof = previousProof;
             return this;
         }
 
-        public DataIntegrityProof build(Signature signature) {
+        public DataIntegrityProof unsigned() {
+            return proof;
+        }
+
+        protected DataIntegrityProof signed(Signature signature) {
             proof.signature = signature;
             return proof;
         }
 
-        public Builder context(Collection<String> context) {
+        public Draft context(Collection<String> context) {
             proof.context = context;
             return this;
         }
