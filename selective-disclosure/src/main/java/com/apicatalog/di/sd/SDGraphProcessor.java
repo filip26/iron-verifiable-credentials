@@ -9,14 +9,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.payload.DerivedPayload;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.processor.GraphProcessor;
 
 public class SDGraphProcessor implements GraphProcessor {
@@ -69,10 +66,7 @@ public class SDGraphProcessor implements GraphProcessor {
 
     }
 
-    @Override
-    public RedactablePayload redactable(Collection<String> mandatoryPointers, Map<String, Object> options) {
-
-        var hmacKey = (byte[]) options.get("HMAC_KEY"); // FIXME
+    public BaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
 
         lazyInit();
 
@@ -148,7 +142,7 @@ public class SDGraphProcessor implements GraphProcessor {
         var mandatory = new int[selectedNQuads.size()];
         int mandatoryIndex = 0;
 
-        var optional = new ArrayList<Entry<Integer, byte[]>>(canonized.size() - mandatory.length);
+        var optional = new ArrayList<byte[]>(canonized.size() - mandatory.length);
         var baseWriter = new StringWriter(mandatory.length * 256);
 
         for (var nquad : canonized) {
@@ -157,7 +151,7 @@ public class SDGraphProcessor implements GraphProcessor {
                 mandatory[mandatoryIndex++] = index;
                 baseWriter.write(nquad);
             } else {
-                optional.add(Map.entry(index, nquad.getBytes(StandardCharsets.UTF_8)));
+                optional.add(nquad.getBytes(StandardCharsets.UTF_8));
             }
             index++;
         }
@@ -174,12 +168,8 @@ public class SDGraphProcessor implements GraphProcessor {
         return base;
     }
 
-    @Override
-    public DerivedPayload derived(Map<String, Object> options) {
-     
-        var labels = (Map<Integer, byte[]>)options.get("LABELS");
-        var indices = (int[])options.get("INDICES");
-        
+    public DerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
+
         lazyInit();
 
         var expanded = expandedDocument;
@@ -250,7 +240,6 @@ public class SDGraphProcessor implements GraphProcessor {
         IO.println("optional > ");
         nonMandatory.stream().map(String::new).forEach(IO::print);
 
-        
         var derived = new DerivedDocument();
         derived.base = mandatory.toString().getBytes(StandardCharsets.UTF_8);
         derived.disclosed = nonMandatory;
@@ -336,10 +325,10 @@ public class SDGraphProcessor implements GraphProcessor {
         }
     }
 
-    public static class BaseDocument implements RedactablePayload, PayloadWithHmac {
+    public static class BaseDocument implements SDPayload {
 
         byte[] base;
-        Collection<Entry<Integer, byte[]>> redactable;
+        Collection<byte[]> redactable;
         Collection<String> pointers;
         byte[] hmacKey;
 
@@ -349,40 +338,26 @@ public class SDGraphProcessor implements GraphProcessor {
         }
 
         @Override
-        public void digest(String algorithm, byte[] value) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public byte[] digest(String algorithm) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public Collection<String> digestAlgorithms() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public Collection<Entry<Integer, byte[]>> redactablePayload() {
+        public Collection<byte[]> redactablePayload() {
             return redactable;
         }
 
-        @Override
         public Collection<String> pointers() {
             return pointers;
         }
 
-        @Override
         public byte[] hmacKey() {
             return hmacKey;
         }
+
+        @Override
+        public String c14n() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 
-    public static class DerivedDocument implements DerivedPayload {
+    public static class DerivedDocument implements SDPayload {
 
         byte[] base;
         Collection<byte[]> disclosed;
@@ -393,26 +368,14 @@ public class SDGraphProcessor implements GraphProcessor {
         }
 
         @Override
-        public void digest(String algorithm, byte[] value) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public byte[] digest(String algorithm) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public Collection<String> digestAlgorithms() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public Collection<byte[]> disclosedPayload() {
+        public Collection<byte[]> redactablePayload() {
             return disclosed;
+        }
+
+        @Override
+        public String c14n() {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     }

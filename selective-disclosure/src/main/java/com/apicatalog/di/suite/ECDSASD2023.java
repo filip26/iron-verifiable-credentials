@@ -7,6 +7,7 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.sd.SDBaseProofValue;
 import com.apicatalog.di.sd.SDDerivedProofValue;
 import com.apicatalog.di.sd.SDGraphProcessor;
+import com.apicatalog.di.sd.SDGraphProcessor.BaseDocument;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
@@ -14,7 +15,6 @@ import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
@@ -64,29 +64,34 @@ public final class ECDSASD2023 implements CryptoSuite {
     }
 
     @Override
-    public Signature decode(String value, Proof proof, PayloadProcessor data) {
+    public Signature decode(String value, Proof proof, PayloadProcessor processor) {
 
-        var signature = Multibase.BASE_64_URL.decode(value);
+        if (processor instanceof SDGraphProcessor graphProcessor) {
 
-        if (SDBaseProofValue.isAccepted(signature)) {
-            return SDBaseProofValue.decode(
-                    signature,
-                    ECDSASD2023::getAlgorithm,
-                    proofPublicKeyDecoder,
-                    proof,
-                    data);
+            var signature = Multibase.BASE_64_URL.decode(value);
+
+            if (SDBaseProofValue.isAccepted(signature)) {
+                return SDBaseProofValue.decode(
+                        signature,
+                        ECDSASD2023::getAlgorithm,
+                        proofPublicKeyDecoder,
+                        proof,
+                        graphProcessor);
+            }
+
+            if (SDDerivedProofValue.isAccepted(signature)) {
+                return SDDerivedProofValue.decode(
+                        signature,
+                        ECDSASD2023::getAlgorithm,
+                        proofPublicKeyDecoder,
+                        proof,
+                        graphProcessor);
+            }
+
+            throw new IllegalArgumentException();
+
         }
-        
-        if (SDDerivedProofValue.isAccepted(signature)) {
-            return SDDerivedProofValue.decode(
-                    signature,
-                    ECDSASD2023::getAlgorithm,
-                    proofPublicKeyDecoder,
-                    proof,
-                    (SDGraphProcessor)data);
-        }
-
-        throw new IllegalArgumentException();
+        throw new IllegalStateException("Unsupported payload processor, " + processor);
     }
 
     @Override
@@ -119,7 +124,7 @@ public final class ECDSASD2023 implements CryptoSuite {
                 byte[] proofPublicKey,
                 AsymmetricSigner proofSigner,
                 Digestor.Factory digestFactory,
-                RedactablePayload payload) throws SignatureException {
+                BaseDocument payload) throws SignatureException {
 
             canonize(DataModel.C14N_RDFC);
 

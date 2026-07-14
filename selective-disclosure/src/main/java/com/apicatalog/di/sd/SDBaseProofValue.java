@@ -3,23 +3,18 @@ package com.apicatalog.di.sd;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.sd.SDGraphProcessor.BaseDocument;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.RedactablePayload;
-import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.BaseSignature;
 import com.apicatalog.trust.signature.Signature;
@@ -30,29 +25,14 @@ import co.nstant.in.cbor.CborEncoder;
 import co.nstant.in.cbor.CborException;
 import co.nstant.in.cbor.builder.ArrayBuilder;
 import co.nstant.in.cbor.model.Array;
-import co.nstant.in.cbor.model.ByteString;
-import co.nstant.in.cbor.model.DataItem;
-import co.nstant.in.cbor.model.MajorType;
-import co.nstant.in.cbor.model.UnicodeString;
 
-public final class SDBaseProofValue implements BaseSignature {
+public final class SDBaseProofValue extends SDProofValue implements BaseSignature {
 
     private static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x00 };
 
-    private String signatureAlgorithm;
-    private String digestAlgorithm;
-
-    private Proof proof;
-    private RedactablePayload payload;
-
-    private byte[] baseSignature;
-    private byte[] proofPublicKey;
     private byte[] hmacKey;
 
-    private Collection<byte[]> signatures;
     private Collection<String> mandatoryPointers;
-
-    private Multicodec proofPublicKeyCodec;
 
     public static boolean isAccepted(byte[] signature) {
         return signature.length > 2
@@ -66,7 +46,7 @@ public final class SDBaseProofValue implements BaseSignature {
             Function<Integer, SignatureAlgorithm> algorithmProvider,
             Function<byte[], Multicodec> proofPublicKeyDecoder,
             Proof proof,
-            PayloadProcessor processor) {
+            SDGraphProcessor processor) {
 
         Objects.requireNonNull(signature);
 
@@ -145,7 +125,7 @@ public final class SDBaseProofValue implements BaseSignature {
 
             proofValue.payload = processor.redactable(
                     proofValue.mandatoryPointers,
-                    Map.of("HMAC_KEY", proofValue.hmacKey));
+                    proofValue.hmacKey);
 
             return proofValue;
 
@@ -164,7 +144,7 @@ public final class SDBaseProofValue implements BaseSignature {
             AsymmetricSigner proofSigner,
             Digestor digestor,
             DataIntegrityProof unsignedProof,
-            RedactablePayload payload) throws SignatureException {
+            BaseDocument payload) throws SignatureException {
 
         var proofDigest = digestor.digest(unsignedProof.canonicalPayload());
         var dataDigest = digestor.digest(payload.canonicalPayload());
@@ -180,7 +160,7 @@ public final class SDBaseProofValue implements BaseSignature {
         proofValue.digestAlgorithm = digestAlgorithm;
 
         proofValue.baseSignature = baseSigner.sign(digest);
-        proofValue.hmacKey = ((PayloadWithHmac) payload).hmacKey();
+        proofValue.hmacKey = payload.hmacKey();
         proofValue.proofPublicKey = proofPublicKey;
         proofValue.proofPublicKeyCodec = proofPublicKeyCodec;
         proofValue.mandatoryPointers = payload.pointers();
@@ -190,7 +170,7 @@ public final class SDBaseProofValue implements BaseSignature {
             proofValue.signatures = new ArrayList<byte[]>(payload.redactablePayload().size());
 
             for (var optional : payload.redactablePayload()) {
-                proofValue.signatures.add(proofSigner.sign(optional.getValue()));
+                proofValue.signatures.add(proofSigner.sign(optional));
             }
         }
 
@@ -239,113 +219,13 @@ public final class SDBaseProofValue implements BaseSignature {
     }
 
     @Override
-    public boolean verify(
-            AsymmetricVerifier verifier,
-            Digestor.Factory digestFactory,
-            byte[] publicKey)
-            throws InvalidKeyException, SignatureException {
-        return verify(verifier, verifier, digestFactory, publicKey);
-    }
-
-    public boolean verify(
-            AsymmetricVerifier baseVerifier,
-            AsymmetricVerifier proofVerifier,
-            Digestor.Factory digestFactory,
-            byte[] publicKey)
-            throws InvalidKeyException, SignatureException {
-
-        if (signatures.size() != payload.redactablePayload().size()) {
-            return false;
-        }
-
-        var digestor = digestFactory.newDigestor(digestAlgorithm);
-
-        var proofDigest = digestor.digest(proof.canonicalPayload());
-        var mandatoryDigest = digestor.digest(payload.canonicalPayload());
-
-        var baseDigest = hash(
-                proofDigest,
-                proofPublicKey,
-                mandatoryDigest);
-
-        var isBaseSignatureVerified = baseVerifier.verify(publicKey, baseDigest, baseSignature);
-
-        if (!isBaseSignatureVerified) {
-            return false;
-        }
-
-        var decodedProofPublicKey = proofPublicKeyCodec.decode(proofPublicKey);
-
-        var redactableIterator = payload.redactablePayload().iterator();
-
-        for (var signature : signatures) {
-
-            var redactable = redactableIterator.next();
-
-            if (!proofVerifier.verify(decodedProofPublicKey, redactable.getValue(), signature)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public Proof proof() {
-        return proof;
-    }
-
-    @Override
     public byte[] toByteArray() {
         return toByteArray(baseSignature, proofPublicKey, hmacKey, signatures, mandatoryPointers);
     }
 
     @Override
-    public String algorithm() {
-        return signatureAlgorithm;
-    }
-
-    static byte[] byteArray(DataItem item) {
-        if (!MajorType.BYTE_STRING.equals(item.getMajorType())) {
-//      throw new DocumentError(ErrorType.Invalid, "ProofValue");
-        }
-        return ((ByteString) item).getBytes();
-    }
-
-    static String string(DataItem item) {
-        if (!MajorType.UNICODE_STRING.equals(item.getMajorType())) {
-//      throw new DocumentError(ErrorType.Invalid, "ProofValue");
-        }
-        return ((UnicodeString) item).getString();
-    }
-
-    static final byte[] hash(
-            final byte[] proofHash,
-            final byte[] proofPublicKey,
-            byte[] mandatoryHash) {
-
-        final byte[] hash = new byte[proofHash.length
-                + proofPublicKey.length
-                + mandatoryHash.length];
-
-        System.arraycopy(proofHash, 0, hash, 0, proofHash.length);
-        System.arraycopy(proofPublicKey, 0, hash, proofHash.length, proofPublicKey.length);
-        System.arraycopy(mandatoryHash, 0, hash, proofHash.length + proofPublicKey.length, mandatoryHash.length);
-        return hash;
-    }
-
-    @Override
-    public DigestiblePayload payload() {
-        return payload;
-    }
-
-    @Override
     public Collection<String> mandatoryPointers() {
         return mandatoryPointers;
-    }
-
-    public byte[] proofPublicKey() {
-        return proofPublicKey;
     }
 
     public byte[] hmacKey() {

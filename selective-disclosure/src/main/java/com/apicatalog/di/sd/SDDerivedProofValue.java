@@ -16,9 +16,7 @@ import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.payload.DerivedPayload;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.DerivedSignature;
 
@@ -36,7 +34,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
     private String signatureAlgorithm;
     private String digestAlgorithm;
 
-    private DerivedPayload payload;
+    private SDPayload payload;
     private Proof proof;
 
     private byte[] baseSignature;
@@ -144,9 +142,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
                 proofValue.indices[i] = toUInt(item);
             }
 
-            proofValue.payload = processor.derived(Map.of(
-                    "LABELS", proofValue.labels,
-                    "INDICES", proofValue.indices));
+            proofValue.payload = processor.derived(proofValue.labels, proofValue.indices);
 
             return proofValue;
 
@@ -162,28 +158,20 @@ public final class SDDerivedProofValue implements DerivedSignature {
             Digestor.Factory digestFactory,
             byte[] publicKey) throws InvalidKeyException, SignatureException {
 
+        if (signatures.size() != payload.redactablePayload().size()) {
+//          throw new VerificationError(VerificationErrorCode.InvalidSignature);
+            throw new SignatureException();
+        }
+
 //        IO.println(expanded);
         IO.println(labels);
         IO.println(Arrays.toString(indices));
 
         var digestor = digestFactory.newDigestor(digestAlgorithm);
-
-        final byte[] proofHash = digestor.digest(proof.canonicalPayload());
 //
-//      // unsignedProof.context()
-//
-//      final byte[] mandatoryHash = signer.hash(verifyData.mandatory);
-// final byte[] mandatoryHash = digestor.digest(payload.mandatory);
         var proofDigest = digestor.digest(proof.canonicalPayload());
         var mandatoryDigest = digestor.digest(payload.canonicalPayload());
 
-        if (signatures.size() != payload.disclosedPayload().size()) {
-//          throw new VerificationError(VerificationErrorCode.InvalidSignature);
-            throw new SignatureException();
-        }
-
-        //
-//      final byte[] signature = SDProofValue.hash(proofHash, proofPublicKey, mandatoryHash);
 
         var baseDigest = SDBaseProofValue.hash(
                 proofDigest,
@@ -195,14 +183,20 @@ public final class SDDerivedProofValue implements DerivedSignature {
         if (!isBaseSignatureVerified) {
             return false;
         }
-//
-//      final byte[] decodedProofPublicKey = ECDSASD2023.CODECS.decode(proofPublicKey);
-//
-//      int i = 0;
-//      for (byte[] sig : signatures) {
-//          signer.verify(decodedProofPublicKey, sig, (verifyData.nonMandatory.get(i).toString() + '\n').getBytes(StandardCharsets.UTF_8));
-//          i++;
-//      }
+        
+        var decodedProofPublicKey = proofPublicKeyCodec.decode(proofPublicKey);
+
+        var redactableIterator = payload.redactablePayload().iterator();
+
+        for (var signature : signatures) {
+
+            var redactable = redactableIterator.next();
+
+            if (!verifier.verify(decodedProofPublicKey, redactable, signature)) {
+                return false;
+            }
+        }
+
         // all good
         return true;
     }
@@ -214,7 +208,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
 
     @Override
     public DigestiblePayload payload() {
-        return payload;
+        return null;    //FIXME
     }
 
     @Override

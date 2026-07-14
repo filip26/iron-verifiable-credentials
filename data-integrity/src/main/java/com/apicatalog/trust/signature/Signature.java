@@ -5,7 +5,7 @@ import java.security.SignatureException;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.trust.payload.CanonicalPayload;
 import com.apicatalog.trust.proof.Proof;
 
 public interface Signature {
@@ -29,7 +29,7 @@ public interface Signature {
 
     String algorithm();
 
-    DigestiblePayload payload();
+    CanonicalPayload payload();
 
     Proof proof();
 

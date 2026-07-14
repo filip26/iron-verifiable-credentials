@@ -18,7 +18,6 @@ import com.apicatalog.crypto.bc.BCECDSASigner;
 import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.crypto.bc.BCSLHDSASigner;
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.di.suite.MLDSA2024;
@@ -91,21 +90,15 @@ public class IssuerTest {
 
             processor.withProofs(proofDraft.previous());
 
-            if (proofDraft.cryptosuite() instanceof ECDSASD2023 suite) {
-
-                proof = proofDraft.sign(
-                        keyAlgorithm,
-                        baseSigner,
-                        keys.proofPublicKey(),
-                        proofSigner,
-                        Resources.DIGEST_FACTORY,
-                        processor.redactable(
-                                (Collection<String>) options.get("mandatoryPointers"), // TODO separate it from draft
-                                Map.of("HMAC_KEY", keys.hmacKey())));
-
-            } else {
-                fail();
-            }
+            proof = proofDraft.sign(
+                    keyAlgorithm,
+                    baseSigner,
+                    keys.proofPublicKey(),
+                    proofSigner,
+                    Resources.DIGEST_FACTORY,
+                    ((SDGraphProcessor) processor).redactable(
+                            (Collection<String>) options.get("mandatoryPointers"),
+                            keys.hmacKey()));
 
             DataIntegrityProof.write(proof, composer);
 
