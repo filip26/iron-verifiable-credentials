@@ -1,5 +1,9 @@
 package com.apicatalog.di.sd.legacy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
 public class ECDSASDBaseProofValue
 //implements BaseProofValue
 
@@ -255,4 +259,31 @@ public class ECDSASDBaseProofValue
 //        }
 //        return filtered;
 //    }
+
+    protected static int[] mandatory(int[] combined, int[] mandatory) {
+
+        final Collection<Integer> indices = new ArrayList<>();
+
+        int relative = 0;
+        
+        Arrays.sort(mandatory);
+
+        for (int index : combined) {
+            if (Arrays.binarySearch(mandatory, index) >= 0) {
+                IO.println("i > " + relative + ", " + index);
+                indices.add(relative);
+            }
+            relative++;
+        }
+        return indices.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    public static void main(String[] args) {
+
+        var c = new int[] { 0, 1, 2, 9, 12, 13, 16, 17, 18, 19 };
+        var m = new int[] { 0, 12, 13, 17 };
+        
+        IO.println(Arrays.toString(mandatory( c, m)));
+
+    }
 }

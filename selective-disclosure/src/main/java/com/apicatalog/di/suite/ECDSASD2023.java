@@ -4,10 +4,11 @@ import java.security.SignatureException;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.sd.SDBaseDocument;
 import com.apicatalog.di.sd.SDBaseProofValue;
+import com.apicatalog.di.sd.SDDerivedDocument;
 import com.apicatalog.di.sd.SDDerivedProofValue;
 import com.apicatalog.di.sd.SDGraphProcessor;
-import com.apicatalog.di.sd.SDGraphProcessor.BaseDocument;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
@@ -124,17 +125,17 @@ public final class ECDSASD2023 implements CryptoSuite {
                 byte[] proofPublicKey,
                 AsymmetricSigner proofSigner,
                 Digestor.Factory digestFactory,
-                BaseDocument payload) throws SignatureException {
-
-            canonize(DataModel.C14N_RDFC);
-
-            var unsignedProof = unsigned();
+                SDBaseDocument payload) throws SignatureException {
 
             var digestAlgorithm = switch (algorithm) {
             case P256 -> Digestor.SHA_256;
             case P384 -> Digestor.SHA_384;
             default -> throw new IllegalArgumentException();
             };
+
+            canonize(DataModel.C14N_RDFC);
+
+            var unsignedProof = unsigned();
 
             var signature = SDBaseProofValue.generateSignature(
                     algorithm,

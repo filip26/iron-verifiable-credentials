@@ -12,13 +12,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
+import com.apicatalog.di.sd.signature.DerivedSignature;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.signature.DerivedSignature;
 
 import co.nstant.in.cbor.CborDecoder;
 import co.nstant.in.cbor.CborException;
@@ -43,12 +44,12 @@ public final class SDDerivedProofValue implements DerivedSignature {
     private Multicodec proofPublicKeyCodec;
 
     private Collection<byte[]> signatures;
-    private Map<Integer, byte[]> labels;
-    private int[] indices;
+//    private Map<Integer, byte[]> labels;
+//    private int[] indices;
 
-    private SDDerivedProofValue() {
-        // TODO Auto-generated constructor stub
-    }
+//    private SDDerivedProofValue() {
+//        // TODO Auto-generated constructor stub
+//    }
 
     public static boolean isAccepted(byte[] signature) {
         return signature.length > 2
@@ -124,10 +125,10 @@ public final class SDDerivedProofValue implements DerivedSignature {
 
             final co.nstant.in.cbor.model.Map labels = (co.nstant.in.cbor.model.Map) top.getDataItems().get(3);
 
-            proofValue.labels = new LinkedHashMap<>(labels.getKeys().size());
+            var labelMap = new LinkedHashMap<Integer, byte[]>(labels.getKeys().size());
 
-            for (final DataItem key : labels.getKeys()) {
-                proofValue.labels.put(toUInt(key), SDBaseProofValue.byteArray(labels.get(key)));
+            for (final var key : labels.getKeys()) {
+                labelMap.put(toUInt(key), SDBaseProofValue.byteArray(labels.get(key)));
             }
 
             // indices
@@ -135,14 +136,14 @@ public final class SDDerivedProofValue implements DerivedSignature {
 //                throw new DocumentError(ErrorType.Invalid, "ProofValue");
             }
 
-            proofValue.indices = new int[(((Array) top.getDataItems().get(4)).getDataItems().size())];
+            var indices = new int[(((Array) top.getDataItems().get(4)).getDataItems().size())];
 
-            for (int i = 0; i < proofValue.indices.length; i++) {
+            for (int i = 0; i < indices.length; i++) {
                 final DataItem item = ((Array) top.getDataItems().get(4)).getDataItems().get(i);
-                proofValue.indices[i] = toUInt(item);
+                indices[i] = toUInt(item);
             }
 
-            proofValue.payload = processor.derived(proofValue.labels, proofValue.indices);
+            proofValue.payload = processor.derived(labelMap, indices);
 
             return proofValue;
 
@@ -164,8 +165,8 @@ public final class SDDerivedProofValue implements DerivedSignature {
         }
 
 //        IO.println(expanded);
-        IO.println(labels);
-        IO.println(Arrays.toString(indices));
+//        IO.println(labels);
+//        IO.println(Arrays.toString(indices));
 
         var digestor = digestFactory.newDigestor(digestAlgorithm);
 //
@@ -229,6 +230,50 @@ public final class SDDerivedProofValue implements DerivedSignature {
         }
 
         return ((UnsignedInteger) item).getValue().intValueExact();
+    }
+
+    public static SDDerivedProofValue generate(SDBaseProofValue base, SDDerivedDocument document) {
+        
+        var signature = new SDDerivedProofValue();
+        signature.baseSignature = base.baseSignature;
+        signature.digestAlgorithm = base.digestAlgorithm;
+        signature.payload = document;
+        signature.proofPublicKey = base.proofPublicKey;
+        signature.proofPublicKeyCodec = base.proofPublicKeyCodec;
+        signature.signatureAlgorithm = base.signatureAlgorithm;
+        
+        
+        signature.signatures = new ArrayList<byte[]>(document.redactablePayload().size());
+        
+        //TODO better when signature are an array!
+        int i = 0;
+        int y = 0;
+        for (var s : base.signatures ) {
+            if (i == document.disclosedIndices[y]) {
+                signature.signatures.add(s);
+                y++;
+                if (y == document.disclosedIndices.length) {
+                    break;
+                }
+            }
+            i++;
+        }
+        
+        var d = new DataIntegrityProof.Draft(((DataIntegrityProof)base.proof).cryptosuite());
+        d.proof(((DataIntegrityProof)base.proof));
+        
+        
+        signature.proof = d.signed(signature);
+        
+//        signature.proof 
+//        signature.p
+//        var derivedProof = DataIntegrityProof.clone((DataIntegrityProof) proof, signature);
+        
+        
+
+        
+        // TODO Auto-generated method stub
+        return signature;
     }
 
 //    protected ECDSASDDerivedProofValue(

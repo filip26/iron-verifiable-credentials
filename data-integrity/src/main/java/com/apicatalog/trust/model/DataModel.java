@@ -16,6 +16,10 @@ public interface DataModel {
     ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document);
 
     PayloadProcessor createProcessor(Map<String, Object> document);
-    
-    //TODO accepted proof types, for configuration dump
+
+    // TODO accepted proof types, for configuration dump
+
+    // TODO proof predicate or selector returns proof graph or null
+    // Function<String[], String>;
+
 }

@@ -10,13 +10,12 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.sd.SDGraphProcessor.BaseDocument;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
+import com.apicatalog.di.sd.signature.BaseSignature;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.signature.BaseSignature;
 import com.apicatalog.trust.signature.Signature;
 
 import co.nstant.in.cbor.CborBuilder;
@@ -144,7 +143,7 @@ public final class SDBaseProofValue extends SDProofValue implements BaseSignatur
             AsymmetricSigner proofSigner,
             Digestor digestor,
             DataIntegrityProof unsignedProof,
-            BaseDocument payload) throws SignatureException {
+            SDBaseDocument payload) throws SignatureException {
 
         var proofDigest = digestor.digest(unsignedProof.canonicalPayload());
         var dataDigest = digestor.digest(payload.canonicalPayload());
@@ -163,7 +162,7 @@ public final class SDBaseProofValue extends SDProofValue implements BaseSignatur
         proofValue.hmacKey = payload.hmacKey();
         proofValue.proofPublicKey = proofPublicKey;
         proofValue.proofPublicKeyCodec = proofPublicKeyCodec;
-        proofValue.mandatoryPointers = payload.pointers();
+        proofValue.mandatoryPointers = payload.mandatoryPointers();
 
         if (payload.redactablePayload() != null && !payload.redactablePayload().isEmpty()) {
 
@@ -230,5 +229,12 @@ public final class SDBaseProofValue extends SDProofValue implements BaseSignatur
 
     public byte[] hmacKey() {
         return hmacKey;
+    }
+
+    public SDDerivedProofValue derive(SDDerivedDocument derivedDocument) {
+
+        var signature = SDDerivedProofValue.generate(this, derivedDocument);
+        
+        return signature;
     }
 }

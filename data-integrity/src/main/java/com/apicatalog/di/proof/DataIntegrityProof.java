@@ -550,7 +550,8 @@ public final class DataIntegrityProof implements Proof {
 
         protected final DataIntegrityProof proof;
 
-        protected Draft(CryptoSuite cryptosuite) {
+        //TODO public?!
+        public Draft(CryptoSuite cryptosuite) {
             this.proof = new DataIntegrityProof();
             this.proof.cryptosuite = cryptosuite;
         }
@@ -565,6 +566,22 @@ public final class DataIntegrityProof implements Proof {
 
             proof.canonicalPayload = canonizer.apply(proof);
             return proof.canonicalPayload;
+        }
+
+        public Draft proof(DataIntegrityProof source) {
+            proof.canonicalPayload = source.canonicalPayload;
+            proof.challenge = source.challenge;
+            proof.context = source.context;
+            proof.created = source.created;
+            proof.cryptosuite = source.cryptosuite;
+            proof.domain = source.domain;
+            proof.expires = source.expires;
+            proof.id = source.id;
+            proof.nonce = source.nonce;
+            proof.previousProof = source.previousProof;
+            proof.purpose = source.purpose;
+            proof.verificationMethod = source.verificationMethod;
+            return this;
         }
 
         // TODO ?!?!
@@ -665,7 +682,7 @@ public final class DataIntegrityProof implements Proof {
             return proof;
         }
 
-        protected DataIntegrityProof signed(Signature signature) {
+        public DataIntegrityProof signed(Signature signature) {
             proof.signature = signature;
             return proof;
         }

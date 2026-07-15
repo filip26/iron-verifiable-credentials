@@ -1,11 +1,13 @@
-package com.apicatalog.trust.signature;
+package com.apicatalog.di.sd.signature;
 
 import java.util.Collection;
+
+import com.apicatalog.trust.signature.Signature;
 
 public interface BaseSignature extends Signature {
 
     Collection<String> mandatoryPointers();
     
-    //TODO derive
+//    DerivedSignature
     
 }

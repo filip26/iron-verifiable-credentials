@@ -8,7 +8,6 @@ import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.payload.CanonicalPayload;
-import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -27,7 +26,7 @@ public abstract class SDProofValue implements Signature {
 
     protected byte[] proofPublicKey;
     protected Multicodec proofPublicKeyCodec;
-    
+
     protected byte[] baseSignature;
     protected Collection<byte[]> signatures;
 
@@ -107,6 +106,14 @@ public abstract class SDProofValue implements Signature {
         }
         return ((UnicodeString) item).getString();
     }
+
+//    private static int toUInt(DataItem item) {
+//        if (!MajorType.UNSIGNED_INTEGER.equals(item.getMajorType())) {
+////          throw new DocumentError(ErrorType.Invalid, "ProofValue");
+//        }
+////
+//        return ((UnsignedInteger) item).getValue().intValueExact();
+//    }
 
     static final byte[] hash(
             final byte[] proofHash,

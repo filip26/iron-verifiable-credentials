@@ -66,7 +66,7 @@ public class SDGraphProcessor implements GraphProcessor {
 
     }
 
-    public BaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
+    public SDBaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
 
         lazyInit();
 
@@ -75,8 +75,6 @@ public class SDGraphProcessor implements GraphProcessor {
         var compacted = model.compact().apply(context, skolemized);
 
 //        IO.println("compacted > " + compacted);
-
-        var selection = Selection.select(compacted, mandatoryPointers);
 
 //        IO.println("selection > " + selection);
 
@@ -101,17 +99,17 @@ public class SDGraphProcessor implements GraphProcessor {
         var canonized = new ArrayList<String>();
 
         // TODO read from model
-        var hmac = HmacIdProvider.newInstance(hmacKey);
+        var hmac = Hmac.newInstance(hmacKey);
 
         canonizer.canonize((subject, predicate, object, datatype, language, direction, graph) -> {
 
             var s = subject;
             if (s.startsWith("_:")) {
-                s = hmac.getHmacId(s);
+                s = hmac.assignId(s);
             }
             var o = object;
             if (o.startsWith("_:")) {
-                o = hmac.getHmacId(o);
+                o = hmac.assignId(o);
             }
 
             canonized.add(canonizer.toNQuad(s, predicate, o, datatype, language, direction, graph));
@@ -119,56 +117,88 @@ public class SDGraphProcessor implements GraphProcessor {
 
         Collections.sort(canonized);
 
-        var selectedNQuads = new HashSet<String>(selection.size());
+        var selection = Pointer.select(compacted, mandatoryPointers);
+
+        var mandatoryNQuads = new HashSet<String>(selection.size());
 
         model.tordf().accept(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {
 
             var s = subject;
             if (s.startsWith(Skolemizer.URN_PREFIX)) {
-                s = hmac.mapping.get(canonizer.labels().get("_:" + s.substring(Skolemizer.URN_PREFIX.length())));
+                s = hmac.getId(canonizer.labels().get("_:" + s.substring(Skolemizer.URN_PREFIX.length())));
             }
             var o = object;
             if (o.startsWith(Skolemizer.URN_PREFIX)) {
-                o = hmac.mapping.get(canonizer.labels().get("_:" + o.substring(Skolemizer.URN_PREFIX.length())));
+                o = hmac.getId(canonizer.labels().get("_:" + o.substring(Skolemizer.URN_PREFIX.length())));
             }
 
             var nquad = canonizer.toNQuad(s, predicate, o, datatype, language, direction, graph);
 
-            selectedNQuads.add(nquad);
+            mandatoryNQuads.add(nquad);
         }));
+
+        var labels = HashMap.<String, String>newHashMap(selection.size());
+        for (var label : canonizer.labels().entrySet()) {
+            labels.put(label.getKey(), hmac.mapping().get(label.getValue()));
+        }
 
         int index = 0;
 
-        var mandatory = new int[selectedNQuads.size()];
+        var mandatoryIndices = new int[mandatoryNQuads.size()];
         int mandatoryIndex = 0;
 
-        var optional = new ArrayList<byte[]>(canonized.size() - mandatory.length);
-        var baseWriter = new StringWriter(mandatory.length * 256);
+        var optionalIndices = new int[canonized.size() - mandatoryIndices.length];
+        int optionalIndex = 0;
+
+        var optional = new byte[canonized.size() - mandatoryIndices.length][];
+
+        var baseWriter = new StringWriter(mandatoryIndices.length * 256);
 
         for (var nquad : canonized) {
-            if (selectedNQuads.contains(nquad)) {
-                selectedNQuads.remove(nquad);
-                mandatory[mandatoryIndex++] = index;
+            if (mandatoryNQuads.contains(nquad)) {
+                mandatoryNQuads.remove(nquad);
+                mandatoryIndices[mandatoryIndex++] = index;
                 baseWriter.write(nquad);
             } else {
-                optional.add(nquad.getBytes(StandardCharsets.UTF_8));
+                optionalIndices[optionalIndex] = index;
+                optional[optionalIndex++] = nquad.getBytes(StandardCharsets.UTF_8);
             }
             index++;
         }
 
-        if (!selectedNQuads.isEmpty()) {
+        if (!mandatoryNQuads.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        var base = new BaseDocument();
+        var base = new SDBaseDocument();
         base.base = baseWriter.toString().getBytes(StandardCharsets.UTF_8);
         base.redactable = optional;
-        base.pointers = mandatoryPointers;
+        base.redactableIndices = optionalIndices;
+        base.mandatoryPointers = mandatoryPointers;
+        base.mandatoryIndices = mandatoryIndices;
         base.hmacKey = hmacKey;
+
+        base.labels = labels;
+        base.compacted = compacted;
+        base.canonized = canonized;
+        base.model = model;
+
+//        base.selectNQuads = selectors -> select(
+//                selectors, 
+//                compacted, 
+//                canonized, 
+//                canonizer.labels(), 
+//                model, 
+//                hmac.mapping());
+
         return base;
     }
 
-    public DerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
+    public SDDerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
+        IO.println("ix > " + Arrays.toString(indices));
+        for (var l : labels.entrySet()) {
+            IO.println("ix > " + l.getKey() + " -> " + Multibase.BASE_64_URL.encode(l.getValue()));
+        }
 
         lazyInit();
 
@@ -199,8 +229,6 @@ public class SDGraphProcessor implements GraphProcessor {
         for (int i = 0; i < labelMap.size(); i++) {
             map.put(labelMap.get(i), "_:" + Multibase.BASE_64_URL.encode(labels.get(i)));
         }
-
-        IO.println(map);
 
         var nquads = new ArrayList<String>(canonized.size());
 
@@ -234,13 +262,13 @@ public class SDGraphProcessor implements GraphProcessor {
 
             index++;
         }
-
+        IO.println("labels > " + map);
         IO.println("mandatory > ");
         IO.print(mandatory);
         IO.println("optional > ");
         nonMandatory.stream().map(String::new).forEach(IO::print);
 
-        var derived = new DerivedDocument();
+        var derived = new SDDerivedDocument();
         derived.base = mandatory.toString().getBytes(StandardCharsets.UTF_8);
         derived.disclosed = nonMandatory;
         return derived;
@@ -323,61 +351,6 @@ public class SDGraphProcessor implements GraphProcessor {
                             subject, predicate, object, datatype, language, direction, graph
                     });
         }
-    }
-
-    public static class BaseDocument implements SDPayload {
-
-        byte[] base;
-        Collection<byte[]> redactable;
-        Collection<String> pointers;
-        byte[] hmacKey;
-
-        @Override
-        public byte[] canonicalPayload() {
-            return base;
-        }
-
-        @Override
-        public Collection<byte[]> redactablePayload() {
-            return redactable;
-        }
-
-        public Collection<String> pointers() {
-            return pointers;
-        }
-
-        public byte[] hmacKey() {
-            return hmacKey;
-        }
-
-        @Override
-        public String c14n() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-    }
-
-    public static class DerivedDocument implements SDPayload {
-
-        byte[] base;
-        Collection<byte[]> disclosed;
-
-        @Override
-        public byte[] canonicalPayload() {
-            return base;
-        }
-
-        @Override
-        public Collection<byte[]> redactablePayload() {
-            return disclosed;
-        }
-
-        @Override
-        public String c14n() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
     }
 
     public Map<String, Object> expanded() {

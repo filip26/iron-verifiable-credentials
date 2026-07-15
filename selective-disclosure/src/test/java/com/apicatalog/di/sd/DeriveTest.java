@@ -1,6 +1,74 @@
 package com.apicatalog.di.sd;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import com.apicatalog.trust.model.ModelResolver;
+
 class DeriveTest {
+
+    static ModelResolver MODEL_RESOLVER = ModelResolver.newBuilder()
+            // accept any context - for test purposes only
+            .model(Predicate.not(Collection::isEmpty), Resources.MODEL)
+            .build();
+
+    @ParameterizedTest
+    @MethodSource({ "resources" })
+    void testVerify(String resource) throws Throwable {
+
+        var signed = Resources.getMap(resource);
+
+        var contexts = ModelResolver.getContexts(signed);
+
+        var cursor = Resources.MODEL.createProofCursor(contexts, signed);
+
+        if (cursor == null) {
+            fail();
+        }
+
+        if (!cursor.next()) {
+            fail("No proof(s)");
+        }
+
+        if (!cursor.isAccepted()) {
+            fail();
+        }
+
+        var proof = cursor.proof();
+        if (proof.signature() instanceof SDBaseProofValue signature
+                && signature.payload() instanceof SDBaseDocument baseDocument) {
+            var derivedDocument = baseDocument.derive(List.of(
+                    "/validFrom",
+                    "/validUntil",
+                    "/credentialSubject/birthCountry"));
+
+            var derivedSignature = signature.derive(derivedDocument);
+
+            var isVerified = VerifierTest.PROOF_VERIFIER.verify(derivedSignature.proof());
+            assertTrue(isVerified);
+
+        } else {
+            fail();
+        }
+
+        assertFalse(cursor.next());
+    }
+
+    static final Stream<String> resources() {
+        return Resources
+                .stream()
+                .filter(name -> name.endsWith(".signed.json"))
+                .sorted();
+    }
 
 //    static final DocumentReader READER = DocumentReader.with(new ECDSASD2023());
 //

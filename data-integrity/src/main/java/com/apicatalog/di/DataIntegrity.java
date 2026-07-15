@@ -144,7 +144,7 @@ public class DataIntegrity {
 
         private Function<Map<String, Object>, byte[]> canonize;
 
-        private MapProofCursor.Factory factory;
+        private MapProofCursor.Factory cursorFactory;
 
         private Map<String, CryptoSuite> cryptosuites;
         private Map<String, MapProofReader> readers;
@@ -160,7 +160,7 @@ public class DataIntegrity {
         }
 
         public LexicalModelBuilder processor(MapProofCursor.Factory factory) {
-            this.factory = factory;
+            this.cursorFactory = factory;
             return this;
         }
 
@@ -186,15 +186,15 @@ public class DataIntegrity {
                         new DataIntegrityProof.MapReader(cryptosuites));
             }
 
-            if (readers.isEmpty()) {
-                throw new IllegalStateException();
-            }
+//            if (readers.isEmpty()) {
+//                throw new IllegalStateException();
+//            }
 
             if (canonize == null) {
                 throw new IllegalStateException();
             }
 
-            return new LexicalModel(factory, c14n, canonize, readers);
+            return new LexicalModel(cursorFactory, c14n, canonize, readers);
         }
     }
 

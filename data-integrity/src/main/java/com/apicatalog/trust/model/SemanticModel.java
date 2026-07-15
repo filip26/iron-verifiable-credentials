@@ -14,7 +14,7 @@ import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
 public class SemanticModel implements DataModel {
-
+    
     // use just Supplier
     @FunctionalInterface
     @Deprecated

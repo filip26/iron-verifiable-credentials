@@ -11,40 +11,44 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.apicatalog.multibase.Multibase;
 
-class HmacIdProvider {
+class Hmac {
 
-    final Map<String, String> mapping = new HashMap<>();
-    final Mac hmac;
+    private final Map<String, String> mapping = new HashMap<>();
+    private final Mac hmac;
 
-    protected HmacIdProvider(Mac hmac) {
+    private Hmac(Mac hmac) {
         this.hmac = hmac;
     }
 
-    public static HmacIdProvider newInstance(final byte[] hmacKey) {
+    public static Hmac newInstance(final byte[] hmacKey) {
         final String type = "HmacSHA256";// getHmacType("P-256");
         final SecretKeySpec key = new SecretKeySpec(hmacKey, type);
         try {
             final Mac hmac = Mac.getInstance(type);
             hmac.init(key);
-            return new HmacIdProvider(hmac);
+            return new Hmac(hmac);
         } catch (InvalidKeyException | NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public String getHmacId(final String resource) {
+    public String assignId(final String resource) {
 
-        String hmacId = mapping.get(resource);
+        String id = mapping.get(resource);
 
-        if (hmacId == null) {
-            hmacId = "_:" + Multibase.BASE_64_URL
+        if (id == null) {
+            id = "_:" + Multibase.BASE_64_URL
                     .encode(hmac.doFinal(resource.substring(2).getBytes(StandardCharsets.UTF_8)));
             hmac.reset();
-            mapping.put(resource, hmacId);
+            mapping.put(resource, id);
         }
-        return hmacId;
+        return id;
     }
 
+    public String getId(final String resource) {
+        return mapping.get(resource);
+    }
+    
     public Map<String, String> mapping() {
         return mapping;
     }
