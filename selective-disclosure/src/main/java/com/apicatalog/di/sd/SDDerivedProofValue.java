@@ -1,8 +1,6 @@
 package com.apicatalog.di.sd;
 
 import java.io.ByteArrayInputStream;
-import java.security.InvalidKeyException;
-import java.security.SignatureException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -12,10 +10,6 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.di.sd.signature.DerivedSignature;
 import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.security.AsymmetricVerifier;
-import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.proof.Proof;
 
 import co.nstant.in.cbor.CborDecoder;
 import co.nstant.in.cbor.CborException;
@@ -24,22 +18,9 @@ import co.nstant.in.cbor.model.DataItem;
 import co.nstant.in.cbor.model.MajorType;
 import co.nstant.in.cbor.model.UnsignedInteger;
 
-public final class SDDerivedProofValue implements DerivedSignature {
+public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> implements DerivedSignature {
 
     protected static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x01 };
-
-    private String signatureAlgorithm;
-    private String digestAlgorithm;
-
-    private SDPayload payload;
-    private Proof proof;
-
-    private byte[] baseSignature;
-
-    private byte[] proofPublicKey;
-    private Multicodec proofPublicKeyCodec;
-
-    private byte[][] signatures;
 
     private SDDerivedProofValue() {
 //        // TODO Auto-generated constructor stub
@@ -56,7 +37,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
             byte[] signature,
             Function<Integer, SignatureAlgorithm> algorithmProvider,
             Function<byte[], Multicodec> proofPublicKeyDecoder,
-            Proof proof,
+            DataIntegrityProof proof,
             // TODO DerivedPayload?
             SDGraphProcessor processor) {
 
@@ -147,85 +128,8 @@ public final class SDDerivedProofValue implements DerivedSignature {
             throw new IllegalArgumentException(e);
         }
     }
-
-    @Override
-    public boolean verify(
-            AsymmetricVerifier verifier,
-            Digestor.Factory digestFactory,
-            byte[] publicKey) throws InvalidKeyException, SignatureException {
-
-        if (signatures.length != payload.redactablePayload().length) {
-//          throw new VerificationError(VerificationErrorCode.InvalidSignature);
-            throw new SignatureException();
-        }
-
-//        IO.println(expanded);
-//        IO.println(labels);
-//        IO.println(Arrays.toString(indices));
-
-        var digestor = digestFactory.newDigestor(digestAlgorithm);
-//
-        var proofDigest = digestor.digest(proof.canonicalPayload());
-        var mandatoryDigest = digestor.digest(payload.canonicalPayload());
-
-        var baseDigest = SDBaseProofValue.hash(
-                proofDigest,
-                proofPublicKey,
-                mandatoryDigest);
-
-        var isBaseSignatureVerified = verifier.verify(publicKey, baseDigest, baseSignature);
-
-        if (!isBaseSignatureVerified) {
-            return false;
-        }
-
-        var decodedProofPublicKey = proofPublicKeyCodec.decode(proofPublicKey);
-
-        for (int signatureIndex = 0; signatureIndex < signatures.length; signatureIndex++) {
-
-            var redactable = payload.redactablePayload()[signatureIndex];
-            var signature = signatures[signatureIndex];
-
-            if (!verifier.verify(decodedProofPublicKey, redactable, signature)) {
-                return false;
-            }
-        }
-
-        // all good
-        return true;
-    }
-
-    @Override
-    public String algorithm() {
-        return signatureAlgorithm;
-    }
-
-    @Override
-    public DigestiblePayload payload() {
-        return null; // FIXME
-    }
-
-    @Override
-    public Proof proof() {
-        return proof;
-    }
-
-    @Override
-    public byte[] toByteArray() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    private static int toUInt(DataItem item) {
-
-        if (!MajorType.UNSIGNED_INTEGER.equals(item.getMajorType())) {
-//            throw new DocumentError(ErrorType.Invalid, "ProofValue");
-        }
-
-        return ((UnsignedInteger) item).getValue().intValueExact();
-    }
-
-    public static SDDerivedProofValue generate(SDBaseProofValue base, SDDerivedDocument document) {
+    
+    public static SDDerivedProofValue generateSignature(SDBaseProofValue base, SDDerivedDocument document) {
 
         var signature = new SDDerivedProofValue();
         signature.baseSignature = base.baseSignature;
@@ -253,6 +157,70 @@ public final class SDDerivedProofValue implements DerivedSignature {
         // TODO Auto-generated method stub
         return signature;
     }
+
+    @Override
+    public byte[] toByteArray() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+//    @Override
+//    public boolean verify(
+//            AsymmetricVerifier verifier,
+//            Digestor.Factory digestFactory,
+//            byte[] publicKey) throws InvalidKeyException, SignatureException {
+//
+//        if (signatures.length != payload.redactablePayload().length) {
+////          throw new VerificationError(VerificationErrorCode.InvalidSignature);
+//            throw new SignatureException();
+//        }
+//
+////        IO.println(expanded);
+////        IO.println(labels);
+////        IO.println(Arrays.toString(indices));
+//
+//        var digestor = digestFactory.newDigestor(digestAlgorithm);
+////
+//        var proofDigest = digestor.digest(proof.canonicalPayload());
+//        var mandatoryDigest = digestor.digest(payload.canonicalPayload());
+//
+//        var baseDigest = SDBaseProofValue.hash(
+//                proofDigest,
+//                proofPublicKey,
+//                mandatoryDigest);
+//
+//        var isBaseSignatureVerified = verifier.verify(publicKey, baseDigest, baseSignature);
+//
+//        if (!isBaseSignatureVerified) {
+//            return false;
+//        }
+//
+//        var decodedProofPublicKey = proofPublicKeyCodec.decode(proofPublicKey);
+//
+//        for (int signatureIndex = 0; signatureIndex < signatures.length; signatureIndex++) {
+//
+//            var redactable = payload.redactablePayload()[signatureIndex];
+//            var signature = signatures[signatureIndex];
+//
+//            if (!verifier.verify(decodedProofPublicKey, redactable, signature)) {
+//                return false;
+//            }
+//        }
+//
+//        // all good
+//        return true;
+//    }
+
+    private static int toUInt(DataItem item) {
+
+        if (!MajorType.UNSIGNED_INTEGER.equals(item.getMajorType())) {
+//            throw new DocumentError(ErrorType.Invalid, "ProofValue");
+        }
+
+        return ((UnsignedInteger) item).getValue().intValueExact();
+    }
+
+
 
 //    protected ECDSASDDerivedProofValue(
 //            Proof proof,

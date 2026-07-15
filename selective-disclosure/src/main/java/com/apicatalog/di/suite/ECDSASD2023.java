@@ -84,7 +84,7 @@ public final class ECDSASD2023 implements CryptoSuite {
                         signature,
                         ECDSASD2023::getAlgorithm,
                         proofPublicKeyDecoder,
-                        proof,
+                        (DataIntegrityProof) proof,
                         graphProcessor);
             }
 

@@ -221,6 +221,10 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
         return toByteArray(baseSignature, proofPublicKey, hmacKey, signatures, mandatoryPointers);
     }
 
+    public SDDerivedProofValue derive(SDDerivedDocument derivedDocument) {
+        return SDDerivedProofValue.generateSignature(this, derivedDocument);
+    }
+
     @Override
     public Collection<String> mandatoryPointers() {
         return mandatoryPointers;
@@ -228,12 +232,5 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
 
     public byte[] hmacKey() {
         return hmacKey;
-    }
-
-    public SDDerivedProofValue derive(SDDerivedDocument derivedDocument) {
-
-        var signature = SDDerivedProofValue.generate(this, derivedDocument);
-
-        return signature;
     }
 }

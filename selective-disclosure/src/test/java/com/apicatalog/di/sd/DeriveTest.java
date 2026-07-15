@@ -4,9 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,11 +13,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.apicatalog.trust.model.ModelResolver;
 
 class DeriveTest {
-
-    static ModelResolver MODEL_RESOLVER = ModelResolver.newBuilder()
-            // accept any context - for test purposes only
-            .model(Predicate.not(Collection::isEmpty), Resources.MODEL)
-            .build();
 
     @ParameterizedTest
     @MethodSource({ "resources" })
@@ -44,6 +37,7 @@ class DeriveTest {
         }
 
         var proof = cursor.proof();
+
         if (proof.signature() instanceof SDBaseProofValue signature) {
             var derivedPayload = signature.payload().derive(List.of(
                     "/validFrom",
@@ -54,12 +48,11 @@ class DeriveTest {
 
             var isVerified = VerifierTest.PROOF_VERIFIER.verify(derivedSignature.proof());
             assertTrue(isVerified);
+            assertFalse(cursor.next());
 
         } else {
             fail();
         }
-
-        assertFalse(cursor.next());
     }
 
     static final Stream<String> resources() {

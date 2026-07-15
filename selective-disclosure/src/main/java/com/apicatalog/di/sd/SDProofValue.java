@@ -90,6 +90,15 @@ public abstract class SDProofValue<T extends SDPayload> implements Signature {
         return signatureAlgorithm;
     }
 
+    @Override
+    public T payload() {
+        return payload;
+    }
+
+    public byte[] proofPublicKey() {
+        return proofPublicKey;
+    }
+
     static byte[] byteArray(DataItem item) {
         if (!MajorType.BYTE_STRING.equals(item.getMajorType())) {
 //      throw new DocumentError(ErrorType.Invalid, "ProofValue");
@@ -126,14 +135,5 @@ public abstract class SDProofValue<T extends SDPayload> implements Signature {
         System.arraycopy(proofPublicKey, 0, hash, proofHash.length, proofPublicKey.length);
         System.arraycopy(mandatoryHash, 0, hash, proofHash.length + proofPublicKey.length, mandatoryHash.length);
         return hash;
-    }
-
-    @Override
-    public T payload() {
-        return payload;
-    }
-
-    public byte[] proofPublicKey() {
-        return proofPublicKey;
     }
 }
