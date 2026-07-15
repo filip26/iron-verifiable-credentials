@@ -151,9 +151,4 @@ public class StandardGraphProcessor implements GraphProcessor {
                     });
         }
     }
-
-    @Override
-    public SemanticModel model() {
-        return model;
-    }
 }

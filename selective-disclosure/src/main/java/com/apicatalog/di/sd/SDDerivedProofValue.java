@@ -3,12 +3,8 @@ package com.apicatalog.di.sd;
 import java.io.ByteArrayInputStream;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -43,13 +39,11 @@ public final class SDDerivedProofValue implements DerivedSignature {
     private byte[] proofPublicKey;
     private Multicodec proofPublicKeyCodec;
 
-    private Collection<byte[]> signatures;
-//    private Map<Integer, byte[]> labels;
-//    private int[] indices;
+    private byte[][] signatures;
 
-//    private SDDerivedProofValue() {
+    private SDDerivedProofValue() {
 //        // TODO Auto-generated constructor stub
-//    }
+    }
 
     public static boolean isAccepted(byte[] signature) {
         return signature.length > 2
@@ -112,10 +106,11 @@ public final class SDDerivedProofValue implements DerivedSignature {
 //                throw new DocumentError(ErrorType.Invalid, "ProofValue");
             }
 
-            proofValue.signatures = new ArrayList<>(((Array) top.getDataItems().get(2)).getDataItems().size());
+            proofValue.signatures = new byte[((Array) top.getDataItems().get(2)).getDataItems().size()][];
 
-            for (final DataItem item : ((Array) top.getDataItems().get(2)).getDataItems()) {
-                proofValue.signatures.add(SDBaseProofValue.byteArray(item));
+            int signatureIndex = 0;
+            for (final var item : ((Array) top.getDataItems().get(2)).getDataItems()) {
+                proofValue.signatures[signatureIndex++] = SDBaseProofValue.byteArray(item);
             }
 
             // label map
@@ -159,7 +154,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
             Digestor.Factory digestFactory,
             byte[] publicKey) throws InvalidKeyException, SignatureException {
 
-        if (signatures.size() != payload.redactablePayload().size()) {
+        if (signatures.length != payload.redactablePayload().length) {
 //          throw new VerificationError(VerificationErrorCode.InvalidSignature);
             throw new SignatureException();
         }
@@ -173,7 +168,6 @@ public final class SDDerivedProofValue implements DerivedSignature {
         var proofDigest = digestor.digest(proof.canonicalPayload());
         var mandatoryDigest = digestor.digest(payload.canonicalPayload());
 
-
         var baseDigest = SDBaseProofValue.hash(
                 proofDigest,
                 proofPublicKey,
@@ -184,14 +178,13 @@ public final class SDDerivedProofValue implements DerivedSignature {
         if (!isBaseSignatureVerified) {
             return false;
         }
-        
+
         var decodedProofPublicKey = proofPublicKeyCodec.decode(proofPublicKey);
 
-        var redactableIterator = payload.redactablePayload().iterator();
+        for (int signatureIndex = 0; signatureIndex < signatures.length; signatureIndex++) {
 
-        for (var signature : signatures) {
-
-            var redactable = redactableIterator.next();
+            var redactable = payload.redactablePayload()[signatureIndex];
+            var signature = signatures[signatureIndex];
 
             if (!verifier.verify(decodedProofPublicKey, redactable, signature)) {
                 return false;
@@ -209,7 +202,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
 
     @Override
     public DigestiblePayload payload() {
-        return null;    //FIXME
+        return null; // FIXME
     }
 
     @Override
@@ -233,7 +226,7 @@ public final class SDDerivedProofValue implements DerivedSignature {
     }
 
     public static SDDerivedProofValue generate(SDBaseProofValue base, SDDerivedDocument document) {
-        
+
         var signature = new SDDerivedProofValue();
         signature.baseSignature = base.baseSignature;
         signature.digestAlgorithm = base.digestAlgorithm;
@@ -241,37 +234,22 @@ public final class SDDerivedProofValue implements DerivedSignature {
         signature.proofPublicKey = base.proofPublicKey;
         signature.proofPublicKeyCodec = base.proofPublicKeyCodec;
         signature.signatureAlgorithm = base.signatureAlgorithm;
-        
-        
-        signature.signatures = new ArrayList<byte[]>(document.redactablePayload().size());
-        
-        //TODO better when signature are an array!
-        int i = 0;
-        int y = 0;
-        for (var s : base.signatures ) {
-            if (i == document.disclosedIndices[y]) {
-                signature.signatures.add(s);
-                y++;
-                if (y == document.disclosedIndices.length) {
-                    break;
-                }
-            }
-            i++;
+
+        signature.signatures = new byte[document.disclosedIndices.length][];
+
+        for (int index = 0; index < signature.signatures.length; index++) {
+            signature.signatures[index] = base.signatures[document.disclosedIndices[index]];
         }
-        
-        var d = new DataIntegrityProof.Draft(((DataIntegrityProof)base.proof).cryptosuite());
-        d.proof(((DataIntegrityProof)base.proof));
-        
-        
+
+        var d = new DataIntegrityProof.Draft(((DataIntegrityProof) base.proof).cryptosuite());
+        d.proof(((DataIntegrityProof) base.proof));
+
         signature.proof = d.signed(signature);
-        
+
 //        signature.proof 
 //        signature.p
 //        var derivedProof = DataIntegrityProof.clone((DataIntegrityProof) proof, signature);
-        
-        
 
-        
         // TODO Auto-generated method stub
         return signature;
     }

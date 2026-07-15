@@ -74,10 +74,6 @@ public class SDGraphProcessor implements GraphProcessor {
 
         var compacted = model.compact().apply(context, skolemized);
 
-//        IO.println("compacted > " + compacted);
-
-//        IO.println("selection > " + selection);
-
         var canonizer = model.newCanonizer();
 
         var consumer = canonizer.consumer();
@@ -183,23 +179,10 @@ public class SDGraphProcessor implements GraphProcessor {
         base.canonized = canonized;
         base.model = model;
 
-//        base.selectNQuads = selectors -> select(
-//                selectors, 
-//                compacted, 
-//                canonized, 
-//                canonizer.labels(), 
-//                model, 
-//                hmac.mapping());
-
         return base;
     }
 
     public SDDerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
-        IO.println("ix > " + Arrays.toString(indices));
-        for (var l : labels.entrySet()) {
-            IO.println("ix > " + l.getKey() + " -> " + Multibase.BASE_64_URL.encode(l.getValue()));
-        }
-
         lazyInit();
 
         var expanded = expandedDocument;
@@ -247,43 +230,39 @@ public class SDGraphProcessor implements GraphProcessor {
         Collections.sort(nquads);
 
         var mandatory = new StringWriter(indices.length * 256);
-        var nonMandatory = new ArrayList<byte[]>();
+        var disclosed = new byte[nquads.size() - indices.length][];
 
         Arrays.sort(indices);
 
         int index = 0;
+        int disclosedIndex = 0;
         for (var nquad : nquads) {
 
             if (Arrays.binarySearch(indices, index) >= 0) {
                 mandatory.write(nquad);
             } else {
-                nonMandatory.add(nquad.getBytes(StandardCharsets.UTF_8));
+                disclosed[disclosedIndex++] = nquad.getBytes(StandardCharsets.UTF_8);
             }
 
             index++;
         }
-        IO.println("labels > " + map);
-        IO.println("mandatory > ");
-        IO.print(mandatory);
-        IO.println("optional > ");
-        nonMandatory.stream().map(String::new).forEach(IO::print);
 
         var derived = new SDDerivedDocument();
         derived.base = mandatory.toString().getBytes(StandardCharsets.UTF_8);
-        derived.disclosed = nonMandatory;
+        derived.disclosed = disclosed;
         return derived;
     }
 
     @Override
     public DigestiblePayload digestible() {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Yet, not supported.");
     }
 
     @Override
     public void withProofs(Collection<String> ids) {
         // TODO Auto-generated method stub
-
+        return;
     }
 
     private void lazyInit() {
@@ -345,21 +324,12 @@ public class SDGraphProcessor implements GraphProcessor {
             } else if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
                 proofTypes.put(graph, object);
             }
-//            IO.println(graph);
+
             graphs.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
                     .add(new String[] {
                             subject, predicate, object, datatype, language, direction, graph
                     });
         }
-    }
-
-    public Map<String, Object> expanded() {
-        return expandedDocument;
-    }
-
-    @Override
-    public SemanticModel model() {
-        return model;
     }
 
     public static record SignatureAlgorithm(String signature, String digest) {

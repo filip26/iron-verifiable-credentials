@@ -23,8 +23,6 @@ public interface GraphProcessor extends PayloadProcessor {
 
     String proofType(String graph);
 
-    SemanticModel model();
-    
     /**
      * resets the selector state, but might cache vanilla digestible payload for
      * re-use

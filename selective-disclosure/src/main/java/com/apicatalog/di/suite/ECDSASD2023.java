@@ -6,7 +6,6 @@ import java.util.function.Function;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.sd.SDBaseDocument;
 import com.apicatalog.di.sd.SDBaseProofValue;
-import com.apicatalog.di.sd.SDDerivedDocument;
 import com.apicatalog.di.sd.SDDerivedProofValue;
 import com.apicatalog.di.sd.SDGraphProcessor;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
@@ -76,7 +75,7 @@ public final class ECDSASD2023 implements CryptoSuite {
                         signature,
                         ECDSASD2023::getAlgorithm,
                         proofPublicKeyDecoder,
-                        proof,
+                        (DataIntegrityProof) proof,
                         graphProcessor);
             }
 

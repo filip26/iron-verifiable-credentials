@@ -2,13 +2,11 @@ package com.apicatalog.di.sd;
 
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
-import java.util.Collection;
 
+import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.payload.CanonicalPayload;
-import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
 import co.nstant.in.cbor.model.ByteString;
@@ -16,19 +14,19 @@ import co.nstant.in.cbor.model.DataItem;
 import co.nstant.in.cbor.model.MajorType;
 import co.nstant.in.cbor.model.UnicodeString;
 
-public abstract class SDProofValue implements Signature {
+public abstract class SDProofValue<T extends SDPayload> implements Signature {
 
     protected String signatureAlgorithm;
     protected String digestAlgorithm;
 
-    protected Proof proof;
-    protected SDPayload payload;
+    protected DataIntegrityProof proof;
+    protected T payload;
 
     protected byte[] proofPublicKey;
     protected Multicodec proofPublicKeyCodec;
 
     protected byte[] baseSignature;
-    protected Collection<byte[]> signatures;
+    protected byte[][] signatures;
 
     @Override
     public boolean verify(
@@ -46,7 +44,7 @@ public abstract class SDProofValue implements Signature {
             byte[] publicKey)
             throws InvalidKeyException, SignatureException {
 
-        if (signatures.size() != payload.redactablePayload().size()) {
+        if (signatures.length != payload.redactablePayload().length) {
             throw new SignatureException();
         }
 
@@ -68,11 +66,10 @@ public abstract class SDProofValue implements Signature {
 
         var decodedProofPublicKey = proofPublicKeyCodec.decode(proofPublicKey);
 
-        var redactableIterator = payload.redactablePayload().iterator();
+        for (int index = 0; index < signatures.length; index++) {
 
-        for (var signature : signatures) {
-
-            var redactable = redactableIterator.next();
+            var redactable = payload.redactablePayload()[index];
+            var signature = signatures[index];
 
             if (!proofVerifier.verify(decodedProofPublicKey, redactable, signature)) {
                 return false;
@@ -84,7 +81,7 @@ public abstract class SDProofValue implements Signature {
     }
 
     @Override
-    public Proof proof() {
+    public DataIntegrityProof proof() {
         return proof;
     }
 
@@ -109,9 +106,10 @@ public abstract class SDProofValue implements Signature {
 
 //    private static int toUInt(DataItem item) {
 //        if (!MajorType.UNSIGNED_INTEGER.equals(item.getMajorType())) {
-////          throw new DocumentError(ErrorType.Invalid, "ProofValue");
+    //// throw new DocumentError(ErrorType.Invalid, "ProofValue");
+
 //        }
-////
+    //
 //        return ((UnsignedInteger) item).getValue().intValueExact();
 //    }
 
@@ -131,7 +129,7 @@ public abstract class SDProofValue implements Signature {
     }
 
     @Override
-    public CanonicalPayload payload() {
+    public T payload() {
         return payload;
     }
 

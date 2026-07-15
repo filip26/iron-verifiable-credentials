@@ -1,13 +1,11 @@
 package com.apicatalog.di.sd;
 
-import java.util.Collection;
-
 import com.apicatalog.trust.model.DataModel;
 
 public class SDDerivedDocument implements SDPayload {
 
     byte[] base;
-    Collection<byte[]> disclosed;
+    byte[][] disclosed;
     int[] disclosedIndices;
 
     @Override
@@ -16,7 +14,7 @@ public class SDDerivedDocument implements SDPayload {
     }
 
     @Override
-    public Collection<byte[]> redactablePayload() {
+    public byte[][] redactablePayload() {
         return disclosed;
     }
 

@@ -15,17 +15,15 @@ import com.apicatalog.di.sd.signature.BaseSignature;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
 import co.nstant.in.cbor.CborBuilder;
 import co.nstant.in.cbor.CborDecoder;
 import co.nstant.in.cbor.CborEncoder;
 import co.nstant.in.cbor.CborException;
-import co.nstant.in.cbor.builder.ArrayBuilder;
 import co.nstant.in.cbor.model.Array;
 
-public final class SDBaseProofValue extends SDProofValue implements BaseSignature {
+public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> implements BaseSignature {
 
     private static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x00 };
 
@@ -44,7 +42,7 @@ public final class SDBaseProofValue extends SDProofValue implements BaseSignatur
             byte[] signature,
             Function<Integer, SignatureAlgorithm> algorithmProvider,
             Function<byte[], Multicodec> proofPublicKeyDecoder,
-            Proof proof,
+            DataIntegrityProof proof,
             SDGraphProcessor processor) {
 
         Objects.requireNonNull(signature);
@@ -98,10 +96,11 @@ public final class SDBaseProofValue extends SDProofValue implements BaseSignatur
             proofValue.hmacKey = byteArray(top.getDataItems().get(2));
 
             if (top.getDataItems().get(3) instanceof Array signatures) {
-                proofValue.signatures = new ArrayList<>(signatures.getDataItems().size());
+                proofValue.signatures = new byte[signatures.getDataItems().size()][];
 
+                var index = 0;
                 for (final var item : signatures.getDataItems()) {
-                    proofValue.signatures.add(byteArray(item));
+                    proofValue.signatures[index++] = byteArray(item);
                 }
 
             } else {
@@ -164,12 +163,12 @@ public final class SDBaseProofValue extends SDProofValue implements BaseSignatur
         proofValue.proofPublicKeyCodec = proofPublicKeyCodec;
         proofValue.mandatoryPointers = payload.mandatoryPointers();
 
-        if (payload.redactablePayload() != null && !payload.redactablePayload().isEmpty()) {
+        if (payload.redactablePayload() != null && payload.redactablePayload().length > 0) {
 
-            proofValue.signatures = new ArrayList<byte[]>(payload.redactablePayload().size());
+            proofValue.signatures = new byte[payload.redactablePayload().length][];
 
-            for (var optional : payload.redactablePayload()) {
-                proofValue.signatures.add(proofSigner.sign(optional));
+            for (int index = 0; index < proofValue.signatures.length; index++) {
+                proofValue.signatures[index] = proofSigner.sign(payload.redactablePayload()[index]);
             }
         }
 
@@ -182,24 +181,24 @@ public final class SDBaseProofValue extends SDProofValue implements BaseSignatur
             byte[] baseSignature,
             byte[] proofPublicKey,
             byte[] hmacKey,
-            Collection<byte[]> signatures,
+            byte[][] signatures,
             Collection<String> pointers) {
 
         final CborBuilder cbor = new CborBuilder();
 
-        final ArrayBuilder<CborBuilder> top = cbor.addArray();
+        var top = cbor.addArray();
 
         top.add(baseSignature);
         top.add(proofPublicKey);
         top.add(hmacKey);
 
-        final ArrayBuilder<ArrayBuilder<CborBuilder>> cborSigs = top.addArray();
+        var cborSignatures = top.addArray();
 
-        if (signatures != null) {
-            signatures.forEach(m -> cborSigs.add(m));
+        for (int signatureIndex = 0; signatureIndex < signatures.length; signatureIndex++) {
+            cborSignatures.add(signatures[signatureIndex]);
         }
 
-        final ArrayBuilder<ArrayBuilder<CborBuilder>> cborPointers = top.addArray();
+        var cborPointers = top.addArray();
 
         if (pointers != null) {
             pointers.forEach(cborPointers::add);
@@ -234,7 +233,7 @@ public final class SDBaseProofValue extends SDProofValue implements BaseSignatur
     public SDDerivedProofValue derive(SDDerivedDocument derivedDocument) {
 
         var signature = SDDerivedProofValue.generate(this, derivedDocument);
-        
+
         return signature;
     }
 }

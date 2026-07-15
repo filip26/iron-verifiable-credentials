@@ -23,7 +23,7 @@ class DeriveTest {
 
     @ParameterizedTest
     @MethodSource({ "resources" })
-    void testVerify(String resource) throws Throwable {
+    void testDerive(String resource) throws Throwable {
 
         var signed = Resources.getMap(resource);
 
@@ -44,14 +44,13 @@ class DeriveTest {
         }
 
         var proof = cursor.proof();
-        if (proof.signature() instanceof SDBaseProofValue signature
-                && signature.payload() instanceof SDBaseDocument baseDocument) {
-            var derivedDocument = baseDocument.derive(List.of(
+        if (proof.signature() instanceof SDBaseProofValue signature) {
+            var derivedPayload = signature.payload().derive(List.of(
                     "/validFrom",
                     "/validUntil",
                     "/credentialSubject/birthCountry"));
 
-            var derivedSignature = signature.derive(derivedDocument);
+            var derivedSignature = signature.derive(derivedPayload);
 
             var isVerified = VerifierTest.PROOF_VERIFIER.verify(derivedSignature.proof());
             assertTrue(isVerified);
