@@ -5,30 +5,33 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
+import com.apicatalog.trust.processor.MapProcessor;
 import com.apicatalog.trust.processor.PayloadProcessor;
-import com.apicatalog.trust.proof.MapProofCursor.Factory;
+import com.apicatalog.trust.proof.MapProofCursor;
 import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
 public class LexicalModel implements DataModel {
 
-    private final Factory factory;
+    private final MapProcessor.Factory processorFactory;
+    private final MapProofCursor.Factory cursorFactory;
     private final Map<String, MapProofReader> proofReaders;
 
     private final String c14n;
     private final Function<Map<String, Object>, byte[]> canonize;
 
     public LexicalModel(
-            Factory factory,
+            MapProcessor.Factory processorFactory,
+            MapProofCursor.Factory cursorFactory,
             String c14n,
             Function<Map<String, Object>, byte[]> canonize,
             Map<String, MapProofReader> proofReaders) {
-        this.factory = factory;
+        this.processorFactory = processorFactory;
+        this.cursorFactory = cursorFactory;
         this.c14n = c14n;
         this.canonize = canonize;
         this.proofReaders = proofReaders;
@@ -37,23 +40,12 @@ public class LexicalModel implements DataModel {
     @Override
     public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
 
-        var proofProperty = document.get("proof");
+        var processor = processorFactory.newInstance(
+                this,
+                context,
+                document);
 
-        if (proofProperty == null) {
-            return null;
-        }
-
-        final Collection<?> proofs;
-
-        if (!(proofProperty instanceof Collection<?> col)) {
-            proofs = List.of(proofProperty);
-
-        } else if (col.isEmpty()) {
-            return null;
-
-        } else {
-            proofs = col;
-        }
+        var proofs = processor.proofs();
 
         var mapping = new ArrayList<Entry<Map<String, Object>, MapProofReader>>(proofs.size());
 
@@ -80,7 +72,7 @@ public class LexicalModel implements DataModel {
         var data = new LinkedHashMap<>(document);
         data.remove("proof");
 
-        return factory.newInstance(this, data, mapping);
+        return cursorFactory.newInstance(this, processor, mapping);
     }
 
     public byte[] canonize(Map<String, Object> data) {
@@ -94,7 +86,9 @@ public class LexicalModel implements DataModel {
 
     @Override
     public PayloadProcessor createProcessor(Map<String, Object> document) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Yet, Not Supported");
+        return processorFactory.newInstance(
+                this,
+                ModelResolver.getContexts(document),
+                document);
     }
 }

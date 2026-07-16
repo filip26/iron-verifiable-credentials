@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.std.StandardGraphProcessor;
+import com.apicatalog.di.std.StandardMapProcessor;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
@@ -44,6 +45,7 @@ class Resources {
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
+            .processor(StandardMapProcessor::new)
             .processor(MapProofCursor::new)
             .build();
 

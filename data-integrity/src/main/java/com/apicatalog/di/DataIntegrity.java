@@ -17,6 +17,7 @@ import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.C14nFactory;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.processor.GraphProcessor;
+import com.apicatalog.trust.processor.MapProcessor;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.MapProofCursor;
@@ -144,6 +145,7 @@ public class DataIntegrity {
 
         private Function<Map<String, Object>, byte[]> canonize;
 
+        private MapProcessor.Factory processorFactory;
         private MapProofCursor.Factory cursorFactory;
 
         private Map<String, CryptoSuite> cryptosuites;
@@ -161,6 +163,11 @@ public class DataIntegrity {
 
         public LexicalModelBuilder processor(MapProofCursor.Factory factory) {
             this.cursorFactory = factory;
+            return this;
+        }
+        
+        public LexicalModelBuilder processor(MapProcessor.Factory factory) {
+            this.processorFactory = factory;
             return this;
         }
 
@@ -194,7 +201,7 @@ public class DataIntegrity {
                 throw new IllegalStateException();
             }
 
-            return new LexicalModel(cursorFactory, c14n, canonize, readers);
+            return new LexicalModel(processorFactory, cursorFactory, c14n, canonize, readers);
         }
     }
 
