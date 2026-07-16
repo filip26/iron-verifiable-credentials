@@ -2,7 +2,6 @@ package com.apicatalog.di;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,25 +11,16 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.apicatalog.crypto.bc.BCECDSASigner;
-import com.apicatalog.crypto.bc.BCEd25519Signer;
-import com.apicatalog.crypto.bc.BCMLDSASigner;
-import com.apicatalog.crypto.bc.BCSLHDSASigner;
+import com.apicatalog.di.barcodes.ECDSAXI2023;
+import com.apicatalog.di.barcodes.ECDSAXI2023.BarcodePayload;
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.di.suite.ECDSA2019;
-import com.apicatalog.di.suite.EdDSA2022;
-import com.apicatalog.di.suite.MLDSA2024;
-import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
@@ -45,16 +35,10 @@ public class IssuerTest {
 
     static final MulticodecDecoder MULTICODEC = MulticodecDecoder.newInstance(
             KeyCodec.P256_PRIVATE,
-            KeyCodec.P384_PRIVATE,
-            KeyCodec.ED25519_PRIVATE,
-            KeyCodec.MLDSA_44_PRIVATE,
-            KeyCodec.SLHDSA_SHA2_128S_PRIVATE,
-            // TODO remove when multicodec is updated
-            Multicodec.of("falcon-512-pub", Tag.Key, 4652));
+            KeyCodec.P384_PRIVATE);
 
     @ParameterizedTest
     @MethodSource({ "resources" })
-    @Disabled
     void testIssue(String resource) throws Throwable {
 
         Map<String, String> keys = Resources.getMap(resource + ".keys.json");
@@ -92,51 +76,35 @@ public class IssuerTest {
 
         var composer = new NativeComposer<Map<String, ? extends Object>>();
 
-        if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
+        var cryptosuite = ECDSAXI2023.getInstance();
 
-            var cryptosuite = getCryptosuite((String) options.get("cryptosuite"));
+        var proofDraft = cryptosuite.createProofDraft();
+        proofDraft.options(options);
 
-            var proofDraft = cryptosuite.createProofDraft();
-            proofDraft.options(options);
+        var processor = getProcessor(proofDraft.c14n()).apply(document);
 
-            var processor = getProcessor(proofDraft.c14n()).apply(document);
+        processor.withProofs(proofDraft.previous());
 
-            processor.withProofs(proofDraft.previous());
+        var payload = processor.digestible(BarcodePayload::new);
 
-            proof = proofDraft.sign(
-                    keyAlgorithm,
-                    signer,
-                    Resources.DIGEST_FACTORY,
-                    processor.digestible());
+        byte[] XX = new byte[] { (byte) 188, 38, (byte) 200, (byte) 146, (byte) 227, (byte) 213, 90,
+                (byte) 250,
+                50, 18, 126, (byte) 254, 47, (byte) 177, 91, 23,
+                64, (byte) 129, 104, (byte) 223, (byte) 136, 81, 116, 67,
+                (byte) 136, 125, (byte) 137, (byte) 165, 117, 63, (byte) 152, (byte) 207 };
 
-            DataIntegrityProof.write((DataIntegrityProof) proof, composer);
+        payload.opticalData(XX);
 
-            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-                document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
-            }
+        proof = proofDraft.sign(
+                keyAlgorithm,
+                signer,
+                Resources.DIGEST_FACTORY,
+                payload);
 
-        } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
+        DataIntegrityProof.write((DataIntegrityProof) proof, composer);
 
-            assertEquals(Ed25519Signature2020.SIGNATURE_ALGORITHM, keyAlgorithm);
-
-            var proofDraft = Ed25519Signature2020.newDraft((Map) options);
-
-            var processor = Resources.SEMANTIC_MODEL_1.createProcessor(document);
-
-            proof = Ed25519Signature2020.generateProof(
-                    signer,
-                    Resources.DIGEST_FACTORY,
-                    proofDraft,
-                    processor.digestible());
-
-            Ed25519Signature2020.write((Ed25519Signature2020) proof, composer);
-
-            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-                document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
-            }
-
-        } else {
-            fail("An unsupported proof type " + options.get("type"));
+        if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
+            document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
         }
 
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
@@ -176,24 +144,6 @@ public class IssuerTest {
         };
     }
 
-    static StandardCryptoSuite getCryptosuite(String id) {
-
-        return switch (id) {
-        case "eddsa-rdfc-2022" -> EdDSA2022.withRDFC();
-        case "eddsa-jcs-2022" -> EdDSA2022.withJCS();
-
-        case "ecdsa-rdfc-2019" -> ECDSA2019.withRDFC();
-        case "ecdsa-jcs-2019" -> ECDSA2019.withJCS();
-
-        case "mldsa44-rdfc-2024" -> MLDSA2024.get44withRDFC();
-        case "mldsa44-jcs-2024" -> MLDSA2024.get44withJCS();
-
-        case "slhdsa128-rdfc-2024" -> SLHDSA2024.get128withRDFC();
-        case "slhdsa128-jcs-2024" -> SLHDSA2024.get128withJCS();
-
-        default -> throw new IllegalArgumentException();
-        };
-    }
 
     static final Stream<String> resources() throws IOException {
         return Resources.stream()
@@ -203,11 +153,9 @@ public class IssuerTest {
     }
 
     static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
-
-        var result = new LinkedHashSet<>(documentContext);
-
+        var result = LinkedHashSet.<String>newLinkedHashSet(documentContext.size() + proofContext.size());
+        result.addAll(documentContext);
         result.addAll(proofContext);
-
         return result;
     }
 }
