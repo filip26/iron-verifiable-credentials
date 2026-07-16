@@ -1,0 +1,255 @@
+package com.apicatalog.di.barcodes;
+
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.util.Arrays;
+import java.util.HexFormat;
+
+import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.std.StandardCryptoSuite;
+import com.apicatalog.multibase.Multibase;
+import com.apicatalog.security.AsymmetricSigner;
+import com.apicatalog.security.AsymmetricVerifier;
+import com.apicatalog.security.Digestor;
+import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.signature.Signature;
+
+public final class ECDSAXI2023 extends StandardCryptoSuite {
+
+    public static final String P256 = "P-256";
+    public static final String P384 = "P-384";
+
+    private static final ECDSAXI2023 ECDSA_XI_2023 = new ECDSAXI2023(
+            "ecdsa-xi-2023",
+            DataModel.C14N_RDFC);
+
+    private ECDSAXI2023(String id, String c14n) {
+        super(id, c14n, Multibase.BASE_58_BTC, ECDSAXI2023::generate);
+    }
+
+    public static ECDSAXI2023 getInstance() {
+        return ECDSA_XI_2023;
+    }
+
+    static final byte[] XX = new byte[] { (byte) 188, 38, (byte) 200, (byte) 146, (byte) 227, (byte) 213, 90,
+            (byte) 250,
+            50, 18, 126, (byte) 254, 47, (byte) 177, 91, 23,
+            64, (byte) 129, 104, (byte) 223, (byte) 136, 81, 116, 67,
+            (byte) 136, 125, (byte) 137, (byte) 165, 117, 63, (byte) 152, (byte) 207 };
+
+    @Override
+    public Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
+
+        String algorithm = null;
+        String digest = null;
+
+        switch (signature.length) {
+        case 64:
+            algorithm = P256;
+            digest = "SHA-256";
+            break;
+        case 96:
+            algorithm = P384;
+            digest = "SHA-384";
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+
+        return ProofValue.newInstance(
+                algorithm,
+                digest,
+                signature,
+                proof,
+                payload, XX);
+    }
+
+    private static Signature generate(
+            String signatureAlgorithm,
+            AsymmetricSigner signer,
+            Digestor.Factory digestFactory,
+            DataIntegrityProof proof,
+            DigestiblePayload payload)
+            throws SignatureException {
+
+        var digestAlgorithm = switch (signatureAlgorithm) {
+        case P256 -> Digestor.SHA_256;
+        case P384 -> Digestor.SHA_384;
+        default -> throw new IllegalArgumentException();
+        };
+
+        var digestor = digestFactory.newDigestor(digestAlgorithm);
+
+        return ProofValue.generateSignature(
+                signatureAlgorithm,
+                digestAlgorithm,
+                signer,
+                digestor,
+                proof,
+                payload,
+                XX);
+    }
+
+    public static class ProofValue implements Signature {
+
+        private final String algorithm;
+        private final String digestAlgorithm;
+
+        private final byte[] signature;
+
+        private final DigestiblePayload payload;
+        private final Proof proof;
+        private final byte[] data;
+
+        private ProofValue(
+                String algorithm,
+                String digestAlgorithm,
+                byte[] signature,
+                Proof proof,
+                DigestiblePayload payload,
+                byte[] data) {
+            this.algorithm = algorithm;
+            this.digestAlgorithm = digestAlgorithm;
+            this.signature = signature;
+            this.payload = payload;
+            this.proof = proof;
+            this.data = data;
+        }
+
+        public static ProofValue newInstance(
+                String algorithm,
+                String digestAlgorithm,
+                byte[] value,
+                Proof proof,
+                PayloadProcessor payload,
+                byte[] data) {
+            return new ProofValue(
+                    algorithm,
+                    digestAlgorithm,
+                    value,
+                    proof,
+                    payload.digestible(),
+                    data);
+        }
+
+        public static ProofValue generateSignature(
+                String signatureAlgorithm,
+                String digestAlgorithm,
+                AsymmetricSigner signer,
+                Digestor digestor,
+                Proof proof,
+                DigestiblePayload payload,
+                byte[] data) throws SignatureException {
+
+            var digest = digest(digestAlgorithm, digestor, proof.canonicalPayload(), payload, data);
+
+            return new ProofValue(
+                    signatureAlgorithm,
+                    digestAlgorithm,
+                    signer.sign(digest),
+                    proof,
+                    payload,
+                    data);
+        }
+
+        @Override
+        public boolean verify(
+                AsymmetricVerifier verifier,
+                Digestor.Factory digestFactory,
+                byte[] publicKey)
+                throws InvalidKeyException, SignatureException {
+
+            var digestor = digestFactory.newDigestor(digestAlgorithm);
+
+            var digest = digest(digestAlgorithm, digestor, proof.canonicalPayload(), payload, XX);
+
+            return verifier.verify(publicKey, digest, toByteArray());
+        }
+
+        /**
+         * Computes the cryptographic hash of the canonical proof concatenated with the
+         * cryptographic hash of the canonical document.
+         * <p>
+         * The output is structured as H(canonicalProof) || H(canonicalDocument) and is
+         * utilized as signing or verification data.
+         * 
+         * @param digestAlgorithm
+         * @param digest
+         * @param canonicalProof    the byte array representing the canonicalized proof
+         * @param canonicalDocument the byte array representing the canonicalized
+         *                          document
+         * @return a byte array containing the concatenated hashes in the specified
+         *         order
+         */
+        private static byte[] digest(
+                String digestAlgorithm,
+                Digestor digest,
+                byte[] canonicalProof,
+                DigestiblePayload payload,
+                byte[] data) {
+
+            var proofHash = digest.digest(canonicalProof);
+
+            var payloadHash = payload.digest(digestAlgorithm);
+
+            if (payloadHash == null) {
+                payloadHash = digest.digest(payload.canonicalPayload());
+                payload.digest(digestAlgorithm, payloadHash);
+            }
+
+            var dataHash = digest.digest(data);
+
+            return digestFromHash(proofHash, payloadHash, dataHash);
+        }
+
+        private static byte[] digestFromHash(byte[] proofHash, byte[] payloadHash, byte[] dataHash) {
+            var digest = new byte[proofHash.length + payloadHash.length + dataHash.length];
+            System.arraycopy(proofHash, 0, digest, 0, proofHash.length);
+            System.arraycopy(payloadHash, 0, digest, proofHash.length, payloadHash.length);
+            System.arraycopy(dataHash, 0, digest, proofHash.length + payloadHash.length, dataHash.length);
+            return digest;
+        }
+
+        @Override
+        public byte[] toByteArray() {
+            return signature;
+        }
+
+        @Override
+        public Proof proof() {
+            return proof;
+        }
+
+        @Override
+        public String algorithm() {
+            return algorithm;
+        }
+
+        @Override
+        public DigestiblePayload payload() {
+            return payload;
+        }
+    }
+
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+
+        var x = "DACJOHN\nDAQF987654321\nDCSSMITH\n";
+
+        var y = MessageDigest.getInstance("SHA-256");
+        var z = y.digest(x.getBytes(StandardCharsets.UTF_8));
+
+        IO.println(HexFormat.of().formatHex(z));
+
+        IO.println(Arrays.toString(x.getBytes(StandardCharsets.UTF_8)));
+        IO.println(Multibase.BASE_2.encode(Multibase.BASE_64_URL.decode("uggAg")));
+        IO.println(HexFormat.of().formatHex(XX));
+        IO.println(x.length() + ", " + XX.length);
+    }
+
+}

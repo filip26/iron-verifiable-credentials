@@ -36,6 +36,7 @@ The following cryptographic suites are supported out-of-the-box.
 | `slhdsa128-rdfc-2024` | `SLH-DSA-SHA2-128s` | `RDFC`  | ✅ | |
 | `slhdsa128-jcs-2024` | `SLH-DSA-SHA2-128s` | `JCS`  | ✅ | |
 | `Ed25519Signature2020` | `Ed25519` | `RDFC` | | |
+| `ecdsa-xi-2023` | `P-256`, `P-384` | `RDFC` | | |
 
 ## 🤝 Contributing
 
@@ -49,6 +50,7 @@ Contributions of all kinds are welcome - whether it’s code, documentation, tes
 * [Quantum-Resistant Cryptosuites v1.0](https://www.w3.org/TR/vc-di-quantum-resistant-1.0/)
 * [Verifiable Credentials Data Model v2.0](https://w3c.github.io/vc-data-model/)
 * [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
+* [Verifiable Credential Barcodes v1.0](https://www.w3.org/TR/vc-barcodes-1.0/)
 
 ## 💼 Commercial Support
 
