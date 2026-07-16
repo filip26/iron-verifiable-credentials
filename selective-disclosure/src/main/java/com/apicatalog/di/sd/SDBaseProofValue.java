@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -20,6 +21,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
+import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
 
 import co.nstant.in.cbor.CborBuilder;
@@ -304,16 +306,28 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
         }
 
         var derivedDocument = new SDDerivedDocument(
+                () -> SDBaseProofValue.recompact(payload.context, selection, payload.model),
                 payload.base,
                 disclosedPayload,
                 indices,
                 selectionLabels);
 
         return SDDerivedProofValue.newInstance(this, derivedDocument, selectedSignatures);
-
     }
 
-    static int[] relativeIndices(int[] combined, int[] mandatory) {
+    private static Map<String, Object> recompact(
+            Collection<String> context,
+            Map<String, Object> document,
+            SemanticModel model) {
+
+        var expanded = model.expand().apply(document);
+
+        var deskolemized = Skolemizer.deskolemizeExpanded(expanded);
+
+        return model.compact().apply(context, (Map<String, Object>) deskolemized.iterator().next());
+    }
+
+    private static int[] relativeIndices(int[] combined, int[] mandatory) {
         final var indices = new int[mandatory.length];
 
         int index = 0;

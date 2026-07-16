@@ -871,7 +871,9 @@ public final class DataIntegrityProof implements Proof {
                                 An unexpected proof type has been detected %s, expected %s.
                                 """.formatted(statement[1], TYPE_URI));
                     }
-                    di.id = statement[0];
+                    if (!statement[0].startsWith("_:")) {
+                        di.id = statement[0];
+                    }
                     break;
                 case PREDICATE_CRYPTOSUITE:
                     di.cryptosuite = cryptosuites.get(statement[2]);
@@ -880,7 +882,7 @@ public final class DataIntegrityProof implements Proof {
                     di.created = Instant.parse(statement[2]);
                     break;
                 case PREDICATE_PROOF_PURPOSE:
-                    di.purpose = statement[2];
+                    di.purpose = statement[2].substring("https://w3id.org/security#".length());
                     break;
                 case PREDICATE_VERIFICATION_METHOD:
                     di.verificationMethod = statement[2];

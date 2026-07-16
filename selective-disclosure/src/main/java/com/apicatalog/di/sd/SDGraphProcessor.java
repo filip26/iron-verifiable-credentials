@@ -178,6 +178,7 @@ public class SDGraphProcessor implements GraphProcessor {
         base.compacted = compacted;
         base.canonized = canonized;
         base.model = model;
+        base.context = context;
 
         return base;
     }
@@ -253,10 +254,15 @@ public class SDGraphProcessor implements GraphProcessor {
         }
 
         return new SDDerivedDocument(
+                this::compacted,
                 mandatory.toString().getBytes(StandardCharsets.UTF_8),
                 disclosed,
                 indices,
                 labels);
+    }
+
+    private Map<String, Object> compacted() {
+        return model.compact().apply(context, expandedDocument);
     }
 
     @Override
@@ -295,7 +301,6 @@ public class SDGraphProcessor implements GraphProcessor {
 
         if (expandedProofs != null) {
             dataset = new Dataset();
-
             model.tordf().accept(expandedProofs, dataset);
         }
     }

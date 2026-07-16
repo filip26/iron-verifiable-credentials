@@ -1,15 +1,21 @@
 package com.apicatalog.di.sd;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.jcs.Jcs;
+import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.model.ModelResolver;
 
 class DeriveTest {
@@ -18,7 +24,7 @@ class DeriveTest {
     @MethodSource({ "resources" })
     void testDerive(String resource) throws Throwable {
 
-        var signed = Resources.getMap(resource);
+        var signed = Resources.getMap(resource + ".signed.json");
 
         var contexts = ModelResolver.getContexts(signed);
 
@@ -48,6 +54,16 @@ class DeriveTest {
             assertTrue(isVerified);
             assertFalse(cursor.next());
 
+            var document = new LinkedHashMap<String, Object>(derivedSignature.payload().compacted().get());
+            
+            var composer = new NativeComposer<Map<String, ? extends Object>>();
+            DataIntegrityProof.write(derivedSignature.proof(), composer);
+            document.put("proof", composer.compose());
+            
+            var expected = Resources.getMap(resource + ".derived.json");
+
+            assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));   
+
         } else {
             fail();
         }
@@ -56,7 +72,8 @@ class DeriveTest {
     static final Stream<String> resources() {
         return Resources
                 .stream()
-                .filter(name -> name.endsWith(".signed.json"))
+                .filter(name -> name.endsWith(".derived.json"))
+                .map(name -> name.substring(0, name.length() - ".derived.json".length()))
                 .sorted();
     }
 

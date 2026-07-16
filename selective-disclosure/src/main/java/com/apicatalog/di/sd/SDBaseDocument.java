@@ -19,6 +19,7 @@ public class SDBaseDocument implements SDPayload {
 
     byte[] hmacKey;
 
+    Collection<String> context;
     Map<String, Object> compacted;
     List<String> canonized;
 

@@ -1,8 +1,11 @@
 package com.apicatalog.di.sd;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -11,8 +14,12 @@ import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.di.sd.signature.DerivedSignature;
 import com.apicatalog.multicodec.Multicodec;
 
+import co.nstant.in.cbor.CborBuilder;
 import co.nstant.in.cbor.CborDecoder;
+import co.nstant.in.cbor.CborEncoder;
 import co.nstant.in.cbor.CborException;
+import co.nstant.in.cbor.builder.ArrayBuilder;
+import co.nstant.in.cbor.builder.MapBuilder;
 import co.nstant.in.cbor.model.Array;
 import co.nstant.in.cbor.model.DataItem;
 import co.nstant.in.cbor.model.MajorType;
@@ -153,57 +160,50 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
 
     @Override
     public byte[] toByteArray() {
-        // TODO Auto-generated method stub
-        return null;
+        return toByteArray(baseSignature, proofPublicKey, signatures, payload.labels(), payload.indices());
     }
 
-//    @Override
-//    public boolean verify(
-//            AsymmetricVerifier verifier,
-//            Digestor.Factory digestFactory,
-//            byte[] publicKey) throws InvalidKeyException, SignatureException {
-//
-//        if (signatures.length != payload.redactablePayload().length) {
-////          throw new VerificationError(VerificationErrorCode.InvalidSignature);
-//            throw new SignatureException();
-//        }
-//
-////        IO.println(expanded);
-////        IO.println(labels);
-////        IO.println(Arrays.toString(indices));
-//
-//        var digestor = digestFactory.newDigestor(digestAlgorithm);
-////
-//        var proofDigest = digestor.digest(proof.canonicalPayload());
-//        var mandatoryDigest = digestor.digest(payload.canonicalPayload());
-//
-//        var baseDigest = SDBaseProofValue.hash(
-//                proofDigest,
-//                proofPublicKey,
-//                mandatoryDigest);
-//
-//        var isBaseSignatureVerified = verifier.verify(publicKey, baseDigest, baseSignature);
-//
-//        if (!isBaseSignatureVerified) {
-//            return false;
-//        }
-//
-//        var decodedProofPublicKey = proofPublicKeyCodec.decode(proofPublicKey);
-//
-//        for (int signatureIndex = 0; signatureIndex < signatures.length; signatureIndex++) {
-//
-//            var redactable = payload.redactablePayload()[signatureIndex];
-//            var signature = signatures[signatureIndex];
-//
-//            if (!verifier.verify(decodedProofPublicKey, redactable, signature)) {
-//                return false;
-//            }
-//        }
-//
-//        // all good
-//        return true;
-//    }
+    public static byte[] toByteArray(
+            byte[] baseSignature,
+            byte[] proofPublicKey,
+            byte[][] signatures,
+            Map<Integer, byte[]> labels,
+            int[] indices) {
 
+        final var cbor = new CborBuilder();
+
+        final var top = cbor.addArray();
+
+        top.add(baseSignature); // .tagged(64);
+        top.add(proofPublicKey); // .tagged(64);
+
+        var cborSignatures = top.addArray();
+
+        for (int signatureIndex = 0; signatureIndex < signatures.length; signatureIndex++) {
+            cborSignatures.add(signatures[signatureIndex]);  // .tagged(64);
+        }
+
+        final MapBuilder<ArrayBuilder<CborBuilder>> cborLabels = top.addMap();
+
+        labels.entrySet().forEach(e -> cborLabels.put(e.getKey(), e.getValue())); // .tagged(64));
+
+        final ArrayBuilder<ArrayBuilder<CborBuilder>> cborIndices = top.addArray();
+
+        for (int i = 0; i < indices.length; i++) {
+            cborIndices.add(new UnsignedInteger(indices[i]));
+        }
+
+        try {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            out.write(BYTE_PREFIX);
+
+            (new CborEncoder(out)).encode(cbor.build());
+
+            return out.toByteArray();
+        } catch (IOException | CborException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
     private static int toUInt(DataItem item) {
 
         if (!MajorType.UNSIGNED_INTEGER.equals(item.getMajorType())) {
@@ -215,104 +215,8 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
 
 
 
-//    protected ECDSASDDerivedProofValue(
-//            Proof proof,
-//            DocumentModel model,
-//            DocumentLoader loader) {
-//        this.model = model;
-//        this.proof = proof;
-//        this.loader = loader;
-//    }
-//
-//
-//    public static byte[] toByteArray(
-//            byte[] baseSignature,
-//            byte[] proofPublicKey,
-//            Collection<byte[]> signatures,
-//            Map<Integer, byte[]> labels,
-//            int[] indices) {
-//
-//        final CborBuilder cbor = new CborBuilder();
-//
-//        final ArrayBuilder<CborBuilder> top = cbor.addArray();
-//
-//        top.add(baseSignature); // .tagged(64);
-//        top.add(proofPublicKey); // .tagged(64);
-//
-//        final ArrayBuilder<ArrayBuilder<CborBuilder>> cborSigs = top.addArray();
-//
-//        signatures.forEach(m -> cborSigs.add(m)); // .tagged(64));
-//
-//        final MapBuilder<ArrayBuilder<CborBuilder>> cborLabels = top.addMap();
-//
-//        labels.entrySet().forEach(e -> cborLabels.put(e.getKey(), e.getValue())); // .tagged(64));
-//
-//        final ArrayBuilder<ArrayBuilder<CborBuilder>> cborIndices = top.addArray();
-//
-//        for (int i = 0; i < indices.length; i++) {
-//            cborIndices.add(new UnsignedInteger(indices[i]));
-//        }
-//
-//        try {
-//            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-//            out.write(BYTE_PREFIX);
-//
-//            (new CborEncoder(out)).encode(cbor.build());
-//
-//            return out.toByteArray();
-//        } catch (IOException | CborException e) {
-//            throw new IllegalArgumentException(e);
-//        }
-//    }
-//
-//    @Override
-//    public Proof proof() {
-//        return proof;
-//    }
-//
-//    protected static byte[] toByteArray(DataItem item) throws DocumentError {
-//
-//        if (!MajorType.BYTE_STRING.equals(item.getMajorType())) {
-//            throw new DocumentError(ErrorType.Invalid, "ProofValue");
-//        }
-//
-//        return ((ByteString) item).getBytes();
-//    }
-//
 
-//    @Override
-//    public void verify(VerificationKey key) throws VerificationError, DocumentError {
-//        final SDProofValue signer = new SDProofValue(proof.cryptosuite(), proof.cryptosuite(), proof.cryptosuite());
-//
-//        try {
-//            final byte[] proofHash = signer.hash(model.proofs().iterator().next());
-//
-//            // unsignedProof.context()
-//            final RecoveredIndices verifyData = RecoveredIndices.of(model.data().expanded(), loader, labels, indices);
-//
-//            final byte[] mandatoryHash = signer.hash(verifyData.mandatory);
-//
-//            if (signatures.size() != verifyData.nonMandatory.size()) {
-//                throw new VerificationError(VerificationErrorCode.InvalidSignature);
-//            }
-//
-//            final byte[] signature = SDProofValue.hash(proofHash, proofPublicKey, mandatoryHash);
-//
-//            signer.verify(key.publicKey().rawBytes(), baseSignature, signature);
-//
-//            final byte[] decodedProofPublicKey = ECDSASD2023.CODECS.decode(proofPublicKey);
-//
-//            int i = 0;
-//            for (byte[] sig : signatures) {
-//                signer.verify(decodedProofPublicKey, sig, (verifyData.nonMandatory.get(i).toString() + '\n').getBytes(StandardCharsets.UTF_8));
-//                i++;
-//            }
-//            // all good
-//
-//        } catch (CryptoSuiteError | DocumentError e) {
-//            throw new VerificationError(VerificationErrorCode.InvalidSignature, e);
-//        }
-//    }
+
 //
 //    @Override
 //    public String toString() {
@@ -344,16 +248,6 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
 //                .append(indices != null ? Arrays.toString(indices) : "n/a")
 //                .append('\n')
 //                .toString();
-//    }
-//
-//    @Override
-//    public byte[] byteArrayValue() {
-//        return toByteArray(baseSignature, proofPublicKey, signatures, labels, indices);
-//    }
-//
-//    @Override
-//    public DocumentModel model() {
-//        return model;
 //    }
 
 }

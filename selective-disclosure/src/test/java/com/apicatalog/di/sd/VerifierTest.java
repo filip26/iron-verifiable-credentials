@@ -66,7 +66,7 @@ public class VerifierTest {
 
         var signed = Resources.getMap(resource);
 
-        var contexts = MODEL_RESOLVER.getContexts(signed);
+        var contexts = ModelResolver.getContexts(signed);
 
         var models = MODEL_RESOLVER.resolve(contexts, signed);
 
@@ -99,13 +99,7 @@ public class VerifierTest {
                 }
 
                 var proof = cursor.proof();
-//                IO.println(((DataIntegrityProof)proof).cryptosuite().algorithm());
-//                IO.println(new String(cursor.data().digestiblePayload().canonicalPayload()));
-//                IO.println("D: " + HexFormat.of().formatHex(cursor.data().digestiblePayload().digest("SHA-384")));
 
-//                var x = MessageDigest.getInstance("SHA-384");
-//                x.update(proof.canonicalPayload());
-//IO.println("P: " +  HexFormat.of().formatHex(x.digest()));
                 var verified = PROOF_VERIFIER.verify(proof);
 
                 assertTrue(verified);
