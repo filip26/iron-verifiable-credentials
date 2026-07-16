@@ -5,13 +5,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.di.sd.signature.BaseSignature;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
@@ -221,8 +226,108 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
         return toByteArray(baseSignature, proofPublicKey, hmacKey, signatures, mandatoryPointers);
     }
 
-    public SDDerivedProofValue derive(SDDerivedDocument derivedDocument) {
-        return SDDerivedProofValue.generateSignature(this, derivedDocument);
+    public SDDerivedProofValue derive(Collection<String> selectors) {
+
+        var combinedPointers = new LinkedHashSet<String>(mandatoryPointers.size() + selectors.size());
+        combinedPointers.addAll(mandatoryPointers);
+        combinedPointers.addAll(selectors);
+
+        var selection = Pointer.select(payload.compacted, combinedPointers);
+
+        var selectedNQuads = new HashSet<String>();
+
+        var c14n = payload.model.newCanonizer();
+        var consumer = c14n.consumer();
+
+        payload.model.tordf().accept(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {
+
+            var s = subject;
+            if (s.startsWith(Skolemizer.URN_PREFIX)) {
+                s = payload.labels.get("_:" + s.substring(Skolemizer.URN_PREFIX.length()));
+            }
+            var o = object;
+            if (o.startsWith(Skolemizer.URN_PREFIX)) {
+                o = payload.labels.get("_:" + o.substring(Skolemizer.URN_PREFIX.length()));
+            }
+
+            var nquad = c14n.toNQuad(s, predicate, o, datatype, language, direction, graph);
+
+            consumer.accept(s, predicate, o, datatype, language, direction, graph);
+            selectedNQuads.add(nquad);
+        }));
+
+        c14n.canonize();
+
+        var selectionLabels = HashMap.<Integer, byte[]>newHashMap(c14n.labels().size());
+        for (var label : c14n.labels().entrySet()) {
+            selectionLabels.put(
+                    Integer.parseInt(label.getValue().substring("_:c14n".length())),
+                    Multibase.BASE_64_URL.decode(label.getKey().substring("_:".length())));
+        }
+
+        int index = 0;
+
+        var selectedIndices = new int[selectedNQuads.size()];
+        int selectedIndex = 0;
+
+        for (var nquad : payload.canonized) { // TODO iterate over selected?!
+            if (selectedNQuads.contains(nquad)) {
+                selectedNQuads.remove(nquad);
+
+                selectedIndices[selectedIndex++] = index;
+
+                // all selected indices found
+                if (selectedNQuads.isEmpty()) {
+                    break;
+                }
+            }
+            index++;
+        }
+
+        var indices = relativeIndices(selectedIndices, payload.mandatoryIndices);
+
+        var disclosedPayload = new byte[selectedIndices.length - payload.mandatoryIndices.length][];
+        var signatureIndex = 0;
+
+        var selectedSignatures = new byte[selectedIndices.length - payload.mandatoryIndices.length][];
+
+        for (var si : selectedIndices) {
+            var ri = Arrays.binarySearch(payload.redactableIndices, si);
+            if (ri >= 0) {
+                disclosedPayload[signatureIndex] = payload.redactable[ri];
+                selectedSignatures[signatureIndex++] = signatures[ri];
+            }
+        }
+
+        if (signatureIndex < selectedSignatures.length) {
+            throw new IllegalStateException();
+        }
+
+        var derivedDocument = new SDDerivedDocument(
+                payload.base,
+                disclosedPayload,
+                indices,
+                selectionLabels);
+
+        return SDDerivedProofValue.newInstance(this, derivedDocument, selectedSignatures);
+
+    }
+
+    static int[] relativeIndices(int[] combined, int[] mandatory) {
+        final var indices = new int[mandatory.length];
+
+        int index = 0;
+        int relative = 0;
+
+        Arrays.sort(mandatory); // TODO all indices should be sorted already
+
+        for (int key : combined) {
+            if (Arrays.binarySearch(mandatory, key) >= 0) {
+                indices[index++] = relative;
+            }
+            relative++;
+        }
+        return indices;
     }
 
     @Override

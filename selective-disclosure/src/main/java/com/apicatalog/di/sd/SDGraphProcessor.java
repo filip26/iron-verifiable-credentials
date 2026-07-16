@@ -234,23 +234,29 @@ public class SDGraphProcessor implements GraphProcessor {
 
         Arrays.sort(indices);
 
+        var combinedIndices = new int[nquads.size() - indices.length];
+
         int index = 0;
         int disclosedIndex = 0;
+
         for (var nquad : nquads) {
 
             if (Arrays.binarySearch(indices, index) >= 0) {
                 mandatory.write(nquad);
+
             } else {
+                combinedIndices[disclosedIndex] = index;
                 disclosed[disclosedIndex++] = nquad.getBytes(StandardCharsets.UTF_8);
             }
 
             index++;
         }
 
-        var derived = new SDDerivedDocument();
-        derived.base = mandatory.toString().getBytes(StandardCharsets.UTF_8);
-        derived.disclosed = disclosed;
-        return derived;
+        return new SDDerivedDocument(
+                mandatory.toString().getBytes(StandardCharsets.UTF_8),
+                disclosed,
+                indices,
+                labels);
     }
 
     @Override

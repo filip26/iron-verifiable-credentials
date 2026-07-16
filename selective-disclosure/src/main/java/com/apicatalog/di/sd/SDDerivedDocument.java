@@ -1,22 +1,14 @@
 package com.apicatalog.di.sd;
 
+import java.util.Map;
+
 import com.apicatalog.trust.model.DataModel;
 
-public class SDDerivedDocument implements SDPayload {
-
-    byte[] base;
-    byte[][] disclosed;
-    int[] disclosedIndices;
-
-    @Override
-    public byte[] canonicalPayload() {
-        return base;
-    }
-
-    @Override
-    public byte[][] redactablePayload() {
-        return disclosed;
-    }
+public record SDDerivedDocument(
+        byte[] canonicalPayload,
+        byte[][] redactablePayload,
+        int[] indices,
+        Map<Integer, byte[]> labels) implements SDPayload {
 
     @Override
     public String c14n() {

@@ -129,7 +129,10 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
         }
     }
     
-    public static SDDerivedProofValue generateSignature(SDBaseProofValue base, SDDerivedDocument document) {
+    public static SDDerivedProofValue newInstance(
+            SDBaseProofValue base, 
+            SDDerivedDocument document,
+            byte[][] signatures) {
 
         var signature = new SDDerivedProofValue();
         signature.baseSignature = base.baseSignature;
@@ -138,23 +141,13 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
         signature.proofPublicKey = base.proofPublicKey;
         signature.proofPublicKeyCodec = base.proofPublicKeyCodec;
         signature.signatureAlgorithm = base.signatureAlgorithm;
+        signature.signatures = signatures;
 
-        signature.signatures = new byte[document.disclosedIndices.length][];
-
-        for (int index = 0; index < signature.signatures.length; index++) {
-            signature.signatures[index] = base.signatures[document.disclosedIndices[index]];
-        }
-
+        //FIXME use close function
         var d = new DataIntegrityProof.Draft(((DataIntegrityProof) base.proof).cryptosuite());
         d.proof(((DataIntegrityProof) base.proof));
-
         signature.proof = d.signed(signature);
 
-//        signature.proof 
-//        signature.p
-//        var derivedProof = DataIntegrityProof.clone((DataIntegrityProof) proof, signature);
-
-        // TODO Auto-generated method stub
         return signature;
     }
 
