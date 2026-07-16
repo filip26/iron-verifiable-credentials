@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.SemanticModel;
@@ -266,7 +267,7 @@ public class SDGraphProcessor implements GraphProcessor {
     }
 
     @Override
-    public DigestiblePayload digestible() {
+    public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Yet, not supported.");
     }

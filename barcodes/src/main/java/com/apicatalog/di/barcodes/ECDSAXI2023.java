@@ -37,12 +37,6 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
         return ECDSA_XI_2023;
     }
 
-    static final byte[] XX = new byte[] { (byte) 188, 38, (byte) 200, (byte) 146, (byte) 227, (byte) 213, 90,
-            (byte) 250,
-            50, 18, 126, (byte) 254, 47, (byte) 177, 91, 23,
-            64, (byte) 129, 104, (byte) 223, (byte) 136, 81, 116, 67,
-            (byte) 136, 125, (byte) 137, (byte) 165, 117, 63, (byte) 152, (byte) 207 };
-
     @Override
     public Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
 
@@ -67,7 +61,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 digest,
                 signature,
                 proof,
-                payload, XX);
+                payload);
     }
 
     private static Signature generate(
@@ -78,6 +72,9 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
             DigestiblePayload payload)
             throws SignatureException {
 
+        if (!(payload instanceof OpticalBarcode barcode)) {
+            throw new IllegalArgumentException();
+        }
         var digestAlgorithm = switch (signatureAlgorithm) {
         case P256 -> Digestor.SHA_256;
         case P384 -> Digestor.SHA_384;
@@ -92,8 +89,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 signer,
                 digestor,
                 proof,
-                payload,
-                XX);
+                barcode);
     }
 
     public static class ProofValue implements Signature {
@@ -103,23 +99,20 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
 
         private final byte[] signature;
 
-        private final DigestiblePayload payload;
+        private final OpticalBarcode payload;
         private final Proof proof;
-        private final byte[] data;
 
         private ProofValue(
                 String algorithm,
                 String digestAlgorithm,
                 byte[] signature,
                 Proof proof,
-                DigestiblePayload payload,
-                byte[] data) {
+                OpticalBarcode payload) {
             this.algorithm = algorithm;
             this.digestAlgorithm = digestAlgorithm;
             this.signature = signature;
             this.payload = payload;
             this.proof = proof;
-            this.data = data;
         }
 
         public static ProofValue newInstance(
@@ -127,15 +120,13 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 String digestAlgorithm,
                 byte[] value,
                 Proof proof,
-                PayloadProcessor payload,
-                byte[] data) {
+                PayloadProcessor payload) {
             return new ProofValue(
                     algorithm,
                     digestAlgorithm,
                     value,
                     proof,
-                    payload.digestible(),
-                    data);
+                    payload.digestible(OpticalBarcode::new));
         }
 
         public static ProofValue generateSignature(
@@ -144,18 +135,16 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 AsymmetricSigner signer,
                 Digestor digestor,
                 Proof proof,
-                DigestiblePayload payload,
-                byte[] data) throws SignatureException {
+                OpticalBarcode payload) throws SignatureException {
 
-            var digest = digest(digestAlgorithm, digestor, proof.canonicalPayload(), payload, data);
+            var digest = digest(digestAlgorithm, digestor, proof.canonicalPayload(), payload);
 
             return new ProofValue(
                     signatureAlgorithm,
                     digestAlgorithm,
                     signer.sign(digest),
                     proof,
-                    payload,
-                    data);
+                    payload);
         }
 
         @Override
@@ -167,7 +156,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
 
             var digestor = digestFactory.newDigestor(digestAlgorithm);
 
-            var digest = digest(digestAlgorithm, digestor, proof.canonicalPayload(), payload, XX);
+            var digest = digest(digestAlgorithm, digestor, proof.canonicalPayload(), payload);
 
             return verifier.verify(publicKey, digest, toByteArray());
         }
@@ -191,8 +180,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 String digestAlgorithm,
                 Digestor digest,
                 byte[] canonicalProof,
-                DigestiblePayload payload,
-                byte[] data) {
+                OpticalBarcode payload) {
 
             var proofHash = digest.digest(canonicalProof);
 
@@ -203,7 +191,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 payload.digest(digestAlgorithm, payloadHash);
             }
 
-            var dataHash = digest.digest(data);
+            var dataHash = digest.digest(payload.opticalData());
 
             return digestFromHash(proofHash, payloadHash, dataHash);
         }
@@ -237,19 +225,27 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
         }
     }
 
-    public static void main(String[] args) throws NoSuchAlgorithmException {
-
-        var x = "DACJOHN\nDAQF987654321\nDCSSMITH\n";
-
-        var y = MessageDigest.getInstance("SHA-256");
-        var z = y.digest(x.getBytes(StandardCharsets.UTF_8));
-
-        IO.println(HexFormat.of().formatHex(z));
-
-        IO.println(Arrays.toString(x.getBytes(StandardCharsets.UTF_8)));
-        IO.println(Multibase.BASE_2.encode(Multibase.BASE_64_URL.decode("uggAg")));
-        IO.println(HexFormat.of().formatHex(XX));
-        IO.println(x.length() + ", " + XX.length);
-    }
+//    public static void main(String[] args) throws NoSuchAlgorithmException {
+//
+//        var x = "DACJOHN\nDAQF987654321\nDCSSMITH\n";
+//
+//        var y = MessageDigest.getInstance("SHA-256");
+//        var z = y.digest(x.getBytes(StandardCharsets.UTF_8));
+//
+//        IO.println(HexFormat.of().formatHex(z));
+//
+//        IO.println(Arrays.toString(x.getBytes(StandardCharsets.UTF_8)));
+//        IO.println(Multibase.BASE_2.encode(Multibase.BASE_64_URL.decode("uggAg")));
+//        IO.println(HexFormat.of().formatHex(XX));
+//        IO.println(x.length() + ", " + XX.length);
+//
+//        var zx = """
+//                 IAUTO0000007010SRC0000000701<<
+//                 8804192M2601058NOT<<<<<<<<<<<5
+//                 SMITH<<JOHN<<<<<<<<<<<<<<<<<<<
+//                 """;
+//        var yz = y.digest(zx.getBytes(StandardCharsets.UTF_8));
+//        IO.println(Arrays.toString(yz));
+//    }
 
 }

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
@@ -18,7 +19,7 @@ public class StandardMapProcessor implements MapProcessor {
 
     private Collection<String> includedProofs;
     private Collection<?> proofs;
-    
+
     public StandardMapProcessor(
             LexicalModel model,
             Collection<String> context,
@@ -31,9 +32,9 @@ public class StandardMapProcessor implements MapProcessor {
     }
 
     @Override
-    public DigestiblePayload digestible() {
+    public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
         var canonical = model.canonize(document);
-        return new GenericPayload(canonical);
+        return payloadFactory.apply(canonical);
     }
 
     @Override
@@ -63,5 +64,4 @@ public class StandardMapProcessor implements MapProcessor {
 
         return proofs;
     }
-
 }

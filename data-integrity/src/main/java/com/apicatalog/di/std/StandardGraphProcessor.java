@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
@@ -58,6 +59,11 @@ public class StandardGraphProcessor implements GraphProcessor {
 
     @Override
     public DigestiblePayload digestible() {
+        return digestible(GenericPayload::new);
+    }
+
+    @Override
+    public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
 
         lazyInit();
         
@@ -92,9 +98,9 @@ public class StandardGraphProcessor implements GraphProcessor {
 
         var canonical = canonizer.canonize();
 
-        return new GenericPayload(canonical);
+        return payloadFactory.apply(canonical);
     }
-
+    
     @Override
     public void withProofs(Collection<String> ids) {
         this.includedProofs = ids;
