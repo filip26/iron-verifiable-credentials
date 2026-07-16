@@ -1,12 +1,8 @@
 package com.apicatalog.di.barcodes;
 
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
-import java.util.Arrays;
-import java.util.HexFormat;
+import java.util.Collection;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.std.StandardCryptoSuite;
@@ -38,7 +34,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
     }
 
     @Override
-    public Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
+    public ProofValue decode(byte[] signature, Proof proof, PayloadProcessor payload) {
 
         String algorithm = null;
         String digest = null;
@@ -60,7 +56,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 algorithm,
                 digest,
                 signature,
-                proof,
+                (DataIntegrityProof) proof,
                 payload);
     }
 
@@ -72,7 +68,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
             DigestiblePayload payload)
             throws SignatureException {
 
-        if (!(payload instanceof OpticalBarcode barcode)) {
+        if (!(payload instanceof BarcodePayload barcode)) {
             throw new IllegalArgumentException();
         }
         var digestAlgorithm = switch (signatureAlgorithm) {
@@ -99,15 +95,15 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
 
         private final byte[] signature;
 
-        private final OpticalBarcode payload;
-        private final Proof proof;
+        private final BarcodePayload payload;
+        private final DataIntegrityProof proof;
 
         private ProofValue(
                 String algorithm,
                 String digestAlgorithm,
                 byte[] signature,
-                Proof proof,
-                OpticalBarcode payload) {
+                DataIntegrityProof proof,
+                BarcodePayload payload) {
             this.algorithm = algorithm;
             this.digestAlgorithm = digestAlgorithm;
             this.signature = signature;
@@ -119,14 +115,14 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 String algorithm,
                 String digestAlgorithm,
                 byte[] value,
-                Proof proof,
+                DataIntegrityProof proof,
                 PayloadProcessor payload) {
             return new ProofValue(
                     algorithm,
                     digestAlgorithm,
                     value,
                     proof,
-                    payload.digestible(OpticalBarcode::new));
+                    payload.digestible(BarcodePayload::new));
         }
 
         public static ProofValue generateSignature(
@@ -134,8 +130,8 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 String digestAlgorithm,
                 AsymmetricSigner signer,
                 Digestor digestor,
-                Proof proof,
-                OpticalBarcode payload) throws SignatureException {
+                DataIntegrityProof proof,
+                BarcodePayload payload) throws SignatureException {
 
             var digest = digest(digestAlgorithm, digestor, proof.canonicalPayload(), payload);
 
@@ -180,7 +176,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 String digestAlgorithm,
                 Digestor digest,
                 byte[] canonicalProof,
-                OpticalBarcode payload) {
+                BarcodePayload payload) {
 
             var proofHash = digest.digest(canonicalProof);
 
@@ -210,7 +206,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
         }
 
         @Override
-        public Proof proof() {
+        public DataIntegrityProof proof() {
             return proof;
         }
 
@@ -220,9 +216,56 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
         }
 
         @Override
-        public DigestiblePayload payload() {
+        public BarcodePayload payload() {
             return payload;
         }
+    }
+    
+    public static class BarcodePayload implements DigestiblePayload {
+
+        byte[] canonicalPayload;
+        byte[] opticalData;
+
+        public BarcodePayload(byte[] canonicalPayload) {
+            this.canonicalPayload = canonicalPayload;
+        }
+
+        @Override
+        public byte[] canonicalPayload() {
+            return canonicalPayload;
+        }
+
+        @Override
+        public String c14n() {
+            return DataModel.C14N_RDFC;
+        }
+
+        @Override
+        public void digest(String algorithm, byte[] value) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public byte[] digest(String algorithm) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Collection<String> digestAlgorithms() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public byte[] opticalData() {
+            return opticalData;
+        }
+
+        public void opticalData(byte[] opticalData) {
+            this.opticalData = opticalData;
+        }
+
     }
 
 //    public static void main(String[] args) throws NoSuchAlgorithmException {
