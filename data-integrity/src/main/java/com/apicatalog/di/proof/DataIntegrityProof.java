@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.SignatureException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -19,13 +17,11 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadSelector;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.Proof;
@@ -127,67 +123,6 @@ public final class DataIntegrityProof implements Proof {
         }
     }
 
-    public static Draft newDraft(CryptoSuite cryptosuite) {
-        var di = new DataIntegrityProof();
-        di.cryptosuite = cryptosuite;
-        return new Draft(di);
-    }
-
-    public static Draft newDraft(Map<String, Object> options, Function<String, CryptoSuite> suiteProvider) {
-
-        var cryptosuite = (String) options.get("cryptosuite");
-
-        var di = new DataIntegrityProof();
-        di.cryptosuite = suiteProvider.apply(cryptosuite);
-        var draft = new Draft(di);
-        draft.previousProof(Set.of());
-
-        for (var entry : options.entrySet()) {
-            switch (entry.getKey()) {
-            case "@context":
-                if (entry.getValue() instanceof Collection<?> col) {
-                    draft.context(col.stream().map(String.class::cast).toList());
-
-                } else if (entry.getValue() instanceof String uri) {
-                    draft.context(List.of(uri));
-
-                } else {
-                    throw new IllegalArgumentException();
-                }
-                break;
-            case KEY_ID:
-                draft.id((String) entry.getValue());
-                break;
-            case KEY_CREATED:
-                draft.created(Instant.parse((String) entry.getValue()));
-                break;
-            case KEY_EXPIRES:
-                draft.expires(Instant.parse((String) entry.getValue()));
-                break;
-            case KEY_PURPOSE:
-                draft.purpose((String) entry.getValue());
-                break;
-            case KEY_VERIFICATION_METHOD:
-                draft.verificationMethod((String) entry.getValue());
-                break;
-            case KEY_PREVIOUS_PROOF:
-                if (entry.getValue() instanceof Collection<?> col) {
-                    draft.previousProof(col.stream().map(String.class::cast).toList());
-
-                } else if (entry.getValue() instanceof String uri) {
-                    draft.previousProof(List.of(uri));
-
-                } else {
-                    throw new IllegalArgumentException();
-                }
-
-                break;
-            }
-        }
-
-        return draft;
-    }
-
     public String id() {
         return id;
     }
@@ -216,7 +151,6 @@ public final class DataIntegrityProof implements Proof {
         return nonce;
     }
 
-    @Override
     public Collection<String> previous() {
         return previousProof;
     }
@@ -612,30 +546,21 @@ public final class DataIntegrityProof implements Proof {
         return out.toByteArray();
     }
 
-    public static final class Draft {
+    public static class Draft {
 
-        private final DataIntegrityProof proof;
+        protected final DataIntegrityProof proof;
 
-        private Draft(DataIntegrityProof proof) {
-            this.proof = proof;
+        //TODO public?!
+        public Draft(CryptoSuite cryptosuite) {
+            this.proof = new DataIntegrityProof();
+            this.proof.cryptosuite = cryptosuite;
         }
 
-        public Proof generateProof(
-                String keyAlgorithm,
-                AsymmetricSigner signer,
-                Function<String, MessageDigest> digestFactory,
-                Draft proofDraft,
-                DigestiblePayload payload)
-                throws SignatureException {
-
-            return proof.cryptosuite.generateProof(keyAlgorithm, signer, digestFactory, proofDraft, payload);
-        }
-
-        public byte[] canonize(String c14n) {
+        protected byte[] canonize(String c14n) {
             return canonize(DataIntegrityProof.getSignTemplate(c14n));
         }
 
-        public byte[] canonize(Function<DataIntegrityProof, byte[]> canonizer) {
+        protected byte[] canonize(Function<DataIntegrityProof, byte[]> canonizer) {
 
             Objects.requireNonNull(canonizer);
 
@@ -643,8 +568,70 @@ public final class DataIntegrityProof implements Proof {
             return proof.canonicalPayload;
         }
 
-        public DataIntegrityProof get() {
-            return proof;
+        public Draft proof(DataIntegrityProof source) {
+            proof.canonicalPayload = source.canonicalPayload;
+            proof.challenge = source.challenge;
+            proof.context = source.context;
+            proof.created = source.created;
+            proof.cryptosuite = source.cryptosuite;
+            proof.domain = source.domain;
+            proof.expires = source.expires;
+            proof.id = source.id;
+            proof.nonce = source.nonce;
+            proof.previousProof = source.previousProof;
+            proof.purpose = source.purpose;
+            proof.verificationMethod = source.verificationMethod;
+            return this;
+        }
+
+        // TODO ?!?!
+        public Draft options(Map<String, Object> options) {
+
+            previousProof(Set.of());
+
+            for (var entry : options.entrySet()) {
+                switch (entry.getKey()) {
+                case "@context":
+                    if (entry.getValue() instanceof Collection<?> col) {
+                        context(col.stream().map(String.class::cast).toList());
+
+                    } else if (entry.getValue() instanceof String uri) {
+                        context(List.of(uri));
+
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                    break;
+                case KEY_ID:
+                    id((String) entry.getValue());
+                    break;
+                case KEY_CREATED:
+                    created(Instant.parse((String) entry.getValue()));
+                    break;
+                case KEY_EXPIRES:
+                    expires(Instant.parse((String) entry.getValue()));
+                    break;
+                case KEY_PURPOSE:
+                    purpose((String) entry.getValue());
+                    break;
+                case KEY_VERIFICATION_METHOD:
+                    verificationMethod((String) entry.getValue());
+                    break;
+                case KEY_PREVIOUS_PROOF:
+                    if (entry.getValue() instanceof Collection<?> col) {
+                        previousProof(col.stream().map(String.class::cast).toList());
+
+                    } else if (entry.getValue() instanceof String uri) {
+                        previousProof(List.of(uri));
+
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+
+                    break;
+                }
+            }
+            return this;
         }
 
         public Draft created(Instant created) {
@@ -691,10 +678,13 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
-        public Draft signature(Signature signature) {
-            proof.signature = signature;
-            return this;
+        public DataIntegrityProof unsigned() {
+            return proof;
+        }
 
+        public DataIntegrityProof signed(Signature signature) {
+            proof.signature = signature;
+            return proof;
         }
 
         public Draft context(Collection<String> context) {
@@ -740,7 +730,7 @@ public final class DataIntegrityProof implements Proof {
                 Collection<String> contexts,
                 Map<String, Object> proof,
                 byte[] proofPayload,
-                PayloadSelector payload) {
+                PayloadProcessor payload) {
 
             final var di = new DataIntegrityProof();
             di.canonicalPayload = proofPayload;
@@ -861,9 +851,9 @@ public final class DataIntegrityProof implements Proof {
 
         @Override
         public Proof read(
-                Collection<String[]> proof, 
+                Collection<String[]> proof,
                 SemanticModel model,
-                PayloadSelector payload) {
+                PayloadProcessor payload) {
             final var di = new DataIntegrityProof();
 
             var canonizer = model.newCanonizer();
@@ -881,7 +871,9 @@ public final class DataIntegrityProof implements Proof {
                                 An unexpected proof type has been detected %s, expected %s.
                                 """.formatted(statement[1], TYPE_URI));
                     }
-                    di.id = statement[0];
+                    if (!statement[0].startsWith("_:")) {
+                        di.id = statement[0];
+                    }
                     break;
                 case PREDICATE_CRYPTOSUITE:
                     di.cryptosuite = cryptosuites.get(statement[2]);
@@ -890,7 +882,7 @@ public final class DataIntegrityProof implements Proof {
                     di.created = Instant.parse(statement[2]);
                     break;
                 case PREDICATE_PROOF_PURPOSE:
-                    di.purpose = statement[2];
+                    di.purpose = statement[2].substring("https://w3id.org/security#".length());
                     break;
                 case PREDICATE_VERIFICATION_METHOD:
                     di.verificationMethod = statement[2];

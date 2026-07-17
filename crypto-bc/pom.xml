@@ -13,7 +13,7 @@
         Integrity specifications.
     </description>
 
-    <url>https://github.com/filip26/iron-did-cel</url>
+    <url>https://github.com/filip26/iron-verifiable-credentials</url>
 
     <licenses>
         <license>
@@ -24,14 +24,14 @@
 
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/filip26/iron-did-cel/issues</url>
+        <url>https://github.com/filip26/iron-verifiable-credentials/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/filip26/iron-did-cel.git</connection>
+        <connection>scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
         <developerConnection>
-            scm:git:git://github.com/filip26/iron-did-cel.git</developerConnection>
-        <url>https://github.com/filip26/iron-did-cel/tree/main</url>
+            scm:git:git://github.com/filip26/iron-verifiable-credentials.git</developerConnection>
+        <url>https://github.com/filip26/iron-verifiable-credentials/tree/main</url>
     </scm>
 
     <developers>

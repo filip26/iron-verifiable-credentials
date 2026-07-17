@@ -1,0 +1,10 @@
+/target/
+/.project
+/.settings/
+/.classpath
+/.env.yaml
+/deps/
+*.log
+*.txt
+/sbin/
+/functions.json

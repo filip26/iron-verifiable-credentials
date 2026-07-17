@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.apicatalog.trust.model.SemanticModel;
 
-public interface GraphProcessor extends PayloadSelector {
+public interface GraphProcessor extends PayloadProcessor {
 
     @FunctionalInterface
     public interface Factory {

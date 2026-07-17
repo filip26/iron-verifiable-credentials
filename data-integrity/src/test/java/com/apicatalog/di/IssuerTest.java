@@ -1,18 +1,15 @@
 package com.apicatalog.di;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,31 +21,22 @@ import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.crypto.bc.BCSLHDSASigner;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.suite.CryptoSuite;
+import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
 import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jcs.Jcs;
-import com.apicatalog.jsonld.JsonLd;
-import com.apicatalog.jsonld.JsonLdError;
-import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
-import com.apicatalog.rdf.canon.RdfCanon;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.tree.io.Tree;
-import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.data.MapData;
 import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.payload.GenericPayload;
+import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
-import com.fasterxml.jackson.core.JsonFactory;
 
 public class IssuerTest {
 
@@ -108,52 +96,29 @@ public class IssuerTest {
                     """
                             .formatted(privateKeyCodec.name(), privateKeyCodec.code()));
         }
-        ;
 
         Proof proof = null;
 
-        var proofs = document.remove("proof");
+        var proofs = document.get("proof");
 
         var composer = new NativeComposer<Map<String, ? extends Object>>();
 
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
-            var proofDraft = DataIntegrityProof.newDraft(
-                    options,
-                    IssuerTest::getInstance);
+            var cryptosuite = getCryptosuite((String) options.get("cryptosuite"));
 
-            var c14nData = document;
+            var proofDraft = cryptosuite.createProofDraft();
+            proofDraft.options(options);
 
-            if (proofDraft.previous() != null && !proofDraft.previous().isEmpty()) {
-                // TODO better, use model
-                var previousProofs = new ArrayList<>(proofDraft.previous().size());
-                for (var p : (Collection<Map<String, Object>>) proofs) {
-                    if (proofDraft.previous().contains(p.get("id"))) {
-                        previousProofs.add(p);
-                    }
-                }
+            var processor = getProcessor(proofDraft.c14n()).apply(document);
 
-                c14nData = new LinkedHashMap<String, Object>(document);
-                c14nData.put("proof", previousProofs);
-            }
+            processor.withProofs(proofDraft.previous());
 
-            var canonicalPayload = switch (proofDraft.c14n()) {
-            case DataModel.C14N_JCS -> Jcs.canonize(c14nData);
-            case DataModel.C14N_RDFC -> rdfc(c14nData);
-            default -> throw new IllegalStateException(
-                    """
-                    Unsupported c14n = %s.
-                    """.formatted(proofDraft.cryptosuite().c14n()));
-            };
-
-//            payload.withProofs(proof.previous());
-                        
-            proof = proofDraft.generateProof(
+            proof = proofDraft.sign(
                     keyAlgorithm,
                     signer,
-                    Resources.DIGEST_FACTORY::get,
-                    proofDraft,
-                    new GenericPayload(canonicalPayload));
+                    Resources.DIGEST_FACTORY,
+                    processor.digestible());
 
             DataIntegrityProof.write((DataIntegrityProof) proof, composer);
 
@@ -167,13 +132,13 @@ public class IssuerTest {
 
             var proofDraft = Ed25519Signature2020.newDraft((Map) options);
 
-            byte[] canonicalPayload = rdfc(document);
+            var processor = Resources.SEMANTIC_MODEL_1.createProcessor(document);
 
             proof = Ed25519Signature2020.generateProof(
                     signer,
-                    Resources.DIGEST_FACTORY::get,
+                    Resources.DIGEST_FACTORY,
                     proofDraft,
-                    new GenericPayload(canonicalPayload));
+                    processor.digestible());
 
             Ed25519Signature2020.write((Ed25519Signature2020) proof, composer);
 
@@ -184,6 +149,9 @@ public class IssuerTest {
         } else {
             fail("An unsupported proof type " + options.get("type"));
         }
+
+        var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
+        assertTrue(verified);
 
         var proofMap = composer.compose();
 
@@ -209,7 +177,18 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
-    public static CryptoSuite getInstance(String id) {
+    static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
+        return switch (c14n) {
+        case DataModel.C14N_RDFC -> Resources.SEMANTIC_MODEL_1::createProcessor;
+        case DataModel.C14N_JCS -> Resources.LEXICAL_MODEL_1::createProcessor;
+        default -> throw new IllegalStateException(
+                """
+                Unsupported c14n = %s.
+                """.formatted(c14n));
+        };
+    }
+
+    static StandardCryptoSuite getCryptosuite(String id) {
 
         return switch (id) {
         case "eddsa-rdfc-2022" -> EdDSA2022.withRDFC();
@@ -235,33 +214,6 @@ public class IssuerTest {
                 .sorted();
     }
 
-    static final byte[] rdfc(Map<String, ?> document) throws IOException, JsonLdError {
-
-        // TODO temporary, remove with Titanium v2.x.x
-        var bos = new ByteArrayOutputStream();
-        try (var emitter = Jackson2Emitter.newEmitter(bos, JsonFactory.builder().build())) {
-            Tree.write(document, emitter);
-        }
-
-        var toRdf = JsonLd.toRdf(JsonDocument.of(new ByteArrayInputStream(bos.toByteArray())))
-                .loader(ContextLoader.getInstance());
-
-        var canon = RdfCanon.create(Resources.DIGEST_FACTORY.get("SHA-256"));
-        toRdf.provide(canon);
-
-        bos.reset();
-
-        canon.provide(s -> {
-            try {
-                bos.write(s.getBytes(StandardCharsets.UTF_8));
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        });
-//        System.out.println(new String(bos.toByteArray()));
-        return bos.toByteArray();
-    }
-
     static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
 
         var result = new LinkedHashSet<>(documentContext);
@@ -270,13 +222,4 @@ public class IssuerTest {
 
         return result;
     }
-
-    public static void main(String[] args) {
-
-        var c = KeyCodec.SLHDSA_SHA2_128S_PRIVATE;
-        var d = Multibase.BASE_16.decode(
-                "f765d610794caa0dd67472ed92b8ec0b23c1d57c8ed25a9147be7dcd5dca241fb4834a55ff26a17f3947a265bc421093a629d2e863381f8f9f6d64f707cf2e95b");
-        IO.println(Multibase.BASE_64_URL.encode(c.encode(d)));
-    }
-
 }

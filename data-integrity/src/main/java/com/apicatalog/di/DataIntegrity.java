@@ -17,6 +17,7 @@ import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.C14nFactory;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.processor.GraphProcessor;
+import com.apicatalog.trust.processor.MapProcessor;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.MapProofCursor;
@@ -118,9 +119,9 @@ public class DataIntegrity {
                         new DataIntegrityProof.GraphReader(cryptosuites));
             }
 
-            if (readers.isEmpty()) {
-                throw new IllegalStateException();
-            }
+//            if (readers.isEmpty()) {
+//                throw new IllegalStateException();
+//            }
 
             if (c14nFactory == null) {
                 throw new IllegalStateException();
@@ -144,7 +145,8 @@ public class DataIntegrity {
 
         private Function<Map<String, Object>, byte[]> canonize;
 
-        private MapProofCursor.Factory factory;
+        private MapProcessor.Factory processorFactory;
+        private MapProofCursor.Factory cursorFactory;
 
         private Map<String, CryptoSuite> cryptosuites;
         private Map<String, MapProofReader> readers;
@@ -160,7 +162,12 @@ public class DataIntegrity {
         }
 
         public LexicalModelBuilder processor(MapProofCursor.Factory factory) {
-            this.factory = factory;
+            this.cursorFactory = factory;
+            return this;
+        }
+        
+        public LexicalModelBuilder processor(MapProcessor.Factory factory) {
+            this.processorFactory = factory;
             return this;
         }
 
@@ -186,15 +193,15 @@ public class DataIntegrity {
                         new DataIntegrityProof.MapReader(cryptosuites));
             }
 
-            if (readers.isEmpty()) {
-                throw new IllegalStateException();
-            }
+//            if (readers.isEmpty()) {
+//                throw new IllegalStateException();
+//            }
 
             if (canonize == null) {
                 throw new IllegalStateException();
             }
 
-            return new LexicalModel(factory, c14n, canonize, readers);
+            return new LexicalModel(processorFactory, cursorFactory, c14n, canonize, readers);
         }
     }
 

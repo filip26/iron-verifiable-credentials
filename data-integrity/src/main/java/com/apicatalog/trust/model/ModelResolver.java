@@ -20,7 +20,7 @@ public class ModelResolver {
         return new Builder();
     }
 
-    public Collection<String> getContexts(Map<String, Object> document) {
+    public static Collection<String> getContexts(Map<String, Object> document) {
         return switch (document.get("@context")) {
         case Collection<?> col -> col.stream()
                 .map(item -> {

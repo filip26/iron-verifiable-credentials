@@ -100,4 +100,10 @@ public class GenericPayload implements DigestiblePayload {
         }
         return Set.copyOf(digests.keySet());
     }
+
+    @Override
+    public String c14n() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

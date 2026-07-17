@@ -3,19 +3,19 @@ package com.apicatalog.di.sd;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.function.Function;
 
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.RedactablePayload;
 import com.apicatalog.trust.processor.GraphProcessor;
-import com.apicatalog.trust.signature.Signature;
 
 public class SDGraphProcessor implements GraphProcessor {
 
@@ -67,20 +67,13 @@ public class SDGraphProcessor implements GraphProcessor {
 
     }
 
-    @Override
-    public RedactablePayload redactable(Signature signature, Collection<String> mandatoryPointers) {
+    public SDBaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
 
         lazyInit();
 
         var skolemized = Skolemizer.skolemize(expandedDocument);
 
         var compacted = model.compact().apply(context, skolemized);
-
-//        IO.println("compacted > " + compacted);
-
-        var selection = Selection.select(compacted, mandatoryPointers);
-
-//        IO.println("selection > " + selection);
 
         var canonizer = model.newCanonizer();
 
@@ -103,17 +96,17 @@ public class SDGraphProcessor implements GraphProcessor {
         var canonized = new ArrayList<String>();
 
         // TODO read from model
-        var hmac = HmacIdProvider.newInstance(((SDBaseProofValue) signature).hmacKey());
+        var hmac = Hmac.newInstance(hmacKey);
 
         canonizer.canonize((subject, predicate, object, datatype, language, direction, graph) -> {
 
             var s = subject;
             if (s.startsWith("_:")) {
-                s = hmac.getHmacId(s);
+                s = hmac.assignId(s);
             }
             var o = object;
             if (o.startsWith("_:")) {
-                o = hmac.getHmacId(o);
+                o = hmac.assignId(o);
             }
 
             canonized.add(canonizer.toNQuad(s, predicate, o, datatype, language, direction, graph));
@@ -121,107 +114,196 @@ public class SDGraphProcessor implements GraphProcessor {
 
         Collections.sort(canonized);
 
-        var selectedNQuads = new HashSet<String>(selection.size());
+        var selection = Pointer.select(compacted, mandatoryPointers);
+
+        var mandatoryNQuads = new HashSet<String>(selection.size());
 
         model.tordf().accept(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {
 
             var s = subject;
             if (s.startsWith(Skolemizer.URN_PREFIX)) {
-                s = hmac.mapping.get(canonizer.labels().get("_:" + s.substring(Skolemizer.URN_PREFIX.length())));
+                s = hmac.getId(canonizer.labels().get("_:" + s.substring(Skolemizer.URN_PREFIX.length())));
             }
             var o = object;
             if (o.startsWith(Skolemizer.URN_PREFIX)) {
-                o = hmac.mapping.get(canonizer.labels().get("_:" + o.substring(Skolemizer.URN_PREFIX.length())));
+                o = hmac.getId(canonizer.labels().get("_:" + o.substring(Skolemizer.URN_PREFIX.length())));
             }
 
             var nquad = canonizer.toNQuad(s, predicate, o, datatype, language, direction, graph);
 
-            selectedNQuads.add(nquad);
+            mandatoryNQuads.add(nquad);
         }));
+
+        var labels = HashMap.<String, String>newHashMap(selection.size());
+        for (var label : canonizer.labels().entrySet()) {
+            labels.put(label.getKey(), hmac.mapping().get(label.getValue()));
+        }
 
         int index = 0;
 
-        var mandatory = new int[selectedNQuads.size()];
+        var mandatoryIndices = new int[mandatoryNQuads.size()];
         int mandatoryIndex = 0;
 
-        var optional = new ArrayList<Entry<Integer, byte[]>>(canonized.size() - mandatory.length);
-        var baseWriter = new StringWriter(mandatory.length * 256); 
+        var optionalIndices = new int[canonized.size() - mandatoryIndices.length];
+        int optionalIndex = 0;
+
+        var optional = new byte[canonized.size() - mandatoryIndices.length][];
+
+        var baseWriter = new StringWriter(mandatoryIndices.length * 256);
 
         for (var nquad : canonized) {
-            if (selectedNQuads.contains(nquad)) {
-                selectedNQuads.remove(nquad);
-                mandatory[mandatoryIndex++] = index;
+            if (mandatoryNQuads.contains(nquad)) {
+                mandatoryNQuads.remove(nquad);
+                mandatoryIndices[mandatoryIndex++] = index;
                 baseWriter.write(nquad);
             } else {
-                optional.add(Map.entry(index, nquad.getBytes(StandardCharsets.UTF_8)));
+                optionalIndices[optionalIndex] = index;
+                optional[optionalIndex++] = nquad.getBytes(StandardCharsets.UTF_8);
             }
             index++;
         }
 
-        if (!selectedNQuads.isEmpty()) {
+        if (!mandatoryNQuads.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        var base = new BasePayload();
+        var base = new SDBaseDocument();
         base.base = baseWriter.toString().getBytes(StandardCharsets.UTF_8);
         base.redactable = optional;
-        
-//        IO.println("c14n > " + canonized);
-//        IO.println("mandatory > " + Arrays.toString(mandatory));
-//        IO.println("labels > " + canonizer.labels());
-//        IO.println("mapping > " + hmac.mapping);
-//        IO.println("base > " + new String(base.base));
+        base.redactableIndices = optionalIndices;
+        base.mandatoryPointers = mandatoryPointers;
+        base.mandatoryIndices = mandatoryIndices;
+        base.hmacKey = hmacKey;
+
+        base.labels = labels;
+        base.compacted = compacted;
+        base.canonized = canonized;
+        base.model = model;
+        base.context = context;
 
         return base;
     }
 
+    public SDDerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
+        lazyInit();
+
+        var expanded = expandedDocument;
+
+        var canonizer = model.newCanonizer();
+
+        var consumer = canonizer.consumer();
+
+        model.tordf().accept(expanded, consumer);
+
+        var canonized = new ArrayList<String[]>();
+
+        canonizer.canonize(((subject, predicate, object, datatype, language, direction, graph) -> {
+            canonized.add(
+                    new String[] {
+                            subject, predicate, object, datatype, language, direction, graph
+                    });
+
+        }));
+
+        var labelMap = canonizer.labels().values().stream()
+                .sorted()
+                .toList();
+
+        var map = HashMap.<String, String>newHashMap(labels.size());
+
+        for (int i = 0; i < labelMap.size(); i++) {
+            map.put(labelMap.get(i), "_:" + Multibase.BASE_64_URL.encode(labels.get(i)));
+        }
+
+        var nquads = new ArrayList<String>(canonized.size());
+
+        // relabel blank nodes
+        for (var quad : canonized) {
+            if (quad[0].startsWith("_:") && map.containsKey(quad[0])) {
+                quad[0] = map.get(quad[0]);
+            }
+            if (quad[2].startsWith("_:") && map.containsKey(quad[2])) {
+                quad[2] = map.get(quad[2]);
+            }
+            var nquad = canonizer.toNQuad(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], quad[6]);
+            nquads.add(nquad);
+        }
+
+        Collections.sort(nquads);
+
+        var mandatory = new StringWriter(indices.length * 256);
+        var disclosed = new byte[nquads.size() - indices.length][];
+
+        Arrays.sort(indices);
+
+        var combinedIndices = new int[nquads.size() - indices.length];
+
+        int index = 0;
+        int disclosedIndex = 0;
+
+        for (var nquad : nquads) {
+
+            if (Arrays.binarySearch(indices, index) >= 0) {
+                mandatory.write(nquad);
+
+            } else {
+                combinedIndices[disclosedIndex] = index;
+                disclosed[disclosedIndex++] = nquad.getBytes(StandardCharsets.UTF_8);
+            }
+
+            index++;
+        }
+
+        return new SDDerivedDocument(
+                this::compacted,
+                mandatory.toString().getBytes(StandardCharsets.UTF_8),
+                disclosed,
+                indices,
+                labels);
+    }
+
+    private Map<String, Object> compacted() {
+        return model.compact().apply(context, expandedDocument);
+    }
+
     @Override
-    public DigestiblePayload digestible() {
+    public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Yet, not supported.");
     }
 
     @Override
     public void withProofs(Collection<String> ids) {
         // TODO Auto-generated method stub
-
+        return;
     }
 
     private void lazyInit() {
 
-        if (dataset != null) {
+        if (expandedDocument != null || dataset != null) {
             return;
         }
 
         var expanded = model.expand().apply(document);
-//        IO.println("expanded > " + expanded);
-
-        Object expandedProofs = null;
 
         if (expanded.size() != 1) {
             throw new IllegalArgumentException();
         }
 
-        if (expanded.iterator().next() instanceof Map map
-                && map.containsKey("https://w3id.org/security#proof")) {
+        Object expandedProofs = null;
 
+        if (expanded.iterator().next() instanceof Map map) {
             expandedDocument = new HashMap<String, Object>(map);
-//                expandedProofs = expandedDocument.remove("https://w3id.org/security#proof");
-            expandedProofs = Map.of("https://w3id.org/security#proof",
-                    expandedDocument.remove("https://w3id.org/security#proof"));
+            if (map.containsKey("https://w3id.org/security#proof")) {
+                expandedProofs = Map.of("https://w3id.org/security#proof",
+                        expandedDocument.remove("https://w3id.org/security#proof"));
+            }
         }
 
-        if (expandedProofs == null || expandedDocument == null) {
-            return;
+        if (expandedProofs != null) {
+            dataset = new Dataset();
+            model.tordf().accept(expandedProofs, dataset);
         }
-
-        dataset = new Dataset();
-
-        model.tordf().accept(expandedProofs, dataset);
-
-//        IO.println(dataset.graphs);
-//        IO.println(dataset.proofGraphs);
-
     }
 
     private static class Dataset implements QuadConsumer {
@@ -254,11 +336,14 @@ public class SDGraphProcessor implements GraphProcessor {
             } else if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
                 proofTypes.put(graph, object);
             }
-//            IO.println(graph);
+
             graphs.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
                     .add(new String[] {
                             subject, predicate, object, datatype, language, direction, graph
                     });
         }
     }
+
+    public static record SignatureAlgorithm(String signature, String digest) {
+    };
 }

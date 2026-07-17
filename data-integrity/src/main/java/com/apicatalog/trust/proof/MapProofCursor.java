@@ -6,27 +6,24 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.apicatalog.trust.data.Data;
-import com.apicatalog.trust.data.MapData;
+import com.apicatalog.trust.document.Data;
 import com.apicatalog.trust.model.LexicalModel;
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.GenericPayload;
-import com.apicatalog.trust.payload.RedactablePayload;
-import com.apicatalog.trust.processor.PayloadSelector;
-import com.apicatalog.trust.signature.Signature;
+import com.apicatalog.trust.processor.MapProcessor;
 
-public class MapProofCursor implements ProofCursor, PayloadSelector {
+public class MapProofCursor implements ProofCursor {
 
     public interface Factory {
         MapProofCursor newInstance(
                 LexicalModel model,
-                Map<String, Object> document,
+                MapProcessor processor,
                 Collection<Entry<Map<String, Object>, MapProofReader>> proofReaders);
     }
 
-    final LexicalModel model;
-    final Map<String, Object> payload;
-    final Collection<Entry<Map<String, Object>, MapProofReader>> proofs;
+    private final LexicalModel model;
+    private final MapProcessor processor;
+
+//    final Map<String, Object> payload;
+    private final Collection<Entry<Map<String, Object>, MapProofReader>> proofs;
 
     Data document;
     Iterator<Entry<Map<String, Object>, MapProofReader>> iterator;
@@ -37,10 +34,10 @@ public class MapProofCursor implements ProofCursor, PayloadSelector {
 
     public MapProofCursor(
             LexicalModel model,
-            Map<String, Object> payload,
+            MapProcessor processor,
             Collection<Entry<Map<String, Object>, MapProofReader>> proofs) {
         this.model = model;
-        this.payload = payload;
+        this.processor = processor;
         this.proofs = proofs;
         this.iterator = proofs.iterator();
 
@@ -54,7 +51,7 @@ public class MapProofCursor implements ProofCursor, PayloadSelector {
         if (document == null) {
 
             // TODO add custom document reader
-            document = new MapData(payload, model.c14n());
+//FIXME            document = new MapData(payload, model.c14n());
         }
 
         return document;
@@ -79,7 +76,7 @@ public class MapProofCursor implements ProofCursor, PayloadSelector {
 
             var canonicalProof = model.canonize(unsignedProof);
 
-            currentProof = reader.read(null, proof, canonicalProof, this);
+            currentProof = reader.read(null, proof, canonicalProof, processor);
         }
 
         return currentProof;
@@ -97,36 +94,4 @@ public class MapProofCursor implements ProofCursor, PayloadSelector {
         currentProof = null;
         return true;
     }
-
-//    Data data(Collection<String> previous) {
-//        var data = data();
-//
-//        if (data.digestiblePayload(previous) == null) {
-//
-////TODO select proofs for proof chain
-////            var canonizer = model.newCanonizer();
-////            var consumer = canonizer.consumer();
-//
-//
-//        }
-//        return data;
-//    }
-
-    @Override
-    public void withProofs(Collection<String> ids) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public DigestiblePayload digestible() {
-        var canonical = model.canonize(payload);
-        return new GenericPayload(canonical);
-    }
-
-    @Override
-    public RedactablePayload redactable(Signature signature, Collection<String> pointers) {
-        throw new UnsupportedOperationException();
-    }
-
 }

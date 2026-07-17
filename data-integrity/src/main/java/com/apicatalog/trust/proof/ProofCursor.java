@@ -1,6 +1,6 @@
 package com.apicatalog.trust.proof;
 
-import com.apicatalog.trust.data.Data;
+import com.apicatalog.trust.document.Data;
 
 public interface ProofCursor {
 

@@ -1,46 +1,42 @@
 package com.apicatalog.di.sd;
 
 import java.io.ByteArrayInputStream;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.security.AsymmetricVerifier;
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.RedactablePayload;
-import com.apicatalog.trust.processor.PayloadSelector;
-import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
+import com.apicatalog.di.sd.signature.BaseSignature;
+import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multicodec.Multicodec;
+import com.apicatalog.security.AsymmetricSigner;
+import com.apicatalog.security.Digestor;
+import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
 
+import co.nstant.in.cbor.CborBuilder;
 import co.nstant.in.cbor.CborDecoder;
+import co.nstant.in.cbor.CborEncoder;
 import co.nstant.in.cbor.CborException;
 import co.nstant.in.cbor.model.Array;
-import co.nstant.in.cbor.model.ByteString;
-import co.nstant.in.cbor.model.DataItem;
-import co.nstant.in.cbor.model.MajorType;
-import co.nstant.in.cbor.model.UnicodeString;
 
-public class SDBaseProofValue implements Signature {
+public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> implements BaseSignature {
 
-    static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x00 };
+    private static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x00 };
 
-    private String signatureAlgorithm;
-    private String digestAlgorithm;
-
-    private Proof proof;
-    private RedactablePayload payload;
-
-    private byte[] baseSignature;
-    private byte[] proofPublicKey;
     private byte[] hmacKey;
 
-    private Collection<byte[]> signatures;
-    private ArrayList<String> mandatoryPointers;
+    private Collection<String> mandatoryPointers;
 
     public static boolean isAccepted(byte[] signature) {
         return signature.length > 2
@@ -50,21 +46,18 @@ public class SDBaseProofValue implements Signature {
     }
 
     public static Signature decode(
-            String signatureAlgorithm,
-            String digestAlgorithm,
             byte[] signature,
-            Proof proof,
-            PayloadSelector data) {
+            Function<Integer, SignatureAlgorithm> algorithmProvider,
+            Function<byte[], Multicodec> proofPublicKeyDecoder,
+            DataIntegrityProof proof,
+            SDGraphProcessor processor) {
 
-//  public static ECDSASDBaseProofValue of(Proof proof, DocumentModel model, byte[] signature, DocumentLoader loader) throws DocumentError {
-//
         Objects.requireNonNull(signature);
 
-        // TODO validate signature size
-//      if (signature.length < 3) {
+        if (signature.length < 3) {
 //          throw new DocumentError(ErrorType.Invalid, "ProofValue");
-//      }
-//
+        }
+
         var is = new ByteArrayInputStream(signature);
 
         if ((byte) is.read() != BYTE_PREFIX[0] || is.read() != BYTE_PREFIX[1] || is.read() != BYTE_PREFIX[2]) {
@@ -81,48 +74,63 @@ public class SDBaseProofValue implements Signature {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
             }
 
-            if (!MajorType.ARRAY.equals(cbor.get(0).getMajorType())) {
-//              throw new DocumentError(ErrorType.Invalid, "ProofValue");
-            }
+            final Array top;
 
-            final var top = (Array) cbor.get(0);
+            if (cbor.get(0) instanceof Array array) {
+                top = array;
+
+            } else {
+//              throw new DocumentError(ErrorType.Invalid, "ProofValue");
+                throw new IllegalArgumentException();
+            }
 
             if (top.getDataItems().size() != 5) {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
+                throw new IllegalArgumentException();
             }
 
             final var proofValue = new SDBaseProofValue();
-            proofValue.signatureAlgorithm = signatureAlgorithm;
-            proofValue.digestAlgorithm = digestAlgorithm;
-
             proofValue.proof = proof;
-
             proofValue.baseSignature = byteArray(top.getDataItems().get(0));
+
+            final var algorithms = algorithmProvider.apply(proofValue.baseSignature.length);
+            proofValue.signatureAlgorithm = algorithms.signature();
+            proofValue.digestAlgorithm = algorithms.digest();
+
             proofValue.proofPublicKey = byteArray(top.getDataItems().get(1));
+            proofValue.proofPublicKeyCodec = proofPublicKeyDecoder.apply(proofValue.proofPublicKey);
+
             proofValue.hmacKey = byteArray(top.getDataItems().get(2));
 
-            if (!MajorType.ARRAY.equals(top.getDataItems().get(3).getMajorType())) {
+            if (top.getDataItems().get(3) instanceof Array signatures) {
+                proofValue.signatures = new byte[signatures.getDataItems().size()][];
+
+                var index = 0;
+                for (final var item : signatures.getDataItems()) {
+                    proofValue.signatures[index++] = byteArray(item);
+                }
+
+            } else {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
+                throw new IllegalArgumentException();
             }
 
-            proofValue.signatures = new ArrayList<>(((Array) top.getDataItems().get(3)).getDataItems().size());
+            if (top.getDataItems().get(4) instanceof Array pointers) {
 
-            for (final DataItem item : ((Array) top.getDataItems().get(3)).getDataItems()) {
-                proofValue.signatures.add(byteArray(item));
-            }
+                proofValue.mandatoryPointers = new ArrayList<>(pointers.getDataItems().size());
 
-            if (!MajorType.ARRAY.equals(top.getDataItems().get(4).getMajorType())) {
+                for (final var item : pointers.getDataItems()) {
+                    proofValue.mandatoryPointers.add(string(item));
+                }
+
+            } else {
 //              throw new DocumentError(ErrorType.Invalid, "ProofValue");
+                throw new IllegalArgumentException();
             }
-//            IO.println("> signatures: " + proofValue.signatures.size());
-            proofValue.mandatoryPointers = new ArrayList<>(((Array) top.getDataItems().get(4)).getDataItems().size());
 
-            for (final DataItem item : ((Array) top.getDataItems().get(4)).getDataItems()) {
-                proofValue.mandatoryPointers.add(string(item));
-            }
-//            IO.println("> mandatory pointers: " + proofValue.mandatoryPointers);
-
-            proofValue.payload = data.redactable(proofValue, proofValue.mandatoryPointers);
+            proofValue.payload = processor.redactable(
+                    proofValue.mandatoryPointers,
+                    proofValue.hmacKey);
 
             return proofValue;
 
@@ -132,110 +140,216 @@ public class SDBaseProofValue implements Signature {
         }
     }
 
-    @Override
-    public boolean verify(
-            AsymmetricVerifier verifier,
-            Function<String, MessageDigest> digestFactory,
-            byte[] publicKey)
-            throws InvalidKeyException, SignatureException {
+    public static SDBaseProofValue generateSignature(
+            String signatureAlgorithm,
+            String digestAlgorithm,
+            AsymmetricSigner baseSigner,
+            byte[] proofPublicKey,
+            Multicodec proofPublicKeyCodec,
+            AsymmetricSigner proofSigner,
+            Digestor digestor,
+            DataIntegrityProof unsignedProof,
+            SDBaseDocument payload) throws SignatureException {
 
-        if (signatures.size() != payload.redactablePayload().size()) {
-            return false;
-        }
-        
-        var digestor = digestFactory.apply(digestAlgorithm);
-
-        var proofDigest = digestor.digest(proof.canonicalPayload());
+        var proofDigest = digestor.digest(unsignedProof.canonicalPayload());
         var dataDigest = digestor.digest(payload.canonicalPayload());
-//IO.println(new String(payload.canonicalPayload()));
+
         var digest = hash(
                 proofDigest,
                 proofPublicKey,
                 dataDigest);
-//IO.println("> digest:" + digest.length);
-////        var digest = digest(digestor, proof.canonicalPayload(), data.digestiblePayload(proof.previous()));
-////System.out.println(new String(data.digestiblePayload(Set.of()).canonicalPayload()));
-//IO.println(HexFormat.of().formatHex(proofDigest));
-//IO.println(HexFormat.of().formatHex(dataDigest));
 
-        var isBaseSignatureVerified = verifier.verify(publicKey, digest, toByteArray());
-        
-        if (!isBaseSignatureVerified) {
-            return false;
-        }
-        
-        var proofKeyCodec = MulticodecDecoder.newInstance().getCodec(proofPublicKey)
-                .orElseThrow();
-        
-        //TODO must match signature algo -> limitation because of verifier ...
-        
-        var decodedProofPublicKey = proofKeyCodec.decode(proofPublicKey);
-        
-        var redactableIterator = payload.redactablePayload().iterator();
-        
-        for (var signature :signatures) {
-            
-            var redactable = redactableIterator.next();
-            
-            if (!verifier.verify(decodedProofPublicKey, redactable.getValue(), signature)) {
-                return false;
+        var proofValue = new SDBaseProofValue();
+        proofValue.proof = unsignedProof;
+        proofValue.signatureAlgorithm = signatureAlgorithm;
+        proofValue.digestAlgorithm = digestAlgorithm;
+
+        proofValue.baseSignature = baseSigner.sign(digest);
+        proofValue.hmacKey = payload.hmacKey();
+        proofValue.proofPublicKey = proofPublicKey;
+        proofValue.proofPublicKeyCodec = proofPublicKeyCodec;
+        proofValue.mandatoryPointers = payload.mandatoryPointers();
+
+        if (payload.redactablePayload() != null && payload.redactablePayload().length > 0) {
+
+            proofValue.signatures = new byte[payload.redactablePayload().length][];
+
+            for (int index = 0; index < proofValue.signatures.length; index++) {
+                proofValue.signatures[index] = proofSigner.sign(payload.redactablePayload()[index]);
             }
         }
-        
-        return true;
+
+        proofValue.payload = payload;
+
+        return proofValue;
     }
 
-    @Override
-    public Proof proof() {
-        return proof;
+    public static byte[] toByteArray(
+            byte[] baseSignature,
+            byte[] proofPublicKey,
+            byte[] hmacKey,
+            byte[][] signatures,
+            Collection<String> pointers) {
+
+        final CborBuilder cbor = new CborBuilder();
+
+        var top = cbor.addArray();
+
+        top.add(baseSignature);
+        top.add(proofPublicKey);
+        top.add(hmacKey);
+
+        var cborSignatures = top.addArray();
+
+        for (int signatureIndex = 0; signatureIndex < signatures.length; signatureIndex++) {
+            cborSignatures.add(signatures[signatureIndex]);
+        }
+
+        var cborPointers = top.addArray();
+
+        if (pointers != null) {
+            pointers.forEach(cborPointers::add);
+        }
+
+        try {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            out.write(BYTE_PREFIX);
+
+            (new CborEncoder(out)).encode(cbor.build());
+
+            return out.toByteArray();
+        } catch (IOException | CborException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public byte[] toByteArray() {
-        return baseSignature;
+        return toByteArray(baseSignature, proofPublicKey, hmacKey, signatures, mandatoryPointers);
+    }
+
+    public SDDerivedProofValue derive(Collection<String> selectors) {
+
+        var combinedPointers = new LinkedHashSet<String>(mandatoryPointers.size() + selectors.size());
+        combinedPointers.addAll(mandatoryPointers);
+        combinedPointers.addAll(selectors);
+
+        var selection = Pointer.select(payload.compacted, combinedPointers);
+
+        var selectedNQuads = new HashSet<String>();
+
+        var c14n = payload.model.newCanonizer();
+        var consumer = c14n.consumer();
+
+        payload.model.tordf().accept(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {
+
+            var s = subject;
+            if (s.startsWith(Skolemizer.URN_PREFIX)) {
+                s = payload.labels.get("_:" + s.substring(Skolemizer.URN_PREFIX.length()));
+            }
+            var o = object;
+            if (o.startsWith(Skolemizer.URN_PREFIX)) {
+                o = payload.labels.get("_:" + o.substring(Skolemizer.URN_PREFIX.length()));
+            }
+
+            var nquad = c14n.toNQuad(s, predicate, o, datatype, language, direction, graph);
+
+            consumer.accept(s, predicate, o, datatype, language, direction, graph);
+            selectedNQuads.add(nquad);
+        }));
+
+        c14n.canonize();
+
+        var selectionLabels = HashMap.<Integer, byte[]>newHashMap(c14n.labels().size());
+        for (var label : c14n.labels().entrySet()) {
+            selectionLabels.put(
+                    Integer.parseInt(label.getValue().substring("_:c14n".length())),
+                    Multibase.BASE_64_URL.decode(label.getKey().substring("_:".length())));
+        }
+
+        int index = 0;
+
+        var selectedIndices = new int[selectedNQuads.size()];
+        int selectedIndex = 0;
+
+        for (var nquad : payload.canonized) { // TODO iterate over selected?!
+            if (selectedNQuads.contains(nquad)) {
+                selectedNQuads.remove(nquad);
+
+                selectedIndices[selectedIndex++] = index;
+
+                // all selected indices found
+                if (selectedNQuads.isEmpty()) {
+                    break;
+                }
+            }
+            index++;
+        }
+
+        var indices = relativeIndices(selectedIndices, payload.mandatoryIndices);
+
+        var disclosedPayload = new byte[selectedIndices.length - payload.mandatoryIndices.length][];
+        var signatureIndex = 0;
+
+        var selectedSignatures = new byte[selectedIndices.length - payload.mandatoryIndices.length][];
+
+        for (var si : selectedIndices) {
+            var ri = Arrays.binarySearch(payload.redactableIndices, si);
+            if (ri >= 0) {
+                disclosedPayload[signatureIndex] = payload.redactable[ri];
+                selectedSignatures[signatureIndex++] = signatures[ri];
+            }
+        }
+
+        if (signatureIndex < selectedSignatures.length) {
+            throw new IllegalStateException();
+        }
+
+        var derivedDocument = new SDDerivedDocument(
+                () -> SDBaseProofValue.recompact(payload.context, selection, payload.model),
+                payload.base,
+                disclosedPayload,
+                indices,
+                selectionLabels);
+
+        return SDDerivedProofValue.newInstance(this, derivedDocument, selectedSignatures);
+    }
+
+    private static Map<String, Object> recompact(
+            Collection<String> context,
+            Map<String, Object> document,
+            SemanticModel model) {
+
+        var expanded = model.expand().apply(document);
+
+        var deskolemized = Skolemizer.deskolemizeExpanded(expanded);
+
+        return model.compact().apply(context, (Map<String, Object>) deskolemized.iterator().next());
+    }
+
+    private static int[] relativeIndices(int[] combined, int[] mandatory) {
+        final var indices = new int[mandatory.length];
+
+        int index = 0;
+        int relative = 0;
+
+        Arrays.sort(mandatory); // TODO all indices should be sorted already
+
+        for (int key : combined) {
+            if (Arrays.binarySearch(mandatory, key) >= 0) {
+                indices[index++] = relative;
+            }
+            relative++;
+        }
+        return indices;
     }
 
     @Override
-    public String algorithm() {
-        return signatureAlgorithm;
-    }
-
-    private static byte[] byteArray(DataItem item) {
-        if (!MajorType.BYTE_STRING.equals(item.getMajorType())) {
-//      throw new DocumentError(ErrorType.Invalid, "ProofValue");
-        }
-        return ((ByteString) item).getBytes();
-    }
-
-    private static String string(DataItem item) {
-        if (!MajorType.UNICODE_STRING.equals(item.getMajorType())) {
-//      throw new DocumentError(ErrorType.Invalid, "ProofValue");
-        }
-        return ((UnicodeString) item).getString();
-    }
-
-    private static byte[] hash(
-            final byte[] proofHash,
-            final byte[] proofPublicKey,
-            byte[] mandatoryHash) {
-
-        final byte[] hash = new byte[proofHash.length
-                + proofPublicKey.length
-                + mandatoryHash.length];
-
-        System.arraycopy(proofHash, 0, hash, 0, proofHash.length);
-        System.arraycopy(proofPublicKey, 0, hash, proofHash.length, proofPublicKey.length);
-        System.arraycopy(mandatoryHash, 0, hash, proofHash.length + proofPublicKey.length, mandatoryHash.length);
-        return hash;
-    }
-
-    @Override
-    public DigestiblePayload payload() {
-        return payload;
+    public Collection<String> mandatoryPointers() {
+        return mandatoryPointers;
     }
 
     public byte[] hmacKey() {
         return hmacKey;
     }
-
 }

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.apicatalog.trust.data.GraphData;
+import com.apicatalog.trust.document.GraphData;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.processor.GraphProcessor;
 

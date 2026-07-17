@@ -10,16 +10,7 @@ import java.util.Collection;
  * deterministic bytes required for hashing, while acting as a stateful registry
  * for the resulting digest values.
  */
-public interface DigestiblePayload {
-
-    /**
-     * Returns the canonical, normalized byte representation. This payload serves as
-     * the deterministic input for cryptographic operations.
-     *
-     * @return the byte array representing the canonical document
-     */
-
-    byte[] canonicalPayload();
+public interface DigestiblePayload extends CanonicalPayload {
 
     /**
      * Adds, or replaces an existing, digest value for the canonical payload.

@@ -1,12 +1,11 @@
 package com.apicatalog.trust.signature;
 
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.SignatureException;
-import java.util.function.Function;
 
 import com.apicatalog.security.AsymmetricVerifier;
-import com.apicatalog.trust.payload.DigestiblePayload;
+import com.apicatalog.security.Digestor;
+import com.apicatalog.trust.payload.CanonicalPayload;
 import com.apicatalog.trust.proof.Proof;
 
 public interface Signature {
@@ -24,15 +23,15 @@ public interface Signature {
      */
     boolean verify(
             AsymmetricVerifier verifier,
-            Function<String, MessageDigest> digestFactory,
+            Digestor.Factory digestFactory,
             byte[] publicKey)
             throws InvalidKeyException, SignatureException;
 
-    DigestiblePayload payload();
+    String algorithm();
+
+    CanonicalPayload payload();
 
     Proof proof();
 
     byte[] toByteArray(); // TODO ?! this could be encoders task
-
-    String algorithm();
 }

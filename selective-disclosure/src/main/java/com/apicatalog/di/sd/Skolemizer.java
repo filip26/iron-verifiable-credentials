@@ -87,4 +87,61 @@ class Skolemizer {
         }
         return node;
     }
+
+    static Collection<Object> deskolemizeExpanded(final Collection<?> collection) {
+
+        var deskolemized = new ArrayList<>(collection.size());
+
+        for (var element : collection) {
+            if (element instanceof Map map) {
+                deskolemized.add(deskolemizeExpanded(map));
+
+            } else {
+                deskolemized.add(element);
+            }
+        }
+
+        return deskolemized;
+    }
+
+    static Map<String, Object> deskolemizeExpanded(final Map<String, Object> document) {
+
+        if (document.containsKey("@value")) {
+            return document;
+        }
+
+        var node = HashMap.<String, Object>newHashMap(document.size() + 1);
+
+        for (var entry : document.entrySet()) {
+
+            var key = entry.getKey();
+            var value = entry.getValue();
+
+            if ("@id".equals(key)) {
+
+                if (!(value instanceof String id)) {
+                    throw new IllegalArgumentException();
+                }
+                
+                if (!id.startsWith(URN_PREFIX)) {
+                    node.put("@id", id);
+                }
+
+            } else if (value instanceof Collection collection) {
+
+                if ("@type".equals(key)) {
+                    node.put(key, value);
+
+                } else {
+                    node.put(key, deskolemizeExpanded(collection));
+                }
+
+            } else {
+                throw new IllegalArgumentException("Not expanded JSON-LD");
+            }
+        }
+
+        return node;
+    }
+
 }
