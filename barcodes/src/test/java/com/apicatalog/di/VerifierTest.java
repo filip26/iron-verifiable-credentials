@@ -3,7 +3,11 @@ package com.apicatalog.di;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,7 +61,8 @@ public class VerifierTest {
     @MethodSource({ "resources" })
     void testVerify(String resource) throws Throwable {
 
-        var signed = Resources.getMap(resource);
+        Map<String, Object> options = Resources.getMap(resource + ".options.json");
+        Map<String, Object> signed = Resources.getMap(resource + ".signed.json");
 
         var contexts = ModelResolver.getContexts(signed);
 
@@ -81,13 +86,11 @@ public class VerifierTest {
                 return;
             }
 
-            byte[] XX = new byte[] { (byte) 188, 38, (byte) 200, (byte) 146, (byte) 227, (byte) 213, 90,
-                    (byte) 250,
-                    50, 18, 126, (byte) 254, 47, (byte) 177, 91, 23,
-                    64, (byte) 129, 104, (byte) 223, (byte) 136, 81, 116, 67,
-                    (byte) 136, 125, (byte) 137, (byte) 165, 117, 63, (byte) 152, (byte) 207 };
-
-            barcode.opticalData(XX);
+            barcode.opticalData(((Collection<?>) options.get("opticalDataBytes"))
+                    .stream().map(BigInteger.class::cast).map(BigInteger::byteValue)
+                    .collect(ByteArrayOutputStream::new, ByteArrayOutputStream::write, (_, _) -> {
+                    })
+                    .toByteArray());
 
             var verified = PROOF_VERIFIER.verify(proof);
 
@@ -102,6 +105,7 @@ public class VerifierTest {
         return Resources
                 .stream()
                 .filter(name -> name.endsWith(".signed.json"))
+                .map(name -> name.substring(0, name.indexOf('.')))
                 .sorted();
     }
 }
