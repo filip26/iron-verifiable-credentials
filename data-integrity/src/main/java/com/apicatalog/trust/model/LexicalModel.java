@@ -15,7 +15,7 @@ import com.apicatalog.trust.proof.MapProofCursor;
 import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class LexicalModel implements ProcessingModel, ProcessorFactory {
+public class LexicalModel implements ProcessingModel, PayloadProcessor.Factory {
 
     private final MapProcessor.Factory processorFactory;
     private final MapProofCursor.Factory cursorFactory;
@@ -85,7 +85,7 @@ public class LexicalModel implements ProcessingModel, ProcessorFactory {
 //    }
 
     @Override
-    public PayloadProcessor createProcessor(Map<String, Object> document) {
+    public PayloadProcessor newInstance(Map<String, Object> document) {
         return processorFactory.newInstance(
                 this,
                 ContextAwareResolver.getContexts(document),

@@ -4,20 +4,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 public class ContextAwareResolver {
 
-    Collection<Entry<Predicate<Collection<String>>, ProcessingModel>> models;
+    private final Predicate<Collection<String>>[] predicates;
+    private final ProcessingModel[] models;
 
     private ContextAwareResolver(
-            Collection<Entry<Predicate<Collection<String>>, ProcessingModel>> models) {
+            Predicate<Collection<String>>[] predicates,
+            ProcessingModel[] models) {
+        this.predicates = predicates;
         this.models = models;
-    }
-
-    public static final Builder createBuilder() {
-        return new Builder();
     }
 
     // TODO must not be static, the resolver should have been configured with
@@ -41,37 +39,43 @@ public class ContextAwareResolver {
     }
 
     public ProcessingModel resolve(Collection<String> contexts, Map<String, Object> document) {
-        for (var entry : models) {
-            if (entry.getKey().test(contexts)) {
-                return entry.getValue();
+        for (int i = 0; i < models.length; i++) {
+            if (predicates[i].test(contexts)) {
+                return models[i];
             }
         }
         return null;
     }
 
+    public static final Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
 
-        Collection<Entry<Predicate<Collection<String>>, ProcessingModel>> models;
+        private final Collection<Predicate<Collection<String>>> predicates = new ArrayList<>();;
+        private final Collection<ProcessingModel> models = new ArrayList<>();
 
         public Builder model(
                 Predicate<Collection<String>> selector,
                 ProcessingModel... models) {
 
-            if (this.models == null) {
-                this.models = new ArrayList<>();
-            }
-            
             if (models.length == 1) {
-                this.models.add(Map.entry(selector, models[0]));
+                this.predicates.add(selector);
+                this.models.add(models[0]);
                 return this;
             }
-            
-            this.models.add(Map.entry(selector, new HybridModel(models)));
+
+            this.predicates.add(selector);
+            this.models.add(new HybridModel(models));
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public ContextAwareResolver build() {
-            return new ContextAwareResolver(models);
+            return new ContextAwareResolver(
+                    predicates.toArray(Predicate[]::new),
+                    models.toArray(ProcessingModel[]::new));
         }
     }
 

@@ -14,7 +14,7 @@ import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class SemanticModel implements ProcessingModel, ProcessorFactory {
+public class SemanticModel implements ProcessingModel, PayloadProcessor.Factory {
 
     @FunctionalInterface
     public interface QuadConsumer {
@@ -82,7 +82,7 @@ public class SemanticModel implements ProcessingModel, ProcessorFactory {
     }
 
     @Override
-    public PayloadProcessor createProcessor(Map<String, Object> document) {
+    public PayloadProcessor newInstance(Map<String, Object> document) {
         return processorFactory.newInstance(
                 this,
                 ContextAwareResolver.getContexts(document),

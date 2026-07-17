@@ -20,7 +20,7 @@ import com.apicatalog.trust.model.ContextAwareResolver;
 
 public class VerifierTest {
 
-    static ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.createBuilder()
+    static ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.builder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty), Resources.SEMANTIC_MODEL)
             .build();

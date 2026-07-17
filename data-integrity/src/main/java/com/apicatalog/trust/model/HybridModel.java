@@ -53,9 +53,11 @@ public class HybridModel implements ProcessingModel {
     private static class Cursor implements ProofCursor {
 
         final Collection<ProofCursor> cursors;
+        ProofCursor accepted;
 
         Cursor(Collection<ProofCursor> cursors) {
             this.cursors = cursors;
+            this.accepted = null;
         }
 
         @Override
@@ -77,28 +79,38 @@ public class HybridModel implements ProcessingModel {
                 throw new IllegalArgumentException();
             }
 
+            accepted = null;
             return next;
         }
 
         @Override
         public boolean isAccepted() {
+            if (accepted != null) {
+                return true;
+            }
+
             for (var cursor : cursors) {
                 if (cursor.isAccepted()) {
+                    accepted = cursor;
                     return true;
                 }
             }
+
             return false;
         }
 
         @Override
         public Proof proof() {
-            for (var cursor : cursors) {
-                if (cursor.isAccepted()) {
-                    return cursor.proof();
+            if (accepted == null) {
+                for (var cursor : cursors) {
+                    if (cursor.isAccepted()) {
+                        accepted = cursor;
+                        return cursor.proof();
+                    }
                 }
+                return null;
             }
-
-            return null;
+            return accepted.proof();
         }
     }
 }

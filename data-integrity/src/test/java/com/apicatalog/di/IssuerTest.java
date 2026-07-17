@@ -138,7 +138,7 @@ public class IssuerTest {
 
             var proofDraft = Ed25519Signature2020.newInstance((Map<String, Object>) options);
 
-            var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
+            var processor = Resources.SEMANTIC_MODEL.newInstance(document);
 
             var edProof = Ed25519Signature2020.generateProof(
                     signer,
@@ -189,8 +189,8 @@ public class IssuerTest {
 
     static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
         return switch (c14n) {
-        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createProcessor;
-        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::createProcessor;
+        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::newInstance;
+        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::newInstance;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.

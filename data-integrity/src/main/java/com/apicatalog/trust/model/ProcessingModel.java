@@ -14,6 +14,8 @@ public interface ProcessingModel {
 //    String c14n();
 
     ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document);
+    
+//    ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document);
 
 //    PayloadProcessor createProcessor(Map<String, Object> document);
 
