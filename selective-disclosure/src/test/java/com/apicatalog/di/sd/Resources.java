@@ -35,7 +35,7 @@ import jakarta.json.Json;
 
 class Resources {
 
-    static ProcessingModel MODEL = DataIntegrity.newSematicModelBuilder(ProcessingModel.C14N_RDFC)
+    static ProcessingModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
             .proof(ECDSASD2023.getInstance())
             .expand(Resources::expand)
             .compact(Resources::compact)

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.processor.PayloadProcessor;
@@ -14,13 +15,6 @@ import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
 public class SemanticModel implements ProcessingModel {
-    
-    // use just Supplier
-    @FunctionalInterface
-    @Deprecated
-    public interface C14nFactory {
-        GraphCanonizer newInstance();
-    }
 
     @FunctionalInterface
     public interface QuadConsumer {
@@ -60,7 +54,7 @@ public class SemanticModel implements ProcessingModel {
     private final Map<String, GraphProofReader> readers;
 
     private final String c14n;
-    private final C14nFactory canonizeFactory;
+    private final Supplier<GraphCanonizer> canonizeFactory;
 
     private final Function<Map<String, Object>, Collection<Object>> expand;
     private final BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
@@ -73,7 +67,7 @@ public class SemanticModel implements ProcessingModel {
             Function<Map<String, Object>, Collection<Object>> expand,
             BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact,
             BiConsumer<Object, QuadConsumer> tordf,
-            C14nFactory canonizeFactory,
+            Supplier<GraphCanonizer> canonizeFactory,
             Map<String, GraphProofReader> readers) {
         this.processorFactory = processorFactory;
         this.cursorFactory = cursorFactory;
@@ -136,7 +130,7 @@ public class SemanticModel implements ProcessingModel {
     }
 
     public GraphCanonizer newCanonizer() {
-        return canonizeFactory.newInstance();
+        return canonizeFactory.get();
     }
 
     public BiConsumer<Object, QuadConsumer> tordf() {

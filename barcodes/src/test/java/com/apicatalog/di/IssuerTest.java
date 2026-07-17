@@ -136,7 +136,7 @@ public class IssuerTest {
 
     static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
         return switch (c14n) {
-        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL_1::createProcessor;
+        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createProcessor;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.

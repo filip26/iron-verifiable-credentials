@@ -28,7 +28,7 @@ class DeriveTest {
 
         var contexts = ContextAwareResolver.getContexts(signed);
 
-        var cursor = Resources.MODEL.createProofCursor(contexts, signed);
+        var cursor = Resources.SEMANTIC_MODEL.createProofCursor(contexts, signed);
 
         if (cursor == null) {
             fail();

@@ -89,11 +89,11 @@ public final class Ed25519Signature2020 implements Proof {
         return proofDraft.get();
     }
 
-    public static Draft newDraft() {
+    public static Draft newInstance() {
         return new Draft(new Ed25519Signature2020(), List.of());
     }
 
-    public static Draft newDraft(Map<String, Object> map) {
+    public static Draft newInstance(Map<String, Object> map) {
 
         var proof = new Ed25519Signature2020();
         Collection<String> context = List.of();

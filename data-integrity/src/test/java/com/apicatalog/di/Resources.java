@@ -39,7 +39,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static ProcessingModel LEXICAL_MODEL_1 = DataIntegrity.newLexicalModelBuilder(ProcessingModel.C14N_JCS)
+    static ProcessingModel LEXICAL_MODEL_1 = DataIntegrity.createLexicalModel(ProcessingModel.C14N_JCS)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
@@ -49,7 +49,7 @@ class Resources {
             .processor(MapProofCursor::new)
             .build();
 
-    static ProcessingModel SEMANTIC_MODEL_1 = DataIntegrity.newSematicModelBuilder(ProcessingModel.C14N_RDFC)
+    static ProcessingModel SEMANTIC_MODEL_1 = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
             .proof(EdDSA2022.withRDFC())
             .proof(ECDSA2019.withRDFC())
             .proof(MLDSA2024.get44withRDFC())
@@ -57,7 +57,7 @@ class Resources {
             .Ed25519Signature2020()
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
-            .c14n(Resources::newRDFC)
+            .c14n(Resources::createRDFC)
             .processor(StandardGraphProcessor::new)
             .processor(GraphProofCursor::new)
             .build();
@@ -68,11 +68,11 @@ class Resources {
 
     static {
         try {
-            SHA_256 = MessageDigest.getInstance("SHA-256");
+            SHA_256 = MessageDigest.getInstance(Digestor.SHA_256);
 
             DIGEST_FACTORY = (Map.<String, Digestor>of(
-                    "SHA-256", SHA_256::digest,
-                    "SHA-384", MessageDigest.getInstance("SHA-384")::digest))::get;
+                    Digestor.SHA_256, SHA_256::digest,
+                    Digestor.SHA_384, MessageDigest.getInstance(Digestor.SHA_384)::digest))::get;
 
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
@@ -143,7 +143,7 @@ class Resources {
         }
     }
 
-    static final RdfcPrcessor newRDFC() {
+    static final RdfcPrcessor createRDFC() {
         return new RdfcPrcessor(); // TODO reuse one instance across
     }
 

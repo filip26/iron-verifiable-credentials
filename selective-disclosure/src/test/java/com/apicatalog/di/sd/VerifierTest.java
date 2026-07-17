@@ -25,7 +25,7 @@ public class VerifierTest {
 
     static ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.createBuilder()
             // accept any context - for test purposes only
-            .model(Predicate.not(Collection::isEmpty), Resources.MODEL)
+            .model(Predicate.not(Collection::isEmpty), Resources.SEMANTIC_MODEL)
             .build();
 
     static MethodResolver DID_KEY_RESOLVER = proof -> {

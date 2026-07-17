@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
@@ -14,7 +15,7 @@ import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.model.SemanticModel.C14nFactory;
+import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.processor.MapProcessor;
@@ -25,11 +26,11 @@ import com.apicatalog.trust.proof.MapProofReader;
 
 public class DataIntegrity {
 
-    public static SemanticModelBuilder newSematicModelBuilder(String c14n) {
+    public static SemanticModelBuilder createSematicModel(String c14n) {
         return new SemanticModelBuilder(c14n);
     }
 
-    public static LexicalModelBuilder newLexicalModelBuilder(String c14n) {
+    public static LexicalModelBuilder createLexicalModel(String c14n) {
         return new LexicalModelBuilder(c14n);
     }
 
@@ -37,7 +38,7 @@ public class DataIntegrity {
 
         private final String c14n;
 
-        private C14nFactory c14nFactory;
+        private Supplier<GraphCanonizer> c14nFactory;
 
         private GraphProcessor.Factory processorFactory;
         private GraphProofCursor.Factory cursorFactory;
@@ -54,7 +55,7 @@ public class DataIntegrity {
             this.readers = new LinkedHashMap<>();
         }
 
-        public SemanticModelBuilder c14n(C14nFactory c14nFactory) {
+        public SemanticModelBuilder c14n(Supplier<GraphCanonizer> c14nFactory) {
             this.c14nFactory = c14nFactory;
             return this;
         }

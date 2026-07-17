@@ -26,6 +26,7 @@ import com.apicatalog.jcs.Jcs;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.java.NativeComposer;
+import com.apicatalog.trust.model.ContextAwareResolver;
 
 public class IssuerTest {
 
@@ -48,23 +49,23 @@ public class IssuerTest {
         // for the algorithms below in production environments.
         case KeyCodec.P256_PRIVATE_CODE:
             keyAlgorithm = ECDSA2019.P256;
-            baseSigner = BCECDSASigner.newP256Instance(keys.baseSecretKey())::sign;
-            proofSigner = BCECDSASigner.newP256Instance(keys.proofSecretKey())::sign;
+            baseSigner = BCECDSASigner.newP256Instance(keys.basePrivateKey())::sign;
+            proofSigner = BCECDSASigner.newP256Instance(keys.proofPrivateKey())::sign;
             break;
         case KeyCodec.P384_PRIVATE_CODE:
             keyAlgorithm = ECDSA2019.P384;
-            baseSigner = BCECDSASigner.newP384Instance(keys.baseSecretKey())::sign;
-            proofSigner = BCECDSASigner.newP384Instance(keys.proofSecretKey())::sign;
+            baseSigner = BCECDSASigner.newP384Instance(keys.basePrivateKey())::sign;
+            proofSigner = BCECDSASigner.newP384Instance(keys.proofPrivateKey())::sign;
             break;
         case KeyCodec.MLDSA_44_PRIVATE_CODE:
             keyAlgorithm = MLDSA2024.ALGORITHM_44;
-            baseSigner = BCMLDSASigner.new44Instance(keys.baseSecretKey())::sign;
-            proofSigner = BCMLDSASigner.new44Instance(keys.proofSecretKey())::sign;
+            baseSigner = BCMLDSASigner.new44Instance(keys.basePrivateKey())::sign;
+            proofSigner = BCMLDSASigner.new44Instance(keys.proofPrivateKey())::sign;
             break;
         case KeyCodec.SLHDSA_SHA2_128S_PRIVATE_CODE:
             keyAlgorithm = SLHDSA2024.ALGORITHM_SHA2_128s;
-            baseSigner = BCSLHDSASigner.new128sInstance(keys.baseSecretKey())::sign;
-            proofSigner = BCSLHDSASigner.new128sInstance(keys.proofSecretKey())::sign;
+            baseSigner = BCSLHDSASigner.new128sInstance(keys.basePrivateKey())::sign;
+            proofSigner = BCSLHDSASigner.new128sInstance(keys.proofPrivateKey())::sign;
             break;
         default:
             throw new IllegalArgumentException(
@@ -81,12 +82,16 @@ public class IssuerTest {
 
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
-            var cryptosuite = getCryptoSuite((String) options.get("cryptosuite"));
+            var cryptosuite = ECDSASD2023.getInstance();
+
+            if (!cryptosuite.id().equals(options.get("cryptosuite"))) {
+                fail();
+            }
 
             var proofDraft = cryptosuite.createProofDraft();
             proofDraft.options(options);
 
-            var processor = Resources.MODEL.createProcessor(document);
+            var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
 
             processor.withProofs(proofDraft.previous());
 
@@ -103,7 +108,7 @@ public class IssuerTest {
             DataIntegrityProof.write(proof, composer);
 
             if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-                document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
+                document.put("@context", merge(ContextAwareResolver.getContexts(document), proofDraft.context()));
             }
 
         } else {
@@ -137,15 +142,6 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
-    public static ECDSASD2023 getCryptoSuite(String id) {
-
-        return switch (id) {
-        case "ecdsa-sd-2023" -> ECDSASD2023.getInstance();
-
-        default -> throw new IllegalArgumentException();
-        };
-    }
-
     static final Stream<String> resources() throws IOException {
         return Resources.stream()
                 .filter(name -> name.endsWith("unsigned.json"))
@@ -154,11 +150,9 @@ public class IssuerTest {
     }
 
     static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
-
-        var result = new LinkedHashSet<>(documentContext);
-
+        var result = LinkedHashSet.<String>newLinkedHashSet(documentContext.size() + proofContext.size());
+        result.addAll(documentContext);
         result.addAll(proofContext);
-
         return result;
     }
 
@@ -231,20 +225,5 @@ public class IssuerTest {
 //
 //        assertNotNull(signed);
 //    }
-//    JsonObject fetchResource(String name) throws IOException {
-//        try (InputStream is = getClass().getResourceAsStream(name)) {
-//            return Json.createReader(is).readObject();
-//        }
-//    }
-//
-//    public static String write(JsonValue doc) {
-//        StringWriter sw = new StringWriter();
-//        final JsonWriterFactory writerFactory = Json.createWriterFactory(
-//                Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
-//
-//        try (JsonWriter writer = writerFactory.createWriter(sw)) {
-//            writer.write(doc);
-//        }
-//        return sw.toString();
-//    }
+
 }

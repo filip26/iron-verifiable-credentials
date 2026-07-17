@@ -33,10 +33,10 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static ProcessingModel SEMANTIC_MODEL_1 = DataIntegrity.newSematicModelBuilder(ProcessingModel.C14N_RDFC)
+    static ProcessingModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
             .proof(ECDSAXI2023.getInstance())
             .tordf(Resources::toRDF)
-            .c14n(Resources::newRDFC)
+            .c14n(Resources::createRDFC)
             .processor(StandardGraphProcessor::new)
             .processor(GraphProofCursor::new)
             .build();
@@ -50,8 +50,8 @@ class Resources {
             SHA_256 = MessageDigest.getInstance("SHA-256");
 
             DIGEST_FACTORY = (Map.<String, Digestor>of(
-                    "SHA-256", SHA_256::digest,
-                    "SHA-384", MessageDigest.getInstance("SHA-384")::digest))::get;
+                    Digestor.SHA_256, SHA_256::digest,
+                    Digestor.SHA_384, MessageDigest.getInstance("SHA-384")::digest))::get;
 
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
@@ -122,7 +122,7 @@ class Resources {
         }
     }
 
-    static final RdfcPrcessor newRDFC() {
+    static final RdfcPrcessor createRDFC() {
         return new RdfcPrcessor(); // TODO reuse one instance across
     }
 
