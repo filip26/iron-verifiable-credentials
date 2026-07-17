@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.model.ModelResolver;
+import com.apicatalog.trust.model.ContextAwareResolver;
 
 class DeriveTest {
 
@@ -26,7 +26,7 @@ class DeriveTest {
 
         var signed = Resources.getMap(resource + ".signed.json");
 
-        var contexts = ModelResolver.getContexts(signed);
+        var contexts = ContextAwareResolver.getContexts(signed);
 
         var cursor = Resources.MODEL.createProofCursor(contexts, signed);
 

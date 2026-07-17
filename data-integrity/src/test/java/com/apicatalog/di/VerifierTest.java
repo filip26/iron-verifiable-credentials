@@ -24,12 +24,12 @@ import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
-import com.apicatalog.trust.model.ModelResolver;
+import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.proof.Proof;
 
 public class VerifierTest {
 
-    static ModelResolver MODEL_RESOLVER = ModelResolver.newBuilder()
+    static ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.createBuilder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty),
                     Resources.LEXICAL_MODEL_1,
@@ -77,7 +77,7 @@ public class VerifierTest {
 
         var signed = Resources.getMap(resource);
 
-        var contexts = ModelResolver.getContexts(signed);
+        var contexts = ContextAwareResolver.getContexts(signed);
 
         var models = MODEL_RESOLVER.resolve(contexts, signed);
 

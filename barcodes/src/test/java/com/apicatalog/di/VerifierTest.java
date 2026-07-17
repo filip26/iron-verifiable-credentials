@@ -20,7 +20,7 @@ import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
-import com.apicatalog.trust.model.ModelResolver;
+import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.proof.Proof;
 
 public class VerifierTest {
@@ -64,7 +64,7 @@ public class VerifierTest {
         Map<String, Object> options = Resources.getMap(resource + ".options.json");
         Map<String, Object> signed = Resources.getMap(resource + ".signed.json");
 
-        var contexts = ModelResolver.getContexts(signed);
+        var contexts = ContextAwareResolver.getContexts(signed);
 
         var proofs = new ArrayList<Proof>();
 

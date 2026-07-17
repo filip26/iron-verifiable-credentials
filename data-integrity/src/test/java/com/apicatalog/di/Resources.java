@@ -29,7 +29,7 @@ import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
-import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
@@ -39,7 +39,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static DataModel LEXICAL_MODEL_1 = DataIntegrity.newLexicalModelBuilder(DataModel.C14N_JCS)
+    static ProcessingModel LEXICAL_MODEL_1 = DataIntegrity.newLexicalModelBuilder(ProcessingModel.C14N_JCS)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
@@ -49,7 +49,7 @@ class Resources {
             .processor(MapProofCursor::new)
             .build();
 
-    static DataModel SEMANTIC_MODEL_1 = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
+    static ProcessingModel SEMANTIC_MODEL_1 = DataIntegrity.newSematicModelBuilder(ProcessingModel.C14N_RDFC)
             .proof(EdDSA2022.withRDFC())
             .proof(ECDSA2019.withRDFC())
             .proof(MLDSA2024.get44withRDFC())

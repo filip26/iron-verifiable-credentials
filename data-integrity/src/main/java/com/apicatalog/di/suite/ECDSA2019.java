@@ -8,7 +8,7 @@ import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
@@ -21,11 +21,11 @@ public final class ECDSA2019 extends StandardCryptoSuite {
 
     private static final ECDSA2019 ECDSA_RDFC_2019 = new ECDSA2019(
             "ecdsa-rdfc-2019",
-            DataModel.C14N_RDFC);
+            ProcessingModel.C14N_RDFC);
 
     private static final ECDSA2019 ECDSA_JCS_2019 = new ECDSA2019(
             "ecdsa-jcs-2019",
-            DataModel.C14N_JCS);
+            ProcessingModel.C14N_JCS);
 
     private ECDSA2019(String id, String c14n) {
         super(id, c14n, Multibase.BASE_58_BTC, ECDSA2019::generate);

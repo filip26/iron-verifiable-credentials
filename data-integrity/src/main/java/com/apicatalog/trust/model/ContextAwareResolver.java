@@ -8,18 +8,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
-public class ModelResolver {
+public class ContextAwareResolver {
 
-    Collection<Entry<Predicate<Collection<String>>, Collection<DataModel>>> models;
+    Collection<Entry<Predicate<Collection<String>>, Collection<ProcessingModel>>> models;
 
-    private ModelResolver(Collection<Entry<Predicate<Collection<String>>, Collection<DataModel>>> models) {
+    private ContextAwareResolver(
+            Collection<Entry<Predicate<Collection<String>>, Collection<ProcessingModel>>> models) {
         this.models = models;
     }
 
-    public static final Builder newBuilder() {
+    public static final Builder createBuilder() {
         return new Builder();
     }
 
+    // TODO must not be static, the resolver should have been configured with
+    // "@context" key, or context extractos? -> getJsonLdContext(...)
     public static Collection<String> getContexts(Map<String, Object> document) {
         return switch (document.get("@context")) {
         case Collection<?> col -> col.stream()
@@ -32,13 +35,13 @@ public class ModelResolver {
                 })
                 .toList();
         case String context -> List.of(context);
-        case null -> null;
+        case null -> List.of();
         default ->
             throw new IllegalArgumentException("Invalid @context type: expected a string or a collection of strings");
         };
     }
 
-    public Collection<DataModel> resolve(Collection<String> contexts, Map<String, Object> document) {
+    public Collection<ProcessingModel> resolve(Collection<String> contexts, Map<String, Object> document) {
         for (var entry : models) {
             if (entry.getKey().test(contexts)) {
                 return entry.getValue();
@@ -49,11 +52,11 @@ public class ModelResolver {
 
     public static class Builder {
 
-        Collection<Entry<Predicate<Collection<String>>, Collection<DataModel>>> models;
+        Collection<Entry<Predicate<Collection<String>>, Collection<ProcessingModel>>> models;
 
         public Builder model(
                 Predicate<Collection<String>> selector,
-                DataModel... model) {
+                ProcessingModel... model) {
 
             if (this.models == null) {
                 this.models = new ArrayList<>();
@@ -63,8 +66,8 @@ public class ModelResolver {
             return this;
         }
 
-        public ModelResolver build() {
-            return new ModelResolver(models);
+        public ContextAwareResolver build() {
+            return new ContextAwareResolver(models);
         }
     }
 

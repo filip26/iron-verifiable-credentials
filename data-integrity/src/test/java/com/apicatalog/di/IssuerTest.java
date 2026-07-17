@@ -34,7 +34,7 @@ import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
 
@@ -179,8 +179,8 @@ public class IssuerTest {
 
     static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
         return switch (c14n) {
-        case DataModel.C14N_RDFC -> Resources.SEMANTIC_MODEL_1::createProcessor;
-        case DataModel.C14N_JCS -> Resources.LEXICAL_MODEL_1::createProcessor;
+        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL_1::createProcessor;
+        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL_1::createProcessor;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.

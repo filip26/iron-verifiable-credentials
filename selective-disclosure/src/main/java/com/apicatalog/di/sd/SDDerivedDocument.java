@@ -3,7 +3,7 @@ package com.apicatalog.di.sd;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.model.ProcessingModel;
 
 public record SDDerivedDocument(
         Supplier<Map<String, Object>> compacted,
@@ -14,7 +14,7 @@ public record SDDerivedDocument(
 
     @Override
     public String c14n() {
-        return DataModel.C14N_RDFC;
+        return ProcessingModel.C14N_RDFC;
     }
 
 }

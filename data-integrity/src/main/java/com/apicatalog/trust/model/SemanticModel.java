@@ -13,7 +13,7 @@ import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class SemanticModel implements DataModel {
+public class SemanticModel implements ProcessingModel {
     
     // use just Supplier
     @FunctionalInterface
@@ -96,7 +96,7 @@ public class SemanticModel implements DataModel {
     public PayloadProcessor createProcessor(Map<String, Object> document) {
         return processorFactory.newInstance(
                 this,
-                ModelResolver.getContexts(document),
+                ContextAwareResolver.getContexts(document),
                 document);
     }
     

@@ -10,7 +10,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.Proof;
@@ -23,7 +23,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
 
     private static final ECDSAXI2023 ECDSA_XI_2023 = new ECDSAXI2023(
             "ecdsa-xi-2023",
-            DataModel.C14N_RDFC);
+            ProcessingModel.C14N_RDFC);
 
     private ECDSAXI2023(String id, String c14n) {
         super(id, c14n, Multibase.BASE_58_BTC, ECDSAXI2023::generate);
@@ -237,7 +237,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
 
         @Override
         public String c14n() {
-            return DataModel.C14N_RDFC;
+            return ProcessingModel.C14N_RDFC;
         }
 
         @Override

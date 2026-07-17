@@ -6,7 +6,7 @@ import java.util.Map;
 import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public interface DataModel {
+public interface ProcessingModel {
 
     static final String C14N_RDFC = "RDFC";
     static final String C14N_JCS = "JCS";

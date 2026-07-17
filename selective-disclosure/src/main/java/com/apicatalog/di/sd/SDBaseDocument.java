@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.model.SemanticModel;
 
 public class SDBaseDocument implements SDPayload {
@@ -47,6 +47,6 @@ public class SDBaseDocument implements SDPayload {
 
     @Override
     public String c14n() {
-        return DataModel.C14N_RDFC;
+        return ProcessingModel.C14N_RDFC;
     }
 }

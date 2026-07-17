@@ -11,8 +11,8 @@ import java.util.function.Function;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.model.DataModel;
 import com.apicatalog.trust.model.LexicalModel;
+import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.C14nFactory;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
@@ -111,7 +111,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public DataModel build() {
+        public ProcessingModel build() {
 
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
@@ -186,7 +186,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public DataModel build() {
+        public ProcessingModel build() {
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_NAME,
