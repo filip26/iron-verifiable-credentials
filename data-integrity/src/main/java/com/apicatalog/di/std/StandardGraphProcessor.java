@@ -35,7 +35,7 @@ public class StandardGraphProcessor implements GraphProcessor {
     }
 
     @Override
-    public Collection<String> contexts() {
+    public Collection<String> context() {
         return context;
     }
 

@@ -1,7 +1,6 @@
 package com.apicatalog.di.suite;
 
 import com.apicatalog.di.signature.ProofValue;
-import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.ProcessingModel;
@@ -23,7 +22,7 @@ public final class EdDSA2022 extends StandardCryptoSuite {
             ProcessingModel.C14N_JCS);
 
     private EdDSA2022(String id, String c14n) {
-        super(id, c14n, Multibase.BASE_58_BTC, ProofValueGenerator::generateWithSHA256);
+        super(id, c14n, Multibase.BASE_58_BTC, ProofValue::generateSignatureWithSHA256);
     }
 
     public static EdDSA2022 withRDFC() {

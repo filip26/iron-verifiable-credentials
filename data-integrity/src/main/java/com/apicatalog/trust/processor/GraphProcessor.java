@@ -15,10 +15,11 @@ public interface GraphProcessor extends PayloadProcessor {
                 Map<String, Object> document);
     }
 
-    Collection<String> contexts();
+    Collection<String> context();
 
     Collection<String[]> proof(String graph);
 
+    // returns proof graph ids, might be URI or blank node identifier
     Collection<String> proofs();
 
     String proofType(String graph);

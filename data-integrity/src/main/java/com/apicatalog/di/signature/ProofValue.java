@@ -3,6 +3,7 @@ package com.apicatalog.di.signature;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
 
+import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
@@ -64,6 +65,43 @@ public final class ProofValue implements Signature {
                 signer.sign(digest),
                 proof,
                 payload);
+    }
+
+    public static Signature generateSignature(
+            String signatureAlgorithm,
+            String digestAlgorithm,
+            AsymmetricSigner signer,
+            Digestor.Factory digestFactory,
+            DataIntegrityProof proof,
+            DigestiblePayload payload) throws SignatureException {
+
+        var digestor = digestFactory.newDigestor(digestAlgorithm);
+
+        return ProofValue.generateSignature(
+                signatureAlgorithm,
+                digestAlgorithm,
+                signer,
+                digestor,
+                proof,
+                payload);
+    }
+
+    public static Signature generateSignatureWithSHA256(
+            String signatureAlgorithm,
+            AsymmetricSigner signer,
+            Digestor.Factory digestFactory,
+            DataIntegrityProof proof,
+            DigestiblePayload data) throws SignatureException {
+        return generateSignature(signatureAlgorithm, Digestor.SHA_256, signer, digestFactory, proof, data);
+    }
+
+    public static Signature generateSignatureWithSHA384(
+            String algorithm,
+            AsymmetricSigner signer,
+            Digestor.Factory digestFactory,
+            DataIntegrityProof proof,
+            DigestiblePayload data) throws SignatureException {
+        return generateSignature(algorithm, Digestor.SHA_384, signer, digestFactory, proof, data);
     }
 
     @Override

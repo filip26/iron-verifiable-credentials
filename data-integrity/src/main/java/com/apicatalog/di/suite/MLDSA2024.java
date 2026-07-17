@@ -1,7 +1,6 @@
 package com.apicatalog.di.suite;
 
 import com.apicatalog.di.signature.ProofValue;
-import com.apicatalog.di.signature.ProofValueGenerator;
 import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.ProcessingModel;
@@ -26,7 +25,7 @@ public final class MLDSA2024 extends StandardCryptoSuite {
     private MLDSA2024(
             String id,
             String c14n) {
-        super(id, c14n, Multibase.BASE_64_URL, ProofValueGenerator::generateWithSHA256);
+        super(id, c14n, Multibase.BASE_64_URL, ProofValue::generateSignatureWithSHA256);
     }
 
     public static MLDSA2024 get44Instance(String c14n) {
