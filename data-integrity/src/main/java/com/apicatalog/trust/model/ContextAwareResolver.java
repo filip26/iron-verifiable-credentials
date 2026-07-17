@@ -1,7 +1,6 @@
 package com.apicatalog.trust.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -10,10 +9,10 @@ import java.util.function.Predicate;
 
 public class ContextAwareResolver {
 
-    Collection<Entry<Predicate<Collection<String>>, Collection<ProcessingModel>>> models;
+    Collection<Entry<Predicate<Collection<String>>, ProcessingModel>> models;
 
     private ContextAwareResolver(
-            Collection<Entry<Predicate<Collection<String>>, Collection<ProcessingModel>>> models) {
+            Collection<Entry<Predicate<Collection<String>>, ProcessingModel>> models) {
         this.models = models;
     }
 
@@ -41,28 +40,33 @@ public class ContextAwareResolver {
         };
     }
 
-    public Collection<ProcessingModel> resolve(Collection<String> contexts, Map<String, Object> document) {
+    public ProcessingModel resolve(Collection<String> contexts, Map<String, Object> document) {
         for (var entry : models) {
             if (entry.getKey().test(contexts)) {
                 return entry.getValue();
             }
         }
-        return List.of();
+        return null;
     }
 
     public static class Builder {
 
-        Collection<Entry<Predicate<Collection<String>>, Collection<ProcessingModel>>> models;
+        Collection<Entry<Predicate<Collection<String>>, ProcessingModel>> models;
 
         public Builder model(
                 Predicate<Collection<String>> selector,
-                ProcessingModel... model) {
+                ProcessingModel... models) {
 
             if (this.models == null) {
                 this.models = new ArrayList<>();
             }
-
-            this.models.add(Map.entry(selector, Arrays.asList(model)));
+            
+            if (models.length == 1) {
+                this.models.add(Map.entry(selector, models[0]));
+                return this;
+            }
+            
+            this.models.add(Map.entry(selector, new HybridModel(models)));
             return this;
         }
 

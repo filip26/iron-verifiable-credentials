@@ -1,10 +1,8 @@
 package com.apicatalog.di;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -25,15 +23,15 @@ import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
 import com.apicatalog.trust.model.ContextAwareResolver;
-import com.apicatalog.trust.proof.Proof;
 
 public class VerifierTest {
 
     static ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.createBuilder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty),
-                    Resources.LEXICAL_MODEL_1,
-                    Resources.SEMANTIC_MODEL_1)
+                    // in processing preferences order
+                    Resources.SEMANTIC_MODEL,
+                    Resources.LEXICAL_MODEL)
             .build();
 
     static MethodResolver DID_KEY_RESOLVER = proof -> {
@@ -79,57 +77,28 @@ public class VerifierTest {
 
         var contexts = ContextAwareResolver.getContexts(signed);
 
-        var models = MODEL_RESOLVER.resolve(contexts, signed);
+        var model = MODEL_RESOLVER.resolve(contexts, signed);
 
-        assertFalse(models.isEmpty());
+        var cursor = model.createProofCursor(contexts, signed);
 
-        var proofs = new ArrayList<Proof>();
-
-        int lastCount = -1;
-
-        for (var model : models) {
-
-            var cursor = model.createProofCursor(contexts, signed);
-
-            if (cursor == null) {
-                continue;
-            }
-
-            if (!cursor.next()) {
-                fail("No proof(s) to verify");
-                return;
-            }
-
-            int count = 0;
-
-            do {
-                count++;
-
-                if (!cursor.isAccepted()) {
-                    continue;
-                }
-
-                var proof = cursor.proof();
-                var verified = PROOF_VERIFIER.verify(proof);
-
-                assertTrue(verified);
-
-                proofs.add(proof);
-
-            } while (cursor.next());
-
-            if (lastCount != -1 && lastCount != count) {
-                throw new IllegalArgumentException("Inconsistent proofs size");
-            }
-            lastCount = count;
-
-            // no unknown proofs, all proofs have been processed, terminate
-            if (lastCount == proofs.size()) {
-                break;
-            }
-
+        if (cursor == null || !cursor.next()) {
+            fail("No proof(s) to verify");
+            return;
         }
-        assertFalse(proofs.isEmpty());
+
+        do {
+
+            if (!cursor.isAccepted()) {
+                fail();
+            }
+
+            var proof = cursor.proof();
+            var verified = PROOF_VERIFIER.verify(proof);
+
+            assertTrue(verified);
+
+        } while (cursor.next());
+
     }
 
     static final Stream<String> resources() {

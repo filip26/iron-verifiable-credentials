@@ -33,7 +33,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static ProcessingModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
             .proof(ECDSAXI2023.getInstance())
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)

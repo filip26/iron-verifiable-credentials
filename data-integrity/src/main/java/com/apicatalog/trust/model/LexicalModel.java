@@ -15,7 +15,7 @@ import com.apicatalog.trust.proof.MapProofCursor;
 import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class LexicalModel implements ProcessingModel {
+public class LexicalModel implements ProcessingModel, ProcessorFactory {
 
     private final MapProcessor.Factory processorFactory;
     private final MapProofCursor.Factory cursorFactory;
@@ -79,10 +79,10 @@ public class LexicalModel implements ProcessingModel {
         return canonize.apply(data);
     }
 
-    @Override
-    public String c14n() {
-        return c14n;
-    }
+//    @Override
+//    public String c14n() {
+//        return c14n;
+//    }
 
     @Override
     public PayloadProcessor createProcessor(Map<String, Object> document) {

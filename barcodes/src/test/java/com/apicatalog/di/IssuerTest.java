@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,8 +26,7 @@ import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.model.ProcessingModel;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.proof.Proof;
 
 public class IssuerTest {
@@ -83,7 +81,7 @@ public class IssuerTest {
         var proofDraft = cryptosuite.createProofDraft();
         proofDraft.options(options);
 
-        var processor = getProcessor(proofDraft.c14n()).apply(document);
+        var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
 
         processor.withProofs(proofDraft.previous());
 
@@ -104,7 +102,7 @@ public class IssuerTest {
         DataIntegrityProof.write((DataIntegrityProof) proof, composer);
 
         if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-            document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
+            document.put("@context", merge(ContextAwareResolver.getContexts(document), proofDraft.context()));
         }
 
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
@@ -132,16 +130,6 @@ public class IssuerTest {
         var expected = Resources.getMap(resource + ".signed.json");
 
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
-    }
-
-    static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
-        return switch (c14n) {
-        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createProcessor;
-        default -> throw new IllegalStateException(
-                """
-                Unsupported c14n = %s.
-                """.formatted(c14n));
-        };
     }
 
     static final Stream<String> resources() throws IOException {

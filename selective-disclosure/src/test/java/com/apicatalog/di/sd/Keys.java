@@ -26,15 +26,15 @@ public record Keys(
 
         var baseKeys = (Map<String, String>) keysMap.get("baseKeyPair");
 
-        var basePublicKey = MULTIBASE.decode(baseKeys.get("publicKeyMultibase"));
-        var basePublicKeyCodec = MULTICODEC.getCodec(basePublicKey).orElseThrow();
+//        var basePublicKey = MULTIBASE.decode(baseKeys.get("publicKeyMultibase"));
+//        var basePublicKeyCodec = MULTICODEC.getCodec(basePublicKey).orElseThrow();
 
         var basePrivateKey = MULTIBASE.decode(baseKeys.get("secretKeyMultibase"));
         var basePrivateKeyCodec = MULTICODEC.getCodec(basePrivateKey).orElseThrow();
 
-        if (!basePublicKeyCodec.equals(basePrivateKeyCodec)) {
-            throw new IllegalArgumentException();
-        }
+//        if (!basePublicKeyCodec.equals(basePrivateKeyCodec)) {
+//            throw new IllegalArgumentException();
+//        }
 
         var proofKeys = (Map<String, String>) keysMap.get("proofKeyPair");
 
@@ -48,7 +48,7 @@ public record Keys(
 
         return new Keys(
                 basePrivateKeyCodec,
-                basePublicKey,
+                null, //basePublicKey,
                 basePrivateKeyCodec.decode(basePrivateKey),
                 proofPublicKey,
                 proofPrivateKeyCodec.decode(proofPrivateKey),

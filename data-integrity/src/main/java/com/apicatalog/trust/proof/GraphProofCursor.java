@@ -46,19 +46,6 @@ public class GraphProofCursor implements ProofCursor {
     }
 
     @Override
-    public GraphData data() {
-//FIXME
-//        if (document == null && graphs.containsKey("@default")) {
-//
-//            var data = graphs.get("@default");
-//
-//            document = new GraphData(data, model.c14n());
-//        }
-//
-        return document;
-    }
-
-    @Override
     public boolean isAccepted() {
         return currentProofReader != null && currentProofReader.isAccepted(currentGraphProof);
     }

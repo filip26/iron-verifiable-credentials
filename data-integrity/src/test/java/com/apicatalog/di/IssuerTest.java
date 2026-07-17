@@ -99,7 +99,7 @@ public class IssuerTest {
         var proofs = document.get("proof");
 
         var context = ContextAwareResolver.getContexts(document);
-        
+
         var composer = new NativeComposer<Map<String, ? extends Object>>();
 
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
@@ -109,7 +109,7 @@ public class IssuerTest {
             var proofDraft = cryptosuite.createProofDraft();
             proofDraft.options(options);
 
-            var processor = getProcessor(proofDraft.c14n()).apply(document);
+            var processor = getProcessor(cryptosuite.c14n()).apply(document);
 
             processor.withProofs(proofDraft.previous());
 
@@ -119,12 +119,17 @@ public class IssuerTest {
                     Resources.DIGEST_FACTORY,
                     processor.digestible());
 
+//TODO
+//            processor.add(proof);
+//
+//            processor.write(composer);
+
             DataIntegrityProof.write(integrityProof, composer);
 
             if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
                 document.put("@context", merge(context, proofDraft.context()));
             }
-            
+
             proof = integrityProof;
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
@@ -133,7 +138,7 @@ public class IssuerTest {
 
             var proofDraft = Ed25519Signature2020.newInstance((Map<String, Object>) options);
 
-            var processor = Resources.SEMANTIC_MODEL_1.createProcessor(document);
+            var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
 
             var edProof = Ed25519Signature2020.generateProof(
                     signer,
@@ -146,16 +151,18 @@ public class IssuerTest {
             if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
                 document.put("@context", merge(context, proofDraft.context()));
             }
-            
+
             proof = edProof;
 
         } else {
             fail("An unsupported proof type " + options.get("type"));
         }
 
+        // verify the newly issued proof just for testing
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 
+        // TODO remove, hide in document handler interface
         var proofMap = composer.compose();
 
         if (proofs instanceof Collection col) {
@@ -182,8 +189,8 @@ public class IssuerTest {
 
     static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
         return switch (c14n) {
-        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL_1::createProcessor;
-        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL_1::createProcessor;
+        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createProcessor;
+        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::createProcessor;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.

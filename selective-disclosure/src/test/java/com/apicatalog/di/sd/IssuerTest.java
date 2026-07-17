@@ -75,46 +75,44 @@ public class IssuerTest {
                             .formatted(keys.codec().name(), keys.codec().code()));
         }
 
-        DataIntegrityProof proof = null;
         var proofs = document.get("proof");
 
         var composer = new NativeComposer<Map<String, ? extends Object>>();
 
-        if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
+        assertEquals(DataIntegrityProof.TYPE_NAME, options.get("type"), "An unsupported proof type.");
 
-            var cryptosuite = ECDSASD2023.getInstance();
+        var cryptosuite = ECDSASD2023.getInstance();
 
-            if (!cryptosuite.id().equals(options.get("cryptosuite"))) {
-                fail();
-            }
-
-            var proofDraft = cryptosuite.createProofDraft();
-            proofDraft.options(options);
-
-            var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
-
-            processor.withProofs(proofDraft.previous());
-
-            proof = proofDraft.sign(
-                    keyAlgorithm,
-                    baseSigner,
-                    keys.proofPublicKey(),
-                    proofSigner,
-                    Resources.DIGEST_FACTORY,
-                    ((SDGraphProcessor) processor).redactable(
-                            (Collection<String>) options.get("mandatoryPointers"),
-                            keys.hmacKey()));
-
-            DataIntegrityProof.write(proof, composer);
-
-            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-                document.put("@context", merge(ContextAwareResolver.getContexts(document), proofDraft.context()));
-            }
-
-        } else {
-            fail("An unsupported proof type " + options.get("type"));
+        if (!cryptosuite.id().equals(options.get("cryptosuite"))) {
+            fail();
         }
 
+        var proofDraft = cryptosuite.createProofDraft();
+        proofDraft.options(options);
+
+        var context = ContextAwareResolver.getContexts(document);
+        
+        var processor = new SDGraphProcessor(Resources.SEMANTIC_MODEL, context, document);
+
+        processor.withProofs(proofDraft.previous());
+
+        var proof = proofDraft.sign(
+                keyAlgorithm,
+                baseSigner,
+                keys.proofPublicKey(),
+                proofSigner,
+                Resources.DIGEST_FACTORY,
+                processor.redactable(
+                        (Collection<String>) options.get("mandatoryPointers"),
+                        keys.hmacKey()));
+
+        DataIntegrityProof.write(proof, composer);
+
+        if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
+            document.put("@context", merge(ContextAwareResolver.getContexts(document), proofDraft.context()));
+        }
+
+        // verify the newly issued proof just for testing
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 

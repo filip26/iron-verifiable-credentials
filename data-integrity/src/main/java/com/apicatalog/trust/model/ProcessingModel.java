@@ -11,11 +11,11 @@ public interface ProcessingModel {
     static final String C14N_RDFC = "RDFC";
     static final String C14N_JCS = "JCS";
 
-    String c14n();
+//    String c14n();
 
     ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document);
 
-    PayloadProcessor createProcessor(Map<String, Object> document);
+//    PayloadProcessor createProcessor(Map<String, Object> document);
 
     // TODO accepted proof types, for configuration dump
 

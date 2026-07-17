@@ -112,7 +112,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public ProcessingModel build() {
+        public SemanticModel build() {
 
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
@@ -187,7 +187,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public ProcessingModel build() {
+        public LexicalModel build() {
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_NAME,

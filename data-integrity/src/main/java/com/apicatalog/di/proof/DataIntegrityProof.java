@@ -413,12 +413,6 @@ public final class DataIntegrityProof implements Proof {
             return proof.cryptosuite;
         }
 
-        public String c14n() {
-            return proof.cryptosuite != null
-                    ? proof.cryptosuite.c14n()
-                    : null;
-        }
-
         public Collection<String> context() {
             return proof.context();
         }

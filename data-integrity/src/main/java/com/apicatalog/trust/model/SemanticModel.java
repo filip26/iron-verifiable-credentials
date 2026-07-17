@@ -14,7 +14,7 @@ import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class SemanticModel implements ProcessingModel {
+public class SemanticModel implements ProcessingModel, ProcessorFactory {
 
     @FunctionalInterface
     public interface QuadConsumer {
@@ -79,11 +79,6 @@ public class SemanticModel implements ProcessingModel {
 
         this.canonizeFactory = canonizeFactory;
         this.readers = readers;
-    }
-
-    @Override
-    public String c14n() {
-        return c14n;
     }
 
     @Override
