@@ -1,0 +1,16 @@
+{
+  "type": "DataIntegrityProof",
+  "cryptosuite": "ecdsa-xi-2023",
+  "created": "2023-02-24T23:36:38Z",
+  "verificationMethod": "did:key:zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP#zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP",
+  "proofPurpose": "assertionMethod",
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2"
+  ],
+  "canonicalizedData": "DACJOHN\nDAQF987654321\nDCSSMITH\n",
+  "opticalDataBytes":
+    [188,  38, 200, 146, 227, 213,  90, 250,
+    50,  18, 126, 254,  47, 177,  91,  23,
+    64, 129, 104, 223, 136,  81, 116,  67,
+    136, 125, 137, 165, 117,  63, 152, 207]
+}
