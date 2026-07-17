@@ -220,7 +220,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
             return payload;
         }
     }
-    
+
     public static class BarcodePayload implements DigestiblePayload {
 
         byte[] canonicalPayload;
@@ -267,28 +267,4 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
         }
 
     }
-
-//    public static void main(String[] args) throws NoSuchAlgorithmException {
-//
-//        var x = "DACJOHN\nDAQF987654321\nDCSSMITH\n";
-//
-//        var y = MessageDigest.getInstance("SHA-256");
-//        var z = y.digest(x.getBytes(StandardCharsets.UTF_8));
-//
-//        IO.println(HexFormat.of().formatHex(z));
-//
-//        IO.println(Arrays.toString(x.getBytes(StandardCharsets.UTF_8)));
-//        IO.println(Multibase.BASE_2.encode(Multibase.BASE_64_URL.decode("uggAg")));
-//        IO.println(HexFormat.of().formatHex(XX));
-//        IO.println(x.length() + ", " + XX.length);
-//
-//        var zx = """
-//                 IAUTO0000007010SRC0000000701<<
-//                 8804192M2601058NOT<<<<<<<<<<<5
-//                 SMITH<<JOHN<<<<<<<<<<<<<<<<<<<
-//                 """;
-//        var yz = y.digest(zx.getBytes(StandardCharsets.UTF_8));
-//        IO.println(Arrays.toString(yz));
-//    }
-
 }
