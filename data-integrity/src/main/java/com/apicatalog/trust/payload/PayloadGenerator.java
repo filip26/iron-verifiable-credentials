@@ -8,7 +8,6 @@ public interface PayloadGenerator {
 
     public interface Factory {
 
-
         PayloadGenerator createPayload(Map<String, Object> document);
 
         // TODO accepted proof types, for configuration dump
@@ -18,7 +17,6 @@ public interface PayloadGenerator {
 
     }
 
-    
     void withProofs(Collection<String> ids);
 
     default DigestiblePayload digestible() {
@@ -26,7 +24,6 @@ public interface PayloadGenerator {
     }
 
     <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory);
-
 
     /**
      * resets the provider state, but might cache vanilla digestible payload for
