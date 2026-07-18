@@ -10,7 +10,6 @@ import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.processor.GraphProcessor;
-import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.ProofCursor;
 
 public class StandardGraphProcessor implements GraphProcessor {
@@ -21,13 +20,19 @@ public class StandardGraphProcessor implements GraphProcessor {
 
     private Dataset dataset;
 
-    public StandardGraphProcessor(
+    protected StandardGraphProcessor(
             SemanticModel model,
             Collection<String> context,
             Map<String, Object> document) {
         this.model = model;
         this.context = context;
         this.document = document;
+    }
+
+    public static StandardGraphProcessor newInstance(SemanticModel model,
+            Collection<String> context,
+            Map<String, Object> document) {
+        return new StandardGraphProcessor(model, context, document);
     }
 
     @Override

@@ -61,7 +61,10 @@ public class SemanticModel implements ProcessingModel {
     private final BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
     private final BiConsumer<Object, QuadConsumer> tordf;
 
+    private final String proofPredicate;
+    
     public SemanticModel(
+            String proofPredicate,
             GraphProcessor.Factory processorFactory,
             GraphProofCursor.Factory cursorFactory,
             String c14n,
@@ -70,6 +73,7 @@ public class SemanticModel implements ProcessingModel {
             BiConsumer<Object, QuadConsumer> tordf,
             Supplier<GraphCanonizer> canonizeFactory,
             Map<String, GraphProofReader> readers) {
+        this.proofPredicate = proofPredicate;   //TODO replace with vocab record or so
         this.processorFactory = processorFactory;
         this.cursorFactory = cursorFactory;
         this.c14n = c14n;

@@ -90,36 +90,6 @@ public class HybridModel implements ProcessingModel {
 
     }
 
-//    @Override
-//    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
-//
-//        List<ProofCursor> cursors = null;
-//
-//        for (var model : models) {
-//
-//            var cursor = model.createProofCursor(context, document);
-//            if (cursor == null) {
-//                continue;
-//            }
-//
-//            if (cursors == null) {
-//                cursors = new ArrayList<>(models.length);
-//            }
-//
-//            cursors.add(cursor);
-//        }
-//
-//        if (cursors == null) {
-//            return null;
-//        }
-//
-//        if (cursors.size() == 1) {
-//            return cursors.get(0);
-//        }
-//
-//        return new Cursor(cursors);
-//    }
-
     private static class Cursor implements ProofCursor {
 
         final Collection<ProofCursor> cursors;

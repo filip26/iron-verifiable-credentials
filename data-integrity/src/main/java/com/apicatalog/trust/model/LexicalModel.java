@@ -3,9 +3,7 @@ package com.apicatalog.trust.model;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.processor.MapProcessor;
-import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.MapProofCursor;
 import com.apicatalog.trust.proof.MapProofReader;
 
@@ -18,12 +16,16 @@ public class LexicalModel implements ProcessingModel {
     private final String c14n;
     private final Function<Map<String, Object>, byte[]> canonize;
 
+    private final String proofPropertyName;
+    
     public LexicalModel(
+            String proofPropertyName,
             MapProcessor.Factory processorFactory,
             MapProofCursor.Factory cursorFactory,
             String c14n,
             Function<Map<String, Object>, byte[]> canonize,
             Map<String, MapProofReader> proofReaders) {
+        this.proofPropertyName = proofPropertyName;
         this.processorFactory = processorFactory;
         this.cursorFactory = cursorFactory;
         this.c14n = c14n;
@@ -31,43 +33,16 @@ public class LexicalModel implements ProcessingModel {
         this.proofReaders = proofReaders;
     }
 
-//    @Override
-//    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
-//
-//        var processor = processorFactory.createProcessor(
-//                this,
-//                context,
-//                document);
-//
-//        var proofs = processor.proofs();
-//
-//        var mapping = new ArrayList<MapProofReader>(proofs);
-//
-//        for (var index = 0; index < proofs; index++) {
-//
-//            var proofMap = processor.proof(index);
-//
-//            var reader = proofReaders.get(proofMap.get("type"));
-//
-//            mapping.add(reader);
-//        }
-//
-//        if (mapping.isEmpty()) {
-//            return null;
-//        }
-//
-//        var data = new LinkedHashMap<>(document);
-//        data.remove("proof");
-//
-//        return cursorFactory.newInstance(this, processor, mapping.toArray(MapProofReader[]::new));
-//    }
-
     @Override
     public MapProcessor createProcessor(Map<String, Object> document) {
         return processorFactory.createProcessor(
                 this,
                 ContextAwareResolver.getContexts(document),
                 document);
+    }
+
+    public MapProofCursor createCursor(MapProcessor processor) {
+        return cursorFactory.newInstance(this, processor);
     }
 
     public byte[] canonize(Map<String, Object> data) {
@@ -82,8 +57,8 @@ public class LexicalModel implements ProcessingModel {
     public MapProofReader reader(String proofType) {
         return proofReaders.get(proofType);
     }
-
-    public MapProofCursor createCursor(MapProcessor processor) {
-        return cursorFactory.newInstance(this, processor);
+    
+    public String proofPropertyName() {
+        return proofPropertyName;
     }
 }

@@ -40,7 +40,7 @@ public class StandardMapProcessor implements MapProcessor {
 
         var data = new LinkedHashMap<>(document);
 
-        var proofs = switch (data.remove("proof")) {
+        var proofs = switch (data.remove(model.proofPropertyName())) {
         case Collection<?> col -> col;
         case null -> List.of();
         case Object obj -> List.of(obj);

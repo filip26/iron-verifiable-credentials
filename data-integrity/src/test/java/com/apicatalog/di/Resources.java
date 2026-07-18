@@ -41,16 +41,18 @@ import com.fasterxml.jackson.core.JsonFactory;
 class Resources {
 
     static LexicalModel LEXICAL_MODEL = DataIntegrity.createLexicalModel(ProcessingModel.C14N_JCS)
+            .proofProperty(DataIntegrity.VOCAB_PROOF_KEY)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
             .processor(StandardMapProcessor::newInstance)
-            .processor(MapProofCursor::newInstance)
+            .cursor(MapProofCursor::newInstance)
             .build();
 
     static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
+            .proofPredicate(DataIntegrity.VOCAB_PROOF_URI)
             .proof(EdDSA2022.withRDFC())
             .proof(ECDSA2019.withRDFC())
             .proof(MLDSA2024.get44withRDFC())
@@ -59,8 +61,8 @@ class Resources {
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
-            .processor(StandardGraphProcessor::new)
-            .processor(GraphProofCursor::newInstance)
+            .processor(StandardGraphProcessor::newInstance)
+            .cursor(GraphProofCursor::newInstance)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;

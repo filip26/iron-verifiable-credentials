@@ -5,6 +5,8 @@ import com.apicatalog.trust.proof.ProofCursor;
 
 public interface DocumentProcessor {
 
+    record Vocab(String context, String proof, String id, String type) {};
+    
 //    <T> T adapt(Class<T> type);
 //
 //    void add(Proof proof);

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -11,6 +12,7 @@ import java.util.function.Supplier;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
+import com.apicatalog.di.std.StandardGraphProcessor;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.model.ProcessingModel;
@@ -26,6 +28,9 @@ import com.apicatalog.trust.proof.MapProofReader;
 
 public class DataIntegrity {
 
+    public static final String VOCAB_PROOF_URI = "https://w3id.org/security#proof";
+    public static final String VOCAB_PROOF_KEY = "proof";
+
     public static SemanticModelBuilder createSematicModel(String c14n) {
         return new SemanticModelBuilder(c14n);
     }
@@ -40,6 +45,8 @@ public class DataIntegrity {
 
         private Supplier<GraphCanonizer> c14nFactory;
 
+        private String proofPredicate;
+        
         private GraphProcessor.Factory processorFactory;
         private GraphProofCursor.Factory cursorFactory;
 
@@ -55,6 +62,11 @@ public class DataIntegrity {
             this.readers = new LinkedHashMap<>();
         }
 
+        public SemanticModelBuilder proofPredicate(String uri) {
+            this.proofPredicate = uri;
+            return this;
+        }
+        
         public SemanticModelBuilder c14n(Supplier<GraphCanonizer> c14nFactory) {
             this.c14nFactory = c14nFactory;
             return this;
@@ -65,18 +77,18 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder compact(BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact) {
+        public SemanticModelBuilder compact(
+                BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact) {
             this.compact = compact;
             return this;
         }
-
 
         public SemanticModelBuilder tordf(BiConsumer<Object, QuadConsumer> tordf) {
             this.tordf = tordf;
             return this;
         }
 
-        public SemanticModelBuilder processor(GraphProofCursor.Factory factory) {
+        public SemanticModelBuilder cursor(GraphProofCursor.Factory factory) {
             this.cursorFactory = factory;
             return this;
         }
@@ -129,6 +141,7 @@ public class DataIntegrity {
             }
 
             return new SemanticModel(
+                    proofPredicate,
                     processorFactory,
                     cursorFactory,
                     c14n,
@@ -152,9 +165,17 @@ public class DataIntegrity {
         private Map<String, CryptoSuite> cryptosuites;
         private Map<String, MapProofReader> readers;
 
+        private String proofProperty = "proof";
+
         private LexicalModelBuilder(String c14n) {
             this.c14n = c14n;
             this.readers = new LinkedHashMap<>();
+        }
+
+        public LexicalModelBuilder proofProperty(String name) {
+            Objects.requireNonNull(name);
+            proofProperty = name;
+            return this;
         }
 
         public LexicalModelBuilder c14n(Function<Map<String, Object>, byte[]> canonize) {
@@ -162,11 +183,11 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder processor(MapProofCursor.Factory factory) {
+        public LexicalModelBuilder cursor(MapProofCursor.Factory factory) {
             this.cursorFactory = factory;
             return this;
         }
-        
+
         public LexicalModelBuilder processor(MapProcessor.Factory factory) {
             this.processorFactory = factory;
             return this;
@@ -202,7 +223,7 @@ public class DataIntegrity {
                 throw new IllegalStateException();
             }
 
-            return new LexicalModel(processorFactory, cursorFactory, c14n, canonize, readers);
+            return new LexicalModel(proofProperty, processorFactory, cursorFactory, c14n, canonize, readers);
         }
     }
 
