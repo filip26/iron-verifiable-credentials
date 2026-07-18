@@ -60,7 +60,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
         }
 
         for (var quad : processor.data()) {
-            if (!"https://w3id.org/security#proof".equals(quad[1])
+            if (!model.vocab().proof().equals(quad[1])
                     || selectedGraph.contains(quad[2])) {
                 consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], null);
             }

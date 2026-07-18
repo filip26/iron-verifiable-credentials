@@ -77,6 +77,8 @@ public class StandardGraphProcessor implements GraphProcessor {
         if (dataset == null) {
 
             dataset = new Dataset();
+            dataset.typePredicate = model.vocab().type();
+            dataset.proofPredicate = model.vocab().proof();
 
             model.tordf().accept(document, dataset);
         }
@@ -89,6 +91,9 @@ public class StandardGraphProcessor implements GraphProcessor {
         private Map<String, Collection<String[]>> graphs = new HashMap<>();
 
         private Collection<String> proofGraphs = new HashSet<>();
+
+        private String typePredicate;
+        private String proofPredicate;
 
         @Override
         public void accept(
@@ -105,11 +110,11 @@ public class StandardGraphProcessor implements GraphProcessor {
             if (key == null) {
                 key = "@default";
 
-                if ("https://w3id.org/security#proof".equals(predicate)) {
+                if (proofPredicate.equals(predicate)) {
                     proofGraphs.add(object);
                 }
 
-            } else if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
+            } else if (typePredicate.equals(predicate)) {
                 proofTypes.put(graph, object);
             }
 

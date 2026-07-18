@@ -1,21 +1,19 @@
 package com.apicatalog.trust.model;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.DocumentProcessor;
 import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
-import com.apicatalog.trust.proof.ProofCursor;
 
 public class SemanticModel implements ProcessingModel {
+
+    // "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
     @FunctionalInterface
     public interface QuadConsumer {
@@ -61,10 +59,10 @@ public class SemanticModel implements ProcessingModel {
     private final BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
     private final BiConsumer<Object, QuadConsumer> tordf;
 
-    private final String proofPredicate;
-    
+    private final Vocab vocab;
+
     public SemanticModel(
-            String proofPredicate,
+            Vocab vocab,
             GraphProcessor.Factory processorFactory,
             GraphProofCursor.Factory cursorFactory,
             String c14n,
@@ -73,7 +71,7 @@ public class SemanticModel implements ProcessingModel {
             BiConsumer<Object, QuadConsumer> tordf,
             Supplier<GraphCanonizer> canonizeFactory,
             Map<String, GraphProofReader> readers) {
-        this.proofPredicate = proofPredicate;   //TODO replace with vocab record or so
+        this.vocab = vocab;
         this.processorFactory = processorFactory;
         this.cursorFactory = cursorFactory;
         this.c14n = c14n;
@@ -97,7 +95,7 @@ public class SemanticModel implements ProcessingModel {
     public GraphProofCursor createCursor(GraphProcessor processor) {
         return cursorFactory.createCursor(this, processor);
     }
-    
+
 //    @Override
 //    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
 //
@@ -132,7 +130,7 @@ public class SemanticModel implements ProcessingModel {
 //
 //        return cursorFactory.newInstance(this, processor);
 //    }
-    
+
     public GraphProofReader reader(String proofType) {
         return readers.get(proofType);
     }
@@ -153,5 +151,8 @@ public class SemanticModel implements ProcessingModel {
         return compact;
     }
 
-
+    @Override
+    public Vocab vocab() {
+        return vocab;
+    }
 }

@@ -23,24 +23,24 @@ public class HybridModel implements ProcessingModel {
     }
 
     @Override
-    //TODO add context as parameter
+    // TODO add context as parameter
     public DocumentProcessor createProcessor(Map<String, Object> document) {
 
         var context = ContextAwareResolver.getContexts(document);
-        
+
         var processor = new Processor();
-        
+
         var processors = new ArrayList<DocumentProcessor>(models.length);
-        
+
         for (var model : models) {
             var modelProcessor = model.createProcessor(document);
             if (modelProcessor != null) {
                 processors.add(modelProcessor);
             }
         }
-        
+
         processors.trimToSize();
-        
+
         processor.context = context;
         processor.document = document;
         processor.processors = processors;
@@ -152,5 +152,10 @@ public class HybridModel implements ProcessingModel {
             }
             return accepted.proof();
         }
+    }
+
+    @Override
+    public Vocab vocab() {
+        throw new UnsupportedOperationException();
     }
 }

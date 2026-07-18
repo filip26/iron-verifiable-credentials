@@ -3,14 +3,14 @@ package com.apicatalog.trust.model;
 import java.util.Map;
 
 import com.apicatalog.trust.processor.DocumentProcessor;
-import com.apicatalog.trust.processor.GraphProcessor;
-import com.apicatalog.trust.proof.ProofCursor;
 
 public interface ProcessingModel {
 
     static final String C14N_RDFC = "RDFC";
     static final String C14N_JCS = "JCS";
 
+    record Vocab(String context, String proof, String id, String type) {};
+    
 //    String c14n();
 
 //    ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document);
@@ -25,5 +25,6 @@ public interface ProcessingModel {
 
     // TODO proof predicate or selector returns proof graph or null
     // Function<String[], String>;
-
+    
+    Vocab vocab();
 }

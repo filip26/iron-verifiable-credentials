@@ -12,10 +12,9 @@ import java.util.function.Supplier;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.std.StandardGraphProcessor;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.model.LexicalModel;
-import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.model.ProcessingModel.Vocab;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
@@ -141,7 +140,7 @@ public class DataIntegrity {
             }
 
             return new SemanticModel(
-                    proofPredicate,
+                    new Vocab("@context", proofPredicate, null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
                     processorFactory,
                     cursorFactory,
                     c14n,
@@ -223,7 +222,13 @@ public class DataIntegrity {
                 throw new IllegalStateException();
             }
 
-            return new LexicalModel(proofProperty, processorFactory, cursorFactory, c14n, canonize, readers);
+            return new LexicalModel(
+                    new Vocab("@context", proofProperty, "id", "type"),
+                    processorFactory, 
+                    cursorFactory, 
+                    c14n, 
+                    canonize, 
+                    readers);
         }
     }
 

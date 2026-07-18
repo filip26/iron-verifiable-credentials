@@ -16,16 +16,16 @@ public class LexicalModel implements ProcessingModel {
     private final String c14n;
     private final Function<Map<String, Object>, byte[]> canonize;
 
-    private final String proofPropertyName;
+    private final Vocab vocab;
     
     public LexicalModel(
-            String proofPropertyName,
+            Vocab vocab,
             MapProcessor.Factory processorFactory,
             MapProofCursor.Factory cursorFactory,
             String c14n,
             Function<Map<String, Object>, byte[]> canonize,
             Map<String, MapProofReader> proofReaders) {
-        this.proofPropertyName = proofPropertyName;
+        this.vocab = vocab;
         this.processorFactory = processorFactory;
         this.cursorFactory = cursorFactory;
         this.c14n = c14n;
@@ -58,7 +58,8 @@ public class LexicalModel implements ProcessingModel {
         return proofReaders.get(proofType);
     }
     
-    public String proofPropertyName() {
-        return proofPropertyName;
+    @Override
+    public Vocab vocab() {
+        return vocab;
     }
 }
