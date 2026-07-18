@@ -8,7 +8,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 import com.apicatalog.trust.signature.SignatureGenerator;
@@ -41,12 +41,12 @@ public abstract class StandardCryptoSuite implements CryptoSuite {
     }
 
     @Override
-    public Signature decode(String encoded, Proof proof, PayloadProcessor payload) {
+    public Signature decode(String encoded, Proof proof, PayloadGenerator payload) {
         var signature = multibase.decode(encoded);
         return decode(signature, proof, payload);
     }
 
-    protected abstract Signature decode(byte[] signature, Proof proof, PayloadProcessor payload);
+    protected abstract Signature decode(byte[] signature, Proof proof, PayloadGenerator payload);
 
     public String id() {
         return id;

@@ -1,18 +1,15 @@
-package com.apicatalog.trust.processor;
+package com.apicatalog.trust.payload;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.GenericPayload;
-
-public interface PayloadProcessor {
+public interface PayloadGenerator {
 
     public interface Factory {
 
 
-        PayloadProcessor newInstance(Map<String, Object> document);
+        PayloadGenerator createPayload(Map<String, Object> document);
 
         // TODO accepted proof types, for configuration dump
 
@@ -30,4 +27,13 @@ public interface PayloadProcessor {
 
     <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory);
 
+
+    /**
+     * resets the provider state, but might cache vanilla digestible payload for
+     * re-use
+     * 
+     */
+    default void reset() {
+        throw new UnsupportedOperationException();
+    }
 }

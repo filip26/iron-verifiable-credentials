@@ -1,82 +1,97 @@
 package com.apicatalog.trust.proof;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import com.apicatalog.trust.document.Data;
 import com.apicatalog.trust.model.LexicalModel;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.processor.MapProcessor;
 
 public class MapProofCursor implements ProofCursor {
 
+    @FunctionalInterface
     public interface Factory {
         MapProofCursor newInstance(
                 LexicalModel model,
-                MapProcessor processor,
-                Collection<Entry<Map<String, Object>, MapProofReader>> proofReaders);
+                MapProcessor processor);
     }
 
     private final LexicalModel model;
     private final MapProcessor processor;
+    private final MapProofReader[] readers;
 
-//    final Map<String, Object> payload;
-    private final Collection<Entry<Map<String, Object>, MapProofReader>> proofs;
+    private int currentIndex;
 
-    Data document;
-    Iterator<Entry<Map<String, Object>, MapProofReader>> iterator;
+    private Proof currentProof;
+    private Map<String, Object> currentEntry;
+    private PayloadGenerator payloadProvider;
 
-    Proof currentProof;
-    int currentIndex;
-    Entry<Map<String, Object>, MapProofReader> currentEntry;
-
-    public MapProofCursor(
+    protected MapProofCursor(
             LexicalModel model,
             MapProcessor processor,
-            Collection<Entry<Map<String, Object>, MapProofReader>> proofs) {
+            MapProofReader[] readers) {
         this.model = model;
         this.processor = processor;
-        this.proofs = proofs;
-        this.iterator = proofs.iterator();
+        this.readers = readers;
 
         this.currentProof = null;
         this.currentIndex = -1;
         this.currentEntry = null;
+        this.payloadProvider = processor.createPayload();
     }
 
-    public Data data() {
+    public static MapProofCursor newInstance(LexicalModel model, MapProcessor processor) {
+        var proofs = processor.proofs();
 
-        if (document == null) {
+        var mapping = new ArrayList<MapProofReader>(proofs);
 
-            // TODO add custom document reader
-//FIXME            document = new MapData(payload, model.c14n());
+        for (var index = 0; index < proofs; index++) {
+
+            var proofMap = processor.proof(index);
+
+            var reader = model.reader((String) proofMap.get("type"));
+
+            mapping.add(reader);
         }
 
-        return document;
+        if (mapping.isEmpty()) {
+            return null;
+        }
+
+        return new MapProofCursor(model, processor, mapping.toArray(MapProofReader[]::new));
     }
+
+//    public Data data() {
+//
+//        if (document == null) {
+//
+//            // TODO add custom document reader
+    //// FIXME document = new MapData(payload, model.c14n());
+//        }
+//
+//        return document;
+//    }
 
     @Override
     public boolean isAccepted() {
-        return currentEntry != null && currentEntry.getValue() != null && currentEntry.getKey() != null
-                && currentEntry.getValue().isAccepted(currentEntry.getKey());
+        return currentEntry != null && readers[currentIndex].isAccepted(currentEntry);
     }
 
     @Override
     public Proof proof() {
-        if (currentProof == null && currentEntry != null && currentEntry.getValue() != null) {
+        if (currentProof == null && currentEntry != null) {
 
-            var reader = currentEntry.getValue();
+            var reader = readers[currentIndex];
 
-            var proof = currentEntry.getKey();
-
-            var unsignedProof = new HashMap<>(proof);
+            var unsignedProof = new LinkedHashMap<>(currentEntry);
             unsignedProof.remove("proofValue");
 
             var canonicalProof = model.canonize(unsignedProof);
 
-            currentProof = reader.read(null, proof, canonicalProof, processor);
+            // FIXME context!
+            payloadProvider.reset();
+            currentProof = reader.read(processor.context(), currentEntry, canonicalProof, payloadProvider);
         }
 
         return currentProof;
@@ -85,12 +100,11 @@ public class MapProofCursor implements ProofCursor {
     @Override
     public boolean next() {
 
-        if (!iterator.hasNext()) {
+        if ((currentIndex + 1) == readers.length) {
             return false;
         }
 
-        currentEntry = iterator.next();
-        currentIndex++;
+        currentEntry = processor.proof(++currentIndex);
         currentProof = null;
         return true;
     }

@@ -8,13 +8,13 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.processor.GraphProcessor;
-import com.apicatalog.trust.processor.PayloadProcessor;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class SemanticModel implements ProcessingModel, PayloadProcessor.Factory {
+public class SemanticModel implements ProcessingModel {
 
     @FunctionalInterface
     public interface QuadConsumer {
@@ -82,46 +82,50 @@ public class SemanticModel implements ProcessingModel, PayloadProcessor.Factory 
     }
 
     @Override
-    public PayloadProcessor newInstance(Map<String, Object> document) {
-        return processorFactory.newInstance(
+    public GraphProcessor createProcessor(Map<String, Object> document) {
+        return processorFactory.createProcessor(
                 this,
                 ContextAwareResolver.getContexts(document),
                 document);
     }
     
-    @Override
-    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
-
-        var processor = processorFactory.newInstance(
-                this,
-                context,
-                document);
-
-        var proofs = processor.proofs();
-
-        if (proofs == null || proofs.isEmpty()) {
-            return null;
-        }
-
-        var proofReaders = new HashMap<String, GraphProofReader>(proofs.size());
-
-        for (var proofGraph : proofs) {
-
-            var proof = processor.proof(proofGraph);
-            var proofType = processor.proofType(proofGraph);
-
-            var reader = readers.get(proofType);
-
-            if (reader != null && reader.isAccepted(proof)) {
-                proofReaders.put(proofGraph, reader);
-            }
-        }
-
-        if (proofReaders.isEmpty()) {
-            return null;
-        }
-
-        return cursorFactory.newInstance(this, processor, proofReaders);
+//    @Override
+//    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
+//
+//        var processor = processorFactory.createProcessor(
+//                this,
+//                context,
+//                document);
+//
+//        var proofs = processor.proofs();
+//
+//        if (proofs == null || proofs.isEmpty()) {
+//            return null;
+//        }
+//
+//        var proofReaders = new HashMap<String, GraphProofReader>(proofs.size());
+//
+//        for (var proofGraph : proofs) {
+//
+//            var proof = processor.proof(proofGraph);
+//            var proofType = processor.proofType(proofGraph);
+//
+//            var reader = readers.get(proofType);
+//
+//            if (reader != null && reader.isAccepted(proof)) {
+//                proofReaders.put(proofGraph, reader);
+//            }
+//        }
+//
+//        if (proofReaders.isEmpty()) {
+//            return null;
+//        }
+//
+//        return cursorFactory.newInstance(this, processor);
+//    }
+    
+    public GraphProofReader reader(String proofType) {
+        return readers.get(proofType);
     }
 
     public GraphCanonizer newCanonizer() {

@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.processor.DocumentProcessor;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
 
@@ -21,34 +23,102 @@ public class HybridModel implements ProcessingModel {
     }
 
     @Override
-    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
+    //TODO add context as parameter
+    public DocumentProcessor createProcessor(Map<String, Object> document) {
 
-        List<ProofCursor> cursors = null;
-
+        var context = ContextAwareResolver.getContexts(document);
+        
+        var processor = new Processor();
+        
+        var processors = new ArrayList<DocumentProcessor>(models.length);
+        
         for (var model : models) {
+            var modelProcessor = model.createProcessor(document);
+            if (modelProcessor != null) {
+                processors.add(modelProcessor);
+            }
+        }
+        
+        processors.trimToSize();
+        
+        processor.context = context;
+        processor.document = document;
+        processor.processors = processors;
 
-            var cursor = model.createProofCursor(context, document);
-            if (cursor == null) {
-                continue;
+        return processor;
+    }
+
+    public static class Processor implements DocumentProcessor {
+
+        Collection<DocumentProcessor> processors;
+        Collection<String> context;
+        Map<String, Object> document;
+
+        @Override
+        public ProofCursor createProofCursor() {
+            List<ProofCursor> cursors = null;
+
+            for (var processor : processors) {
+
+                var cursor = processor.createProofCursor();
+                if (cursor == null) {
+                    continue;
+                }
+
+                if (cursors == null) {
+                    cursors = new ArrayList<>(processors.size());
+                }
+
+                cursors.add(cursor);
             }
 
             if (cursors == null) {
-                cursors = new ArrayList<>(models.length);
+                return null;
             }
 
-            cursors.add(cursor);
+            if (cursors.size() == 1) {
+                return cursors.get(0);
+            }
+
+            return new Cursor(cursors);
         }
 
-        if (cursors == null) {
-            return null;
+        @Override
+        public PayloadGenerator createPayload() {
+            throw new UnsupportedOperationException();
         }
 
-        if (cursors.size() == 1) {
-            return cursors.get(0);
-        }
-
-        return new Cursor(cursors);
     }
+
+//    @Override
+//    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
+//
+//        List<ProofCursor> cursors = null;
+//
+//        for (var model : models) {
+//
+//            var cursor = model.createProofCursor(context, document);
+//            if (cursor == null) {
+//                continue;
+//            }
+//
+//            if (cursors == null) {
+//                cursors = new ArrayList<>(models.length);
+//            }
+//
+//            cursors.add(cursor);
+//        }
+//
+//        if (cursors == null) {
+//            return null;
+//        }
+//
+//        if (cursors.size() == 1) {
+//            return cursors.get(0);
+//        }
+//
+//        return new Cursor(cursors);
+//    }
 
     private static class Cursor implements ProofCursor {
 

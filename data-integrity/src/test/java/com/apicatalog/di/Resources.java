@@ -46,8 +46,8 @@ class Resources {
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
-            .processor(StandardMapProcessor::new)
-            .processor(MapProofCursor::new)
+            .processor(StandardMapProcessor::newInstance)
+            .processor(MapProofCursor::newInstance)
             .build();
 
     static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
@@ -60,7 +60,7 @@ class Resources {
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
             .processor(StandardGraphProcessor::new)
-            .processor(GraphProofCursor::new)
+            .processor(GraphProofCursor::newInstance)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;

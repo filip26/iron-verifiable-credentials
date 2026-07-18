@@ -79,7 +79,9 @@ public class VerifierTest {
 
         var model = MODEL_RESOLVER.resolve(contexts, signed);
 
-        var cursor = model.createProofCursor(contexts, signed);
+        var processor = model.createProcessor(signed);
+        
+        var cursor = processor.createProofCursor();
 
         if (cursor == null || !cursor.next()) {
             fail("No proof(s) to verify");

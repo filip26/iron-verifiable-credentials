@@ -5,14 +5,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.GenericPayload;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.processor.GraphProcessor;
+import com.apicatalog.trust.proof.GraphProofCursor;
+import com.apicatalog.trust.proof.ProofCursor;
 
 public class StandardGraphProcessor implements GraphProcessor {
 
@@ -21,7 +20,6 @@ public class StandardGraphProcessor implements GraphProcessor {
     private final Map<String, Object> document;
 
     private Dataset dataset;
-    private Collection<String> includedProofs;
 
     public StandardGraphProcessor(
             SemanticModel model,
@@ -30,8 +28,16 @@ public class StandardGraphProcessor implements GraphProcessor {
         this.model = model;
         this.context = context;
         this.document = document;
+    }
 
-        this.includedProofs = null;
+    @Override
+    public ProofCursor createProofCursor() {
+        return GraphProofCursor.newInstance(model, this);
+    }
+
+    @Override
+    public PayloadGenerator createPayload() {
+        return new GraphPayloadGenerator(model, this);
     }
 
     @Override
@@ -40,12 +46,17 @@ public class StandardGraphProcessor implements GraphProcessor {
     }
 
     @Override
+    public Collection<String[]> data() {
+        lazyInit();
+        return dataset.graphs.get("@default");
+    }
+
+    @Override
     public Collection<String[]> proof(String graph) {
         lazyInit();
         return dataset.graphs.get(graph);
     }
-    
-    
+
     public Collection<String> proofs() {
         lazyInit();
         return dataset.proofGraphs;
@@ -55,60 +66,6 @@ public class StandardGraphProcessor implements GraphProcessor {
     public String proofType(String graph) {
         lazyInit();
         return dataset.proofTypes.get(graph);
-    }
-
-    @Override
-    public DigestiblePayload digestible() {
-        return digestible(GenericPayload::new);
-    }
-
-    @Override
-    public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
-
-        lazyInit();
-        
-        var canonizer = model.newCanonizer();
-        var consumer = canonizer.consumer();
-
-        Set<String> selectedGraph = Set.of();
-
-        if (includedProofs != null && !includedProofs.isEmpty()) {
-            selectedGraph = new HashSet<String>();
-
-            // select proofs
-            for (var graph : dataset.graphs.entrySet()) {
-                if ("@default".equals(graph.getKey())) {
-                    continue;
-                }
-                if (includedProofs.contains(graph.getValue().iterator().next()[0])) {
-                    selectedGraph.add(graph.getKey());
-                    for (var quad : graph.getValue()) {
-                        consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], quad[6]);
-                    }
-                }
-            }
-        }
-
-        for (var quad : dataset.graphs.get("@default")) {
-            if (!"https://w3id.org/security#proof".equals(quad[1])
-                    || selectedGraph.contains(quad[2])) {
-                consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], null);
-            }
-        }
-
-        var canonical = canonizer.canonize();
-
-        return payloadFactory.apply(canonical);
-    }
-    
-    @Override
-    public void withProofs(Collection<String> ids) {
-        this.includedProofs = ids;
-    }
-
-    @Override
-    public void reset() {
-        this.includedProofs = null;
     }
 
     private void lazyInit() {

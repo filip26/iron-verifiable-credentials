@@ -4,7 +4,7 @@ import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.ProcessingModel;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -45,11 +45,11 @@ public final class MLDSA2024 extends StandardCryptoSuite {
     }
 
     @Override
-    public Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
+    public Signature decode(byte[] signature, Proof proof, PayloadGenerator payload) {
         return decode44(signature, proof, payload);
     }
 
-    private Signature decode44(byte[] signature, Proof proof, PayloadProcessor payload) {
+    private Signature decode44(byte[] signature, Proof proof, PayloadGenerator payload) {
         if (signature.length != SIGNATURE_LENGTH) {
             throw new IllegalArgumentException(
                     """

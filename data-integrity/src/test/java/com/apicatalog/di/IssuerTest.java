@@ -34,7 +34,8 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.ProcessingModel;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.processor.DocumentProcessor;
 import com.apicatalog.trust.proof.Proof;
 
 public class IssuerTest {
@@ -110,14 +111,16 @@ public class IssuerTest {
             proofDraft.options(options);
 
             var processor = getProcessor(cryptosuite.c14n()).apply(document);
+            
+            var payload = processor.createPayload();
 
-            processor.withProofs(proofDraft.previous());
+            payload.withProofs(proofDraft.previous());
 
             var integrityProof = proofDraft.sign(
                     signatureAlgorithm,
                     signer,
                     Resources.DIGEST_FACTORY,
-                    processor.digestible());
+                    payload.digestible());
 
 //TODO
 //            processor.add(proof);
@@ -138,13 +141,15 @@ public class IssuerTest {
 
             var proofDraft = Ed25519Signature2020.newInstance((Map<String, Object>) options);
 
-            var processor = Resources.SEMANTIC_MODEL.newInstance(document);
+            var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
 
+            var payload = processor.createPayload();
+            
             var edProof = Ed25519Signature2020.generateProof(
                     signer,
                     Resources.DIGEST_FACTORY,
                     proofDraft,
-                    processor.digestible());
+                    payload.digestible());
 
             Ed25519Signature2020.write(edProof, composer);
 
@@ -187,10 +192,10 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
-    static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
+    static Function<Map<String, Object>, DocumentProcessor> getProcessor(String c14n) {
         return switch (c14n) {
-        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::newInstance;
-        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::newInstance;
+        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createProcessor;
+        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::createProcessor;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.

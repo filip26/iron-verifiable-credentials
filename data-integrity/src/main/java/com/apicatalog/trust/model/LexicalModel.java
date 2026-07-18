@@ -1,21 +1,18 @@
 package com.apicatalog.trust.model;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 
 import com.apicatalog.trust.processor.MapProcessor;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.proof.GraphProofReader;
 import com.apicatalog.trust.proof.MapProofCursor;
 import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class LexicalModel implements ProcessingModel, PayloadProcessor.Factory {
+public class LexicalModel implements ProcessingModel {
 
     private final MapProcessor.Factory processorFactory;
     private final MapProofCursor.Factory cursorFactory;
@@ -37,42 +34,43 @@ public class LexicalModel implements ProcessingModel, PayloadProcessor.Factory {
         this.proofReaders = proofReaders;
     }
 
+//    @Override
+//    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
+//
+//        var processor = processorFactory.createProcessor(
+//                this,
+//                context,
+//                document);
+//
+//        var proofs = processor.proofs();
+//
+//        var mapping = new ArrayList<MapProofReader>(proofs);
+//
+//        for (var index = 0; index < proofs; index++) {
+//
+//            var proofMap = processor.proof(index);
+//
+//            var reader = proofReaders.get(proofMap.get("type"));
+//
+//            mapping.add(reader);
+//        }
+//
+//        if (mapping.isEmpty()) {
+//            return null;
+//        }
+//
+//        var data = new LinkedHashMap<>(document);
+//        data.remove("proof");
+//
+//        return cursorFactory.newInstance(this, processor, mapping.toArray(MapProofReader[]::new));
+//    }
+
     @Override
-    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
-
-        var processor = processorFactory.newInstance(
+    public MapProcessor createProcessor(Map<String, Object> document) {
+        return processorFactory.createProcessor(
                 this,
-                context,
+                ContextAwareResolver.getContexts(document),
                 document);
-
-        var proofs = processor.proofs();
-
-        var mapping = new ArrayList<Entry<Map<String, Object>, MapProofReader>>(proofs.size());
-
-        for (var proof : proofs) {
-            if (proof instanceof Map proofMap) {
-
-                MapProofReader reader = proofReaders.get(proofMap.get("type"));
-
-                Map<String, Object> map = proofMap;
-
-                if (!map.containsKey("@context")) {
-                    map = new HashMap<String, Object>(proofMap);
-                    map.put("@context", context);
-                }
-
-                mapping.add(new AbstractMap.SimpleImmutableEntry<>(map, reader));
-            }
-        }
-
-        if (mapping.isEmpty()) {
-            return null;
-        }
-
-        var data = new LinkedHashMap<>(document);
-        data.remove("proof");
-
-        return cursorFactory.newInstance(this, processor, mapping);
     }
 
     public byte[] canonize(Map<String, Object> data) {
@@ -84,11 +82,7 @@ public class LexicalModel implements ProcessingModel, PayloadProcessor.Factory {
 //        return c14n;
 //    }
 
-    @Override
-    public PayloadProcessor newInstance(Map<String, Object> document) {
-        return processorFactory.newInstance(
-                this,
-                ContextAwareResolver.getContexts(document),
-                document);
+    public MapProofReader reader(String proofType) {
+        return proofReaders.get(proofType);
     }
 }

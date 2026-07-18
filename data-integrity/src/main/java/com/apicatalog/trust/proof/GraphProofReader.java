@@ -3,7 +3,7 @@ package com.apicatalog.trust.proof;
 import java.util.Collection;
 
 import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.payload.PayloadGenerator;
 
 public interface GraphProofReader {
 
@@ -13,5 +13,5 @@ public interface GraphProofReader {
     Proof read(
             Collection<String[]> proof,
             SemanticModel model,
-            PayloadProcessor payload);
+            PayloadGenerator payload);
 }

@@ -10,7 +10,7 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -40,7 +40,7 @@ public final class ECDSA2019 extends StandardCryptoSuite {
     }
 
     @Override
-    public Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
+    public Signature decode(byte[] signature, Proof proof, PayloadGenerator payload) {
 
         String algorithm = null;
         String digest = null;

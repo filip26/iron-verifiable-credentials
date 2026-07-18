@@ -81,7 +81,7 @@ public class IssuerTest {
         var proofDraft = cryptosuite.createProofDraft();
         proofDraft.options(options);
 
-        var processor = Resources.SEMANTIC_MODEL.newInstance(document);
+        var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
 
         processor.withProofs(proofDraft.previous());
 
