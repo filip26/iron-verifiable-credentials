@@ -25,7 +25,7 @@ public class GraphProofCursor implements ProofCursor {
     // TODO ?!?
     @FunctionalInterface
     public interface Factory {
-        GraphProofCursor newInstance(
+        GraphProofCursor createCursor(
                 SemanticModel model,
                 GraphProcessor processor);
     }

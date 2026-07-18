@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.processor.DocumentProcessor;
 import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
@@ -88,6 +89,10 @@ public class SemanticModel implements ProcessingModel {
                 ContextAwareResolver.getContexts(document),
                 document);
     }
+
+    public GraphProofCursor createCursor(GraphProcessor processor) {
+        return cursorFactory.createCursor(this, processor);
+    }
     
 //    @Override
 //    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
@@ -143,4 +148,6 @@ public class SemanticModel implements ProcessingModel {
     public BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact() {
         return compact;
     }
+
+
 }

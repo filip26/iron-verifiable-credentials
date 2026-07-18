@@ -71,7 +71,7 @@ public class StandardMapProcessor implements MapProcessor {
 
     @Override
     public MapProofCursor createProofCursor() {
-        return MapProofCursor.newInstance(model, this);
+        return model.createCursor(this);
     }
 
     @Override

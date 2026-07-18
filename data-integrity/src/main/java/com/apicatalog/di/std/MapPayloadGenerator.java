@@ -13,19 +13,17 @@ public class MapPayloadGenerator implements PayloadGenerator {
 
     private final LexicalModel model;
     private final MapProcessor processor;
-    
+
     private Collection<String> includedProofs;
 
     public MapPayloadGenerator(
             LexicalModel model,
-            MapProcessor processor
-            ) {
+            MapProcessor processor) {
         this.model = model;
         this.processor = processor;
         this.includedProofs = null;
     }
-    
-    
+
     @Override
     public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
 
@@ -42,4 +40,8 @@ public class MapPayloadGenerator implements PayloadGenerator {
         this.includedProofs = ids;
     }
 
+    @Override
+    public void reset() {
+        this.includedProofs = null;
+    }
 }

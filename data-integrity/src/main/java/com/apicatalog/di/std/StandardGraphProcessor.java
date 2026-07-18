@@ -32,7 +32,7 @@ public class StandardGraphProcessor implements GraphProcessor {
 
     @Override
     public ProofCursor createProofCursor() {
-        return GraphProofCursor.newInstance(model, this);
+        return model.createCursor(this);
     }
 
     @Override

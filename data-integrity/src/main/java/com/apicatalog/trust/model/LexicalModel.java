@@ -1,16 +1,13 @@
 package com.apicatalog.trust.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.processor.MapProcessor;
-import com.apicatalog.trust.proof.GraphProofReader;
+import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.MapProofCursor;
 import com.apicatalog.trust.proof.MapProofReader;
-import com.apicatalog.trust.proof.ProofCursor;
 
 public class LexicalModel implements ProcessingModel {
 
@@ -84,5 +81,9 @@ public class LexicalModel implements ProcessingModel {
 
     public MapProofReader reader(String proofType) {
         return proofReaders.get(proofType);
+    }
+
+    public MapProofCursor createCursor(MapProcessor processor) {
+        return cursorFactory.newInstance(this, processor);
     }
 }
