@@ -56,14 +56,14 @@
         <!-- Tests -->
         <multibase.version>4.1.0</multibase.version>
         <multicodec.version>4.0.0</multicodec.version>
-        <junit.version>6.0.3</junit.version>
+        <junit.version>6.1.2</junit.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.84</version>
+            <version>1.85</version>
             <scope>compile</scope>
         </dependency>
         <!-- Tests -->

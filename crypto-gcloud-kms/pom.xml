@@ -56,7 +56,7 @@
         <multibase.version>4.1.0</multibase.version>
         <multicodec.version>4.0.0</multicodec.version>
         <!-- Tests -->
-        <junit.version>6.0.3</junit.version>
+        <junit.version>6.1.2</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -64,7 +64,7 @@
             <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.85.0</version>
+                <version>26.85.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
