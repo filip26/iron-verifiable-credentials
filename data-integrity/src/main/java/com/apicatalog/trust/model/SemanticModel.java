@@ -7,9 +7,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
+import com.apicatalog.trust.proof.Proof;
 
 public class SemanticModel implements ProcessingModel {
 
@@ -47,6 +49,17 @@ public class SemanticModel implements ProcessingModel {
 
         // TODO void reset();
     }
+//    
+//    public interface GraphProofReader {
+//
+//        boolean isAccepted(Collection<String[]> proof);
+//
+//        // reads from n-quads
+//        Proof read(
+//                Collection<String[]> proof,
+//                SemanticModel model,
+//                PayloadGenerator payload);
+//    }
 
     private final GraphProcessor.Factory processorFactory;
     private final GraphProofCursor.Factory cursorFactory;

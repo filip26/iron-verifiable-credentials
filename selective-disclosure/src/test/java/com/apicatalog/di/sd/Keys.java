@@ -24,6 +24,7 @@ public record Keys(
 
     public static Keys from(Map<String, Object> keysMap) {
 
+        @SuppressWarnings("unchecked")
         var baseKeys = (Map<String, String>) keysMap.get("baseKeyPair");
 
 //        var basePublicKey = MULTIBASE.decode(baseKeys.get("publicKeyMultibase"));
@@ -36,6 +37,7 @@ public record Keys(
 //            throw new IllegalArgumentException();
 //        }
 
+        @SuppressWarnings("unchecked")
         var proofKeys = (Map<String, String>) keysMap.get("proofKeyPair");
 
         var proofPublicKey = MULTIBASE.decode(proofKeys.get("publicKeyMultibase"));

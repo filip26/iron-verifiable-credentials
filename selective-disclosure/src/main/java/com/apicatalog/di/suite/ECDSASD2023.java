@@ -9,6 +9,7 @@ import com.apicatalog.di.sd.SDBaseProofValue;
 import com.apicatalog.di.sd.SDDerivedProofValue;
 import com.apicatalog.di.sd.SDGraphProcessor;
 import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
+import com.apicatalog.di.sd.SDPayloadGenerator;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.codec.KeyCodec;
@@ -64,9 +65,9 @@ public final class ECDSASD2023 implements CryptoSuite {
     }
 
     @Override
-    public Signature decode(String value, Proof proof, PayloadGenerator processor) {
+    public Signature decode(String value, Proof proof, PayloadGenerator payload) {
 
-        if (processor instanceof SDGraphProcessor graphProcessor) {
+        if (payload instanceof SDPayloadGenerator sdPayload) {
 
             var signature = Multibase.BASE_64_URL.decode(value);
 
@@ -76,7 +77,7 @@ public final class ECDSASD2023 implements CryptoSuite {
                         ECDSASD2023::getAlgorithm,
                         proofPublicKeyDecoder,
                         (DataIntegrityProof) proof,
-                        graphProcessor);
+                        sdPayload);
             }
 
             if (SDDerivedProofValue.isAccepted(signature)) {
@@ -85,13 +86,13 @@ public final class ECDSASD2023 implements CryptoSuite {
                         ECDSASD2023::getAlgorithm,
                         proofPublicKeyDecoder,
                         (DataIntegrityProof) proof,
-                        graphProcessor);
+                        sdPayload);
             }
 
             throw new IllegalArgumentException();
 
         }
-        throw new IllegalStateException("Unsupported payload processor, " + processor);
+        throw new IllegalStateException("Unsupported payload genetaror: " + payload);
     }
 
     @Override

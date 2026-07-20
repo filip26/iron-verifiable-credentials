@@ -37,8 +37,8 @@ class Resources {
             .proof(ECDSAXI2023.getInstance())
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
-            .processor(StandardGraphProcessor::new)
-            .processor(GraphProofCursor::new)
+            .processor(StandardGraphProcessor::newInstance)
+            .cursor(GraphProofCursor::newInstance)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;

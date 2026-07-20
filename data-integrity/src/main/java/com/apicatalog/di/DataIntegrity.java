@@ -44,8 +44,8 @@ public class DataIntegrity {
 
         private Supplier<GraphCanonizer> c14nFactory;
 
-        private String proofPredicate;
-        
+        private String proofPredicate = DataIntegrity.VOCAB_PROOF_URI;
+
         private GraphProcessor.Factory processorFactory;
         private GraphProofCursor.Factory cursorFactory;
 
@@ -65,7 +65,7 @@ public class DataIntegrity {
             this.proofPredicate = uri;
             return this;
         }
-        
+
         public SemanticModelBuilder c14n(Supplier<GraphCanonizer> c14nFactory) {
             this.c14nFactory = c14nFactory;
             return this;
@@ -140,7 +140,7 @@ public class DataIntegrity {
             }
 
             return new SemanticModel(
-                    new Vocab("@context", proofPredicate, null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), 
+                    new Vocab("@context", proofPredicate, null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
                     processorFactory,
                     cursorFactory,
                     c14n,
@@ -164,7 +164,7 @@ public class DataIntegrity {
         private Map<String, CryptoSuite> cryptosuites;
         private Map<String, MapProofReader> readers;
 
-        private String proofProperty = "proof";
+        private String proofProperty = DataIntegrity.VOCAB_PROOF_KEY;
 
         private LexicalModelBuilder(String c14n) {
             this.c14n = c14n;
@@ -224,10 +224,10 @@ public class DataIntegrity {
 
             return new LexicalModel(
                     new Vocab("@context", proofProperty, "id", "type"),
-                    processorFactory, 
-                    cursorFactory, 
-                    c14n, 
-                    canonize, 
+                    processorFactory,
+                    cursorFactory,
+                    c14n,
+                    canonize,
                     readers);
         }
     }

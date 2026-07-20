@@ -68,7 +68,9 @@ public class VerifierTest {
 
         var proofs = new ArrayList<Proof>();
 
-        var cursor = Resources.SEMANTIC_MODEL.createProofCursor(contexts, signed);
+        var processor = Resources.SEMANTIC_MODEL.createProcessor(signed);
+        
+        var cursor = processor.createProofCursor();
 
         if (cursor == null || !cursor.next()) {
             fail("No proof(s) to verify");

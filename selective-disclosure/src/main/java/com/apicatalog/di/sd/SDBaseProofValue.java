@@ -50,7 +50,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
             Function<Integer, SignatureAlgorithm> algorithmProvider,
             Function<byte[], Multicodec> proofPublicKeyDecoder,
             DataIntegrityProof proof,
-            SDGraphProcessor processor) {
+            SDPayloadGenerator payload) {
 
         Objects.requireNonNull(signature);
 
@@ -128,7 +128,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
                 throw new IllegalArgumentException();
             }
 
-            proofValue.payload = processor.redactable(
+            proofValue.payload = payload.redactable(
                     proofValue.mandatoryPointers,
                     proofValue.hmacKey);
 

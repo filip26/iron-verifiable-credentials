@@ -3,8 +3,6 @@ package com.apicatalog.di.sd;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.Collection;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,14 +14,8 @@ import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.trust.MethodResolver;
 import com.apicatalog.trust.ProofVerifier;
-import com.apicatalog.trust.model.ContextAwareResolver;
 
 public class VerifierTest {
-
-    static ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.builder()
-            // accept any context - for test purposes only
-            .model(Predicate.not(Collection::isEmpty), Resources.SEMANTIC_MODEL)
-            .build();
 
     static MethodResolver DID_KEY_RESOLVER = proof -> {
         if (!proof.verificationMethod().startsWith("did:key:")) {
@@ -63,11 +55,9 @@ public class VerifierTest {
 
         var signed = Resources.getMap(resource);
 
-        var contexts = ContextAwareResolver.getContexts(signed);
+        var processor = Resources.SEMANTIC_MODEL.createProcessor(signed);
 
-        var model = MODEL_RESOLVER.resolve(contexts, signed);
-
-        var cursor = model.createProofCursor(contexts, signed);
+        var cursor = processor.createProofCursor();
 
         if (cursor == null || !cursor.next()) {
             fail("No proof(s) to verify");

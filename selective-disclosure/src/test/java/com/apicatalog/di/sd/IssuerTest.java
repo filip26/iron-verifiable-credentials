@@ -91,10 +91,15 @@ public class IssuerTest {
         proofDraft.options(options);
 
         var context = ContextAwareResolver.getContexts(document);
-        
+
         var processor = new SDGraphProcessor(Resources.SEMANTIC_MODEL, context, document);
 
-        processor.withProofs(proofDraft.previous());
+        var payload = processor.createPayload();
+
+        payload.withProofs(proofDraft.previous());
+
+        @SuppressWarnings("unchecked")
+        var mandatoryPointers = (Collection<String>) options.get("mandatoryPointers");
 
         var proof = proofDraft.sign(
                 keyAlgorithm,
@@ -102,8 +107,8 @@ public class IssuerTest {
                 keys.proofPublicKey(),
                 proofSigner,
                 Resources.DIGEST_FACTORY,
-                processor.redactable(
-                        (Collection<String>) options.get("mandatoryPointers"),
+                payload.redactable(
+                        mandatoryPointers,
                         keys.hmacKey()));
 
         DataIntegrityProof.write(proof, composer);

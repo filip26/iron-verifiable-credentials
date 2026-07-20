@@ -141,16 +141,7 @@ public class HybridModel implements ProcessingModel {
 
         @Override
         public Proof proof() {
-            if (accepted == null) {
-                for (var cursor : cursors) {
-                    if (cursor.isAccepted()) {
-                        accepted = cursor;
-                        return cursor.proof();
-                    }
-                }
-                return null;
-            }
-            return accepted.proof();
+            return isAccepted() ? accepted.proof() : null;
         }
     }
 

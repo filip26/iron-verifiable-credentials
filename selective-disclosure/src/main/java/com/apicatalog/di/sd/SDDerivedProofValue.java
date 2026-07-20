@@ -46,7 +46,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
             Function<byte[], Multicodec> proofPublicKeyDecoder,
             DataIntegrityProof proof,
             // TODO DerivedPayload?
-            SDGraphProcessor processor) {
+            SDPayloadGenerator payload) {
 
         Objects.requireNonNull(signature);
 
@@ -126,7 +126,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
                 indices[i] = toUInt(item);
             }
 
-            proofValue.payload = processor.derived(labelMap, indices);
+            proofValue.payload = payload.derived(labelMap, indices);
 
             return proofValue;
 
@@ -135,9 +135,9 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
             throw new IllegalArgumentException(e);
         }
     }
-    
+
     public static SDDerivedProofValue newInstance(
-            SDBaseProofValue base, 
+            SDBaseProofValue base,
             SDDerivedDocument document,
             byte[][] signatures) {
 
@@ -150,7 +150,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
         signature.signatureAlgorithm = base.signatureAlgorithm;
         signature.signatures = signatures;
 
-        //FIXME use close function
+        // FIXME use close function
         var d = new DataIntegrityProof.Draft(((DataIntegrityProof) base.proof).cryptosuite());
         d.proof(((DataIntegrityProof) base.proof));
         signature.proof = d.signed(signature);
@@ -180,7 +180,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
         var cborSignatures = top.addArray();
 
         for (int signatureIndex = 0; signatureIndex < signatures.length; signatureIndex++) {
-            cborSignatures.add(signatures[signatureIndex]);  // .tagged(64);
+            cborSignatures.add(signatures[signatureIndex]); // .tagged(64);
         }
 
         final MapBuilder<ArrayBuilder<CborBuilder>> cborLabels = top.addMap();
@@ -204,6 +204,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
             throw new IllegalArgumentException(e);
         }
     }
+
     private static int toUInt(DataItem item) {
 
         if (!MajorType.UNSIGNED_INTEGER.equals(item.getMajorType())) {
@@ -212,10 +213,6 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
 
         return ((UnsignedInteger) item).getValue().intValueExact();
     }
-
-
-
-
 
 //
 //    @Override

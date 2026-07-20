@@ -43,7 +43,7 @@ class Resources {
             .c14n(Resources::newRDFC)
 //TODO            .hmac()
             .processor(SDGraphProcessor::new)
-            .processor(GraphProofCursor::new)
+            .cursor(GraphProofCursor::newInstance)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;

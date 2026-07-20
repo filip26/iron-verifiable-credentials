@@ -83,9 +83,10 @@ public class IssuerTest {
 
         var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
 
-        processor.withProofs(proofDraft.previous());
+        var payloadProvider = processor.createPayload();
+        payloadProvider.withProofs(proofDraft.previous());
 
-        var payload = processor.digestible(BarcodePayload::new);
+        var payload = payloadProvider.digestible(BarcodePayload::new);
 
         payload.opticalData(((Collection<?>) options.get("opticalDataBytes"))
                 .stream().map(BigInteger.class::cast).map(BigInteger::byteValue)

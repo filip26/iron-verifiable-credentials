@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.model.ContextAwareResolver;
 
 class DeriveTest {
 
@@ -26,15 +25,11 @@ class DeriveTest {
 
         var signed = Resources.getMap(resource + ".signed.json");
 
-        var contexts = ContextAwareResolver.getContexts(signed);
+        var processor = Resources.SEMANTIC_MODEL.createProcessor(signed);
 
-        var cursor = Resources.SEMANTIC_MODEL.createProofCursor(contexts, signed);
+        var cursor = processor.createProofCursor();
 
-        if (cursor == null) {
-            fail();
-        }
-
-        if (!cursor.next()) {
+        if (cursor == null || !cursor.next()) {
             fail("No proof(s)");
         }
 
@@ -44,29 +39,29 @@ class DeriveTest {
 
         var proof = cursor.proof();
 
-        if (proof.signature() instanceof SDBaseProofValue signature) {
-            var derivedSignature = signature.derive(List.of(
-                    "/validFrom",
-                    "/validUntil",
-                    "/credentialSubject/birthCountry"));
-
-            var isVerified = VerifierTest.PROOF_VERIFIER.verify(derivedSignature.proof());
-            assertTrue(isVerified);
-            assertFalse(cursor.next());
-
-            var document = new LinkedHashMap<String, Object>(derivedSignature.payload().compacted().get());
-            
-            var composer = new NativeComposer<Map<String, ? extends Object>>();
-            DataIntegrityProof.write(derivedSignature.proof(), composer);
-            document.put("proof", composer.compose());
-            
-            var expected = Resources.getMap(resource + ".derived.json");
-
-            assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));   
-
-        } else {
+        if (!(proof.signature() instanceof SDBaseProofValue signature)) {
             fail();
+            return;
         }
+
+        var derivedSignature = signature.derive(List.of(
+                "/validFrom",
+                "/validUntil",
+                "/credentialSubject/birthCountry"));
+
+        var isVerified = VerifierTest.PROOF_VERIFIER.verify(derivedSignature.proof());
+        assertTrue(isVerified);
+        assertFalse(cursor.next());
+
+        var document = new LinkedHashMap<String, Object>(derivedSignature.payload().compacted().get());
+
+        var composer = new NativeComposer<Map<String, ? extends Object>>();
+        DataIntegrityProof.write(derivedSignature.proof(), composer);
+        document.put("proof", composer.compose());
+
+        var expected = Resources.getMap(resource + ".derived.json");
+
+        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
     static final Stream<String> resources() {
