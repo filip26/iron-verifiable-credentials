@@ -12,7 +12,7 @@ import com.apicatalog.trust.proof.ProofCursor;
 public class GraphProofCursor implements ProofCursor {
 
     private final SemanticModel model;
-    private final GraphAdapter processor;
+    private final SemanticAdapter processor;
     private final Map<String, GraphProofReader> readers;
 
     private Iterator<String> graphIterator;
@@ -27,12 +27,12 @@ public class GraphProofCursor implements ProofCursor {
     public interface Factory {
         GraphProofCursor createCursor(
                 SemanticModel model,
-                GraphAdapter processor);
+                SemanticAdapter processor);
     }
 
     protected GraphProofCursor(
             SemanticModel model,
-            GraphAdapter processor,
+            SemanticAdapter processor,
             Map<String, GraphProofReader> readers) {
         this.model = model;
         this.processor = processor;
@@ -45,7 +45,7 @@ public class GraphProofCursor implements ProofCursor {
         this.payloadProvider = model.createPayload(processor);
     }
 
-    public static GraphProofCursor newInstance(SemanticModel model, GraphAdapter processor) {
+    public static GraphProofCursor newInstance(SemanticModel model, SemanticAdapter processor) {
 
         var proofs = processor.proofs();
 

@@ -14,11 +14,11 @@ public class MapProofCursor implements ProofCursor {
     public interface Factory {
         MapProofCursor newInstance(
                 LexicalModel model,
-                MapAdapter processor);
+                LexicalAdapter processor);
     }
 
     private final LexicalModel model;
-    private final MapAdapter processor;
+    private final LexicalAdapter processor;
     private final MapProofReader[] readers;
 
     private int currentIndex;
@@ -29,7 +29,7 @@ public class MapProofCursor implements ProofCursor {
 
     protected MapProofCursor(
             LexicalModel model,
-            MapAdapter processor,
+            LexicalAdapter processor,
             MapProofReader[] readers) {
         this.model = model;
         this.processor = processor;
@@ -41,7 +41,7 @@ public class MapProofCursor implements ProofCursor {
         this.payloadProvider = model.createPayload(processor);
     }
 
-    public static MapProofCursor newInstance(LexicalModel model, MapAdapter processor) {
+    public static MapProofCursor newInstance(LexicalModel model, LexicalAdapter processor) {
         var proofs = processor.proofs();
 
         var mapping = new ArrayList<MapProofReader>(proofs);

@@ -1,4 +1,4 @@
-package com.apicatalog.di.std;
+package com.apicatalog.trust.lexical;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,20 +7,17 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 
 import com.apicatalog.trust.Document;
-import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.MapAdapter;
-import com.apicatalog.trust.lexical.MapPayloadGenerator;
 import com.apicatalog.trust.model.Model.Vocab;
 
-public class PlainMapUpdater implements Document.Updater {
+public class MapUpdater implements Document.Updater {
 
     private final LexicalModel model;
-    private final MapAdapter adapter;
+    private final LexicalAdapter adapter;
 
     private Collection<Map<String, ?>> newProofs;
     private Collection<String> contexts = null;
 
-    public PlainMapUpdater(LexicalModel model, MapAdapter adapter) {
+    public MapUpdater(LexicalModel model, LexicalAdapter adapter) {
         this.model = model;
         this.adapter = adapter;
     }

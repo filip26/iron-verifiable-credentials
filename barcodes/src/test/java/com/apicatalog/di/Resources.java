@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.barcodes.ECDSAXI2023;
-import com.apicatalog.di.std.JsonLdAdapter;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
@@ -25,6 +24,7 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.semantic.GraphAdapter;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -39,7 +39,7 @@ class Resources {
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
-            .processor(JsonLdAdapter::newInstance)
+            .processor(GraphAdapter::newInstance)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
             .build();

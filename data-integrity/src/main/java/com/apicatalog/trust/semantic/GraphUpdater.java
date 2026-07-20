@@ -1,4 +1,4 @@
-package com.apicatalog.di.std;
+package com.apicatalog.trust.semantic;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,18 +9,16 @@ import java.util.Map;
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.semantic.GraphAdapter;
-import com.apicatalog.trust.semantic.SemanticModel;
 
-public final class JsonLdUpdater implements Document.Updater {
+public final class GraphUpdater implements Document.Updater {
 
     private final SemanticModel model;
-    private final GraphAdapter adapter;
+    private final SemanticAdapter adapter;
 
     private Collection<Map<String, ?>> newProofs;
     private Collection<String> contexts = null;
 
-    public JsonLdUpdater(SemanticModel model, GraphAdapter adapter) {
+    public GraphUpdater(SemanticModel model, SemanticAdapter adapter) {
         this.model = model;
         this.adapter = adapter;
     }

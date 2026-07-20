@@ -11,8 +11,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.apicatalog.di.std.JsonLdAdapter;
-import com.apicatalog.di.std.PlainMapAdapter;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
@@ -30,8 +28,10 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.lexical.LexicalModel;
+import com.apicatalog.trust.lexical.MapAdapter;
 import com.apicatalog.trust.lexical.MapProofCursor;
 import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.semantic.GraphAdapter;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -48,7 +48,7 @@ class Resources {
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
-            .processor(PlainMapAdapter::newInstance)
+            .processor(MapAdapter::newInstance)
             .cursor(MapProofCursor::newInstance)
             .build();
 
@@ -62,7 +62,7 @@ class Resources {
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
-            .processor(JsonLdAdapter::newInstance)
+            .processor(GraphAdapter::newInstance)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
             .build();

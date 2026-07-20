@@ -10,7 +10,7 @@ import com.apicatalog.trust.model.Model.Vocab;
 
 public class LexicalModel implements Model {
 
-    private final MapAdapter.Factory processorFactory;
+    private final LexicalAdapter.Factory processorFactory;
     private final MapProofCursor.Factory cursorFactory;
     private final Map<String, MapProofReader> proofReaders;
 
@@ -21,7 +21,7 @@ public class LexicalModel implements Model {
 
     public LexicalModel(
             Vocab vocab,
-            MapAdapter.Factory processorFactory,
+            LexicalAdapter.Factory processorFactory,
             MapProofCursor.Factory cursorFactory,
             String c14n,
             Function<Map<String, Object>, byte[]> canonize,
@@ -35,14 +35,14 @@ public class LexicalModel implements Model {
     }
 
     @Override
-    public MapAdapter createAdapter(Map<String, Object> document) {
+    public LexicalAdapter createAdapter(Map<String, Object> document) {
         return processorFactory.createProcessor(
                 this,
                 ContextAwareResolver.getContexts(document),
                 document);
     }
 
-    public MapProofCursor createCursor(MapAdapter processor) {
+    public MapProofCursor createCursor(LexicalAdapter processor) {
         return cursorFactory.newInstance(this, processor);
     }
 
@@ -50,7 +50,7 @@ public class LexicalModel implements Model {
         return createPayload(createAdapter(document));
     }
 
-    public MapPayloadGenerator createPayload(MapAdapter processor) {
+    public MapPayloadGenerator createPayload(LexicalAdapter processor) {
         return new MapPayloadGenerator(this, processor);
     }
 

@@ -14,11 +14,11 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.MapAdapter;
+import com.apicatalog.trust.lexical.LexicalAdapter;
 import com.apicatalog.trust.lexical.MapProofCursor;
 import com.apicatalog.trust.lexical.MapProofReader;
 import com.apicatalog.trust.model.Model.Vocab;
-import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.SemanticAdapter;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphProofReader;
@@ -47,7 +47,7 @@ public class DataIntegrity {
 
         private String proofPredicate = DataIntegrity.VOCAB_PROOF_URI;
 
-        private GraphAdapter.Factory processorFactory;
+        private SemanticAdapter.Factory processorFactory;
         private GraphProofCursor.Factory cursorFactory;
         private GraphPayloadGenerator.Factory payloadFactory;
 
@@ -94,7 +94,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder processor(GraphAdapter.Factory factory) {
+        public SemanticModelBuilder processor(SemanticAdapter.Factory factory) {
             this.processorFactory = factory;
             return this;
         }
@@ -166,7 +166,7 @@ public class DataIntegrity {
 
         private Function<Map<String, Object>, byte[]> canonize;
 
-        private MapAdapter.Factory processorFactory;
+        private LexicalAdapter.Factory processorFactory;
         private MapProofCursor.Factory cursorFactory;
 
         private Map<String, CryptoSuite> cryptosuites;
@@ -195,7 +195,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder processor(MapAdapter.Factory factory) {
+        public LexicalModelBuilder processor(LexicalAdapter.Factory factory) {
             this.processorFactory = factory;
             return this;
         }

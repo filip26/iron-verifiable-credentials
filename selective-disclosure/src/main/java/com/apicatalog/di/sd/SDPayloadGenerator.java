@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.SemanticAdapter;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.SemanticModel;
 
@@ -24,7 +24,7 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
 
     public SDPayloadGenerator(
             SemanticModel model,
-            GraphAdapter processor) {
+            SemanticAdapter processor) {
         super(model, processor);
 //        this.model = model;
 //        this.processor = processor;

@@ -7,7 +7,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.apicatalog.di.std.JsonLdUpdater;
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.Model;
@@ -50,7 +49,7 @@ public class SemanticModel implements Model {
         // TODO void reset();
     }
 
-    private final GraphAdapter.Factory processorFactory;
+    private final SemanticAdapter.Factory processorFactory;
     private final GraphProofCursor.Factory cursorFactory;
     private final GraphPayloadGenerator.Factory payloadFactory;
 
@@ -68,7 +67,7 @@ public class SemanticModel implements Model {
 
     public SemanticModel(
             Vocab vocab,
-            GraphAdapter.Factory processorFactory,
+            SemanticAdapter.Factory processorFactory,
             GraphProofCursor.Factory cursorFactory,
             GraphPayloadGenerator.Factory payloadFactory,
             String c14n,
@@ -92,7 +91,7 @@ public class SemanticModel implements Model {
     }
 
     @Override
-    public GraphAdapter createAdapter(Map<String, Object> document) {
+    public SemanticAdapter createAdapter(Map<String, Object> document) {
         return processorFactory.createProcessor(
                 this,
                 ContextAwareResolver.getContexts(document),
@@ -101,14 +100,14 @@ public class SemanticModel implements Model {
 
     @Override
     public Document.Updater createUpdater(Map<String, Object> document) {
-        return new JsonLdUpdater(this, createAdapter(document));
+        return new GraphUpdater(this, createAdapter(document));
     }
 
-    public PayloadGenerator createPayload(GraphAdapter adapter) {
+    public PayloadGenerator createPayload(SemanticAdapter adapter) {
         return payloadFactory.createPayload(this, adapter);
     }
 
-    public GraphProofCursor createCursor(GraphAdapter adapter) {
+    public GraphProofCursor createCursor(SemanticAdapter adapter) {
         return cursorFactory.createCursor(this, adapter);
     }
 

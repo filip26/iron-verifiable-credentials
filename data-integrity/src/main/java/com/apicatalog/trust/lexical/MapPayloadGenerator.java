@@ -10,13 +10,13 @@ import com.apicatalog.trust.payload.PayloadGenerator;
 public class MapPayloadGenerator implements PayloadGenerator {
 
     private final LexicalModel model;
-    private final MapAdapter processor;
+    private final LexicalAdapter processor;
 
     private Collection<String> includedProofs;
 
     public MapPayloadGenerator(
             LexicalModel model,
-            MapAdapter processor) {
+            LexicalAdapter processor) {
         this.model = model;
         this.processor = processor;
         this.includedProofs = null;

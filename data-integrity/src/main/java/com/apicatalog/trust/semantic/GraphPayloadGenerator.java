@@ -12,17 +12,17 @@ import com.apicatalog.trust.payload.PayloadGenerator;
 public class GraphPayloadGenerator implements PayloadGenerator {
 
     public interface Factory {
-        PayloadGenerator createPayload(SemanticModel model, GraphAdapter processor);
+        PayloadGenerator createPayload(SemanticModel model, SemanticAdapter processor);
     }
 
     protected final SemanticModel model;
-    protected final GraphAdapter processor;
+    protected final SemanticAdapter processor;
 
     protected Collection<String> includedProofs;
 
     public GraphPayloadGenerator(
             SemanticModel model,
-            GraphAdapter processor) {
+            SemanticAdapter processor) {
         this.model = model;
         this.processor = processor;
         this.includedProofs = null;
