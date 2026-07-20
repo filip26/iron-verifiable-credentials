@@ -14,18 +14,18 @@ public class PlainMapAdapter implements MapAdapter {
 
     private final LexicalModel model;
     private final Collection<String> context;
+    
     private final Map<String, Object> data;
-
-    private Map<String, Object>[] proofs;
+    private final Map<String, Object>[] proofs;
 
     protected PlainMapAdapter(
             LexicalModel model,
             Collection<String> context,
-            Map<String, Object> document,
+            Map<String, Object> data,
             Map<String, Object>[] proofs) {
         this.model = model;
         this.context = context;
-        this.data = document;
+        this.data = data;
         this.proofs = proofs;
     }
 

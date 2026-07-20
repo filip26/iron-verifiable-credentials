@@ -28,29 +28,29 @@ public class HybridAdapterModel implements ProcessingModel {
 
         var context = ContextAwareResolver.getContexts(document);
 
-        var processor = new Processor();
+        var hybrid = new Adapter();
 
-        var processors = new ArrayList<Document.Adapter>(models.length);
+        var adapters = new ArrayList<Document.Adapter>(models.length);
 
         for (var model : models) {
             var modelProcessor = model.createAdapter(document);
             if (modelProcessor != null) {
-                processors.add(modelProcessor);
+                adapters.add(modelProcessor);
             }
         }
 
-        processors.trimToSize();
+        adapters.trimToSize();
 
-        processor.context = context;
-        processor.document = document;
-        processor.processors = processors;
+        hybrid.context = context;
+        hybrid.document = document;
+        hybrid.adapters = adapters;
 
-        return processor;
+        return hybrid;
     }
 
-    public static class Processor implements Document.Adapter {
+    public static class Adapter implements Document.Adapter {
 
-        Collection<Document.Adapter> processors;
+        Collection<Document.Adapter> adapters;
         Collection<String> context;
         Map<String, Object> document;
 
@@ -58,7 +58,7 @@ public class HybridAdapterModel implements ProcessingModel {
         public ProofCursor createProofCursor() {
             List<ProofCursor> cursors = null;
 
-            for (var processor : processors) {
+            for (var processor : adapters) {
 
                 var cursor = processor.createProofCursor();
                 if (cursor == null) {
@@ -66,7 +66,7 @@ public class HybridAdapterModel implements ProcessingModel {
                 }
 
                 if (cursors == null) {
-                    cursors = new ArrayList<>(processors.size());
+                    cursors = new ArrayList<>(adapters.size());
                 }
 
                 cursors.add(cursor);

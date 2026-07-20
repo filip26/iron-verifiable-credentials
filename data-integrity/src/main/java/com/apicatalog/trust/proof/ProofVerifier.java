@@ -1,4 +1,4 @@
-package com.apicatalog.trust;
+package com.apicatalog.trust.proof;
 
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
@@ -12,8 +12,7 @@ import java.util.Set;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.proof.ProofCursor;
+import com.apicatalog.trust.MethodResolver;
 
 public class ProofVerifier {
 

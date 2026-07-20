@@ -13,7 +13,7 @@ import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.trust.MethodResolver;
-import com.apicatalog.trust.ProofVerifier;
+import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
 

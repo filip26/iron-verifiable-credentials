@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.apicatalog.trust.model.ProcessingModel.Vocab;
 import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.semantic.GraphAdapter;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -77,7 +78,6 @@ public final class JsonLdAdapter implements GraphAdapter {
         lazyInit();
         return dataset.proofTypes.get(graph);
     }
-    
 
     @Override
     public Map<String, Object> expandedData() {
@@ -91,7 +91,7 @@ public final class JsonLdAdapter implements GraphAdapter {
             return;
         }
 
-        //TODO get term map
+        // TODO get term map
         var expanded = model.expand().apply(document);
 
         if (expanded.size() != 1) {
@@ -114,10 +114,10 @@ public final class JsonLdAdapter implements GraphAdapter {
         }
 
 //        if (expandedProofs != null) {
-            dataset = new Dataset();
-            dataset.proofPredicate = model.vocab().proof();
-            dataset.typePredicate = model.vocab().type();
-            model.tordf().accept(expanded, dataset);
+        dataset = new Dataset();
+        dataset.proofPredicate = model.vocab().proof();
+        dataset.typePredicate = model.vocab().type();
+        model.tordf().accept(expanded, dataset);
 //        }
 //        if (dataset == null) {
 //
@@ -128,7 +128,7 @@ public final class JsonLdAdapter implements GraphAdapter {
 //            model.tordf().accept(document, dataset);
 //        }
     }
-    
+
     private static class Dataset implements QuadConsumer {
 
         private final Map<String, String> proofTypes = new HashMap<>();
@@ -168,5 +168,16 @@ public final class JsonLdAdapter implements GraphAdapter {
                             subject, predicate, object, datatype, language, direction, graph
                     });
         }
+    }
+
+    @Override
+    public Vocab keys() {
+        // FIXME read from JSON-LD term map after expansion
+        return new Vocab("@context", "proof", "id", "type");
+    }
+
+    @Override
+    public Map<String, ?> compacted() {
+        return document;
     }
 }

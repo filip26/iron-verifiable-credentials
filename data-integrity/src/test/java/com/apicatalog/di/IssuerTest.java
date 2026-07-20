@@ -5,9 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -21,20 +18,18 @@ import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.crypto.bc.BCSLHDSASigner;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.suite.StandardCryptoSuite;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
 import com.apicatalog.di.suite.SLHDSA2024;
+import com.apicatalog.di.suite.StandardCryptoSuite;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.ProcessingModel;
-import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 
 public class IssuerTest {
@@ -95,12 +90,9 @@ public class IssuerTest {
         }
 
         Proof proof = null;
-
-        var proofs = document.get("proof");
+        Map<String, ?> issued = null;
 
         var context = ContextAwareResolver.getContexts(document);
-
-        var composer = new NativeComposer<Map<String, ? extends Object>>();
 
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
@@ -109,8 +101,10 @@ public class IssuerTest {
             var proofDraft = cryptosuite.createProofDraft();
             proofDraft.options(options);
 
-            var payload = getPayload(cryptosuite.c14n()).apply(document);
-            
+            var updater = getUpdater(cryptosuite.c14n()).apply(document);
+
+            var payload = updater.createPayload();
+
             payload.withProofs(proofDraft.previous());
 
             var integrityProof = proofDraft.sign(
@@ -119,16 +113,18 @@ public class IssuerTest {
                     Resources.DIGEST_FACTORY,
                     payload.digestible());
 
+            updater.addProof(integrityProof);
+            issued = updater.compacted();
 //TODO
 //            processor.add(proof);
 //
 //            processor.write(composer);
 
-            DataIntegrityProof.write(integrityProof, composer);
+//            DataIntegrityProof.write(integrityProof, composer);
 
-            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-                document.put("@context", merge(context, proofDraft.context()));
-            }
+//            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
+//                document.put("@context", merge(context, proofDraft.context()));
+//            }
 
             proof = integrityProof;
 
@@ -139,18 +135,18 @@ public class IssuerTest {
             var proofDraft = Ed25519Signature2020.newInstance((Map<String, Object>) options);
 
             var payload = Resources.SEMANTIC_MODEL.createPayload(document);
-            
+
             var edProof = Ed25519Signature2020.generateProof(
                     signer,
                     Resources.DIGEST_FACTORY,
                     proofDraft,
                     payload.digestible());
 
-            Ed25519Signature2020.write(edProof, composer);
+//            Ed25519Signature2020.write(edProof, composer);
 
-            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-                document.put("@context", merge(context, proofDraft.context()));
-            }
+//            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
+//                document.put("@context", merge(context, proofDraft.context()));
+//            }
 
             proof = edProof;
 
@@ -162,35 +158,15 @@ public class IssuerTest {
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 
-        // TODO remove, hide in document handler interface
-        var proofMap = composer.compose();
-
-        if (proofs instanceof Collection col) {
-            var clone = new ArrayList<>(col);
-            col.add(proofMap);
-            proofs = col;
-
-        } else if (proofs == null) {
-            proofs = proofMap;
-
-        } else {
-            var col = new ArrayList<>();
-            col.add(proofs);
-            col.add(proofMap);
-            proofs = col;
-        }
-
-        document.put("proof", proofs);
-
         var expected = Resources.getMap(resource + ".signed.json");
 
-        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
+        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(issued)));
     }
 
-    static Function<Map<String, Object>, PayloadGenerator> getPayload(String c14n) {
+    static Function<Map<String, Object>, com.apicatalog.trust.Document.Updater> getUpdater(String c14n) {
         return switch (c14n) {
-        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createPayload;
-        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::createPayload;
+        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createUpdater;
+        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::createUpdater;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.
@@ -222,12 +198,5 @@ public class IssuerTest {
                 .filter(name -> name.endsWith("unsigned.json"))
                 .map(name -> name.substring(0, name.indexOf('.')))
                 .sorted();
-    }
-
-    static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
-        var result = LinkedHashSet.<String>newLinkedHashSet(documentContext.size() + proofContext.size());
-        result.addAll(documentContext);
-        result.addAll(proofContext);
-        return result;
     }
 }

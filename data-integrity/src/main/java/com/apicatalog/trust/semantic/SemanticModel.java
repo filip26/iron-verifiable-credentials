@@ -7,9 +7,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.apicatalog.di.std.JsonLdUpdater;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.ProcessingModel;
-import com.apicatalog.trust.model.ProcessingModel.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
 
 public class SemanticModel implements ProcessingModel {
@@ -89,12 +89,12 @@ public class SemanticModel implements ProcessingModel {
         this.canonizeFactory = canonizeFactory;
         this.readers = readers;
     }
-    
+
     @Override
     public GraphUpdater createUpdater(Map<String, Object> document) {
-        return null;
+        return new JsonLdUpdater(this, createAdapter(document));
     }
-    
+
     @Override
     public GraphAdapter createAdapter(Map<String, Object> document) {
         return processorFactory.createProcessor(
@@ -110,7 +110,7 @@ public class SemanticModel implements ProcessingModel {
     public PayloadGenerator createPayload(Map<String, Object> document) {
         return createPayload(createAdapter(document));
     }
-    
+
     public PayloadGenerator createPayload(GraphAdapter processor) {
         return payloadFactory.createPayload(this, processor);
     }
