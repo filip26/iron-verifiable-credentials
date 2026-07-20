@@ -6,18 +6,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.apicatalog.trust.model.LexicalModel;
-import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.MapProcessor;
-import com.apicatalog.trust.proof.MapProofCursor;
+import com.apicatalog.trust.lexical.LexicalModel;
+import com.apicatalog.trust.lexical.MapAdapter;
+import com.apicatalog.trust.lexical.MapProofCursor;
 
-public class StandardMapProcessor implements MapProcessor {
+public class StandardMapProcessor implements MapAdapter {
 
     private final LexicalModel model;
     private final Collection<String> context;
     private final Map<String, Object> data;
 
-    private Collection<String> includedProofs;
     private Map<String, Object>[] proofs;
 
     protected StandardMapProcessor(
@@ -29,8 +27,6 @@ public class StandardMapProcessor implements MapProcessor {
         this.context = context;
         this.data = document;
         this.proofs = proofs;
-
-        this.includedProofs = null;
     }
 
     public static final StandardMapProcessor newInstance(
@@ -72,11 +68,6 @@ public class StandardMapProcessor implements MapProcessor {
     @Override
     public MapProofCursor createProofCursor() {
         return model.createCursor(this);
-    }
-
-    @Override
-    public PayloadGenerator createPayload() {
-        return new MapPayloadGenerator(model, this);
     }
 
     @Override

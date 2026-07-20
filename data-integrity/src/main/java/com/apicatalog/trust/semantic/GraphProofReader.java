@@ -1,9 +1,9 @@
-package com.apicatalog.trust.proof;
+package com.apicatalog.trust.semantic;
 
 import java.util.Collection;
 
-import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.proof.Proof;
 
 public interface GraphProofReader {
 

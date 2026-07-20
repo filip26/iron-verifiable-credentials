@@ -1,18 +1,18 @@
-package com.apicatalog.trust.proof;
+package com.apicatalog.trust.semantic;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.GraphProcessor;
+import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.proof.ProofCursor;
 
 public class GraphProofCursor implements ProofCursor {
 
     private final SemanticModel model;
-    private final GraphProcessor processor;
+    private final GraphAdapter processor;
     private final Map<String, GraphProofReader> readers;
 
     private Iterator<String> graphIterator;
@@ -27,12 +27,12 @@ public class GraphProofCursor implements ProofCursor {
     public interface Factory {
         GraphProofCursor createCursor(
                 SemanticModel model,
-                GraphProcessor processor);
+                GraphAdapter processor);
     }
 
     protected GraphProofCursor(
             SemanticModel model,
-            GraphProcessor processor,
+            GraphAdapter processor,
             Map<String, GraphProofReader> readers) {
         this.model = model;
         this.processor = processor;
@@ -45,7 +45,7 @@ public class GraphProofCursor implements ProofCursor {
         this.payloadProvider = model.createPayload(processor);
     }
 
-    public static GraphProofCursor newInstance(SemanticModel model, GraphProcessor processor) {
+    public static GraphProofCursor newInstance(SemanticModel model, GraphAdapter processor) {
 
         var proofs = processor.proofs();
 

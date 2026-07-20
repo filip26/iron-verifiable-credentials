@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.apicatalog.di.std.GraphPayloadGenerator;
 import com.apicatalog.di.std.StandardGraphProcessor;
 import com.apicatalog.di.std.StandardMapProcessor;
 import com.apicatalog.di.suite.ECDSA2019;
@@ -30,13 +29,14 @@ import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
-import com.apicatalog.trust.model.LexicalModel;
+import com.apicatalog.trust.lexical.LexicalModel;
+import com.apicatalog.trust.lexical.MapProofCursor;
 import com.apicatalog.trust.model.ProcessingModel;
-import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.proof.GraphProofCursor;
-import com.apicatalog.trust.proof.MapProofCursor;
+import com.apicatalog.trust.semantic.GraphPayloadGenerator;
+import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
+import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {

@@ -1,30 +1,28 @@
-package com.apicatalog.di.std;
+package com.apicatalog.trust.semantic;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
-import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.GenericPayload;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.GraphProcessor;
 
 public class GraphPayloadGenerator implements PayloadGenerator {
 
     public interface Factory {
-        PayloadGenerator createPayload(SemanticModel model, GraphProcessor processor);
+        PayloadGenerator createPayload(SemanticModel model, GraphAdapter processor);
     }
 
     protected final SemanticModel model;
-    protected final GraphProcessor processor;
+    protected final GraphAdapter processor;
 
     protected Collection<String> includedProofs;
 
     public GraphPayloadGenerator(
             SemanticModel model,
-            GraphProcessor processor) {
+            GraphAdapter processor) {
         this.model = model;
         this.processor = processor;
         this.includedProofs = null;

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.apicatalog.trust.model.ProcessingModel;
-import com.apicatalog.trust.model.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel;
 
 public class SDBaseDocument implements SDPayload {
 

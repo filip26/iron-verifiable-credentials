@@ -79,7 +79,7 @@ public class VerifierTest {
 
         var model = MODEL_RESOLVER.resolve(contexts, signed);
 
-        var processor = model.createProcessor(signed);
+        var processor = model.createAdapter(signed);
         
         var cursor = processor.createProofCursor();
 

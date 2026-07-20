@@ -1,24 +1,22 @@
-package com.apicatalog.di.std;
+package com.apicatalog.trust.lexical;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.MapProcessor;
 
 public class MapPayloadGenerator implements PayloadGenerator {
 
     private final LexicalModel model;
-    private final MapProcessor processor;
+    private final MapAdapter processor;
 
     private Collection<String> includedProofs;
 
     public MapPayloadGenerator(
             LexicalModel model,
-            MapProcessor processor) {
+            MapAdapter processor) {
         this.model = model;
         this.processor = processor;
         this.includedProofs = null;

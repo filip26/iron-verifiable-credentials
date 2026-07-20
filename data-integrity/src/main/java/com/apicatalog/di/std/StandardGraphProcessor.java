@@ -7,13 +7,12 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.proof.ProofCursor;
+import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
-public class StandardGraphProcessor implements GraphProcessor {
+public final class StandardGraphProcessor implements GraphAdapter {
 
     private final SemanticModel model;
 
@@ -49,11 +48,6 @@ public class StandardGraphProcessor implements GraphProcessor {
     @Override
     public ProofCursor createProofCursor() {
         return model.createCursor(this);
-    }
-
-    @Override
-    public PayloadGenerator createPayload() {
-        return model.createPayload(this);
     }
 
     @Override
@@ -97,6 +91,7 @@ public class StandardGraphProcessor implements GraphProcessor {
             return;
         }
 
+        //TODO get term map
         var expanded = model.expand().apply(document);
 
         if (expanded.size() != 1) {

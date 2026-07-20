@@ -5,16 +5,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.DocumentProcessor;
+import com.apicatalog.trust.Document;
+import com.apicatalog.trust.Document.Updater;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class HybridModel implements ProcessingModel {
+public class HybridAdapterModel implements ProcessingModel {
 
     private final ProcessingModel[] models;
 
-    public HybridModel(ProcessingModel... models) {
+    public HybridAdapterModel(ProcessingModel... models) {
         this.models = models;
     }
 
@@ -24,16 +24,16 @@ public class HybridModel implements ProcessingModel {
 
     @Override
     // TODO add context as parameter
-    public DocumentProcessor createProcessor(Map<String, Object> document) {
+    public Document.Adapter createAdapter(Map<String, Object> document) {
 
         var context = ContextAwareResolver.getContexts(document);
 
         var processor = new Processor();
 
-        var processors = new ArrayList<DocumentProcessor>(models.length);
+        var processors = new ArrayList<Document.Adapter>(models.length);
 
         for (var model : models) {
-            var modelProcessor = model.createProcessor(document);
+            var modelProcessor = model.createAdapter(document);
             if (modelProcessor != null) {
                 processors.add(modelProcessor);
             }
@@ -48,9 +48,9 @@ public class HybridModel implements ProcessingModel {
         return processor;
     }
 
-    public static class Processor implements DocumentProcessor {
+    public static class Processor implements Document.Adapter {
 
-        Collection<DocumentProcessor> processors;
+        Collection<Document.Adapter> processors;
         Collection<String> context;
         Map<String, Object> document;
 
@@ -82,11 +82,11 @@ public class HybridModel implements ProcessingModel {
 
             return new Cursor(cursors);
         }
-
-        @Override
-        public PayloadGenerator createPayload() {
-            throw new UnsupportedOperationException();
-        }
+//
+//        @Override
+//        public PayloadGenerator createPayload() {
+//            throw new UnsupportedOperationException();
+//        }
 
     }
 
@@ -147,6 +147,11 @@ public class HybridModel implements ProcessingModel {
 
     @Override
     public Vocab vocab() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Updater createUpdater(Map<String, Object> document) {
         throw new UnsupportedOperationException();
     }
 }

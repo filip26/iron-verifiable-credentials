@@ -1,15 +1,15 @@
-package com.apicatalog.trust.processor;
+package com.apicatalog.trust.lexical;
 
 import java.util.Collection;
 import java.util.Map;
 
-import com.apicatalog.trust.model.LexicalModel;
+import com.apicatalog.trust.Document;
 
-public interface MapProcessor extends DocumentProcessor {
+public interface MapAdapter extends Document.Adapter {
 
     @FunctionalInterface
     interface Factory {
-        MapProcessor createProcessor(
+        MapAdapter createProcessor(
                 LexicalModel model,
                 Collection<String> context,
                 Map<String, Object> document);

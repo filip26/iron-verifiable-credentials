@@ -67,7 +67,7 @@ public class ContextAwareResolver {
             }
 
             this.predicates.add(selector);
-            this.models.add(new HybridModel(models));
+            this.models.add(new HybridAdapterModel(models));
             return this;
         }
 

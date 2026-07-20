@@ -20,7 +20,7 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.model.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
 
 import co.nstant.in.cbor.CborBuilder;

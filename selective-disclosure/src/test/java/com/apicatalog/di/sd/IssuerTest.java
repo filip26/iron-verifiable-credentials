@@ -90,10 +90,10 @@ public class IssuerTest {
         var proofDraft = cryptosuite.createProofDraft();
         proofDraft.options(options);
 
-        var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
+        var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
 
-        var payload = processor.createPayload();
-
+        var payload = updater.createPayload();
+        
         @SuppressWarnings("unchecked")
         var mandatoryPointers = (Collection<String>) options.get("mandatoryPointers");
 

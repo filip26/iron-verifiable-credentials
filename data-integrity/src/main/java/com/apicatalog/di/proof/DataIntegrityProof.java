@@ -13,11 +13,11 @@ import java.util.function.Function;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
-import com.apicatalog.trust.model.SemanticModel;
+import com.apicatalog.trust.lexical.MapProofReader;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.proof.GraphProofReader;
-import com.apicatalog.trust.proof.MapProofReader;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.semantic.GraphProofReader;
+import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
 
 /**

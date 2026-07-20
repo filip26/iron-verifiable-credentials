@@ -81,9 +81,8 @@ public class IssuerTest {
         var proofDraft = cryptosuite.createProofDraft();
         proofDraft.options(options);
 
-        var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
+        var payloadProvider = Resources.SEMANTIC_MODEL.createPayload(document);
 
-        var payloadProvider = processor.createPayload();
         payloadProvider.withProofs(proofDraft.previous());
 
         var payload = payloadProvider.digestible(BarcodePayload::new);

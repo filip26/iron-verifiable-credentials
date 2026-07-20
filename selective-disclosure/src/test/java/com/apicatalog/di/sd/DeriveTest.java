@@ -25,7 +25,7 @@ class DeriveTest {
 
         var signed = Resources.getMap(resource + ".signed.json");
 
-        var processor = Resources.SEMANTIC_MODEL.createProcessor(signed);
+        var processor = Resources.SEMANTIC_MODEL.createAdapter(signed);
 
         var cursor = processor.createProofCursor();
 

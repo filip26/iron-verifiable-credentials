@@ -1,16 +1,15 @@
-package com.apicatalog.trust.processor;
+package com.apicatalog.trust.semantic;
 
 import java.util.Collection;
 import java.util.Map;
 
-import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.Document;
 
-public interface GraphProcessor extends DocumentProcessor {
+public interface GraphAdapter extends Document.Adapter {
 
     @FunctionalInterface
     public interface Factory {
-        GraphProcessor createProcessor(
+        GraphAdapter createProcessor(
                 SemanticModel model,
                 Collection<String> context,
                 Map<String, Object> document);
@@ -26,8 +25,6 @@ public interface GraphProcessor extends DocumentProcessor {
     Collection<String[]> proof(String graph);
 
     String proofType(String graph);
-
-//    PayloadGenerator createPayload();
 
     Map<String, Object> expandedData();
 }

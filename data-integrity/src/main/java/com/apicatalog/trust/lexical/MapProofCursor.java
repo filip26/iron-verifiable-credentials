@@ -1,12 +1,12 @@
-package com.apicatalog.trust.proof;
+package com.apicatalog.trust.lexical;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.MapProcessor;
+import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.proof.ProofCursor;
 
 public class MapProofCursor implements ProofCursor {
 
@@ -14,11 +14,11 @@ public class MapProofCursor implements ProofCursor {
     public interface Factory {
         MapProofCursor newInstance(
                 LexicalModel model,
-                MapProcessor processor);
+                MapAdapter processor);
     }
 
     private final LexicalModel model;
-    private final MapProcessor processor;
+    private final MapAdapter processor;
     private final MapProofReader[] readers;
 
     private int currentIndex;
@@ -29,7 +29,7 @@ public class MapProofCursor implements ProofCursor {
 
     protected MapProofCursor(
             LexicalModel model,
-            MapProcessor processor,
+            MapAdapter processor,
             MapProofReader[] readers) {
         this.model = model;
         this.processor = processor;
@@ -38,10 +38,10 @@ public class MapProofCursor implements ProofCursor {
         this.currentProof = null;
         this.currentIndex = -1;
         this.currentEntry = null;
-        this.payloadProvider = processor.createPayload();
+        this.payloadProvider = model.createPayload(processor);
     }
 
-    public static MapProofCursor newInstance(LexicalModel model, MapProcessor processor) {
+    public static MapProofCursor newInstance(LexicalModel model, MapAdapter processor) {
         var proofs = processor.proofs();
 
         var mapping = new ArrayList<MapProofReader>(proofs);

@@ -35,7 +35,6 @@ import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.DocumentProcessor;
 import com.apicatalog.trust.proof.Proof;
 
 public class IssuerTest {
@@ -110,10 +109,8 @@ public class IssuerTest {
             var proofDraft = cryptosuite.createProofDraft();
             proofDraft.options(options);
 
-            var processor = getProcessor(cryptosuite.c14n()).apply(document);
+            var payload = getPayload(cryptosuite.c14n()).apply(document);
             
-            var payload = processor.createPayload();
-
             payload.withProofs(proofDraft.previous());
 
             var integrityProof = proofDraft.sign(
@@ -141,9 +138,7 @@ public class IssuerTest {
 
             var proofDraft = Ed25519Signature2020.newInstance((Map<String, Object>) options);
 
-            var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
-
-            var payload = processor.createPayload();
+            var payload = Resources.SEMANTIC_MODEL.createPayload(document);
             
             var edProof = Ed25519Signature2020.generateProof(
                     signer,
@@ -192,10 +187,10 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
     }
 
-    static Function<Map<String, Object>, DocumentProcessor> getProcessor(String c14n) {
+    static Function<Map<String, Object>, PayloadGenerator> getPayload(String c14n) {
         return switch (c14n) {
-        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createProcessor;
-        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::createProcessor;
+        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createPayload;
+        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::createPayload;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.

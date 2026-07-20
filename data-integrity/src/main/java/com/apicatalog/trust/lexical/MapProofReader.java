@@ -1,9 +1,10 @@
-package com.apicatalog.trust.proof;
+package com.apicatalog.trust.lexical;
 
 import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.proof.Proof;
 
 public interface MapProofReader {
     

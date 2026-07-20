@@ -55,7 +55,7 @@ public class VerifierTest {
 
         var signed = Resources.getMap(resource);
 
-        var processor = Resources.SEMANTIC_MODEL.createProcessor(signed);
+        var processor = Resources.SEMANTIC_MODEL.createAdapter(signed);
 
         var cursor = processor.createProofCursor();
 

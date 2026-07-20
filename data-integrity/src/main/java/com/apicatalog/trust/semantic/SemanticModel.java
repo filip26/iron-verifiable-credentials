@@ -1,4 +1,4 @@
-package com.apicatalog.trust.model;
+package com.apicatalog.trust.semantic;
 
 import java.util.Collection;
 import java.util.Map;
@@ -7,11 +7,10 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.apicatalog.di.std.GraphPayloadGenerator;
+import com.apicatalog.trust.model.ContextAwareResolver;
+import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.model.ProcessingModel.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.GraphProcessor;
-import com.apicatalog.trust.proof.GraphProofCursor;
-import com.apicatalog.trust.proof.GraphProofReader;
 
 public class SemanticModel implements ProcessingModel {
 
@@ -50,11 +49,12 @@ public class SemanticModel implements ProcessingModel {
         // TODO void reset();
     }
 
-    private final GraphProcessor.Factory processorFactory;
+    private final GraphAdapter.Factory processorFactory;
     private final GraphProofCursor.Factory cursorFactory;
     private final GraphPayloadGenerator.Factory payloadFactory;
 
     private final Map<String, GraphProofReader> readers;
+//    private final Map<String, GraphProofWriter> writers;
 
     private final String c14n;
     private final Supplier<GraphCanonizer> canonizeFactory;
@@ -67,7 +67,7 @@ public class SemanticModel implements ProcessingModel {
 
     public SemanticModel(
             Vocab vocab,
-            GraphProcessor.Factory processorFactory,
+            GraphAdapter.Factory processorFactory,
             GraphProofCursor.Factory cursorFactory,
             GraphPayloadGenerator.Factory payloadFactory,
             String c14n,
@@ -89,57 +89,31 @@ public class SemanticModel implements ProcessingModel {
         this.canonizeFactory = canonizeFactory;
         this.readers = readers;
     }
-
+    
     @Override
-    public GraphProcessor createProcessor(Map<String, Object> document) {
+    public GraphUpdater createUpdater(Map<String, Object> document) {
+        return null;
+    }
+    
+    @Override
+    public GraphAdapter createAdapter(Map<String, Object> document) {
         return processorFactory.createProcessor(
                 this,
                 ContextAwareResolver.getContexts(document),
                 document);
     }
 
-    public GraphProofCursor createCursor(GraphProcessor processor) {
+    public GraphProofCursor createCursor(GraphAdapter processor) {
         return cursorFactory.createCursor(this, processor);
     }
 
-    public PayloadGenerator createPayload(GraphProcessor processor) {
+    public PayloadGenerator createPayload(Map<String, Object> document) {
+        return createPayload(createAdapter(document));
+    }
+    
+    public PayloadGenerator createPayload(GraphAdapter processor) {
         return payloadFactory.createPayload(this, processor);
     }
-
-//    @Override
-//    public ProofCursor createProofCursor(Collection<String> context, Map<String, Object> document) {
-//
-//        var processor = processorFactory.createProcessor(
-//                this,
-//                context,
-//                document);
-//
-//        var proofs = processor.proofs();
-//
-//        if (proofs == null || proofs.isEmpty()) {
-//            return null;
-//        }
-//
-//        var proofReaders = new HashMap<String, GraphProofReader>(proofs.size());
-//
-//        for (var proofGraph : proofs) {
-//
-//            var proof = processor.proof(proofGraph);
-//            var proofType = processor.proofType(proofGraph);
-//
-//            var reader = readers.get(proofType);
-//
-//            if (reader != null && reader.isAccepted(proof)) {
-//                proofReaders.put(proofGraph, reader);
-//            }
-//        }
-//
-//        if (proofReaders.isEmpty()) {
-//            return null;
-//        }
-//
-//        return cursorFactory.newInstance(this, processor);
-//    }
 
     public GraphProofReader reader(String proofType) {
         return readers.get(proofType);

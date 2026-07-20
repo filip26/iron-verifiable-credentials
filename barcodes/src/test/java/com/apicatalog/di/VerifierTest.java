@@ -68,7 +68,7 @@ public class VerifierTest {
 
         var proofs = new ArrayList<Proof>();
 
-        var processor = Resources.SEMANTIC_MODEL.createProcessor(signed);
+        var processor = Resources.SEMANTIC_MODEL.createAdapter(signed);
         
         var cursor = processor.createProofCursor();
 

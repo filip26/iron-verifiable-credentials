@@ -1,15 +1,16 @@
-package com.apicatalog.trust.model;
+package com.apicatalog.trust.lexical;
 
 import java.util.Map;
 import java.util.function.Function;
 
-import com.apicatalog.trust.processor.MapProcessor;
-import com.apicatalog.trust.proof.MapProofCursor;
-import com.apicatalog.trust.proof.MapProofReader;
+import com.apicatalog.trust.Document.Updater;
+import com.apicatalog.trust.model.ContextAwareResolver;
+import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.model.ProcessingModel.Vocab;
 
 public class LexicalModel implements ProcessingModel {
 
-    private final MapProcessor.Factory processorFactory;
+    private final MapAdapter.Factory processorFactory;
     private final MapProofCursor.Factory cursorFactory;
     private final Map<String, MapProofReader> proofReaders;
 
@@ -17,10 +18,10 @@ public class LexicalModel implements ProcessingModel {
     private final Function<Map<String, Object>, byte[]> canonize;
 
     private final Vocab vocab;
-    
+
     public LexicalModel(
             Vocab vocab,
-            MapProcessor.Factory processorFactory,
+            MapAdapter.Factory processorFactory,
             MapProofCursor.Factory cursorFactory,
             String c14n,
             Function<Map<String, Object>, byte[]> canonize,
@@ -34,15 +35,23 @@ public class LexicalModel implements ProcessingModel {
     }
 
     @Override
-    public MapProcessor createProcessor(Map<String, Object> document) {
+    public MapAdapter createAdapter(Map<String, Object> document) {
         return processorFactory.createProcessor(
                 this,
                 ContextAwareResolver.getContexts(document),
                 document);
     }
 
-    public MapProofCursor createCursor(MapProcessor processor) {
+    public MapProofCursor createCursor(MapAdapter processor) {
         return cursorFactory.newInstance(this, processor);
+    }
+
+    public MapPayloadGenerator createPayload(Map<String, Object> document) {
+        return createPayload(createAdapter(document));
+    }
+
+    public MapPayloadGenerator createPayload(MapAdapter processor) {
+        return new MapPayloadGenerator(this, processor);
     }
 
     public byte[] canonize(Map<String, Object> data) {
@@ -57,9 +66,15 @@ public class LexicalModel implements ProcessingModel {
     public MapProofReader reader(String proofType) {
         return proofReaders.get(proofType);
     }
-    
+
     @Override
     public Vocab vocab() {
         return vocab;
+    }
+
+    @Override
+    public Updater createUpdater(Map<String, Object> document) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
