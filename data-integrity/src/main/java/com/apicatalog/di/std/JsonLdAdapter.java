@@ -12,7 +12,7 @@ import com.apicatalog.trust.semantic.GraphAdapter;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
-public final class StandardGraphProcessor implements GraphAdapter {
+public final class JsonLdAdapter implements GraphAdapter {
 
     private final SemanticModel model;
 
@@ -24,7 +24,7 @@ public final class StandardGraphProcessor implements GraphAdapter {
 
     private Dataset dataset;
 
-    protected StandardGraphProcessor(
+    protected JsonLdAdapter(
             SemanticModel model,
             Collection<String> context,
             Map<String, Object> document) {
@@ -38,11 +38,11 @@ public final class StandardGraphProcessor implements GraphAdapter {
         this.dataset = null;
     }
 
-    public static StandardGraphProcessor newInstance(
+    public static JsonLdAdapter newInstance(
             SemanticModel model,
             Collection<String> context,
             Map<String, Object> document) {
-        return new StandardGraphProcessor(model, context, document);
+        return new JsonLdAdapter(model, context, document);
     }
 
     @Override

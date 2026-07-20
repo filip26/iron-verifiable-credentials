@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.DataIntegrity;
-import com.apicatalog.di.std.StandardGraphProcessor;
+import com.apicatalog.di.std.JsonLdAdapter;
 import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -46,7 +46,7 @@ class Resources {
 //TODO            .hmac()
 //            .processor(SDGraphProcessor::new)
 //            .cursor(GraphProofCursor::newInstance)
-            .processor(StandardGraphProcessor::newInstance)
+            .processor(JsonLdAdapter::newInstance)
             .cursor(GraphProofCursor::newInstance)
             .payload(SDPayloadGenerator::new)
 

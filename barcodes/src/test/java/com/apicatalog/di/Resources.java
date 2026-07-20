@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.barcodes.ECDSAXI2023;
-import com.apicatalog.di.std.StandardGraphProcessor;
+import com.apicatalog.di.std.JsonLdAdapter;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
@@ -39,7 +39,7 @@ class Resources {
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
-            .processor(StandardGraphProcessor::newInstance)
+            .processor(JsonLdAdapter::newInstance)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
             .build();

@@ -1,7 +1,6 @@
 package com.apicatalog.di.suite;
 
 import com.apicatalog.di.signature.ProofValue;
-import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.ProcessingModel;
 import com.apicatalog.trust.payload.PayloadGenerator;

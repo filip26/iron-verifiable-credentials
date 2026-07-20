@@ -5,7 +5,7 @@ import java.security.SignatureException;
 import java.util.Collection;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.std.StandardCryptoSuite;
+import com.apicatalog.di.suite.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;

@@ -10,7 +10,7 @@ import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.MapAdapter;
 import com.apicatalog.trust.lexical.MapProofCursor;
 
-public class StandardMapProcessor implements MapAdapter {
+public class PlainMapAdapter implements MapAdapter {
 
     private final LexicalModel model;
     private final Collection<String> context;
@@ -18,7 +18,7 @@ public class StandardMapProcessor implements MapAdapter {
 
     private Map<String, Object>[] proofs;
 
-    protected StandardMapProcessor(
+    protected PlainMapAdapter(
             LexicalModel model,
             Collection<String> context,
             Map<String, Object> document,
@@ -29,7 +29,7 @@ public class StandardMapProcessor implements MapAdapter {
         this.proofs = proofs;
     }
 
-    public static final StandardMapProcessor newInstance(
+    public static final PlainMapAdapter newInstance(
             LexicalModel model,
             Collection<String> context,
             Map<String, Object> document) {
@@ -62,7 +62,7 @@ public class StandardMapProcessor implements MapAdapter {
             mapProofs[index++] = map;
         }
 
-        return new StandardMapProcessor(model, context, data, mapProofs);
+        return new PlainMapAdapter(model, context, data, mapProofs);
     }
 
     @Override

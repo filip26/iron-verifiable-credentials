@@ -1,9 +1,8 @@
-package com.apicatalog.di.std;
+package com.apicatalog.di.suite;
 
 import java.security.SignatureException;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;

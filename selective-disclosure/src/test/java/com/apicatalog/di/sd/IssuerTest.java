@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -26,7 +25,6 @@ import com.apicatalog.jcs.Jcs;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.model.ContextAwareResolver;
 
 public class IssuerTest {
 
@@ -36,7 +34,7 @@ public class IssuerTest {
 
         Map<String, Object> keysMap = Resources.getMap(resource + ".keys.json");
         Map<String, Object> options = Resources.getMap(resource + ".options.json");
-        Map<String, Object> document = Resources.getMap(resource + ".unsigned.json");
+        Map<String, Object> sourceDocument = Resources.getMap(resource + ".unsigned.json");
 
         var keys = Keys.from(keysMap);
 
@@ -75,10 +73,6 @@ public class IssuerTest {
                             .formatted(keys.codec().name(), keys.codec().code()));
         }
 
-        var proofs = document.get("proof");
-
-        var composer = new NativeComposer<Map<String, ? extends Object>>();
-
         assertEquals(DataIntegrityProof.TYPE_NAME, options.get("type"), "An unsupported proof type.");
 
         var cryptosuite = ECDSASD2023.getInstance();
@@ -90,10 +84,10 @@ public class IssuerTest {
         var proofDraft = cryptosuite.createProofDraft();
         proofDraft.options(options);
 
-        var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
+        var updater = Resources.SEMANTIC_MODEL.createUpdater(sourceDocument);
 
         var payload = updater.createPayload();
-        
+
         @SuppressWarnings("unchecked")
         var mandatoryPointers = (Collection<String>) options.get("mandatoryPointers");
 
@@ -107,38 +101,41 @@ public class IssuerTest {
                         mandatoryPointers,
                         keys.hmacKey()));
 
-        DataIntegrityProof.write(proof, composer);
-
-        if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-            document.put("@context", merge(ContextAwareResolver.getContexts(document), proofDraft.context()));
-        }
+//        DataIntegrityProof.write(proof, composer);
+//
+//        if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
+//            document.put("@context", merge(ContextAwareResolver.getContexts(document), proofDraft.context()));
+//        }
 
         // verify the newly issued proof just for testing
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 
-        var proofMap = composer.compose();
+        updater.addProof(proof);
 
-        if (proofs instanceof Collection col) {
-            var clone = new ArrayList<>(col);
-            col.add(proofMap);
-            proofs = col;
-
-        } else if (proofs == null) {
-            proofs = proofMap;
-
-        } else {
-            var col = new ArrayList<>();
-            col.add(proofs);
-            col.add(proofMap);
-            proofs = col;
-        }
-
-        document.put("proof", proofs);
+        var issuedDocument = updater.compacted();
+//        var proofMap = composer.compose();
+//
+//        if (proofs instanceof Collection col) {
+//            var clone = new ArrayList<>(col);
+//            col.add(proofMap);
+//            proofs = col;
+//
+//        } else if (proofs == null) {
+//            proofs = proofMap;
+//
+//        } else {
+//            var col = new ArrayList<>();
+//            col.add(proofs);
+//            col.add(proofMap);
+//            proofs = col;
+//        }
+//
+//        document.put("proof", proofs);
 
         var expected = Resources.getMap(resource + ".signed.json");
 
-        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
+        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(issuedDocument)));
     }
 
     static final Stream<String> resources() throws IOException {

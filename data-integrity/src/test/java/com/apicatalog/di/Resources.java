@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.apicatalog.di.std.StandardGraphProcessor;
-import com.apicatalog.di.std.StandardMapProcessor;
+import com.apicatalog.di.std.JsonLdAdapter;
+import com.apicatalog.di.std.PlainMapAdapter;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
@@ -48,7 +48,7 @@ class Resources {
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
-            .processor(StandardMapProcessor::newInstance)
+            .processor(PlainMapAdapter::newInstance)
             .cursor(MapProofCursor::newInstance)
             .build();
 
@@ -62,7 +62,7 @@ class Resources {
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
-            .processor(StandardGraphProcessor::newInstance)
+            .processor(JsonLdAdapter::newInstance)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
             .build();
