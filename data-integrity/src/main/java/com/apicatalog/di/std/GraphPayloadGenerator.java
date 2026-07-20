@@ -17,12 +17,12 @@ public class GraphPayloadGenerator implements PayloadGenerator {
         PayloadGenerator createPayload(SemanticModel model, GraphProcessor processor);
     }
 
-    private final SemanticModel model;
-    private final GraphProcessor processor;
+    protected final SemanticModel model;
+    protected final GraphProcessor processor;
 
-    private Collection<String> includedProofs;
+    protected Collection<String> includedProofs;
 
-    protected GraphPayloadGenerator(
+    public GraphPayloadGenerator(
             SemanticModel model,
             GraphProcessor processor) {
         this.model = model;
@@ -30,10 +30,6 @@ public class GraphPayloadGenerator implements PayloadGenerator {
         this.includedProofs = null;
     }
     
-    public final static GraphPayloadGenerator newInstance(SemanticModel model, GraphProcessor processor) {
-        return new GraphPayloadGenerator(model, processor);
-    }
-
     @Override
     public DigestiblePayload digestible() {
         return digestible(GenericPayload::new);

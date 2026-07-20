@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.apicatalog.trust.model.SemanticModel;
@@ -15,8 +16,12 @@ import com.apicatalog.trust.proof.ProofCursor;
 public class StandardGraphProcessor implements GraphProcessor {
 
     private final SemanticModel model;
+
     private final Collection<String> context;
     private final Map<String, Object> document;
+
+    private Map<String, Object> expandedData;
+    private Collection<?> expandedProofs;
 
     private Dataset dataset;
 
@@ -27,6 +32,11 @@ public class StandardGraphProcessor implements GraphProcessor {
         this.model = model;
         this.context = context;
         this.document = document;
+
+        this.expandedData = null;
+        this.expandedProofs = null;
+
+        this.dataset = null;
     }
 
     public static StandardGraphProcessor newInstance(
@@ -73,18 +83,57 @@ public class StandardGraphProcessor implements GraphProcessor {
         lazyInit();
         return dataset.proofTypes.get(graph);
     }
+    
+
+    @Override
+    public Map<String, Object> expandedData() {
+        lazyInit();
+        return expandedData;
+    }
 
     private void lazyInit() {
-        if (dataset == null) {
 
+        if (expandedData != null || dataset != null) {
+            return;
+        }
+
+        var expanded = model.expand().apply(document);
+
+        if (expanded.size() != 1) {
+            throw new IllegalArgumentException();
+        }
+
+        if (expanded.iterator().next() instanceof Map map) {
+            expandedData = new LinkedHashMap<String, Object>(map);
+            if (map.containsKey(model.vocab().proof())) {
+                var proofs = expandedData.remove(model.vocab().proof());
+                if (proofs instanceof Collection<?> col) {
+                    expandedProofs = col;
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            }
+
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+//        if (expandedProofs != null) {
             dataset = new Dataset();
             dataset.proofPredicate = model.vocab().proof();
             dataset.typePredicate = model.vocab().type();
-
-            model.tordf().accept(document, dataset);
-        }
+            model.tordf().accept(expanded, dataset);
+//        }
+//        if (dataset == null) {
+//
+//            dataset = new Dataset();
+//            dataset.proofPredicate = model.vocab().proof();
+//            dataset.typePredicate = model.vocab().type();
+//
+//            model.tordf().accept(document, dataset);
+//        }
     }
-
+    
     private static class Dataset implements QuadConsumer {
 
         private final Map<String, String> proofTypes = new HashMap<>();

@@ -64,7 +64,7 @@ class Resources {
             .c14n(Resources::createRDFC)
             .processor(StandardGraphProcessor::newInstance)
             .cursor(GraphProofCursor::newInstance)
-            .payload(GraphPayloadGenerator::newInstance)
+            .payload(GraphPayloadGenerator::new)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;

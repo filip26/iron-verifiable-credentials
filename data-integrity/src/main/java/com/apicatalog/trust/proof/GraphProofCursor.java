@@ -42,7 +42,7 @@ public class GraphProofCursor implements ProofCursor {
         this.currentProof = null;
         this.currentGraph = null;
         this.currentReader = null;
-        this.payloadProvider = processor.createPayload();
+        this.payloadProvider = model.createPayload(processor);
     }
 
     public static GraphProofCursor newInstance(SemanticModel model, GraphProcessor processor) {

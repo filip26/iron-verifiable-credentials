@@ -9,30 +9,30 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.function.Function;
 
+import com.apicatalog.di.std.GraphPayloadGenerator;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.processor.GraphProcessor;
 
-public class SDPayloadGenerator implements PayloadGenerator {
+public class SDPayloadGenerator extends GraphPayloadGenerator {
 
-    private final SemanticModel model;
-    private final SDGraphProcessor processor;
-
-    private Collection<String> includedProofs;
+//    private final SemanticModel model;
+//    private final SDGraphProcessor processor;
+//
+//    private Collection<String> includedProofs;
 
     public SDPayloadGenerator(
             SemanticModel model,
-            SDGraphProcessor processor) {
-        this.model = model;
-        this.processor = processor;
+            GraphProcessor processor) {
+        super(model, processor);
+//        this.model = model;
+//        this.processor = processor;
     }
 
     public SDBaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
 
-        var skolemized = Skolemizer.skolemize(processor.expandedDocument());
+        var skolemized = Skolemizer.skolemize(processor.expandedData());
 
         var compacted = model.compact().apply(processor.context(), skolemized);
 
@@ -151,7 +151,7 @@ public class SDPayloadGenerator implements PayloadGenerator {
 
         var consumer = canonizer.consumer();
 
-        model.tordf().accept(processor.expandedDocument(), consumer);
+        model.tordf().accept(processor.expandedData(), consumer);
 
         var canonized = new ArrayList<String[]>();
 
@@ -221,23 +221,6 @@ public class SDPayloadGenerator implements PayloadGenerator {
     }
 
     private Map<String, Object> compacted() {
-        return model.compact().apply(processor.context(), processor.expandedDocument());
-    }
-
-    @Override
-    public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void withProofs(Collection<String> ids) {
-        // TODO Auto-generated method stub
-        return;
-    }
-
-    @Override
-    public void reset() {
-        // TODO Auto-generated method stub
+        return model.compact().apply(processor.context(), processor.expandedData());
     }
 }

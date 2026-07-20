@@ -36,11 +36,12 @@ class Resources {
 
     static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
             .proof(ECDSAXI2023.getInstance())
+            .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
             .processor(StandardGraphProcessor::newInstance)
             .cursor(GraphProofCursor::newInstance)
-            .payload(GraphPayloadGenerator::newInstance)
+            .payload(GraphPayloadGenerator::new)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;

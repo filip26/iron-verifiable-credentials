@@ -27,5 +27,7 @@ public interface GraphProcessor extends DocumentProcessor {
 
     String proofType(String graph);
 
-    PayloadGenerator createPayload();
+//    PayloadGenerator createPayload();
+
+    Map<String, Object> expandedData();
 }

@@ -90,9 +90,7 @@ public class IssuerTest {
         var proofDraft = cryptosuite.createProofDraft();
         proofDraft.options(options);
 
-        var context = ContextAwareResolver.getContexts(document);
-
-        var processor = new SDGraphProcessor(Resources.SEMANTIC_MODEL, context, document);
+        var processor = Resources.SEMANTIC_MODEL.createProcessor(document);
 
         var payload = processor.createPayload();
 

@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.DataIntegrity;
+import com.apicatalog.di.std.GraphPayloadGenerator;
+import com.apicatalog.di.std.StandardGraphProcessor;
 import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -42,8 +44,12 @@ class Resources {
             .tordf(Resources::toRDF)
             .c14n(Resources::newRDFC)
 //TODO            .hmac()
-            .processor(SDGraphProcessor::new)
+//            .processor(SDGraphProcessor::new)
+//            .cursor(GraphProofCursor::newInstance)
+            .processor(StandardGraphProcessor::newInstance)
             .cursor(GraphProofCursor::newInstance)
+            .payload(SDPayloadGenerator::new)
+
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;
