@@ -24,7 +24,6 @@ import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.tree.io.java.NativeComposer;
 
 public class IssuerTest {
 
@@ -101,37 +100,13 @@ public class IssuerTest {
                         mandatoryPointers,
                         keys.hmacKey()));
 
-//        DataIntegrityProof.write(proof, composer);
-//
-//        if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-//            document.put("@context", merge(ContextAwareResolver.getContexts(document), proofDraft.context()));
-//        }
-
         // verify the newly issued proof just for testing
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 
-        updater.addProof(proof);
+        updater.addProof(proof.context(), DataIntegrityProof.compact(proof));
 
         var issuedDocument = updater.compacted();
-//        var proofMap = composer.compose();
-//
-//        if (proofs instanceof Collection col) {
-//            var clone = new ArrayList<>(col);
-//            col.add(proofMap);
-//            proofs = col;
-//
-//        } else if (proofs == null) {
-//            proofs = proofMap;
-//
-//        } else {
-//            var col = new ArrayList<>();
-//            col.add(proofs);
-//            col.add(proofMap);
-//            proofs = col;
-//        }
-//
-//        document.put("proof", proofs);
 
         var expected = Resources.getMap(resource + ".signed.json");
 

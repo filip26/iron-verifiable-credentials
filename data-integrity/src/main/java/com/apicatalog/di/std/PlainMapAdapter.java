@@ -9,12 +9,13 @@ import java.util.Map;
 import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.MapAdapter;
 import com.apicatalog.trust.lexical.MapProofCursor;
+import com.apicatalog.trust.model.Model.Vocab;
 
 public class PlainMapAdapter implements MapAdapter {
 
     private final LexicalModel model;
     private final Collection<String> context;
-    
+
     private final Map<String, Object> data;
     private final Map<String, Object>[] proofs;
 

@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.model.Model;
 
 final class DIProofC14NTemplates {
 
@@ -66,8 +66,8 @@ final class DIProofC14NTemplates {
 
     static Function<DataIntegrityProof, byte[]> getSignTemplate(String c14n) {
         return switch (c14n) {
-        case ProcessingModel.C14N_JCS -> DIProofC14NTemplates::jcs;
-        case ProcessingModel.C14N_RDFC -> DIProofC14NTemplates::rdfc;
+        case Model.C14N_JCS -> DIProofC14NTemplates::jcs;
+        case Model.C14N_RDFC -> DIProofC14NTemplates::rdfc;
         default -> throw new IllegalArgumentException();
         };
     }

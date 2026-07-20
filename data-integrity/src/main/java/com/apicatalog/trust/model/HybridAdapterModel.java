@@ -10,15 +10,15 @@ import com.apicatalog.trust.Document.Updater;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class HybridAdapterModel implements ProcessingModel {
+public class HybridAdapterModel implements Model {
 
-    private final ProcessingModel[] models;
+    private final Model[] models;
 
-    public HybridAdapterModel(ProcessingModel... models) {
+    public HybridAdapterModel(Model... models) {
         this.models = models;
     }
 
-    public ProcessingModel[] models() {
+    public Model[] models() {
         return models;
     }
 
@@ -82,12 +82,6 @@ public class HybridAdapterModel implements ProcessingModel {
 
             return new Cursor(cursors);
         }
-//
-//        @Override
-//        public PayloadGenerator createPayload() {
-//            throw new UnsupportedOperationException();
-//        }
-
     }
 
     private static class Cursor implements ProofCursor {

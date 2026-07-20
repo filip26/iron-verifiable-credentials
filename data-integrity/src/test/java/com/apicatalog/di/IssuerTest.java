@@ -28,8 +28,8 @@ import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.trust.model.ContextAwareResolver;
-import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.Document;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.proof.Proof;
 
 public class IssuerTest {
@@ -92,8 +92,6 @@ public class IssuerTest {
         Proof proof = null;
         Map<String, ?> issued = null;
 
-        var context = ContextAwareResolver.getContexts(document);
-
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
             var cryptosuite = getCryptosuite((String) options.get("cryptosuite"));
@@ -107,26 +105,14 @@ public class IssuerTest {
 
             payload.withProofs(proofDraft.previous());
 
-            var integrityProof = proofDraft.sign(
+            proof = proofDraft.sign(
                     signatureAlgorithm,
                     signer,
                     Resources.DIGEST_FACTORY,
                     payload.digestible());
 
-            updater.addProof(integrityProof);
+            updater.addProof(proofDraft.context(), DataIntegrityProof.compact((DataIntegrityProof) proof));
             issued = updater.compacted();
-//TODO
-//            processor.add(proof);
-//
-//            processor.write(composer);
-
-//            DataIntegrityProof.write(integrityProof, composer);
-
-//            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-//                document.put("@context", merge(context, proofDraft.context()));
-//            }
-
-            proof = integrityProof;
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 
@@ -134,9 +120,11 @@ public class IssuerTest {
 
             var proofDraft = Ed25519Signature2020.newInstance((Map<String, Object>) options);
 
-            var payload = Resources.SEMANTIC_MODEL.createPayload(document);
+            var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
 
-            var edProof = Ed25519Signature2020.generateProof(
+            var payload = updater.createPayload();
+
+            proof = Ed25519Signature2020.generateProof(
                     signer,
                     Resources.DIGEST_FACTORY,
                     proofDraft,
@@ -144,11 +132,8 @@ public class IssuerTest {
 
 //            Ed25519Signature2020.write(edProof, composer);
 
-//            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-//                document.put("@context", merge(context, proofDraft.context()));
-//            }
-
-            proof = edProof;
+            // updater.addProof(proof);
+            issued = updater.compacted();
 
         } else {
             fail("An unsupported proof type " + options.get("type"));
@@ -163,10 +148,10 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(issued)));
     }
 
-    static Function<Map<String, Object>, com.apicatalog.trust.Document.Updater> getUpdater(String c14n) {
+    static Function<Map<String, Object>, Document.Updater> getUpdater(String c14n) {
         return switch (c14n) {
-        case ProcessingModel.C14N_RDFC -> Resources.SEMANTIC_MODEL::createUpdater;
-        case ProcessingModel.C14N_JCS -> Resources.LEXICAL_MODEL::createUpdater;
+        case Model.C14N_RDFC -> Resources.SEMANTIC_MODEL::createUpdater;
+        case Model.C14N_JCS -> Resources.LEXICAL_MODEL::createUpdater;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.

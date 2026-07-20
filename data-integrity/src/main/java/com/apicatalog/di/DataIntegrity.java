@@ -17,7 +17,7 @@ import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.MapAdapter;
 import com.apicatalog.trust.lexical.MapProofCursor;
 import com.apicatalog.trust.lexical.MapProofReader;
-import com.apicatalog.trust.model.ProcessingModel.Vocab;
+import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.GraphAdapter;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;

@@ -6,21 +6,19 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.tree.io.Tree.NodeContext;
-import com.apicatalog.tree.io.java.NativeComposer;
+import com.apicatalog.trust.Document;
+import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.GraphAdapter;
-import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 
-public final class JsonLdUpdater implements GraphUpdater {
+public final class JsonLdUpdater implements Document.Updater {
 
     private final SemanticModel model;
     private final GraphAdapter adapter;
 
-    private Collection<Proof> proofsToAdd;
+    private Collection<Map<String, ?>> newProofs;
+    private Collection<String> contexts = null;
 
     public JsonLdUpdater(SemanticModel model, GraphAdapter adapter) {
         this.model = model;
@@ -28,50 +26,44 @@ public final class JsonLdUpdater implements GraphUpdater {
     }
 
     @Override
-    public void addProof(Proof proof) {
-        if (proofsToAdd == null) {
-            proofsToAdd = new ArrayList<Proof>();
+    public void addProof(Collection<String> context, Map<String, ?> compacted) {
+        if (newProofs == null) {
+            newProofs = new ArrayList<>();
+            contexts = new LinkedHashSet<>(context.size() * 2);
         }
-        proofsToAdd.add(proof);
+        newProofs.add(compacted);
+        contexts.addAll(context);
     }
 
     @Override
     public Map<String, ?> compacted() {
+
+        if (newProofs == null) {
+            return adapter.source();
+        }
+
         // TODO Auto-generated method stub
-        var document = new LinkedHashMap<String, Object>(adapter.compacted());
-        var terms = adapter.keys();
+        var document = new LinkedHashMap<String, Object>(adapter.source());
+        var terms = adapter.vocab();
 
         var proofs = document.get(terms.proof());
 
-        var composer = new NativeComposer<Map<String, ? extends Object>>();
-//        composer.beginSequence(NodeContext.ROOT);
-        for (var proof : proofsToAdd) {
-
-            // TODO use id, type, pass it to writer
-            DataIntegrityProof.write((DataIntegrityProof) proof, composer);
-
-//          if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-//              document.put("@context", merge(context, proofDraft.context()));
-//          }
-
+        if (contexts != null) {
+            document.put(adapter.vocab().context(), merge(adapter.context(), contexts));
         }
-//        composer.endSequence(NodeContext.ROOT);
 
-        // TODO remove, hide in document handler interface
-        var proofMap = composer.compose();
-
-        if (proofs instanceof Collection col) {
-            var clone = new ArrayList<>(col);
-            col.add(proofMap);
+        if (proofs instanceof Collection<?> col) {
+            var clone = new ArrayList<Object>(col);
+            clone.addAll(newProofs);
             proofs = col;
 
         } else if (proofs == null) {
-            proofs = proofMap;
+            proofs = newProofs.size() == 1 ? newProofs.iterator().next() : newProofs;
 
         } else {
             var col = new ArrayList<>();
             col.add(proofs);
-            col.add(proofMap);
+            col.addAll(newProofs);
             proofs = col;
         }
 
@@ -93,4 +85,8 @@ public final class JsonLdUpdater implements GraphUpdater {
         return model.createPayload(adapter);
     }
 
+    @Override
+    public Vocab vocab() {
+        return adapter.vocab();
+    }
 }

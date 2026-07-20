@@ -2,7 +2,7 @@ package com.apicatalog.di.suite;
 
 import com.apicatalog.di.signature.ProofValue;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
@@ -15,11 +15,11 @@ public final class MLDSA2024 extends StandardCryptoSuite {
 
     private static MLDSA2024 MLDSA_44_RDFC_2024 = new MLDSA2024(
             "mldsa44-rdfc-2024",
-            ProcessingModel.C14N_RDFC);
+            Model.C14N_RDFC);
 
     private static MLDSA2024 MLDSA_44_JCS_2024 = new MLDSA2024(
             "mldsa44-jcs-2024",
-            ProcessingModel.C14N_JCS);
+            Model.C14N_JCS);
 
     private MLDSA2024(
             String id,
@@ -29,8 +29,8 @@ public final class MLDSA2024 extends StandardCryptoSuite {
 
     public static MLDSA2024 get44Instance(String c14n) {
         return switch (c14n) {
-        case ProcessingModel.C14N_RDFC -> MLDSA_44_RDFC_2024;
-        case ProcessingModel.C14N_JCS -> MLDSA_44_JCS_2024;
+        case Model.C14N_RDFC -> MLDSA_44_RDFC_2024;
+        case Model.C14N_JCS -> MLDSA_44_JCS_2024;
         default -> throw new IllegalArgumentException();
         };
     }

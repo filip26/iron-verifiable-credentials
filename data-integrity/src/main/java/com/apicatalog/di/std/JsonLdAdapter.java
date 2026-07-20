@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.apicatalog.trust.model.ProcessingModel.Vocab;
+import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.semantic.GraphAdapter;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -171,13 +171,13 @@ public final class JsonLdAdapter implements GraphAdapter {
     }
 
     @Override
-    public Vocab keys() {
+    public Vocab vocab() {
         // FIXME read from JSON-LD term map after expansion
         return new Vocab("@context", "proof", "id", "type");
     }
 
     @Override
-    public Map<String, ?> compacted() {
+    public Map<String, ?> source() {
         return document;
     }
 }

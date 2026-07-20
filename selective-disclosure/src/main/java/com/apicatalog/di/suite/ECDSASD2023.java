@@ -14,7 +14,7 @@ import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
@@ -106,7 +106,7 @@ public final class ECDSASD2023 implements CryptoSuite {
 
     @Override
     public String c14n() {
-        return ProcessingModel.C14N_RDFC;
+        return Model.C14N_RDFC;
     }
 
     public static class ProofDraft extends DataIntegrityProof.Draft {
@@ -132,7 +132,7 @@ public final class ECDSASD2023 implements CryptoSuite {
             default -> throw new IllegalArgumentException();
             };
 
-            canonize(ProcessingModel.C14N_RDFC);
+            canonize(Model.C14N_RDFC);
 
             var unsignedProof = unsigned();
 

@@ -13,7 +13,9 @@ import java.util.function.Function;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
+import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.lexical.MapProofReader;
+import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.GraphProofReader;
@@ -76,6 +78,12 @@ public final class DataIntegrityProof implements Proof {
     private byte[] canonicalPayload;
 
     private DataIntegrityProof() {
+    }
+
+    public static Map<String, ?> compact(DataIntegrityProof proof) {
+        var composer = new NativeComposer<Map<String, ? extends Object>>();
+        write(proof, composer);
+        return composer.compose();
     }
 
     public static void write(DataIntegrityProof proof, TreeEmitter emitter) {

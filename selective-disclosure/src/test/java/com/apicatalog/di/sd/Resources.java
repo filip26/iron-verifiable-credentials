@@ -25,7 +25,7 @@ import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
-import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -37,7 +37,7 @@ import jakarta.json.Json;
 
 class Resources {
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
             .proof(ECDSASD2023.getInstance())
             .expand(Resources::expand)
             .compact(Resources::compact)

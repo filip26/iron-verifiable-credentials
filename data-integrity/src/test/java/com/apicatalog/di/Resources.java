@@ -31,7 +31,7 @@ import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.MapProofCursor;
-import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -41,7 +41,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static LexicalModel LEXICAL_MODEL = DataIntegrity.createLexicalModel(ProcessingModel.C14N_JCS)
+    static LexicalModel LEXICAL_MODEL = DataIntegrity.createLexicalModel(Model.C14N_JCS)
             .proofProperty(DataIntegrity.VOCAB_PROOF_KEY)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
@@ -52,7 +52,7 @@ class Resources {
             .cursor(MapProofCursor::newInstance)
             .build();
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(ProcessingModel.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
             .proofPredicate(DataIntegrity.VOCAB_PROOF_URI)
             .proof(EdDSA2022.withRDFC())
             .proof(ECDSA2019.withRDFC())

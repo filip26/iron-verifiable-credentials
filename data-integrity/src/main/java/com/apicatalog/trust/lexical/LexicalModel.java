@@ -5,10 +5,10 @@ import java.util.function.Function;
 
 import com.apicatalog.trust.Document.Updater;
 import com.apicatalog.trust.model.ContextAwareResolver;
-import com.apicatalog.trust.model.ProcessingModel;
-import com.apicatalog.trust.model.ProcessingModel.Vocab;
+import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.model.Model.Vocab;
 
-public class LexicalModel implements ProcessingModel {
+public class LexicalModel implements Model {
 
     private final MapAdapter.Factory processorFactory;
     private final MapProofCursor.Factory cursorFactory;

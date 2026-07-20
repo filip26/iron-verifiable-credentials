@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.trust.Document;
-import com.apicatalog.trust.model.ProcessingModel.Vocab;
+import com.apicatalog.trust.model.Model.Vocab;
 
 public interface GraphAdapter extends Document.Adapter {
 
@@ -29,7 +29,8 @@ public interface GraphAdapter extends Document.Adapter {
 
     Map<String, Object> expandedData();
 
-    Vocab keys();
+    Vocab vocab();
     
-    Map<String, ?> compacted();
+    Map<String, ?> source();
+   
 }

@@ -8,11 +8,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.apicatalog.di.std.JsonLdUpdater;
+import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.ContextAwareResolver;
-import com.apicatalog.trust.model.ProcessingModel;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.PayloadGenerator;
 
-public class SemanticModel implements ProcessingModel {
+public class SemanticModel implements Model {
 
     // "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
@@ -91,11 +92,6 @@ public class SemanticModel implements ProcessingModel {
     }
 
     @Override
-    public GraphUpdater createUpdater(Map<String, Object> document) {
-        return new JsonLdUpdater(this, createAdapter(document));
-    }
-
-    @Override
     public GraphAdapter createAdapter(Map<String, Object> document) {
         return processorFactory.createProcessor(
                 this,
@@ -103,16 +99,17 @@ public class SemanticModel implements ProcessingModel {
                 document);
     }
 
-    public GraphProofCursor createCursor(GraphAdapter processor) {
-        return cursorFactory.createCursor(this, processor);
+    @Override
+    public Document.Updater createUpdater(Map<String, Object> document) {
+        return new JsonLdUpdater(this, createAdapter(document));
     }
 
-    public PayloadGenerator createPayload(Map<String, Object> document) {
-        return createPayload(createAdapter(document));
+    public PayloadGenerator createPayload(GraphAdapter adapter) {
+        return payloadFactory.createPayload(this, adapter);
     }
 
-    public PayloadGenerator createPayload(GraphAdapter processor) {
-        return payloadFactory.createPayload(this, processor);
+    public GraphProofCursor createCursor(GraphAdapter adapter) {
+        return cursorFactory.createCursor(this, adapter);
     }
 
     public GraphProofReader reader(String proofType) {

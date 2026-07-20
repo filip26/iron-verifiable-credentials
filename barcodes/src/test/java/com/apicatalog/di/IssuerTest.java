@@ -81,7 +81,9 @@ public class IssuerTest {
         var proofDraft = cryptosuite.createProofDraft();
         proofDraft.options(options);
 
-        var payloadProvider = Resources.SEMANTIC_MODEL.createPayload(document);
+        var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
+
+        var payloadProvider = updater.createPayload();
 
         payloadProvider.withProofs(proofDraft.previous());
 
