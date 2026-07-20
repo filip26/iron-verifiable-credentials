@@ -29,7 +29,8 @@ public class StandardGraphProcessor implements GraphProcessor {
         this.document = document;
     }
 
-    public static StandardGraphProcessor newInstance(SemanticModel model,
+    public static StandardGraphProcessor newInstance(
+            SemanticModel model,
             Collection<String> context,
             Map<String, Object> document) {
         return new StandardGraphProcessor(model, context, document);
@@ -42,7 +43,7 @@ public class StandardGraphProcessor implements GraphProcessor {
 
     @Override
     public PayloadGenerator createPayload() {
-        return new GraphPayloadGenerator(model, this);
+        return model.createPayload(this);
     }
 
     @Override
@@ -77,8 +78,8 @@ public class StandardGraphProcessor implements GraphProcessor {
         if (dataset == null) {
 
             dataset = new Dataset();
-            dataset.typePredicate = model.vocab().type();
             dataset.proofPredicate = model.vocab().proof();
+            dataset.typePredicate = model.vocab().type();
 
             model.tordf().accept(document, dataset);
         }
@@ -92,8 +93,8 @@ public class StandardGraphProcessor implements GraphProcessor {
 
         private Collection<String> proofGraphs = new HashSet<>();
 
-        private String typePredicate;
         private String proofPredicate;
+        private String typePredicate;
 
         @Override
         public void accept(

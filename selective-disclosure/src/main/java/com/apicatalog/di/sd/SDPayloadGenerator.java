@@ -15,7 +15,6 @@ import com.apicatalog.multibase.Multibase;
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.PayloadGenerator;
-import com.apicatalog.trust.processor.GraphProcessor;
 
 public class SDPayloadGenerator implements PayloadGenerator {
 
@@ -148,13 +147,11 @@ public class SDPayloadGenerator implements PayloadGenerator {
 
     public SDDerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
 
-        var expanded = processor.expandedDocument();
-
         var canonizer = model.newCanonizer();
 
         var consumer = canonizer.consumer();
 
-        model.tordf().accept(expanded, consumer);
+        model.tordf().accept(processor.expandedDocument(), consumer);
 
         var canonized = new ArrayList<String[]>();
 

@@ -96,8 +96,6 @@ public class IssuerTest {
 
         var payload = processor.createPayload();
 
-        payload.withProofs(proofDraft.previous());
-
         @SuppressWarnings("unchecked")
         var mandatoryPointers = (Collection<String>) options.get("mandatoryPointers");
 
@@ -107,7 +105,7 @@ public class IssuerTest {
                 keys.proofPublicKey(),
                 proofSigner,
                 Resources.DIGEST_FACTORY,
-                payload.redactable(
+                ((SDPayloadGenerator) payload).redactable(
                         mandatoryPointers,
                         keys.hmacKey()));
 

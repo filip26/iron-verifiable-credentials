@@ -136,4 +136,7 @@ public abstract class SDProofValue<T extends SDPayload> implements Signature {
         System.arraycopy(mandatoryHash, 0, hash, proofHash.length + proofPublicKey.length, mandatoryHash.length);
         return hash;
     }
+
+    public static record SignatureAlgorithm(String signature, String digest) {
+    }
 }

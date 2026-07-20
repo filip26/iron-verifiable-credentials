@@ -13,20 +13,27 @@ import com.apicatalog.trust.processor.GraphProcessor;
 
 public class GraphPayloadGenerator implements PayloadGenerator {
 
+    public interface Factory {
+        PayloadGenerator createPayload(SemanticModel model, GraphProcessor processor);
+    }
+
     private final SemanticModel model;
     private final GraphProcessor processor;
-    
+
     private Collection<String> includedProofs;
 
-    public GraphPayloadGenerator(
+    protected GraphPayloadGenerator(
             SemanticModel model,
-            GraphProcessor processor
-            ) {
+            GraphProcessor processor) {
         this.model = model;
         this.processor = processor;
         this.includedProofs = null;
     }
     
+    public final static GraphPayloadGenerator newInstance(SemanticModel model, GraphProcessor processor) {
+        return new GraphPayloadGenerator(model, processor);
+    }
+
     @Override
     public DigestiblePayload digestible() {
         return digestible(GenericPayload::new);
@@ -44,12 +51,11 @@ public class GraphPayloadGenerator implements PayloadGenerator {
             selectedGraph = new HashSet<String>();
 
             // select proofs
-            
-            
+
             for (var graph : processor.proofs()) {
-                
+
                 var proof = processor.proof(graph);
-                
+
                 if (includedProofs.contains(proof.iterator().next()[0])) {
                     selectedGraph.add(graph);
                     for (var quad : proof) {
@@ -67,7 +73,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
         }
 
         var canonical = canonizer.canonize();
-        //TODO cache generic
+        // TODO cache generic
         return payloadFactory.apply(canonical);
     }
 

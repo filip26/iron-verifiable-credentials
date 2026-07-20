@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.barcodes.ECDSAXI2023;
+import com.apicatalog.di.std.GraphPayloadGenerator;
 import com.apicatalog.di.std.StandardGraphProcessor;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -39,6 +40,7 @@ class Resources {
             .c14n(Resources::createRDFC)
             .processor(StandardGraphProcessor::newInstance)
             .cursor(GraphProofCursor::newInstance)
+            .payload(GraphPayloadGenerator::newInstance)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;

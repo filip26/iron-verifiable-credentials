@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.apicatalog.di.std.GraphPayloadGenerator;
 import com.apicatalog.di.std.StandardGraphProcessor;
 import com.apicatalog.di.std.StandardMapProcessor;
 import com.apicatalog.di.suite.ECDSA2019;
@@ -63,6 +64,7 @@ class Resources {
             .c14n(Resources::createRDFC)
             .processor(StandardGraphProcessor::newInstance)
             .cursor(GraphProofCursor::newInstance)
+            .payload(GraphPayloadGenerator::newInstance)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;
@@ -71,11 +73,11 @@ class Resources {
 
     static {
         try {
-            SHA_256 = MessageDigest.getInstance(Digestor.SHA_256);
+            SHA_256 = MessageDigest.getInstance("SHA-256");
 
             DIGEST_FACTORY = (Map.<String, Digestor>of(
                     Digestor.SHA_256, SHA_256::digest,
-                    Digestor.SHA_384, MessageDigest.getInstance(Digestor.SHA_384)::digest))::get;
+                    Digestor.SHA_384, MessageDigest.getInstance("SHA-384")::digest))::get;
 
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);

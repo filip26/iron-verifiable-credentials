@@ -7,11 +7,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.apicatalog.di.std.GraphPayloadGenerator;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.proof.GraphProofCursor;
 import com.apicatalog.trust.proof.GraphProofReader;
-import com.apicatalog.trust.proof.Proof;
 
 public class SemanticModel implements ProcessingModel {
 
@@ -49,20 +49,11 @@ public class SemanticModel implements ProcessingModel {
 
         // TODO void reset();
     }
-//    
-//    public interface GraphProofReader {
-//
-//        boolean isAccepted(Collection<String[]> proof);
-//
-//        // reads from n-quads
-//        Proof read(
-//                Collection<String[]> proof,
-//                SemanticModel model,
-//                PayloadGenerator payload);
-//    }
 
     private final GraphProcessor.Factory processorFactory;
     private final GraphProofCursor.Factory cursorFactory;
+    private final GraphPayloadGenerator.Factory payloadFactory;
+
     private final Map<String, GraphProofReader> readers;
 
     private final String c14n;
@@ -78,6 +69,7 @@ public class SemanticModel implements ProcessingModel {
             Vocab vocab,
             GraphProcessor.Factory processorFactory,
             GraphProofCursor.Factory cursorFactory,
+            GraphPayloadGenerator.Factory payloadFactory,
             String c14n,
             Function<Map<String, Object>, Collection<Object>> expand,
             BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact,
@@ -87,6 +79,7 @@ public class SemanticModel implements ProcessingModel {
         this.vocab = vocab;
         this.processorFactory = processorFactory;
         this.cursorFactory = cursorFactory;
+        this.payloadFactory = payloadFactory;
         this.c14n = c14n;
 
         this.expand = expand;
@@ -107,6 +100,10 @@ public class SemanticModel implements ProcessingModel {
 
     public GraphProofCursor createCursor(GraphProcessor processor) {
         return cursorFactory.createCursor(this, processor);
+    }
+
+    public PayloadGenerator createPayload(GraphProcessor processor) {
+        return payloadFactory.createPayload(this, processor);
     }
 
 //    @Override

@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.di.sd.signature.BaseSignature;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.apicatalog.trust.model.SemanticModel;
 import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.processor.GraphProcessor;
 import com.apicatalog.trust.proof.ProofCursor;
 
@@ -76,9 +77,9 @@ public class SDGraphProcessor implements GraphProcessor {
 
         if (expanded.iterator().next() instanceof Map map) {
             expandedDocument = new HashMap<String, Object>(map);
-            if (map.containsKey("https://w3id.org/security#proof")) {
-                expandedProofs = Map.of("https://w3id.org/security#proof",
-                        expandedDocument.remove("https://w3id.org/security#proof"));
+            if (map.containsKey(model.vocab().proof())) {
+                expandedProofs = Map.of(model.vocab().proof(),
+                        expandedDocument.remove(model.vocab().proof()));
             }
 
         } else {
@@ -87,6 +88,8 @@ public class SDGraphProcessor implements GraphProcessor {
 
         if (expandedProofs != null) {
             dataset = new Dataset();
+            dataset.proofPredicate = model.vocab().proof();
+            dataset.typePredicate = model.vocab().type();
             model.tordf().accept(expandedProofs, dataset);
         }
     }
@@ -98,6 +101,9 @@ public class SDGraphProcessor implements GraphProcessor {
         private Map<String, Collection<String[]>> graphs = new HashMap<>();
 
         private Collection<String> proofGraphs = new HashSet<>();
+
+        private String proofPredicate;
+        private String typePredicate;
 
         @Override
         public void accept(
@@ -114,11 +120,11 @@ public class SDGraphProcessor implements GraphProcessor {
             if (key == null) {
                 key = "@default";
 
-                if ("https://w3id.org/security#proof".equals(predicate)) {
+                if (proofPredicate.equals(predicate)) {
                     proofGraphs.add(object);
                 }
 
-            } else if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
+            } else if (typePredicate.equals(predicate)) {
                 proofTypes.put(graph, object);
             }
 
@@ -127,9 +133,6 @@ public class SDGraphProcessor implements GraphProcessor {
                             subject, predicate, object, datatype, language, direction, graph
                     });
         }
-    }
-
-    public static record SignatureAlgorithm(String signature, String digest) {
     }
 
     @Override
@@ -144,7 +147,7 @@ public class SDGraphProcessor implements GraphProcessor {
     }
 
     @Override
-    public SDPayloadGenerator createPayload() {
+    public PayloadGenerator createPayload() {
         return new SDPayloadGenerator(model, this);
     }
 }

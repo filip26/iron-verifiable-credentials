@@ -1,21 +1,9 @@
 package com.apicatalog.trust.payload;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.Function;
 
 public interface PayloadGenerator {
-
-    public interface Factory {
-
-        PayloadGenerator createPayload(Map<String, Object> document);
-
-        // TODO accepted proof types, for configuration dump
-
-        // TODO proof predicate or selector returns proof graph or null
-        // Function<String[], String>;
-
-    }
 
     void withProofs(Collection<String> ids);
 

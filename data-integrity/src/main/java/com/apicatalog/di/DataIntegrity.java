@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
+import com.apicatalog.di.std.GraphPayloadGenerator;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.model.LexicalModel;
 import com.apicatalog.trust.model.ProcessingModel.Vocab;
@@ -48,6 +49,7 @@ public class DataIntegrity {
 
         private GraphProcessor.Factory processorFactory;
         private GraphProofCursor.Factory cursorFactory;
+        private GraphPayloadGenerator.Factory payloadFactory;
 
         private BiConsumer<Object, QuadConsumer> tordf;
         private BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
@@ -97,6 +99,11 @@ public class DataIntegrity {
             return this;
         }
 
+        public SemanticModelBuilder payload(GraphPayloadGenerator.Factory factory) {
+            this.payloadFactory = factory;
+            return this;
+        }
+
         public SemanticModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
             return proof(cryptosuite.apply(c14n));
         }
@@ -143,6 +150,7 @@ public class DataIntegrity {
                     new Vocab("@context", proofPredicate, null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
                     processorFactory,
                     cursorFactory,
+                    payloadFactory,
                     c14n,
                     expand,
                     compact,
