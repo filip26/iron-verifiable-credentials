@@ -26,10 +26,14 @@ public class MapUpdater implements Document.Updater {
     public void addProof(Collection<String> context, Map<String, ?> compacted) {
         if (newProofs == null) {
             newProofs = new ArrayList<>();
-            contexts = new LinkedHashSet<>(contexts.size() * 2);
         }
         newProofs.add(compacted);
-        contexts.addAll(context);
+        if (context != null) {
+            if (contexts == null) {
+                contexts = new LinkedHashSet<>(context.size() * 2);
+            }
+            contexts.addAll(context);
+        }
     }
 
     @Override
@@ -45,7 +49,7 @@ public class MapUpdater implements Document.Updater {
                 proofs.add(adapter.proof(i));
             }
         }
-
+        
         if (newProofs != null) {
             if (proofs == null) {
                 proofs = newProofs;

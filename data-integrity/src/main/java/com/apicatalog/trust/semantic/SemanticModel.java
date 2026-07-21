@@ -54,9 +54,7 @@ public class SemanticModel implements Model {
     private final GraphPayloadGenerator.Factory payloadFactory;
 
     private final Map<String, GraphProofReader> readers;
-//    private final Map<String, GraphProofWriter> writers;
 
-    private final String c14n;
     private final Supplier<GraphCanonizer> canonizeFactory;
 
     private final Function<Map<String, Object>, Collection<Object>> expand;
@@ -70,7 +68,6 @@ public class SemanticModel implements Model {
             SemanticAdapter.Factory processorFactory,
             GraphProofCursor.Factory cursorFactory,
             GraphPayloadGenerator.Factory payloadFactory,
-            String c14n,
             Function<Map<String, Object>, Collection<Object>> expand,
             BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact,
             BiConsumer<Object, QuadConsumer> tordf,
@@ -80,7 +77,6 @@ public class SemanticModel implements Model {
         this.processorFactory = processorFactory;
         this.cursorFactory = cursorFactory;
         this.payloadFactory = payloadFactory;
-        this.c14n = c14n;
 
         this.expand = expand;
         this.compact = compact;

@@ -27,10 +27,15 @@ public final class GraphUpdater implements Document.Updater {
     public void addProof(Collection<String> context, Map<String, ?> compacted) {
         if (newProofs == null) {
             newProofs = new ArrayList<>();
-            contexts = new LinkedHashSet<>(context.size() * 2);
         }
         newProofs.add(compacted);
-        contexts.addAll(context);
+
+        if (context != null) {
+            if (contexts == null) {
+                contexts = new LinkedHashSet<>(context.size() * 2);
+            }
+            contexts.addAll(context);
+        }
     }
 
     @Override
@@ -53,7 +58,7 @@ public final class GraphUpdater implements Document.Updater {
         if (proofs instanceof Collection<?> col) {
             var clone = new ArrayList<Object>(col);
             clone.addAll(newProofs);
-            proofs = col;
+            proofs = clone;
 
         } else if (proofs == null) {
             proofs = newProofs.size() == 1 ? newProofs.iterator().next() : newProofs;

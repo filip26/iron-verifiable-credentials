@@ -130,9 +130,7 @@ public class IssuerTest {
                     proofDraft,
                     payload.digestible());
 
-//            Ed25519Signature2020.write(edProof, composer);
-
-            // updater.addProof(proof);
+            updater.addProof(proofDraft.context(), Ed25519Signature2020.compact((Ed25519Signature2020) proof));
             issued = updater.compacted();
 
         } else {

@@ -17,6 +17,7 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
+import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
@@ -52,6 +53,12 @@ public final class Ed25519Signature2020 implements Proof {
     private Ed25519Signature2020() {
     }
 
+    public static Map<String, ?> compact(Ed25519Signature2020 proof) {
+        var composer = new NativeComposer<Map<String, ? extends Object>>();
+        write(proof, composer);
+        return composer.compose();
+    }
+    
     public static void write(Ed25519Signature2020 proof, TreeEmitter emitter) {
         var writer = Tree.newPropertyTree(emitter)
                 .beginMap()

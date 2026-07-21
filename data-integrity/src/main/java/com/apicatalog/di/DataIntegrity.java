@@ -147,11 +147,14 @@ public class DataIntegrity {
             }
 
             return new SemanticModel(
-                    new Vocab("@context", proofPredicate, null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                    new Vocab(
+                            "@context",
+                            proofPredicate,
+                            null,
+                            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
                     processorFactory,
                     cursorFactory,
                     payloadFactory,
-                    c14n,
                     expand,
                     compact,
                     tordf,
@@ -234,7 +237,6 @@ public class DataIntegrity {
                     new Vocab("@context", proofProperty, "id", "type"),
                     processorFactory,
                     cursorFactory,
-                    c14n,
                     canonize,
                     readers);
         }
