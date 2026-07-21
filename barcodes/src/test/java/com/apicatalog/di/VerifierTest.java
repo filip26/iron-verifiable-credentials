@@ -1,11 +1,11 @@
 package com.apicatalog.di;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -19,8 +19,6 @@ import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.trust.MethodResolver;
-import com.apicatalog.trust.model.ContextAwareResolver;
-import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
@@ -64,43 +62,35 @@ public class VerifierTest {
         Map<String, Object> options = Resources.getMap(resource + ".options.json");
         Map<String, Object> signed = Resources.getMap(resource + ".signed.json");
 
-        var contexts = ContextAwareResolver.getContexts(signed);
-
-        var proofs = new ArrayList<Proof>();
-
         var processor = Resources.SEMANTIC_MODEL.createAdapter(signed);
-        
+
         var cursor = processor.createProofCursor();
 
         if (cursor == null || !cursor.next()) {
             fail("No proof(s) to verify");
         }
 
-        do {
-            if (!cursor.isAccepted()) {
-                continue;
-            }
+        if (!cursor.isAccepted()) {
+            fail();
+        }
 
-            var proof = cursor.proof();
+        var proof = cursor.proof();
 
-            if (!(proof.signature().payload() instanceof BarcodePayload barcode)) {
-                fail();
-                return;
-            }
+        if (!(proof.signature().payload() instanceof BarcodePayload barcode)) {
+            fail();
+            return;
+        }
 
-            barcode.opticalData(((Collection<?>) options.get("opticalDataBytes"))
-                    .stream().map(BigInteger.class::cast).map(BigInteger::byteValue)
-                    .collect(ByteArrayOutputStream::new, ByteArrayOutputStream::write, (_, _) -> {
-                    })
-                    .toByteArray());
+        barcode.opticalData(((Collection<?>) options.get("opticalDataBytes"))
+                .stream().map(BigInteger.class::cast).map(BigInteger::byteValue)
+                .collect(ByteArrayOutputStream::new, ByteArrayOutputStream::write, (_, _) -> {
+                })
+                .toByteArray());
 
-            var verified = PROOF_VERIFIER.verify(proof);
+        var verified = PROOF_VERIFIER.verify(proof);
+        assertTrue(verified);
 
-            assertTrue(verified);
-
-            proofs.add(proof);
-
-        } while (cursor.next());
+        assertFalse(cursor.next());
     }
 
     static final Stream<String> resources() {

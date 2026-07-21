@@ -42,11 +42,11 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
         switch (signature.length) {
         case 64:
             algorithm = P256;
-            digest = "SHA-256";
+            digest = Digestor.SHA_256;
             break;
         case 96:
             algorithm = P384;
-            digest = "SHA-384";
+            digest = Digestor.SHA_384;
             break;
         default:
             throw new IllegalArgumentException();
@@ -71,6 +71,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
         if (!(payload instanceof BarcodePayload barcode)) {
             throw new IllegalArgumentException();
         }
+
         var digestAlgorithm = switch (signatureAlgorithm) {
         case P256 -> Digestor.SHA_256;
         case P384 -> Digestor.SHA_384;

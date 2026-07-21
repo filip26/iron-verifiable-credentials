@@ -65,7 +65,6 @@ public class VerifierTest {
         }
 
         do {
-
             if (!cursor.isAccepted()) {
                 fail();
             }
