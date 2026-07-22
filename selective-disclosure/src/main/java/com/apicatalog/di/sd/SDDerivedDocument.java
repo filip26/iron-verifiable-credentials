@@ -10,7 +10,7 @@ public record SDDerivedDocument(
         byte[] canonicalPayload,
         byte[][] redactablePayload,
         int[] indices,
-        Map<Integer, byte[]> labels) implements SDPayload {
+        Map<Integer, byte[]> labels) implements RedactablePayload {
 
     @Override
     public String c14n() {

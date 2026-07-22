@@ -45,7 +45,6 @@ public final class GraphUpdater implements Document.Updater {
             return adapter.source();
         }
 
-        // TODO Auto-generated method stub
         var document = new LinkedHashMap<String, Object>(adapter.source());
         var terms = adapter.vocab();
 
@@ -56,7 +55,8 @@ public final class GraphUpdater implements Document.Updater {
         }
 
         if (proofs instanceof Collection<?> col) {
-            var clone = new ArrayList<Object>(col);
+            var clone = new ArrayList<Object>(col.size() + newProofs.size());
+            clone.addAll(col);
             clone.addAll(newProofs);
             proofs = clone;
 
@@ -64,7 +64,7 @@ public final class GraphUpdater implements Document.Updater {
             proofs = newProofs.size() == 1 ? newProofs.iterator().next() : newProofs;
 
         } else {
-            var col = new ArrayList<>();
+            var col = new ArrayList<>(newProofs.size() + 1);
             col.add(proofs);
             col.addAll(newProofs);
             proofs = col;
@@ -73,7 +73,6 @@ public final class GraphUpdater implements Document.Updater {
         document.put(terms.proof(), proofs);
 
         return document;
-
     }
 
     static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {

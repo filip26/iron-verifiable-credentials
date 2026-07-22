@@ -26,8 +26,8 @@ public final class ECDSASD2023 implements CryptoSuite {
     public static final String P256 = "P-256";
     public static final String P384 = "P-384";
 
-    private static final SignatureAlgorithm P256_ALGORITHM = new SignatureAlgorithm(P256, "SHA-256");
-    private static final SignatureAlgorithm P384_ALGORITHM = new SignatureAlgorithm(P384, "SHA-384");
+    private static final SignatureAlgorithm P256_ALGORITHMS = new SignatureAlgorithm(P256, Digestor.SHA_256);
+    private static final SignatureAlgorithm P384_ALGORITHMS = new SignatureAlgorithm(P384, Digestor.SHA_384);
 
     private static final ECDSASD2023 INSTANCE = new ECDSASD2023();
 
@@ -52,10 +52,6 @@ public final class ECDSASD2023 implements CryptoSuite {
     }
 
     public static ECDSASD2023 getInstance() {
-        return INSTANCE;
-    }
-
-    public static ECDSASD2023 newInstance(Function<byte[], Multicodec> proofPublicKeyDecoder) {
         return INSTANCE;
     }
 
@@ -151,10 +147,10 @@ public final class ECDSASD2023 implements CryptoSuite {
         }
     }
 
-    static SignatureAlgorithm getAlgorithm(int signatureLength) {
+    private static SignatureAlgorithm getAlgorithm(int signatureLength) {
         return switch (signatureLength) {
-        case 64 -> P256_ALGORITHM;
-        case 96 -> P384_ALGORITHM;
+        case 64 -> P256_ALGORITHMS;
+        case 96 -> P384_ALGORITHMS;
         default -> throw new IllegalArgumentException();
         };
     }

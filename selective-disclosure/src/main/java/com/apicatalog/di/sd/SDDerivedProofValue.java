@@ -212,38 +212,4 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
 
         return ((UnsignedInteger) item).getValue().intValueExact();
     }
-
-//
-//    @Override
-//    public String toString() {
-//        final StringBuilder string = new StringBuilder();
-//        string.append("DerivedProofValue").append('\n')
-//                .append("  baseSignature: ").append(baseSignature != null ? Hex.toHexString(baseSignature) : "n/a").append('\n')
-//                .append("  publicKey: ").append(proofPublicKey != null ? Multibase.BASE_58_BTC.encode(proofPublicKey) : "n/a").append('\n')
-//                .append("  signatures:\n");
-//
-//        if (signatures != null) {
-//            signatures.stream().map(Hex::toHexString).forEach(s -> string
-//                    .append("    ")
-//                    .append(s)
-//                    .append('\n'));
-//        }
-//
-//        string.append("  labels:\n");
-//
-//        if (labels != null) {
-//            labels.entrySet().forEach(e -> string
-//                    .append("    ")
-//                    .append(e.getKey())
-//                    .append(" -> ")
-//                    .append(e.getValue() != null ? Multibase.BASE_64_URL.encode(e.getValue()) : "n/a")
-//                    .append('\n'));
-//        }
-//        return string
-//                .append("  indicies: ")
-//                .append(indices != null ? Arrays.toString(indices) : "n/a")
-//                .append('\n')
-//                .toString();
-//    }
-
 }

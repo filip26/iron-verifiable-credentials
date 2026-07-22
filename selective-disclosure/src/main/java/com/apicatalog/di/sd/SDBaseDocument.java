@@ -7,7 +7,7 @@ import java.util.Map;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.SemanticModel;
 
-public class SDBaseDocument implements SDPayload {
+public class SDBaseDocument implements RedactablePayload {
 
     byte[] base;
 

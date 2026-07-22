@@ -227,6 +227,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
         return toByteArray(baseSignature, proofPublicKey, hmacKey, signatures, mandatoryPointers);
     }
 
+    @Override
     public SDDerivedProofValue derive(Collection<String> selectors) {
 
         var combinedPointers = new LinkedHashSet<String>(mandatoryPointers.size() + selectors.size());
