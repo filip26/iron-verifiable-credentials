@@ -27,6 +27,7 @@ import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAdapter;
 import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
@@ -43,7 +44,8 @@ class Resources {
             .tordf(Resources::toRDF)
             .c14n(Resources::newRDFC)
 //TODO            .hmac()
-            .processor(GraphAdapter::newInstance)
+            .adapter(GraphAdapter::newInstance)
+            .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(SDPayloadGenerator::new)
 
