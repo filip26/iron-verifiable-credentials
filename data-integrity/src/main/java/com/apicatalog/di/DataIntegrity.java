@@ -4,32 +4,38 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.model.LexicalModel;
-import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.model.SemanticModel.C14nFactory;
-import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.processor.GraphProcessor;
-import com.apicatalog.trust.processor.MapProcessor;
-import com.apicatalog.trust.proof.GraphProofCursor;
-import com.apicatalog.trust.proof.GraphProofReader;
-import com.apicatalog.trust.proof.MapProofCursor;
-import com.apicatalog.trust.proof.MapProofReader;
+import com.apicatalog.trust.lexical.LexicalModel;
+import com.apicatalog.trust.lexical.LexicalAdapter;
+import com.apicatalog.trust.lexical.MapProofCursor;
+import com.apicatalog.trust.lexical.MapProofReader;
+import com.apicatalog.trust.model.Model.Vocab;
+import com.apicatalog.trust.semantic.SemanticAdapter;
+import com.apicatalog.trust.semantic.GraphPayloadGenerator;
+import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.GraphProofReader;
+import com.apicatalog.trust.semantic.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
+import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
 public class DataIntegrity {
 
-    public static SemanticModelBuilder newSematicModelBuilder(String c14n) {
+    public static final String VOCAB_PROOF_URI = "https://w3id.org/security#proof";
+    public static final String VOCAB_PROOF_KEY = "proof";
+
+    public static SemanticModelBuilder createSematicModel(String c14n) {
         return new SemanticModelBuilder(c14n);
     }
 
-    public static LexicalModelBuilder newLexicalModelBuilder(String c14n) {
+    public static LexicalModelBuilder createLexicalModel(String c14n) {
         return new LexicalModelBuilder(c14n);
     }
 
@@ -37,10 +43,13 @@ public class DataIntegrity {
 
         private final String c14n;
 
-        private C14nFactory c14nFactory;
+        private Supplier<GraphCanonizer> c14nFactory;
 
-        private GraphProcessor.Factory processorFactory;
+        private String proofPredicate = DataIntegrity.VOCAB_PROOF_URI;
+
+        private SemanticAdapter.Factory processorFactory;
         private GraphProofCursor.Factory cursorFactory;
+        private GraphPayloadGenerator.Factory payloadFactory;
 
         private BiConsumer<Object, QuadConsumer> tordf;
         private BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
@@ -54,7 +63,12 @@ public class DataIntegrity {
             this.readers = new LinkedHashMap<>();
         }
 
-        public SemanticModelBuilder c14n(C14nFactory c14nFactory) {
+        public SemanticModelBuilder proofPredicate(String uri) {
+            this.proofPredicate = uri;
+            return this;
+        }
+
+        public SemanticModelBuilder c14n(Supplier<GraphCanonizer> c14nFactory) {
             this.c14nFactory = c14nFactory;
             return this;
         }
@@ -64,24 +78,29 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder compact(BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact) {
+        public SemanticModelBuilder compact(
+                BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact) {
             this.compact = compact;
             return this;
         }
-
 
         public SemanticModelBuilder tordf(BiConsumer<Object, QuadConsumer> tordf) {
             this.tordf = tordf;
             return this;
         }
 
-        public SemanticModelBuilder processor(GraphProofCursor.Factory factory) {
+        public SemanticModelBuilder cursor(GraphProofCursor.Factory factory) {
             this.cursorFactory = factory;
             return this;
         }
 
-        public SemanticModelBuilder processor(GraphProcessor.Factory factory) {
+        public SemanticModelBuilder processor(SemanticAdapter.Factory factory) {
             this.processorFactory = factory;
+            return this;
+        }
+
+        public SemanticModelBuilder payload(GraphPayloadGenerator.Factory factory) {
+            this.payloadFactory = factory;
             return this;
         }
 
@@ -111,7 +130,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public DataModel build() {
+        public SemanticModel build() {
 
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
@@ -128,9 +147,14 @@ public class DataIntegrity {
             }
 
             return new SemanticModel(
+                    new Vocab(
+                            "@context",
+                            proofPredicate,
+                            null,
+                            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
                     processorFactory,
                     cursorFactory,
-                    c14n,
+                    payloadFactory,
                     expand,
                     compact,
                     tordf,
@@ -145,15 +169,23 @@ public class DataIntegrity {
 
         private Function<Map<String, Object>, byte[]> canonize;
 
-        private MapProcessor.Factory processorFactory;
+        private LexicalAdapter.Factory processorFactory;
         private MapProofCursor.Factory cursorFactory;
 
         private Map<String, CryptoSuite> cryptosuites;
         private Map<String, MapProofReader> readers;
 
+        private String proofProperty = DataIntegrity.VOCAB_PROOF_KEY;
+
         private LexicalModelBuilder(String c14n) {
             this.c14n = c14n;
             this.readers = new LinkedHashMap<>();
+        }
+
+        public LexicalModelBuilder proofProperty(String name) {
+            Objects.requireNonNull(name);
+            proofProperty = name;
+            return this;
         }
 
         public LexicalModelBuilder c14n(Function<Map<String, Object>, byte[]> canonize) {
@@ -161,12 +193,12 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder processor(MapProofCursor.Factory factory) {
+        public LexicalModelBuilder cursor(MapProofCursor.Factory factory) {
             this.cursorFactory = factory;
             return this;
         }
-        
-        public LexicalModelBuilder processor(MapProcessor.Factory factory) {
+
+        public LexicalModelBuilder processor(LexicalAdapter.Factory factory) {
             this.processorFactory = factory;
             return this;
         }
@@ -186,7 +218,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public DataModel build() {
+        public LexicalModel build() {
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_NAME,
@@ -201,7 +233,12 @@ public class DataIntegrity {
                 throw new IllegalStateException();
             }
 
-            return new LexicalModel(processorFactory, cursorFactory, c14n, canonize, readers);
+            return new LexicalModel(
+                    new Vocab("@context", proofProperty, "id", "type"),
+                    processorFactory,
+                    cursorFactory,
+                    canonize,
+                    readers);
         }
     }
 

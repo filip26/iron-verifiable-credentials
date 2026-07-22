@@ -24,26 +24,29 @@ import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.proof.GraphProofCursor;
+import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
+import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 import com.fasterxml.jackson.core.JsonFactory;
 
 import jakarta.json.Json;
 
 class Resources {
 
-    static DataModel MODEL = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
             .proof(ECDSASD2023.getInstance())
             .expand(Resources::expand)
             .compact(Resources::compact)
             .tordf(Resources::toRDF)
             .c14n(Resources::newRDFC)
 //TODO            .hmac()
-            .processor(SDGraphProcessor::new)
-            .processor(GraphProofCursor::new)
+            .processor(GraphAdapter::newInstance)
+            .cursor(GraphProofCursor::newInstance)
+            .payload(SDPayloadGenerator::new)
+
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;
@@ -55,8 +58,8 @@ class Resources {
             SHA_256 = MessageDigest.getInstance("SHA-256");
 
             DIGEST_FACTORY = (Map.<String, Digestor>of(
-                    "SHA-256", SHA_256::digest,
-                    "SHA-384", MessageDigest.getInstance("SHA-384")::digest))::get;
+                    Digestor.SHA_256, SHA_256::digest,
+                    Digestor.SHA_384, MessageDigest.getInstance("SHA-384")::digest))::get;
 
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);

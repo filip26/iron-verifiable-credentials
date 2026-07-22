@@ -7,15 +7,15 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.sd.SDBaseDocument;
 import com.apicatalog.di.sd.SDBaseProofValue;
 import com.apicatalog.di.sd.SDDerivedProofValue;
-import com.apicatalog.di.sd.SDGraphProcessor;
-import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
+import com.apicatalog.di.sd.SDPayloadGenerator;
+import com.apicatalog.di.sd.SDProofValue.SignatureAlgorithm;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -26,8 +26,8 @@ public final class ECDSASD2023 implements CryptoSuite {
     public static final String P256 = "P-256";
     public static final String P384 = "P-384";
 
-    private static final SignatureAlgorithm P256_ALGORITHM = new SignatureAlgorithm(P256, "SHA-256");
-    private static final SignatureAlgorithm P384_ALGORITHM = new SignatureAlgorithm(P384, "SHA-384");
+    private static final SignatureAlgorithm P256_ALGORITHMS = new SignatureAlgorithm(P256, Digestor.SHA_256);
+    private static final SignatureAlgorithm P384_ALGORITHMS = new SignatureAlgorithm(P384, Digestor.SHA_384);
 
     private static final ECDSASD2023 INSTANCE = new ECDSASD2023();
 
@@ -55,18 +55,14 @@ public final class ECDSASD2023 implements CryptoSuite {
         return INSTANCE;
     }
 
-    public static ECDSASD2023 newInstance(Function<byte[], Multicodec> proofPublicKeyDecoder) {
-        return INSTANCE;
-    }
-
     public ProofDraft createProofDraft() throws SignatureException {
         return new ProofDraft(this);
     }
 
     @Override
-    public Signature decode(String value, Proof proof, PayloadProcessor processor) {
+    public Signature decode(String value, Proof proof, PayloadGenerator payload) {
 
-        if (processor instanceof SDGraphProcessor graphProcessor) {
+        if (payload instanceof SDPayloadGenerator sdPayload) {
 
             var signature = Multibase.BASE_64_URL.decode(value);
 
@@ -76,7 +72,7 @@ public final class ECDSASD2023 implements CryptoSuite {
                         ECDSASD2023::getAlgorithm,
                         proofPublicKeyDecoder,
                         (DataIntegrityProof) proof,
-                        graphProcessor);
+                        sdPayload);
             }
 
             if (SDDerivedProofValue.isAccepted(signature)) {
@@ -85,13 +81,13 @@ public final class ECDSASD2023 implements CryptoSuite {
                         ECDSASD2023::getAlgorithm,
                         proofPublicKeyDecoder,
                         (DataIntegrityProof) proof,
-                        graphProcessor);
+                        sdPayload);
             }
 
             throw new IllegalArgumentException();
 
         }
-        throw new IllegalStateException("Unsupported payload processor, " + processor);
+        throw new IllegalStateException("Unsupported payload genetaror: " + payload);
     }
 
     @Override
@@ -106,7 +102,7 @@ public final class ECDSASD2023 implements CryptoSuite {
 
     @Override
     public String c14n() {
-        return DataModel.C14N_RDFC;
+        return Model.C14N_RDFC;
     }
 
     public static class ProofDraft extends DataIntegrityProof.Draft {
@@ -132,7 +128,7 @@ public final class ECDSASD2023 implements CryptoSuite {
             default -> throw new IllegalArgumentException();
             };
 
-            canonize(DataModel.C14N_RDFC);
+            canonize(Model.C14N_RDFC);
 
             var unsignedProof = unsigned();
 
@@ -151,10 +147,10 @@ public final class ECDSASD2023 implements CryptoSuite {
         }
     }
 
-    static SignatureAlgorithm getAlgorithm(int signatureLength) {
+    private static SignatureAlgorithm getAlgorithm(int signatureLength) {
         return switch (signatureLength) {
-        case 64 -> P256_ALGORITHM;
-        case 96 -> P384_ALGORITHM;
+        case 64 -> P256_ALGORITHMS;
+        case 96 -> P384_ALGORITHMS;
         default -> throw new IllegalArgumentException();
         };
     }

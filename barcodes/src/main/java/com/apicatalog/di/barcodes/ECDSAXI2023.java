@@ -5,14 +5,14 @@ import java.security.SignatureException;
 import java.util.Collection;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.std.StandardCryptoSuite;
+import com.apicatalog.di.suite.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.model.DataModel;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -23,7 +23,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
 
     private static final ECDSAXI2023 ECDSA_XI_2023 = new ECDSAXI2023(
             "ecdsa-xi-2023",
-            DataModel.C14N_RDFC);
+            Model.C14N_RDFC);
 
     private ECDSAXI2023(String id, String c14n) {
         super(id, c14n, Multibase.BASE_58_BTC, ECDSAXI2023::generate);
@@ -34,7 +34,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
     }
 
     @Override
-    public ProofValue decode(byte[] signature, Proof proof, PayloadProcessor payload) {
+    public ProofValue decode(byte[] signature, Proof proof, PayloadGenerator payload) {
 
         String algorithm = null;
         String digest = null;
@@ -42,11 +42,11 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
         switch (signature.length) {
         case 64:
             algorithm = P256;
-            digest = "SHA-256";
+            digest = Digestor.SHA_256;
             break;
         case 96:
             algorithm = P384;
-            digest = "SHA-384";
+            digest = Digestor.SHA_384;
             break;
         default:
             throw new IllegalArgumentException();
@@ -71,6 +71,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
         if (!(payload instanceof BarcodePayload barcode)) {
             throw new IllegalArgumentException();
         }
+
         var digestAlgorithm = switch (signatureAlgorithm) {
         case P256 -> Digestor.SHA_256;
         case P384 -> Digestor.SHA_384;
@@ -116,7 +117,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
                 String digestAlgorithm,
                 byte[] value,
                 DataIntegrityProof proof,
-                PayloadProcessor payload) {
+                PayloadGenerator payload) {
             return new ProofValue(
                     algorithm,
                     digestAlgorithm,
@@ -237,7 +238,7 @@ public final class ECDSAXI2023 extends StandardCryptoSuite {
 
         @Override
         public String c14n() {
-            return DataModel.C14N_RDFC;
+            return Model.C14N_RDFC;
         }
 
         @Override

@@ -5,9 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -21,21 +18,18 @@ import com.apicatalog.crypto.bc.BCMLDSASigner;
 import com.apicatalog.crypto.bc.BCSLHDSASigner;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
 import com.apicatalog.di.suite.SLHDSA2024;
+import com.apicatalog.di.suite.StandardCryptoSuite;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.Document;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.proof.Proof;
 
 public class IssuerTest {
@@ -47,9 +41,7 @@ public class IssuerTest {
             KeyCodec.P384_PRIVATE,
             KeyCodec.ED25519_PRIVATE,
             KeyCodec.MLDSA_44_PRIVATE,
-            KeyCodec.SLHDSA_SHA2_128S_PRIVATE,
-            // TODO remove when multicodec is updated
-            Multicodec.of("falcon-512-pub", Tag.Key, 4652));
+            KeyCodec.SLHDSA_SHA2_128S_PRIVATE);
 
     @ParameterizedTest
     @MethodSource({ "resources" })
@@ -62,30 +54,30 @@ public class IssuerTest {
         var privateKey = MULTIBASE.decode(keys.get("secretKeyMultibase"));
         var privateKeyCodec = MULTICODEC.getCodec(privateKey).orElseThrow();
 
-        final String keyAlgorithm;
+        final String signatureAlgorithm;
         final AsymmetricSigner signer;
 
         switch (privateKeyCodec.code()) {
         case KeyCodec.ED25519_PRIVATE_CODE:
-            keyAlgorithm = EdDSA2022.ALGORITHM;
+            signatureAlgorithm = EdDSA2022.ALGORITHM;
             signer = BCEd25519Signer.newInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
         // Use a secure random number generator to create non-deterministic signatures
         // for the algorithms below in production environments.
         case KeyCodec.P256_PRIVATE_CODE:
-            keyAlgorithm = ECDSA2019.P256;
+            signatureAlgorithm = ECDSA2019.P256;
             signer = BCECDSASigner.newP256Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case KeyCodec.P384_PRIVATE_CODE:
-            keyAlgorithm = ECDSA2019.P384;
+            signatureAlgorithm = ECDSA2019.P384;
             signer = BCECDSASigner.newP384Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case KeyCodec.MLDSA_44_PRIVATE_CODE:
-            keyAlgorithm = MLDSA2024.ALGORITHM_44;
+            signatureAlgorithm = MLDSA2024.ALGORITHM_44;
             signer = BCMLDSASigner.new44Instance(privateKeyCodec.decode(privateKey))::sign;
             break;
         case KeyCodec.SLHDSA_SHA2_128S_PRIVATE_CODE:
-            keyAlgorithm = SLHDSA2024.ALGORITHM_SHA2_128s;
+            signatureAlgorithm = SLHDSA2024.ALGORITHM_SHA2_128s;
             signer = BCSLHDSASigner.new128sInstance(privateKeyCodec.decode(privateKey))::sign;
             break;
 
@@ -98,10 +90,7 @@ public class IssuerTest {
         }
 
         Proof proof = null;
-
-        var proofs = document.get("proof");
-
-        var composer = new NativeComposer<Map<String, ? extends Object>>();
+        Map<String, ?> issued = null;
 
         if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
 
@@ -110,77 +99,57 @@ public class IssuerTest {
             var proofDraft = cryptosuite.createProofDraft();
             proofDraft.options(options);
 
-            var processor = getProcessor(proofDraft.c14n()).apply(document);
+            var updater = getUpdater(cryptosuite.c14n()).apply(document);
 
-            processor.withProofs(proofDraft.previous());
+            var payload = updater.createPayload();
+
+            payload.withProofs(proofDraft.previous());
 
             proof = proofDraft.sign(
-                    keyAlgorithm,
+                    signatureAlgorithm,
                     signer,
                     Resources.DIGEST_FACTORY,
-                    processor.digestible());
+                    payload.digestible());
 
-            DataIntegrityProof.write((DataIntegrityProof) proof, composer);
-
-            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-                document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
-            }
+            updater.addProof(proofDraft.context(), DataIntegrityProof.compact((DataIntegrityProof) proof));
+            issued = updater.compacted();
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 
-            assertEquals(Ed25519Signature2020.SIGNATURE_ALGORITHM, keyAlgorithm);
+            assertEquals(Ed25519Signature2020.SIGNATURE_ALGORITHM, signatureAlgorithm);
 
-            var proofDraft = Ed25519Signature2020.newDraft((Map) options);
+            var proofDraft = Ed25519Signature2020.newInstance((Map<String, Object>) options);
 
-            var processor = Resources.SEMANTIC_MODEL_1.createProcessor(document);
+            var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
+
+            var payload = updater.createPayload();
 
             proof = Ed25519Signature2020.generateProof(
                     signer,
                     Resources.DIGEST_FACTORY,
                     proofDraft,
-                    processor.digestible());
+                    payload.digestible());
 
-            Ed25519Signature2020.write((Ed25519Signature2020) proof, composer);
-
-            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-                document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
-            }
+            updater.addProof(proofDraft.context(), Ed25519Signature2020.compact((Ed25519Signature2020) proof));
+            issued = updater.compacted();
 
         } else {
             fail("An unsupported proof type " + options.get("type"));
         }
 
+        // verify the newly issued proof just for testing
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 
-        var proofMap = composer.compose();
-
-        if (proofs instanceof Collection col) {
-            var clone = new ArrayList<>(col);
-            col.add(proofMap);
-            proofs = col;
-
-        } else if (proofs == null) {
-            proofs = proofMap;
-
-        } else {
-            var col = new ArrayList<>();
-            col.add(proofs);
-            col.add(proofMap);
-            proofs = col;
-        }
-
-        document.put("proof", proofs);
-
         var expected = Resources.getMap(resource + ".signed.json");
 
-        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
+        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(issued)));
     }
 
-    static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
+    static Function<Map<String, Object>, Document.Updater> getUpdater(String c14n) {
         return switch (c14n) {
-        case DataModel.C14N_RDFC -> Resources.SEMANTIC_MODEL_1::createProcessor;
-        case DataModel.C14N_JCS -> Resources.LEXICAL_MODEL_1::createProcessor;
+        case Model.C14N_RDFC -> Resources.SEMANTIC_MODEL::createUpdater;
+        case Model.C14N_JCS -> Resources.LEXICAL_MODEL::createUpdater;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.
@@ -212,14 +181,5 @@ public class IssuerTest {
                 .filter(name -> name.endsWith("unsigned.json"))
                 .map(name -> name.substring(0, name.indexOf('.')))
                 .sorted();
-    }
-
-    static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
-
-        var result = new LinkedHashSet<>(documentContext);
-
-        result.addAll(proofContext);
-
-        return result;
     }
 }

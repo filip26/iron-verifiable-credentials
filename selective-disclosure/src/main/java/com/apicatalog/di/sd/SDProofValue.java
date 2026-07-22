@@ -14,7 +14,7 @@ import co.nstant.in.cbor.model.DataItem;
 import co.nstant.in.cbor.model.MajorType;
 import co.nstant.in.cbor.model.UnicodeString;
 
-public abstract class SDProofValue<T extends SDPayload> implements Signature {
+public abstract class SDProofValue<T extends RedactablePayload> implements Signature {
 
     protected String signatureAlgorithm;
     protected String digestAlgorithm;
@@ -135,5 +135,8 @@ public abstract class SDProofValue<T extends SDPayload> implements Signature {
         System.arraycopy(proofPublicKey, 0, hash, proofHash.length, proofPublicKey.length);
         System.arraycopy(mandatoryHash, 0, hash, proofHash.length + proofPublicKey.length, mandatoryHash.length);
         return hash;
+    }
+
+    public static record SignatureAlgorithm(String signature, String digest) {
     }
 }

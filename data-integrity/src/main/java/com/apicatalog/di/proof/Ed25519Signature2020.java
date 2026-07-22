@@ -17,11 +17,12 @@ import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
-import com.apicatalog.trust.model.SemanticModel;
+import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.PayloadProcessor;
-import com.apicatalog.trust.proof.GraphProofReader;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.semantic.GraphProofReader;
+import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
 
 public final class Ed25519Signature2020 implements Proof {
@@ -39,6 +40,8 @@ public final class Ed25519Signature2020 implements Proof {
     private static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
     private static final String PREDICATE_PROOF_VALUE = "https://w3id.org/security#proofValue";
 
+    private Collection<String> context;
+
     private Instant created;
     private String purpose;
     private String verificationMethod;
@@ -50,6 +53,12 @@ public final class Ed25519Signature2020 implements Proof {
     private Ed25519Signature2020() {
     }
 
+    public static Map<String, ?> compact(Ed25519Signature2020 proof) {
+        var composer = new NativeComposer<Map<String, ? extends Object>>();
+        write(proof, composer);
+        return composer.compose();
+    }
+    
     public static void write(Ed25519Signature2020 proof, TreeEmitter emitter) {
         var writer = Tree.newPropertyTree(emitter)
                 .beginMap()
@@ -89,11 +98,11 @@ public final class Ed25519Signature2020 implements Proof {
         return proofDraft.get();
     }
 
-    public static Draft newDraft() {
+    public static Draft newInstance() {
         return new Draft(new Ed25519Signature2020(), List.of());
     }
 
-    public static Draft newDraft(Map<String, Object> map) {
+    public static Draft newInstance(Map<String, Object> map) {
 
         var proof = new Ed25519Signature2020();
         Collection<String> context = List.of();
@@ -129,11 +138,10 @@ public final class Ed25519Signature2020 implements Proof {
     public static final class Draft {
 
         private final Ed25519Signature2020 proof;
-        private Collection<String> context;
 
         private Draft(Ed25519Signature2020 proof, Collection<String> context) {
             this.proof = proof;
-            this.context = context;
+            this.proof.context = context;
         }
 
         public byte[] canonize() {
@@ -173,12 +181,12 @@ public final class Ed25519Signature2020 implements Proof {
         }
 
         public Draft context(Collection<String> context) {
-            this.context = context;
+            proof.context = context;
             return this;
         }
 
         public Collection<String> context() {
-            return context;
+            return proof.context;
         }
     }
 
@@ -214,6 +222,10 @@ public final class Ed25519Signature2020 implements Proof {
     @Override
     public String purpose() {
         return purpose;
+    }
+
+    public Collection<String> context() {
+        return context;
     }
 
     private final static byte[][] RDFC_TEMPLATE = Stream.of(
@@ -278,7 +290,7 @@ public final class Ed25519Signature2020 implements Proof {
         public Proof read(
                 Collection<String[]> proof,
                 SemanticModel model,
-                PayloadProcessor payload) {
+                PayloadGenerator payload) {
 
             final var di = new Ed25519Signature2020();
 

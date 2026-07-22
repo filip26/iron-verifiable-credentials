@@ -6,11 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,10 +24,6 @@ import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.processor.PayloadProcessor;
-import com.apicatalog.trust.proof.Proof;
 
 public class IssuerTest {
 
@@ -72,22 +66,20 @@ public class IssuerTest {
                             .formatted(privateKeyCodec.name(), privateKeyCodec.code()));
         }
 
-        Proof proof = null;
-
-        var proofs = document.get("proof");
-
-        var composer = new NativeComposer<Map<String, ? extends Object>>();
+        DataIntegrityProof proof = null;
 
         var cryptosuite = ECDSAXI2023.getInstance();
 
         var proofDraft = cryptosuite.createProofDraft();
         proofDraft.options(options);
 
-        var processor = getProcessor(proofDraft.c14n()).apply(document);
+        var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
 
-        processor.withProofs(proofDraft.previous());
+        var payloadProvider = updater.createPayload();
 
-        var payload = processor.digestible(BarcodePayload::new);
+        payloadProvider.withProofs(proofDraft.previous());
+
+        var payload = payloadProvider.digestible(BarcodePayload::new);
 
         payload.opticalData(((Collection<?>) options.get("opticalDataBytes"))
                 .stream().map(BigInteger.class::cast).map(BigInteger::byteValue)
@@ -101,47 +93,17 @@ public class IssuerTest {
                 Resources.DIGEST_FACTORY,
                 payload);
 
-        DataIntegrityProof.write((DataIntegrityProof) proof, composer);
+        updater.addProof(
+                proof.context(),
+                DataIntegrityProof.compact(proof));
 
-        if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-            document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
-        }
+        var issued = updater.compacted();
 
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 
-        var proofMap = composer.compose();
-
-        if (proofs instanceof Collection col) {
-            var clone = new ArrayList<>(col);
-            col.add(proofMap);
-            proofs = col;
-
-        } else if (proofs == null) {
-            proofs = proofMap;
-
-        } else {
-            var col = new ArrayList<>();
-            col.add(proofs);
-            col.add(proofMap);
-            proofs = col;
-        }
-
-        document.put("proof", proofs);
-
         var expected = Resources.getMap(resource + ".signed.json");
-
-        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
-    }
-
-    static Function<Map<String, Object>, PayloadProcessor> getProcessor(String c14n) {
-        return switch (c14n) {
-        case DataModel.C14N_RDFC -> Resources.SEMANTIC_MODEL_1::createProcessor;
-        default -> throw new IllegalStateException(
-                """
-                Unsupported c14n = %s.
-                """.formatted(c14n));
-        };
+        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(issued)));
     }
 
     static final Stream<String> resources() throws IOException {

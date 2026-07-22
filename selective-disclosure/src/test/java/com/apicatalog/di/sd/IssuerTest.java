@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -25,7 +24,6 @@ import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
-import com.apicatalog.tree.io.java.NativeComposer;
 
 public class IssuerTest {
 
@@ -35,7 +33,7 @@ public class IssuerTest {
 
         Map<String, Object> keysMap = Resources.getMap(resource + ".keys.json");
         Map<String, Object> options = Resources.getMap(resource + ".options.json");
-        Map<String, Object> document = Resources.getMap(resource + ".unsigned.json");
+        Map<String, Object> sourceDocument = Resources.getMap(resource + ".unsigned.json");
 
         var keys = Keys.from(keysMap);
 
@@ -48,23 +46,23 @@ public class IssuerTest {
         // for the algorithms below in production environments.
         case KeyCodec.P256_PRIVATE_CODE:
             keyAlgorithm = ECDSA2019.P256;
-            baseSigner = BCECDSASigner.newP256Instance(keys.baseSecretKey())::sign;
-            proofSigner = BCECDSASigner.newP256Instance(keys.proofSecretKey())::sign;
+            baseSigner = BCECDSASigner.newP256Instance(keys.basePrivateKey())::sign;
+            proofSigner = BCECDSASigner.newP256Instance(keys.proofPrivateKey())::sign;
             break;
         case KeyCodec.P384_PRIVATE_CODE:
             keyAlgorithm = ECDSA2019.P384;
-            baseSigner = BCECDSASigner.newP384Instance(keys.baseSecretKey())::sign;
-            proofSigner = BCECDSASigner.newP384Instance(keys.proofSecretKey())::sign;
+            baseSigner = BCECDSASigner.newP384Instance(keys.basePrivateKey())::sign;
+            proofSigner = BCECDSASigner.newP384Instance(keys.proofPrivateKey())::sign;
             break;
         case KeyCodec.MLDSA_44_PRIVATE_CODE:
             keyAlgorithm = MLDSA2024.ALGORITHM_44;
-            baseSigner = BCMLDSASigner.new44Instance(keys.baseSecretKey())::sign;
-            proofSigner = BCMLDSASigner.new44Instance(keys.proofSecretKey())::sign;
+            baseSigner = BCMLDSASigner.new44Instance(keys.basePrivateKey())::sign;
+            proofSigner = BCMLDSASigner.new44Instance(keys.proofPrivateKey())::sign;
             break;
         case KeyCodec.SLHDSA_SHA2_128S_PRIVATE_CODE:
             keyAlgorithm = SLHDSA2024.ALGORITHM_SHA2_128s;
-            baseSigner = BCSLHDSASigner.new128sInstance(keys.baseSecretKey())::sign;
-            proofSigner = BCSLHDSASigner.new128sInstance(keys.proofSecretKey())::sign;
+            baseSigner = BCSLHDSASigner.new128sInstance(keys.basePrivateKey())::sign;
+            proofSigner = BCSLHDSASigner.new128sInstance(keys.proofPrivateKey())::sign;
             break;
         default:
             throw new IllegalArgumentException(
@@ -74,76 +72,45 @@ public class IssuerTest {
                             .formatted(keys.codec().name(), keys.codec().code()));
         }
 
-        DataIntegrityProof proof = null;
-        var proofs = document.get("proof");
+        assertEquals(DataIntegrityProof.TYPE_NAME, options.get("type"), "An unsupported proof type.");
 
-        var composer = new NativeComposer<Map<String, ? extends Object>>();
+        var cryptosuite = ECDSASD2023.getInstance();
 
-        if (DataIntegrityProof.TYPE_NAME.equals(options.get("type"))) {
-
-            var cryptosuite = getCryptoSuite((String) options.get("cryptosuite"));
-
-            var proofDraft = cryptosuite.createProofDraft();
-            proofDraft.options(options);
-
-            var processor = Resources.MODEL.createProcessor(document);
-
-            processor.withProofs(proofDraft.previous());
-
-            proof = proofDraft.sign(
-                    keyAlgorithm,
-                    baseSigner,
-                    keys.proofPublicKey(),
-                    proofSigner,
-                    Resources.DIGEST_FACTORY,
-                    ((SDGraphProcessor) processor).redactable(
-                            (Collection<String>) options.get("mandatoryPointers"),
-                            keys.hmacKey()));
-
-            DataIntegrityProof.write(proof, composer);
-
-            if (proofDraft.context() != null && !proofDraft.context().isEmpty()) {
-                document.put("@context", merge((Collection) document.get("@context"), proofDraft.context()));
-            }
-
-        } else {
-            fail("An unsupported proof type " + options.get("type"));
+        if (!cryptosuite.id().equals(options.get("cryptosuite"))) {
+            fail();
         }
 
+        var proofDraft = cryptosuite.createProofDraft();
+        proofDraft.options(options);
+
+        var updater = Resources.SEMANTIC_MODEL.createUpdater(sourceDocument);
+
+        var payload = updater.createPayload();
+
+        @SuppressWarnings("unchecked")
+        var mandatoryPointers = (Collection<String>) options.get("mandatoryPointers");
+
+        var proof = proofDraft.sign(
+                keyAlgorithm,
+                baseSigner,
+                keys.proofPublicKey(),
+                proofSigner,
+                Resources.DIGEST_FACTORY,
+                ((SDPayloadGenerator) payload).redactable(
+                        mandatoryPointers,
+                        keys.hmacKey()));
+
+        // verify the newly issued proof just for testing
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 
-        var proofMap = composer.compose();
+        updater.addProof(proof.context(), DataIntegrityProof.compact(proof));
 
-        if (proofs instanceof Collection col) {
-            var clone = new ArrayList<>(col);
-            col.add(proofMap);
-            proofs = col;
-
-        } else if (proofs == null) {
-            proofs = proofMap;
-
-        } else {
-            var col = new ArrayList<>();
-            col.add(proofs);
-            col.add(proofMap);
-            proofs = col;
-        }
-
-        document.put("proof", proofs);
+        var issuedDocument = updater.compacted();
 
         var expected = Resources.getMap(resource + ".signed.json");
 
-        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(document)));
-    }
-
-    public static ECDSASD2023 getCryptoSuite(String id) {
-
-        return switch (id) {
-        case "ecdsa-sd-2023" -> ECDSASD2023.getInstance();
-
-        default -> throw new IllegalArgumentException();
-        };
+        assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(issuedDocument)));
     }
 
     static final Stream<String> resources() throws IOException {
@@ -154,11 +121,9 @@ public class IssuerTest {
     }
 
     static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
-
-        var result = new LinkedHashSet<>(documentContext);
-
+        var result = LinkedHashSet.<String>newLinkedHashSet(documentContext.size() + proofContext.size());
+        result.addAll(documentContext);
         result.addAll(proofContext);
-
         return result;
     }
 
@@ -231,20 +196,5 @@ public class IssuerTest {
 //
 //        assertNotNull(signed);
 //    }
-//    JsonObject fetchResource(String name) throws IOException {
-//        try (InputStream is = getClass().getResourceAsStream(name)) {
-//            return Json.createReader(is).readObject();
-//        }
-//    }
-//
-//    public static String write(JsonValue doc) {
-//        StringWriter sw = new StringWriter();
-//        final JsonWriterFactory writerFactory = Json.createWriterFactory(
-//                Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
-//
-//        try (JsonWriter writer = writerFactory.createWriter(sw)) {
-//            writer.write(doc);
-//        }
-//        return sw.toString();
-//    }
+
 }

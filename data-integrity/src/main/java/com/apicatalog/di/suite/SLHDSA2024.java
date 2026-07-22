@@ -1,11 +1,9 @@
 package com.apicatalog.di.suite;
 
 import com.apicatalog.di.signature.ProofValue;
-import com.apicatalog.di.signature.ProofValueGenerator;
-import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -18,22 +16,22 @@ public final class SLHDSA2024 extends StandardCryptoSuite {
 
     private static SLHDSA2024 SLHDSA_128s_RDFC_2024 = new SLHDSA2024(
             "slhdsa128-rdfc-2024",
-            DataModel.C14N_RDFC);
+            Model.C14N_RDFC);
 
     private static SLHDSA2024 SLHDSA_128s_JCS_2024 = new SLHDSA2024(
             "slhdsa128-jcs-2024",
-            DataModel.C14N_JCS);
+            Model.C14N_JCS);
 
     private SLHDSA2024(
             String id,
             String c14n) {
-        super(id, c14n, Multibase.BASE_64_URL, ProofValueGenerator::generateWithSHA256);
+        super(id, c14n, Multibase.BASE_64_URL, ProofValue::generateSignatureWithSHA256);
     }
 
     public static CryptoSuite get128sInstance(String c14n) {
         return switch (c14n) {
-        case DataModel.C14N_RDFC -> SLHDSA_128s_RDFC_2024;
-        case DataModel.C14N_JCS -> SLHDSA_128s_JCS_2024;
+        case Model.C14N_RDFC -> SLHDSA_128s_RDFC_2024;
+        case Model.C14N_JCS -> SLHDSA_128s_JCS_2024;
         default -> throw new IllegalArgumentException();
         };
     }
@@ -46,11 +44,11 @@ public final class SLHDSA2024 extends StandardCryptoSuite {
         return SLHDSA_128s_JCS_2024;
     }
 
-    protected Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
+    protected Signature decode(byte[] signature, Proof proof, PayloadGenerator payload) {
         return decode128s(signature, proof, payload);
     }
 
-    private static Signature decode128s(byte[] signature, Proof proof, PayloadProcessor payload) {
+    private static Signature decode128s(byte[] signature, Proof proof, PayloadGenerator payload) {
         if (signature.length != SIGNATURE_LENGTH) {
             throw new IllegalArgumentException(
                     """

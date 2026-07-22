@@ -11,8 +11,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.apicatalog.di.std.StandardGraphProcessor;
-import com.apicatalog.di.std.StandardMapProcessor;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
@@ -29,27 +27,33 @@ import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.proof.GraphProofCursor;
-import com.apicatalog.trust.proof.MapProofCursor;
+import com.apicatalog.trust.lexical.LexicalModel;
+import com.apicatalog.trust.lexical.MapAdapter;
+import com.apicatalog.trust.lexical.MapProofCursor;
+import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.GraphPayloadGenerator;
+import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
+import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static DataModel LEXICAL_MODEL_1 = DataIntegrity.newLexicalModelBuilder(DataModel.C14N_JCS)
+    static LexicalModel LEXICAL_MODEL = DataIntegrity.createLexicalModel(Model.C14N_JCS)
+            .proofProperty(DataIntegrity.VOCAB_PROOF_KEY)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
-            .processor(StandardMapProcessor::new)
-            .processor(MapProofCursor::new)
+            .processor(MapAdapter::newInstance)
+            .cursor(MapProofCursor::newInstance)
             .build();
 
-    static DataModel SEMANTIC_MODEL_1 = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
+            .proofPredicate(DataIntegrity.VOCAB_PROOF_URI)
             .proof(EdDSA2022.withRDFC())
             .proof(ECDSA2019.withRDFC())
             .proof(MLDSA2024.get44withRDFC())
@@ -57,9 +61,10 @@ class Resources {
             .Ed25519Signature2020()
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
-            .c14n(Resources::newRDFC)
-            .processor(StandardGraphProcessor::new)
-            .processor(GraphProofCursor::new)
+            .c14n(Resources::createRDFC)
+            .processor(GraphAdapter::newInstance)
+            .cursor(GraphProofCursor::newInstance)
+            .payload(GraphPayloadGenerator::new)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;
@@ -71,8 +76,8 @@ class Resources {
             SHA_256 = MessageDigest.getInstance("SHA-256");
 
             DIGEST_FACTORY = (Map.<String, Digestor>of(
-                    "SHA-256", SHA_256::digest,
-                    "SHA-384", MessageDigest.getInstance("SHA-384")::digest))::get;
+                    Digestor.SHA_256, SHA_256::digest,
+                    Digestor.SHA_384, MessageDigest.getInstance("SHA-384")::digest))::get;
 
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
@@ -143,7 +148,7 @@ class Resources {
         }
     }
 
-    static final RdfcPrcessor newRDFC() {
+    static final RdfcPrcessor createRDFC() {
         return new RdfcPrcessor(); // TODO reuse one instance across
     }
 

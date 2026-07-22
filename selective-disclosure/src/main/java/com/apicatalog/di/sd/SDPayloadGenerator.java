@@ -9,71 +9,32 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.payload.DigestiblePayload;
-import com.apicatalog.trust.processor.GraphProcessor;
+import com.apicatalog.trust.semantic.SemanticAdapter;
+import com.apicatalog.trust.semantic.GraphPayloadGenerator;
+import com.apicatalog.trust.semantic.SemanticModel;
 
-public class SDGraphProcessor implements GraphProcessor {
+public class SDPayloadGenerator extends GraphPayloadGenerator {
 
-    private final SemanticModel model;
-    private final Collection<String> context;
-    private final Map<String, Object> document;
+//    private final SemanticModel model;
+//    private final SDGraphProcessor processor;
+//
+//    private Collection<String> includedProofs;
 
-    private Map<String, Object> expandedDocument;
-    private Dataset dataset;
-
-    public SDGraphProcessor(
+    public SDPayloadGenerator(
             SemanticModel model,
-            Collection<String> context,
-            Map<String, Object> document) {
-        this.model = model;
-        this.context = context;
-        this.document = document;
-
-        this.expandedDocument = null;
-        this.dataset = null;
-    }
-
-    @Override
-    public Collection<String> contexts() {
-        return context;
-    }
-
-    @Override
-    public Collection<String[]> proof(String graph) {
-        lazyInit();
-        return dataset.graphs.get(graph);
-    }
-
-    @Override
-    public String proofType(String graph) {
-        lazyInit();
-        return dataset.proofTypes.get(graph);
-    }
-
-    @Override
-    public Collection<String> proofs() {
-        lazyInit();
-        return dataset.proofGraphs;
-    }
-
-    @Override
-    public void reset() {
-        // TODO Auto-generated method stub
-
+            SemanticAdapter processor) {
+        super(model, processor);
+//        this.model = model;
+//        this.processor = processor;
     }
 
     public SDBaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
 
-        lazyInit();
+        var skolemized = Skolemizer.skolemize(processor.expandedData());
 
-        var skolemized = Skolemizer.skolemize(expandedDocument);
-
-        var compacted = model.compact().apply(context, skolemized);
+        var compacted = model.compact().apply(processor.context(), skolemized);
 
         var canonizer = model.newCanonizer();
 
@@ -179,21 +140,18 @@ public class SDGraphProcessor implements GraphProcessor {
         base.compacted = compacted;
         base.canonized = canonized;
         base.model = model;
-        base.context = context;
+        base.context = processor.context();
 
         return base;
     }
 
     public SDDerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
-        lazyInit();
-
-        var expanded = expandedDocument;
 
         var canonizer = model.newCanonizer();
 
         var consumer = canonizer.consumer();
 
-        model.tordf().accept(expanded, consumer);
+        model.tordf().accept(processor.expandedData(), consumer);
 
         var canonized = new ArrayList<String[]>();
 
@@ -263,87 +221,6 @@ public class SDGraphProcessor implements GraphProcessor {
     }
 
     private Map<String, Object> compacted() {
-        return model.compact().apply(context, expandedDocument);
+        return model.compact().apply(processor.context(), processor.expandedData());
     }
-
-    @Override
-    public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Yet, not supported.");
-    }
-
-    @Override
-    public void withProofs(Collection<String> ids) {
-        // TODO Auto-generated method stub
-        return;
-    }
-
-    private void lazyInit() {
-
-        if (expandedDocument != null || dataset != null) {
-            return;
-        }
-
-        var expanded = model.expand().apply(document);
-
-        if (expanded.size() != 1) {
-            throw new IllegalArgumentException();
-        }
-
-        Object expandedProofs = null;
-
-        if (expanded.iterator().next() instanceof Map map) {
-            expandedDocument = new HashMap<String, Object>(map);
-            if (map.containsKey("https://w3id.org/security#proof")) {
-                expandedProofs = Map.of("https://w3id.org/security#proof",
-                        expandedDocument.remove("https://w3id.org/security#proof"));
-            }
-        }
-
-        if (expandedProofs != null) {
-            dataset = new Dataset();
-            model.tordf().accept(expandedProofs, dataset);
-        }
-    }
-
-    private static class Dataset implements QuadConsumer {
-
-        private final Map<String, String> proofTypes = new HashMap<>();
-
-        private Map<String, Collection<String[]>> graphs = new HashMap<>();
-
-        private Collection<String> proofGraphs = new HashSet<>();
-
-        @Override
-        public void accept(
-                String subject,
-                String predicate,
-                String object,
-                String datatype,
-                String language,
-                String direction,
-                String graph) {
-
-            var key = graph;
-
-            if (key == null) {
-                key = "@default";
-
-                if ("https://w3id.org/security#proof".equals(predicate)) {
-                    proofGraphs.add(object);
-                }
-
-            } else if ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type".equals(predicate)) {
-                proofTypes.put(graph, object);
-            }
-
-            graphs.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
-                    .add(new String[] {
-                            subject, predicate, object, datatype, language, direction, graph
-                    });
-        }
-    }
-
-    public static record SignatureAlgorithm(String signature, String digest) {
-    };
 }

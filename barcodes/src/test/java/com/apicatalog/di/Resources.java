@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.barcodes.ECDSAXI2023;
-import com.apicatalog.di.std.StandardGraphProcessor;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
@@ -24,21 +23,25 @@ import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.model.SemanticModel;
-import com.apicatalog.trust.model.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.model.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.proof.GraphProofCursor;
+import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.GraphPayloadGenerator;
+import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
+import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static DataModel SEMANTIC_MODEL_1 = DataIntegrity.newSematicModelBuilder(DataModel.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
             .proof(ECDSAXI2023.getInstance())
+            .expand(Resources::expand)
             .tordf(Resources::toRDF)
-            .c14n(Resources::newRDFC)
-            .processor(StandardGraphProcessor::new)
-            .processor(GraphProofCursor::new)
+            .c14n(Resources::createRDFC)
+            .processor(GraphAdapter::newInstance)
+            .cursor(GraphProofCursor::newInstance)
+            .payload(GraphPayloadGenerator::new)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;
@@ -50,8 +53,8 @@ class Resources {
             SHA_256 = MessageDigest.getInstance("SHA-256");
 
             DIGEST_FACTORY = (Map.<String, Digestor>of(
-                    "SHA-256", SHA_256::digest,
-                    "SHA-384", MessageDigest.getInstance("SHA-384")::digest))::get;
+                    Digestor.SHA_256, SHA_256::digest,
+                    Digestor.SHA_384, MessageDigest.getInstance("SHA-384")::digest))::get;
 
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
@@ -122,7 +125,7 @@ class Resources {
         }
     }
 
-    static final RdfcPrcessor newRDFC() {
+    static final RdfcPrcessor createRDFC() {
         return new RdfcPrcessor(); // TODO reuse one instance across
     }
 

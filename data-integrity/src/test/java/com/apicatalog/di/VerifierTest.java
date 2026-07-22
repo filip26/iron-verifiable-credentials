@@ -1,10 +1,8 @@
 package com.apicatalog.di;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -23,17 +21,17 @@ import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.trust.MethodResolver;
-import com.apicatalog.trust.ProofVerifier;
-import com.apicatalog.trust.model.ModelResolver;
-import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.model.ContextAwareResolver;
+import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
 
-    static ModelResolver MODEL_RESOLVER = ModelResolver.newBuilder()
+    static ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.builder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty),
-                    Resources.LEXICAL_MODEL_1,
-                    Resources.SEMANTIC_MODEL_1)
+                    // in processing preferences order
+                    Resources.SEMANTIC_MODEL,
+                    Resources.LEXICAL_MODEL)
             .build();
 
     static MethodResolver DID_KEY_RESOLVER = proof -> {
@@ -77,59 +75,32 @@ public class VerifierTest {
 
         var signed = Resources.getMap(resource);
 
-        var contexts = ModelResolver.getContexts(signed);
+        var contexts = ContextAwareResolver.getContexts(signed);
 
-        var models = MODEL_RESOLVER.resolve(contexts, signed);
+        var model = MODEL_RESOLVER.resolve(contexts, signed);
 
-        assertFalse(models.isEmpty());
+        var processor = model.createAdapter(signed);
+        
+        var cursor = processor.createProofCursor();
 
-        var proofs = new ArrayList<Proof>();
-
-        int lastCount = -1;
-
-        for (var model : models) {
-
-            var cursor = model.createProofCursor(contexts, signed);
-
-            if (cursor == null) {
-                continue;
-            }
-
-            if (!cursor.next()) {
-                fail("No proof(s) to verify");
-                return;
-            }
-
-            int count = 0;
-
-            do {
-                count++;
-
-                if (!cursor.isAccepted()) {
-                    continue;
-                }
-
-                var proof = cursor.proof();
-                var verified = PROOF_VERIFIER.verify(proof);
-
-                assertTrue(verified);
-
-                proofs.add(proof);
-
-            } while (cursor.next());
-
-            if (lastCount != -1 && lastCount != count) {
-                throw new IllegalArgumentException("Inconsistent proofs size");
-            }
-            lastCount = count;
-
-            // no unknown proofs, all proofs have been processed, terminate
-            if (lastCount == proofs.size()) {
-                break;
-            }
-
+        if (cursor == null || !cursor.next()) {
+            fail("No proof(s) to verify");
+            return;
         }
-        assertFalse(proofs.isEmpty());
+
+        do {
+
+            if (!cursor.isAccepted()) {
+                fail();
+            }
+
+            var proof = cursor.proof();
+            var verified = PROOF_VERIFIER.verify(proof);
+
+            assertTrue(verified);
+
+        } while (cursor.next());
+
     }
 
     static final Stream<String> resources() {

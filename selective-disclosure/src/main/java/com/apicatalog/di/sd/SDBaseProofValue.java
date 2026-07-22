@@ -15,13 +15,12 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.di.sd.signature.BaseSignature;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.model.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
 
 import co.nstant.in.cbor.CborBuilder;
@@ -50,7 +49,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
             Function<Integer, SignatureAlgorithm> algorithmProvider,
             Function<byte[], Multicodec> proofPublicKeyDecoder,
             DataIntegrityProof proof,
-            SDGraphProcessor processor) {
+            SDPayloadGenerator payload) {
 
         Objects.requireNonNull(signature);
 
@@ -128,7 +127,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
                 throw new IllegalArgumentException();
             }
 
-            proofValue.payload = processor.redactable(
+            proofValue.payload = payload.redactable(
                     proofValue.mandatoryPointers,
                     proofValue.hmacKey);
 
@@ -228,6 +227,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
         return toByteArray(baseSignature, proofPublicKey, hmacKey, signatures, mandatoryPointers);
     }
 
+    @Override
     public SDDerivedProofValue derive(Collection<String> selectors) {
 
         var combinedPointers = new LinkedHashSet<String>(mandatoryPointers.size() + selectors.size());

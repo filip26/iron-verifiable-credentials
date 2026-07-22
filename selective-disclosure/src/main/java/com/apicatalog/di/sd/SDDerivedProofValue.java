@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.sd.SDGraphProcessor.SignatureAlgorithm;
 import com.apicatalog.di.sd.signature.DerivedSignature;
 import com.apicatalog.multicodec.Multicodec;
 
@@ -46,7 +45,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
             Function<byte[], Multicodec> proofPublicKeyDecoder,
             DataIntegrityProof proof,
             // TODO DerivedPayload?
-            SDGraphProcessor processor) {
+            SDPayloadGenerator payload) {
 
         Objects.requireNonNull(signature);
 
@@ -126,7 +125,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
                 indices[i] = toUInt(item);
             }
 
-            proofValue.payload = processor.derived(labelMap, indices);
+            proofValue.payload = payload.derived(labelMap, indices);
 
             return proofValue;
 
@@ -135,9 +134,9 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
             throw new IllegalArgumentException(e);
         }
     }
-    
+
     public static SDDerivedProofValue newInstance(
-            SDBaseProofValue base, 
+            SDBaseProofValue base,
             SDDerivedDocument document,
             byte[][] signatures) {
 
@@ -150,7 +149,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
         signature.signatureAlgorithm = base.signatureAlgorithm;
         signature.signatures = signatures;
 
-        //FIXME use close function
+        // FIXME use close function
         var d = new DataIntegrityProof.Draft(((DataIntegrityProof) base.proof).cryptosuite());
         d.proof(((DataIntegrityProof) base.proof));
         signature.proof = d.signed(signature);
@@ -180,7 +179,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
         var cborSignatures = top.addArray();
 
         for (int signatureIndex = 0; signatureIndex < signatures.length; signatureIndex++) {
-            cborSignatures.add(signatures[signatureIndex]);  // .tagged(64);
+            cborSignatures.add(signatures[signatureIndex]); // .tagged(64);
         }
 
         final MapBuilder<ArrayBuilder<CborBuilder>> cborLabels = top.addMap();
@@ -204,6 +203,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
             throw new IllegalArgumentException(e);
         }
     }
+
     private static int toUInt(DataItem item) {
 
         if (!MajorType.UNSIGNED_INTEGER.equals(item.getMajorType())) {
@@ -212,42 +212,4 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
 
         return ((UnsignedInteger) item).getValue().intValueExact();
     }
-
-
-
-
-
-//
-//    @Override
-//    public String toString() {
-//        final StringBuilder string = new StringBuilder();
-//        string.append("DerivedProofValue").append('\n')
-//                .append("  baseSignature: ").append(baseSignature != null ? Hex.toHexString(baseSignature) : "n/a").append('\n')
-//                .append("  publicKey: ").append(proofPublicKey != null ? Multibase.BASE_58_BTC.encode(proofPublicKey) : "n/a").append('\n')
-//                .append("  signatures:\n");
-//
-//        if (signatures != null) {
-//            signatures.stream().map(Hex::toHexString).forEach(s -> string
-//                    .append("    ")
-//                    .append(s)
-//                    .append('\n'));
-//        }
-//
-//        string.append("  labels:\n");
-//
-//        if (labels != null) {
-//            labels.entrySet().forEach(e -> string
-//                    .append("    ")
-//                    .append(e.getKey())
-//                    .append(" -> ")
-//                    .append(e.getValue() != null ? Multibase.BASE_64_URL.encode(e.getValue()) : "n/a")
-//                    .append('\n'));
-//        }
-//        return string
-//                .append("  indicies: ")
-//                .append(indices != null ? Arrays.toString(indices) : "n/a")
-//                .append('\n')
-//                .toString();
-//    }
-
 }

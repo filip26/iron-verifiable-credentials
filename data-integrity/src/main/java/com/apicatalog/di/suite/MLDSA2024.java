@@ -1,11 +1,9 @@
 package com.apicatalog.di.suite;
 
 import com.apicatalog.di.signature.ProofValue;
-import com.apicatalog.di.signature.ProofValueGenerator;
-import com.apicatalog.di.std.StandardCryptoSuite;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.trust.model.DataModel;
-import com.apicatalog.trust.processor.PayloadProcessor;
+import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.signature.Signature;
 
@@ -17,22 +15,22 @@ public final class MLDSA2024 extends StandardCryptoSuite {
 
     private static MLDSA2024 MLDSA_44_RDFC_2024 = new MLDSA2024(
             "mldsa44-rdfc-2024",
-            DataModel.C14N_RDFC);
+            Model.C14N_RDFC);
 
     private static MLDSA2024 MLDSA_44_JCS_2024 = new MLDSA2024(
             "mldsa44-jcs-2024",
-            DataModel.C14N_JCS);
+            Model.C14N_JCS);
 
     private MLDSA2024(
             String id,
             String c14n) {
-        super(id, c14n, Multibase.BASE_64_URL, ProofValueGenerator::generateWithSHA256);
+        super(id, c14n, Multibase.BASE_64_URL, ProofValue::generateSignatureWithSHA256);
     }
 
     public static MLDSA2024 get44Instance(String c14n) {
         return switch (c14n) {
-        case DataModel.C14N_RDFC -> MLDSA_44_RDFC_2024;
-        case DataModel.C14N_JCS -> MLDSA_44_JCS_2024;
+        case Model.C14N_RDFC -> MLDSA_44_RDFC_2024;
+        case Model.C14N_JCS -> MLDSA_44_JCS_2024;
         default -> throw new IllegalArgumentException();
         };
     }
@@ -46,11 +44,11 @@ public final class MLDSA2024 extends StandardCryptoSuite {
     }
 
     @Override
-    public Signature decode(byte[] signature, Proof proof, PayloadProcessor payload) {
+    public Signature decode(byte[] signature, Proof proof, PayloadGenerator payload) {
         return decode44(signature, proof, payload);
     }
 
-    private Signature decode44(byte[] signature, Proof proof, PayloadProcessor payload) {
+    private Signature decode44(byte[] signature, Proof proof, PayloadGenerator payload) {
         if (signature.length != SIGNATURE_LENGTH) {
             throw new IllegalArgumentException(
                     """

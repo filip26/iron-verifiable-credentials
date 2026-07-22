@@ -1,7 +1,8 @@
-package com.apicatalog.trust;
+package com.apicatalog.trust.proof;
 
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.MethodResolver;
 
 public class ProofVerifier {
 
@@ -54,14 +55,14 @@ public class ProofVerifier {
     }
 
     public boolean verify(Proof proof, byte[] publicKey) throws InvalidKeyException, SignatureException {
-        
+
         Objects.requireNonNull(proof.signature());
         Objects.requireNonNull(proof.signature().algorithm());
-        
+
         var asymmetricVerifier = signatureVerifiers.get(proof.signature().algorithm());
-        
+
         Objects.requireNonNull(asymmetricVerifier);
-        
+
         return verify(proof, publicKey, asymmetricVerifier);
     }
 
@@ -76,9 +77,52 @@ public class ProofVerifier {
             return false;
         }
 
-
-        return proof.signature().verify(verifier, digestFactory,  publicKey);
+        return proof.signature().verify(verifier, digestFactory, publicKey);
     }
+
+    public Collection<Result> verify(ProofCursor cursor, int max) {
+
+        Objects.requireNonNull(cursor);
+
+        if (!cursor.next()) {
+            return null;
+        }
+
+        int count = 0;
+
+        var results = new ArrayList<Result>();
+
+        do {
+            if (count++ == max) {
+                throw new IllegalStateException();
+            }
+
+            if (!cursor.isAccepted()) {
+                results.add(null);
+                continue;
+            }
+
+            Proof proof = null;
+            boolean verified = false;
+            Exception error = null;
+
+            try {
+                proof = cursor.proof();
+                verified = verify(proof);
+
+            } catch (Exception e) {
+                error = e;
+            }
+
+            results.add(new Result(proof, verified, error));
+
+        } while (cursor.next());
+
+        return results;
+    }
+
+    public static record Result(Proof proof, boolean verified, Exception error) {
+    };
 
     public static class Builder {
 
@@ -107,7 +151,7 @@ public class ProofVerifier {
             verifiers.put(publicKeyAlgorithm, verifier);
             return this;
         }
-        
+
         public Builder digestFactory(Digestor.Factory digestFactory) {
             this.digestFactory = digestFactory;
             return this;

@@ -11,9 +11,9 @@ import com.apicatalog.multicodec.codec.KeyCodec;
 public record Keys(
         Multicodec codec,
         byte[] basePublicKey,
-        byte[] baseSecretKey,
+        byte[] basePrivateKey,
         byte[] proofPublicKey,
-        byte[] proofSecretKey,
+        byte[] proofPrivateKey,
         byte[] hmacKey) {
 
     static final MultibaseDecoder MULTIBASE = MultibaseDecoder.getInstance();
@@ -24,11 +24,20 @@ public record Keys(
 
     public static Keys from(Map<String, Object> keysMap) {
 
+        @SuppressWarnings("unchecked")
         var baseKeys = (Map<String, String>) keysMap.get("baseKeyPair");
+
+//        var basePublicKey = MULTIBASE.decode(baseKeys.get("publicKeyMultibase"));
+//        var basePublicKeyCodec = MULTICODEC.getCodec(basePublicKey).orElseThrow();
 
         var basePrivateKey = MULTIBASE.decode(baseKeys.get("secretKeyMultibase"));
         var basePrivateKeyCodec = MULTICODEC.getCodec(basePrivateKey).orElseThrow();
 
+//        if (!basePublicKeyCodec.equals(basePrivateKeyCodec)) {
+//            throw new IllegalArgumentException();
+//        }
+
+        @SuppressWarnings("unchecked")
         var proofKeys = (Map<String, String>) keysMap.get("proofKeyPair");
 
         var proofPublicKey = MULTIBASE.decode(proofKeys.get("publicKeyMultibase"));
@@ -39,10 +48,9 @@ public record Keys(
             throw new IllegalStateException("Unsupported");
         }
 
-        // FIXME
         return new Keys(
                 basePrivateKeyCodec,
-                null,
+                null, //basePublicKey,
                 basePrivateKeyCodec.decode(basePrivateKey),
                 proofPublicKey,
                 proofPrivateKeyCodec.decode(proofPrivateKey),
