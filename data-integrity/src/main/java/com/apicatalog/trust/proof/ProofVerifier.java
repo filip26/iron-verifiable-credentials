@@ -12,22 +12,26 @@ import java.util.Set;
 
 import com.apicatalog.security.AsymmetricVerifier;
 import com.apicatalog.security.Digestor;
-import com.apicatalog.trust.MethodResolver;
 
 public class ProofVerifier {
 
+    @FunctionalInterface
+    public interface PublicKeyResolver {
+        byte[] getPublicKey(Proof proof);
+    }
+
     Collection<String> proofTypes;
-    MethodResolver methodResolver;
+    PublicKeyResolver publicKeyResolver;
     Map<String, AsymmetricVerifier> signatureVerifiers;
     Digestor.Factory digestFactory;
 
     private ProofVerifier(
             Set<String> proofTypes,
-            MethodResolver methodResolver,
+            PublicKeyResolver publicKeyResolver,
             Map<String, AsymmetricVerifier> signatureVerifiers,
             Digestor.Factory digestFactory) {
         this.proofTypes = proofTypes;
-        this.methodResolver = methodResolver;
+        this.publicKeyResolver = publicKeyResolver;
         this.signatureVerifiers = signatureVerifiers;
         this.digestFactory = digestFactory;
     }
@@ -49,7 +53,7 @@ public class ProofVerifier {
 //            throw new IllegalArgumentException();
 //        }
 
-        var publicKey = methodResolver.resolve(proof);
+        var publicKey = publicKeyResolver.getPublicKey(proof);
 
         return verify(proof, publicKey);
     }
@@ -128,7 +132,7 @@ public class ProofVerifier {
 
         Collection<String> proofTypes;
         Map<String, AsymmetricVerifier> verifiers;
-        MethodResolver resolver;
+        PublicKeyResolver resolver;
         Digestor.Factory digestFactory;
 
         private Builder() {
@@ -142,7 +146,7 @@ public class ProofVerifier {
 //            return this;
 //        }
 
-        public Builder resolver(MethodResolver resolver) {
+        public Builder resolver(PublicKeyResolver resolver) {
             this.resolver = resolver;
             return this;
         }

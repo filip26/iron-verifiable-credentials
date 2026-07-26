@@ -11,6 +11,7 @@ import com.apicatalog.trust.payload.PayloadGenerator;
 
 public class GraphPayloadGenerator implements PayloadGenerator {
 
+    @FunctionalInterface
     public interface Factory {
         PayloadGenerator createPayload(SemanticModel model, SemanticAdapter processor);
     }

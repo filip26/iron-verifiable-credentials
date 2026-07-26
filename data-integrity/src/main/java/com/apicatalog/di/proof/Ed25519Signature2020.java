@@ -40,6 +40,12 @@ public final class Ed25519Signature2020 implements Proof {
     private static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
     private static final String PREDICATE_PROOF_VALUE = "https://w3id.org/security#proofValue";
 
+    private static final String KEY_TYPE = "type";
+    private static final String KEY_CREATED = "created";
+    private static final String KEY_VERIFICATION_METHOD = "verificationMethod";
+    private static final String KEY_PURPOSE = "proofPurpose";
+    private static final String KEY_PROOF_VALUE = "proofValue";
+
     private Collection<String> context;
 
     private Instant created;
@@ -55,20 +61,20 @@ public final class Ed25519Signature2020 implements Proof {
 
     public static Map<String, ?> compact(Ed25519Signature2020 proof) {
         var composer = new NativeComposer<Map<String, ? extends Object>>();
-        write(proof, composer);
+        compact(proof, composer);
         return composer.compose();
     }
-    
-    public static void write(Ed25519Signature2020 proof, TreeEmitter emitter) {
+
+    public static void compact(Ed25519Signature2020 proof, TreeEmitter emitter) {
         var writer = Tree.newPropertyTree(emitter)
                 .beginMap()
-                .entry("type", proof.type())
-                .entry("created", proof.created, Instant::toString)
-                .entry("verificationMethod", proof.verificationMethod)
-                .entry("proofPurpose", proof.purpose);
+                .entry(KEY_TYPE, proof.type())
+                .entry(KEY_CREATED, proof.created, Instant::toString)
+                .entry(KEY_VERIFICATION_METHOD, proof.verificationMethod)
+                .entry(KEY_PURPOSE, proof.purpose);
         if (proof.signature != null) {
             writer.entry(
-                    "proofValue",
+                    KEY_PROOF_VALUE,
                     proof.signature.toByteArray(),
                     Multibase.BASE_58_BTC::encode);
         }
@@ -120,13 +126,13 @@ public final class Ed25519Signature2020 implements Proof {
                     throw new IllegalArgumentException();
                 }
                 break;
-            case "created":
+            case KEY_CREATED:
                 proof.created = Instant.parse((String) entry.getValue());
                 break;
-            case "proofPurpose":
+            case KEY_PURPOSE:
                 proof.purpose = (String) entry.getValue();
                 break;
-            case "verificationMethod":
+            case KEY_VERIFICATION_METHOD:
                 proof.verificationMethod = (String) entry.getValue();
                 break;
             }
@@ -194,40 +200,102 @@ public final class Ed25519Signature2020 implements Proof {
         return created;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] canonicalPayload() {
         return canonicalPayload;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String c14n() {
         return c14n;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String type() {
         return TYPE_NAME;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Signature signature() {
         return signature;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String verificationMethod() {
         return verificationMethod;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String purpose() {
         return purpose;
     }
 
+    /**
+     * The JSON-LD context used to process the proof. Optional.
+     * 
+     * @return a collection of strings representing the JSON-LD context URIs, or
+     *         {@code null} if not present
+     */
     public Collection<String> context() {
         return context;
     }
-
+//
+//    public void validate(Map<String, Object> params) throws DocumentError {
+//        if (created == null) {
+//            throw new DocumentError(ErrorType.Missing, "Created");
+//        }
+//        if (method == null) {
+//            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
+//        }
+//        if (purpose == null) {
+//            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
+//        }
+//        if (value == null || ((SolidProofValue) value).toByteArray().length == 0) {
+//            throw new DocumentError(ErrorType.Missing, "ProofValue");
+//        }
+//        // proof value must be 64 bytes
+//        if (((SolidProofValue) value).toByteArray().length != 64) {
+//            throw new DocumentError(ErrorType.Invalid, "ProofValue");
+//        }
+//
+//        if (params != null) {
+//            assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
+//            assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
+//            assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
+//        }
+//    }
+//
+//    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
+//
+//        final Object value = params.get(name.name());
+//
+//        if (value == null) {
+//            return;
+//        }
+//
+//        if (!value.equals(param)) {
+//            throw new DocumentError(ErrorType.Invalid, name);
+//        }
+//    }
+//    
     private final static byte[][] RDFC_TEMPLATE = Stream.of(
             "_:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#Ed25519Signature2020> .",
 
@@ -329,7 +397,7 @@ public final class Ed25519Signature2020 implements Proof {
                             """.formatted(statement[1], TYPE_URI));
 
                 }
-                if (!PREDICATE_PROOF_VALUE.equals(statement[1])) { // TODO better
+                if (!PREDICATE_PROOF_VALUE.equals(statement[1])) {
                     consumer.accept(
                             statement[0], // subject
                             statement[1], // predicate

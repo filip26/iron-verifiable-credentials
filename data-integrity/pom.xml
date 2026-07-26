@@ -63,6 +63,7 @@
         <jcs.version>3.0.0-M4</jcs.version>
         <rdfc.version>3.0.0</rdfc.version>
         <jsonld.version>1.7.0</jsonld.version>
+        <did.key.version>0.11.0-SNAPSHOT</did.key.version>
         <junit.version>6.1.2</junit.version>
     </properties>
 
@@ -99,6 +100,12 @@
             <groupId>com.apicatalog</groupId>
             <artifactId>titanium-json-ld</artifactId>
             <version>${jsonld.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>carbon-did-key</artifactId>
+            <version>${did.key.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- remove, not needed with Titanium JSON-LD 2.x.x -->

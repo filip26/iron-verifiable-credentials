@@ -3,6 +3,7 @@ package com.apicatalog.di;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -18,15 +19,17 @@ import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
 import com.apicatalog.di.suite.SLHDSA2024;
-import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.trust.MethodResolver;
+import com.apicatalog.did.DidDocument.Relationship;
+import com.apicatalog.did.key.DidKey;
+import com.apicatalog.did.key.DidKeyResolver;
+import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.proof.ProofVerifier;
+import com.apicatalog.trust.proof.ProofVerifier.PublicKeyResolver;
 
 public class VerifierTest {
 
-    static ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.builder()
+    static final ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.builder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty),
                     // in processing preferences order
@@ -34,33 +37,39 @@ public class VerifierTest {
                     Resources.LEXICAL_MODEL)
             .build();
 
-    static MethodResolver DID_KEY_RESOLVER = proof -> {
-        if (!proof.verificationMethod().startsWith("did:key:")) {
+    static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.builder()
+            .multikey()
+            .build();
+
+    static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.builder()
+            .codec(EdDSA2022.ALGORITHM, KeyCodec.ED25519_PUBLIC)
+            .codec(ECDSA2019.P256, KeyCodec.P256_PUBLIC)
+            .codec(ECDSA2019.P384, KeyCodec.P384_PUBLIC)
+            .codec(MLDSA2024.ALGORITHM_44, KeyCodec.MLDSA_44_PUBLIC)
+            .codec(SLHDSA2024.ALGORITHM_SHA2_128s, KeyCodec.SLHDSA_SHA2_128S_PUBLIC)
+            .methodResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
+            .documentResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
+            .build();
+
+    static final PublicKeyResolver PUPLIC_KEY_RESOLVER = proof -> {
+
+        var rel = Relationship.from(proof.purpose());
+
+        if (Relationship.ASSERTION != rel) {
             throw new IllegalArgumentException();
         }
 
-        String based = null;
-        var fragmentIndex = proof.verificationMethod().indexOf('#');
-        if (fragmentIndex != -1) {
-            based = proof.verificationMethod().substring("did:key:".length(), fragmentIndex);
-        } else {
-            based = proof.verificationMethod().substring("did:key:".length());
-        }
-
-        var key = MultibaseDecoder.getInstance().decode(based);
-
-        var codec = MulticodecDecoder.newInstance().getCodec(key).orElseThrow();
-
-        // TODO check the key codec vs proof.signature().algorithm()
-
-        return codec.decode(key);
-
+        return MULTIKEY_RESOLVER.getPublicKey(
+                proof.verificationMethod(),
+                rel,
+                proof.signature().algorithm(),
+                Instant.now());
     };
 
     static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
             // TODO allow list concrete DI cryptosuites only OR list models and
             // configurations
-            .resolver(DID_KEY_RESOLVER)
+            .resolver(PUPLIC_KEY_RESOLVER)
             .verifier(EdDSA2022.ALGORITHM, BCEd25519Verifier.getInstance()::verify)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
             .verifier(ECDSA2019.P384, BCECDSAVerifier.getP384Instance()::verify)
@@ -80,7 +89,7 @@ public class VerifierTest {
         var model = MODEL_RESOLVER.resolve(contexts, signed);
 
         var processor = model.createAdapter(signed);
-        
+
         var cursor = processor.createProofCursor();
 
         if (cursor == null || !cursor.next()) {

@@ -12,12 +12,12 @@ import com.apicatalog.crypto.bc.BCECDSAVerifier;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.trust.MethodResolver;
+import com.apicatalog.trust.PublicKeyResolver;
 import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
 
-    static MethodResolver DID_KEY_RESOLVER = proof -> {
+    static PublicKeyResolver DID_KEY_RESOLVER = proof -> {
         if (!proof.verificationMethod().startsWith("did:key:")) {
             throw new IllegalArgumentException();
         }
