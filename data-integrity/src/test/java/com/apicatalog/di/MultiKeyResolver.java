@@ -26,7 +26,9 @@ public final class MultiKeyResolver {
         this.methodResolvers = methodResolvers;
     }
 
-    public byte[] getPublicKey(String vm, Relationship rel, String algorithm, Instant timestamp) {
+    public byte[] getPublicKey(String vm, String purpose, String algorithm, Instant timestamp) {
+
+        var rel = Relationship.from(purpose);
 
         var codec = codecs.get(algorithm);
 

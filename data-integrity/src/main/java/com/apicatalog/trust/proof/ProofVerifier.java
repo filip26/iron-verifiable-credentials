@@ -2,6 +2,7 @@ package com.apicatalog.trust.proof;
 
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ public class ProofVerifier {
 
     @FunctionalInterface
     public interface PublicKeyResolver {
-        byte[] getPublicKey(Proof proof);
+        byte[] getPublicKey(String vm, String purpose, String algorithm, Instant timestamp);
     }
 
     Collection<String> proofTypes;
@@ -53,7 +54,11 @@ public class ProofVerifier {
 //            throw new IllegalArgumentException();
 //        }
 
-        var publicKey = publicKeyResolver.getPublicKey(proof);
+        var publicKey = publicKeyResolver.getPublicKey(
+                proof.verificationMethod(),
+                proof.purpose(),
+                proof.signature().algorithm(),
+                Instant.now());
 
         return verify(proof, publicKey);
     }

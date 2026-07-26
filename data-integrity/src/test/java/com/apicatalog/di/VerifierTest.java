@@ -3,7 +3,6 @@ package com.apicatalog.di;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -19,13 +18,11 @@ import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
 import com.apicatalog.di.suite.SLHDSA2024;
-import com.apicatalog.did.DidDocument.Relationship;
 import com.apicatalog.did.key.DidKey;
 import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.proof.ProofVerifier;
-import com.apicatalog.trust.proof.ProofVerifier.PublicKeyResolver;
 
 public class VerifierTest {
 
@@ -51,25 +48,10 @@ public class VerifierTest {
             .documentResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
             .build();
 
-    static final PublicKeyResolver PUPLIC_KEY_RESOLVER = proof -> {
-
-        var rel = Relationship.from(proof.purpose());
-
-        if (Relationship.ASSERTION != rel) {
-            throw new IllegalArgumentException();
-        }
-
-        return MULTIKEY_RESOLVER.getPublicKey(
-                proof.verificationMethod(),
-                rel,
-                proof.signature().algorithm(),
-                Instant.now());
-    };
-
     static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
             // TODO allow list concrete DI cryptosuites only OR list models and
             // configurations
-            .resolver(PUPLIC_KEY_RESOLVER)
+            .resolver(MULTIKEY_RESOLVER::getPublicKey)
             .verifier(EdDSA2022.ALGORITHM, BCEd25519Verifier.getInstance()::verify)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
             .verifier(ECDSA2019.P384, BCECDSAVerifier.getP384Instance()::verify)
@@ -104,6 +86,11 @@ public class VerifierTest {
             }
 
             var proof = cursor.proof();
+            
+//            if (!Relationship.ASSERTION.getName().equals(proof.purpose())) {
+//                throw new IllegalArgumentException();
+//            }
+
             var verified = PROOF_VERIFIER.verify(proof);
 
             assertTrue(verified);
