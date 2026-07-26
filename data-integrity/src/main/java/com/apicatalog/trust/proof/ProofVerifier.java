@@ -37,7 +37,7 @@ public class ProofVerifier {
         this.digestFactory = digestFactory;
     }
 
-    public static Builder newBuilder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -151,7 +151,7 @@ public class ProofVerifier {
 //            return this;
 //        }
 
-        public Builder resolver(PublicKeyResolver resolver) {
+        public Builder publicKeyResolver(PublicKeyResolver resolver) {
             this.resolver = resolver;
             return this;
         }

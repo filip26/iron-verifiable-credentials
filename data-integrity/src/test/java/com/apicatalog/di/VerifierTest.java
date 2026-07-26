@@ -20,6 +20,9 @@ import com.apicatalog.di.suite.MLDSA2024;
 import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.did.key.DidKey;
 import com.apicatalog.did.key.DidKeyResolver;
+import com.apicatalog.did.resolver.MultiKeyResolver;
+import com.apicatalog.multibase.Multibase;
+import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.proof.ProofVerifier;
@@ -35,23 +38,24 @@ public class VerifierTest {
             .build();
 
     static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.builder()
+            .multibaseDecoder(MultibaseDecoder.getInstance(
+                    Multibase.BASE_58_BTC,
+                    Multibase.BASE_64_URL)::decode)
             .multikey()
             .build();
 
     static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.builder()
-            .codec(EdDSA2022.ALGORITHM, KeyCodec.ED25519_PUBLIC)
-            .codec(ECDSA2019.P256, KeyCodec.P256_PUBLIC)
-            .codec(ECDSA2019.P384, KeyCodec.P384_PUBLIC)
-            .codec(MLDSA2024.ALGORITHM_44, KeyCodec.MLDSA_44_PUBLIC)
-            .codec(SLHDSA2024.ALGORITHM_SHA2_128s, KeyCodec.SLHDSA_SHA2_128S_PUBLIC)
+            .codec(EdDSA2022.ALGORITHM, KeyCodec.ED25519_PUBLIC.varint())
+            .codec(ECDSA2019.P256, KeyCodec.P256_PUBLIC.varint())
+            .codec(ECDSA2019.P384, KeyCodec.P384_PUBLIC.varint())
+            .codec(MLDSA2024.ALGORITHM_44, KeyCodec.MLDSA_44_PUBLIC.varint())
+            .codec(SLHDSA2024.ALGORITHM_SHA2_128s, KeyCodec.SLHDSA_SHA2_128S_PUBLIC.varint())
             .methodResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
             .documentResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
             .build();
 
-    static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
-            // TODO allow list concrete DI cryptosuites only OR list models and
-            // configurations
-            .resolver(MULTIKEY_RESOLVER::getPublicKey)
+    static ProofVerifier PROOF_VERIFIER = ProofVerifier.builder()
+            .publicKeyResolver(MULTIKEY_RESOLVER::getPublicKey)
             .verifier(EdDSA2022.ALGORITHM, BCEd25519Verifier.getInstance()::verify)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
             .verifier(ECDSA2019.P384, BCECDSAVerifier.getP384Instance()::verify)
@@ -86,7 +90,7 @@ public class VerifierTest {
             }
 
             var proof = cursor.proof();
-            
+
 //            if (!Relationship.ASSERTION.getName().equals(proof.purpose())) {
 //                throw new IllegalArgumentException();
 //            }

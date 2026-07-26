@@ -9,8 +9,9 @@
 
     <name>Iron: Verifiable Credential Barcodes</name>
     <description>
-   Standards-compliant, modular library for W3C Verifiable Credential Barcodes,
-    enabling compact, secure Verifiable Credentials for optical barcodes.
+        Standards-compliant, modular library for W3C Verifiable Credential
+        Barcodes,
+        enabling compact, secure Verifiable Credentials for optical barcodes.
     </description>
 
     <url>https://github.com/filip26/iron-verifiable-credentials</url>
@@ -28,7 +29,8 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
+        <connection>
+            scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
         <developerConnection>
             scm:git:git://github.com/filip26/iron-verifiable-credentials.git</developerConnection>
         <url>https://github.com/filip26/iron-verifiable-credentials/tree/main</url>
@@ -61,6 +63,7 @@
         <jcs.version>3.0.0-M4</jcs.version>
         <rdfc.version>3.0.0</rdfc.version>
         <jsonld.version>1.7.0</jsonld.version>
+        <did.key.version>0.11.0-SNAPSHOT</did.key.version>
         <junit.version>6.0.3</junit.version>
     </properties>
 
@@ -92,6 +95,12 @@
             <groupId>com.apicatalog</groupId>
             <artifactId>titanium-json-ld</artifactId>
             <version>${jsonld.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>carbon-did-key</artifactId>
+            <version>${did.key.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- remove, not needed with Titanium JSON-LD 2.x.x -->
