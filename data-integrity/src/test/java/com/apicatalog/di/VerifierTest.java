@@ -37,14 +37,14 @@ public class VerifierTest {
                     Resources.LEXICAL_MODEL)
             .build();
 
-    static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.builder()
+    static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.newBuilder()
             .multibaseDecoder(MultibaseDecoder.getInstance(
                     Multibase.BASE_58_BTC,
                     Multibase.BASE_64_URL)::decode)
             .multikey()
             .build();
 
-    static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.builder()
+    static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.newBuilder()
             .codec(EdDSA2022.ALGORITHM, KeyCodec.ED25519_PUBLIC.varint())
             .codec(ECDSA2019.P256, KeyCodec.P256_PUBLIC.varint())
             .codec(ECDSA2019.P384, KeyCodec.P384_PUBLIC.varint())

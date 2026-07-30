@@ -20,12 +20,12 @@ import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
 
-    static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.builder()
+    static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.newBuilder()
             .multibaseDecoder(MultibaseDecoder.getInstance(Multibase.BASE_58_BTC)::decode)
             .multikey()
             .build();
 
-    static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.builder()
+    static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.newBuilder()
             .codec(ECDSA2019.P256, KeyCodec.P256_PUBLIC.varint())
             .codec(ECDSA2019.P384, KeyCodec.P384_PUBLIC.varint())
             .methodResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)

@@ -16,26 +16,22 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.apicatalog.crypto.bc.BCECDSAVerifier;
 import com.apicatalog.di.barcodes.ECDSAXI2023.BarcodePayload;
 import com.apicatalog.di.suite.ECDSA2019;
-import com.apicatalog.di.suite.EdDSA2022;
-import com.apicatalog.di.suite.MLDSA2024;
-import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.did.key.DidKey;
 import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.did.resolver.MultiKeyResolver;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
 
-    static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.builder()
+    static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.newBuilder()
             .multibaseDecoder(MultibaseDecoder.getInstance(Multibase.BASE_58_BTC)::decode)
             .multikey()
             .build();
 
-    static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.builder()
+    static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.newBuilder()
             .codec(ECDSA2019.P256, KeyCodec.P256_PUBLIC.varint())
             .codec(ECDSA2019.P384, KeyCodec.P384_PUBLIC.varint())
             .methodResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)

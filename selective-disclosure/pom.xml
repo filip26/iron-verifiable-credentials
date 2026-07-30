@@ -68,7 +68,7 @@
         <jcs.version>3.0.0-M4</jcs.version>
         <rdfc.version>3.0.0</rdfc.version>
         <jsonld.version>1.7.0</jsonld.version>
-        <did.key.version>0.11.0-SNAPSHOT</did.key.version>
+        <did.key.version>0.11.0</did.key.version>
         <junit.version>6.1.2</junit.version>
     </properties>
 
