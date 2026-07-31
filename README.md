@@ -2,7 +2,6 @@
 # Iron Verifiable Credentials
 
 [![Java 25 CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/build.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-verifiable-credentials)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 > [!IMPORTANT]
@@ -37,6 +36,16 @@ The following cryptographic suites are supported out-of-the-box.
 | `slhdsa128-jcs-2024` | `SLH-DSA-SHA2-128s` | `JCS`  | ✅ | |
 | `Ed25519Signature2020` | `Ed25519` | `RDFC` | | |
 | `ecdsa-xi-2023` | `P-256`, `P-384` | `RDFC` | | |
+
+## 📦 Artifacts
+
+| Name | Version | Note |
+| :--- | :-----: | :--- |
+| `iron-crypto-bc` | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-bc.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-bc) | Bouncy Castle based asymmetric cryptography implementation for W3C Data Integrity specifications | 
+| `iron-data-integrity` |  | W3C Verifiable Credentials Data Integrity Proofs | 
+| `iron-selective-disclosure` | | W3C VC Data Integrity Selective Disclosure Proofs |
+| `iron-barcodes` | | W3C Verifiable Credential Barcodes, enabling compact, secure Verifiable Credentials for optical barcodes |
+| `iron-verifiable-credentials` | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-verifiable-credentials) | Legacy artifact |
 
 ## 🤝 Contributing
 
