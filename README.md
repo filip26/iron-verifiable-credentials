@@ -39,14 +39,14 @@ The following cryptographic suites are supported out-of-the-box.
 
 ## 📦 Artifacts
 
-| Name | Version | Note |
+| Name | Version | Description |
 | :--- | :-----: | :--- |
-| [`iron-crypto-bc`](crypto-bc) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-bc.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-bc) | Bouncy Castle based asymmetric cryptography implementation for W3C Data Integrity specifications | 
-| [`iron-crypto-jca`](crypto-jca) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-jca.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-jca) | Java Cryptography Architecture (JCA) based asymmetric cryptography implementation for W3C Data Integrity specifications |
+| [iron-crypto-bc](crypto-bc/README.md) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-bc.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-bc) | Bouncy Castle based asymmetric cryptography implementation for W3C Data Integrity specifications | 
+| [iron-crypto-jca](crypto-jca/README.md) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-jca.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-jca) | Java Cryptography Architecture (JCA) based asymmetric cryptography implementation for W3C Data Integrity specifications |
 | `iron-data-integrity` |  | W3C Verifiable Credentials Data Integrity Proofs | 
 | `iron-selective-disclosure` | | W3C Verifiable Credentials Data Integrity Selective Disclosure Proofs |
 | `iron-barcodes` | | W3C Verifiable Credential Barcodes, enabling compact, secure Verifiable Credentials for optical barcodes |
-| `iron-verifiable-credentials` | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-verifiable-credentials) | Legacy artifact |
+| `iron-verifiable-credentials` | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-verifiable-credentials) | Legacy artifact |
 
 ## 🤝 Contributing
 
