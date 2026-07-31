@@ -1,4 +1,3 @@
-
 # Iron Verifiable Credentials
 
 [![Java 25 CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/build.yml)
