@@ -56,7 +56,7 @@ class DeriveTest {
         var document = new LinkedHashMap<String, Object>(derivedSignature.payload().compacted().get());
 
         var composer = new NativeComposer<Map<String, ? extends Object>>();
-        DataIntegrityProof.write(derivedSignature.proof(), composer);
+        DataIntegrityProof.compact(derivedSignature.proof(), composer);
         document.put("proof", composer.compose());
 
         var expected = Resources.getMap(resource + ".derived.json");

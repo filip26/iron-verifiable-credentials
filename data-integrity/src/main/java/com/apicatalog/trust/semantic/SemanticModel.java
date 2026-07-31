@@ -49,38 +49,38 @@ public class SemanticModel implements Model {
         // TODO void reset();
     }
 
-    private final SemanticAdapter.Factory processorFactory;
-    private final GraphProofCursor.Factory cursorFactory;
-    private final GraphPayloadGenerator.Factory payloadFactory;
+    public record Primitives(
+            SemanticAdapter.Factory adapter,
+            GraphUpdater.Factory updater,
+            GraphProofCursor.Factory cursor,
+            GraphPayloadGenerator.Factory payload) {
+    };
 
-    private final Map<String, GraphProofReader> readers;
-
-    private final Supplier<GraphCanonizer> canonizeFactory;
-
-    private final Function<Map<String, Object>, Collection<Object>> expand;
-    private final BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
-    private final BiConsumer<Object, QuadConsumer> tordf;
+    public record JsonLdOps(
+            Function<Map<String, Object>, Collection<Object>> expand,
+            BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact,
+            BiConsumer<Object, QuadConsumer> tordf) {
+    };
 
     private final Vocab vocab;
 
+    private final Primitives primitives;
+
+    private final JsonLdOps jsonLd;
+
+    private final Supplier<GraphCanonizer> canonizeFactory;
+
+    private final Map<String, GraphProofReader> readers;
+
     public SemanticModel(
             Vocab vocab,
-            SemanticAdapter.Factory processorFactory,
-            GraphProofCursor.Factory cursorFactory,
-            GraphPayloadGenerator.Factory payloadFactory,
-            Function<Map<String, Object>, Collection<Object>> expand,
-            BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact,
-            BiConsumer<Object, QuadConsumer> tordf,
+            Primitives primitives,
+            JsonLdOps jsonLd,
             Supplier<GraphCanonizer> canonizeFactory,
             Map<String, GraphProofReader> readers) {
         this.vocab = vocab;
-        this.processorFactory = processorFactory;
-        this.cursorFactory = cursorFactory;
-        this.payloadFactory = payloadFactory;
-
-        this.expand = expand;
-        this.compact = compact;
-        this.tordf = tordf;
+        this.primitives = primitives;
+        this.jsonLd = jsonLd;
 
         this.canonizeFactory = canonizeFactory;
         this.readers = readers;
@@ -88,7 +88,7 @@ public class SemanticModel implements Model {
 
     @Override
     public SemanticAdapter createAdapter(Map<String, Object> document) {
-        return processorFactory.createProcessor(
+        return primitives.adapter.createAdapter(
                 this,
                 ContextAwareResolver.getContexts(document),
                 document);
@@ -96,15 +96,15 @@ public class SemanticModel implements Model {
 
     @Override
     public Document.Updater createUpdater(Map<String, Object> document) {
-        return new GraphUpdater(this, createAdapter(document));
+        return primitives.updater.createUpdater(this, createAdapter(document));
     }
 
     public PayloadGenerator createPayload(SemanticAdapter adapter) {
-        return payloadFactory.createPayload(this, adapter);
+        return primitives.payload.createPayload(this, adapter);
     }
 
     public GraphProofCursor createCursor(SemanticAdapter adapter) {
-        return cursorFactory.createCursor(this, adapter);
+        return primitives.cursor.createCursor(this, adapter);
     }
 
     public GraphProofReader reader(String proofType) {
@@ -116,15 +116,15 @@ public class SemanticModel implements Model {
     }
 
     public BiConsumer<Object, QuadConsumer> tordf() {
-        return tordf;
+        return jsonLd.tordf;
     }
 
     public Function<Map<String, Object>, Collection<Object>> expand() {
-        return expand;
+        return jsonLd.expand;
     }
 
     public BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact() {
-        return compact;
+        return jsonLd.compact;
     }
 
     @Override

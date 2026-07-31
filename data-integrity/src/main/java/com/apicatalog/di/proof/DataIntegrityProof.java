@@ -15,7 +15,6 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.lexical.MapProofReader;
-import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.GraphProofReader;
@@ -72,7 +71,7 @@ public final class DataIntegrityProof implements Proof {
     private String nonce;
     private String purpose;
     private String verificationMethod;
-    private Signature signature;
+    private Signature proofValue;
     private Collection<String> previousProof;
 
     private byte[] canonicalPayload;
@@ -82,11 +81,11 @@ public final class DataIntegrityProof implements Proof {
 
     public static Map<String, ?> compact(DataIntegrityProof proof) {
         var composer = new NativeComposer<Map<String, ? extends Object>>();
-        write(proof, composer);
+        compact(proof, composer);
         return composer.compose();
     }
 
-    public static void write(DataIntegrityProof proof, TreeEmitter emitter) {
+    public static void compact(DataIntegrityProof proof, TreeEmitter emitter) {
 
         var writer = Tree.newPropertyTree(emitter)
                 .beginMap()
@@ -242,7 +241,7 @@ public final class DataIntegrityProof implements Proof {
      */
     @Override
     public Signature signature() {
-        return signature;
+        return proofValue;
     }
 
     /**
@@ -271,6 +270,33 @@ public final class DataIntegrityProof implements Proof {
         return context;
     }
 
+    
+    public void validate(Map<String, Object> params) {
+        
+        Objects.requireNonNull(created, "");
+        Objects.requireNonNull(verificationMethod, "");
+        Objects.requireNonNull(purpose, "");
+        Objects.requireNonNull(proofValue, "");
+
+        if (params != null) {
+//            assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
+//            assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
+//            assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
+        }
+    }
+    
+//    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
+//        final Object value = params.get(name.name());
+//
+//        if (value == null) {
+//            return;
+//        }
+//
+//        if (!value.equals(param)) {
+//            throw new DocumentError(ErrorType.Invalid, name);
+//        }
+//    }
+    
     public static class Draft {
 
         protected final DataIntegrityProof proof;
@@ -408,7 +434,7 @@ public final class DataIntegrityProof implements Proof {
         }
 
         public DataIntegrityProof signed(Signature signature) {
-            proof.signature = signature;
+            proof.proofValue = signature;
             return proof;
         }
 
@@ -525,7 +551,7 @@ public final class DataIntegrityProof implements Proof {
             }
 
             if (proofValue != null) {
-                di.signature = di.cryptosuite
+                di.proofValue = di.cryptosuite
                         .decode(
                                 proofValue,
                                 di,
@@ -637,7 +663,7 @@ public final class DataIntegrityProof implements Proof {
             di.canonicalPayload = canonizer.canonize();
 
             if (proofValue != null) {
-                di.signature = di.cryptosuite
+                di.proofValue = di.cryptosuite
                         .decode(
                                 proofValue,
                                 di,

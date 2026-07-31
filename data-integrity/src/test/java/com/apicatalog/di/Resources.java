@@ -34,6 +34,7 @@ import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAdapter;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
@@ -48,7 +49,7 @@ class Resources {
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
-            .processor(MapAdapter::newInstance)
+            .adapter(MapAdapter::newInstance)
             .cursor(MapProofCursor::newInstance)
             .build();
 
@@ -62,7 +63,8 @@ class Resources {
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
-            .processor(GraphAdapter::newInstance)
+            .adapter(GraphAdapter::newInstance)
+            .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
             .build();

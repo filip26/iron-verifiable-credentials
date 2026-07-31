@@ -10,40 +10,29 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.apicatalog.crypto.bc.BCECDSAVerifier;
 import com.apicatalog.di.suite.ECDSA2019;
+import com.apicatalog.did.key.DidKey;
+import com.apicatalog.did.key.DidKeyResolver;
+import com.apicatalog.did.resolver.MultiKeyResolver;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.trust.MethodResolver;
+import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
 
-    static MethodResolver DID_KEY_RESOLVER = proof -> {
-        if (!proof.verificationMethod().startsWith("did:key:")) {
-            throw new IllegalArgumentException();
-        }
+    static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.newBuilder()
+            .multibaseDecoder(MultibaseDecoder.getInstance(Multibase.BASE_58_BTC)::decode)
+            .multikey()
+            .build();
 
-        String based = null;
-        var fragmentIndex = proof.verificationMethod().indexOf('#');
-        if (fragmentIndex != -1) {
-            based = proof.verificationMethod().substring("did:key:".length(), fragmentIndex);
-        } else {
-            based = proof.verificationMethod().substring("did:key:".length());
-        }
+    static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.newBuilder()
+            .codec(ECDSA2019.P256, KeyCodec.P256_PUBLIC.varint())
+            .codec(ECDSA2019.P384, KeyCodec.P384_PUBLIC.varint())
+            .methodResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
+            .build();
 
-        var key = MultibaseDecoder.getInstance().decode(based);
-
-        var codec = MulticodecDecoder.newInstance().getCodec(key).orElseThrow();
-
-        // TODO check the key codec vs proof.signature().algorithm()
-
-        return codec.decode(key);
-
-    };
-
-    static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
-            // TODO allow list concrete DI cryptosuites only OR list models and
-            // configurations
-            .resolver(DID_KEY_RESOLVER)
+    static ProofVerifier PROOF_VERIFIER = ProofVerifier.builder()
+            .publicKeyResolver(MULTIKEY_RESOLVER::getPublicKey)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
             .verifier(ECDSA2019.P384, BCECDSAVerifier.getP384Instance()::verify)
             .digestFactory(Resources.DIGEST_FACTORY)

@@ -18,15 +18,18 @@ import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
 import com.apicatalog.di.suite.SLHDSA2024;
+import com.apicatalog.did.key.DidKey;
+import com.apicatalog.did.key.DidKeyResolver;
+import com.apicatalog.did.resolver.MultiKeyResolver;
+import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseDecoder;
-import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.trust.MethodResolver;
+import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
 
-    static ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.builder()
+    static final ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.builder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty),
                     // in processing preferences order
@@ -34,33 +37,25 @@ public class VerifierTest {
                     Resources.LEXICAL_MODEL)
             .build();
 
-    static MethodResolver DID_KEY_RESOLVER = proof -> {
-        if (!proof.verificationMethod().startsWith("did:key:")) {
-            throw new IllegalArgumentException();
-        }
+    static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.newBuilder()
+            .multibaseDecoder(MultibaseDecoder.getInstance(
+                    Multibase.BASE_58_BTC,
+                    Multibase.BASE_64_URL)::decode)
+            .multikey()
+            .build();
 
-        String based = null;
-        var fragmentIndex = proof.verificationMethod().indexOf('#');
-        if (fragmentIndex != -1) {
-            based = proof.verificationMethod().substring("did:key:".length(), fragmentIndex);
-        } else {
-            based = proof.verificationMethod().substring("did:key:".length());
-        }
+    static final MultiKeyResolver MULTIKEY_RESOLVER = MultiKeyResolver.newBuilder()
+            .codec(EdDSA2022.ALGORITHM, KeyCodec.ED25519_PUBLIC.varint())
+            .codec(ECDSA2019.P256, KeyCodec.P256_PUBLIC.varint())
+            .codec(ECDSA2019.P384, KeyCodec.P384_PUBLIC.varint())
+            .codec(MLDSA2024.ALGORITHM_44, KeyCodec.MLDSA_44_PUBLIC.varint())
+            .codec(SLHDSA2024.ALGORITHM_SHA2_128s, KeyCodec.SLHDSA_SHA2_128S_PUBLIC.varint())
+            .methodResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
+            .documentResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
+            .build();
 
-        var key = MultibaseDecoder.getInstance().decode(based);
-
-        var codec = MulticodecDecoder.newInstance().getCodec(key).orElseThrow();
-
-        // TODO check the key codec vs proof.signature().algorithm()
-
-        return codec.decode(key);
-
-    };
-
-    static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
-            // TODO allow list concrete DI cryptosuites only OR list models and
-            // configurations
-            .resolver(DID_KEY_RESOLVER)
+    static ProofVerifier PROOF_VERIFIER = ProofVerifier.builder()
+            .publicKeyResolver(MULTIKEY_RESOLVER::getPublicKey)
             .verifier(EdDSA2022.ALGORITHM, BCEd25519Verifier.getInstance()::verify)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
             .verifier(ECDSA2019.P384, BCECDSAVerifier.getP384Instance()::verify)
@@ -80,7 +75,7 @@ public class VerifierTest {
         var model = MODEL_RESOLVER.resolve(contexts, signed);
 
         var processor = model.createAdapter(signed);
-        
+
         var cursor = processor.createProofCursor();
 
         if (cursor == null || !cursor.next()) {
@@ -95,6 +90,11 @@ public class VerifierTest {
             }
 
             var proof = cursor.proof();
+
+//            if (!Relationship.ASSERTION.getName().equals(proof.purpose())) {
+//                throw new IllegalArgumentException();
+//            }
+
             var verified = PROOF_VERIFIER.verify(proof);
 
             assertTrue(verified);

@@ -13,17 +13,20 @@ import java.util.function.Supplier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.LexicalAdapter;
+import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.MapProofCursor;
 import com.apicatalog.trust.lexical.MapProofReader;
 import com.apicatalog.trust.model.Model.Vocab;
-import com.apicatalog.trust.semantic.SemanticAdapter;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphProofReader;
+import com.apicatalog.trust.semantic.GraphUpdater;
+import com.apicatalog.trust.semantic.SemanticAdapter;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
+import com.apicatalog.trust.semantic.SemanticModel.JsonLdOps;
+import com.apicatalog.trust.semantic.SemanticModel.Primitives;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
 public class DataIntegrity {
@@ -47,7 +50,8 @@ public class DataIntegrity {
 
         private String proofPredicate = DataIntegrity.VOCAB_PROOF_URI;
 
-        private SemanticAdapter.Factory processorFactory;
+        private SemanticAdapter.Factory adapterFactory;
+        private GraphUpdater.Factory updaterFactory;
         private GraphProofCursor.Factory cursorFactory;
         private GraphPayloadGenerator.Factory payloadFactory;
 
@@ -94,8 +98,13 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder processor(SemanticAdapter.Factory factory) {
-            this.processorFactory = factory;
+        public SemanticModelBuilder adapter(SemanticAdapter.Factory factory) {
+            this.adapterFactory = factory;
+            return this;
+        }
+
+        public SemanticModelBuilder updater(GraphUpdater.Factory factory) {
+            this.updaterFactory = factory;
             return this;
         }
 
@@ -152,12 +161,15 @@ public class DataIntegrity {
                             proofPredicate,
                             null,
                             "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                    processorFactory,
-                    cursorFactory,
-                    payloadFactory,
-                    expand,
-                    compact,
-                    tordf,
+                    new Primitives(
+                            adapterFactory,
+                            updaterFactory,
+                            cursorFactory,
+                            payloadFactory),
+                    new JsonLdOps(
+                            expand,
+                            compact,
+                            tordf),
                     c14nFactory,
                     readers);
         }
@@ -198,7 +210,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder processor(LexicalAdapter.Factory factory) {
+        public LexicalModelBuilder adapter(LexicalAdapter.Factory factory) {
             this.processorFactory = factory;
             return this;
         }

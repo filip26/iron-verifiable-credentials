@@ -10,7 +10,7 @@ public interface SemanticAdapter extends Document.Adapter {
 
     @FunctionalInterface
     public interface Factory {
-        SemanticAdapter createProcessor(
+        SemanticAdapter createAdapter(
                 SemanticModel model,
                 Collection<String> context,
                 Map<String, Object> document);

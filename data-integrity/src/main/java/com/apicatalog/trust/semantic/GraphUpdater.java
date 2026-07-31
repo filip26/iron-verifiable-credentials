@@ -12,6 +12,11 @@ import com.apicatalog.trust.payload.PayloadGenerator;
 
 public final class GraphUpdater implements Document.Updater {
 
+    @FunctionalInterface
+    public interface Factory {
+        GraphUpdater createUpdater(SemanticModel model, SemanticAdapter adapter);
+    }
+
     private final SemanticModel model;
     private final SemanticAdapter adapter;
 

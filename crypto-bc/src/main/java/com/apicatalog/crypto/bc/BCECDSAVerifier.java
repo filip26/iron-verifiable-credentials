@@ -21,6 +21,10 @@ import org.bouncycastle.jce.ECPointUtil;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 
+/**
+ * A verifier for ECDSA signatures utilizing the BouncyCastle provider. Supports
+ * P-256 (secp256r1) and P-384 (secp384r1) curves.
+ */
 public final class BCECDSAVerifier {
 
     private static BCECDSAVerifier P256_VERIFIER = new BCECDSAVerifier(
@@ -34,19 +38,42 @@ public final class BCECDSAVerifier {
     private final String algorithm;
     private final String curve;
 
-    public BCECDSAVerifier(String algorithm, String curve) {
+    private BCECDSAVerifier(String algorithm, String curve) {
         this.algorithm = algorithm;
         this.curve = curve;
     }
 
+    /**
+     * Retrieves a verifier instance configured for the P-256 curve (secp256r1) and
+     * SHA-256.
+     *
+     * @return a BCECDSAVerifier instance for P-256
+     */
     public static BCECDSAVerifier getP256Instance() {
         return P256_VERIFIER;
     }
 
+    /**
+     * Retrieves a verifier instance configured for the P-384 curve (secp384r1) and
+     * SHA-384.
+     *
+     * @return a BCECDSAVerifier instance for P-384
+     */
     public static BCECDSAVerifier getP384Instance() {
         return P384_VERIFIER;
     }
 
+    /**
+     * Verifies the provided signature against the given data and public key.
+     *
+     * @param publicKey the raw bytes of the public key
+     * @param data      the data that was signed
+     * @param signature the raw signature bytes to verify
+     * @return true if the signature is valid, false otherwise
+     * @throws SignatureException  if a signature parsing or verification error
+     *                             occurs
+     * @throws InvalidKeyException if the provided public key is invalid
+     */
     public boolean verify(final byte[] publicKey, final byte[] data, final byte[] signature)
             throws SignatureException, InvalidKeyException {
 
@@ -108,5 +135,4 @@ public final class BCECDSAVerifier {
 
         return sequence.getEncoded();
     }
-
 }

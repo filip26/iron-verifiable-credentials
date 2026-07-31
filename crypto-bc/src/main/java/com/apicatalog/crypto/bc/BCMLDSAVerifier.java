@@ -7,14 +7,38 @@ import org.bouncycastle.crypto.params.MLDSAParameters;
 import org.bouncycastle.crypto.params.MLDSAPublicKeyParameters;
 import org.bouncycastle.crypto.signers.MLDSASigner;
 
+/**
+ * A verifier for ML-DSA (Module-Lattice-Based Digital Signature Algorithm)
+ * signatures utilizing the BouncyCastle provider.
+ */
 public final class BCMLDSAVerifier {
 
     private static final BCMLDSAVerifier INSTANCE = new BCMLDSAVerifier();
 
+    private BCMLDSAVerifier() {
+        // protected, reserved
+    }
+
+    /**
+     * Retrieves the singleton verifier instance configured for ML-DSA-44.
+     *
+     * @return the BCMLDSAVerifier instance
+     */
     public static BCMLDSAVerifier get44Instance() {
         return INSTANCE;
     }
 
+    /**
+     * Verifies the ML-DSA-44 signature against the given data and public key.
+     *
+     * @param publicKey the raw bytes of the public key
+     * @param data      the data that was signed
+     * @param signature the raw signature bytes to verify
+     * @return true if the signature is valid, false otherwise
+     * @throws SignatureException  if a signature parsing or verification error
+     *                             occurs
+     * @throws InvalidKeyException if the provided public key is invalid
+     */
     public boolean verify(final byte[] publicKey, final byte[] data, final byte[] signature)
             throws SignatureException, InvalidKeyException {
 

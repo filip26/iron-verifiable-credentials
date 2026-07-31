@@ -2,7 +2,7 @@
 # Iron Verifiable Credentials
 
 [![Java 25 CI](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/build.yml/badge.svg)](https://github.com/filip26/iron-verifiable-credentials/actions/workflows/build.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.apicatalog%20AND%20a:iron-verifiable-credentials)
+[![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-verifiable-credentials.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-verifiable-credentials)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 > [!IMPORTANT]
