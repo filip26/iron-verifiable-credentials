@@ -13,6 +13,7 @@ import org.bouncycastle.crypto.signers.SLHDSASigner;
  * <p>
  * This signer supports the {@code sha2_128s} parameter set and can optionally
  * use a {@link SecureRandom} source during signature generation.
+ * </p>
  */
 public final class BCSLHDSASigner {
 

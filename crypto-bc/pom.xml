@@ -5,9 +5,11 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-crypto-bc</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0</version>
 
-    <name>Iron: Crypto BC</name>
+    <packaging>jar</packaging>
+
+    <name>Iron Data Integrity: Bouncy Castle Crypto</name>
     <description>
         Bouncy Castle based asymmetric cryptography implementation for W3C Data
         Integrity specifications.
@@ -28,7 +30,8 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
+        <connection>
+            scm:git:git://github.com/filip26/iron-verifiable-credentials.git</connection>
         <developerConnection>
             scm:git:git://github.com/filip26/iron-verifiable-credentials.git</developerConnection>
         <url>https://github.com/filip26/iron-verifiable-credentials/tree/main</url>
@@ -90,9 +93,84 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.12.0</version>
+                <configuration>
+                    <doclint>all,-missing</doclint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.6</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
                 <version>3.5.6</version>
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>maven-central</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.11.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

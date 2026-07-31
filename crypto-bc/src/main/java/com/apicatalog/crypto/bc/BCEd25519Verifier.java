@@ -15,14 +15,35 @@ import java.security.spec.NamedParameterSpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+/**
+ * A verifier for Ed25519 signatures utilizing the BouncyCastle provider.
+ */
 public final class BCEd25519Verifier {
 
     private static final BCEd25519Verifier INSTANCE = new BCEd25519Verifier();
 
+    private BCEd25519Verifier() {
+        // protected, reserved
+    }
+
+    /**
+     * A verifier for Ed25519 signatures utilizing the BouncyCastle provider.
+     */
     public static BCEd25519Verifier getInstance() {
         return INSTANCE;
     }
 
+    /**
+     * Verifies an Ed25519 signature against the given data and public key.
+     *
+     * @param publicKey the raw bytes of the public key
+     * @param data      the data that was signed
+     * @param signature the raw signature bytes to verify
+     * @return true if the signature is valid, false otherwise
+     * @throws SignatureException  if a signature parsing or verification error
+     *                             occurs
+     * @throws InvalidKeyException if the provided public key is invalid
+     */
     public boolean verify(final byte[] publicKey, final byte[] data, final byte[] signature)
             throws SignatureException, InvalidKeyException {
 

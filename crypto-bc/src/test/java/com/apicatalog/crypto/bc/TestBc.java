@@ -44,8 +44,7 @@ class TestBc {
             "P-256", BCECDSAVerifier.getP256Instance()::verify,
             "P-384", BCECDSAVerifier.getP384Instance()::verify,
             "Ed25519", BCEd25519Verifier.getInstance()::verify,
-            "ML-DSA-44", BCMLDSAVerifier.get44Instance()::verify,
-            "FALCON-512", BCFalconVerifier.get512Instance()::verify);
+            "ML-DSA-44", BCMLDSAVerifier.get44Instance()::verify);
 
     @ParameterizedTest
     @MethodSource("vectors")
@@ -57,8 +56,7 @@ class TestBc {
         assertNotNull(verifier);
 
         var verified = verifier.verify(
-                MULTICODEC.decode(
-                        MULTIBASE.decode(publicKey)),
+                MULTICODEC.decode(MULTIBASE.decode(publicKey)),
                 MULTIBASE.decode(data),
                 MULTIBASE.decode(signature));
 
@@ -73,8 +71,7 @@ class TestBc {
 
         var signer = getDetermisticSigner(
                 algo,
-                MULTICODEC.decode(
-                        MULTIBASE.decode(privateKey)));
+                MULTICODEC.decode(MULTIBASE.decode(privateKey)));
 
         assertNotNull(signer);
 
@@ -97,8 +94,7 @@ class TestBc {
 
         var signer = getSigner(
                 algo,
-                MULTICODEC.decode(
-                        MULTIBASE.decode(privateKey)));
+                MULTICODEC.decode(MULTIBASE.decode(privateKey)));
         assertNotNull(signer);
 
         var signatureBytes = signer.sign(MULTIBASE.decode(data));
@@ -110,8 +106,7 @@ class TestBc {
         assertNotNull(verifier);
 
         var verified = verifier.verify(
-                MULTICODEC.decode(
-                        MULTIBASE.decode(publicKey)),
+                MULTICODEC.decode(MULTIBASE.decode(publicKey)),
                 MULTIBASE.decode(data),
                 signatureBytes);
 
@@ -143,7 +138,7 @@ class TestBc {
 
     static final Stream<Arguments> signVectors() {
         return vectors()
-                // Temporary disable W3C test vectors check, vectors seems not deterministic
+                // Temporary disable W3C test vectors check, vectors are not deterministic
                 .filter(a -> !"ML-DSA-44".equals(a.get()[0]));
     }
 

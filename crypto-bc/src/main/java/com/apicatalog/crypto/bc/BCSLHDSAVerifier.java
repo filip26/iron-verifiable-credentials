@@ -11,10 +11,15 @@ import org.bouncycastle.crypto.signers.SLHDSASigner;
  * Verifies SLH-DSA signatures using the Bouncy Castle implementation.
  * <p>
  * This verifier is configured for the {@code sha2_128s} parameter set.
+ * </p>
  */
 public final class BCSLHDSAVerifier {
 
     private static final BCSLHDSAVerifier INSTANCE_128S = new BCSLHDSAVerifier();
+
+    private BCSLHDSAVerifier() {
+        // protected, reserved
+    }
 
     /**
      * Returns the singleton verifier instance for the SLH-DSA {@code sha2_128s}

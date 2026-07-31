@@ -17,26 +17,56 @@ import org.bouncycastle.crypto.signers.RandomDSAKCalculator;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.util.BigIntegers;
 
+/**
+ * A signer for ECDSA signatures utilizing the BouncyCastle provider. Supports
+ * P-256 (secp256r1) and P-384 (secp384r1) curves with optional random or
+ * deterministic signing.
+ */
 public final class BCECDSASigner {
 
     private final ECPrivateKeyParameters privateKeyParams;
-    private final Supplier<ExtendedDigest> digestFactory;
+    private final Supplier<ExtendedDigest> digestorFactory;
 
     private SecureRandom random;
 
+    /**
+     * Constructs a new BCECDSASigner instance.
+     *
+     * @param privateKeyParams the private key parameters
+     * @param digestorFactory  the supplier for the extended digest
+     * @param random           the source of randomness, or null for deterministic
+     *                         signing
+     */
     public BCECDSASigner(
             ECPrivateKeyParameters privateKeyParams,
-            Supplier<ExtendedDigest> digestFactory,
+            Supplier<ExtendedDigest> digestorFactory,
             SecureRandom random) {
         this.privateKeyParams = privateKeyParams;
-        this.digestFactory = digestFactory;
+        this.digestorFactory = digestorFactory;
         this.random = random;
     }
 
+    /**
+     * Creates a new deterministic signer instance configured for the P-256 curve
+     * (secp256r1).
+     *
+     * @param privateKey the raw bytes of the private key
+     * @return a BCECDSASigner instance for P-256
+     * @throws InvalidKeySpecException if the provided private key is invalid
+     */
     public static BCECDSASigner newP256Instance(byte[] privateKey) throws InvalidKeySpecException {
         return newP256Instance(privateKey, null);
     }
 
+    /**
+     * Creates a new signer instance configured for the P-256 curve (secp256r1) with
+     * a specific secure random source.
+     *
+     * @param privateKey the raw bytes of the private key
+     * @param random     the source of randomness
+     * @return a BCECDSASigner instance for P-256
+     * @throws InvalidKeySpecException if the provided private key is invalid
+     */
     public static BCECDSASigner newP256Instance(byte[] privateKey, SecureRandom random) throws InvalidKeySpecException {
         return new BCECDSASigner(
                 BCECDSASigner.getPrivateKeyFromBytes("secp256r1", privateKey),
@@ -44,10 +74,27 @@ public final class BCECDSASigner {
                 random);
     }
 
+    /**
+     * Creates a new deterministic signer instance configured for the P-384 curve
+     * (secp384r1).
+     *
+     * @param privateKey the raw bytes of the private key
+     * @return a BCECDSASigner instance for P-384
+     * @throws InvalidKeySpecException if the provided private key is invalid
+     */
     public static BCECDSASigner newP384Instance(byte[] privateKey) throws InvalidKeySpecException {
         return newP384Instance(privateKey, null);
     }
 
+    /**
+     * Creates a new signer instance configured for the P-384 curve (secp384r1) with
+     * a specific secure random source.
+     *
+     * @param privateKey the raw bytes of the private key
+     * @param random     the source of randomness
+     * @return a BCECDSASigner instance for P-384
+     * @throws InvalidKeySpecException if the provided private key is invalid
+     */
     public static BCECDSASigner newP384Instance(byte[] privateKey, SecureRandom random) throws InvalidKeySpecException {
         return new BCECDSASigner(
                 BCECDSASigner.getPrivateKeyFromBytes("secp384r1", privateKey),
@@ -55,9 +102,15 @@ public final class BCECDSASigner {
                 random);
     }
 
+    /**
+     * Generates an ECDSA signature for the provided data.
+     *
+     * @param data the data to be signed
+     * @return the raw bytes of the generated signature
+     */
     public byte[] sign(final byte[] data) {
 
-        final ExtendedDigest digest = digestFactory.get();
+        final ExtendedDigest digest = digestorFactory.get();
 
         var hash = new byte[digest.getDigestSize()];
         digest.update(data, 0, data.length);
@@ -76,6 +129,12 @@ public final class BCECDSASigner {
         return toByteArray(signer.generateSignature(hash));
     }
 
+    /**
+     * Sets the source of randomness used for subsequent signature generation.
+     *
+     * @param random the source of randomness, or {@code null}
+     * @return this signer instance
+     */
     public BCECDSASigner random(SecureRandom random) {
         this.random = random;
         return this;
