@@ -9,16 +9,39 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+/**
+ * A verifier implementation for the ML-DSA algorithm using the Java
+ * Cryptography Architecture (JCA).
+ */
 public final class JcaMLDSAVerifier {
 
     private static final String ALGORITHM = "ML-DSA-44";
 
-    private static JcaMLDSAVerifier INSTANCE = new JcaMLDSAVerifier();
+    private static final JcaMLDSAVerifier INSTANCE = new JcaMLDSAVerifier();
 
+    private JcaMLDSAVerifier() {
+        // protected, reserved
+    }
+
+    /**
+     * Retrieves the singleton instance of the ML-DSA-44 verifier.
+     *
+     * @return the ML-DSA-44 verifier instance
+     */
     public static JcaMLDSAVerifier get44Instance() {
         return INSTANCE;
     }
 
+    /**
+     * Verifies a signature for the given data using the provided raw public key.
+     *
+     * @param rawPublicKey the raw byte array of the public key
+     * @param data         the original data that was signed
+     * @param signature    the signature to verify
+     * @return true if the signature is valid, false otherwise
+     * @throws InvalidKeyException if the provided key is invalid
+     * @throws SignatureException  if an error occurs during signature verification
+     */
     public boolean verify(byte[] rawPublicKey, byte[] data, byte[] signature)
             throws InvalidKeyException, SignatureException {
 
@@ -38,9 +61,16 @@ public final class JcaMLDSAVerifier {
         }
     }
 
-    public static PublicKey toMlDsaPublicKey(KeyFactory keyFactory, byte[] rawPublicKey) throws InvalidKeyException {
+    /**
+     * Converts a raw ML-DSA public key into a JCA PublicKey instance.
+     *
+     * @param keyFactory   the KeyFactory to generate the public key
+     * @param rawPublicKey the raw byte array of the public key
+     * @return the generated PublicKey instance
+     * @throws InvalidKeyException if the provided raw key is invalid or unsupported
+     */
+    private static PublicKey toMlDsaPublicKey(KeyFactory keyFactory, byte[] rawPublicKey) throws InvalidKeyException {
         byte[] x509Header;
-//        String algorithmName = "ML-DSA";
 
         switch (rawPublicKey.length) {
         case 1312: // ML-DSA-44

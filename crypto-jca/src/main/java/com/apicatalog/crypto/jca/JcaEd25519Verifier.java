@@ -12,14 +12,38 @@ import java.security.spec.EdECPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.NamedParameterSpec;
 
+/**
+ * A verifier implementation for Ed25519 signatures using the Java Cryptography
+ * Architecture (JCA).
+ */
 public final class JcaEd25519Verifier {
 
     private static final JcaEd25519Verifier INSTANCE = new JcaEd25519Verifier();
 
+    private JcaEd25519Verifier() {
+        // protected, reserved
+    }
+
+    /**
+     * Retrieves the singleton instance of the Ed25519 verifier.
+     *
+     * @return the Ed25519 verifier instance
+     */
     public static JcaEd25519Verifier getInstance() {
         return INSTANCE;
     }
 
+    /**
+     * Verifies an Ed25519 signature for the given data using the provided raw
+     * public key.
+     *
+     * @param rawPublicKey the raw byte array of the public key
+     * @param data         the original data that was signed
+     * @param signature    the signature to verify
+     * @return true if the signature is valid, false otherwise
+     * @throws InvalidKeyException if the provided key is invalid
+     * @throws SignatureException  if an error occurs during signature verification
+     */
     public boolean verify(byte[] rawPublicKey, byte[] data, byte[] signature)
             throws InvalidKeyException, SignatureException {
 
