@@ -79,17 +79,29 @@ public final class DataIntegrityProof implements Proof {
     private DataIntegrityProof() {
     }
 
-    public static Map<String, ?> compact(DataIntegrityProof proof) {
+    public static Map<String, ?> compact(DataIntegrityProof proof, boolean addContext) {
         var composer = new NativeComposer<Map<String, ? extends Object>>();
-        compact(proof, composer);
+        compact(proof, composer, addContext);
         return composer.compose();
     }
 
-    public static void compact(DataIntegrityProof proof, TreeEmitter emitter) {
+    public static void compact(DataIntegrityProof proof, TreeEmitter emitter, boolean addContext) {
 
         var writer = Tree.newPropertyTree(emitter)
-                .beginMap()
-                .entry(KEY_ID, proof.id())
+                .beginMap();
+
+        if (addContext && proof.context != null && !proof.context.isEmpty()) {
+
+            writer.beginSequence("@context");
+
+            for (var ctx : proof.context) {
+                writer.element(ctx);
+            }
+
+            writer.endSequence();
+        }
+
+        writer.entry(KEY_ID, proof.id())
                 .entry(KEY_TYPE, proof.type())
                 .entry(KEY_CRYPTOSUITE, proof.cryptosuite(), CryptoSuite::id)
                 .entry(KEY_CREATED, proof.created(), Instant::toString)
@@ -270,9 +282,8 @@ public final class DataIntegrityProof implements Proof {
         return context;
     }
 
-    
     public void validate(Map<String, Object> params) {
-        
+
         Objects.requireNonNull(created, "");
         Objects.requireNonNull(verificationMethod, "");
         Objects.requireNonNull(purpose, "");
@@ -284,7 +295,7 @@ public final class DataIntegrityProof implements Proof {
 //            assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
         }
     }
-    
+
 //    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
 //        final Object value = params.get(name.name());
 //
@@ -296,7 +307,7 @@ public final class DataIntegrityProof implements Proof {
 //            throw new DocumentError(ErrorType.Invalid, name);
 //        }
 //    }
-    
+
     public static class Draft {
 
         protected final DataIntegrityProof proof;
@@ -421,6 +432,11 @@ public final class DataIntegrityProof implements Proof {
 
         public Draft nonce(String nonce) {
             proof.nonce = nonce;
+            return this;
+        }
+
+        public Draft domain(Collection<String> domain) {
+            proof.domain = domain;
             return this;
         }
 

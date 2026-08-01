@@ -11,13 +11,12 @@ public interface Document {
 
     interface Adapter {
 
-
 //TODO       
 //      <T> T adapt(Class<T> type);
 //      boolean hasProofs();
 
         ProofCursor createProofCursor();
-        
+
     }
 
     interface Updater {

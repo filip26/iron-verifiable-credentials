@@ -1,5 +1,8 @@
 # Iron Data Integrity: Google Cloud KMS-based Crypto
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-gcloud-kms.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-gcloud-kms)
+[![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-crypto-gcloud-kms/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-crypto-gcloud-kms)
+
 An asymmetric cryptography implementation based on the Google Cloud KMS for W3C Data Integrity specifications.
 
 | Algorithm | Sign | Verify | ⚛️ Quantum Resistant |

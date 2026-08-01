@@ -37,7 +37,7 @@ public class ProofVerifier {
         this.digestFactory = digestFactory;
     }
 
-    public static Builder builder() {
+    public static Builder newBuilder() {
         return new Builder();
     }
 

@@ -47,7 +47,7 @@ public class ContextAwareResolver {
         return null;
     }
 
-    public static final Builder builder() {
+    public static final Builder newBuilder() {
         return new Builder();
     }
 

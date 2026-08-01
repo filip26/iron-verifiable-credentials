@@ -11,6 +11,7 @@ public final class EdDSA2022 extends StandardCryptoSuite {
 
     public static final String ALGORITHM = "Ed25519";
     public static final int SIGNATURE_LENGTH = 64;
+    public static final int PUBLIC_KEY_SIZE = 32;
 
     private static final EdDSA2022 MLDSA_44_RDFC_2024 = new EdDSA2022(
             "eddsa-rdfc-2022",

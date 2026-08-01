@@ -28,7 +28,7 @@ public class MapUpdater implements Document.Updater {
             newProofs = new ArrayList<>();
         }
         newProofs.add(compacted);
-        if (context != null) {
+        if (context != null && !context.isEmpty()) {
             if (contexts == null) {
                 contexts = new LinkedHashSet<>(context.size() * 2);
             }

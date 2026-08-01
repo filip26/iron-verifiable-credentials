@@ -5,7 +5,7 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-crypto-gcloud-kms</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0</version>
 
     <name>Iron Data Integrity: Google Cloud KMS-based Crypto</name>
     <description>

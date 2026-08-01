@@ -42,6 +42,34 @@ public final class KmsAsymmetricSigner {
         this.kmsKeyResource = kmsKeyResource;
     }
 
+    public static KmsAsymmetricSigner newP256Instance(String kmsKeyResource, KeyManagementServiceClient kms) {
+        return new KmsAsymmetricSigner(
+                KmsAsymmetricSigner::ec256Sign,
+                kms,
+                kmsKeyResource);
+    }
+
+    public static KmsAsymmetricSigner newP384Instance(String kmsKeyResource, KeyManagementServiceClient kms) {
+        return new KmsAsymmetricSigner(
+                KmsAsymmetricSigner::ec384Sign,
+                kms,
+                kmsKeyResource);
+    }
+
+    public static KmsAsymmetricSigner newEd25519Instance(String kmsKeyResource, KeyManagementServiceClient kms) {
+        return new KmsAsymmetricSigner(
+                KmsAsymmetricSigner::sign,
+                kms,
+                kmsKeyResource);
+    }
+
+    public static KmsAsymmetricSigner newDSAInstance(String kmsKeyResource, KeyManagementServiceClient kms) {
+        return new KmsAsymmetricSigner(
+                KmsAsymmetricSigner::sign,
+                kms,
+                kmsKeyResource);
+    }
+
     /**
      * Creates a new {@link KmsAsymmetricSigner} instance for the specified KMS
      * algorithm.
@@ -62,29 +90,17 @@ public final class KmsAsymmetricSigner {
         Objects.requireNonNull(kms, "kms client must not be null");
 
         return switch (algorithm) {
-        case EC_SIGN_P256_SHA256 -> new KmsAsymmetricSigner(
-                KmsAsymmetricSigner::ec256Sign,
-                kms,
-                kmsKeyResource);
+        case EC_SIGN_P256_SHA256 -> newP256Instance(kmsKeyResource, kms);
 
-        case EC_SIGN_P384_SHA384 -> new KmsAsymmetricSigner(
-                KmsAsymmetricSigner::ec384Sign,
-                kms,
-                kmsKeyResource);
+        case EC_SIGN_P384_SHA384 -> newP384Instance(kmsKeyResource, kms);
 
-        case EC_SIGN_ED25519 -> new KmsAsymmetricSigner(
-                KmsAsymmetricSigner::ed256Sign,
-                kms,
-                kmsKeyResource);
+        case EC_SIGN_ED25519 -> newEd25519Instance(kmsKeyResource, kms);
 
         // PQ
         case PQ_SIGN_SLH_DSA_SHA2_128S,
                 PQ_SIGN_ML_DSA_44,
                 PQ_SIGN_ML_DSA_87 ->
-            new KmsAsymmetricSigner(
-                    KmsAsymmetricSigner::dsaSign,
-                    kms,
-                    kmsKeyResource);
+            newDSAInstance(kmsKeyResource, kms);
 
         default -> throw new IllegalArgumentException("Unsupported KMS Key Algorithm [" + algorithm + "]");
         };
@@ -101,13 +117,6 @@ public final class KmsAsymmetricSigner {
         return kms.asymmetricSign(requestFactory.createRequest(kms, kmsKeyResource, data))
                 .getSignature()
                 .toByteArray();
-    }
-
-    private static AsymmetricSignRequest ed256Sign(KeyManagementServiceClient kms, String resource, byte[] blob) {
-        return AsymmetricSignRequest.newBuilder()
-                .setName(resource)
-                .setData(ByteString.copyFrom(blob))
-                .build();
     }
 
     private static AsymmetricSignRequest ec256Sign(KeyManagementServiceClient kms, String resource, byte[] blob) {
@@ -138,7 +147,7 @@ public final class KmsAsymmetricSigner {
         }
     }
 
-    private static AsymmetricSignRequest dsaSign(KeyManagementServiceClient kms, String resource, byte[] blob) {
+    private static AsymmetricSignRequest sign(KeyManagementServiceClient kms, String resource, byte[] blob) {
         return AsymmetricSignRequest.newBuilder()
                 .setName(resource)
                 .setData(ByteString.copyFrom(blob))

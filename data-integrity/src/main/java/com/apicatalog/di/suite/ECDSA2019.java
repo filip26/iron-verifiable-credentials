@@ -16,7 +16,10 @@ import com.apicatalog.trust.signature.Signature;
 public final class ECDSA2019 extends StandardCryptoSuite {
 
     public static final String P256 = "P-256";
+    public static final int P256_PUBLIC_KEY_SIZE = 32;
+
     public static final String P384 = "P-384";
+    public static final int P384_PUBLIC_KEY_SIZE = 48;
 
     private static final ECDSA2019 ECDSA_RDFC_2019 = new ECDSA2019(
             "ecdsa-rdfc-2019",
@@ -76,7 +79,7 @@ public final class ECDSA2019 extends StandardCryptoSuite {
         var digestAlgorithm = switch (signatureAlgorithm) {
         case P256 -> Digestor.SHA_256;
         case P384 -> Digestor.SHA_384;
-        default -> throw new IllegalArgumentException();
+        default -> throw new IllegalArgumentException("Unsupported signature algorithm " + signatureAlgorithm);
         };
 
         var digestor = digestFactory.newDigestor(digestAlgorithm);
