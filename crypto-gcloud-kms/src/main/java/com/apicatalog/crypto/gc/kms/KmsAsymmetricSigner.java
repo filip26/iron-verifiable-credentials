@@ -3,6 +3,7 @@ package com.apicatalog.crypto.gc.kms;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
+import java.util.Objects;
 
 import com.google.cloud.kms.v1.AsymmetricSignRequest;
 import com.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm;
@@ -10,7 +11,11 @@ import com.google.cloud.kms.v1.Digest;
 import com.google.cloud.kms.v1.KeyManagementServiceClient;
 import com.google.protobuf.ByteString;
 
-public final class KmsAsymmericSigner {
+/**
+ * Provides digital signature operations using Google Cloud KMS private keys
+ * without exposing private key material locally.
+ */
+public final class KmsAsymmetricSigner {
 
     @FunctionalInterface
     private interface RequestFactory {
@@ -21,7 +26,14 @@ public final class KmsAsymmericSigner {
     private final KeyManagementServiceClient kms;
     private final String kmsKeyResource;
 
-    public KmsAsymmericSigner(
+    /**
+     * Constructs a new {@code KmsAsymmetricSigner}.
+     *
+     * @param requestFactory factory function to build signing requests
+     * @param kms            Google Cloud KMS client instance
+     * @param kmsKeyResource full resource identifier of the KMS crypto key version
+     */
+    public KmsAsymmetricSigner(
             RequestFactory requestFactory,
             KeyManagementServiceClient kms,
             String kmsKeyResource) {
@@ -31,51 +43,60 @@ public final class KmsAsymmericSigner {
     }
 
     /**
-     * Creates a new {@link KmsAsymmericSigner} instance for the specified KMS
-     * algorithm
+     * Creates a new {@link KmsAsymmetricSigner} instance for the specified KMS
+     * algorithm.
+     *
+     * @param algorithm      the KMS cryptographic key algorithm
+     * @param kmsKeyResource full resource identifier of the KMS key version
+     * @param kms            Google Cloud KMS client instance
+     * @return configured {@link KmsAsymmetricSigner} instance
+     * @throws IllegalArgumentException if the algorithm is unsupported or null
      */
-    public static KmsAsymmericSigner newInstance(
+    public static KmsAsymmetricSigner newInstance(
             CryptoKeyVersionAlgorithm algorithm,
             String kmsKeyResource,
             KeyManagementServiceClient kms) {
 
+        Objects.requireNonNull(algorithm, "CryptoKeyVersionAlgorithm must not be null\"");
+        Objects.requireNonNull(kmsKeyResource, "kmsKeyResource must not be null");
+        Objects.requireNonNull(kms, "kms client must not be null");
+
         return switch (algorithm) {
-        case EC_SIGN_P256_SHA256 -> new KmsAsymmericSigner(
-                KmsAsymmericSigner::ec256Sign,
+        case EC_SIGN_P256_SHA256 -> new KmsAsymmetricSigner(
+                KmsAsymmetricSigner::ec256Sign,
                 kms,
                 kmsKeyResource);
 
-        case EC_SIGN_P384_SHA384 -> new KmsAsymmericSigner(
-                KmsAsymmericSigner::ec384Sign,
+        case EC_SIGN_P384_SHA384 -> new KmsAsymmetricSigner(
+                KmsAsymmetricSigner::ec384Sign,
                 kms,
                 kmsKeyResource);
 
-        case EC_SIGN_ED25519 -> new KmsAsymmericSigner(
-                KmsAsymmericSigner::ed256Sign,
+        case EC_SIGN_ED25519 -> new KmsAsymmetricSigner(
+                KmsAsymmetricSigner::ed256Sign,
                 kms,
                 kmsKeyResource);
 
-        // PQ experiments
-        case PQ_SIGN_SLH_DSA_SHA2_128S -> new KmsAsymmericSigner(
-                KmsAsymmericSigner::dsaSign,
-                kms,
-                kmsKeyResource);
+        // PQ
+        case PQ_SIGN_SLH_DSA_SHA2_128S,
+                PQ_SIGN_ML_DSA_44,
+                PQ_SIGN_ML_DSA_87 ->
+            new KmsAsymmetricSigner(
+                    KmsAsymmetricSigner::dsaSign,
+                    kms,
+                    kmsKeyResource);
 
-        case PQ_SIGN_ML_DSA_44 -> new KmsAsymmericSigner(
-                KmsAsymmericSigner::dsaSign,
-                kms,
-                kmsKeyResource);
-
-        case PQ_SIGN_ML_DSA_87 -> new KmsAsymmericSigner(
-                KmsAsymmericSigner::dsaSign,
-                kms,
-                kmsKeyResource);
-
-        case null, default ->
-            throw new IllegalArgumentException("Unsupported KMS Key Algorithm [" + algorithm + "]");
+        default -> throw new IllegalArgumentException("Unsupported KMS Key Algorithm [" + algorithm + "]");
         };
     }
 
+    /**
+     * Signs input data using the configured Google Cloud KMS key.
+     *
+     * @param data byte array to sign, must not be null
+     * @return generated signature byte array
+     * @throws SignatureException if signature generation fails
+     */
     public byte[] sign(byte[] data) throws SignatureException {
         return kms.asymmetricSign(requestFactory.createRequest(kms, kmsKeyResource, data))
                 .getSignature()
@@ -99,7 +120,7 @@ public final class KmsAsymmericSigner {
                             .build())
                     .build();
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("SHA-256 digest algorithm not available", e);
         }
     }
 
@@ -113,7 +134,7 @@ public final class KmsAsymmericSigner {
                             .build())
                     .build();
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("SHA-384 digest algorithm not available", e);
         }
     }
 

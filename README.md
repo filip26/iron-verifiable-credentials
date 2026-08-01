@@ -42,6 +42,7 @@ The following cryptographic suites are supported out-of-the-box.
 | :--- | :-----: | :--- |
 | [iron-crypto-bc](crypto-bc/README.md) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-bc.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-bc) | Bouncy Castle based asymmetric cryptography implementation for W3C Data Integrity specifications | 
 | [iron-crypto-jca](crypto-jca/README.md) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-jca.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-jca) | Java Cryptography Architecture (JCA) based asymmetric cryptography implementation for W3C Data Integrity specifications |
+| [iron-crypto-gcloud-kms](crypto-gcloud-kms/README.md) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-gcloud-kms.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-gcloud-kms) | Google Cloud KMS based asymmetric cryptography implementation for W3C Data Integrity specifications |
 | `iron-data-integrity` |  | W3C Verifiable Credentials Data Integrity Proofs | 
 | `iron-selective-disclosure` | | W3C Verifiable Credentials Data Integrity Selective Disclosure Proofs |
 | `iron-barcodes` | | W3C Verifiable Credential Barcodes, enabling compact, secure Verifiable Credentials for optical barcodes |
