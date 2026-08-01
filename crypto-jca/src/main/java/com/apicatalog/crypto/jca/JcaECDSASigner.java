@@ -14,16 +14,33 @@ import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 
+/**
+ * A signer implementation for ECDSA algorithms using the Java Cryptography
+ * Architecture (JCA).
+ */
 public final class JcaECDSASigner {
 
-    private String algorithm;
-    private PrivateKey privateKey;
+    private final String algorithm;
+    private final PrivateKey privateKey;
 
+    /**
+     * Constructs a new JcaECDSASigner with the specified algorithm and private key.
+     *
+     * @param algorithm  the signature algorithm to use (e.g., SHA256withECDSA)
+     * @param privateKey the private key used for signing
+     */
     public JcaECDSASigner(String algorithm, PrivateKey privateKey) {
         this.algorithm = algorithm;
         this.privateKey = privateKey;
     }
 
+    /**
+     * Creates a new P-256 (SHA256withECDSA) signer instance from a raw private key.
+     *
+     * @param privateKey the raw byte array of the private key
+     * @return a new instance of JcaECDSASigner
+     * @throws InvalidKeySpecException if the provided key specification is invalid
+     */
     public static JcaECDSASigner newP256Instance(byte[] privateKey)
             throws InvalidKeySpecException {
         return new JcaECDSASigner(
@@ -32,6 +49,13 @@ public final class JcaECDSASigner {
 
     }
 
+    /**
+     * Creates a new P-384 (SHA384withECDSA) signer instance from a raw private key.
+     *
+     * @param privateKey the raw byte array of the private key
+     * @return a new instance of JcaECDSASigner
+     * @throws InvalidKeySpecException if the provided key specification is invalid
+     */
     public static JcaECDSASigner newP384Instance(byte[] privateKey)
             throws InvalidKeySpecException {
         return new JcaECDSASigner(
@@ -39,6 +63,13 @@ public final class JcaECDSASigner {
                 JcaECDSASigner.toP384PrivateKey(privateKey));
     }
 
+    /**
+     * Signs the given data using the configured ECDSA algorithm.
+     *
+     * @param data the data to be signed
+     * @return the generated signature
+     * @throws SignatureException if an error occurs during the signing process
+     */
     public byte[] sign(byte[] data) throws SignatureException {
 
         try {
@@ -105,11 +136,11 @@ public final class JcaECDSASigner {
         }
     }
 
-    public static PrivateKey toP256PrivateKey(byte[] rawPrivate) throws InvalidKeySpecException {
+    private static PrivateKey toP256PrivateKey(byte[] rawPrivate) throws InvalidKeySpecException {
         return toECPrivateKey("secp256r1", rawPrivate);
     }
 
-    public static PrivateKey toP384PrivateKey(byte[] rawPrivate) throws InvalidKeySpecException {
+    private static PrivateKey toP384PrivateKey(byte[] rawPrivate) throws InvalidKeySpecException {
         return toECPrivateKey("secp384r1", rawPrivate);
     }
 

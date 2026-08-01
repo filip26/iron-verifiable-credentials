@@ -12,13 +12,24 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
+/**
+ * A signer implementation for the ML-DSA algorithm using the Java Cryptography
+ * Architecture (JCA).
+ */
 public final class JcaMLDSASigner {
-    
+
     private static final String ALGORITHM = "ML-DSA-44";
 
     private final PrivateKey privateKey;
     private SecureRandom random;
 
+    /**
+     * Constructs a new JcaMLDSASigner with the provided private key and secure
+     * random instance.
+     *
+     * @param privateKey the private key used for signing
+     * @param random     the secure random number generator, may be null
+     */
     public JcaMLDSASigner(
             final PrivateKey privateKey,
             final SecureRandom random) {
@@ -26,11 +37,27 @@ public final class JcaMLDSASigner {
         this.random = random;
     }
 
+    /**
+     * Creates a new ML-DSA-44 signer instance from a raw private key.
+     *
+     * @param privateKey the raw byte array of the private key
+     * @return a new instance of JcaMLDSASigner
+     * @throws InvalidKeySpecException if the provided key specification is invalid
+     */
     public static JcaMLDSASigner new44Instance(final byte[] privateKey)
             throws InvalidKeySpecException {
         return new44Instance(privateKey, null);
     }
 
+    /**
+     * Creates a new ML-DSA-44 signer instance from a raw private key and a secure
+     * random instance.
+     *
+     * @param privateKey the raw byte array of the private key
+     * @param random     the secure random number generator
+     * @return a new instance of JcaMLDSASigner
+     * @throws InvalidKeySpecException if the provided key specification is invalid
+     */
     public static JcaMLDSASigner new44Instance(
             final byte[] privateKey,
             final SecureRandom random) throws InvalidKeySpecException {
@@ -40,6 +67,13 @@ public final class JcaMLDSASigner {
                 random);
     }
 
+    /**
+     * Signs the given data using the ML-DSA algorithm.
+     *
+     * @param data the data to be signed
+     * @return the generated signature
+     * @throws SignatureException if an error occurs during the signing process
+     */
     public byte[] sign(final byte[] data)
             throws SignatureException {
 
@@ -67,6 +101,12 @@ public final class JcaMLDSASigner {
         }
     }
 
+    /**
+     * Sets the secure random instance for this signer.
+     *
+     * @param random the secure random number generator
+     * @return this signer instance for method chaining
+     */
     public JcaMLDSASigner random(final SecureRandom random) {
         this.random = random;
         return this;
