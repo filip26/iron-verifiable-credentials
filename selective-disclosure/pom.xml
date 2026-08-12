@@ -11,7 +11,7 @@
 
     <packaging>jar</packaging>
 
-    <name>Iron: Selective Disclosure Proofs</name>
+    <name>Iron Selective Disclosure (SD) Proofs</name>
 
     <description>
         A modular, high-performance implementation of W3C VC Data Integrity

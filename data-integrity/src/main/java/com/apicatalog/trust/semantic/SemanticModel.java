@@ -28,8 +28,9 @@ public class SemanticModel implements Model {
                 String graph);
     }
 
-    public interface GraphCanonizer {
-        QuadConsumer consumer();
+    public interface GraphCanonizer extends QuadConsumer {
+
+//        QuadConsumer consumer();
 
         byte[] canonize();
 
@@ -51,7 +52,7 @@ public class SemanticModel implements Model {
 
     public record Primitives(
             SemanticAdapter.Factory adapter,
-            GraphUpdater.Factory updater,
+            SemanticUpdater.Factory updater,
             GraphProofCursor.Factory cursor,
             GraphPayloadGenerator.Factory payload) {
     };

@@ -11,7 +11,7 @@ public final class SLHDSA2024 extends StandardCryptoSuite {
 
     public static final String ALGORITHM_SHA2_128s = "SLH-DSA-SHA2-128s";
     public static final int SIGNATURE_LENGTH = 7856;
-    public static final int PUBLIC_KEY_SIZE = 32;
+    public static final int SHA2_128S_PUBLIC_KEY_SIZE = 32;
     public static final int PRIVATE_KEY_SIZE = 64;
 
     private static SLHDSA2024 SLHDSA_128s_RDFC_2024 = new SLHDSA2024(

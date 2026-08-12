@@ -32,13 +32,13 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
 
     public SDBaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
 
-        var skolemized = Skolemizer.skolemize(processor.expandedData());
+        var skolemized = Skolemizer.skolemize(adapter.expandedData());
 
-        var compacted = model.compact().apply(processor.context(), skolemized);
+        var compacted = model.compact().apply(adapter.context(), skolemized);
 
         var canonizer = model.newCanonizer();
 
-        var consumer = canonizer.consumer();
+//        var consumer = canonizer.consumer();
 
         model.tordf().accept(skolemized, ((subject, predicate, object, datatype, language, direction, graph) -> {
 
@@ -51,7 +51,7 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
                 o = "_:" + o.substring(Skolemizer.URN_PREFIX.length());
             }
 
-            consumer.accept(s, predicate, o, datatype, language, direction, graph);
+            canonizer.accept(s, predicate, o, datatype, language, direction, graph);
         }));
 
         var canonized = new ArrayList<String>();
@@ -140,7 +140,7 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
         base.compacted = compacted;
         base.canonized = canonized;
         base.model = model;
-        base.context = processor.context();
+        base.context = adapter.context();
 
         return base;
     }
@@ -149,9 +149,9 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
 
         var canonizer = model.newCanonizer();
 
-        var consumer = canonizer.consumer();
+//        var consumer = canonizer.consumer();
 
-        model.tordf().accept(processor.expandedData(), consumer);
+        model.tordf().accept(adapter.expandedData(), canonizer);
 
         var canonized = new ArrayList<String[]>();
 
@@ -160,7 +160,6 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
                     new String[] {
                             subject, predicate, object, datatype, language, direction, graph
                     });
-
         }));
 
         var labelMap = canonizer.labels().values().stream()
@@ -221,6 +220,6 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
     }
 
     private Map<String, Object> compacted() {
-        return model.compact().apply(processor.context(), processor.expandedData());
+        return model.compact().apply(adapter.context(), adapter.expandedData());
     }
 }

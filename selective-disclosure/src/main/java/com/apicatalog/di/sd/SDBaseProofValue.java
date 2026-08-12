@@ -239,7 +239,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
         var selectedNQuads = new HashSet<String>();
 
         var c14n = payload.model.newCanonizer();
-        var consumer = c14n.consumer();
+//        var consumer = c14n.consumer();
 
         payload.model.tordf().accept(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {
 
@@ -254,7 +254,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
 
             var nquad = c14n.toNQuad(s, predicate, o, datatype, language, direction, graph);
 
-            consumer.accept(s, predicate, o, datatype, language, direction, graph);
+            c14n.accept(s, predicate, o, datatype, language, direction, graph);
             selectedNQuads.add(nquad);
         }));
 
