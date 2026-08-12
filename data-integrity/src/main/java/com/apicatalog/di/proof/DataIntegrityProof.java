@@ -18,6 +18,8 @@ import com.apicatalog.trust.lexical.MapProofReader;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.Graph;
+import com.apicatalog.trust.semantic.Graph.LiteralStatement;
+import com.apicatalog.trust.semantic.Graph.ResourceStatement;
 import com.apicatalog.trust.semantic.GraphProofReader;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
@@ -51,10 +53,10 @@ public final class DataIntegrityProof implements Proof {
     private static final String PREDICATE_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     private static final String PREDICATE_CRYPTOSUITE = "https://w3id.org/security#cryptosuite";
     private static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
-    private static final String PREDICATE_EXPIRES = "";
-    private static final String PREDICATE_DOMAIN = "";
-    private static final String PREDICATE_CHALLENGE = "";
-    private static final String PREDICATE_NONCE = "";
+    private static final String PREDICATE_EXPIRES = "https://w3id.org/security#expiration";
+    private static final String PREDICATE_DOMAIN = "https://w3id.org/security#domain";
+    private static final String PREDICATE_CHALLENGE = "https://w3id.org/security#challenge";
+    private static final String PREDICATE_NONCE = "https://w3id.org/security#nonce";
     private static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
     private static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
     private static final String PREDICATE_PROOF_VALUE = "https://w3id.org/security#proofValue";
@@ -604,13 +606,14 @@ public final class DataIntegrityProof implements Proof {
         public boolean isAccepted(Graph.Node proofNode) {
 
             if (proofNode.type().size() != 1
-                    || !TYPE_URI.equals(proofNode.type().getFirst())
-                    ) {
+                    || !TYPE_URI.equals(proofNode.type().getFirst())) {
                 return false;
             }
 
             for (var statement : proofNode.statements()) {
-                if (PREDICATE_CRYPTOSUITE.equals(statement[0]) && cryptosuites.containsKey(statement[1])) {
+                if (PREDICATE_CRYPTOSUITE.equals(statement.predicate())
+                        && statement instanceof LiteralStatement literal
+                        && cryptosuites.containsKey(literal.object())) {
                     return true;
                 }
             }
@@ -626,9 +629,14 @@ public final class DataIntegrityProof implements Proof {
                 PayloadGenerator payload) {
 
             var proofNode = proofGraph.nodes().get(id);
-            
+
             if (proofNode.type().size() != 1) {
                 throw new IllegalArgumentException();
+            }
+
+            if (proofGraph.nodes().size() != 1) {
+                throw new IllegalArgumentException(
+                        "Only one node is allowed per proof graph; found " + proofGraph.nodes().size() + " nodes");
             }
 
             final var proofType = proofNode.type().getFirst();
@@ -653,45 +661,86 @@ public final class DataIntegrityProof implements Proof {
             String proofValue = null;
 
             for (var statement : proofNode.statements()) {
-                switch (statement[0]) {
+
+                boolean canonizeStatement = true;
+
+                switch (statement.predicate()) {
                 case PREDICATE_TYPE:
                     break;
+
                 case PREDICATE_CRYPTOSUITE:
-                    di.cryptosuite = cryptosuites.get(statement[1]);
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    if (!"https://w3id.org/security#cryptosuiteString".equals(literal.datatype())) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    di.cryptosuite = cryptosuites.get(literal.object());
                     break;
+
                 case PREDICATE_CREATED:
-                    di.created = Instant.parse(statement[1]);
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    if (!"http://www.w3.org/2001/XMLSchema#dateTime".equals(literal.datatype())) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    di.created = Instant.parse(literal.object());
                     break;
+
                 case PREDICATE_PROOF_PURPOSE:
-                    di.purpose = statement[1].substring("https://w3id.org/security#".length());
+                    // TODO checks
+
+                    di.purpose = statement.object().substring("https://w3id.org/security#".length());
                     break;
+
                 case PREDICATE_VERIFICATION_METHOD:
-                    di.verificationMethod = statement[1];
+                    if (!(statement instanceof ResourceStatement resource)) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    di.verificationMethod = resource.object();
                     break;
+
                 case PREDICATE_PROOF_VALUE:
-                    proofValue = statement[1];
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    // TODO "https://w3id.org/security#multibase"
+                    canonizeStatement = false;
+                    proofValue = literal.object();
                     break;
+
                 case PREDICATE_PREVIOUS_PROOF:
+                    if (!(statement instanceof ResourceStatement resource)) {
+                        throw new IllegalArgumentException();
+                    }
+
                     if (di.previousProof == null) {
                         di.previousProof = new ArrayList<String>();
                     }
-                    di.previousProof.add(statement[1]);
+
+                    di.previousProof.add(resource.object());
                     break;
+
                 default:
                     throw new IllegalArgumentException(
                             """
                             Unrecognized proof predicate has been found %s.
-                            """.formatted(statement[0]));
+                            """.formatted(statement.predicate()));
                 }
 
-                if (!PREDICATE_PROOF_VALUE.equals(statement[0])) { // TODO better
+                if (canonizeStatement) {
                     canonizer.accept(
                             proofNode.id(),
-                            statement[0],
-                            statement[1],
-                            statement[2],
-                            statement[3],
-                            statement[4],
+                            statement.predicate(),
+                            statement.object(),
+                            statement.datatype(),
+                            statement.language(),
+                            statement.direction(),
                             null);
                 }
             }
@@ -715,4 +764,5 @@ public final class DataIntegrityProof implements Proof {
             return di;
         }
     }
+
 }

@@ -66,38 +66,34 @@ public class GraphPayloadGenerator implements PayloadGenerator {
                     selectedGraph.add(proofGraphId);
 
                     for (var proofNode : proofGraph.nodes().values()) {
-                        for (var quad : proofNode.statements()) {
-                            canonizer.accept(proofNode.id(), quad[0], quad[1], quad[2], quad[3], quad[4], quad[5]);
+                        for (var statement : proofNode.statements()) {
+                            canonizer.accept(
+                                    proofNode.id(),
+                                    statement.predicate(),
+                                    statement.object(),
+                                    statement.datatype(),
+                                    statement.language(),
+                                    statement.direction(),
+                                    proofNode.graph());
                         }
                     }
                 }
             }
-
-//            for (var includedProofId : includedProofs) {
-//
-//                var proofNode = adapter.proof(includedProofId);
-//
-//                if (proofNode == null) {
-//                    throw new IllegalArgumentException();
-//                }
-//
-//                for (var quad : proofNode.statements()) {
-//                    canonizer.accept(proofNode.id(), quad[0], quad[1], quad[2], quad[3], quad[4], quad[5]);
-//                }
-//
-//                // FIXME
-            //// if (includedProofs.contains(proofNode.iterator().next()[0])) { /
-            /// selectedGraph.add(graph); / for (var quad : proofNode) { /
-            /// consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5],
-            /// quad[6]); / } / }
-//            }
         }
 
         for (var node : adapter.data().nodes().values()) {
-            for (var quad : node.statements()) {
+            for (var statement : node.statements()) {
                 // do not include proof predicates if not selected
-                if (!model.vocab().proof().equals(quad[0]) || selectedGraph.contains(quad[1])) {
-                    canonizer.accept(node.id(), quad[0], quad[1], quad[2], quad[3], quad[4], quad[5]);
+                if (!model.vocab().proof().equals(statement.predicate())
+                        || selectedGraph.contains(statement.object())) {
+                    canonizer.accept(
+                            node.id(),
+                            statement.predicate(),
+                            statement.object(),
+                            statement.datatype(),
+                            statement.language(),
+                            statement.direction(),
+                            node.graph());
                 }
             }
         }

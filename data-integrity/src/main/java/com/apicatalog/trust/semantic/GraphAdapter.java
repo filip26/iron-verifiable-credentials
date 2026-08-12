@@ -63,33 +63,13 @@ public final class GraphAdapter implements SemanticAdapter {
     @Override
     public Graph proofGraph(String graph) {
         lazyInit();
-
         return dataset.graphs.get(graph);
-
-//        if (proofGraph.nodes().size() != 1) {
-//            throw new IllegalArgumentException(
-//                    "Only one resource/node is allowed per proof graph; found " + proofGraph.nodes());
-//        }
-//
-//        return proofGraph.nodes().values().iterator().next();   //FIXME
     }
-
-//    @Override
-//    public Graph.Node proof(String id) {
-//        lazyInit();
-//        return dataset.nodes.get(id);
-//    }
 
     public Collection<String> proofGraphs() {
         lazyInit();
         return dataset.proofGraphs;
     }
-
-//    @Override
-//    public String proofType(String graph) {
-//        lazyInit();
-//        return dataset.proofTypes.get(graph);
-//    }
 
     @Override
     public Map<String, Object> expandedData() {
@@ -128,7 +108,6 @@ public final class GraphAdapter implements SemanticAdapter {
 //        if (expandedProofs != null) {
         dataset = new Dataset();
         dataset.proofPredicate = model.vocab().proof();
-        dataset.typePredicate = model.vocab().type();
         model.tordf().accept(expanded, dataset);
 //        }
 //        if (dataset == null) {
@@ -150,7 +129,6 @@ public final class GraphAdapter implements SemanticAdapter {
         private final Collection<String> proofGraphs = new HashSet<>();
 
         private String proofPredicate;
-        private String typePredicate;
 
         @Override
         public void accept(
@@ -175,41 +153,15 @@ public final class GraphAdapter implements SemanticAdapter {
 
             var container = graphs.computeIfAbsent(key, _ -> new Graph(graph, new HashMap<>()));
 
-            var node = container.nodes().computeIfAbsent(subject,
-                    _ -> new Graph.Node(subject, new ArrayList<>(), new ArrayList<>()));
+            var node = container.nodes().computeIfAbsent(
+                    subject,
+                    _ -> new Graph.Node(subject, graph));
 
-//            if (nodeRecord == null) {
-//                nodeRecord = new Graph.Node(subject, new ArrayList<>(), new ArrayList<>());
-//                container.nodes().put(subject, nodeRecord);                
+//            if (typePredicate.equals(predicate)) {
+//                node.type().add(object);
 //            }
-//
-            if (typePredicate.equals(predicate)) {
-                node.type().add(object);
 
-            }
-
-            node.statements().add(new String[] {
-                    predicate, object, datatype, language, direction, graph
-            });
-
-//            var node = graphs.computeIfAbsent(key, _ -> new ArrayList<>()); 
-
-//
-//            if (key == null) {
-//                key = "@default";
-//
-//                if (proofPredicate.equals(predicate)) {
-//                    proofGraphs.add(object);
-//                }
-//
-//            } else if (typePredicate.equals(predicate)) {
-//                proofTypes.put(graph, object);
-//            }
-//
-//            graphs.computeIfAbsent(key, _ -> new ArrayList<String[]>())
-//                    .add(new String[] {
-//                            subject, predicate, object, datatype, language, direction, graph
-//                    });
+            node.addStatement(predicate, object, datatype, language, direction);
         }
     }
 

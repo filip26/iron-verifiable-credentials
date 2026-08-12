@@ -388,18 +388,26 @@ public final class Ed25519Signature2020 implements Proof {
             byte[] proofValue = null;
 
             for (var statement : proofNode.statements()) {
-                switch (statement[0]) {
+                
+                boolean canonizeStatement = true;
+                
+                switch (statement.predicate()) {
                 case PREDICATE_CREATED:
-                    di.created = Instant.parse(statement[1]);
+                    //TODO datatype
+                    di.created = Instant.parse(statement.object());
                     break;
                 case PREDICATE_PROOF_PURPOSE:
-                    di.purpose = statement[1];
+                    //TODO type
+                    di.purpose = statement.object();
                     break;
                 case PREDICATE_VERIFICATION_METHOD:
-                    di.verificationMethod = statement[1];
+                    //TODO type
+                    di.verificationMethod = statement.object();
                     break;
                 case PREDICATE_PROOF_VALUE:
-                    proofValue = Multibase.BASE_58_BTC.decode(statement[1]);
+                    //TODO type
+                    canonizeStatement = false;
+                    proofValue = Multibase.BASE_58_BTC.decode(statement.object());
                     break;
                 case PREDICATE_TYPE:
                     break;
@@ -407,17 +415,18 @@ public final class Ed25519Signature2020 implements Proof {
                     throw new IllegalArgumentException(
                             """
                             An unsupported predicate %s for proof %s.
-                            """.formatted(statement[0], TYPE_URI));
+                            """.formatted(statement.predicate(), TYPE_URI));
 
                 }
-                if (!PREDICATE_PROOF_VALUE.equals(statement[0])) {
+                
+                if (canonizeStatement) {
                     canonizer.accept(
                             proofNode.id(),
-                            statement[0], // predicate
-                            statement[1], // object
-                            statement[2], // datatype
-                            statement[3], // language
-                            statement[4], // direction
+                            statement.predicate(),
+                            statement.object(),
+                            statement.datatype(),
+                            statement.language(),
+                            statement.direction(),
                             null // graph
                     );
                 }
