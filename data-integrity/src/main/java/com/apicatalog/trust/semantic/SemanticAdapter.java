@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
-import com.apicatalog.trust.semantic.Graph.Node;
 
 public interface SemanticAdapter extends Document.Adapter {
 
@@ -21,12 +20,10 @@ public interface SemanticAdapter extends Document.Adapter {
 
     Graph data();
 
-//    Node proof(String id);
-
     // returns proof graph ids, might be URI or blank node identifier
     Collection<String> proofGraphs();
 
-    Graph.Node proofGraph(String graph);
+    Graph proofGraph(String graph);
 
     Map<String, Object> expandedData();
 

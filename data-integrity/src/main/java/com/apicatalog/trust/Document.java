@@ -28,7 +28,6 @@ public interface Document {
         Map<String, ?> compacted();
 
         Vocab vocab();
-
     }
 
 }

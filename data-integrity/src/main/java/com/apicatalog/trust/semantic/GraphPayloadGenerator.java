@@ -2,6 +2,8 @@ package com.apicatalog.trust.semantic;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -17,18 +19,18 @@ public class GraphPayloadGenerator implements PayloadGenerator {
     }
 
     protected final SemanticModel model;
-    protected final SemanticAdapter processor;
+    protected final SemanticAdapter adapter;
 
     protected Collection<String> includedProofs;
 
     public GraphPayloadGenerator(
             SemanticModel model,
-            SemanticAdapter processor) {
+            SemanticAdapter adapter) {
         this.model = model;
-        this.processor = processor;
-        this.includedProofs = null;
+        this.adapter = adapter;
+        this.includedProofs = List.of();
     }
-    
+
     @Override
     public DigestiblePayload digestible() {
         return digestible(GenericPayload::new);
@@ -38,47 +40,72 @@ public class GraphPayloadGenerator implements PayloadGenerator {
     public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
 
         var canonizer = model.newCanonizer();
-        var consumer = canonizer.consumer();
+//        var consumer = canonizer.consumer();
 
         Set<String> selectedGraph = Set.of();
 
-        if (includedProofs != null && !includedProofs.isEmpty()) {
-            selectedGraph = new HashSet<String>();
+        if (!includedProofs.isEmpty()) {
+            selectedGraph = HashSet.<String>newHashSet(includedProofs.size());
 
             // select proofs
+            for (var proofGraphId : adapter.proofGraphs()) {
 
-            for (var graph : processor.proofs()) {
+                var proofGraph = adapter.proofGraph(proofGraphId);
 
-                var proof = processor.proof(graph);
+                if (includedProofs.contains(proofGraph.id())) {
 
-                if (includedProofs.contains(proof.iterator().next()[0])) {
-                    selectedGraph.add(graph);
-                    for (var quad : proof) {
-                        consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], quad[6]);
+                    selectedGraph.add(proofGraphId);
+
+                    for (var proofNode : proofGraph.nodes().values()) {
+                        for (var quad : proofNode.statements()) {
+                            canonizer.accept(proofNode.id(), quad[0], quad[1], quad[2], quad[3], quad[4], quad[5]);
+                        }
                     }
+                }
+            }
+
+//            for (var includedProofId : includedProofs) {
+//
+//                var proofNode = adapter.proof(includedProofId);
+//
+//                if (proofNode == null) {
+//                    throw new IllegalArgumentException();
+//                }
+//
+//                for (var quad : proofNode.statements()) {
+//                    canonizer.accept(proofNode.id(), quad[0], quad[1], quad[2], quad[3], quad[4], quad[5]);
+//                }
+//
+//                // FIXME
+            //// if (includedProofs.contains(proofNode.iterator().next()[0])) { /
+            /// selectedGraph.add(graph); / for (var quad : proofNode) { /
+            /// consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5],
+            /// quad[6]); / } / }
+//            }
+        }
+
+        for (var node : adapter.data().nodes().values()) {
+            for (var quad : node.statements()) {
+                // do not include proof predicates if not selected
+                if (!model.vocab().proof().equals(quad[0]) || selectedGraph.contains(quad[1])) {
+                    canonizer.accept(node.id(), quad[0], quad[1], quad[2], quad[3], quad[4], quad[5]);
                 }
             }
         }
 
-        for (var quad : processor.data()) {
-            if (!model.vocab().proof().equals(quad[1])
-                    || selectedGraph.contains(quad[2])) {
-                consumer.accept(quad[0], quad[1], quad[2], quad[3], quad[4], quad[5], null);
-            }
-        }
-
         var canonical = canonizer.canonize();
-        // TODO cache generic
+        // TODO cache generic, i.e. no included proofs
         return payloadFactory.apply(canonical);
     }
 
     @Override
     public void withProofs(Collection<String> ids) {
+        Objects.requireNonNull(ids);
         this.includedProofs = ids;
     }
 
     @Override
     public void reset() {
-        this.includedProofs = null;
+        this.includedProofs = List.of();
     }
 }

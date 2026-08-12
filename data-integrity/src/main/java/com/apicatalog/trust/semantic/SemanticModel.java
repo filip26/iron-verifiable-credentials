@@ -108,8 +108,8 @@ public class SemanticModel implements Model {
         return primitives.cursor.createCursor(this, adapter);
     }
 
-    public GraphProofReader reader(String proofType) {
-        return readers.get(proofType);
+    public GraphProofReader reader(String type) {
+        return readers.get(type);
     }
 
     public GraphCanonizer newCanonizer() {

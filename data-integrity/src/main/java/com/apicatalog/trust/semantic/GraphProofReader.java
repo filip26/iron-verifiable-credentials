@@ -1,17 +1,17 @@
 package com.apicatalog.trust.semantic;
 
-import java.util.Collection;
-
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 
+//TODO generalize, use generic to parameterize
 public interface GraphProofReader {
 
-    boolean isAccepted(Collection<String[]> proof);
+    boolean isAccepted(Graph.Node proof);
 
     // reads from n-quads
     Proof read(
-            Collection<String[]> proof,
+            String id,
+            Graph proof,
             SemanticModel model,
             PayloadGenerator payload);
 }

@@ -9,7 +9,7 @@ public interface LexicalAdapter extends Document.Adapter {
 
     @FunctionalInterface
     interface Factory {
-        LexicalAdapter createProcessor(
+        LexicalAdapter createAdapter(
                 LexicalModel model,
                 Collection<String> context,
                 Map<String, Object> document);

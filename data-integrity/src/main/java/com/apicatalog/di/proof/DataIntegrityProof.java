@@ -17,6 +17,7 @@ import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.lexical.MapProofReader;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.GraphProofReader;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
@@ -600,71 +601,97 @@ public final class DataIntegrityProof implements Proof {
         }
 
         @Override
-        public boolean isAccepted(Collection<String[]> proof) {
+        public boolean isAccepted(Graph.Node proofNode) {
 
-            for (var statement : proof) {
-                if (PREDICATE_CRYPTOSUITE.equals(statement[1]) && cryptosuites.containsKey(statement[2])) {
+            if (proofNode.type().size() != 1
+                    || !TYPE_URI.equals(proofNode.type().getFirst())
+                    ) {
+                return false;
+            }
+
+            for (var statement : proofNode.statements()) {
+                if (PREDICATE_CRYPTOSUITE.equals(statement[0]) && cryptosuites.containsKey(statement[1])) {
                     return true;
                 }
             }
+
             return false;
         }
 
         @Override
         public Proof read(
-                Collection<String[]> proof,
+                String id,
+                Graph proofGraph,
                 SemanticModel model,
                 PayloadGenerator payload) {
+
+            var proofNode = proofGraph.nodes().get(id);
+            
+            if (proofNode.type().size() != 1) {
+                throw new IllegalArgumentException();
+            }
+
+            final var proofType = proofNode.type().getFirst();
+
+            if (!TYPE_URI.equals(proofType)) {
+                throw new IllegalArgumentException(
+                        """
+                        An unexpected proof type has been detected %s, expected %s.
+                        """.formatted(proofType, TYPE_URI));
+            }
+
             final var di = new DataIntegrityProof();
 
-            var canonizer = model.newCanonizer();
+            if (!proofNode.id().startsWith("_:")) {
+                di.id = proofNode.id();
+            }
 
-            var consumer = canonizer.consumer();
+            final var canonizer = model.newCanonizer();
+
+//            final var consumer = canonizer.consumer();
 
             String proofValue = null;
 
-            for (var statement : proof) {
-                switch (statement[1]) {
+            for (var statement : proofNode.statements()) {
+                switch (statement[0]) {
                 case PREDICATE_TYPE:
-                    if (!TYPE_URI.equals(statement[2])) {
-                        throw new IllegalArgumentException(
-                                """
-                                An unexpected proof type has been detected %s, expected %s.
-                                """.formatted(statement[1], TYPE_URI));
-                    }
-                    if (!statement[0].startsWith("_:")) {
-                        di.id = statement[0];
-                    }
                     break;
                 case PREDICATE_CRYPTOSUITE:
-                    di.cryptosuite = cryptosuites.get(statement[2]);
+                    di.cryptosuite = cryptosuites.get(statement[1]);
                     break;
                 case PREDICATE_CREATED:
-                    di.created = Instant.parse(statement[2]);
+                    di.created = Instant.parse(statement[1]);
                     break;
                 case PREDICATE_PROOF_PURPOSE:
-                    di.purpose = statement[2].substring("https://w3id.org/security#".length());
+                    di.purpose = statement[1].substring("https://w3id.org/security#".length());
                     break;
                 case PREDICATE_VERIFICATION_METHOD:
-                    di.verificationMethod = statement[2];
+                    di.verificationMethod = statement[1];
                     break;
                 case PREDICATE_PROOF_VALUE:
-                    proofValue = statement[2];
+                    proofValue = statement[1];
                     break;
                 case PREDICATE_PREVIOUS_PROOF:
                     if (di.previousProof == null) {
                         di.previousProof = new ArrayList<String>();
                     }
-                    di.previousProof.add(statement[2]);
+                    di.previousProof.add(statement[1]);
                     break;
                 default:
                     throw new IllegalArgumentException(
                             """
                             Unrecognized proof predicate has been found %s.
-                            """.formatted(statement[1]));
+                            """.formatted(statement[0]));
                 }
-                if (!PREDICATE_PROOF_VALUE.equals(statement[1])) { // TODO better
-                    consumer.accept(statement[0], statement[1], statement[2], statement[3], statement[4], statement[5],
+
+                if (!PREDICATE_PROOF_VALUE.equals(statement[0])) { // TODO better
+                    canonizer.accept(
+                            proofNode.id(),
+                            statement[0],
+                            statement[1],
+                            statement[2],
+                            statement[3],
+                            statement[4],
                             null);
                 }
             }

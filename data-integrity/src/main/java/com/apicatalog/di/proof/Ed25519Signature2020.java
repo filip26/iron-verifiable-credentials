@@ -21,6 +21,7 @@ import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
+import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.GraphProofReader;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
@@ -257,6 +258,7 @@ public final class Ed25519Signature2020 implements Proof {
     public Collection<String> context() {
         return context;
     }
+
 //
 //    public void validate(Map<String, Object> params) throws DocumentError {
 //        if (created == null) {
@@ -350,62 +352,74 @@ public final class Ed25519Signature2020 implements Proof {
     public static class GraphReader implements GraphProofReader {
 
         @Override
-        public boolean isAccepted(Collection<String[]> proof) {
-            return true;
+        public boolean isAccepted(Graph.Node proofNode) {
+            return proofNode.type().size() == 1
+                    && TYPE_URI.equals(proofNode.type().getFirst());
         }
 
         @Override
         public Proof read(
-                Collection<String[]> proof,
+                String id,
+                Graph proofGraph,
                 SemanticModel model,
                 PayloadGenerator payload) {
+
+            var proofNode = proofGraph.nodes().get(id);
+
+            if (proofNode.type().size() != 1) {
+                throw new IllegalArgumentException();
+            }
+
+            final var proofType = proofNode.type().getFirst();
+
+            if (!TYPE_URI.equals(proofType)) {
+                throw new IllegalArgumentException(
+                        """
+                        An unexpected proof type has been detected %s, expected %s.
+                        """.formatted(proofType, TYPE_URI));
+            }
 
             final var di = new Ed25519Signature2020();
 
             var canonizer = model.newCanonizer();
 
-            var consumer = canonizer.consumer();
+//            var consumer = canonizer.consumer();
 
             byte[] proofValue = null;
 
-            for (var statement : proof) {
-                switch (statement[1]) {
+            for (var statement : proofNode.statements()) {
+                switch (statement[0]) {
                 case PREDICATE_CREATED:
-                    di.created = Instant.parse(statement[2]);
+                    di.created = Instant.parse(statement[1]);
                     break;
                 case PREDICATE_PROOF_PURPOSE:
-                    di.purpose = statement[2];
+                    di.purpose = statement[1];
                     break;
                 case PREDICATE_VERIFICATION_METHOD:
-                    di.verificationMethod = statement[2];
+                    di.verificationMethod = statement[1];
                     break;
                 case PREDICATE_PROOF_VALUE:
-                    proofValue = Multibase.BASE_58_BTC.decode(statement[2]);
+                    proofValue = Multibase.BASE_58_BTC.decode(statement[1]);
                     break;
                 case PREDICATE_TYPE:
-                    if (!TYPE_URI.equals(statement[2])) {
-                        throw new IllegalArgumentException(
-                                """
-                                Proof type mismatch; %s for proof %s.
-                                """.formatted(statement[2], TYPE_URI));
-                    }
                     break;
                 default:
                     throw new IllegalArgumentException(
                             """
                             An unsupported predicate %s for proof %s.
-                            """.formatted(statement[1], TYPE_URI));
+                            """.formatted(statement[0], TYPE_URI));
 
                 }
-                if (!PREDICATE_PROOF_VALUE.equals(statement[1])) {
-                    consumer.accept(
-                            statement[0], // subject
-                            statement[1], // predicate
-                            statement[2], // object
-                            statement[3], // datatype
-                            statement[4], // language
-                            statement[5], // direction
-                            null);
+                if (!PREDICATE_PROOF_VALUE.equals(statement[0])) {
+                    canonizer.accept(
+                            proofNode.id(),
+                            statement[0], // predicate
+                            statement[1], // object
+                            statement[2], // datatype
+                            statement[3], // language
+                            statement[4], // direction
+                            null // graph
+                    );
                 }
             }
 

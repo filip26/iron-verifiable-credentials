@@ -6,8 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.apicatalog.trust.model.Model.Vocab;
-
 public class MapAdapter implements LexicalAdapter {
 
     private final LexicalModel model;
@@ -39,7 +37,7 @@ public class MapAdapter implements LexicalAdapter {
         case null -> List.of();
         case Object obj -> List.of(obj);
         };
-
+        
         @SuppressWarnings("unchecked")
         Map<String, Object>[] mapProofs = new Map[proofs.size()];
 
@@ -52,6 +50,7 @@ public class MapAdapter implements LexicalAdapter {
             @SuppressWarnings("unchecked")
             var map = (Map<String, Object>) rawMap;
 
+            // inject context into a proof
             if (!map.containsKey("@context")) {
                 map = new HashMap<>(map);
                 map.put("@context", context);
@@ -80,7 +79,7 @@ public class MapAdapter implements LexicalAdapter {
 
     @Override
     public int proofs() {
-        return proofs.length;
+        return proofs != null ? proofs.length : 0;
     }
 
     @Override

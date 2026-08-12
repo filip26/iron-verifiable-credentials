@@ -7,7 +7,7 @@
     <artifactId>iron-barcodes</artifactId>
     <version>1.0.0-M1</version>
 
-    <name>Iron: Verifiable Credential Barcodes</name>
+    <name>Iron Verifiable Credential Barcodes</name>
     <description>
         Standards-compliant, modular library for W3C Verifiable Credential
         Barcodes,

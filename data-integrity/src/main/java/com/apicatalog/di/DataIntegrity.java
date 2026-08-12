@@ -21,13 +21,13 @@ import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphProofReader;
-import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticAdapter;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.SemanticModel.JsonLdOps;
 import com.apicatalog.trust.semantic.SemanticModel.Primitives;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
+import com.apicatalog.trust.semantic.SemanticUpdater;
 
 public class DataIntegrity {
 
@@ -51,7 +51,7 @@ public class DataIntegrity {
         private String proofPredicate = DataIntegrity.VOCAB_PROOF_URI;
 
         private SemanticAdapter.Factory adapterFactory;
-        private GraphUpdater.Factory updaterFactory;
+        private SemanticUpdater.Factory updaterFactory;
         private GraphProofCursor.Factory cursorFactory;
         private GraphPayloadGenerator.Factory payloadFactory;
 
@@ -103,7 +103,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder updater(GraphUpdater.Factory factory) {
+        public SemanticModelBuilder updater(SemanticUpdater.Factory factory) {
             this.updaterFactory = factory;
             return this;
         }
@@ -113,9 +113,9 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
-            return proof(cryptosuite.apply(c14n));
-        }
+//        public SemanticModelBuilder proof(Predicate<Collection<?>> context, Function<String, CryptoSuite> cryptosuite) {
+//            return proof(cryptosuite.apply(c14n));
+//        }
 
         public SemanticModelBuilder proof(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
@@ -215,11 +215,12 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
-            return proof(cryptosuite.apply(c14n));
-        }
+//        public LexicalModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
+//            return proof(cryptosuite.apply(c14n));
+//        }
 
-        public LexicalModelBuilder proof(CryptoSuite cryptosuite) {
+        //public LexicalModelBuilder proof(Predicate<Collection<?>> context, CryptoSuite cryptosuite) {
+        public LexicalModelBuilder proof(CryptoSuite cryptosuite) {            
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
             }

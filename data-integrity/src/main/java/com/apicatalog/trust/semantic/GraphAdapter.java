@@ -55,27 +55,41 @@ public final class GraphAdapter implements SemanticAdapter {
     }
 
     @Override
-    public Collection<String[]> data() {
+    public Graph data() {
         lazyInit();
         return dataset.graphs.get("@default");
     }
 
     @Override
-    public Collection<String[]> proof(String graph) {
+    public Graph proofGraph(String graph) {
         lazyInit();
+
         return dataset.graphs.get(graph);
+
+//        if (proofGraph.nodes().size() != 1) {
+//            throw new IllegalArgumentException(
+//                    "Only one resource/node is allowed per proof graph; found " + proofGraph.nodes());
+//        }
+//
+//        return proofGraph.nodes().values().iterator().next();   //FIXME
     }
 
-    public Collection<String> proofs() {
+//    @Override
+//    public Graph.Node proof(String id) {
+//        lazyInit();
+//        return dataset.nodes.get(id);
+//    }
+
+    public Collection<String> proofGraphs() {
         lazyInit();
         return dataset.proofGraphs;
     }
 
-    @Override
-    public String proofType(String graph) {
-        lazyInit();
-        return dataset.proofTypes.get(graph);
-    }
+//    @Override
+//    public String proofType(String graph) {
+//        lazyInit();
+//        return dataset.proofTypes.get(graph);
+//    }
 
     @Override
     public Map<String, Object> expandedData() {
@@ -129,11 +143,11 @@ public final class GraphAdapter implements SemanticAdapter {
 
     private static class Dataset implements QuadConsumer {
 
-        private final Map<String, String> proofTypes = new HashMap<>();
+//        private final Map<String, String> proofTypes = new HashMap<>();
 
-        private Map<String, Collection<String[]>> graphs = new HashMap<>();
+        private final Map<String, Graph> graphs = new HashMap<>();
 
-        private Collection<String> proofGraphs = new HashSet<>();
+        private final Collection<String> proofGraphs = new HashSet<>();
 
         private String proofPredicate;
         private String typePredicate;
@@ -150,21 +164,52 @@ public final class GraphAdapter implements SemanticAdapter {
 
             var key = graph;
 
-            if (key == null) {
+            // default graph
+            if (graph == null) {
                 key = "@default";
 
                 if (proofPredicate.equals(predicate)) {
                     proofGraphs.add(object);
                 }
-
-            } else if (typePredicate.equals(predicate)) {
-                proofTypes.put(graph, object);
             }
 
-            graphs.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
-                    .add(new String[] {
-                            subject, predicate, object, datatype, language, direction, graph
-                    });
+            var container = graphs.computeIfAbsent(key, _ -> new Graph(graph, new HashMap<>()));
+
+            var node = container.nodes().computeIfAbsent(subject,
+                    _ -> new Graph.Node(subject, new ArrayList<>(), new ArrayList<>()));
+
+//            if (nodeRecord == null) {
+//                nodeRecord = new Graph.Node(subject, new ArrayList<>(), new ArrayList<>());
+//                container.nodes().put(subject, nodeRecord);                
+//            }
+//
+            if (typePredicate.equals(predicate)) {
+                node.type().add(object);
+
+            }
+
+            node.statements().add(new String[] {
+                    predicate, object, datatype, language, direction, graph
+            });
+
+//            var node = graphs.computeIfAbsent(key, _ -> new ArrayList<>()); 
+
+//
+//            if (key == null) {
+//                key = "@default";
+//
+//                if (proofPredicate.equals(predicate)) {
+//                    proofGraphs.add(object);
+//                }
+//
+//            } else if (typePredicate.equals(predicate)) {
+//                proofTypes.put(graph, object);
+//            }
+//
+//            graphs.computeIfAbsent(key, _ -> new ArrayList<String[]>())
+//                    .add(new String[] {
+//                            subject, predicate, object, datatype, language, direction, graph
+//                    });
         }
     }
 

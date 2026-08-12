@@ -9,7 +9,7 @@ import java.util.Map;
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
 
-public class MapUpdater implements Document.Updater {
+public class LexicalUpdater implements Document.Updater {
 
     private final LexicalModel model;
     private final LexicalAdapter adapter;
@@ -17,7 +17,7 @@ public class MapUpdater implements Document.Updater {
     private Collection<Map<String, ?>> newProofs;
     private Collection<String> contexts = null;
 
-    public MapUpdater(LexicalModel model, LexicalAdapter adapter) {
+    public LexicalUpdater(LexicalModel model, LexicalAdapter adapter) {
         this.model = model;
         this.adapter = adapter;
     }
