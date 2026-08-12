@@ -196,6 +196,7 @@ class Resources {
                 String language,
                 String direction,
                 String graph) {
+//            IO.println(subject+ " " + predicate+ " " + object+ " " + datatype+ " " + language+ " " + direction+ " " + graph);
             canon.quad(subject, predicate, object, datatype, language, direction, graph);
         }
 

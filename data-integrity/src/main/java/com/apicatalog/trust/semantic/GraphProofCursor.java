@@ -76,6 +76,7 @@ public class GraphProofCursor implements ProofCursor {
                     break;
                 }
             }
+
 //            var proofType = adapter.proofType(proofGraph);
 
 //            var reader = model.reader(proofGraph.type().getFirst()); //TODO, only one type allowed

@@ -52,7 +52,16 @@ public class GraphPayloadGenerator implements PayloadGenerator {
 
                 var proofGraph = adapter.proofGraph(proofGraphId);
 
-                if (includedProofs.contains(proofGraph.id())) {
+                var selected = false;
+
+                for (var included : includedProofs) {
+                    if (proofGraph.nodes().containsKey(included)) {
+                        selected = true;
+                        break;
+                    }
+                }
+
+                if (selected) {
 
                     selectedGraph.add(proofGraphId);
 
