@@ -1,6 +1,5 @@
 package com.apicatalog.trust.semantic;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +10,7 @@ import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
-public final class GraphAdapter implements SemanticAdapter {
+public final class GraphAccessor implements SemanticAccessor {
 
     private final SemanticModel model;
 
@@ -23,7 +22,7 @@ public final class GraphAdapter implements SemanticAdapter {
 
     private Dataset dataset;
 
-    protected GraphAdapter(
+    protected GraphAccessor(
             SemanticModel model,
             Collection<String> context,
             Map<String, Object> document) {
@@ -37,11 +36,11 @@ public final class GraphAdapter implements SemanticAdapter {
         this.dataset = null;
     }
 
-    public static GraphAdapter newInstance(
+    public static GraphAccessor newInstance(
             SemanticModel model,
             Collection<String> context,
             Map<String, Object> document) {
-        return new GraphAdapter(model, context, document);
+        return new GraphAccessor(model, context, document);
     }
 
     @Override

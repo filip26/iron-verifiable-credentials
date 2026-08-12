@@ -3,15 +3,14 @@ package com.apicatalog.trust.semantic;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 
-//TODO generalize, use generic to parameterize
-public interface GraphProofReader {
+public interface GraphProofMapper {
 
-    boolean isAccepted(Graph.Node proof);
+    boolean accepts(Graph.Node node);
 
     // reads from n-quads
-    Proof read(
+    Proof materialize(
             String id,
-            Graph proof,
+            Graph graph,
             SemanticModel model,
             PayloadGenerator payload);
 }

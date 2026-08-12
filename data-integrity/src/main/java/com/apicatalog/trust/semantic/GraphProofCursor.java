@@ -12,14 +12,14 @@ import com.apicatalog.trust.proof.ProofCursor;
 public class GraphProofCursor implements ProofCursor {
 
     private final SemanticModel model;
-    private final SemanticAdapter adapter;
-    private final Map<String, Entry<String, GraphProofReader>> readers;
+    private final SemanticAccessor adapter;
+    private final Map<String, Entry<String, GraphProofMapper>> readers;
 
     private Iterator<String> proofGraphsIterator;
 
     private Proof currentProof;
     private Graph currentProofGraph;
-    private Entry<String, GraphProofReader> currentReader;
+    private Entry<String, GraphProofMapper> currentReader;
     private PayloadGenerator payloadProvider;
 
     // TODO ?!?
@@ -27,13 +27,13 @@ public class GraphProofCursor implements ProofCursor {
     public interface Factory {
         GraphProofCursor createCursor(
                 SemanticModel model,
-                SemanticAdapter processor);
+                SemanticAccessor processor);
     }
 
     protected GraphProofCursor(
             SemanticModel model,
-            SemanticAdapter adapter,
-            Map<String, Entry<String, GraphProofReader>> readers) {
+            SemanticAccessor adapter,
+            Map<String, Entry<String, GraphProofMapper>> readers) {
         this.model = model;
         this.adapter = adapter;
         this.readers = readers;
@@ -45,7 +45,7 @@ public class GraphProofCursor implements ProofCursor {
         this.payloadProvider = model.createPayload(adapter);
     }
 
-    public static GraphProofCursor newInstance(SemanticModel model, SemanticAdapter adapter) {
+    public static GraphProofCursor newInstance(SemanticModel model, SemanticAccessor adapter) {
 
         var proofGraphs = adapter.proofGraphs();
 
@@ -53,7 +53,7 @@ public class GraphProofCursor implements ProofCursor {
             return null;
         }
 
-        var proofReaders = HashMap.<String, Entry<String, GraphProofReader>>newHashMap(proofGraphs.size());
+        var proofReaders = HashMap.<String, Entry<String, GraphProofMapper>>newHashMap(proofGraphs.size());
 
         for (var proofGraphId : proofGraphs) {
 
@@ -71,7 +71,7 @@ public class GraphProofCursor implements ProofCursor {
 
                 var reader = model.reader(proofType);
 
-                if (reader != null && reader.isAccepted(node)) {
+                if (reader != null && reader.accepts(node)) {
                     proofReaders.put(proofGraphId, Map.entry(node.id(), reader));
                     break;
                 }
@@ -95,7 +95,7 @@ public class GraphProofCursor implements ProofCursor {
 
     @Override
     public boolean isAccepted() {
-        return currentReader != null && currentReader.getValue().isAccepted(currentProofGraph.nodes().get(currentReader.getKey()));
+        return currentReader != null && currentReader.getValue().accepts(currentProofGraph.nodes().get(currentReader.getKey()));
     }
 
     @Override
@@ -116,7 +116,7 @@ public class GraphProofCursor implements ProofCursor {
     public Proof proof() {
         if (currentProof == null && currentReader != null) {
             payloadProvider.reset();
-            currentProof = currentReader.getValue().read(currentReader.getKey(), currentProofGraph, model, payloadProvider);
+            currentProof = currentReader.getValue().materialize(currentReader.getKey(), currentProofGraph, model, payloadProvider);
         }
         return currentProof;
     }

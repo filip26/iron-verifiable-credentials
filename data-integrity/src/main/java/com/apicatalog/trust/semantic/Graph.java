@@ -6,13 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
 
+import com.apicatalog.trust.payload.PayloadGenerator;
+
 public record Graph(
         String id,
         Map<String, Node> nodes) {
 
     public static final String PREDICATE_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
-    public static class Node {
+    public static final class Node {
 
         final String id;
         final String graph;
@@ -34,8 +36,10 @@ public record Graph(
             if (PREDICATE_TYPE.equals(predicate)) {
                 if (type.isEmpty()) {
                     type = List.of(object);
+
                 } else if (type.size() == 1) {
                     type = List.of(type.getFirst(), object);
+
                 } else {
                     type = new ArrayList<>(type);
                     type.add(object);
@@ -47,6 +51,7 @@ public record Graph(
             }
 
             Statement statement = null;
+
             if (datatype == null) {
                 statement = new ResourceStatement(predicate, object);
 
@@ -58,7 +63,6 @@ public record Graph(
             }
 
             statements.add(statement);
-
         }
 
         public String id() {
@@ -76,10 +80,10 @@ public record Graph(
         public Collection<Statement> statements() {
             return statements;
         }
-
     }
 
     public interface Statement {
+
         String predicate();
 
         String object();
@@ -115,4 +119,15 @@ public record Graph(
             String language,
             String direction) implements Statement {
     };
+    
+    public interface NodeMapper {
+
+        // reads from n-quads
+        <T> T materialize(
+                Class<T> clazz,
+                String id,
+                Graph graph,
+                SemanticModel model,
+                PayloadGenerator payload);
+    }
 }

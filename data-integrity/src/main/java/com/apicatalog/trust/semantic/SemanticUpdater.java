@@ -14,16 +14,16 @@ public final class SemanticUpdater implements Document.Updater {
 
     @FunctionalInterface
     public interface Factory {
-        SemanticUpdater createUpdater(SemanticModel model, SemanticAdapter adapter);
+        SemanticUpdater createUpdater(SemanticModel model, SemanticAccessor adapter);
     }
 
     private final SemanticModel model;
-    private final SemanticAdapter adapter;
+    private final SemanticAccessor adapter;
 
     private Collection<Map<String, ?>> newProofs;
     private Collection<String> contexts = null;
 
-    public SemanticUpdater(SemanticModel model, SemanticAdapter adapter) {
+    public SemanticUpdater(SemanticModel model, SemanticAccessor adapter) {
         this.model = model;
         this.adapter = adapter;
     }

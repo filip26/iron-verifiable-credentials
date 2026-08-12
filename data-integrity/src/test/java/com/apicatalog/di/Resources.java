@@ -28,10 +28,10 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.MapAdapter;
-import com.apicatalog.trust.lexical.MapProofCursor;
+import com.apicatalog.trust.lexical.PropertyMapAccessor;
+import com.apicatalog.trust.lexical.PropertyMapProofCursor;
 import com.apicatalog.trust.model.Model;
-import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.SemanticUpdater;
@@ -49,8 +49,8 @@ class Resources {
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
-            .adapter(MapAdapter::newInstance)
-            .cursor(MapProofCursor::newInstance)
+            .adapter(PropertyMapAccessor::newInstance)
+            .cursor(PropertyMapProofCursor::newInstance)
             .build();
 
     static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
@@ -63,7 +63,7 @@ class Resources {
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
-            .adapter(GraphAdapter::newInstance)
+            .adapter(GraphAccessor::newInstance)
             .updater(SemanticUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)

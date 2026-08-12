@@ -6,12 +6,12 @@ import java.util.Map;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 
-public interface MapProofReader {
+public interface PropertyMapProofMapper {
     
-    boolean isAccepted(Map<String, Object> proof);
+    boolean accepts(Map<String, Object> proof);
 
     // reads from tree
-    Proof read(
+    Proof materialize(
             Collection<String> contexts,
             Map<String, Object> proof,
             byte[] proofPayload,

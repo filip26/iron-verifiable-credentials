@@ -8,18 +8,18 @@ import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class MapProofCursor implements ProofCursor {
+public class PropertyMapProofCursor implements ProofCursor {
 
     @FunctionalInterface
     public interface Factory {
-        MapProofCursor newInstance(
+        PropertyMapProofCursor newInstance(
                 LexicalModel model,
-                LexicalAdapter processor);
+                LexicalAccessor processor);
     }
 
     private final LexicalModel model;
-    private final LexicalAdapter processor;
-    private final MapProofReader[] readers;
+    private final LexicalAccessor processor;
+    private final PropertyMapProofMapper[] readers;
 
     private int currentIndex;
 
@@ -27,10 +27,10 @@ public class MapProofCursor implements ProofCursor {
     private Map<String, Object> currentEntry;
     private PayloadGenerator payloadProvider;
 
-    protected MapProofCursor(
+    protected PropertyMapProofCursor(
             LexicalModel model,
-            LexicalAdapter processor,
-            MapProofReader[] readers) {
+            LexicalAccessor processor,
+            PropertyMapProofMapper[] readers) {
         this.model = model;
         this.processor = processor;
         this.readers = readers;
@@ -41,10 +41,10 @@ public class MapProofCursor implements ProofCursor {
         this.payloadProvider = model.createPayload(processor);
     }
 
-    public static MapProofCursor newInstance(LexicalModel model, LexicalAdapter processor) {
+    public static PropertyMapProofCursor newInstance(LexicalModel model, LexicalAccessor processor) {
         var proofs = processor.proofs();
 
-        var mapping = new ArrayList<MapProofReader>(proofs);
+        var mapping = new ArrayList<PropertyMapProofMapper>(proofs);
 
         for (var index = 0; index < proofs; index++) {
 
@@ -59,7 +59,7 @@ public class MapProofCursor implements ProofCursor {
             return null;
         }
 
-        return new MapProofCursor(model, processor, mapping.toArray(MapProofReader[]::new));
+        return new PropertyMapProofCursor(model, processor, mapping.toArray(PropertyMapProofMapper[]::new));
     }
 
 //    public Data data() {
@@ -75,7 +75,7 @@ public class MapProofCursor implements ProofCursor {
 
     @Override
     public boolean isAccepted() {
-        return currentEntry != null && readers[currentIndex].isAccepted(currentEntry);
+        return currentEntry != null && readers[currentIndex].accepts(currentEntry);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class MapProofCursor implements ProofCursor {
 
             // FIXME context!
             payloadProvider.reset();
-            currentProof = reader.read(processor.context(), currentEntry, canonicalProof, payloadProvider);
+            currentProof = reader.materialize(processor.context(), currentEntry, canonicalProof, payloadProvider);
         }
 
         return currentProof;

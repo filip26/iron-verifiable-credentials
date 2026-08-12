@@ -13,15 +13,15 @@ import java.util.function.Supplier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.lexical.LexicalAdapter;
+import com.apicatalog.trust.lexical.LexicalAccessor;
 import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.MapProofCursor;
-import com.apicatalog.trust.lexical.MapProofReader;
+import com.apicatalog.trust.lexical.PropertyMapProofCursor;
+import com.apicatalog.trust.lexical.PropertyMapProofMapper;
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
-import com.apicatalog.trust.semantic.GraphProofReader;
-import com.apicatalog.trust.semantic.SemanticAdapter;
+import com.apicatalog.trust.semantic.GraphProofMapper;
+import com.apicatalog.trust.semantic.SemanticAccessor;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.SemanticModel.JsonLdOps;
@@ -50,7 +50,7 @@ public class DataIntegrity {
 
         private String proofPredicate = DataIntegrity.VOCAB_PROOF_URI;
 
-        private SemanticAdapter.Factory adapterFactory;
+        private SemanticAccessor.Factory adapterFactory;
         private SemanticUpdater.Factory updaterFactory;
         private GraphProofCursor.Factory cursorFactory;
         private GraphPayloadGenerator.Factory payloadFactory;
@@ -60,7 +60,7 @@ public class DataIntegrity {
         private Function<Map<String, Object>, Collection<Object>> expand;
 
         private Map<String, CryptoSuite> cryptosuites;
-        private Map<String, GraphProofReader> readers;
+        private Map<String, GraphProofMapper> readers;
 
         private SemanticModelBuilder(String c14n) {
             this.c14n = c14n;
@@ -98,7 +98,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder adapter(SemanticAdapter.Factory factory) {
+        public SemanticModelBuilder adapter(SemanticAccessor.Factory factory) {
             this.adapterFactory = factory;
             return this;
         }
@@ -128,7 +128,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder proof(String proofType, GraphProofReader reader) {
+        public SemanticModelBuilder proof(String proofType, GraphProofMapper reader) {
             readers.put(proofType, reader);
             return this;
         }
@@ -181,11 +181,11 @@ public class DataIntegrity {
 
         private Function<Map<String, Object>, byte[]> canonize;
 
-        private LexicalAdapter.Factory processorFactory;
-        private MapProofCursor.Factory cursorFactory;
+        private LexicalAccessor.Factory processorFactory;
+        private PropertyMapProofCursor.Factory cursorFactory;
 
         private Map<String, CryptoSuite> cryptosuites;
-        private Map<String, MapProofReader> readers;
+        private Map<String, PropertyMapProofMapper> readers;
 
         private String proofProperty = DataIntegrity.VOCAB_PROOF_KEY;
 
@@ -205,12 +205,12 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder cursor(MapProofCursor.Factory factory) {
+        public LexicalModelBuilder cursor(PropertyMapProofCursor.Factory factory) {
             this.cursorFactory = factory;
             return this;
         }
 
-        public LexicalModelBuilder adapter(LexicalAdapter.Factory factory) {
+        public LexicalModelBuilder adapter(LexicalAccessor.Factory factory) {
             this.processorFactory = factory;
             return this;
         }

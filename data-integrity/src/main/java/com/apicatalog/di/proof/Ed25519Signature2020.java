@@ -2,6 +2,7 @@ package com.apicatalog.di.proof;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.security.SignatureException;
 import java.time.Instant;
@@ -22,7 +23,7 @@ import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.Graph;
-import com.apicatalog.trust.semantic.GraphProofReader;
+import com.apicatalog.trust.semantic.GraphProofMapper;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
 
@@ -35,7 +36,6 @@ public final class Ed25519Signature2020 implements Proof {
     public static String HASH_ALGORITHM = "SHA-256";
     public static String C14N = "RDFC";
 
-    private static final String PREDICATE_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     private static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
     private static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
     private static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
@@ -340,25 +340,26 @@ public final class Ed25519Signature2020 implements Proof {
             }
 
             return os.toByteArray();
+
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
-    public static GraphProofReader newReader() {
+    public static GraphProofMapper newReader() {
         return new GraphReader();
     }
 
-    public static class GraphReader implements GraphProofReader {
+    public static class GraphReader implements GraphProofMapper {
 
         @Override
-        public boolean isAccepted(Graph.Node proofNode) {
+        public boolean accepts(Graph.Node proofNode) {
             return proofNode.type().size() == 1
                     && TYPE_URI.equals(proofNode.type().getFirst());
         }
 
         @Override
-        public Proof read(
+        public Proof materialize(
                 String id,
                 Graph proofGraph,
                 SemanticModel model,
@@ -383,42 +384,41 @@ public final class Ed25519Signature2020 implements Proof {
 
             var canonizer = model.newCanonizer();
 
-//            var consumer = canonizer.consumer();
-
             byte[] proofValue = null;
 
             for (var statement : proofNode.statements()) {
-                
+
                 boolean canonizeStatement = true;
-                
+
                 switch (statement.predicate()) {
                 case PREDICATE_CREATED:
-                    //TODO datatype
+                    // TODO datatype
                     di.created = Instant.parse(statement.object());
                     break;
                 case PREDICATE_PROOF_PURPOSE:
-                    //TODO type
+                    // TODO type
                     di.purpose = statement.object();
                     break;
                 case PREDICATE_VERIFICATION_METHOD:
-                    //TODO type
+                    // TODO type
                     di.verificationMethod = statement.object();
                     break;
                 case PREDICATE_PROOF_VALUE:
-                    //TODO type
+                    // TODO type
                     canonizeStatement = false;
                     proofValue = Multibase.BASE_58_BTC.decode(statement.object());
                     break;
-                case PREDICATE_TYPE:
+
+                case Graph.PREDICATE_TYPE:
                     break;
+
                 default:
                     throw new IllegalArgumentException(
                             """
                             An unsupported predicate %s for proof %s.
                             """.formatted(statement.predicate(), TYPE_URI));
-
                 }
-                
+
                 if (canonizeStatement) {
                     canonizer.accept(
                             proofNode.id(),

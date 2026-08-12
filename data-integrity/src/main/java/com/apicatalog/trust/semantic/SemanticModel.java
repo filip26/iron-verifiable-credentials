@@ -51,7 +51,7 @@ public class SemanticModel implements Model {
     }
 
     public record Primitives(
-            SemanticAdapter.Factory adapter,
+            SemanticAccessor.Factory adapter,
             SemanticUpdater.Factory updater,
             GraphProofCursor.Factory cursor,
             GraphPayloadGenerator.Factory payload) {
@@ -71,14 +71,14 @@ public class SemanticModel implements Model {
 
     private final Supplier<GraphCanonizer> canonizeFactory;
 
-    private final Map<String, GraphProofReader> readers;
+    private final Map<String, GraphProofMapper> readers;
 
     public SemanticModel(
             Vocab vocab,
             Primitives primitives,
             JsonLdOps jsonLd,
             Supplier<GraphCanonizer> canonizeFactory,
-            Map<String, GraphProofReader> readers) {
+            Map<String, GraphProofMapper> readers) {
         this.vocab = vocab;
         this.primitives = primitives;
         this.jsonLd = jsonLd;
@@ -88,7 +88,7 @@ public class SemanticModel implements Model {
     }
 
     @Override
-    public SemanticAdapter createAdapter(Map<String, Object> document) {
+    public SemanticAccessor createAdapter(Map<String, Object> document) {
         return primitives.adapter.createAdapter(
                 this,
                 ContextAwareResolver.getContexts(document),
@@ -100,15 +100,15 @@ public class SemanticModel implements Model {
         return primitives.updater.createUpdater(this, createAdapter(document));
     }
 
-    public PayloadGenerator createPayload(SemanticAdapter adapter) {
+    public PayloadGenerator createPayload(SemanticAccessor adapter) {
         return primitives.payload.createPayload(this, adapter);
     }
 
-    public GraphProofCursor createCursor(SemanticAdapter adapter) {
+    public GraphProofCursor createCursor(SemanticAccessor adapter) {
         return primitives.cursor.createCursor(this, adapter);
     }
 
-    public GraphProofReader reader(String type) {
+    public GraphProofMapper reader(String type) {
         return readers.get(type);
     }
 

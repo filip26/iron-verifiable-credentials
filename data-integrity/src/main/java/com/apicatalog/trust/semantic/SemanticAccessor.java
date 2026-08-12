@@ -6,11 +6,11 @@ import java.util.Map;
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
 
-public interface SemanticAdapter extends Document.Adapter {
+public interface SemanticAccessor extends Document.Accessor {
 
     @FunctionalInterface
     public interface Factory {
-        SemanticAdapter createAdapter(
+        SemanticAccessor createAdapter(
                 SemanticModel model,
                 Collection<String> context,
                 Map<String, Object> document);

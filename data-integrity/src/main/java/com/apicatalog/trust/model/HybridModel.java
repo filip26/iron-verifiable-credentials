@@ -10,11 +10,11 @@ import com.apicatalog.trust.Document.Updater;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class HybridAdapterModel implements Model {
+public class HybridModel implements Model {
 
     private final Model[] models;
 
-    public HybridAdapterModel(Model... models) {
+    public HybridModel(Model... models) {
         this.models = models;
     }
 
@@ -24,13 +24,13 @@ public class HybridAdapterModel implements Model {
 
     @Override
     // TODO add context as parameter
-    public Document.Adapter createAdapter(Map<String, Object> document) {
+    public Document.Accessor createAdapter(Map<String, Object> document) {
 
         var context = ContextAwareResolver.getContexts(document);
 
         var hybrid = new Adapter();
 
-        var adapters = new ArrayList<Document.Adapter>(models.length);
+        var adapters = new ArrayList<Document.Accessor>(models.length);
 
         for (var model : models) {
             var modelProcessor = model.createAdapter(document);
@@ -48,9 +48,9 @@ public class HybridAdapterModel implements Model {
         return hybrid;
     }
 
-    public static class Adapter implements Document.Adapter {
+    public static class Adapter implements Document.Accessor {
 
-        Collection<Document.Adapter> adapters;
+        Collection<Document.Accessor> adapters;
         Collection<String> context;
         Map<String, Object> document;
 

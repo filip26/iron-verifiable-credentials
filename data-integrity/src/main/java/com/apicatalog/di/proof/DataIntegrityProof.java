@@ -14,13 +14,13 @@ import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.lexical.MapProofReader;
+import com.apicatalog.trust.lexical.PropertyMapProofMapper;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.Graph.LiteralStatement;
 import com.apicatalog.trust.semantic.Graph.ResourceStatement;
-import com.apicatalog.trust.semantic.GraphProofReader;
+import com.apicatalog.trust.semantic.GraphProofMapper;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
 
@@ -50,7 +50,6 @@ public final class DataIntegrityProof implements Proof {
     private static final String KEY_PROOF_VALUE = "proofValue";
     private static final String KEY_PREVIOUS_PROOF = "previousProof";
 
-    private static final String PREDICATE_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     private static final String PREDICATE_CRYPTOSUITE = "https://w3id.org/security#cryptosuite";
     private static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
     private static final String PREDICATE_EXPIRES = "https://w3id.org/security#expiration";
@@ -90,8 +89,7 @@ public final class DataIntegrityProof implements Proof {
 
     public static void compact(DataIntegrityProof proof, TreeEmitter emitter, boolean addContext) {
 
-        var writer = Tree.newPropertyTree(emitter)
-                .beginMap();
+        var writer = Tree.newPropertyTree(emitter).beginMap();
 
         if (addContext && proof.context != null && !proof.context.isEmpty()) {
 
@@ -475,7 +473,7 @@ public final class DataIntegrityProof implements Proof {
         }
     }
 
-    public static class MapReader implements MapProofReader {
+    public static class MapReader implements PropertyMapProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
 
@@ -484,13 +482,13 @@ public final class DataIntegrityProof implements Proof {
         }
 
         @Override
-        public boolean isAccepted(Map<String, Object> proof) {
+        public boolean accepts(Map<String, Object> proof) {
             return TYPE_NAME.equals(proof.get(KEY_TYPE))
                     && cryptosuites.containsKey(proof.get(KEY_CRYPTOSUITE));
         }
 
         @Override
-        public Proof read(
+        public Proof materialize(
                 Collection<String> contexts,
                 Map<String, Object> proof,
                 byte[] proofPayload,
@@ -594,7 +592,7 @@ public final class DataIntegrityProof implements Proof {
 
     }
 
-    public static class GraphReader implements GraphProofReader {
+    public static class GraphReader implements GraphProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
 
@@ -603,7 +601,7 @@ public final class DataIntegrityProof implements Proof {
         }
 
         @Override
-        public boolean isAccepted(Graph.Node proofNode) {
+        public boolean accepts(Graph.Node proofNode) {
 
             if (proofNode.type().size() != 1
                     || !TYPE_URI.equals(proofNode.type().getFirst())) {
@@ -622,7 +620,7 @@ public final class DataIntegrityProof implements Proof {
         }
 
         @Override
-        public Proof read(
+        public Proof materialize(
                 String id,
                 Graph proofGraph,
                 SemanticModel model,
@@ -665,7 +663,7 @@ public final class DataIntegrityProof implements Proof {
                 boolean canonizeStatement = true;
 
                 switch (statement.predicate()) {
-                case PREDICATE_TYPE:
+                case Graph.PREDICATE_TYPE:
                     break;
 
                 case PREDICATE_CRYPTOSUITE:
@@ -761,6 +759,7 @@ public final class DataIntegrityProof implements Proof {
                                 di,
                                 payload);
             }
+
             return di;
         }
     }

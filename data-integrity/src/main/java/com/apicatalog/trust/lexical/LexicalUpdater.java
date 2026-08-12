@@ -12,12 +12,12 @@ import com.apicatalog.trust.model.Model.Vocab;
 public class LexicalUpdater implements Document.Updater {
 
     private final LexicalModel model;
-    private final LexicalAdapter adapter;
+    private final LexicalAccessor adapter;
 
     private Collection<Map<String, ?>> newProofs;
     private Collection<String> contexts = null;
 
-    public LexicalUpdater(LexicalModel model, LexicalAdapter adapter) {
+    public LexicalUpdater(LexicalModel model, LexicalAccessor adapter) {
         this.model = model;
         this.adapter = adapter;
     }
@@ -80,7 +80,7 @@ public class LexicalUpdater implements Document.Updater {
     }
 
     @Override
-    public MapPayloadGenerator createPayload() {
+    public PropertyMapPayloadGenerator createPayload() {
         return model.createPayload(adapter);
     }
 

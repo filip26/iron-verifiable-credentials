@@ -7,16 +7,16 @@ import java.util.function.Function;
 import com.apicatalog.trust.payload.DigestiblePayload;
 import com.apicatalog.trust.payload.PayloadGenerator;
 
-public class MapPayloadGenerator implements PayloadGenerator {
+public class PropertyMapPayloadGenerator implements PayloadGenerator {
 
     private final LexicalModel model;
-    private final LexicalAdapter processor;
+    private final LexicalAccessor processor;
 
     private Collection<String> includedProofs;
 
-    public MapPayloadGenerator(
+    public PropertyMapPayloadGenerator(
             LexicalModel model,
-            LexicalAdapter processor) {
+            LexicalAccessor processor) {
         this.model = model;
         this.processor = processor;
         this.includedProofs = null;

@@ -9,7 +9,7 @@ import com.apicatalog.trust.proof.ProofCursor;
 
 public interface Document {
 
-    interface Adapter {
+    interface Accessor {
 
 //TODO       
 //      <T> T adapt(Class<T> type);
