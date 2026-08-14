@@ -3,16 +3,13 @@ package com.apicatalog.di.proof.c14n;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
 public final class StaticRDFCCanonizer implements GraphCanonizer {
 
@@ -41,7 +38,7 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
             " <https://w3id.org/security#previousProof> <",
             "> .\n",
 
-            " <https://w3id.org/security#proofPurpose> <https://w3id.org/security#",
+            " <https://w3id.org/security#proofPurpose> <",
             "> .\n",
 
             " <https://w3id.org/security#verificationMethod> <",
@@ -49,8 +46,17 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
             .map(i -> i.getBytes(StandardCharsets.UTF_8))
             .toArray(byte[][]::new);
 
-    private String proofId;
-    private String c14nId;
+    private String node;
+
+    private String created;
+    private String challenge;
+    private String cryptosuite;
+    private Collection<String> domains;
+    private String expires;
+    private String nonce;
+    private Collection<String> previous;
+    private String purpose;
+    private String verificationMethod;
 
     public static final StaticRDFCCanonizer newInstance() {
         return new StaticRDFCCanonizer();
@@ -66,7 +72,35 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
             String direction,
             String graph) {
 
-        // TODO Auto-generated method stub
+        if (node == null) {
+            node = subject;
+
+        } else if (!node.equals(subject)) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (predicate) {
+        case DataIntegrityProof.PREDICATE_CREATED:
+            created = object;
+            break;
+        case DataIntegrityProof.PREDICATE_CHALLENGE:
+            challenge = object;
+            break;
+        case DataIntegrityProof.PREDICATE_VERIFICATION_METHOD:
+            verificationMethod = object;
+            break;
+        case DataIntegrityProof.PREDICATE_PROOF_PURPOSE:
+            purpose = object;
+            break;
+        case DataIntegrityProof.PREDICATE_CRYPTOSUITE:
+            cryptosuite = object;
+            break;
+        case DataIntegrityProof.PREDICATE_NONCE:
+            nonce = object;
+            break;
+        default:
+            IO.println(predicate + " " + object);
+        }
 
     }
 
@@ -84,8 +118,17 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
      */
     @Override
     public byte[] canonize() {
-        // TODO Auto-generated method stub
-        return null;
+        return canonize(
+                node,
+                created,
+                challenge,
+                cryptosuite,
+                domains,
+                expires,
+                nonce,
+                previous,
+                purpose,
+                verificationMethod);
     }
 
     /**
@@ -101,39 +144,75 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
      * @return UTF-8 encoded canonical N-Quads proof representation
      */
     public static byte[] canonize(DataIntegrityProof proof) {
+        return canonize(
+                proof.id(),
+                proof.created() != null ? proof.created().toString() : null,
+                proof.challenge(),
+                proof.cryptosuite() != null ? proof.cryptosuite().id() : null,
+                proof.domains(),
+                proof.expires() != null ? proof.expires().toString() : null,
+                proof.nonce(),
+                proof.previous(),
+                proof.purpose() != null ? "https://w3id.org/security#" + proof.purpose() : null,
+                proof.verificationMethod());
+    }
 
-        byte[] id = proof.id() != null && !proof.id().startsWith("_:")
-                ? ("<" + proof.id() + ">").getBytes(StandardCharsets.UTF_8)
+    public static byte[] canonize(
+            String subject,
+            String created,
+            String challenge,
+            String cryptosuite,
+            Collection<String> domains,
+            String expires,
+            String nonce,
+            Collection<String> previous,
+            String purpose,
+            String vm) {
+
+        byte[] id = subject != null && !subject.startsWith("_:")
+                ? ("<" + subject + ">").getBytes(StandardCharsets.UTF_8)
                 : RDFC_TEMPLATE[0];
 
         try {
             var os = new ByteArrayOutputStream();
 
-            rdfcStatement(id, 2, proof.created(), Instant::toString, os);
+            if (created != null) {
+                rdfcStatement(id, 2, created, os);
+            }
 
             os.write(id);
             os.write(RDFC_TEMPLATE[1]); // type
 
-            rdfcStatement(id, 4, proof.challenge(), os);
-            rdfcStatement(id, 6, proof.cryptosuite(), CryptoSuite::id, os);
-
-            if (proof.domains() != null && !proof.domains().isEmpty()) {
-                for (var domain : proof.domains()) {
-                    rdfcStatement(id, 8, domain, os);
-                }
+            if (challenge != null) {
+                rdfcStatement(id, 4, challenge, os);
+            }
+            if (cryptosuite != null) {
+                rdfcStatement(id, 6, cryptosuite, os);
             }
 
-            rdfcStatement(id, 10, proof.expires(), Instant::toString, os);
-            rdfcStatement(id, 12, proof.nonce(), os);
-
-            if (proof.previous() != null && !proof.previous().isEmpty()) {
-                for (var previous : proof.previous()) {
-                    rdfcStatement(id, 14, previous, os);
-                }
+            if (domains != null && !domains.isEmpty()) {
+                domains.stream().sorted().forEach(domain -> rdfcStatement(id, 8, domain, os));
             }
 
-            rdfcStatement(id, 16, proof.purpose(), os);
-            rdfcStatement(id, 18, proof.verificationMethod(), os);
+            if (expires != null) {
+                rdfcStatement(id, 10, expires, os);
+            }
+
+            if (nonce != null) {
+                rdfcStatement(id, 12, nonce, os);
+            }
+
+            if (previous != null && !previous.isEmpty()) {
+                previous.stream().sorted().forEach(el -> rdfcStatement(id, 14, el, os));
+            }
+
+            if (purpose != null) {
+                rdfcStatement(id, 16, purpose, os);
+            }
+
+            if (vm != null) {
+                rdfcStatement(id, 18, vm, os);
+            }
 
             return os.toByteArray();
         } catch (IOException e) {
@@ -141,19 +220,15 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
         }
     }
 
-    private static <T> void rdfcStatement(byte[] id, int index, String value, OutputStream os) throws IOException {
-        if (value != null) {
+    private static <T> void rdfcStatement(byte[] id, int index, String value, OutputStream os) {
+        try {
             os.write(id);
             os.write(RDFC_TEMPLATE[index]);
             os.write(value.getBytes(StandardCharsets.UTF_8));
             os.write(RDFC_TEMPLATE[index + 1]);
-        }
-    }
 
-    private static <T> void rdfcStatement(byte[] id, int index, T value, Function<T, String> map, OutputStream os)
-            throws IOException {
-        if (value != null) {
-            rdfcStatement(id, index, map.apply(value), os);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }

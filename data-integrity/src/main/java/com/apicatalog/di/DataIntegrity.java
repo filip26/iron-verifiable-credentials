@@ -109,7 +109,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder adapter(SemanticAccessor.Factory factory) {
+        public SemanticModelBuilder accessor(SemanticAccessor.Factory factory) {
             this.adapterFactory = factory;
             return this;
         }
@@ -219,7 +219,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder adapter(LexicalAccessor.Factory factory) {
+        public LexicalModelBuilder accessor(LexicalAccessor.Factory factory) {
             this.processorFactory = factory;
             return this;
         }

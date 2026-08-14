@@ -37,7 +37,7 @@ class Resources {
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(Resources::createRDFC)
-            .adapter(GraphAccessor::newInstance)
+            .accessor(GraphAccessor::newInstance)
             .updater(SemanticUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)

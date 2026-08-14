@@ -43,7 +43,7 @@ class Resources {
             .tordf(Resources::toRDF)
             .c14n(Resources::newRDFC)
 //TODO            .hmac()
-            .adapter(GraphAccessor::newInstance)
+            .accessor(GraphAccessor::newInstance)
             .updater(SemanticUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(SDPayloadGenerator::new)
