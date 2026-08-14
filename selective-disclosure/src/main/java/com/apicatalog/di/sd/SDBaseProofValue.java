@@ -238,7 +238,10 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
 
         var selectedNQuads = new HashSet<String>();
 
-        var c14n = payload.model.newCanonizer();
+        if (!(payload.model.newCanonizer() instanceof SDGraphCanonizer c14n)) {
+            throw new IllegalStateException();
+        }
+
 //        var consumer = c14n.consumer();
 
         payload.model.tordf().accept(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {

@@ -36,7 +36,9 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
 
         var compacted = model.compact().apply(adapter.context(), skolemized);
 
-        var canonizer = model.newCanonizer();
+        if (!(model.newCanonizer() instanceof SDGraphCanonizer canonizer)) {
+            throw new IllegalStateException();
+        }
 
 //        var consumer = canonizer.consumer();
 
@@ -147,7 +149,9 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
 
     public SDDerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
 
-        var canonizer = model.newCanonizer();
+        if (!(model.newCanonizer() instanceof SDGraphCanonizer canonizer)) {
+            throw new IllegalStateException();
+        }
 
 //        var consumer = canonizer.consumer();
 

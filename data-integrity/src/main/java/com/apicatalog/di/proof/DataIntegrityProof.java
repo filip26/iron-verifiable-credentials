@@ -25,9 +25,9 @@ import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.Graph.LiteralStatement;
 import com.apicatalog.trust.semantic.Graph.ResourceStatement;
-import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.GraphProofMapper;
 import com.apicatalog.trust.semantic.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.signature.Signature;
 
 /**
@@ -701,6 +701,7 @@ public final class DataIntegrityProof implements Proof {
             if (!proofNode.id().startsWith("_:")) {
                 di.id = proofNode.id();
             }
+            di.previousProof = Set.of();
 
             final var canonizer = canonizeFactory.get();
 
@@ -805,7 +806,7 @@ public final class DataIntegrityProof implements Proof {
                         throw new IllegalArgumentException();
                     }
 
-                    if (di.previousProof == null) {
+                    if (di.previousProof.isEmpty()) {
                         di.previousProof = new ArrayList<String>();
                     }
 
@@ -831,10 +832,7 @@ public final class DataIntegrityProof implements Proof {
                 }
             }
 
-            if (di.previousProof == null) {
-                di.previousProof = Set.of();
-
-            } else if (!di.previousProof.isEmpty()) {
+            if (!di.previousProof.isEmpty()) {
                 payload.withProofs(di.previousProof);
             }
 

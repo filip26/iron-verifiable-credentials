@@ -18,69 +18,72 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
 
     private static final byte[][] RDFC_TEMPLATE = Stream.of(
             "_:c14n0",
-            " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#DataIntegrityProof> .",
+            " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#DataIntegrityProof> .\n",
 
             " <http://purl.org/dc/terms/created> \"",
-            "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .",
+            "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .\n",
 
-            " <https://vc.ex/1> <https://w3id.org/security#challenge> \"",
-            "\" .",
+            " <https://w3id.org/security#challenge> \"",
+            "\" .\n",
 
             " <https://w3id.org/security#cryptosuite> \"",
-            "\"^^<https://w3id.org/security#cryptosuiteString> .",
+            "\"^^<https://w3id.org/security#cryptosuiteString> .\n",
 
             " <https://w3id.org/security#domain> \"",
-            "\" .",
+            "\" .\n",
 
             " <https://w3id.org/security#expiration> \"",
-            "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .",
+            "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .\n",
 
             " <https://w3id.org/security#nonce> \"",
-            "\" .",
+            "\" .\n",
 
             " <https://w3id.org/security#previousProof> <",
-            "> .",
+            "> .\n",
 
             " <https://w3id.org/security#proofPurpose> <https://w3id.org/security#",
-            "> .",
+            "> .\n",
 
             " <https://w3id.org/security#verificationMethod> <",
-            "> .")
+            "> .\n")
             .map(i -> i.getBytes(StandardCharsets.UTF_8))
             .toArray(byte[][]::new);
+
+    private String proofId;
+    private String c14nId;
 
     public static final StaticRDFCCanonizer newInstance() {
         return new StaticRDFCCanonizer();
     }
 
     @Override
-    public void accept(String subject, String predicate, String object, String datatype, String language,
-            String direction, String graph) {
+    public void accept(
+            String subject,
+            String predicate,
+            String object,
+            String datatype,
+            String language,
+            String direction,
+            String graph) {
+
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * Builds the deterministic N-Quads representation of a DataIntegrityProof for
+     * RDF Dataset Canonicalization (RDFC).
+     *
+     * <p>
+     * The returned value is UTF-8 encoded and suitable for verifying. The output
+     * strictly follows N-Quads syntax and is deterministic for the supplied values.
+     * </p>
+     *
+     * @param proof
+     * @return UTF-8 encoded canonical N-Quads proof representation
+     */
     @Override
     public byte[] canonize() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void canonize(QuadConsumer consumer) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Map<String, String> labels() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String toNQuad(String subject, String predicate, String object, String datatype, String language,
-            String direction, String graph) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -90,9 +93,8 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
      * RDF Dataset Canonicalization (RDFC).
      *
      * <p>
-     * The returned value is UTF-8 encoded and suitable for hashing or signing. The
-     * output strictly follows N-Quads syntax and is deterministic for the supplied
-     * values.
+     * The returned value is UTF-8 encoded and suitable for signing. The output
+     * strictly follows N-Quads syntax and is deterministic for the supplied values.
      * </p>
      *
      * @param proof
@@ -100,7 +102,7 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
      */
     public static byte[] canonize(DataIntegrityProof proof) {
 
-        byte[] id = proof.id() != null
+        byte[] id = proof.id() != null && !proof.id().startsWith("_:")
                 ? ("<" + proof.id() + ">").getBytes(StandardCharsets.UTF_8)
                 : RDFC_TEMPLATE[0];
 
@@ -110,8 +112,7 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
             rdfcStatement(id, 2, proof.created(), Instant::toString, os);
 
             os.write(id);
-            os.write(RDFC_TEMPLATE[1]);
-            os.write('\n');
+            os.write(RDFC_TEMPLATE[1]); // type
 
             rdfcStatement(id, 4, proof.challenge(), os);
             rdfcStatement(id, 6, proof.cryptosuite(), CryptoSuite::id, os);
@@ -146,7 +147,6 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
             os.write(RDFC_TEMPLATE[index]);
             os.write(value.getBytes(StandardCharsets.UTF_8));
             os.write(RDFC_TEMPLATE[index + 1]);
-            os.write('\n');
         }
     }
 

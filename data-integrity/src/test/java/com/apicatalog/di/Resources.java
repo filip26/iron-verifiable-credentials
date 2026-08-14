@@ -178,17 +178,17 @@ class Resources {
             return bos.toByteArray();
         }
 
-        @Override
-        public void canonize(QuadConsumer consumer) {
-            try {
-                canon.provide(((subject, predicate, object, datatype, language, direction, graph) -> {
-                    consumer.accept(subject, predicate, object, datatype, language, direction, graph);
-                    return null;
-                }));
-            } catch (RdfConsumerException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
+//        @Override
+//        public void canonize(QuadConsumer consumer) {
+//            try {
+//                canon.provide(((subject, predicate, object, datatype, language, direction, graph) -> {
+//                    consumer.accept(subject, predicate, object, datatype, language, direction, graph);
+//                    return null;
+//                }));
+//            } catch (RdfConsumerException e) {
+//                throw new IllegalArgumentException(e);
+//            }
+//        }
 
         @Override
         public void accept(
@@ -221,16 +221,16 @@ class Resources {
 //                }
 //            };
 //        }
-
-        @Override
-        public Map<String, String> labels() {
-            return canon.mapping();
-        }
-
-        @Override
-        public String toNQuad(String subject, String predicate, String object, String datatype, String language,
-                String direction, String graph) {
-            return NQuadsWriter.nquad(subject, predicate, object, datatype, language, direction, graph);
-        }
+//
+//        @Override
+//        public Map<String, String> labels() {
+//            return canon.mapping();
+//        }
+//
+//        @Override
+//        public String toNQuad(String subject, String predicate, String object, String datatype, String language,
+//                String direction, String graph) {
+//            return NQuadsWriter.nquad(subject, predicate, object, datatype, language, direction, graph);
+//        }
     }
 }

@@ -34,18 +34,18 @@ public class SemanticModel implements Model {
 
         byte[] canonize();
 
-        void canonize(QuadConsumer consumer);
-
-        Map<String, String> labels();
-
-        String toNQuad(
-                String subject,
-                String predicate,
-                String object,
-                String datatype,
-                String language,
-                String direction,
-                String graph);
+//        void canonize(QuadConsumer consumer);
+//
+//        Map<String, String> labels();
+//
+//        String toNQuad(
+//                String subject,
+//                String predicate,
+//                String object,
+//                String datatype,
+//                String language,
+//                String direction,
+//                String graph);
 
         // TODO void reset();
     }

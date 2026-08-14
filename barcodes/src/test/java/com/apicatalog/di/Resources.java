@@ -15,10 +15,8 @@ import com.apicatalog.di.barcodes.ECDSAXI2023;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
 import com.apicatalog.rdf.canon.RdfCanon;
-import com.apicatalog.rdf.nquads.NQuadsWriter;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
@@ -27,10 +25,9 @@ import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
-import com.apicatalog.trust.semantic.SemanticUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
+import com.apicatalog.trust.semantic.SemanticUpdater;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
@@ -152,17 +149,17 @@ class Resources {
             return bos.toByteArray();
         }
 
-        @Override
-        public void canonize(QuadConsumer consumer) {
-            try {
-                canon.provide(((subject, predicate, object, datatype, language, direction, graph) -> {
-                    consumer.accept(subject, predicate, object, datatype, language, direction, graph);
-                    return null;
-                }));
-            } catch (RdfConsumerException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
+//        @Override
+//        public void canonize(QuadConsumer consumer) {
+//            try {
+//                canon.provide(((subject, predicate, object, datatype, language, direction, graph) -> {
+//                    consumer.accept(subject, predicate, object, datatype, language, direction, graph);
+//                    return null;
+//                }));
+//            } catch (RdfConsumerException e) {
+//                throw new IllegalArgumentException(e);
+//            }
+//        }
 
         @Override
         public void accept(
@@ -184,15 +181,15 @@ class Resources {
 //            };
 //        }
 
-        @Override
-        public Map<String, String> labels() {
-            return canon.mapping();
-        }
-
-        @Override
-        public String toNQuad(String subject, String predicate, String object, String datatype, String language,
-                String direction, String graph) {
-            return NQuadsWriter.nquad(subject, predicate, object, datatype, language, direction, graph);
-        }
+//        @Override
+//        public Map<String, String> labels() {
+//            return canon.mapping();
+//        }
+//
+//        @Override
+//        public String toNQuad(String subject, String predicate, String object, String datatype, String language,
+//                String direction, String graph) {
+//            return NQuadsWriter.nquad(subject, predicate, object, datatype, language, direction, graph);
+//        }
     }
 }

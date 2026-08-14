@@ -155,7 +155,9 @@ public class DataIntegrity {
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_URI,
-                        new DataIntegrityProof.GraphMapper(cryptosuites, c14nFactory));
+                        new DataIntegrityProof.GraphMapper(
+                                cryptosuites,
+                                proofC14n.getOrDefault(DataIntegrityProof.TYPE_URI, c14nFactory)));
             }
 
 //            if (readers.isEmpty()) {
