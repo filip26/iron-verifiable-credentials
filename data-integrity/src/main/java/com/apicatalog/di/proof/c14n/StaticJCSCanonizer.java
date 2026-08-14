@@ -35,28 +35,74 @@ public final class StaticJCSCanonizer {
             .toArray(byte[][]::new);
 
     /**
-     * Builds the canonical {@link DataIntegrityProof} (JCS) for hashing/signing.
+     * Builds the canonical {@link DataIntegrityProof} (JCS) for signing.
      *
      * @param proof
      * @return UTF-8 encoded JSON proof bytes
      */
     public static byte[] canonize(DataIntegrityProof proof) {
-        return jcs(proof, false, false);
+        try {
+            var os = new ByteArrayOutputStream();
+            os.write('{');
+
+            var next = false;
+
+            if (proof.context() != null && !proof.context().isEmpty()) {
+                sequence(proof.context(), 11, os);
+                next = true;
+            }
+
+            next = entry(1, proof.challenge(), os, next);
+            next = entry(2, proof.created(), Instant::toString, os, next);
+            next = entry(3, proof.cryptosuite(), CryptoSuite::id, os, next);
+
+            if (proof.domains() != null) {
+                if (proof.domains().size() > 1) {
+                    next = collection(4, proof.domains(), os, next);
+
+                } else if (proof.domains().size() == 1) {
+                    next = entry(4, proof.domains().iterator().next(), os, next);
+                }
+            }
+
+            next = entry(5, proof.expires(), Instant::toString, os, next);
+            next = entry(6, proof.id(), os, next);
+            next = entry(7, proof.nonce(), os, next);
+
+            if (proof.previous() != null) {
+                if (proof.previous().size() > 1) {
+                    next = collection(8, proof.previous(), os, next);
+
+                } else if (proof.previous().size() == 1) {
+                    next = entry(8, proof.previous().iterator().next(), os, next);
+                }
+            }
+
+            next = entry(9, proof.purpose(), os, next);
+
+            if (next) {
+                os.write(',');
+            }
+
+            os.write(JCS_TEMPLATE[0]); // type
+
+            entry(10, proof.verificationMethod(), os, true);
+
+            os.write('}');
+
+            return os.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
-     * Builds the canonical {@link DataIntegrityProof} (JCS) for hashing/signing.
+     * Builds the canonical {@link DataIntegrityProof} (JCS) for verification.
      *
      * @param proof
-     * @param singleElementContext
-     * @param singleElementDomain
      * @return UTF-8 encoded JSON proof bytes
      */
     public static byte[] canonize(Map<String, ?> proof) {
-        return jcs(proof, false, false);
-    }
-
-    private static byte[] jcs(Map<String, ?> proof, boolean singleElementContext, boolean singleElementDomain) {
         try {
             var os = new ByteArrayOutputStream();
             os.write('{');
@@ -131,55 +177,10 @@ public final class StaticJCSCanonizer {
         }
     }
 
-    private static byte[] jcs(DataIntegrityProof proof, boolean singleElementContext, boolean singleElementDomain) {
-        try {
-            var os = new ByteArrayOutputStream();
-            os.write('{');
-
-            var next = false;
-
-            if (proof.context() != null && !proof.context().isEmpty()) {
-                sequence(proof.context(), 11, singleElementContext, os);
-                next = true;
-            }
-
-            next = entry(1, proof.challenge(), os, next);
-            next = entry(2, proof.created(), Instant::toString, os, next);
-            next = entry(3, proof.cryptosuite(), CryptoSuite::id, os, next);
-
-            if (proof.domains() != null && !proof.domains().isEmpty()) {
-                next = collection(4, proof.domains(), os, next);
-            }
-
-            next = entry(5, proof.expires(), Instant::toString, os, next);
-            next = entry(6, proof.id(), os, next);
-            next = entry(7, proof.nonce(), os, next);
-
-            if (proof.previous() != null && !proof.previous().isEmpty()) {
-                next = collection(8, proof.previous(), os, next);
-            }
-
-            next = entry(9, proof.purpose(), os, next);
-
-            if (next) {
-                os.write(',');
-            }
-
-            os.write(JCS_TEMPLATE[0]); // type
-            entry(10, proof.verificationMethod(), os, true);
-
-            os.write('}');
-
-            return os.toByteArray();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private static void sequence(SequencedCollection<String> col, int index, boolean singleElement, OutputStream os)
+    private static void sequence(SequencedCollection<String> col, int index, OutputStream os)
             throws IOException {
         os.write(JCS_TEMPLATE[index]);
-        if (!singleElement && col.size() == 1) {
+        if (col.size() == 1) {
             os.write('"');
             os.write(jcsEscape(col.getFirst()));
             os.write('"');
