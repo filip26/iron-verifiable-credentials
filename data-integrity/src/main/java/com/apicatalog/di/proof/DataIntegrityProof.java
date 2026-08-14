@@ -11,12 +11,14 @@ import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.function.Function;
 
-import com.apicatalog.di.proof.c14n.DIProofC14NTemplates;
+import com.apicatalog.di.proof.c14n.StaticJCSCanonizer;
+import com.apicatalog.di.proof.c14n.StaticRDFCCanonizer;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.tree.io.java.NativeComposer;
 import com.apicatalog.trust.lexical.PropertyProofMapper;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.Graph;
@@ -39,8 +41,8 @@ public final class DataIntegrityProof implements Proof {
     public static final String TYPE_URI = "https://w3id.org/security#DataIntegrityProof";
     public static final String TYPE_NAME = "DataIntegrityProof";
 
-    private static final String KEY_ID = "id";
-    private static final String KEY_TYPE = "type";
+    public static final String KEY_ID = "id";
+    public static final String KEY_TYPE = "type";
     public static final String KEY_CRYPTOSUITE = "cryptosuite";
     public static final String KEY_CREATED = "created";
     public static final String KEY_EXPIRES = "expires";
@@ -322,6 +324,15 @@ public final class DataIntegrityProof implements Proof {
 //            throw new DocumentError(ErrorType.Invalid, name);
 //        }
 //    }
+    
+
+    public static Function<DataIntegrityProof, byte[]> getProofCanonizer(String c14n) {
+        return switch (c14n) {
+        case Model.C14N_JCS -> StaticJCSCanonizer::canonize;
+        case Model.C14N_RDFC -> StaticRDFCCanonizer::canonize;
+        default -> throw new IllegalArgumentException();
+        };
+    }
 
     public static class Draft {
 
@@ -334,7 +345,7 @@ public final class DataIntegrityProof implements Proof {
         }
 
         protected byte[] canonize(String c14n) {
-            return canonize(DIProofC14NTemplates.getProofCanonizer(c14n));
+            return canonize(DataIntegrityProof.getProofCanonizer(c14n));
         }
 
         protected byte[] canonize(Function<DataIntegrityProof, byte[]> canonizer) {

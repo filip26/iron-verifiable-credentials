@@ -63,72 +63,69 @@ public final class StaticJCSCanonizer {
 
             var next = false;
 
-            if (proof.get("@context") instanceof SequencedCollection col && !col.isEmpty()) {
-                jcs(col, 11, singleElementContext, os);
-                next = true;
+            if (proof.get("@context") instanceof Collection col) {
+                next = collection(11, col, os, next);
+
+            } else if (proof.get("@context") instanceof String value) {
+                next = entry(11, value, os, next);
             }
 
             if (proof.get(DataIntegrityProof.KEY_CHALLENGE) instanceof String challenge) {
-                next = jcsEntry(1, challenge, os, next);
+                next = entry(1, challenge, os, next);
             }
 
             if (proof.get(DataIntegrityProof.KEY_CREATED) instanceof String created) {
-                next = jcsEntry(2, created, os, next);
+                next = entry(2, created, os, next);
             }
 
             if (proof.get(DataIntegrityProof.KEY_CRYPTOSUITE) instanceof String cryptosuite) {
-                next = jcsEntry(3, cryptosuite, os, next);
+                next = entry(3, cryptosuite, os, next);
             }
 
-//            if (proof.domains() != null && !proof.domains().isEmpty()) {
-//                if (next) {
-//                    os.write(',');
-//                }
-//            jcsCollection(proof.domains(), 4, singleElementContext, os);
-//                next = true;
-//            }
-//            next = jcsEntry(5, proof.expires(), Instant::toString, os, next);
-//            next = jcsEntry(6, proof.id(), os, next);
-//            next = jcsEntry(7, proof.nonce(), os, next);
-//
-//            if (proof.previous() != null && !proof.previous().isEmpty()) {
-//                if (next) {
-//                    os.write(',');
-//                }
-//                os.write(JCS_TEMPLATE[8]);
-//                if (!singleElementDomain && proof.previous().size() == 1) {
-//                    os.write('"');
-//                    os.write(jcsEscape(proof.previous().iterator().next()));
-//                    os.write('"');
-//                } else {
-//                    os.write('[');
-//                    boolean first = true;
-//                    for (var previous : proof.previous()) {
-//                        if (!first) {
-//                            os.write(',');
-//                        } else {
-//                            first = false;
-//                        }
-//                        os.write('"');
-//                        os.write(jcsEscape(previous));
-//                        os.write('"');
-//                    }
-//                    os.write(']');
-//                }
-//                next = true;
-//            }
-//            next = jcsEntry(9, proof.purpose(), os, next);
-//
-//            if (next) {
-//                os.write(',');
-//            }
-//
-//            os.write(JCS_TEMPLATE[0]); // type
-//            jcsEntry(10, proof.verificationMethod(), os, true);
+            if (proof.get(DataIntegrityProof.KEY_DOMAIN) instanceof Collection col) {
+                next = collection(4, col, os, next);
+
+            } else if (proof.get(DataIntegrityProof.KEY_DOMAIN) instanceof String value) {
+                next = entry(4, value, os, next);
+            }
+
+            if (proof.get(DataIntegrityProof.KEY_EXPIRES) instanceof String expires) {
+                next = entry(5, expires, os, next);
+            }
+
+            if (proof.get(DataIntegrityProof.KEY_ID) instanceof String id) {
+                next = entry(6, id, os, next);
+            }
+
+            if (proof.get(DataIntegrityProof.KEY_NONCE) instanceof String nonce) {
+                next = entry(7, nonce, os, next);
+            }
+
+            if (proof.get(DataIntegrityProof.KEY_PURPOSE) instanceof String purpose) {
+                next = entry(9, purpose, os, next);
+            }
+
+            if (proof.get(DataIntegrityProof.KEY_PREVIOUS_PROOF) instanceof Collection col) {
+                next = collection(8, col, os, next);
+
+            } else if (proof.get(DataIntegrityProof.KEY_PREVIOUS_PROOF) instanceof String value) {
+                next = entry(8, value, os, next);
+            }
+
+            if (next) {
+                os.write(',');
+            }
+
+            os.write(JCS_TEMPLATE[0]); // type
+
+            if (proof.get(DataIntegrityProof.KEY_VERIFICATION_METHOD) instanceof String vm) {
+                entry(10, vm, os, true);
+            }
 
             os.write('}');
 
             return os.toByteArray();
+
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -142,60 +139,34 @@ public final class StaticJCSCanonizer {
             var next = false;
 
             if (proof.context() != null && !proof.context().isEmpty()) {
-                jcs(proof.context(), 11, singleElementContext, os);
+                sequence(proof.context(), 11, singleElementContext, os);
                 next = true;
             }
 
-            next = jcsEntry(1, proof.challenge(), os, next);
-            next = jcsEntry(2, proof.created(), Instant::toString, os, next);
-            next = jcsEntry(3, proof.cryptosuite(), CryptoSuite::id, os, next);
+            next = entry(1, proof.challenge(), os, next);
+            next = entry(2, proof.created(), Instant::toString, os, next);
+            next = entry(3, proof.cryptosuite(), CryptoSuite::id, os, next);
 
             if (proof.domains() != null && !proof.domains().isEmpty()) {
-                if (next) {
-                    os.write(',');
-                }
-                jcs(proof.domains(), 4, os);
-                next = true;
+                next = collection(4, proof.domains(), os, next);
             }
 
-            next = jcsEntry(5, proof.expires(), Instant::toString, os, next);
-            next = jcsEntry(6, proof.id(), os, next);
-            next = jcsEntry(7, proof.nonce(), os, next);
+            next = entry(5, proof.expires(), Instant::toString, os, next);
+            next = entry(6, proof.id(), os, next);
+            next = entry(7, proof.nonce(), os, next);
 
             if (proof.previous() != null && !proof.previous().isEmpty()) {
-                if (next) {
-                    os.write(',');
-                }
-                os.write(JCS_TEMPLATE[8]);
-                if (!singleElementDomain && proof.previous().size() == 1) {
-                    os.write('"');
-                    os.write(jcsEscape(proof.previous().iterator().next()));
-                    os.write('"');
-                } else {
-                    os.write('[');
-                    boolean first = true;
-                    for (var previous : proof.previous()) {
-                        if (!first) {
-                            os.write(',');
-                        } else {
-                            first = false;
-                        }
-                        os.write('"');
-                        os.write(jcsEscape(previous));
-                        os.write('"');
-                    }
-                    os.write(']');
-                }
-                next = true;
+                next = collection(8, proof.previous(), os, next);
             }
-            next = jcsEntry(9, proof.purpose(), os, next);
+
+            next = entry(9, proof.purpose(), os, next);
 
             if (next) {
                 os.write(',');
             }
 
             os.write(JCS_TEMPLATE[0]); // type
-            jcsEntry(10, proof.verificationMethod(), os, true);
+            entry(10, proof.verificationMethod(), os, true);
 
             os.write('}');
 
@@ -205,7 +176,7 @@ public final class StaticJCSCanonizer {
         }
     }
 
-    private static void jcs(SequencedCollection<String> col, int index, boolean singleElement, OutputStream os)
+    private static void sequence(SequencedCollection<String> col, int index, boolean singleElement, OutputStream os)
             throws IOException {
         os.write(JCS_TEMPLATE[index]);
         if (!singleElement && col.size() == 1) {
@@ -217,10 +188,14 @@ public final class StaticJCSCanonizer {
         }
     }
 
-    private static void jcs(Collection<String> col, int index, OutputStream os)
+    private static boolean collection(int index, Collection<String> col, OutputStream os, boolean next)
             throws IOException {
+        if (next) {
+            os.write(',');
+        }
         os.write(JCS_TEMPLATE[index]);
         collection(col, os);
+        return true;
     }
 
     private static void collection(Collection<String> col, OutputStream os)
@@ -240,7 +215,7 @@ public final class StaticJCSCanonizer {
         os.write(']');
     }
 
-    private static boolean jcsEntry(int index, String value, OutputStream os, boolean next)
+    private static boolean entry(int index, String value, OutputStream os, boolean next)
             throws IOException {
         if (value != null) {
             if (next) {
@@ -254,7 +229,7 @@ public final class StaticJCSCanonizer {
         return next;
     }
 
-    private static <T> boolean jcsEntry(int index, T value, Function<T, String> map, OutputStream os, boolean next)
+    private static <T> boolean entry(int index, T value, Function<T, String> map, OutputStream os, boolean next)
             throws IOException {
         if (value != null) {
             if (next) {
