@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.apicatalog.di.proof.c14n.StaticJCSCanonizer;
 import com.apicatalog.di.proof.c14n.StaticRDFCCanonizer;
@@ -24,6 +25,7 @@ import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.Graph.LiteralStatement;
 import com.apicatalog.trust.semantic.Graph.ResourceStatement;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.GraphProofMapper;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.signature.Signature;
@@ -324,7 +326,6 @@ public final class DataIntegrityProof implements Proof {
 //            throw new DocumentError(ErrorType.Invalid, name);
 //        }
 //    }
-    
 
     public static Function<DataIntegrityProof, byte[]> getProofCanonizer(String c14n) {
         return switch (c14n) {
@@ -642,9 +643,11 @@ public final class DataIntegrityProof implements Proof {
     public static class GraphMapper implements GraphProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
+        private final Supplier<GraphCanonizer> canonizeFactory;
 
-        public GraphMapper(Map<String, CryptoSuite> cryptosuites) {
+        public GraphMapper(Map<String, CryptoSuite> cryptosuites, Supplier<GraphCanonizer> canonizeFactory) {
             this.cryptosuites = cryptosuites;
+            this.canonizeFactory = canonizeFactory;
         }
 
         @Override
@@ -699,9 +702,7 @@ public final class DataIntegrityProof implements Proof {
                 di.id = proofNode.id();
             }
 
-            final var canonizer = model.newCanonizer();
-
-//            final var consumer = canonizer.consumer();
+            final var canonizer = canonizeFactory.get();
 
             String proofValue = null;
 

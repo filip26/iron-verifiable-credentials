@@ -5,14 +5,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.semantic.Graph;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
+import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
-public final class StaticRDFCCanonizer {
+public final class StaticRDFCCanonizer implements GraphCanonizer {
 
     private static final byte[][] RDFC_TEMPLATE = Stream.of(
             "_:c14n0",
@@ -47,12 +49,42 @@ public final class StaticRDFCCanonizer {
             .map(i -> i.getBytes(StandardCharsets.UTF_8))
             .toArray(byte[][]::new);
 
-//
-//    public static byte[] canonize(Graph proof) {
-//        
-//    }
-//    
-    
+    public static final StaticRDFCCanonizer newInstance() {
+        return new StaticRDFCCanonizer();
+    }
+
+    @Override
+    public void accept(String subject, String predicate, String object, String datatype, String language,
+            String direction, String graph) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public byte[] canonize() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void canonize(QuadConsumer consumer) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public Map<String, String> labels() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String toNQuad(String subject, String predicate, String object, String datatype, String language,
+            String direction, String graph) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     /**
      * Builds the deterministic N-Quads representation of a DataIntegrityProof for
      * RDF Dataset Canonicalization (RDFC).

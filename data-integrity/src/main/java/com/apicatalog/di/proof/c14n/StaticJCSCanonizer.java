@@ -19,7 +19,6 @@ public final class StaticJCSCanonizer {
 
     private static final byte[][] JCS_TEMPLATE = Stream.of(
             "\"type\":\"DataIntegrityProof\"",
-
             "\"challenge\":\"",
             "\"created\":\"",
             "\"cryptosuite\":\"",

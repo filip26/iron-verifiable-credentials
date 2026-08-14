@@ -31,8 +31,8 @@ import com.apicatalog.trust.semantic.SemanticUpdater;
 
 public class DataIntegrity {
 
-    public static final String VOCAB_PROOF_URI = "https://w3id.org/security#proof";
-    public static final String VOCAB_PROOF_KEY = "proof";
+    public static final String PREDICATE_PROOF = "https://w3id.org/security#proof";
+    public static final String PROPERTY_PROOF = "proof";
 
     public static SemanticModelBuilder createSematicModel(String c14n) {
         return new SemanticModelBuilder(c14n);
@@ -48,7 +48,7 @@ public class DataIntegrity {
 
         private Supplier<GraphCanonizer> c14nFactory;
 
-        private String proofPredicate = DataIntegrity.VOCAB_PROOF_URI;
+        private String proofPredicate = DataIntegrity.PREDICATE_PROOF;
 
         private SemanticAccessor.Factory adapterFactory;
         private SemanticUpdater.Factory updaterFactory;
@@ -59,7 +59,10 @@ public class DataIntegrity {
         private BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
         private Function<Map<String, Object>, Collection<Object>> expand;
 
+        private Map<String, Supplier<GraphCanonizer>> proofC14n;
+
         private Map<String, CryptoSuite> cryptosuites;
+
         private Map<String, GraphProofMapper> readers;
 
         private SemanticModelBuilder(String c14n) {
@@ -74,6 +77,14 @@ public class DataIntegrity {
 
         public SemanticModelBuilder c14n(Supplier<GraphCanonizer> c14nFactory) {
             this.c14nFactory = c14nFactory;
+            return this;
+        }
+
+        public SemanticModelBuilder c14n(String proofType, Supplier<GraphCanonizer> c14nFactory) {
+            if (this.proofC14n == null) {
+                this.proofC14n = new HashMap<>();
+            }
+            this.proofC14n.put(proofType, c14nFactory);
             return this;
         }
 
@@ -113,10 +124,6 @@ public class DataIntegrity {
             return this;
         }
 
-//        public SemanticModelBuilder proof(Predicate<Collection<?>> context, Function<String, CryptoSuite> cryptosuite) {
-//            return proof(cryptosuite.apply(c14n));
-//        }
-
         public SemanticModelBuilder proof(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
@@ -141,19 +148,19 @@ public class DataIntegrity {
 
         public SemanticModel build() {
 
+            if (c14nFactory == null) {
+                throw new IllegalStateException();
+            }
+
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_URI,
-                        new DataIntegrityProof.GraphMapper(cryptosuites));
+                        new DataIntegrityProof.GraphMapper(cryptosuites, c14nFactory));
             }
 
 //            if (readers.isEmpty()) {
 //                throw new IllegalStateException();
 //            }
-
-            if (c14nFactory == null) {
-                throw new IllegalStateException();
-            }
 
             return new SemanticModel(
                     new Vocab(
@@ -187,7 +194,7 @@ public class DataIntegrity {
         private Map<String, CryptoSuite> cryptosuites;
         private Map<String, PropertyProofMapper> readers;
 
-        private String proofProperty = DataIntegrity.VOCAB_PROOF_KEY;
+        private String proofProperty = DataIntegrity.PROPERTY_PROOF;
 
         private LexicalModelBuilder(String c14n) {
             this.c14n = c14n;
@@ -219,8 +226,9 @@ public class DataIntegrity {
 //            return proof(cryptosuite.apply(c14n));
 //        }
 
-        //public LexicalModelBuilder proof(Predicate<Collection<?>> context, CryptoSuite cryptosuite) {
-        public LexicalModelBuilder proof(CryptoSuite cryptosuite) {            
+        // public LexicalModelBuilder proof(Predicate<Collection<?>> context,
+        // CryptoSuite cryptosuite) {
+        public LexicalModelBuilder proof(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
             }

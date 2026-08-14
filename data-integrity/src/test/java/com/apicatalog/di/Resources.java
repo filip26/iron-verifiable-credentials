@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.proof.c14n.StaticRDFCCanonizer;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
@@ -43,7 +45,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 class Resources {
 
     static LexicalModel LEXICAL_MODEL = DataIntegrity.createLexicalModel(Model.C14N_JCS)
-            .proofProperty(DataIntegrity.VOCAB_PROOF_KEY)
+            .proofProperty(DataIntegrity.PROPERTY_PROOF)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
@@ -54,7 +56,7 @@ class Resources {
             .build();
 
     static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
-            .proofPredicate(DataIntegrity.VOCAB_PROOF_URI)
+            .proofPredicate(DataIntegrity.PREDICATE_PROOF)
             .proof(EdDSA2022.withRDFC())
             .proof(ECDSA2019.withRDFC())
             .proof(MLDSA2024.get44withRDFC())
@@ -62,7 +64,8 @@ class Resources {
             .Ed25519Signature2020()
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
-            .c14n(Resources::createRDFC)
+            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFCCanonizer::newInstance) // proof type specific c14n provider
+            .c14n(Resources::createRDFC) // document and proof c14n provider
             .adapter(GraphAccessor::newInstance)
             .updater(SemanticUpdater::new)
             .cursor(GraphProofCursor::newInstance)
@@ -150,11 +153,11 @@ class Resources {
         }
     }
 
-    static final RdfcPrcessor createRDFC() {
-        return new RdfcPrcessor(); // TODO reuse one instance across
+    static final RDFCProcessor createRDFC() {
+        return new RDFCProcessor(); // TODO reuse one instance across
     }
 
-    static class RdfcPrcessor implements GraphCanonizer {
+    static class RDFCProcessor implements GraphCanonizer {
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         final RdfCanon canon = RdfCanon.create(SHA_256);

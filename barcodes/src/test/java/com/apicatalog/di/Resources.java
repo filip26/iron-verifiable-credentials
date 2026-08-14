@@ -127,11 +127,11 @@ class Resources {
         }
     }
 
-    static final RdfcPrcessor createRDFC() {
-        return new RdfcPrcessor(); // TODO reuse one instance across
+    static final RDFCProcessor createRDFC() {
+        return new RDFCProcessor(); // TODO reuse one instance across
     }
 
-    static class RdfcPrcessor implements GraphCanonizer {
+    static class RDFCProcessor implements GraphCanonizer {
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         final RdfCanon canon = RdfCanon.create(SHA_256);
