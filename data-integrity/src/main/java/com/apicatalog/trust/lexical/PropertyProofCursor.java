@@ -8,18 +8,18 @@ import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class PropertyMapProofCursor implements ProofCursor {
+public class PropertyProofCursor implements ProofCursor {
 
     @FunctionalInterface
     public interface Factory {
-        PropertyMapProofCursor newInstance(
+        PropertyProofCursor newInstance(
                 LexicalModel model,
                 LexicalAccessor processor);
     }
 
     private final LexicalModel model;
     private final LexicalAccessor processor;
-    private final PropertyMapProofMapper[] readers;
+    private final PropertyProofMapper[] readers;
 
     private int currentIndex;
 
@@ -27,10 +27,10 @@ public class PropertyMapProofCursor implements ProofCursor {
     private Map<String, Object> currentEntry;
     private PayloadGenerator payloadProvider;
 
-    protected PropertyMapProofCursor(
+    protected PropertyProofCursor(
             LexicalModel model,
             LexicalAccessor processor,
-            PropertyMapProofMapper[] readers) {
+            PropertyProofMapper[] readers) {
         this.model = model;
         this.processor = processor;
         this.readers = readers;
@@ -41,10 +41,10 @@ public class PropertyMapProofCursor implements ProofCursor {
         this.payloadProvider = model.createPayload(processor);
     }
 
-    public static PropertyMapProofCursor newInstance(LexicalModel model, LexicalAccessor processor) {
+    public static PropertyProofCursor newInstance(LexicalModel model, LexicalAccessor processor) {
         var proofs = processor.proofs();
 
-        var mapping = new ArrayList<PropertyMapProofMapper>(proofs);
+        var mapping = new ArrayList<PropertyProofMapper>(proofs);
 
         for (var index = 0; index < proofs; index++) {
 
@@ -59,7 +59,7 @@ public class PropertyMapProofCursor implements ProofCursor {
             return null;
         }
 
-        return new PropertyMapProofCursor(model, processor, mapping.toArray(PropertyMapProofMapper[]::new));
+        return new PropertyProofCursor(model, processor, mapping.toArray(PropertyProofMapper[]::new));
     }
 
 //    public Data data() {

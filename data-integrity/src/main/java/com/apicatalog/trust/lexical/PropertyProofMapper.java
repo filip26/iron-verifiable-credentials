@@ -6,7 +6,7 @@ import java.util.Map;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 
-public interface PropertyMapProofMapper {
+public interface PropertyProofMapper {
     
     boolean accepts(Map<String, Object> proof);
 

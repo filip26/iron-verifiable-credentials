@@ -15,8 +15,8 @@ import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.lexical.LexicalAccessor;
 import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.PropertyMapProofCursor;
-import com.apicatalog.trust.lexical.PropertyMapProofMapper;
+import com.apicatalog.trust.lexical.PropertyProofCursor;
+import com.apicatalog.trust.lexical.PropertyProofMapper;
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
@@ -144,7 +144,7 @@ public class DataIntegrity {
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_URI,
-                        new DataIntegrityProof.GraphReader(cryptosuites));
+                        new DataIntegrityProof.GraphMapper(cryptosuites));
             }
 
 //            if (readers.isEmpty()) {
@@ -182,10 +182,10 @@ public class DataIntegrity {
         private Function<Map<String, Object>, byte[]> canonize;
 
         private LexicalAccessor.Factory processorFactory;
-        private PropertyMapProofCursor.Factory cursorFactory;
+        private PropertyProofCursor.Factory cursorFactory;
 
         private Map<String, CryptoSuite> cryptosuites;
-        private Map<String, PropertyMapProofMapper> readers;
+        private Map<String, PropertyProofMapper> readers;
 
         private String proofProperty = DataIntegrity.VOCAB_PROOF_KEY;
 
@@ -205,7 +205,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder cursor(PropertyMapProofCursor.Factory factory) {
+        public LexicalModelBuilder cursor(PropertyProofCursor.Factory factory) {
             this.cursorFactory = factory;
             return this;
         }
@@ -235,7 +235,7 @@ public class DataIntegrity {
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_NAME,
-                        new DataIntegrityProof.MapReader(cryptosuites));
+                        new DataIntegrityProof.PropertyMapper(cryptosuites));
             }
 
 //            if (readers.isEmpty()) {

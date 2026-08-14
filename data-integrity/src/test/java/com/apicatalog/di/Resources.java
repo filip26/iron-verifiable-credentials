@@ -29,7 +29,7 @@ import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.PropertyMapAccessor;
-import com.apicatalog.trust.lexical.PropertyMapProofCursor;
+import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
@@ -50,7 +50,7 @@ class Resources {
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
             .adapter(PropertyMapAccessor::newInstance)
-            .cursor(PropertyMapProofCursor::newInstance)
+            .cursor(PropertyProofCursor::newInstance)
             .build();
 
     static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)

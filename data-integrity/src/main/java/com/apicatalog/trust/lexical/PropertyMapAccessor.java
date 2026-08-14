@@ -63,7 +63,7 @@ public class PropertyMapAccessor implements LexicalAccessor {
     }
 
     @Override
-    public PropertyMapProofCursor createProofCursor() {
+    public PropertyProofCursor createProofCursor() {
         return model.createCursor(this);
     }
 

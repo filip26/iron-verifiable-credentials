@@ -14,7 +14,7 @@ import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.lexical.PropertyMapProofMapper;
+import com.apicatalog.trust.lexical.PropertyProofMapper;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.Graph;
@@ -283,19 +283,31 @@ public final class DataIntegrityProof implements Proof {
         return context;
     }
 
-    public void validate(Map<String, Object> params) {
-
-        Objects.requireNonNull(created, "");
-        Objects.requireNonNull(verificationMethod, "");
-        Objects.requireNonNull(purpose, "");
-        Objects.requireNonNull(proofValue, "");
-
-        if (params != null) {
-//            assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
-//            assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
-//            assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
-        }
+    public boolean isValid() {
+        return created != null
+                && Instant.now().isAfter(created)
+                && (expires == null || Instant.now().isBefore(expires))
+                && verificationMethod != null
+                && purpose != null
+                && proofValue != null
+        // TODO && proofValue.isValid()
+        ;
     }
+
+//    public void validate(Map<String, Object> params) {
+//
+//        Objects.requireNonNull(created, "");
+//        Objects.requireNonNull(verificationMethod, "");
+//        Objects.requireNonNull(purpose, "");
+//        Objects.requireNonNull(proofValue, "");
+//
+//        if (params != null) {
+    //// assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); //
+    /// TODO compare as URI, expect URI in params / assertEquals(params,
+    /// DataIntegrityVocab.CHALLENGE, challenge); / assertEquals(params,
+    /// DataIntegrityVocab.DOMAIN, domain);
+//        }
+//    }
 
 //    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
 //        final Object value = params.get(name.name());
@@ -331,6 +343,7 @@ public final class DataIntegrityProof implements Proof {
             return proof.canonicalPayload;
         }
 
+        // TODO clone?
         public Draft proof(DataIntegrityProof source) {
             proof.canonicalPayload = source.canonicalPayload;
             proof.challenge = source.challenge;
@@ -345,6 +358,10 @@ public final class DataIntegrityProof implements Proof {
             proof.purpose = source.purpose;
             proof.verificationMethod = source.verificationMethod;
             return this;
+        }
+
+        public boolean isValid() {
+            return proof.isValid();
         }
 
         // TODO ?!?!
@@ -490,11 +507,11 @@ public final class DataIntegrityProof implements Proof {
         }
     }
 
-    public static class MapReader implements PropertyMapProofMapper {
+    public static class PropertyMapper implements PropertyProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
 
-        public MapReader(Map<String, CryptoSuite> cryptosuites) {
+        public PropertyMapper(Map<String, CryptoSuite> cryptosuites) {
             this.cryptosuites = cryptosuites;
         }
 
@@ -609,11 +626,11 @@ public final class DataIntegrityProof implements Proof {
 
     }
 
-    public static class GraphReader implements GraphProofMapper {
+    public static class GraphMapper implements GraphProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
 
-        public GraphReader(Map<String, CryptoSuite> cryptosuites) {
+        public GraphMapper(Map<String, CryptoSuite> cryptosuites) {
             this.cryptosuites = cryptosuites;
         }
 

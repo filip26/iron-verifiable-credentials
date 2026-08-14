@@ -10,8 +10,8 @@ import com.apicatalog.trust.model.Model;
 public class LexicalModel implements Model {
 
     private final LexicalAccessor.Factory processorFactory;
-    private final PropertyMapProofCursor.Factory cursorFactory;
-    private final Map<String, PropertyMapProofMapper> proofReaders;
+    private final PropertyProofCursor.Factory cursorFactory;
+    private final Map<String, PropertyProofMapper> proofReaders;
 
     private final Function<Map<String, Object>, byte[]> canonize;
 
@@ -20,9 +20,9 @@ public class LexicalModel implements Model {
     public LexicalModel(
             Vocab vocab,
             LexicalAccessor.Factory processorFactory,
-            PropertyMapProofCursor.Factory cursorFactory,
+            PropertyProofCursor.Factory cursorFactory,
             Function<Map<String, Object>, byte[]> canonize,
-            Map<String, PropertyMapProofMapper> proofReaders) {
+            Map<String, PropertyProofMapper> proofReaders) {
         this.vocab = vocab;
         this.processorFactory = processorFactory;
         this.cursorFactory = cursorFactory;
@@ -43,7 +43,7 @@ public class LexicalModel implements Model {
         return new LexicalUpdater(this, createAdapter(document));
     }
 
-    public PropertyMapProofCursor createCursor(LexicalAccessor processor) {
+    public PropertyProofCursor createCursor(LexicalAccessor processor) {
         return cursorFactory.newInstance(this, processor);
     }
 
@@ -59,7 +59,7 @@ public class LexicalModel implements Model {
         return canonize.apply(data);
     }
 
-    public PropertyMapProofMapper reader(String proofType) {
+    public PropertyProofMapper reader(String proofType) {
         return proofReaders.get(proofType);
     }
 

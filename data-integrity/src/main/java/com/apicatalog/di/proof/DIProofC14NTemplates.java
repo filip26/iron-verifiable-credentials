@@ -95,7 +95,7 @@ final class DIProofC14NTemplates {
                 os.write(JCS_TEMPLATE[11]);
                 if (!singleElementContext && proof.context().size() == 1) {
                     os.write('"');
-                    os.write(escape(proof.context().iterator().next()));
+                    os.write(jcsEscape(proof.context().iterator().next()));
                     os.write('"');
                 } else {
                     os.write('[');
@@ -107,16 +107,16 @@ final class DIProofC14NTemplates {
                             first = false;
                         }
                         os.write('"');
-                        os.write(escape(context));
+                        os.write(jcsEscape(context));
                         os.write('"');
                     }
                     os.write(']');
                 }
                 next = true;
             }
-            next = writeJcsEntry(1, proof.challenge(), os, next);
-            next = writeJcsEntry(2, proof.created(), Instant::toString, os, next);
-            next = writeJcsEntry(3, proof.cryptosuite(), CryptoSuite::id, os, next);
+            next = jcsEntry(1, proof.challenge(), os, next);
+            next = jcsEntry(2, proof.created(), Instant::toString, os, next);
+            next = jcsEntry(3, proof.cryptosuite(), CryptoSuite::id, os, next);
             if (proof.domains() != null && !proof.domains().isEmpty()) {
                 if (next) {
                     os.write(',');
@@ -124,7 +124,7 @@ final class DIProofC14NTemplates {
                 os.write(JCS_TEMPLATE[4]);
                 if (!singleElementDomain && proof.domains().size() == 1) {
                     os.write('"');
-                    os.write(escape(proof.domains().iterator().next()));
+                    os.write(jcsEscape(proof.domains().iterator().next()));
                     os.write('"');
                 } else {
                     os.write('[');
@@ -136,16 +136,16 @@ final class DIProofC14NTemplates {
                             first = false;
                         }
                         os.write('"');
-                        os.write(escape(domain));
+                        os.write(jcsEscape(domain));
                         os.write('"');
                     }
                     os.write(']');
                 }
                 next = true;
             }
-            next = writeJcsEntry(5, proof.expires(), Instant::toString, os, next);
-            next = writeJcsEntry(6, proof.id(), os, next);
-            next = writeJcsEntry(7, proof.nonce(), os, next);
+            next = jcsEntry(5, proof.expires(), Instant::toString, os, next);
+            next = jcsEntry(6, proof.id(), os, next);
+            next = jcsEntry(7, proof.nonce(), os, next);
 
             if (proof.previous() != null && !proof.previous().isEmpty()) {
                 if (next) {
@@ -154,7 +154,7 @@ final class DIProofC14NTemplates {
                 os.write(JCS_TEMPLATE[8]);
                 if (!singleElementDomain && proof.previous().size() == 1) {
                     os.write('"');
-                    os.write(escape(proof.previous().iterator().next()));
+                    os.write(jcsEscape(proof.previous().iterator().next()));
                     os.write('"');
                 } else {
                     os.write('[');
@@ -166,20 +166,21 @@ final class DIProofC14NTemplates {
                             first = false;
                         }
                         os.write('"');
-                        os.write(escape(previous));
+                        os.write(jcsEscape(previous));
                         os.write('"');
                     }
                     os.write(']');
                 }
                 next = true;
             }
-            next = writeJcsEntry(9, proof.purpose(), os, next);
+            next = jcsEntry(9, proof.purpose(), os, next);
 
             if (next) {
                 os.write(',');
             }
+
             os.write(JCS_TEMPLATE[0]); // type
-            writeJcsEntry(10, proof.verificationMethod(), os, true);
+            jcsEntry(10, proof.verificationMethod(), os, true);
 
             os.write('}');
 
@@ -211,32 +212,32 @@ final class DIProofC14NTemplates {
         try {
             var os = new ByteArrayOutputStream();
 
-            writeRdfcEntry(id, 2, proof.created(), Instant::toString, os);
+            rdfcStatement(id, 2, proof.created(), Instant::toString, os);
 
             os.write(id);
             os.write(RDFC_TEMPLATE[1]);
             os.write('\n');
 
-            writeRdfcEntry(id, 4, proof.challenge(), os);
-            writeRdfcEntry(id, 6, proof.cryptosuite(), CryptoSuite::id, os);
+            rdfcStatement(id, 4, proof.challenge(), os);
+            rdfcStatement(id, 6, proof.cryptosuite(), CryptoSuite::id, os);
 
             if (proof.domains() != null && !proof.domains().isEmpty()) {
                 for (var domain : proof.domains()) {
-                    writeRdfcEntry(id, 8, domain, os);
+                    rdfcStatement(id, 8, domain, os);
                 }
             }
 
-            writeRdfcEntry(id, 10, proof.expires(), Instant::toString, os);
-            writeRdfcEntry(id, 12, proof.nonce(), os);
+            rdfcStatement(id, 10, proof.expires(), Instant::toString, os);
+            rdfcStatement(id, 12, proof.nonce(), os);
 
             if (proof.previous() != null && !proof.previous().isEmpty()) {
                 for (var previous : proof.previous()) {
-                    writeRdfcEntry(id, 14, previous, os);
+                    rdfcStatement(id, 14, previous, os);
                 }
             }
 
-            writeRdfcEntry(id, 16, proof.purpose(), os);
-            writeRdfcEntry(id, 18, proof.verificationMethod(), os);
+            rdfcStatement(id, 16, proof.purpose(), os);
+            rdfcStatement(id, 18, proof.verificationMethod(), os);
 
             return os.toByteArray();
         } catch (IOException e) {
@@ -244,7 +245,7 @@ final class DIProofC14NTemplates {
         }
     }
 
-    private static <T> void writeRdfcEntry(byte[] id, int index, String value, OutputStream os) throws IOException {
+    private static <T> void rdfcStatement(byte[] id, int index, String value, OutputStream os) throws IOException {
         if (value != null) {
             os.write(id);
             os.write(RDFC_TEMPLATE[index]);
@@ -254,28 +255,28 @@ final class DIProofC14NTemplates {
         }
     }
 
-    private static <T> void writeRdfcEntry(byte[] id, int index, T value, Function<T, String> map, OutputStream os)
+    private static <T> void rdfcStatement(byte[] id, int index, T value, Function<T, String> map, OutputStream os)
             throws IOException {
         if (value != null) {
-            writeRdfcEntry(id, index, map.apply(value), os);
+            rdfcStatement(id, index, map.apply(value), os);
         }
     }
 
-    private static <T> boolean writeJcsEntry(int index, String value, OutputStream os, boolean next)
+    private static <T> boolean jcsEntry(int index, String value, OutputStream os, boolean next)
             throws IOException {
         if (value != null) {
             if (next) {
                 os.write(',');
             }
             os.write(JCS_TEMPLATE[index]);
-            os.write(escape(value));
+            os.write(jcsEscape(value));
             os.write('\"');
             return true;
         }
         return next;
     }
 
-    private static <T> boolean writeJcsEntry(int index, T value, Function<T, String> map, OutputStream os, boolean next)
+    private static <T> boolean jcsEntry(int index, T value, Function<T, String> map, OutputStream os, boolean next)
             throws IOException {
         if (value != null) {
             if (next) {
@@ -298,7 +299,7 @@ final class DIProofC14NTemplates {
      * @throws IllegalArgumentException if invalid Unicode data (lone surrogates) is
      *                                  detected
      */
-    private static byte[] escape(String value) {
+    private static byte[] jcsEscape(String value) {
         final int length = value.length();
         final ByteArrayOutputStream out = new ByteArrayOutputStream(Math.max(length, 16));
         final HexFormat hexFormat = HexFormat.of();
