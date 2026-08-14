@@ -11,11 +11,11 @@
 
 ## ✨ Features
 
-- Deliberate engineering; zero vibe coding.
-- Full conformance with specifications.
-- Secure, stable, and high-performance.
-  - ⚛️ Post-Quantum (PQ) resistance ready.
 - Modular, fully configurable, and extensible.
+- Secure, stable, and high-performance.
+  - ⚡ Static $O(1)$ Data Integrity Proof c14n - RDFC or JCS
+  - ⚛️ Post-Quantum (PQ) resistance ready.
+- Deliberate engineering; zero vibe coding.
 - Minimal external dependencies.
 
 ## 🔐 Supported Data Integrity Cryptosuites

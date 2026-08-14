@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 
 public final class StaticRDFCCanonizer implements GraphCanonizer {
@@ -97,6 +98,11 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
             break;
         case DataIntegrityProof.PREDICATE_NONCE:
             nonce = object;
+            break;
+        case Graph.PREDICATE_TYPE:
+            if (!DataIntegrityProof.TYPE_URI.equals(object)) {
+                throw new IllegalArgumentException();
+            }
             break;
         default:
             IO.println(predicate + " " + object);
