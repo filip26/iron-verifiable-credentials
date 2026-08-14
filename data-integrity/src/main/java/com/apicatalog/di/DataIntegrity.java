@@ -59,7 +59,7 @@ public class DataIntegrity {
         private BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
         private Function<Map<String, Object>, Collection<Object>> expand;
 
-        private Map<String, Supplier<GraphCanonizer>> proofC14n;
+        private Map<String, Supplier<GraphCanonizer>> proofC14n = Map.of();
 
         private Map<String, CryptoSuite> cryptosuites;
 
@@ -81,7 +81,7 @@ public class DataIntegrity {
         }
 
         public SemanticModelBuilder c14n(String proofType, Supplier<GraphCanonizer> c14nFactory) {
-            if (this.proofC14n == null) {
+            if (this.proofC14n.isEmpty()) {
                 this.proofC14n = new HashMap<>();
             }
             this.proofC14n.put(proofType, c14nFactory);
