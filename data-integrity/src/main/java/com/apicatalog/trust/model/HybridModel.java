@@ -51,7 +51,7 @@ public class HybridModel implements Model {
     public static class Adapter implements Document.Accessor {
 
         Collection<Document.Accessor> adapters;
-        Collection<String> context;
+        Collection<?> context;
         Map<String, Object> document;
 
         @Override

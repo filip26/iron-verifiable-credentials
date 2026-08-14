@@ -80,8 +80,8 @@ public final class SemanticUpdater implements Document.Updater {
         return document;
     }
 
-    static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
-        var result = LinkedHashSet.<String>newLinkedHashSet(documentContext.size() + proofContext.size());
+    static Collection<?> merge(Collection<?> documentContext, Collection<String> proofContext) {
+        var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
         result.addAll(documentContext);
         result.addAll(proofContext);
         return result;

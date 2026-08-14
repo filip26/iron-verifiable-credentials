@@ -8,11 +8,11 @@ import java.util.function.Predicate;
 
 public class ContextAwareResolver {
 
-    private final Predicate<Collection<String>>[] predicates;
+    private final Predicate<Collection<?>>[] predicates;
     private final Model[] models;
 
     private ContextAwareResolver(
-            Predicate<Collection<String>>[] predicates,
+            Predicate<Collection<?>>[] predicates,
             Model[] models) {
         this.predicates = predicates;
         this.models = models;
@@ -38,7 +38,7 @@ public class ContextAwareResolver {
         };
     }
 
-    public Model resolve(Collection<String> contexts, Map<String, Object> document) {
+    public Model resolve(Collection<?> contexts, Map<String, Object> document) {
         for (int i = 0; i < models.length; i++) {
             if (predicates[i].test(contexts)) {
                 return models[i];

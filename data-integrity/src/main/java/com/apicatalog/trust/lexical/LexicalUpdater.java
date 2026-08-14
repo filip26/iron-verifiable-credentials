@@ -89,8 +89,8 @@ public class LexicalUpdater implements Document.Updater {
         return model.vocab();
     }
 
-    private static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
-        var result = LinkedHashSet.<String>newLinkedHashSet(documentContext.size() + proofContext.size());
+    private static Collection<?> merge(Collection<?> documentContext, Collection<String> proofContext) {
+        var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
         result.addAll(documentContext);
         result.addAll(proofContext);
         return result;

@@ -1,7 +1,6 @@
 package com.apicatalog.trust.proof;
 
 import java.time.Instant;
-import java.util.Collection;
 
 import com.apicatalog.trust.payload.CanonicalPayload;
 import com.apicatalog.trust.signature.Signature;
@@ -62,8 +61,4 @@ public interface Proof extends CanonicalPayload {
      * @return an {@link Instant} representing the creation timestamp
      */
     Instant created();
-
-//    // an ordered set of proof contexts, optional, never return null but an empty
-//    // set in that case
-//    Collection<String> context();
 }

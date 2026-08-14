@@ -380,6 +380,23 @@ public final class DataIntegrityProof implements Proof {
                 case KEY_VERIFICATION_METHOD:
                     verificationMethod((String) entry.getValue());
                     break;
+                case KEY_NONCE:
+                    nonce((String) entry.getValue());
+                    break;
+                case KEY_CHALLENGE:
+                    challenge((String) entry.getValue());
+                    break;
+                case KEY_DOMAIN:
+                    if (entry.getValue() instanceof Collection<?> col) {
+                        domain(col.stream().map(String.class::cast).toList());
+
+                    } else if (entry.getValue() instanceof String uri) {
+                        domain(List.of(uri));
+
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
+                    break;
                 case KEY_PREVIOUS_PROOF:
                     if (entry.getValue() instanceof Collection<?> col) {
                         previousProof(col.stream().map(String.class::cast).toList());
@@ -688,6 +705,46 @@ public final class DataIntegrityProof implements Proof {
                     di.created = Instant.parse(literal.object());
                     break;
 
+                case PREDICATE_EXPIRES:
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    if (!"http://www.w3.org/2001/XMLSchema#dateTime".equals(literal.datatype())) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    di.expires = Instant.parse(literal.object());
+                    break;
+
+                case PREDICATE_NONCE:
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    // TODO check datatype
+                    di.nonce = literal.object();
+                    break;
+
+                case PREDICATE_CHALLENGE:
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    // TODO check datatype
+                    di.challenge = literal.object();
+                    break;
+
+                case PREDICATE_DOMAIN:
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    // TODO check datatype
+
+                    if (di.domain == null) {
+                        di.domain = new ArrayList<>();
+                    }
+
+                    di.domain.add(literal.object());
+                    break;
+
                 case PREDICATE_PROOF_PURPOSE:
                     // TODO checks
 
@@ -763,5 +820,4 @@ public final class DataIntegrityProof implements Proof {
             return di;
         }
     }
-
 }
