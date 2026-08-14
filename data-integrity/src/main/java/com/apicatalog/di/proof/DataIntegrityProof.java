@@ -7,9 +7,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.function.Function;
 
+import com.apicatalog.di.proof.c14n.DIProofC14NTemplates;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
@@ -39,31 +41,31 @@ public final class DataIntegrityProof implements Proof {
 
     private static final String KEY_ID = "id";
     private static final String KEY_TYPE = "type";
-    private static final String KEY_CRYPTOSUITE = "cryptosuite";
-    private static final String KEY_CREATED = "created";
-    private static final String KEY_EXPIRES = "expires";
-    private static final String KEY_DOMAIN = "domain";
-    private static final String KEY_CHALLENGE = "challenge";
-    private static final String KEY_NONCE = "nonce";
-    private static final String KEY_VERIFICATION_METHOD = "verificationMethod";
-    private static final String KEY_PURPOSE = "proofPurpose";
-    private static final String KEY_PROOF_VALUE = "proofValue";
-    private static final String KEY_PREVIOUS_PROOF = "previousProof";
+    public static final String KEY_CRYPTOSUITE = "cryptosuite";
+    public static final String KEY_CREATED = "created";
+    public static final String KEY_EXPIRES = "expires";
+    public static final String KEY_DOMAIN = "domain";
+    public static final String KEY_CHALLENGE = "challenge";
+    public static final String KEY_NONCE = "nonce";
+    public static final String KEY_VERIFICATION_METHOD = "verificationMethod";
+    public static final String KEY_PURPOSE = "proofPurpose";
+    public static final String KEY_PROOF_VALUE = "proofValue";
+    public static final String KEY_PREVIOUS_PROOF = "previousProof";
 
-    private static final String PREDICATE_CRYPTOSUITE = "https://w3id.org/security#cryptosuite";
-    private static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
-    private static final String PREDICATE_EXPIRES = "https://w3id.org/security#expiration";
-    private static final String PREDICATE_DOMAIN = "https://w3id.org/security#domain";
-    private static final String PREDICATE_CHALLENGE = "https://w3id.org/security#challenge";
-    private static final String PREDICATE_NONCE = "https://w3id.org/security#nonce";
-    private static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
-    private static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
-    private static final String PREDICATE_PROOF_VALUE = "https://w3id.org/security#proofValue";
-    private static final String PREDICATE_PREVIOUS_PROOF = "https://w3id.org/security#previousProof";
+    public static final String PREDICATE_CRYPTOSUITE = "https://w3id.org/security#cryptosuite";
+    public static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
+    public static final String PREDICATE_EXPIRES = "https://w3id.org/security#expiration";
+    public static final String PREDICATE_DOMAIN = "https://w3id.org/security#domain";
+    public static final String PREDICATE_CHALLENGE = "https://w3id.org/security#challenge";
+    public static final String PREDICATE_NONCE = "https://w3id.org/security#nonce";
+    public static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
+    public static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
+    public static final String PREDICATE_PROOF_VALUE = "https://w3id.org/security#proofValue";
+    public static final String PREDICATE_PREVIOUS_PROOF = "https://w3id.org/security#previousProof";
 
     private CryptoSuite cryptosuite;
 
-    private Collection<String> context;
+    private SequencedCollection<String> context;
 
     private String id;
     private Instant created;
@@ -279,7 +281,7 @@ public final class DataIntegrityProof implements Proof {
      * @return a collection of strings representing the JSON-LD context URIs, or
      *         {@code null} if not present
      */
-    public Collection<String> context() {
+    public SequencedCollection<String> context() {
         return context;
     }
 
@@ -332,7 +334,7 @@ public final class DataIntegrityProof implements Proof {
         }
 
         protected byte[] canonize(String c14n) {
-            return canonize(DIProofC14NTemplates.getSignTemplate(c14n));
+            return canonize(DIProofC14NTemplates.getProofCanonizer(c14n));
         }
 
         protected byte[] canonize(Function<DataIntegrityProof, byte[]> canonizer) {
@@ -489,7 +491,7 @@ public final class DataIntegrityProof implements Proof {
             return proof;
         }
 
-        public Draft context(Collection<String> context) {
+        public Draft context(SequencedCollection<String> context) {
             proof.context = context;
             return this;
         }

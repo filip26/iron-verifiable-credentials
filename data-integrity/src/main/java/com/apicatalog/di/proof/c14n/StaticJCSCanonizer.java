@@ -1,51 +1,21 @@
-package com.apicatalog.di.proof;
+package com.apicatalog.di.proof.c14n;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HexFormat;
+import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.model.Model;
 
-final class DIProofC14NTemplates {
-
-    private static final byte[][] RDFC_TEMPLATE = Stream.of(
-            "_:c14n0",
-            " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#DataIntegrityProof> .",
-
-            " <http://purl.org/dc/terms/created> \"",
-            "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .",
-
-            " <https://vc.ex/1> <https://w3id.org/security#challenge> \"",
-            "\" .",
-
-            " <https://w3id.org/security#cryptosuite> \"",
-            "\"^^<https://w3id.org/security#cryptosuiteString> .",
-
-            " <https://w3id.org/security#domain> \"",
-            "\" .",
-
-            " <https://w3id.org/security#expiration> \"",
-            "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .",
-
-            " <https://w3id.org/security#nonce> \"",
-            "\" .",
-
-            " <https://w3id.org/security#previousProof> <",
-            "> .",
-
-            " <https://w3id.org/security#proofPurpose> <https://w3id.org/security#",
-            "> .",
-
-            " <https://w3id.org/security#verificationMethod> <",
-            "> .")
-            .map(i -> i.getBytes(StandardCharsets.UTF_8))
-            .toArray(byte[][]::new);
+public final class StaticJCSCanonizer {
 
     private static final byte[][] JCS_TEMPLATE = Stream.of(
             "\"type\":\"DataIntegrityProof\"",
@@ -64,26 +34,106 @@ final class DIProofC14NTemplates {
             .map(i -> i.getBytes(StandardCharsets.UTF_8))
             .toArray(byte[][]::new);
 
-    static Function<DataIntegrityProof, byte[]> getSignTemplate(String c14n) {
-        return switch (c14n) {
-        case Model.C14N_JCS -> DIProofC14NTemplates::jcs;
-        case Model.C14N_RDFC -> DIProofC14NTemplates::rdfc;
-        default -> throw new IllegalArgumentException();
-        };
-    }
-
-    private static byte[] jcs(DataIntegrityProof proof) {
+    /**
+     * Builds the canonical {@link DataIntegrityProof} (JCS) for hashing/signing.
+     *
+     * @param proof
+     * @return UTF-8 encoded JSON proof bytes
+     */
+    public static byte[] canonize(DataIntegrityProof proof) {
         return jcs(proof, false, false);
     }
 
     /**
-     * Builds the canonical JSON proof (JCS) for hashing/signing.
+     * Builds the canonical {@link DataIntegrityProof} (JCS) for hashing/signing.
      *
      * @param proof
      * @param singleElementContext
      * @param singleElementDomain
      * @return UTF-8 encoded JSON proof bytes
      */
+    public static byte[] canonize(Map<String, ?> proof) {
+        return jcs(proof, false, false);
+    }
+
+    private static byte[] jcs(Map<String, ?> proof, boolean singleElementContext, boolean singleElementDomain) {
+        try {
+            var os = new ByteArrayOutputStream();
+            os.write('{');
+
+            var next = false;
+
+            if (proof.get("@context") instanceof SequencedCollection col && !col.isEmpty()) {
+                jcs(col, 11, singleElementContext, os);
+                next = true;
+            }
+
+            if (proof.get(DataIntegrityProof.KEY_CHALLENGE) instanceof String challenge) {
+                next = jcsEntry(1, challenge, os, next);
+            }
+
+            if (proof.get(DataIntegrityProof.KEY_CREATED) instanceof String created) {
+                next = jcsEntry(2, created, os, next);
+            }
+
+            if (proof.get(DataIntegrityProof.KEY_CRYPTOSUITE) instanceof String cryptosuite) {
+                next = jcsEntry(3, cryptosuite, os, next);
+            }
+
+//            if (proof.domains() != null && !proof.domains().isEmpty()) {
+//                if (next) {
+//                    os.write(',');
+//                }
+//            jcsCollection(proof.domains(), 4, singleElementContext, os);
+//                next = true;
+//            }
+//            next = jcsEntry(5, proof.expires(), Instant::toString, os, next);
+//            next = jcsEntry(6, proof.id(), os, next);
+//            next = jcsEntry(7, proof.nonce(), os, next);
+//
+//            if (proof.previous() != null && !proof.previous().isEmpty()) {
+//                if (next) {
+//                    os.write(',');
+//                }
+//                os.write(JCS_TEMPLATE[8]);
+//                if (!singleElementDomain && proof.previous().size() == 1) {
+//                    os.write('"');
+//                    os.write(jcsEscape(proof.previous().iterator().next()));
+//                    os.write('"');
+//                } else {
+//                    os.write('[');
+//                    boolean first = true;
+//                    for (var previous : proof.previous()) {
+//                        if (!first) {
+//                            os.write(',');
+//                        } else {
+//                            first = false;
+//                        }
+//                        os.write('"');
+//                        os.write(jcsEscape(previous));
+//                        os.write('"');
+//                    }
+//                    os.write(']');
+//                }
+//                next = true;
+//            }
+//            next = jcsEntry(9, proof.purpose(), os, next);
+//
+//            if (next) {
+//                os.write(',');
+//            }
+//
+//            os.write(JCS_TEMPLATE[0]); // type
+//            jcsEntry(10, proof.verificationMethod(), os, true);
+
+            os.write('}');
+
+            return os.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private static byte[] jcs(DataIntegrityProof proof, boolean singleElementContext, boolean singleElementDomain) {
         try {
             var os = new ByteArrayOutputStream();
@@ -92,57 +142,22 @@ final class DIProofC14NTemplates {
             var next = false;
 
             if (proof.context() != null && !proof.context().isEmpty()) {
-                os.write(JCS_TEMPLATE[11]);
-                if (!singleElementContext && proof.context().size() == 1) {
-                    os.write('"');
-                    os.write(jcsEscape(proof.context().iterator().next()));
-                    os.write('"');
-                } else {
-                    os.write('[');
-                    boolean first = true;
-                    for (var context : proof.context()) {
-                        if (!first) {
-                            os.write(',');
-                        } else {
-                            first = false;
-                        }
-                        os.write('"');
-                        os.write(jcsEscape(context));
-                        os.write('"');
-                    }
-                    os.write(']');
-                }
+                jcs(proof.context(), 11, singleElementContext, os);
                 next = true;
             }
+
             next = jcsEntry(1, proof.challenge(), os, next);
             next = jcsEntry(2, proof.created(), Instant::toString, os, next);
             next = jcsEntry(3, proof.cryptosuite(), CryptoSuite::id, os, next);
+
             if (proof.domains() != null && !proof.domains().isEmpty()) {
                 if (next) {
                     os.write(',');
                 }
-                os.write(JCS_TEMPLATE[4]);
-                if (!singleElementDomain && proof.domains().size() == 1) {
-                    os.write('"');
-                    os.write(jcsEscape(proof.domains().iterator().next()));
-                    os.write('"');
-                } else {
-                    os.write('[');
-                    boolean first = true;
-                    for (var domain : proof.domains()) {
-                        if (!first) {
-                            os.write(',');
-                        } else {
-                            first = false;
-                        }
-                        os.write('"');
-                        os.write(jcsEscape(domain));
-                        os.write('"');
-                    }
-                    os.write(']');
-                }
+                jcs(proof.domains(), 4, os);
                 next = true;
             }
+
             next = jcsEntry(5, proof.expires(), Instant::toString, os, next);
             next = jcsEntry(6, proof.id(), os, next);
             next = jcsEntry(7, proof.nonce(), os, next);
@@ -190,79 +205,42 @@ final class DIProofC14NTemplates {
         }
     }
 
-    /**
-     * Builds the deterministic N-Quads representation of a DataIntegrityProof for
-     * RDF Dataset Canonicalization (RDFC).
-     *
-     * <p>
-     * The returned value is UTF-8 encoded and suitable for hashing or signing. The
-     * output strictly follows N-Quads syntax and is deterministic for the supplied
-     * values.
-     * </p>
-     *
-     * @param proof
-     * @return UTF-8 encoded canonical N-Quads proof representation
-     */
-    private static byte[] rdfc(DataIntegrityProof proof) {
-
-        byte[] id = proof.id() != null
-                ? ("<" + proof.id() + ">").getBytes(StandardCharsets.UTF_8)
-                : RDFC_TEMPLATE[0];
-
-        try {
-            var os = new ByteArrayOutputStream();
-
-            rdfcStatement(id, 2, proof.created(), Instant::toString, os);
-
-            os.write(id);
-            os.write(RDFC_TEMPLATE[1]);
-            os.write('\n');
-
-            rdfcStatement(id, 4, proof.challenge(), os);
-            rdfcStatement(id, 6, proof.cryptosuite(), CryptoSuite::id, os);
-
-            if (proof.domains() != null && !proof.domains().isEmpty()) {
-                for (var domain : proof.domains()) {
-                    rdfcStatement(id, 8, domain, os);
-                }
-            }
-
-            rdfcStatement(id, 10, proof.expires(), Instant::toString, os);
-            rdfcStatement(id, 12, proof.nonce(), os);
-
-            if (proof.previous() != null && !proof.previous().isEmpty()) {
-                for (var previous : proof.previous()) {
-                    rdfcStatement(id, 14, previous, os);
-                }
-            }
-
-            rdfcStatement(id, 16, proof.purpose(), os);
-            rdfcStatement(id, 18, proof.verificationMethod(), os);
-
-            return os.toByteArray();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private static <T> void rdfcStatement(byte[] id, int index, String value, OutputStream os) throws IOException {
-        if (value != null) {
-            os.write(id);
-            os.write(RDFC_TEMPLATE[index]);
-            os.write(value.getBytes(StandardCharsets.UTF_8));
-            os.write(RDFC_TEMPLATE[index + 1]);
-            os.write('\n');
-        }
-    }
-
-    private static <T> void rdfcStatement(byte[] id, int index, T value, Function<T, String> map, OutputStream os)
+    private static void jcs(SequencedCollection<String> col, int index, boolean singleElement, OutputStream os)
             throws IOException {
-        if (value != null) {
-            rdfcStatement(id, index, map.apply(value), os);
+        os.write(JCS_TEMPLATE[index]);
+        if (!singleElement && col.size() == 1) {
+            os.write('"');
+            os.write(jcsEscape(col.getFirst()));
+            os.write('"');
+        } else {
+            collection(col, os);
         }
     }
 
-    private static <T> boolean jcsEntry(int index, String value, OutputStream os, boolean next)
+    private static void jcs(Collection<String> col, int index, OutputStream os)
+            throws IOException {
+        os.write(JCS_TEMPLATE[index]);
+        collection(col, os);
+    }
+
+    private static void collection(Collection<String> col, OutputStream os)
+            throws IOException {
+        os.write('[');
+        boolean first = true;
+        for (var element : col) {
+            if (!first) {
+                os.write(',');
+            } else {
+                first = false;
+            }
+            os.write('"');
+            os.write(jcsEscape(element));
+            os.write('"');
+        }
+        os.write(']');
+    }
+
+    private static boolean jcsEntry(int index, String value, OutputStream os, boolean next)
             throws IOException {
         if (value != null) {
             if (next) {

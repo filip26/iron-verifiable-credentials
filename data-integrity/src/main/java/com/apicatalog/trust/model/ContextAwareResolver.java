@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.function.Predicate;
 
 public class ContextAwareResolver {
@@ -20,7 +21,7 @@ public class ContextAwareResolver {
 
     // TODO must not be static, the resolver should have been configured with
     // "@context" key, or context extractos? -> getJsonLdContext(...)
-    public static Collection<String> getContexts(Map<String, Object> document) {
+    public static SequencedCollection<String> getContexts(Map<String, Object> document) {
         return switch (document.get("@context")) {
         case Collection<?> col -> col.stream()
                 .map(item -> {
