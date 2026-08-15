@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -12,7 +13,7 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 
-public final class StaticRDFCCanonizer implements GraphCanonizer {
+public final class StaticRDFC implements GraphCanonizer {
 
     private static final byte[][] RDFC_TEMPLATE = Stream.of(
             "_:c14n0",
@@ -59,8 +60,8 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
     private String purpose;
     private String verificationMethod;
 
-    public static final StaticRDFCCanonizer newInstance() {
-        return new StaticRDFCCanonizer();
+    public static final StaticRDFC newInstance() {
+        return new StaticRDFC();
     }
 
     @Override
@@ -87,17 +88,32 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
         case DataIntegrityProof.PREDICATE_CHALLENGE:
             challenge = object;
             break;
-        case DataIntegrityProof.PREDICATE_VERIFICATION_METHOD:
-            verificationMethod = object;
+        case DataIntegrityProof.PREDICATE_CRYPTOSUITE:
+            cryptosuite = object;
+            break;
+        case DataIntegrityProof.PREDICATE_DOMAIN:
+            if (domains == null) {
+                domains = new ArrayList<>();
+            }
+            domains.add(object);
+            break;            
+        case DataIntegrityProof.PREDICATE_NONCE:
+            nonce = object;
+            break;
+        case DataIntegrityProof.PREDICATE_EXPIRES:
+            expires = object;
+            break;
+        case DataIntegrityProof.PREDICATE_PREVIOUS_PROOF:
+            if (previous == null) {
+                previous = new ArrayList<>();
+            }
+            previous.add(object);
             break;
         case DataIntegrityProof.PREDICATE_PROOF_PURPOSE:
             purpose = object;
             break;
-        case DataIntegrityProof.PREDICATE_CRYPTOSUITE:
-            cryptosuite = object;
-            break;
-        case DataIntegrityProof.PREDICATE_NONCE:
-            nonce = object;
+        case DataIntegrityProof.PREDICATE_VERIFICATION_METHOD:
+            verificationMethod = object;
             break;
         case Graph.PREDICATE_TYPE:
             if (!DataIntegrityProof.TYPE_URI.equals(object)) {
@@ -105,7 +121,7 @@ public final class StaticRDFCCanonizer implements GraphCanonizer {
             }
             break;
         default:
-            IO.println(predicate + " " + object);
+            throw new IllegalArgumentException("Unsupported predicate " + predicate);
         }
 
     }

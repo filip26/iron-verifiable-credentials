@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.CryptoSuite;
 
-public final class StaticJCSCanonizer {
+public final class StaticJCS {
 
     private static final byte[][] JCS_TEMPLATE = Stream.of(
             "\"type\":\"DataIntegrityProof\"",

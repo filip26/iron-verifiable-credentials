@@ -12,8 +12,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.apicatalog.di.proof.c14n.StaticJCSCanonizer;
-import com.apicatalog.di.proof.c14n.StaticRDFCCanonizer;
+import com.apicatalog.di.proof.c14n.StaticJCS;
+import com.apicatalog.di.proof.c14n.StaticRDFC;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
@@ -329,8 +329,8 @@ public final class DataIntegrityProof implements Proof {
 
     public static Function<DataIntegrityProof, byte[]> getProofCanonizer(String c14n) {
         return switch (c14n) {
-        case Model.C14N_JCS -> StaticJCSCanonizer::canonize;
-        case Model.C14N_RDFC -> StaticRDFCCanonizer::canonize;
+        case Model.C14N_JCS -> StaticJCS::canonize;
+        case Model.C14N_RDFC -> StaticRDFC::canonize;
         default -> throw new IllegalArgumentException();
         };
     }

@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.barcodes.ECDSAXI2023;
+import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.proof.c14n.StaticRDFC;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
@@ -36,6 +38,7 @@ class Resources {
             .proof(ECDSAXI2023.getInstance())
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
+            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
             .c14n(Resources::createRDFC)
             .accessor(GraphAccessor::newInstance)
             .updater(SemanticUpdater::new)
