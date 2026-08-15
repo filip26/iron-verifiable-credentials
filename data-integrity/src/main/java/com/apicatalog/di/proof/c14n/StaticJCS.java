@@ -173,7 +173,7 @@ public final class StaticJCS {
         os.write(JCS_TEMPLATE[index]);
         if (col.size() == 1) {
             os.write('"');
-            os.write(jcsEscape(col.getFirst()));
+            os.write(escape(col.getFirst()));
             os.write('"');
         } else {
             collection(col, os);
@@ -202,7 +202,7 @@ public final class StaticJCS {
                 first = false;
             }
             os.write('"');
-            os.write(jcsEscape(element));
+            os.write(escape(element));
             os.write('"');
         }
         os.write(']');
@@ -215,7 +215,7 @@ public final class StaticJCS {
                 os.write(',');
             }
             os.write(JCS_TEMPLATE[index]);
-            os.write(jcsEscape(value));
+            os.write(escape(value));
             os.write('\"');
             return true;
         }
@@ -245,10 +245,9 @@ public final class StaticJCS {
      * @throws IllegalArgumentException if invalid Unicode data (lone surrogates) is
      *                                  detected
      */
-    private static byte[] jcsEscape(String value) {
+    private static byte[] escape(String value) {
         final int length = value.length();
         final ByteArrayOutputStream out = new ByteArrayOutputStream(Math.max(length, 16));
-        final HexFormat hexFormat = HexFormat.of();
 
         for (int i = 0; i < length;) {
             int ch = value.codePointAt(i);
@@ -287,8 +286,8 @@ public final class StaticJCS {
                     out.write('u');
                     out.write('0');
                     out.write('0');
-                    out.write(hexFormat.toHighHexDigit((byte) ch));
-                    out.write(hexFormat.toLowHexDigit((byte) ch));
+                    out.write(HexFormat.of().toHighHexDigit((byte) ch));
+                    out.write(HexFormat.of().toLowHexDigit((byte) ch));
 
                 } else if (ch >= 0xD800 && ch <= 0xDFFF) {
                     throw new IllegalArgumentException(

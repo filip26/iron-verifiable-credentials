@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.proof.c14n.StaticJCS;
 import com.apicatalog.di.proof.c14n.StaticRDFC;
 import com.apicatalog.di.suite.ECDSA2019;
@@ -63,8 +64,11 @@ class Resources {
             .Ed25519Signature2020()
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
-            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance) // proof type specific c14n provider
-            .c14n(Resources::createRDFC) // document and proof c14n provider
+            // proof type specific c14n provider
+            .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
+            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
+            // document and proof c14n provider
+            .c14n(Resources::createRDFC)
             .accessor(GraphAccessor::newInstance)
             .updater(SemanticUpdater::new)
             .cursor(GraphProofCursor::newInstance)

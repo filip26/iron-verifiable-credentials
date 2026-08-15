@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.signature.ProofValue;
@@ -25,6 +26,7 @@ import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.GraphProofMapper;
 import com.apicatalog.trust.semantic.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.signature.Signature;
 
 public final class Ed25519Signature2020 implements Proof {
@@ -152,7 +154,7 @@ public final class Ed25519Signature2020 implements Proof {
         }
 
         public byte[] canonize() {
-            proof.canonicalPayload = Ed25519Signature2020.canonize(proof);
+            proof.canonicalPayload = Ed25519Signature2020.StaticRDFC.canonize(proof);
             return proof.canonicalPayload;
         }
 
@@ -297,60 +299,131 @@ public final class Ed25519Signature2020 implements Proof {
 //            throw new DocumentError(ErrorType.Invalid, name);
 //        }
 //    }
-//    
-    private final static byte[][] RDFC_TEMPLATE = Stream.of(
-            "_:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#Ed25519Signature2020> .",
 
-            "_:c14n0 <http://purl.org/dc/terms/created> \"",
-            "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .",
+    public static StaticRDFC newStaticRDFC() {
+        return new StaticRDFC();
+    }
 
-            "_:c14n0 <https://w3id.org/security#proofPurpose> <https://w3id.org/security#",
-            "> .",
+    public static class StaticRDFC implements GraphCanonizer {
 
-            "_:c14n0 <https://w3id.org/security#verificationMethod> <",
-            "> .")
-            .map(i -> i.getBytes(StandardCharsets.UTF_8))
-            .toArray(byte[][]::new);
+        private final static byte[][] RDFC_TEMPLATE = Stream.of(
+                "_:c14n0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#Ed25519Signature2020> .",
 
-    private static byte[] canonize(Ed25519Signature2020 proof) {
-        try {
-            var os = new ByteArrayOutputStream();
-            if (proof.created != null) {
-                os.write(RDFC_TEMPLATE[1]);
-                os.write(proof.created.toString().getBytes(StandardCharsets.UTF_8));
-                os.write(RDFC_TEMPLATE[2]);
-                os.write('\n');
+                "_:c14n0 <http://purl.org/dc/terms/created> \"",
+                "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .",
+
+                "_:c14n0 <https://w3id.org/security#proofPurpose> <",
+                "> .",
+
+                "_:c14n0 <https://w3id.org/security#verificationMethod> <",
+                "> .")
+                .map(i -> i.getBytes(StandardCharsets.UTF_8))
+                .toArray(byte[][]::new);
+
+        private String node;
+
+        private String created;
+        private String purpose;
+        private String verificationMethod;
+
+        public static byte[] canonize(Ed25519Signature2020 proof) {
+            return canonize(
+                    proof.created != null ? proof.created.toString() : null,
+                    proof.purpose != null ? "https://w3id.org/security#" + proof.purpose : null,
+                    proof.verificationMethod);
+        }
+
+        @Override
+        public byte[] canonize() {
+            return canonize(
+                    created,
+                    purpose,
+                    verificationMethod);
+        }
+
+        @Override
+        public void accept(
+                String subject,
+                String predicate,
+                String object,
+                String datatype,
+                String language,
+                String direction,
+                String graph) {
+
+            if (node == null) {
+                node = subject;
+
+            } else if (!node.equals(subject)) {
+                throw new IllegalArgumentException();
             }
 
-            os.write(RDFC_TEMPLATE[0]);
-            os.write('\n');
-
-            if (proof.purpose != null) {
-                os.write(RDFC_TEMPLATE[3]);
-                os.write(proof.purpose.getBytes(StandardCharsets.UTF_8));
-                os.write(RDFC_TEMPLATE[4]);
-                os.write('\n');
+            switch (predicate) {
+            case PREDICATE_CREATED:
+                created = object;
+                break;
+            case PREDICATE_PROOF_PURPOSE:
+                purpose = object;
+                break;
+            case PREDICATE_VERIFICATION_METHOD:
+                verificationMethod = object;
+                break;
+            case Graph.PREDICATE_TYPE:
+                if (!TYPE_URI.equals(object)) {
+                    throw new IllegalArgumentException();
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported predicate " + predicate);
             }
 
-            if (proof.verificationMethod != null) {
-                os.write(RDFC_TEMPLATE[5]);
-                os.write(proof.verificationMethod.getBytes(StandardCharsets.UTF_8));
-                os.write(RDFC_TEMPLATE[6]);
+        }
+
+        private static byte[] canonize(
+                String created,
+                String purpose,
+                String verificationMethod) {
+            try {
+                var os = new ByteArrayOutputStream();
+                if (created != null) {
+                    os.write(RDFC_TEMPLATE[1]);
+                    os.write(created.getBytes(StandardCharsets.UTF_8));
+                    os.write(RDFC_TEMPLATE[2]);
+                    os.write('\n');
+                }
+
+                os.write(RDFC_TEMPLATE[0]);
                 os.write('\n');
+
+                if (purpose != null) {
+                    os.write(RDFC_TEMPLATE[3]);
+                    os.write(purpose.getBytes(StandardCharsets.UTF_8));
+                    os.write(RDFC_TEMPLATE[4]);
+                    os.write('\n');
+                }
+
+                if (verificationMethod != null) {
+                    os.write(RDFC_TEMPLATE[5]);
+                    os.write(verificationMethod.getBytes(StandardCharsets.UTF_8));
+                    os.write(RDFC_TEMPLATE[6]);
+                    os.write('\n');
+                }
+
+                return os.toByteArray();
+
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
-
-            return os.toByteArray();
-
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
         }
     }
 
-    public static GraphProofMapper newReader() {
-        return new GraphReader();
-    }
+    public static class GraphMapper implements GraphProofMapper {
 
-    public static class GraphReader implements GraphProofMapper {
+        private final Supplier<GraphCanonizer> canonizerFactory;
+
+        public GraphMapper(Supplier<GraphCanonizer> canonizerFactory) {
+            this.canonizerFactory = canonizerFactory;
+        }
 
         @Override
         public boolean accepts(Graph.Node proofNode) {
@@ -382,7 +455,7 @@ public final class Ed25519Signature2020 implements Proof {
 
             final var di = new Ed25519Signature2020();
 
-            var canonizer = model.newCanonizer();
+            var canonizer = canonizerFactory.get();
 
             byte[] proofValue = null;
 

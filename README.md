@@ -13,7 +13,7 @@
 
 - Modular, fully configurable, and extensible.
 - Secure, stable, and high-performance.
-  - ⚡ Static $O(1)$ Data Integrity Proof c14n - RDFC or JCS
+  - ⚡ Static $O(1)$ proof c14n - RDFC or JCS
   - ⚛️ Post-Quantum (PQ) resistance ready.
 - Deliberate engineering; zero vibe coding.
 - Minimal external dependencies.

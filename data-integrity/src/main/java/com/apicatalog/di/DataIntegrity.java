@@ -65,6 +65,8 @@ public class DataIntegrity {
 
         private Map<String, GraphProofMapper> readers;
 
+        private boolean ed25519Signature2020 = false;
+
         private SemanticModelBuilder(String c14n) {
             this.c14n = c14n;
             this.readers = new LinkedHashMap<>();
@@ -142,7 +144,7 @@ public class DataIntegrity {
 
         // legacy support
         public SemanticModelBuilder Ed25519Signature2020() {
-            proof(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020.newReader());
+            this.ed25519Signature2020 = true;
             return this;
         }
 
@@ -158,6 +160,13 @@ public class DataIntegrity {
                         new DataIntegrityProof.GraphMapper(
                                 cryptosuites,
                                 proofC14n.getOrDefault(DataIntegrityProof.TYPE_URI, c14nFactory)));
+            }
+
+            if (ed25519Signature2020) {
+                readers.put(
+                        Ed25519Signature2020.TYPE_URI,
+                        new Ed25519Signature2020.GraphMapper(
+                                proofC14n.getOrDefault(Ed25519Signature2020.TYPE_URI, c14nFactory)));
             }
 
 //            if (readers.isEmpty()) {
@@ -214,7 +223,7 @@ public class DataIntegrity {
             this.canonize = canonize;
             return this;
         }
-        
+
         public LexicalModelBuilder c14n(String proofType, Function<Map<String, Object>, byte[]> canonize) {
             if (this.proofC14n.isEmpty()) {
                 this.proofC14n = new HashMap<>();
@@ -222,7 +231,6 @@ public class DataIntegrity {
             this.proofC14n.put(proofType, canonize);
             return this;
         }
-
 
         public LexicalModelBuilder cursor(PropertyProofCursor.Factory factory) {
             this.cursorFactory = factory;
@@ -252,12 +260,12 @@ public class DataIntegrity {
         }
 
         public LexicalModel build() {
-            
+
             if (canonize == null) {
                 throw new IllegalStateException();
             }
 
-            if (cryptosuites != null && !cryptosuites.isEmpty()) {                
+            if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_NAME,
                         new DataIntegrityProof.PropertyMapMapper(

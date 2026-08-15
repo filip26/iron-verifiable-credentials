@@ -652,11 +652,11 @@ public final class DataIntegrityProof implements Proof {
     public static class GraphMapper implements GraphProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
-        private final Supplier<GraphCanonizer> canonizeFactory;
+        private final Supplier<GraphCanonizer> canonizerFactory;
 
         public GraphMapper(Map<String, CryptoSuite> cryptosuites, Supplier<GraphCanonizer> canonizeFactory) {
             this.cryptosuites = cryptosuites;
-            this.canonizeFactory = canonizeFactory;
+            this.canonizerFactory = canonizeFactory;
         }
 
         @Override
@@ -712,7 +712,7 @@ public final class DataIntegrityProof implements Proof {
             }
             di.previousProof = List.of();
 
-            final var canonizer = canonizeFactory.get();
+            final var canonizer = canonizerFactory.get();
 
             String proofValue = null;
 
