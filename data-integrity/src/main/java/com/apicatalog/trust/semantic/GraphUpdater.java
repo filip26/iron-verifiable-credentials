@@ -10,20 +10,20 @@ import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
 
-public final class SemanticUpdater implements Document.Updater {
+public final class GraphUpdater implements Document.Updater {
 
     @FunctionalInterface
     public interface Factory {
-        SemanticUpdater createUpdater(SemanticModel model, SemanticAccessor adapter);
+        GraphUpdater createUpdater(SemanticModel model, SemanticModel.Accessor adapter);
     }
 
     private final SemanticModel model;
-    private final SemanticAccessor adapter;
+    private final SemanticModel.Accessor adapter;
 
     private Collection<Map<String, ?>> newProofs;
     private Collection<String> contexts = null;
 
-    public SemanticUpdater(SemanticModel model, SemanticAccessor adapter) {
+    public GraphUpdater(SemanticModel model, SemanticModel.Accessor adapter) {
         this.model = model;
         this.adapter = adapter;
     }

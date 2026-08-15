@@ -29,19 +29,19 @@ import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.semantic.SemanticUpdater;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
-            .proof(ECDSAXI2023.getInstance())
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+            .cryptosuite(ECDSAXI2023.getInstance())
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
             .c14n(Resources::createRDFC)
             .accessor(GraphAccessor::newInstance)
-            .updater(SemanticUpdater::new)
+            .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
             .build();

@@ -1,12 +1,12 @@
 package com.apicatalog.trust.semantic;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
-
-import com.apicatalog.trust.payload.PayloadGenerator;
 
 public record Graph(
         String id,
@@ -118,16 +118,98 @@ public record Graph(
             String datatype,
             String language,
             String direction) implements Statement {
+
+        public String tag() {
+
+            String tag = "";
+
+            if (language != null) {
+                tag = language;
+            }
+
+            if (direction != null) {
+                tag = tag + "_" + direction;
+            }
+
+            return tag;
+        }
     };
+
+    public static final Map<String, String> langMap(Graph.Statement statement, Map<String, String> value) {
+
+        if (!(statement instanceof LangStringStatement langString)) {
+            throw new IllegalArgumentException();
+        }
+
+        if (value == null) {
+            return Map.of(langString.tag(), langString.object());
+
+        }
+
+        var mutable = value;
+
+        if (value.size() == 1) {
+            mutable = new HashMap<String, String>(value);
+        }
+
+        mutable.put(langString.tag(), langString.object());
+        return mutable;
+    }
+
+    public static final Instant xsdDateTime(Graph.Statement statement) {
+
+        if (!(statement instanceof LiteralStatement literal)) {
+            throw new IllegalArgumentException();
+        }
+
+        if (!"http://www.w3.org/2001/XMLSchema#dateTime".equals(literal.datatype())) {
+            throw new IllegalArgumentException();
+        }
+
+        return Instant.parse(literal.object());
+    }
     
-    public interface NodeMapper {
+    public static final Object resource(
+            Graph.Statement statement, 
+            Graph graph,
+            SemanticModel model,
+            Class<?> baseclazz, 
+            TypeMapping typeMapping) {
+        if (!(statement instanceof ResourceStatement resource)) {
+            throw new IllegalArgumentException();
+        }
+        
+        if (graph.nodes().containsKey(resource.object())) {
+
+            var node = graph.nodes().get(resource.object());
+
+            if (typeMapping != null) {
+
+                var mapper = typeMapping.mapper(baseclazz, node.type());
+
+                if (mapper != null) {
+                    return mapper.materialize(node, graph, model);
+                }
+            }
+            return node;
+        }
+        return resource.object();
+    }
+
+    @FunctionalInterface
+    public interface NodeMapper<T> {
 
         // reads from n-quads
-        <T> T materialize(
-                Class<T> clazz,
-                String id,
+        T materialize(
+                Graph.Node node,
                 Graph graph,
-                SemanticModel model,
-                PayloadGenerator payload);
+                SemanticModel model);
+    }
+
+    @FunctionalInterface
+    public interface TypeMapping {
+
+        <T> NodeMapper<T> mapper(Class<T> baseclass, Collection<String> types);
+
     }
 }

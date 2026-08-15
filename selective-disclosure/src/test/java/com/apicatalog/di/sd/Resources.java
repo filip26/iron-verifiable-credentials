@@ -31,15 +31,15 @@ import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.semantic.SemanticUpdater;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.fasterxml.jackson.core.JsonFactory;
 
 import jakarta.json.Json;
 
 class Resources {
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
-            .proof(ECDSASD2023.getInstance())
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+            .cryptosuite(ECDSASD2023.getInstance())
             .expand(Resources::expand)
             .compact(Resources::compact)
             .tordf(Resources::toRDF)
@@ -47,7 +47,7 @@ class Resources {
             .c14n(Resources::newRDFC)
 //TODO            .hmac()
             .accessor(GraphAccessor::newInstance)
-            .updater(SemanticUpdater::new)
+            .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(SDPayloadGenerator::new)
 

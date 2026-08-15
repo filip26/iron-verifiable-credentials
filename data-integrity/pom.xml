@@ -5,7 +5,7 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-data-integrity</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0-M1-SNAPSHOT</version>
 
     <name>Iron Data Integrity</name>
     <description>

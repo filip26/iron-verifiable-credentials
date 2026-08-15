@@ -24,7 +24,7 @@ public class HybridModel implements Model {
 
     @Override
     // TODO add context as parameter
-    public Document.Accessor createAdapter(Map<String, Object> document) {
+    public Document.Accessor createAccessor(Map<String, Object> document) {
 
         var context = ContextAwareResolver.getContexts(document);
 
@@ -33,7 +33,7 @@ public class HybridModel implements Model {
         var adapters = new ArrayList<Document.Accessor>(models.length);
 
         for (var model : models) {
-            var modelProcessor = model.createAdapter(document);
+            var modelProcessor = model.createAccessor(document);
             if (modelProcessor != null) {
                 adapters.add(modelProcessor);
             }

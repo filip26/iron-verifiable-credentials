@@ -14,8 +14,6 @@ import com.apicatalog.trust.payload.PayloadGenerator;
 
 public class SemanticModel implements Model {
 
-    // "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-
     @FunctionalInterface
     public interface QuadConsumer {
         void accept(
@@ -51,8 +49,8 @@ public class SemanticModel implements Model {
     }
 
     public record Primitives(
-            SemanticAccessor.Factory adapter,
-            SemanticUpdater.Factory updater,
+            SemanticModel.Accessor.Factory adapter,
+            GraphUpdater.Factory updater,
             GraphProofCursor.Factory cursor,
             GraphPayloadGenerator.Factory payload) {
     };
@@ -88,7 +86,7 @@ public class SemanticModel implements Model {
     }
 
     @Override
-    public SemanticAccessor createAdapter(Map<String, Object> document) {
+    public SemanticModel.Accessor createAccessor(Map<String, Object> document) {
         return primitives.adapter.createAdapter(
                 this,
                 ContextAwareResolver.getContexts(document),
@@ -97,14 +95,14 @@ public class SemanticModel implements Model {
 
     @Override
     public Document.Updater createUpdater(Map<String, Object> document) {
-        return primitives.updater.createUpdater(this, createAdapter(document));
+        return primitives.updater.createUpdater(this, createAccessor(document));
     }
 
-    public PayloadGenerator createPayload(SemanticAccessor adapter) {
+    public PayloadGenerator createPayload(SemanticModel.Accessor adapter) {
         return primitives.payload.createPayload(this, adapter);
     }
 
-    public GraphProofCursor createCursor(SemanticAccessor adapter) {
+    public GraphProofCursor createCursor(SemanticModel.Accessor adapter) {
         return primitives.cursor.createCursor(this, adapter);
     }
 
@@ -131,5 +129,31 @@ public class SemanticModel implements Model {
     @Override
     public Vocab vocab() {
         return vocab;
+    }
+    
+    public interface Accessor extends Document.Accessor {
+
+        @FunctionalInterface
+        public interface Factory {
+            SemanticModel.Accessor createAdapter(
+                    SemanticModel model,
+                    Collection<String> context,
+                    Map<String, Object> document);
+        }
+
+        Collection<String> context();
+
+        Graph data();
+
+        // returns proof graph ids, might be URI or blank node identifier
+        Collection<String> proofGraphs();
+
+        Graph proofGraph(String graph);
+
+        Map<String, Object> expandedData();
+
+        Vocab vocab();
+
+        Map<String, ?> source();
     }
 }

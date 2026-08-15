@@ -10,7 +10,7 @@ import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
-public final class GraphAccessor implements SemanticAccessor {
+public final class GraphAccessor implements SemanticModel.Accessor {
 
     private final SemanticModel model;
 
@@ -89,14 +89,14 @@ public final class GraphAccessor implements SemanticAccessor {
             throw new IllegalArgumentException();
         }
 
-        if (expanded.iterator().next() instanceof Map map) {
+        if (expanded.iterator().next() instanceof Map map) { // TODO use getFirst()
             expandedData = new LinkedHashMap<String, Object>(map);
             if (map.containsKey(model.vocab().proof())) {
                 var proofs = expandedData.remove(model.vocab().proof());
                 if (proofs instanceof Collection<?> col) {
                     expandedProofs = col;
                 } else {
-                    throw new IllegalArgumentException();
+                    throw new IllegalStateException();
                 }
             }
 

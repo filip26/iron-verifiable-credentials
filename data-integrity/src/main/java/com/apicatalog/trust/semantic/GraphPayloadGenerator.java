@@ -15,18 +15,18 @@ public class GraphPayloadGenerator implements PayloadGenerator {
 
     @FunctionalInterface
     public interface Factory {
-        PayloadGenerator createPayload(SemanticModel model, SemanticAccessor processor);
+        PayloadGenerator createPayload(SemanticModel model, SemanticModel.Accessor processor);
     }
 
     protected final SemanticModel model;
-    protected final SemanticAccessor adapter;
+    protected final SemanticModel.Accessor adapter;
 
     protected Collection<String> includedProofs;
     protected byte[] genericPayload;
 
     public GraphPayloadGenerator(
             SemanticModel model,
-            SemanticAccessor adapter) {
+            SemanticModel.Accessor adapter) {
         this.model = model;
         this.adapter = adapter;
         this.includedProofs = List.of();

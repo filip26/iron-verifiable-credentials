@@ -302,33 +302,6 @@ public final class DataIntegrityProof implements Proof {
         ;
     }
 
-//    public void validate(Map<String, Object> params) {
-//
-//        Objects.requireNonNull(created, "");
-//        Objects.requireNonNull(verificationMethod, "");
-//        Objects.requireNonNull(purpose, "");
-//        Objects.requireNonNull(proofValue, "");
-//
-//        if (params != null) {
-    //// assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); //
-    /// TODO compare as URI, expect URI in params / assertEquals(params,
-    /// DataIntegrityVocab.CHALLENGE, challenge); / assertEquals(params,
-    /// DataIntegrityVocab.DOMAIN, domain);
-//        }
-//    }
-
-//    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
-//        final Object value = params.get(name.name());
-//
-//        if (value == null) {
-//            return;
-//        }
-//
-//        if (!value.equals(param)) {
-//            throw new DocumentError(ErrorType.Invalid, name);
-//        }
-//    }
-
     public static Function<DataIntegrityProof, byte[]> getProofCanonizer(String c14n) {
         return switch (c14n) {
         case Model.C14N_JCS -> StaticJCS::canonize;
@@ -736,25 +709,11 @@ public final class DataIntegrityProof implements Proof {
                     break;
 
                 case PREDICATE_CREATED:
-                    if (!(statement instanceof LiteralStatement literal)) {
-                        throw new IllegalArgumentException();
-                    }
-                    if (!"http://www.w3.org/2001/XMLSchema#dateTime".equals(literal.datatype())) {
-                        throw new IllegalArgumentException();
-                    }
-
-                    di.created = Instant.parse(literal.object());
+                    di.created = Graph.xsdDateTime(statement);
                     break;
 
                 case PREDICATE_EXPIRES:
-                    if (!(statement instanceof LiteralStatement literal)) {
-                        throw new IllegalArgumentException();
-                    }
-                    if (!"http://www.w3.org/2001/XMLSchema#dateTime".equals(literal.datatype())) {
-                        throw new IllegalArgumentException();
-                    }
-
-                    di.expires = Instant.parse(literal.object());
+                    di.expires = Graph.xsdDateTime(statement);
                     break;
 
                 case PREDICATE_NONCE:

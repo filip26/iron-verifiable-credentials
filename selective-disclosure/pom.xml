@@ -60,7 +60,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <di.version>1.0.0-M1</di.version>
+        <di.version>1.0.0-M1-SNAPSHOT</di.version>
         <cbor-java.version>0.9</cbor-java.version>
 
         <!-- test resources -->

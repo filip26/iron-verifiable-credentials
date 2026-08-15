@@ -54,11 +54,11 @@ public class ContextAwareResolver {
 
     public static class Builder {
 
-        private final Collection<Predicate<Collection<String>>> predicates = new ArrayList<>();;
+        private final Collection<Predicate<SequencedCollection<?>>> predicates = new ArrayList<>();;
         private final Collection<Model> models = new ArrayList<>();
 
         public Builder model(
-                Predicate<Collection<String>> selector,
+                Predicate<SequencedCollection<?>> selector,
                 Model... models) {
 
             if (models.length == 1) {

@@ -51,7 +51,7 @@ public class VerifierTest {
         Map<String, Object> options = Resources.getMap(resource + ".options.json");
         Map<String, Object> signed = Resources.getMap(resource + ".signed.json");
 
-        var processor = Resources.SEMANTIC_MODEL.createAdapter(signed);
+        var processor = Resources.SEMANTIC_MODEL.createAccessor(signed);
 
         var cursor = processor.createProofCursor();
 

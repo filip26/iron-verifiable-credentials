@@ -54,13 +54,22 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
+        <di.version>1.0.0-M1-SNAPSHOT</di.version>
+
         <!-- Tests -->
         <multibase.version>4.1.0</multibase.version>
         <multicodec.version>4.0.0</multicodec.version>
+        <tree-io.version>1.0.0-M2</tree-io.version>        
         <junit.version>6.1.2</junit.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-data-integrity</artifactId>
+            <version>${di.version}</version>
+        </dependency>
+    
         <!-- Tests -->
         <dependency>
             <groupId>com.apicatalog</groupId>
@@ -72,6 +81,12 @@
             <groupId>com.apicatalog</groupId>
             <artifactId>copper-multicodec</artifactId>
             <version>${multicodec.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>tree-io-jackson2</artifactId>
+            <version>${tree-io.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

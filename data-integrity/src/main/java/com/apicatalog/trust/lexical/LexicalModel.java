@@ -31,7 +31,7 @@ public class LexicalModel implements Model {
     }
 
     @Override
-    public LexicalAccessor createAdapter(Map<String, Object> document) {
+    public LexicalAccessor createAccessor(Map<String, Object> document) {
         return processorFactory.createAdapter(
                 this,
                 ContextAwareResolver.getContexts(document),
@@ -40,7 +40,7 @@ public class LexicalModel implements Model {
 
     @Override
     public Updater createUpdater(Map<String, Object> document) {
-        return new LexicalUpdater(this, createAdapter(document));
+        return new LexicalUpdater(this, createAccessor(document));
     }
 
     public PropertyProofCursor createCursor(LexicalAccessor processor) {
@@ -48,7 +48,7 @@ public class LexicalModel implements Model {
     }
 
     public PropertyMapPayloadGenerator createPayload(Map<String, Object> document) {
-        return createPayload(createAdapter(document));
+        return createPayload(createAccessor(document));
     }
 
     public PropertyMapPayloadGenerator createPayload(LexicalAccessor processor) {

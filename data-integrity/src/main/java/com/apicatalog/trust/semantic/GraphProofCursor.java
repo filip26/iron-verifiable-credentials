@@ -12,7 +12,7 @@ import com.apicatalog.trust.proof.ProofCursor;
 public class GraphProofCursor implements ProofCursor {
 
     private final SemanticModel model;
-    private final SemanticAccessor adapter;
+    private final SemanticModel.Accessor adapter;
     private final Map<String, Entry<String, GraphProofMapper>> readers;
 
     private Iterator<String> proofGraphsIterator;
@@ -27,12 +27,12 @@ public class GraphProofCursor implements ProofCursor {
     public interface Factory {
         GraphProofCursor createCursor(
                 SemanticModel model,
-                SemanticAccessor processor);
+                SemanticModel.Accessor processor);
     }
 
     protected GraphProofCursor(
             SemanticModel model,
-            SemanticAccessor adapter,
+            SemanticModel.Accessor adapter,
             Map<String, Entry<String, GraphProofMapper>> readers) {
         this.model = model;
         this.adapter = adapter;
@@ -45,7 +45,7 @@ public class GraphProofCursor implements ProofCursor {
         this.payloadProvider = model.createPayload(adapter);
     }
 
-    public static GraphProofCursor newInstance(SemanticModel model, SemanticAccessor adapter) {
+    public static GraphProofCursor newInstance(SemanticModel model, SemanticModel.Accessor adapter) {
 
         var proofGraphs = adapter.proofGraphs();
 
@@ -76,14 +76,6 @@ public class GraphProofCursor implements ProofCursor {
                     break;
                 }
             }
-
-//            var proofType = adapter.proofType(proofGraph);
-
-//            var reader = model.reader(proofGraph.type().getFirst()); //TODO, only one type allowed
-//
-//            if (reader != null && reader.isAccepted(proofGraph)) {
-//                proofReaders.put(proofGraphId, reader);
-//            }
         }
 
         if (proofReaders.isEmpty()) {
@@ -95,7 +87,8 @@ public class GraphProofCursor implements ProofCursor {
 
     @Override
     public boolean isAccepted() {
-        return currentReader != null && currentReader.getValue().accepts(currentProofGraph.nodes().get(currentReader.getKey()));
+        return currentReader != null
+                && currentReader.getValue().accepts(currentProofGraph.nodes().get(currentReader.getKey()));
     }
 
     @Override
@@ -116,8 +109,13 @@ public class GraphProofCursor implements ProofCursor {
     public Proof proof() {
         if (currentProof == null && currentReader != null) {
             payloadProvider.reset();
-            currentProof = currentReader.getValue().materialize(currentReader.getKey(), currentProofGraph, model, payloadProvider);
+            currentProof = currentReader.getValue().materialize(currentReader.getKey(), currentProofGraph, model,
+                    payloadProvider);
         }
         return currentProof;
+    }
+
+    public Graph proofGraph() {
+        return currentProofGraph;
     }
 }

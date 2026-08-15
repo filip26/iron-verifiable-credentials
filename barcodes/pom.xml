@@ -55,6 +55,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
+        <di.version>1.0.0-M1-SNAPSHOT</di.version>
         <tree-io.version>1.0.0-M2</tree-io.version>
         <multibase.version>4.1.0</multibase.version>
         <multicodec.version>4.0.0</multicodec.version>
@@ -72,7 +73,7 @@
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-data-integrity</artifactId>
-            <version>1.0.0-M1</version>
+            <version>${di.version}</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>

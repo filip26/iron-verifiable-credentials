@@ -21,24 +21,23 @@ import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphProofMapper;
-import com.apicatalog.trust.semantic.SemanticAccessor;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.SemanticModel.JsonLdOps;
 import com.apicatalog.trust.semantic.SemanticModel.Primitives;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.semantic.SemanticUpdater;
 
 public class DataIntegrity {
 
     public static final String PREDICATE_PROOF = "https://w3id.org/security#proof";
     public static final String PROPERTY_PROOF = "proof";
 
-    public static SemanticModelBuilder createSematicModel(String c14n) {
+    public static SemanticModelBuilder newSematicModel(String c14n) {
         return new SemanticModelBuilder(c14n);
     }
 
-    public static LexicalModelBuilder createLexicalModel(String c14n) {
+    public static LexicalModelBuilder newLexicalModel(String c14n) {
         return new LexicalModelBuilder(c14n);
     }
 
@@ -50,8 +49,8 @@ public class DataIntegrity {
 
         private String proofPredicate = DataIntegrity.PREDICATE_PROOF;
 
-        private SemanticAccessor.Factory adapterFactory;
-        private SemanticUpdater.Factory updaterFactory;
+        private SemanticModel.Accessor.Factory adapterFactory;
+        private GraphUpdater.Factory updaterFactory;
         private GraphProofCursor.Factory cursorFactory;
         private GraphPayloadGenerator.Factory payloadFactory;
 
@@ -111,12 +110,12 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder accessor(SemanticAccessor.Factory factory) {
+        public SemanticModelBuilder accessor(SemanticModel.Accessor.Factory factory) {
             this.adapterFactory = factory;
             return this;
         }
 
-        public SemanticModelBuilder updater(SemanticUpdater.Factory factory) {
+        public SemanticModelBuilder updater(GraphUpdater.Factory factory) {
             this.updaterFactory = factory;
             return this;
         }
@@ -126,7 +125,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder proof(CryptoSuite cryptosuite) {
+        public SemanticModelBuilder cryptosuite(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
             }

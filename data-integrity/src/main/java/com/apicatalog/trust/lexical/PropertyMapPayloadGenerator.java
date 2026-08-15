@@ -38,12 +38,10 @@ public class PropertyMapPayloadGenerator implements PayloadGenerator {
         var proofs = new ArrayList<Map<String, Object>>(includedProofs.size());
 
         for (int i = 0; i < accessor.proofs(); i++) {
-
             var proof = accessor.proof(i);
             if (includedProofs.contains(proof.get(model.vocab().id()))) {
                 proofs.add(proof);
             }
-
         }
 
         var document = new HashMap<>(accessor.data());

@@ -11,23 +11,15 @@ import java.util.HashSet;
 import java.util.Map;
 
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.trust.semantic.SemanticAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.SemanticModel;
 
 public class SDPayloadGenerator extends GraphPayloadGenerator {
 
-//    private final SemanticModel model;
-//    private final SDGraphProcessor processor;
-//
-//    private Collection<String> includedProofs;
-
     public SDPayloadGenerator(
             SemanticModel model,
-            SemanticAccessor processor) {
+            SemanticModel.Accessor processor) {
         super(model, processor);
-//        this.model = model;
-//        this.processor = processor;
     }
 
     public SDBaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
@@ -39,8 +31,6 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
         if (!(model.newCanonizer() instanceof SDGraphCanonizer canonizer)) {
             throw new IllegalStateException();
         }
-
-//        var consumer = canonizer.consumer();
 
         model.tordf().accept(skolemized, ((subject, predicate, object, datatype, language, direction, graph) -> {
 
@@ -152,8 +142,6 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
         if (!(model.newCanonizer() instanceof SDGraphCanonizer canonizer)) {
             throw new IllegalStateException();
         }
-
-//        var consumer = canonizer.consumer();
 
         model.tordf().accept(adapter.expandedData(), canonizer);
 
