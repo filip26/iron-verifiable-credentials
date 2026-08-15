@@ -22,6 +22,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
     protected final SemanticAccessor adapter;
 
     protected Collection<String> includedProofs;
+    protected byte[] genericPayload;
 
     public GraphPayloadGenerator(
             SemanticModel model,
@@ -29,6 +30,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
         this.model = model;
         this.adapter = adapter;
         this.includedProofs = List.of();
+        this.genericPayload = null;
     }
 
     @Override
@@ -39,8 +41,11 @@ public class GraphPayloadGenerator implements PayloadGenerator {
     @Override
     public <T extends DigestiblePayload> T digestible(Function<byte[], T> payloadFactory) {
 
+        if (includedProofs.isEmpty() && genericPayload != null) {
+            return payloadFactory.apply(genericPayload);
+        }
+
         var canonizer = model.newCanonizer();
-//        var consumer = canonizer.consumer();
 
         Set<String> selectedGraph = Set.of();
 
@@ -99,7 +104,11 @@ public class GraphPayloadGenerator implements PayloadGenerator {
         }
 
         var canonical = canonizer.canonize();
-        // TODO cache generic, i.e. no included proofs
+        
+        if (includedProofs.isEmpty() && genericPayload == null) {
+            genericPayload = canonical;
+        }
+        
         return payloadFactory.apply(canonical);
     }
 
