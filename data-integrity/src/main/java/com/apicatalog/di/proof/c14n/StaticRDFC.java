@@ -6,7 +6,8 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.SequencedCollection;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
@@ -53,12 +54,16 @@ public final class StaticRDFC implements GraphCanonizer {
     private String created;
     private String challenge;
     private String cryptosuite;
-    private Collection<String> domains;
+    private SequencedCollection<String> domains;
     private String expires;
     private String nonce;
-    private Collection<String> previous;
+    private SequencedCollection<String> previous;
     private String purpose;
     private String verificationMethod;
+
+    private StaticRDFC() {
+        // protected
+    }
 
     public static final StaticRDFC newInstance() {
         return new StaticRDFC();
@@ -96,7 +101,7 @@ public final class StaticRDFC implements GraphCanonizer {
                 domains = new ArrayList<>();
             }
             domains.add(object);
-            break;            
+            break;
         case DataIntegrityProof.PREDICATE_NONCE:
             nonce = object;
             break;
@@ -123,7 +128,6 @@ public final class StaticRDFC implements GraphCanonizer {
         default:
             throw new IllegalArgumentException("Unsupported predicate " + predicate);
         }
-
     }
 
     /**
@@ -184,10 +188,10 @@ public final class StaticRDFC implements GraphCanonizer {
             String created,
             String challenge,
             String cryptosuite,
-            Collection<String> domains,
+            SequencedCollection<String> domains,
             String expires,
             String nonce,
-            Collection<String> previous,
+            SequencedCollection<String> previous,
             String purpose,
             String vm) {
 
@@ -212,8 +216,17 @@ public final class StaticRDFC implements GraphCanonizer {
                 rdfcStatement(id, 6, cryptosuite, os);
             }
 
-            if (domains != null && !domains.isEmpty()) {
-                domains.stream().sorted().forEach(domain -> rdfcStatement(id, 8, domain, os));
+            if (domains != null) {
+                if (domains.size() == 1) {
+                    rdfcStatement(id, 8, domains.getFirst(), os);
+
+                } else if (domains.size() > 1) {
+                    var array = domains.toArray(String[]::new);
+                    Arrays.sort(array);
+                    for (var el : array) {
+                        rdfcStatement(id, 8, el, os);
+                    }
+                }
             }
 
             if (expires != null) {
@@ -225,7 +238,16 @@ public final class StaticRDFC implements GraphCanonizer {
             }
 
             if (previous != null && !previous.isEmpty()) {
-                previous.stream().sorted().forEach(el -> rdfcStatement(id, 14, el, os));
+                if (previous.size() == 1) {
+                    rdfcStatement(id, 14, previous.getFirst(), os);
+
+                } else if (previous.size() > 1) {
+                    var array = previous.toArray(String[]::new);
+                    Arrays.sort(array);
+                    for (var el : array) {
+                        rdfcStatement(id, 14, el, os);
+                    }
+                }
             }
 
             if (purpose != null) {

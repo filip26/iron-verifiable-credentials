@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.proof.c14n.StaticJCS;
 import com.apicatalog.di.proof.c14n.StaticRDFC;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
@@ -47,6 +48,7 @@ class Resources {
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
+            .c14n(DataIntegrityProof.TYPE_NAME, StaticJCS::canonize) // proof type specific c14n provider
             .c14n(Jcs::canonize)
             .accessor(PropertyMapAccessor::newInstance)
             .cursor(PropertyProofCursor::newInstance)

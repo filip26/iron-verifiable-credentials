@@ -1,7 +1,6 @@
 package com.apicatalog.trust.lexical;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.apicatalog.trust.payload.PayloadGenerator;
@@ -84,14 +83,9 @@ public class PropertyProofCursor implements ProofCursor {
 
             var reader = readers[currentIndex];
 
-            var unsignedProof = new LinkedHashMap<>(currentEntry);
-            unsignedProof.remove("proofValue");
-
-            var canonicalProof = model.canonize(unsignedProof);
-
             // FIXME context!
             payloadProvider.reset();
-            currentProof = reader.materialize(processor.context(), currentEntry, canonicalProof, payloadProvider);
+            currentProof = reader.materialize(processor.context(), currentEntry, model, payloadProvider);
         }
 
         return currentProof;

@@ -193,6 +193,7 @@ public class DataIntegrity {
         private LexicalAccessor.Factory processorFactory;
         private PropertyProofCursor.Factory cursorFactory;
 
+        private Map<String, Function<Map<String, Object>, byte[]>> proofC14n = Map.of();
         private Map<String, CryptoSuite> cryptosuites;
         private Map<String, PropertyProofMapper> readers;
 
@@ -213,6 +214,15 @@ public class DataIntegrity {
             this.canonize = canonize;
             return this;
         }
+        
+        public LexicalModelBuilder c14n(String proofType, Function<Map<String, Object>, byte[]> canonize) {
+            if (this.proofC14n.isEmpty()) {
+                this.proofC14n = new HashMap<>();
+            }
+            this.proofC14n.put(proofType, canonize);
+            return this;
+        }
+
 
         public LexicalModelBuilder cursor(PropertyProofCursor.Factory factory) {
             this.cursorFactory = factory;
@@ -242,19 +252,22 @@ public class DataIntegrity {
         }
 
         public LexicalModel build() {
-            if (cryptosuites != null && !cryptosuites.isEmpty()) {
+            
+            if (canonize == null) {
+                throw new IllegalStateException();
+            }
+
+            if (cryptosuites != null && !cryptosuites.isEmpty()) {                
                 readers.put(
                         DataIntegrityProof.TYPE_NAME,
-                        new DataIntegrityProof.PropertyMapper(cryptosuites));
+                        new DataIntegrityProof.PropertyMapMapper(
+                                cryptosuites,
+                                proofC14n.getOrDefault(DataIntegrityProof.TYPE_NAME, canonize)));
             }
 
 //            if (readers.isEmpty()) {
 //                throw new IllegalStateException();
 //            }
-
-            if (canonize == null) {
-                throw new IllegalStateException();
-            }
 
             return new LexicalModel(
                     new Vocab("@context", proofProperty, "id", "type"),

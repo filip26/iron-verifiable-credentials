@@ -14,7 +14,7 @@ public interface PropertyProofMapper {
     Proof materialize(
             Collection<String> contexts,
             Map<String, Object> proof,
-            byte[] proofPayload,
+            LexicalModel model,
             PayloadGenerator payload);
 
 //    String signatureProperty();

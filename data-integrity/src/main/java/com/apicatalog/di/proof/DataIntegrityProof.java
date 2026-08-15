@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,6 +19,7 @@ import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.tree.io.java.NativeComposer;
+import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.PropertyProofMapper;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.PayloadGenerator;
@@ -74,13 +76,13 @@ public final class DataIntegrityProof implements Proof {
     private String id;
     private Instant created;
     private Instant expires;
-    private Collection<String> domain;
+    private SequencedCollection<String> domain;
     private String challenge;
     private String nonce;
     private String purpose;
     private String verificationMethod;
     private Signature proofValue;
-    private Collection<String> previousProof;
+    private SequencedCollection<String> previousProof;
 
     private byte[] canonicalPayload;
 
@@ -196,7 +198,7 @@ public final class DataIntegrityProof implements Proof {
      * @return a collection of strings representing the domains, or {@code null} if
      *         not present
      */
-    public Collection<String> domains() {
+    public SequencedCollection<String> domains() {
         return domain;
     }
 
@@ -227,7 +229,7 @@ public final class DataIntegrityProof implements Proof {
      * @return a collection of strings representing the URIs of previous proofs, or
      *         {@code null} if not present
      */
-    public Collection<String> previous() {
+    public SequencedCollection<String> previous() {
         return previousProof;
     }
 
@@ -381,7 +383,7 @@ public final class DataIntegrityProof implements Proof {
         // TODO ?!?!
         public Draft options(Map<String, Object> options) {
 
-            previousProof(Set.of());
+            previousProof(List.of());
 
             for (var entry : options.entrySet()) {
                 switch (entry.getKey()) {
@@ -484,12 +486,12 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
-        public Draft domain(Collection<String> domain) {
+        public Draft domain(SequencedCollection<String> domain) {
             proof.domain = domain;
             return this;
         }
 
-        public Draft previousProof(Collection<String> previousProof) {
+        public Draft previousProof(SequencedCollection<String> previousProof) {
             proof.previousProof = previousProof;
             return this;
         }
@@ -521,12 +523,15 @@ public final class DataIntegrityProof implements Proof {
         }
     }
 
-    public static class PropertyMapper implements PropertyProofMapper {
+    public static class PropertyMapMapper implements PropertyProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
+        private final Function<Map<String, Object>, byte[]> canonize;
 
-        public PropertyMapper(Map<String, CryptoSuite> cryptosuites) {
+        public PropertyMapMapper(Map<String, CryptoSuite> cryptosuites,
+                Function<Map<String, Object>, byte[]> canonize) {
             this.cryptosuites = cryptosuites;
+            this.canonize = canonize;
         }
 
         @Override
@@ -539,11 +544,10 @@ public final class DataIntegrityProof implements Proof {
         public Proof materialize(
                 Collection<String> contexts,
                 Map<String, Object> proof,
-                byte[] proofPayload,
+                LexicalModel model,
                 PayloadGenerator payload) {
 
             final var di = new DataIntegrityProof();
-            di.canonicalPayload = proofPayload;
 
             String proofValue = null;
 
@@ -608,12 +612,17 @@ public final class DataIntegrityProof implements Proof {
                             """.formatted(entry.getKey()));
                 }
             }
+
             if (di.previousProof == null) {
-                di.previousProof = Set.of();
+                di.previousProof = List.of();
 
             } else if (!di.previousProof.isEmpty()) {
                 payload.withProofs(di.previousProof);
             }
+
+            var unsignedProof = new LinkedHashMap<>(proof);
+            unsignedProof.remove("proofValue");
+            di.canonicalPayload = canonize.apply(unsignedProof);
 
             if (proofValue != null) {
                 di.proofValue = di.cryptosuite
@@ -701,7 +710,7 @@ public final class DataIntegrityProof implements Proof {
             if (!proofNode.id().startsWith("_:")) {
                 di.id = proofNode.id();
             }
-            di.previousProof = Set.of();
+            di.previousProof = List.of();
 
             final var canonizer = canonizeFactory.get();
 
