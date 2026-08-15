@@ -47,34 +47,23 @@ public final class StaticJCS {
             var next = false;
 
             if (proof.context() != null && !proof.context().isEmpty()) {
-                sequence(proof.context(), 11, os);
-                next = true;
+                next = sequence(proof.context(), 11, os, next);
             }
 
             next = entry(1, proof.challenge(), os, next);
             next = entry(2, proof.created(), Instant::toString, os, next);
             next = entry(3, proof.cryptosuite(), CryptoSuite::id, os, next);
 
-            if (proof.domains() != null) {
-                if (proof.domains().size() > 1) {
-                    next = collection(4, proof.domains(), os, next);
-
-                } else if (proof.domains().size() == 1) {
-                    next = entry(4, proof.domains().iterator().next(), os, next);
-                }
+            if (proof.domains() != null && !proof.domains().isEmpty()) {
+                next = sequence(proof.domains(), 4, os, next);
             }
 
             next = entry(5, proof.expires(), Instant::toString, os, next);
             next = entry(6, proof.id(), os, next);
             next = entry(7, proof.nonce(), os, next);
 
-            if (proof.previous() != null) {
-                if (proof.previous().size() > 1) {
-                    next = collection(8, proof.previous(), os, next);
-
-                } else if (proof.previous().size() == 1) {
-                    next = entry(8, proof.previous().iterator().next(), os, next);
-                }
+            if (proof.previous() != null && !proof.previous().isEmpty()) {
+                next = sequence(proof.previous(), 8, os, next);
             }
 
             next = entry(9, proof.purpose(), os, next);
@@ -130,8 +119,8 @@ public final class StaticJCS {
             if (proof.get(DataIntegrityProof.KEY_DOMAIN) instanceof Collection col) {
                 next = collection(4, col, os, next);
 
-            } else if (proof.get(DataIntegrityProof.KEY_DOMAIN) instanceof String value) {
-                next = entry(4, value, os, next);
+            } else if (proof.get(DataIntegrityProof.KEY_DOMAIN) instanceof String domain) {
+                next = entry(4, domain, os, next);
             }
 
             if (proof.get(DataIntegrityProof.KEY_EXPIRES) instanceof String expires) {
@@ -176,8 +165,11 @@ public final class StaticJCS {
         }
     }
 
-    private static void sequence(SequencedCollection<String> col, int index, OutputStream os)
+    private static boolean sequence(SequencedCollection<String> col, int index, OutputStream os, boolean next)
             throws IOException {
+        if (next) {
+            os.write(',');
+        }
         os.write(JCS_TEMPLATE[index]);
         if (col.size() == 1) {
             os.write('"');
@@ -186,6 +178,7 @@ public final class StaticJCS {
         } else {
             collection(col, os);
         }
+        return true;
     }
 
     private static boolean collection(int index, Collection<String> col, OutputStream os, boolean next)
