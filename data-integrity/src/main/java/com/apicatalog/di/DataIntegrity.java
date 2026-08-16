@@ -18,6 +18,7 @@ import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.lexical.PropertyProofMapper;
 import com.apicatalog.trust.model.Model.Vocab;
+import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphProofMapper;
@@ -177,7 +178,7 @@ public class DataIntegrity {
                             "@context",
                             proofPredicate,
                             null,
-                            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                            Graph.PREDICATE_TYPE),
                     new Primitives(
                             adapterFactory,
                             updaterFactory,

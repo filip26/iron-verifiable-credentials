@@ -66,7 +66,9 @@ public final class StaticJCS {
                 next = sequence(proof.previous(), 8, os, next);
             }
 
-            next = entry(9, proof.purpose(), os, next);
+            if (proof.purpose() != null) {
+                next = entry(9, proof.purpose().key(), os, next);
+            }
 
             if (next) {
                 os.write(',');

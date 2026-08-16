@@ -11,9 +11,7 @@ public interface Document {
 
     interface Accessor {
 
-//TODO       
-//      <T> T adapt(Class<T> type);
-//      boolean hasProofs();
+        Object document();
 
         ProofCursor createProofCursor();
 

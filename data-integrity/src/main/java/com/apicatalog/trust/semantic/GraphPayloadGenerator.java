@@ -86,7 +86,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
             }
         }
 
-        for (var node : adapter.data().nodes().values()) {
+        for (var node : adapter.document().nodes().values()) {
             for (var statement : node.statements()) {
                 // do not include proof predicates if not selected
                 if (!model.vocab().proof().equals(statement.predicate())

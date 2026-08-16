@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import com.apicatalog.di.DataIntegrity;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.proof.c14n.StaticJCS;
 import com.apicatalog.di.proof.c14n.StaticRDFC;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
@@ -18,9 +17,6 @@ import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
-import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.PropertyMapAccessor;
-import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
@@ -31,17 +27,17 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static LexicalModel VCDM20_LEXICAL_MODEL = DataIntegrity.newLexicalModel(Model.C14N_JCS)
-            .proofProperty(DataIntegrity.PROPERTY_PROOF)
-            .proof(EdDSA2022.withJCS())
-            .proof(ECDSA2019.withJCS())
-            .proof(MLDSA2024.get44withJCS())
-            .proof(SLHDSA2024.get128withJCS())
-            .c14n(DataIntegrityProof.TYPE_NAME, StaticJCS::canonize) // proof type specific c14n provider
-//            .c14n(Jcs::canonize)
-            .accessor(PropertyMapAccessor::newInstance)
-            .cursor(PropertyProofCursor::newInstance)
-            .build();
+//    static LexicalModel VCDM20_LEXICAL_MODEL = DataIntegrity.newLexicalModel(Model.C14N_JCS)
+//            .proofProperty(DataIntegrity.PROPERTY_PROOF)
+//            .proof(EdDSA2022.withJCS())
+//            .proof(ECDSA2019.withJCS())
+//            .proof(MLDSA2024.get44withJCS())
+//            .proof(SLHDSA2024.get128withJCS())
+//            .c14n(DataIntegrityProof.TYPE_NAME, StaticJCS::canonize) // proof type specific c14n provider
+////            .c14n(Jcs::canonize)
+//            .accessor(PropertyMapAccessor::newInstance)
+//            .cursor(PropertyProofCursor::newInstance)
+//             .build();
 
     static SemanticModel VCDM20_SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
 //            .document(VCDM2.CREDENTIAL_TYPE_URI, VCDM2.Credential, VCDM2.CredentialMapper::materialize)

@@ -79,7 +79,7 @@ public final class DataIntegrityProof implements Proof {
     private SequencedCollection<String> domain;
     private String challenge;
     private String nonce;
-    private String purpose;
+    private Purpose purpose;
     private String verificationMethod;
     private Signature proofValue;
     private SequencedCollection<String> previousProof;
@@ -131,7 +131,7 @@ public final class DataIntegrityProof implements Proof {
         writer.entry(KEY_CHALLENGE, proof.challenge())
                 .entry(KEY_NONCE, proof.nonce())
                 .entry(KEY_VERIFICATION_METHOD, proof.verificationMethod())
-                .entry(KEY_PURPOSE, proof.purpose());
+                .entry(KEY_PURPOSE, proof.purpose() != null ? proof.purpose().key() : null);
 
         if (proof.cryptosuite() != null) {
             writer.entry(KEY_PROOF_VALUE, proof.signature(), proof.cryptosuite()::encode);
@@ -274,10 +274,14 @@ public final class DataIntegrityProof implements Proof {
     }
 
     /**
-     * {@inheritDoc}
+     * Retrieves the intent behind the proof's creation.
+     * 
+     * This indicates the reason why an entity created the proof (e.g.,
+     * assertionMethod or authentication). This property is mandatory.
+     *
+     * @return a URI identifying the proof purpose
      */
-    @Override
-    public String purpose() {
+    public Purpose purpose() {
         return purpose;
     }
 
@@ -381,7 +385,7 @@ public final class DataIntegrityProof implements Proof {
                     expires(Instant.parse((String) entry.getValue()));
                     break;
                 case KEY_PURPOSE:
-                    purpose((String) entry.getValue());
+                    purpose(Purpose.from((String) entry.getValue()));
                     break;
                 case KEY_VERIFICATION_METHOD:
                     verificationMethod((String) entry.getValue());
@@ -434,7 +438,7 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
-        public Draft purpose(String purpose) {
+        public Draft purpose(Purpose purpose) {
             proof.purpose = purpose;
             return this;
         }
@@ -559,7 +563,7 @@ public final class DataIntegrityProof implements Proof {
                     di.nonce = stringValue(entry.getValue());
                     break;
                 case KEY_PURPOSE:
-                    di.purpose = stringValue(entry.getValue());
+                    di.purpose = Purpose.from(stringValue(entry.getValue()));
                     break;
                 case KEY_VERIFICATION_METHOD:
                     di.verificationMethod = stringValue(entry.getValue());
@@ -748,7 +752,7 @@ public final class DataIntegrityProof implements Proof {
                 case PREDICATE_PROOF_PURPOSE:
                     // TODO checks
 
-                    di.purpose = statement.object().substring("https://w3id.org/security#".length());
+                    di.purpose = Purpose.from(statement.object());
                     break;
 
                 case PREDICATE_VERIFICATION_METHOD:

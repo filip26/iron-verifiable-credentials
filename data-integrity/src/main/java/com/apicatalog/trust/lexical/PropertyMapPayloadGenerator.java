@@ -31,7 +31,7 @@ public class PropertyMapPayloadGenerator implements PayloadGenerator {
 
         if (includedProofs.isEmpty()) {
             // TODO cache
-            var canonical = model.canonize(accessor.data());
+            var canonical = model.canonize(accessor.document());
             return payloadFactory.apply(canonical);
         }
 
@@ -44,7 +44,7 @@ public class PropertyMapPayloadGenerator implements PayloadGenerator {
             }
         }
 
-        var document = new HashMap<>(accessor.data());
+        var document = new HashMap<>(accessor.document());
         document.put(model.vocab().proof(), proofs);
 
         var canonical = model.canonize(document);

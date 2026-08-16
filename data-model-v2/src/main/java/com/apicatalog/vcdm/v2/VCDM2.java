@@ -14,8 +14,6 @@ public class VCDM2 {
 
     public static final String CONTEXT_URI = "https://www.w3.org/ns/credentials/v2";
 
-    public static final String CREDENTIAL_TYPE_URI = "https://www.w3.org/2018/credentials#VerifiableCredential";
-
     private VCDM2() {
         // protected, it's just container
     }

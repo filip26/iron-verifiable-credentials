@@ -31,12 +31,14 @@ import com.apicatalog.trust.signature.Signature;
 
 public final class Ed25519Signature2020 implements Proof {
 
-    public static final String TYPE_URI = "https://w3id.org/security#Ed25519Signature2020";
-    public static String TYPE_NAME = "Ed25519Signature2020";
+    public static final String CONTEXT_URI = "https://w3id.org/security/suites/ed25519-2020/v1";
 
-    public static String SIGNATURE_ALGORITHM = "Ed25519";
-    public static String HASH_ALGORITHM = "SHA-256";
-    public static String C14N = "RDFC";
+    public static final String TYPE_URI = "https://w3id.org/security#Ed25519Signature2020";
+    public static final String TYPE_NAME = "Ed25519Signature2020";
+
+    public static final String SIGNATURE_ALGORITHM = "Ed25519";
+    public static final String HASH_ALGORITHM = "SHA-256";
+    public static final String C14N = "RDFC";
 
     private static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
     private static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
@@ -52,7 +54,7 @@ public final class Ed25519Signature2020 implements Proof {
     private Collection<String> context;
 
     private Instant created;
-    private String purpose;
+    private Purpose purpose;
     private String verificationMethod;
     private Signature signature;
 
@@ -74,7 +76,7 @@ public final class Ed25519Signature2020 implements Proof {
                 .entry(KEY_TYPE, proof.type())
                 .entry(KEY_CREATED, proof.created, Instant::toString)
                 .entry(KEY_VERIFICATION_METHOD, proof.verificationMethod)
-                .entry(KEY_PURPOSE, proof.purpose);
+                .entry(KEY_PURPOSE, proof.purpose != null ? proof.purpose.key() : null);
         if (proof.signature != null) {
             writer.entry(
                     KEY_PROOF_VALUE,
@@ -133,7 +135,7 @@ public final class Ed25519Signature2020 implements Proof {
                 proof.created = Instant.parse((String) entry.getValue());
                 break;
             case KEY_PURPOSE:
-                proof.purpose = (String) entry.getValue();
+                proof.purpose = Purpose.from((String) entry.getValue());
                 break;
             case KEY_VERIFICATION_METHOD:
                 proof.verificationMethod = (String) entry.getValue();
@@ -169,7 +171,7 @@ public final class Ed25519Signature2020 implements Proof {
             return this;
         }
 
-        public Draft purpose(String purpose) {
+        public Draft purpose(Purpose purpose) {
             proof.purpose = purpose;
             return this;
         }
@@ -247,7 +249,7 @@ public final class Ed25519Signature2020 implements Proof {
      * {@inheritDoc}
      */
     @Override
-    public String purpose() {
+    public Proof.Purpose purpose() {
         return purpose;
     }
 
@@ -329,7 +331,7 @@ public final class Ed25519Signature2020 implements Proof {
         public static byte[] canonize(Ed25519Signature2020 proof) {
             return canonize(
                     proof.created != null ? proof.created.toString() : null,
-                    proof.purpose != null ? "https://w3id.org/security#" + proof.purpose : null,
+                    proof.purpose != null ? proof.purpose.uri() : null,
                     proof.verificationMethod);
         }
 
@@ -470,7 +472,7 @@ public final class Ed25519Signature2020 implements Proof {
                     break;
                 case PREDICATE_PROOF_PURPOSE:
                     // TODO type
-                    di.purpose = statement.object();
+                    di.purpose = Purpose.from(statement.object());
                     break;
                 case PREDICATE_VERIFICATION_METHOD:
                     // TODO type

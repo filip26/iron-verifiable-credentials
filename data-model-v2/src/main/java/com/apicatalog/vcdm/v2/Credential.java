@@ -12,6 +12,9 @@ import com.apicatalog.trust.semantic.SemanticModel;
 
 public class Credential {
 
+    public static final String TYPE_URI = "https://www.w3.org/2018/credentials#VerifiableCredential";
+    public static final String TYPE_NAME = "VerifiableCredential";
+
     SequencedCollection<?> context;
 
     URI id;

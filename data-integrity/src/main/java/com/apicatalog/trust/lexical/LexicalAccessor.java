@@ -15,7 +15,8 @@ public interface LexicalAccessor extends Document.Accessor {
                 Map<String, Object> document);
     }
 
-    Map<String, Object> data();
+    @Override
+    Map<String, Object> document();
 
     int proofs();
 

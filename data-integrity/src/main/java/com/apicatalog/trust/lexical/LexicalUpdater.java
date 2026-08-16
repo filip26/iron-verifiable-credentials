@@ -61,10 +61,10 @@ public class LexicalUpdater implements Document.Updater {
         }
 
         if (proofs == null) {
-            return adapter.data();
+            return adapter.document();
         }
 
-        var compacted = new LinkedHashMap<>(adapter.data());
+        var compacted = new LinkedHashMap<>(adapter.document());
 
         if (contexts != null) {
             compacted.put(model.vocab().context(), merge(adapter.context(), contexts));

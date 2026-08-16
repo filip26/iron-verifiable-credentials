@@ -68,7 +68,7 @@ public class PropertyMapAccessor implements LexicalAccessor {
     }
 
     @Override
-    public Map<String, Object> data() {
+    public Map<String, Object> document() {
         return data;
     }
 

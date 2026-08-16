@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedCollection;
 
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.Document.Updater;
@@ -43,30 +44,31 @@ public class HybridModel implements Model {
 
         hybrid.context = context;
         hybrid.document = document;
-        hybrid.adapters = adapters;
+        hybrid.acessors = adapters;
 
         return hybrid;
     }
 
     public static class Adapter implements Document.Accessor {
 
-        Collection<Document.Accessor> adapters;
-        Collection<?> context;
+        SequencedCollection<Document.Accessor> acessors;
+        SequencedCollection<?> context;
         Map<String, Object> document;
+        Object data;
 
         @Override
         public ProofCursor createProofCursor() {
             List<ProofCursor> cursors = null;
 
-            for (var processor : adapters) {
+            for (var accessor : acessors) {
 
-                var cursor = processor.createProofCursor();
+                var cursor = accessor.createProofCursor();
                 if (cursor == null) {
                     continue;
                 }
 
                 if (cursors == null) {
-                    cursors = new ArrayList<>(adapters.size());
+                    cursors = new ArrayList<>(acessors.size());
                 }
 
                 cursors.add(cursor);
@@ -81,6 +83,14 @@ public class HybridModel implements Model {
             }
 
             return new Cursor(cursors);
+        }
+
+        @Override
+        public Object document() {
+            if (data == null) {
+                data = acessors.getFirst().document();
+            }
+            return data;
         }
     }
 

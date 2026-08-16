@@ -1,6 +1,8 @@
 package com.apicatalog.trust.proof;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.apicatalog.trust.payload.CanonicalPayload;
 import com.apicatalog.trust.signature.Signature;
@@ -51,7 +53,7 @@ public interface Proof extends CanonicalPayload {
      *
      * @return a URI identifying the proof purpose
      */
-    String purpose();
+    Purpose purpose();
 
     /**
      * Retrieves the exact date and time the proof was created.
@@ -61,4 +63,59 @@ public interface Proof extends CanonicalPayload {
      * @return an {@link Instant} representing the creation timestamp
      */
     Instant created();
+
+    public enum Purpose {
+
+        AUTHENTICATION("authentication"),
+        ASSERTION("assertionMethod"),
+        KEY_AGREEMENT("keyAgreement"),
+        CAPABILITY_INVOCATION("capabilityInvocation"),
+        CAPABILITY_DELEGATION("capabilityDelegation");
+
+        private final String name;
+        private final String uri;
+
+        private static final Map<String, Purpose> LOOKUP;
+
+        static {
+            Map<String, Purpose> map = HashMap.newHashMap(Purpose.values().length);
+            for (Purpose purpose : values()) {
+                map.put(purpose.name, purpose);
+                map.put(purpose.uri, purpose);
+            }
+            LOOKUP = Map.copyOf(map);
+        }
+
+        Purpose(String name) {
+            this.name = name;
+            this.uri = "https://w3id.org/security#" + (name.endsWith("Method") ? name : name + "Method");
+        }
+
+        Purpose(String name, String uri) {
+            this.name = name;
+            this.uri = uri;
+        }
+
+        public String key() {
+            return name;
+        }
+
+        public String uri() {
+            return uri;
+        }
+
+        public static Purpose from(String nameOrUri) {
+            if (nameOrUri == null || nameOrUri.isBlank()) {
+                throw new IllegalArgumentException("Proof purpose cannot be null or blank");
+            }
+
+            Purpose rel = LOOKUP.get(nameOrUri);
+
+            if (rel == null) {
+                throw new IllegalArgumentException("Unknown relationship: " + nameOrUri);
+            }
+
+            return rel;
+        }
+    }
 }

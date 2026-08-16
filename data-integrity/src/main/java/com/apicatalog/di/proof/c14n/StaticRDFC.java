@@ -179,7 +179,7 @@ public final class StaticRDFC implements GraphCanonizer {
                 proof.expires() != null ? proof.expires().toString() : null,
                 proof.nonce(),
                 proof.previous(),
-                proof.purpose() != null ? "https://w3id.org/security#" + proof.purpose() : null,
+                proof.purpose() != null ? proof.purpose().uri() : null,
                 proof.verificationMethod());
     }
 

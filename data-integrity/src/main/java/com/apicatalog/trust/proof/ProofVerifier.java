@@ -56,7 +56,7 @@ public class ProofVerifier {
 
         var publicKey = publicKeyResolver.getPublicKey(
                 proof.verificationMethod(),
-                proof.purpose(),
+                proof.purpose().uri(),
                 proof.signature().algorithm(),
                 Instant.now());
 

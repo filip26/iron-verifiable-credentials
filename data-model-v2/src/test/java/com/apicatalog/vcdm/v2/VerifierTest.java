@@ -64,7 +64,7 @@ public class VerifierTest {
 
 //        Map<String, Class<?>> documentTypeMapping = accessor.documentMapping();
 
-//        var document = model.materialize()
+        var document = accessor.document();
 
         var cursor = accessor.createProofCursor();
 
