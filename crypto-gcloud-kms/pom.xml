@@ -57,7 +57,7 @@
         <multibase.version>4.1.0</multibase.version>
         <multicodec.version>4.0.0</multicodec.version>
         <!-- Tests -->
-        <junit.version>6.1.2</junit.version>
+        <junit.version>6.1.3</junit.version>
     </properties>
 
     <dependencyManagement>
