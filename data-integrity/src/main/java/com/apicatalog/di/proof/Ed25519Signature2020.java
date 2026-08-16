@@ -109,11 +109,11 @@ public final class Ed25519Signature2020 implements Proof {
         return proofDraft.get();
     }
 
-    public static Draft newInstance() {
+    public static Draft newDraft() {
         return new Draft(new Ed25519Signature2020(), List.of());
     }
 
-    public static Draft newInstance(Map<String, Object> map) {
+    public static Draft newDraft(Map<String, Object> map) {
 
         var proof = new Ed25519Signature2020();
         Collection<String> context = List.of();
@@ -198,6 +198,18 @@ public final class Ed25519Signature2020 implements Proof {
 
         public Collection<String> context() {
             return proof.context;
+        }
+
+        public boolean hasRequired() {
+            return proof.hasRequired();
+        }
+
+        public Purpose purpose() {
+            return proof.purpose;
+        }
+
+        public Instant created() {
+            return proof.created;
         }
     }
 

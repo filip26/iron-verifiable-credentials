@@ -70,7 +70,7 @@ public class IssuerTest {
 
         var cryptosuite = ECDSAXI2023.getInstance();
 
-        var proofDraft = cryptosuite.createProofDraft();
+        var proofDraft = cryptosuite.newProofDraft();
         proofDraft.options(options);
 
         var updater = Resources.SEMANTIC_MODEL.createUpdater(document);

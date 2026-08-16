@@ -96,7 +96,7 @@ public class IssuerTest {
 
             var cryptosuite = getCryptosuite((String) options.get("cryptosuite"));
 
-            var proofDraft = cryptosuite.createProofDraft();
+            var proofDraft = cryptosuite.newProofDraft();
             proofDraft.options(options);
 
             assertTrue(proofDraft.hasRequired());
@@ -120,7 +120,7 @@ public class IssuerTest {
 
             assertEquals(Ed25519Signature2020.SIGNATURE_ALGORITHM, signatureAlgorithm);
 
-            var proofDraft = Ed25519Signature2020.newInstance((Map<String, Object>) options);
+            var proofDraft = Ed25519Signature2020.newDraft((Map<String, Object>) options);
 
             var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
 

@@ -506,6 +506,15 @@ public final class DataIntegrityProof implements Proof {
         public Collection<String> previous() {
             return proof.previous() != null ? proof.previous() : Set.of();
         }
+
+        public Purpose purpose() {
+            return proof.purpose();
+        }
+
+        public Instant created() {
+            return proof.created();
+        }
+
     }
 
     public static class PropertyMapMapper implements PropertyProofMapper {
