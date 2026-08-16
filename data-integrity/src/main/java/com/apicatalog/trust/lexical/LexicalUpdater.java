@@ -9,15 +9,15 @@ import java.util.Map;
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
 
-public class MapUpdater implements Document.Updater {
+public class LexicalUpdater implements Document.Updater {
 
     private final LexicalModel model;
-    private final LexicalAdapter adapter;
+    private final LexicalAccessor adapter;
 
     private Collection<Map<String, ?>> newProofs;
     private Collection<String> contexts = null;
 
-    public MapUpdater(LexicalModel model, LexicalAdapter adapter) {
+    public LexicalUpdater(LexicalModel model, LexicalAccessor adapter) {
         this.model = model;
         this.adapter = adapter;
     }
@@ -28,7 +28,7 @@ public class MapUpdater implements Document.Updater {
             newProofs = new ArrayList<>();
         }
         newProofs.add(compacted);
-        if (context != null) {
+        if (context != null && !context.isEmpty()) {
             if (contexts == null) {
                 contexts = new LinkedHashSet<>(context.size() * 2);
             }
@@ -61,10 +61,10 @@ public class MapUpdater implements Document.Updater {
         }
 
         if (proofs == null) {
-            return adapter.data();
+            return adapter.document();
         }
 
-        var compacted = new LinkedHashMap<>(adapter.data());
+        var compacted = new LinkedHashMap<>(adapter.document());
 
         if (contexts != null) {
             compacted.put(model.vocab().context(), merge(adapter.context(), contexts));
@@ -80,7 +80,7 @@ public class MapUpdater implements Document.Updater {
     }
 
     @Override
-    public MapPayloadGenerator createPayload() {
+    public PropertyMapPayloadGenerator createPayload() {
         return model.createPayload(adapter);
     }
 
@@ -89,8 +89,8 @@ public class MapUpdater implements Document.Updater {
         return model.vocab();
     }
 
-    private static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
-        var result = LinkedHashSet.<String>newLinkedHashSet(documentContext.size() + proofContext.size());
+    private static Collection<?> merge(Collection<?> documentContext, Collection<String> proofContext) {
+        var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
         result.addAll(documentContext);
         result.addAll(proofContext);
         return result;

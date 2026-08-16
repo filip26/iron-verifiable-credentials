@@ -29,7 +29,7 @@ import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
 
-    static final ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.builder()
+    static final ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.newBuilder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty),
                     // in processing preferences order
@@ -54,7 +54,7 @@ public class VerifierTest {
             .documentResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
             .build();
 
-    static ProofVerifier PROOF_VERIFIER = ProofVerifier.builder()
+    static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
             .publicKeyResolver(MULTIKEY_RESOLVER::getPublicKey)
             .verifier(EdDSA2022.ALGORITHM, BCEd25519Verifier.getInstance()::verify)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
@@ -74,9 +74,9 @@ public class VerifierTest {
 
         var model = MODEL_RESOLVER.resolve(contexts, signed);
 
-        var processor = model.createAdapter(signed);
+        var accessor = model.createAccessor(signed);
 
-        var cursor = processor.createProofCursor();
+        var cursor = accessor.createProofCursor();
 
         if (cursor == null || !cursor.next()) {
             fail("No proof(s) to verify");

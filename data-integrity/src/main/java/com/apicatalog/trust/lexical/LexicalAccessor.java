@@ -5,17 +5,18 @@ import java.util.Map;
 
 import com.apicatalog.trust.Document;
 
-public interface LexicalAdapter extends Document.Adapter {
+public interface LexicalAccessor extends Document.Accessor {
 
     @FunctionalInterface
     interface Factory {
-        LexicalAdapter createProcessor(
+        LexicalAccessor createAdapter(
                 LexicalModel model,
                 Collection<String> context,
                 Map<String, Object> document);
     }
 
-    Map<String, Object> data();
+    @Override
+    Map<String, Object> document();
 
     int proofs();
 

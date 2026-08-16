@@ -1,7 +1,6 @@
 package com.apicatalog.crypto.gc.kms;
 
 import java.security.KeyFactory;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
@@ -9,15 +8,32 @@ import java.security.interfaces.EdECPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.Objects;
 
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.codec.KeyCodec;
-import com.google.cloud.kms.v1.CryptoKeyVersionName;
-import com.google.cloud.kms.v1.KeyManagementServiceClient;
 
-public class KmsPublicKeyExporter {
+/**
+ * Utility class for exporting public keys retrieved from Google Cloud KMS into
+ * Multibase-encoded formats required by W3C Data Integrity specifications.
+ */
+public final class KmsPublicKeyExporter {
 
-    public static String publicMultikey(com.google.cloud.kms.v1.PublicKey publicKey) {
+    private KmsPublicKeyExporter() {
+        // protected, reserved
+    }
+
+    /**
+     * Converts a Google Cloud KMS public key into its corresponding
+     * Multibase-encoded string.
+     *
+     * @param publicKey the Google Cloud KMS public key object, must not be null
+     * @return the Multibase-encoded public key string
+     * @throws IllegalArgumentException if the key type or algorithm is unsupported
+     */
+    public static String publicKeyMultibase(com.google.cloud.kms.v1.PublicKey publicKey) {
+
+        Objects.requireNonNull(publicKey, "publicKey must not be null");
 
         return switch (publicKey.getAlgorithm()) {
         case EC_SIGN_P256_SHA256 -> Multibase.BASE_58_BTC.encode(
@@ -40,29 +56,16 @@ public class KmsPublicKeyExporter {
         case PQ_SIGN_ML_DSA_44 -> Multibase.BASE_64_URL.encode(
                 KeyCodec.MLDSA_44_PUBLIC.encode(
                         publicKey.getPublicKey().getData().toByteArray()));
-//            yield Map.entry("#" + fingerprint(publicKey.getPublicKey().getData().toByteArray()), publicKeyMultibase);
 
         case PQ_SIGN_ML_DSA_87 -> Multibase.BASE_64_URL.encode(
                 KeyCodec.MLDSA_87_PUBLIC.encode(
                         publicKey.getPublicKey().getData().toByteArray()));
 
-        default ->
-            throw new IllegalArgumentException("Unsupported key type [" + publicKey + "]");
+        default -> throw new IllegalArgumentException("Unsupported key algorithm [" + publicKey.getAlgorithm() + "]");
         };
     }
 
-    public static String fingerprint(com.google.cloud.kms.v1.PublicKey publicKey, String publicKeyMultibase) { 
-
-        return switch (publicKey.getAlgorithm()) {
-        case EC_SIGN_P256_SHA256, EC_SIGN_P384_SHA384, EC_SIGN_ED25519, PQ_SIGN_SLH_DSA_SHA2_128S -> publicKeyMultibase;        
-        
-        case PQ_SIGN_ML_DSA_87, PQ_SIGN_ML_DSA_44 -> fingerprint(publicKey.getPublicKey().getData().toByteArray());
-        default ->
-            throw new IllegalArgumentException("Unsupported key type [" + publicKey + "]");
-        };
-    }
-
-    public static byte[] exportRawEDKey(com.google.cloud.kms.v1.PublicKey publicKey) {
+    private static byte[] exportRawEDKey(com.google.cloud.kms.v1.PublicKey publicKey) {
 
         // 1. Get Public Key from KMS (Returns X.509 PEM)
         String pem = publicKey.getPem();
@@ -73,20 +76,28 @@ public class KmsPublicKeyExporter {
             KeyFactory edkf = KeyFactory.getInstance("EdDSA");
             PublicKey pubKey = edkf.generatePublic(new X509EncodedKeySpec(derEncoded));
             if (pubKey instanceof EdECPublicKey edKey) {
-                return KmsPublicKeyExporter.extractEd25519Bytes(edKey);
+                return extractEd25519Bytes(edKey);
             }
 
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("EdDSA algorithm not available", e);
 
         } catch (InvalidKeySpecException e) {
-            throw new IllegalArgumentException("Unsupported public key [" + publicKey + "]", e);
+            throw new IllegalArgumentException("Unsupported public key specification", e);
         }
 
-        throw new IllegalArgumentException("Unsupported public key [" + publicKey + "]");
+        throw new IllegalArgumentException("Unsupported public key type [" + publicKey + "]");
     }
 
-    public static byte[] exportRawECKey(com.google.cloud.kms.v1.PublicKey publicKey) {
+    /**
+     * Exports raw compressed bytes from an EC public key retrieved from KMS.
+     *
+     * @param publicKey the Google Cloud KMS public key object, must not be null
+     * @return compressed byte array representation of the NIST EC key
+     */
+    private static byte[] exportRawECKey(com.google.cloud.kms.v1.PublicKey publicKey) {
+
+        Objects.requireNonNull(publicKey, "publicKey must not be null");
 
         // 1. Get Public Key from KMS (Returns X.509 PEM)
         String pem = publicKey.getPem();
@@ -94,41 +105,15 @@ public class KmsPublicKeyExporter {
 
         // NIST EC (P-256/P-384)
         try {
-            KeyFactory eckf = KeyFactory.getInstance("EC");
-            ECPublicKey ecKey = (ECPublicKey) eckf.generatePublic(new X509EncodedKeySpec(derEncoded));
-            return KmsPublicKeyExporter.compressNistKey(ecKey);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
 
-        } catch (InvalidKeySpecException e) {
-            throw new IllegalArgumentException("Unsupported public key [" + publicKey + "]", e);
-        }
-    }
-
-    public byte[] exportRawPublicKey(String projectId, String location, String keyRing, String key, String version)
-            throws Exception {
-        try (KeyManagementServiceClient client = KeyManagementServiceClient.create()) {
-            CryptoKeyVersionName name = CryptoKeyVersionName.of(projectId, location, keyRing, key, version);
-
-            // 1. Get Public Key from KMS (Returns X.509 PEM)
-            String pem = client.getPublicKey(name).getPem();
-            byte[] derEncoded = decodePem(pem);
-
-            // 2. Try to parse as EdDSA (Ed25519) first
-            try {
-                KeyFactory edkf = KeyFactory.getInstance("EdDSA");
-                PublicKey pubKey = edkf.generatePublic(new X509EncodedKeySpec(derEncoded));
-                if (pubKey instanceof EdECPublicKey edKey) {
-                    return extractEd25519Bytes(edKey);
-                }
-            } catch (Exception e) {
-                // Not Ed25519, fall back to NIST EC (P-256/P-384)
-            }
-
-            // 3. Fallback to NIST EC
             KeyFactory eckf = KeyFactory.getInstance("EC");
             ECPublicKey ecKey = (ECPublicKey) eckf.generatePublic(new X509EncodedKeySpec(derEncoded));
             return compressNistKey(ecKey);
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("EC algorithm not available", e);
+        } catch (InvalidKeySpecException e) {
+            throw new IllegalArgumentException("Unsupported public key specification", e);
         }
     }
 
@@ -181,24 +166,5 @@ public class KmsPublicKeyExporter {
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s", "");
         return Base64.getDecoder().decode(clean);
-    }
-
-    private static String fingerprint(byte[] publicKey) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-            return Multibase.BASE_58_BTC.encode(digest.digest(publicKey));
-
-//            // PQ keys (ML-DSA, SLH-DSA) provide raw bytes in 'public_key'
-//            // Standard keys (EC) provide a PEM string in 'pem'
-//            if (!publicKey.getPublicKey().getData().isEmpty()) {
-//                return digest.digest(publicKey.getPublicKey().getData().toByteArray());
-//            } else if (publicKey.getPem() != null && !publicKey.getPem().isEmpty()) {
-//                return digest.digest(publicKey.getPem().getBytes(StandardCharsets.UTF_8));
-//            }
-
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 algorithm not found", e);
-        }
     }
 }

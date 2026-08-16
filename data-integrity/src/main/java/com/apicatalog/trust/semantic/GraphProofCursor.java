@@ -1,9 +1,9 @@
 package com.apicatalog.trust.semantic;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
@@ -12,14 +12,14 @@ import com.apicatalog.trust.proof.ProofCursor;
 public class GraphProofCursor implements ProofCursor {
 
     private final SemanticModel model;
-    private final SemanticAdapter processor;
-    private final Map<String, GraphProofReader> readers;
+    private final SemanticModel.Accessor adapter;
+    private final Map<String, Entry<String, GraphProofMapper>> readers;
 
-    private Iterator<String> graphIterator;
+    private Iterator<String> proofGraphsIterator;
 
     private Proof currentProof;
-    private Collection<String[]> currentGraph;
-    private GraphProofReader currentReader;
+    private Graph currentProofGraph;
+    private Entry<String, GraphProofMapper> currentReader;
     private PayloadGenerator payloadProvider;
 
     // TODO ?!?
@@ -27,43 +27,54 @@ public class GraphProofCursor implements ProofCursor {
     public interface Factory {
         GraphProofCursor createCursor(
                 SemanticModel model,
-                SemanticAdapter processor);
+                SemanticModel.Accessor processor);
     }
 
     protected GraphProofCursor(
             SemanticModel model,
-            SemanticAdapter processor,
-            Map<String, GraphProofReader> readers) {
+            SemanticModel.Accessor adapter,
+            Map<String, Entry<String, GraphProofMapper>> readers) {
         this.model = model;
-        this.processor = processor;
+        this.adapter = adapter;
         this.readers = readers;
 
-        this.graphIterator = processor.proofs().iterator();
+        this.proofGraphsIterator = adapter.proofGraphs().iterator();
         this.currentProof = null;
-        this.currentGraph = null;
+        this.currentProofGraph = null;
         this.currentReader = null;
-        this.payloadProvider = model.createPayload(processor);
+        this.payloadProvider = model.createPayload(adapter);
     }
 
-    public static GraphProofCursor newInstance(SemanticModel model, SemanticAdapter processor) {
+    public static GraphProofCursor newInstance(SemanticModel model, SemanticModel.Accessor adapter) {
 
-        var proofs = processor.proofs();
+        var proofGraphs = adapter.proofGraphs();
 
-        if (proofs == null || proofs.isEmpty()) {
+        if (proofGraphs == null || proofGraphs.isEmpty()) {
             return null;
         }
 
-        var proofReaders = new HashMap<String, GraphProofReader>(proofs.size());
+        var proofReaders = HashMap.<String, Entry<String, GraphProofMapper>>newHashMap(proofGraphs.size());
 
-        for (var proofGraph : proofs) {
+        for (var proofGraphId : proofGraphs) {
 
-            var proof = processor.proof(proofGraph);
-            var proofType = processor.proofType(proofGraph);
+            var proofGraph = adapter.proofGraph(proofGraphId);
 
-            var reader = model.reader(proofType);
+            // find proof node and reader
+            for (var node : proofGraph.nodes().values()) {
 
-            if (reader != null && reader.isAccepted(proof)) {
-                proofReaders.put(proofGraph, reader);
+                // limit proof type to one
+                if (node.type().size() != 1) {
+                    throw new IllegalArgumentException(); // TODO
+                }
+
+                var proofType = node.type().getFirst();
+
+                var reader = model.reader(proofType);
+
+                if (reader != null && reader.accepts(node)) {
+                    proofReaders.put(proofGraphId, Map.entry(node.id(), reader));
+                    break;
+                }
             }
         }
 
@@ -71,24 +82,25 @@ public class GraphProofCursor implements ProofCursor {
             return null;
         }
 
-        return new GraphProofCursor(model, processor, proofReaders);
+        return new GraphProofCursor(model, adapter, proofReaders);
     }
 
     @Override
     public boolean isAccepted() {
-        return currentReader != null && currentReader.isAccepted(currentGraph);
+        return currentReader != null
+                && currentReader.getValue().accepts(currentProofGraph.nodes().get(currentReader.getKey()));
     }
 
     @Override
     public boolean next() {
-        if (!graphIterator.hasNext()) {
+        if (!proofGraphsIterator.hasNext()) {
             return false;
         }
 
-        var graph = graphIterator.next();
+        var proofGraph = proofGraphsIterator.next();
 
-        currentGraph = processor.proof(graph);
-        currentReader = readers.get(graph);
+        currentProofGraph = adapter.proofGraph(proofGraph);
+        currentReader = readers.get(proofGraph);
         currentProof = null;
         return true;
     }
@@ -97,8 +109,13 @@ public class GraphProofCursor implements ProofCursor {
     public Proof proof() {
         if (currentProof == null && currentReader != null) {
             payloadProvider.reset();
-            currentProof = currentReader.read(currentGraph, model, payloadProvider);
+            currentProof = currentReader.getValue().materialize(currentReader.getKey(), currentProofGraph, model,
+                    payloadProvider);
         }
         return currentProof;
+    }
+
+    public Graph proofGraph() {
+        return currentProofGraph;
     }
 }

@@ -4,17 +4,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedCollection;
 
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.Document.Updater;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class HybridAdapterModel implements Model {
+public class HybridModel implements Model {
 
     private final Model[] models;
 
-    public HybridAdapterModel(Model... models) {
+    public HybridModel(Model... models) {
         this.models = models;
     }
 
@@ -24,16 +25,16 @@ public class HybridAdapterModel implements Model {
 
     @Override
     // TODO add context as parameter
-    public Document.Adapter createAdapter(Map<String, Object> document) {
+    public Document.Accessor createAccessor(Map<String, Object> document) {
 
         var context = ContextAwareResolver.getContexts(document);
 
         var hybrid = new Adapter();
 
-        var adapters = new ArrayList<Document.Adapter>(models.length);
+        var adapters = new ArrayList<Document.Accessor>(models.length);
 
         for (var model : models) {
-            var modelProcessor = model.createAdapter(document);
+            var modelProcessor = model.createAccessor(document);
             if (modelProcessor != null) {
                 adapters.add(modelProcessor);
             }
@@ -43,30 +44,31 @@ public class HybridAdapterModel implements Model {
 
         hybrid.context = context;
         hybrid.document = document;
-        hybrid.adapters = adapters;
+        hybrid.acessors = adapters;
 
         return hybrid;
     }
 
-    public static class Adapter implements Document.Adapter {
+    public static class Adapter implements Document.Accessor {
 
-        Collection<Document.Adapter> adapters;
-        Collection<String> context;
+        SequencedCollection<Document.Accessor> acessors;
+        SequencedCollection<?> context;
         Map<String, Object> document;
+        Object data;
 
         @Override
         public ProofCursor createProofCursor() {
             List<ProofCursor> cursors = null;
 
-            for (var processor : adapters) {
+            for (var accessor : acessors) {
 
-                var cursor = processor.createProofCursor();
+                var cursor = accessor.createProofCursor();
                 if (cursor == null) {
                     continue;
                 }
 
                 if (cursors == null) {
-                    cursors = new ArrayList<>(adapters.size());
+                    cursors = new ArrayList<>(acessors.size());
                 }
 
                 cursors.add(cursor);
@@ -81,6 +83,14 @@ public class HybridAdapterModel implements Model {
             }
 
             return new Cursor(cursors);
+        }
+
+        @Override
+        public Object document() {
+            if (data == null) {
+                data = acessors.getFirst().document();
+            }
+            return data;
         }
     }
 

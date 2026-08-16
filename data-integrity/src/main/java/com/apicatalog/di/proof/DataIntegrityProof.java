@@ -4,21 +4,32 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
+import com.apicatalog.di.proof.c14n.StaticJCS;
+import com.apicatalog.di.proof.c14n.StaticRDFC;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.TreeEmitter;
 import com.apicatalog.tree.io.java.NativeComposer;
-import com.apicatalog.trust.lexical.MapProofReader;
+import com.apicatalog.trust.lexical.LexicalModel;
+import com.apicatalog.trust.lexical.PropertyProofMapper;
+import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
-import com.apicatalog.trust.semantic.GraphProofReader;
+import com.apicatalog.trust.semantic.Graph;
+import com.apicatalog.trust.semantic.Graph.LiteralStatement;
+import com.apicatalog.trust.semantic.Graph.ResourceStatement;
+import com.apicatalog.trust.semantic.GraphProofMapper;
 import com.apicatalog.trust.semantic.SemanticModel;
+import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.signature.Signature;
 
 /**
@@ -34,62 +45,72 @@ public final class DataIntegrityProof implements Proof {
     public static final String TYPE_URI = "https://w3id.org/security#DataIntegrityProof";
     public static final String TYPE_NAME = "DataIntegrityProof";
 
-    private static final String KEY_ID = "id";
-    private static final String KEY_TYPE = "type";
-    private static final String KEY_CRYPTOSUITE = "cryptosuite";
-    private static final String KEY_CREATED = "created";
-    private static final String KEY_EXPIRES = "expires";
-    private static final String KEY_DOMAIN = "domain";
-    private static final String KEY_CHALLENGE = "challenge";
-    private static final String KEY_NONCE = "nonce";
-    private static final String KEY_VERIFICATION_METHOD = "verificationMethod";
-    private static final String KEY_PURPOSE = "proofPurpose";
-    private static final String KEY_PROOF_VALUE = "proofValue";
-    private static final String KEY_PREVIOUS_PROOF = "previousProof";
+    public static final String KEY_ID = "id";
+    public static final String KEY_TYPE = "type";
+    public static final String KEY_CRYPTOSUITE = "cryptosuite";
+    public static final String KEY_CREATED = "created";
+    public static final String KEY_EXPIRES = "expires";
+    public static final String KEY_DOMAIN = "domain";
+    public static final String KEY_CHALLENGE = "challenge";
+    public static final String KEY_NONCE = "nonce";
+    public static final String KEY_VERIFICATION_METHOD = "verificationMethod";
+    public static final String KEY_PURPOSE = "proofPurpose";
+    public static final String KEY_PROOF_VALUE = "proofValue";
+    public static final String KEY_PREVIOUS_PROOF = "previousProof";
 
-    private static final String PREDICATE_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-    private static final String PREDICATE_CRYPTOSUITE = "https://w3id.org/security#cryptosuite";
-    private static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
-    private static final String PREDICATE_EXPIRES = "";
-    private static final String PREDICATE_DOMAIN = "";
-    private static final String PREDICATE_CHALLENGE = "";
-    private static final String PREDICATE_NONCE = "";
-    private static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
-    private static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
-    private static final String PREDICATE_PROOF_VALUE = "https://w3id.org/security#proofValue";
-    private static final String PREDICATE_PREVIOUS_PROOF = "https://w3id.org/security#previousProof";
+    public static final String PREDICATE_CRYPTOSUITE = "https://w3id.org/security#cryptosuite";
+    public static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
+    public static final String PREDICATE_EXPIRES = "https://w3id.org/security#expiration";
+    public static final String PREDICATE_DOMAIN = "https://w3id.org/security#domain";
+    public static final String PREDICATE_CHALLENGE = "https://w3id.org/security#challenge";
+    public static final String PREDICATE_NONCE = "https://w3id.org/security#nonce";
+    public static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
+    public static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
+    public static final String PREDICATE_PROOF_VALUE = "https://w3id.org/security#proofValue";
+    public static final String PREDICATE_PREVIOUS_PROOF = "https://w3id.org/security#previousProof";
 
     private CryptoSuite cryptosuite;
 
-    private Collection<String> context;
+    private SequencedCollection<String> context;
 
     private String id;
     private Instant created;
     private Instant expires;
-    private Collection<String> domain;
+    private SequencedCollection<String> domain;
     private String challenge;
     private String nonce;
-    private String purpose;
+    private Purpose purpose;
     private String verificationMethod;
     private Signature proofValue;
-    private Collection<String> previousProof;
+    private SequencedCollection<String> previousProof;
 
     private byte[] canonicalPayload;
 
     private DataIntegrityProof() {
     }
 
-    public static Map<String, ?> compact(DataIntegrityProof proof) {
+    public static Map<String, ?> compact(DataIntegrityProof proof, boolean addContext) {
         var composer = new NativeComposer<Map<String, ? extends Object>>();
-        compact(proof, composer);
+        compact(proof, composer, addContext);
         return composer.compose();
     }
 
-    public static void compact(DataIntegrityProof proof, TreeEmitter emitter) {
+    public static void compact(DataIntegrityProof proof, TreeEmitter emitter, boolean addContext) {
 
-        var writer = Tree.newPropertyTree(emitter)
-                .beginMap()
-                .entry(KEY_ID, proof.id())
+        var writer = Tree.newPropertyTree(emitter).beginMap();
+
+        if (addContext && proof.context != null && !proof.context.isEmpty()) {
+
+            writer.beginSequence("@context");
+
+            for (var ctx : proof.context) {
+                writer.element(ctx);
+            }
+
+            writer.endSequence();
+        }
+
+        writer.entry(KEY_ID, proof.id())
                 .entry(KEY_TYPE, proof.type())
                 .entry(KEY_CRYPTOSUITE, proof.cryptosuite(), CryptoSuite::id)
                 .entry(KEY_CREATED, proof.created(), Instant::toString)
@@ -110,7 +131,7 @@ public final class DataIntegrityProof implements Proof {
         writer.entry(KEY_CHALLENGE, proof.challenge())
                 .entry(KEY_NONCE, proof.nonce())
                 .entry(KEY_VERIFICATION_METHOD, proof.verificationMethod())
-                .entry(KEY_PURPOSE, proof.purpose());
+                .entry(KEY_PURPOSE, proof.purpose() != null ? proof.purpose().key() : null);
 
         if (proof.cryptosuite() != null) {
             writer.entry(KEY_PROOF_VALUE, proof.signature(), proof.cryptosuite()::encode);
@@ -177,7 +198,7 @@ public final class DataIntegrityProof implements Proof {
      * @return a collection of strings representing the domains, or {@code null} if
      *         not present
      */
-    public Collection<String> domains() {
+    public SequencedCollection<String> domains() {
         return domain;
     }
 
@@ -208,7 +229,7 @@ public final class DataIntegrityProof implements Proof {
      * @return a collection of strings representing the URIs of previous proofs, or
      *         {@code null} if not present
      */
-    public Collection<String> previous() {
+    public SequencedCollection<String> previous() {
         return previousProof;
     }
 
@@ -253,10 +274,14 @@ public final class DataIntegrityProof implements Proof {
     }
 
     /**
-     * {@inheritDoc}
+     * Retrieves the intent behind the proof's creation.
+     * 
+     * This indicates the reason why an entity created the proof (e.g.,
+     * assertionMethod or authentication). This property is mandatory.
+     *
+     * @return a URI identifying the proof purpose
      */
-    @Override
-    public String purpose() {
+    public Purpose purpose() {
         return purpose;
     }
 
@@ -266,37 +291,29 @@ public final class DataIntegrityProof implements Proof {
      * @return a collection of strings representing the JSON-LD context URIs, or
      *         {@code null} if not present
      */
-    public Collection<String> context() {
+    public SequencedCollection<String> context() {
         return context;
     }
 
-    
-    public void validate(Map<String, Object> params) {
-        
-        Objects.requireNonNull(created, "");
-        Objects.requireNonNull(verificationMethod, "");
-        Objects.requireNonNull(purpose, "");
-        Objects.requireNonNull(proofValue, "");
-
-        if (params != null) {
-//            assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
-//            assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
-//            assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
-        }
+    public boolean isValid() {
+        return created != null
+                && Instant.now().isAfter(created)
+                && (expires == null || Instant.now().isBefore(expires))
+                && verificationMethod != null
+                && purpose != null
+                && proofValue != null
+        // TODO && proofValue.isValid()
+        ;
     }
-    
-//    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
-//        final Object value = params.get(name.name());
-//
-//        if (value == null) {
-//            return;
-//        }
-//
-//        if (!value.equals(param)) {
-//            throw new DocumentError(ErrorType.Invalid, name);
-//        }
-//    }
-    
+
+    public static Function<DataIntegrityProof, byte[]> getProofCanonizer(String c14n) {
+        return switch (c14n) {
+        case Model.C14N_JCS -> StaticJCS::canonize;
+        case Model.C14N_RDFC -> StaticRDFC::canonize;
+        default -> throw new IllegalArgumentException();
+        };
+    }
+
     public static class Draft {
 
         protected final DataIntegrityProof proof;
@@ -308,7 +325,7 @@ public final class DataIntegrityProof implements Proof {
         }
 
         protected byte[] canonize(String c14n) {
-            return canonize(DIProofC14NTemplates.getSignTemplate(c14n));
+            return canonize(DataIntegrityProof.getProofCanonizer(c14n));
         }
 
         protected byte[] canonize(Function<DataIntegrityProof, byte[]> canonizer) {
@@ -319,6 +336,7 @@ public final class DataIntegrityProof implements Proof {
             return proof.canonicalPayload;
         }
 
+        // TODO clone?
         public Draft proof(DataIntegrityProof source) {
             proof.canonicalPayload = source.canonicalPayload;
             proof.challenge = source.challenge;
@@ -335,10 +353,14 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
+        public boolean isValid() {
+            return proof.isValid();
+        }
+
         // TODO ?!?!
         public Draft options(Map<String, Object> options) {
 
-            previousProof(Set.of());
+            previousProof(List.of());
 
             for (var entry : options.entrySet()) {
                 switch (entry.getKey()) {
@@ -363,10 +385,27 @@ public final class DataIntegrityProof implements Proof {
                     expires(Instant.parse((String) entry.getValue()));
                     break;
                 case KEY_PURPOSE:
-                    purpose((String) entry.getValue());
+                    purpose(Purpose.from((String) entry.getValue()));
                     break;
                 case KEY_VERIFICATION_METHOD:
                     verificationMethod((String) entry.getValue());
+                    break;
+                case KEY_NONCE:
+                    nonce((String) entry.getValue());
+                    break;
+                case KEY_CHALLENGE:
+                    challenge((String) entry.getValue());
+                    break;
+                case KEY_DOMAIN:
+                    if (entry.getValue() instanceof Collection<?> col) {
+                        domain(col.stream().map(String.class::cast).toList());
+
+                    } else if (entry.getValue() instanceof String uri) {
+                        domain(List.of(uri));
+
+                    } else {
+                        throw new IllegalArgumentException();
+                    }
                     break;
                 case KEY_PREVIOUS_PROOF:
                     if (entry.getValue() instanceof Collection<?> col) {
@@ -399,7 +438,7 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
-        public Draft purpose(String purpose) {
+        public Draft purpose(Purpose purpose) {
             proof.purpose = purpose;
             return this;
         }
@@ -424,7 +463,12 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
-        public Draft previousProof(Collection<String> previousProof) {
+        public Draft domain(SequencedCollection<String> domain) {
+            proof.domain = domain;
+            return this;
+        }
+
+        public Draft previousProof(SequencedCollection<String> previousProof) {
             proof.previousProof = previousProof;
             return this;
         }
@@ -438,7 +482,7 @@ public final class DataIntegrityProof implements Proof {
             return proof;
         }
 
-        public Draft context(Collection<String> context) {
+        public Draft context(SequencedCollection<String> context) {
             proof.context = context;
             return this;
         }
@@ -456,29 +500,31 @@ public final class DataIntegrityProof implements Proof {
         }
     }
 
-    public static class MapReader implements MapProofReader {
+    public static class PropertyMapMapper implements PropertyProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
+        private final Function<Map<String, Object>, byte[]> canonize;
 
-        public MapReader(Map<String, CryptoSuite> cryptosuites) {
+        public PropertyMapMapper(Map<String, CryptoSuite> cryptosuites,
+                Function<Map<String, Object>, byte[]> canonize) {
             this.cryptosuites = cryptosuites;
+            this.canonize = canonize;
         }
 
         @Override
-        public boolean isAccepted(Map<String, Object> proof) {
+        public boolean accepts(Map<String, Object> proof) {
             return TYPE_NAME.equals(proof.get(KEY_TYPE))
                     && cryptosuites.containsKey(proof.get(KEY_CRYPTOSUITE));
         }
 
         @Override
-        public Proof read(
+        public Proof materialize(
                 Collection<String> contexts,
                 Map<String, Object> proof,
-                byte[] proofPayload,
+                LexicalModel model,
                 PayloadGenerator payload) {
 
             final var di = new DataIntegrityProof();
-            di.canonicalPayload = proofPayload;
 
             String proofValue = null;
 
@@ -517,7 +563,7 @@ public final class DataIntegrityProof implements Proof {
                     di.nonce = stringValue(entry.getValue());
                     break;
                 case KEY_PURPOSE:
-                    di.purpose = stringValue(entry.getValue());
+                    di.purpose = Purpose.from(stringValue(entry.getValue()));
                     break;
                 case KEY_VERIFICATION_METHOD:
                     di.verificationMethod = stringValue(entry.getValue());
@@ -543,12 +589,17 @@ public final class DataIntegrityProof implements Proof {
                             """.formatted(entry.getKey()));
                 }
             }
+
             if (di.previousProof == null) {
-                di.previousProof = Set.of();
+                di.previousProof = List.of();
 
             } else if (!di.previousProof.isEmpty()) {
                 payload.withProofs(di.previousProof);
             }
+
+            var unsignedProof = new LinkedHashMap<>(proof);
+            unsignedProof.remove("proofValue");
+            di.canonicalPayload = canonize.apply(unsignedProof);
 
             if (proofValue != null) {
                 di.proofValue = di.cryptosuite
@@ -575,88 +626,185 @@ public final class DataIntegrityProof implements Proof {
 
     }
 
-    public static class GraphReader implements GraphProofReader {
+    public static class GraphMapper implements GraphProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
+        private final Supplier<GraphCanonizer> canonizerFactory;
 
-        public GraphReader(Map<String, CryptoSuite> cryptosuites) {
+        public GraphMapper(Map<String, CryptoSuite> cryptosuites, Supplier<GraphCanonizer> canonizeFactory) {
             this.cryptosuites = cryptosuites;
+            this.canonizerFactory = canonizeFactory;
         }
 
         @Override
-        public boolean isAccepted(Collection<String[]> proof) {
+        public boolean accepts(Graph.Node proofNode) {
 
-            for (var statement : proof) {
-                if (PREDICATE_CRYPTOSUITE.equals(statement[1]) && cryptosuites.containsKey(statement[2])) {
+            if (proofNode.type().size() != 1
+                    || !TYPE_URI.equals(proofNode.type().getFirst())) {
+                return false;
+            }
+
+            for (var statement : proofNode.statements()) {
+                if (PREDICATE_CRYPTOSUITE.equals(statement.predicate())
+                        && statement instanceof LiteralStatement literal
+                        && cryptosuites.containsKey(literal.object())) {
                     return true;
                 }
             }
+
             return false;
         }
 
         @Override
-        public Proof read(
-                Collection<String[]> proof,
+        public Proof materialize(
+                String id,
+                Graph proofGraph,
                 SemanticModel model,
                 PayloadGenerator payload) {
+
+            var proofNode = proofGraph.nodes().get(id);
+
+            if (proofNode.type().size() != 1) {
+                throw new IllegalArgumentException();
+            }
+
+            if (proofGraph.nodes().size() != 1) {
+                throw new IllegalArgumentException(
+                        "Only one node is allowed per proof graph; found " + proofGraph.nodes().size() + " nodes");
+            }
+
+            final var proofType = proofNode.type().getFirst();
+
+            if (!TYPE_URI.equals(proofType)) {
+                throw new IllegalArgumentException(
+                        """
+                        An unexpected proof type has been detected %s, expected %s.
+                        """.formatted(proofType, TYPE_URI));
+            }
+
             final var di = new DataIntegrityProof();
 
-            var canonizer = model.newCanonizer();
+            if (!proofNode.id().startsWith("_:")) {
+                di.id = proofNode.id();
+            }
+            di.previousProof = List.of();
 
-            var consumer = canonizer.consumer();
+            final var canonizer = canonizerFactory.get();
 
             String proofValue = null;
 
-            for (var statement : proof) {
-                switch (statement[1]) {
-                case PREDICATE_TYPE:
-                    if (!TYPE_URI.equals(statement[2])) {
-                        throw new IllegalArgumentException(
-                                """
-                                An unexpected proof type has been detected %s, expected %s.
-                                """.formatted(statement[1], TYPE_URI));
-                    }
-                    if (!statement[0].startsWith("_:")) {
-                        di.id = statement[0];
-                    }
+            for (var statement : proofNode.statements()) {
+
+                boolean canonizeStatement = true;
+
+                switch (statement.predicate()) {
+                case Graph.PREDICATE_TYPE:
                     break;
+
                 case PREDICATE_CRYPTOSUITE:
-                    di.cryptosuite = cryptosuites.get(statement[2]);
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    if (!"https://w3id.org/security#cryptosuiteString".equals(literal.datatype())) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    di.cryptosuite = cryptosuites.get(literal.object());
                     break;
+
                 case PREDICATE_CREATED:
-                    di.created = Instant.parse(statement[2]);
+                    di.created = Graph.xsdDateTime(statement);
                     break;
+
+                case PREDICATE_EXPIRES:
+                    di.expires = Graph.xsdDateTime(statement);
+                    break;
+
+                case PREDICATE_NONCE:
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    // TODO check datatype
+                    di.nonce = literal.object();
+                    break;
+
+                case PREDICATE_CHALLENGE:
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    // TODO check datatype
+                    di.challenge = literal.object();
+                    break;
+
+                case PREDICATE_DOMAIN:
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+                    // TODO check datatype
+
+                    if (di.domain == null) {
+                        di.domain = new ArrayList<>();
+                    }
+
+                    di.domain.add(literal.object());
+                    break;
+
                 case PREDICATE_PROOF_PURPOSE:
-                    di.purpose = statement[2].substring("https://w3id.org/security#".length());
+                    // TODO checks
+
+                    di.purpose = Purpose.from(statement.object());
                     break;
+
                 case PREDICATE_VERIFICATION_METHOD:
-                    di.verificationMethod = statement[2];
+                    if (!(statement instanceof ResourceStatement resource)) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    di.verificationMethod = resource.object();
                     break;
+
                 case PREDICATE_PROOF_VALUE:
-                    proofValue = statement[2];
+                    if (!(statement instanceof LiteralStatement literal)) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    // TODO "https://w3id.org/security#multibase"
+                    canonizeStatement = false;
+                    proofValue = literal.object();
                     break;
+
                 case PREDICATE_PREVIOUS_PROOF:
-                    if (di.previousProof == null) {
+                    if (!(statement instanceof ResourceStatement resource)) {
+                        throw new IllegalArgumentException();
+                    }
+
+                    if (di.previousProof.isEmpty()) {
                         di.previousProof = new ArrayList<String>();
                     }
-                    di.previousProof.add(statement[2]);
+
+                    di.previousProof.add(resource.object());
                     break;
+
                 default:
                     throw new IllegalArgumentException(
                             """
                             Unrecognized proof predicate has been found %s.
-                            """.formatted(statement[1]));
+                            """.formatted(statement.predicate()));
                 }
-                if (!PREDICATE_PROOF_VALUE.equals(statement[1])) { // TODO better
-                    consumer.accept(statement[0], statement[1], statement[2], statement[3], statement[4], statement[5],
+
+                if (canonizeStatement) {
+                    canonizer.accept(
+                            proofNode.id(),
+                            statement.predicate(),
+                            statement.object(),
+                            statement.datatype(),
+                            statement.language(),
+                            statement.direction(),
                             null);
                 }
             }
 
-            if (di.previousProof == null) {
-                di.previousProof = Set.of();
-
-            } else if (!di.previousProof.isEmpty()) {
+            if (!di.previousProof.isEmpty()) {
                 payload.withProofs(di.previousProof);
             }
 
@@ -669,6 +817,7 @@ public final class DataIntegrityProof implements Proof {
                                 di,
                                 payload);
             }
+
             return di;
         }
     }

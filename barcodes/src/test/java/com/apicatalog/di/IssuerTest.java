@@ -95,7 +95,7 @@ public class IssuerTest {
 
         updater.addProof(
                 proof.context(),
-                DataIntegrityProof.compact(proof));
+                DataIntegrityProof.compact(proof, false));
 
         var issued = updater.compacted();
 

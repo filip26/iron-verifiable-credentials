@@ -104,7 +104,7 @@ public class IssuerTest {
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 
-        updater.addProof(proof.context(), DataIntegrityProof.compact(proof));
+        updater.addProof(proof.context(), DataIntegrityProof.compact(proof, false));
 
         var issuedDocument = updater.compacted();
 

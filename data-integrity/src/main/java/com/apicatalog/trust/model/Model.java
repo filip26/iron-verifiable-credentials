@@ -14,7 +14,7 @@ public interface Model {
     };
 
     //TODO add context param
-    Document.Adapter createAdapter(Map<String, Object> document);
+    Document.Accessor createAccessor(Map<String, Object> document);
     //TODO add context param
     Document.Updater createUpdater(Map<String, Object> document);
 

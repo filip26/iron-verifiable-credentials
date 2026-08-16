@@ -11,6 +11,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.proof.Ed25519Signature2020;
+import com.apicatalog.di.proof.c14n.StaticJCS;
+import com.apicatalog.di.proof.c14n.StaticRDFC;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
@@ -19,51 +23,53 @@ import com.apicatalog.jcs.Jcs;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
 import com.apicatalog.rdf.canon.RdfCanon;
-import com.apicatalog.rdf.nquads.NQuadsWriter;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.MapAdapter;
-import com.apicatalog.trust.lexical.MapProofCursor;
+import com.apicatalog.trust.lexical.PropertyMapAccessor;
+import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.model.Model;
-import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
-import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static LexicalModel LEXICAL_MODEL = DataIntegrity.createLexicalModel(Model.C14N_JCS)
-            .proofProperty(DataIntegrity.VOCAB_PROOF_KEY)
+    static LexicalModel LEXICAL_MODEL = DataIntegrity.newLexicalModel(Model.C14N_JCS)
+            .proofProperty(DataIntegrity.PROPERTY_PROOF)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
+            .c14n(DataIntegrityProof.TYPE_NAME, StaticJCS::canonize) // proof type specific c14n provider
             .c14n(Jcs::canonize)
-            .adapter(MapAdapter::newInstance)
-            .cursor(MapProofCursor::newInstance)
+            .accessor(PropertyMapAccessor::newInstance)
+            .cursor(PropertyProofCursor::newInstance)
             .build();
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
-            .proofPredicate(DataIntegrity.VOCAB_PROOF_URI)
-            .proof(EdDSA2022.withRDFC())
-            .proof(ECDSA2019.withRDFC())
-            .proof(MLDSA2024.get44withRDFC())
-            .proof(SLHDSA2024.get128withRDFC())
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+            .proofPredicate(DataIntegrity.PREDICATE_PROOF)
+            .cryptosuite(EdDSA2022.withRDFC())
+            .cryptosuite(ECDSA2019.withRDFC())
+            .cryptosuite(MLDSA2024.get44withRDFC())
+            .cryptosuite(SLHDSA2024.get128withRDFC())
             .Ed25519Signature2020()
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
+            // proof type specific c14n provider
+            .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
+            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
+            // document and proof c14n provider
             .c14n(Resources::createRDFC)
-            .adapter(GraphAdapter::newInstance)
+            .accessor(GraphAccessor::newInstance)
             .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
@@ -86,7 +92,7 @@ class Resources {
         }
     }
 
-    static JsonFactory FACTORY = JsonFactory.builder().build();
+    private static JsonFactory FACTORY = JsonFactory.builder().build();
 
     static <T> Map<String, T> getMap(String name) throws IOException {
         try (var parser = Jackson2Parser.newParser(Resources.class.getResourceAsStream(name), FACTORY)) {
@@ -150,14 +156,14 @@ class Resources {
         }
     }
 
-    static final RdfcPrcessor createRDFC() {
-        return new RdfcPrcessor(); // TODO reuse one instance across
+    static final RDFCProcessor createRDFC() {
+        return new RDFCProcessor(); // TODO reuse one instance across
     }
 
-    static class RdfcPrcessor implements GraphCanonizer {
+    private static class RDFCProcessor implements GraphCanonizer {
 
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final RdfCanon canon = RdfCanon.create(SHA_256);
+        private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        private final RdfCanon canon = RdfCanon.create(SHA_256);
 
         @Override
         public byte[] canonize() {
@@ -176,45 +182,16 @@ class Resources {
         }
 
         @Override
-        public void canonize(QuadConsumer consumer) {
-            try {
-                canon.provide(((subject, predicate, object, datatype, language, direction, graph) -> {
-                    consumer.accept(subject, predicate, object, datatype, language, direction, graph);
-                    return null;
-                }));
-            } catch (RdfConsumerException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-
-        @Override
-        public QuadConsumer consumer() {
-            // TODO remove with rdf-api 2.0.0
-            return new SemanticModel.QuadConsumer() {
-                @Override
-                public void accept(
-                        String subject,
-                        String predicate,
-                        String object,
-                        String datatype,
-                        String language,
-                        String direction,
-                        String graph) {
-
-                    canon.quad(subject, predicate, object, datatype, language, direction, graph);
-                }
-            };
-        }
-
-        @Override
-        public Map<String, String> labels() {
-            return canon.mapping();
-        }
-
-        @Override
-        public String toNQuad(String subject, String predicate, String object, String datatype, String language,
-                String direction, String graph) {
-            return NQuadsWriter.nquad(subject, predicate, object, datatype, language, direction, graph);
+        public void accept(
+                String subject,
+                String predicate,
+                String object,
+                String datatype,
+                String language,
+                String direction,
+                String graph) {
+//            IO.println(subject+ " " + predicate+ " " + object+ " " + datatype+ " " + language+ " " + direction+ " " + graph);
+            canon.quad(subject, predicate, object, datatype, language, direction, graph);
         }
     }
 }

@@ -14,16 +14,16 @@ public final class GraphUpdater implements Document.Updater {
 
     @FunctionalInterface
     public interface Factory {
-        GraphUpdater createUpdater(SemanticModel model, SemanticAdapter adapter);
+        GraphUpdater createUpdater(SemanticModel model, SemanticModel.Accessor adapter);
     }
 
     private final SemanticModel model;
-    private final SemanticAdapter adapter;
+    private final SemanticModel.Accessor adapter;
 
     private Collection<Map<String, ?>> newProofs;
     private Collection<String> contexts = null;
 
-    public GraphUpdater(SemanticModel model, SemanticAdapter adapter) {
+    public GraphUpdater(SemanticModel model, SemanticModel.Accessor adapter) {
         this.model = model;
         this.adapter = adapter;
     }
@@ -80,8 +80,8 @@ public final class GraphUpdater implements Document.Updater {
         return document;
     }
 
-    static Collection<String> merge(Collection<String> documentContext, Collection<String> proofContext) {
-        var result = LinkedHashSet.<String>newLinkedHashSet(documentContext.size() + proofContext.size());
+    static Collection<?> merge(Collection<?> documentContext, Collection<String> proofContext) {
+        var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
         result.addAll(documentContext);
         result.addAll(proofContext);
         return result;

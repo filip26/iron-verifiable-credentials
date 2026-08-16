@@ -111,7 +111,7 @@ public class IssuerTest {
                     Resources.DIGEST_FACTORY,
                     payload.digestible());
 
-            updater.addProof(proofDraft.context(), DataIntegrityProof.compact((DataIntegrityProof) proof));
+            updater.addProof(proofDraft.context(), DataIntegrityProof.compact((DataIntegrityProof) proof, false));
             issued = updater.compacted();
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {

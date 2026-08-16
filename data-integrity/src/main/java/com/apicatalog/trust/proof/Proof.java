@@ -1,7 +1,8 @@
 package com.apicatalog.trust.proof;
 
 import java.time.Instant;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.apicatalog.trust.payload.CanonicalPayload;
 import com.apicatalog.trust.signature.Signature;
@@ -52,7 +53,7 @@ public interface Proof extends CanonicalPayload {
      *
      * @return a URI identifying the proof purpose
      */
-    String purpose();
+    Purpose purpose();
 
     /**
      * Retrieves the exact date and time the proof was created.
@@ -63,7 +64,53 @@ public interface Proof extends CanonicalPayload {
      */
     Instant created();
 
-//    // an ordered set of proof contexts, optional, never return null but an empty
-//    // set in that case
-//    Collection<String> context();
+    public enum Purpose {
+
+        AUTHENTICATION("authentication"),
+        ASSERTION("assertionMethod"),
+        KEY_AGREEMENT("keyAgreement"),
+        CAPABILITY_INVOCATION("capabilityInvocation"),
+        CAPABILITY_DELEGATION("capabilityDelegation");
+
+        private final String key;
+        private final String uri;
+
+        private static final Map<String, Purpose> LOOKUP;
+
+        static {
+            Map<String, Purpose> map = HashMap.newHashMap(Purpose.values().length * 2);
+            for (Purpose purpose : values()) {
+                map.put(purpose.key, purpose);
+                map.put(purpose.uri, purpose);
+            }
+            LOOKUP = Map.copyOf(map);
+        }
+
+        Purpose(String name) {
+            this.key = name;
+            this.uri = "https://w3id.org/security#" + (name.endsWith("Method") ? name : name + "Method");
+        }
+
+        public String key() {
+            return key;
+        }
+
+        public String uri() {
+            return uri;
+        }
+
+        public static Purpose from(String nameOrUri) {
+            if (nameOrUri == null || nameOrUri.isBlank()) {
+                throw new IllegalArgumentException("Proof purpose cannot be null or blank");
+            }
+
+            Purpose rel = LOOKUP.get(nameOrUri);
+
+            if (rel == null) {
+                throw new IllegalArgumentException("Unknown proof purpose: " + nameOrUri);
+            }
+
+            return rel;
+        }
+    }
 }

@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.function.Predicate;
 
 public class ContextAwareResolver {
 
-    private final Predicate<Collection<String>>[] predicates;
+    private final Predicate<Collection<?>>[] predicates;
     private final Model[] models;
 
     private ContextAwareResolver(
-            Predicate<Collection<String>>[] predicates,
+            Predicate<Collection<?>>[] predicates,
             Model[] models) {
         this.predicates = predicates;
         this.models = models;
@@ -20,7 +21,7 @@ public class ContextAwareResolver {
 
     // TODO must not be static, the resolver should have been configured with
     // "@context" key, or context extractos? -> getJsonLdContext(...)
-    public static Collection<String> getContexts(Map<String, Object> document) {
+    public static SequencedCollection<String> getContexts(Map<String, Object> document) {
         return switch (document.get("@context")) {
         case Collection<?> col -> col.stream()
                 .map(item -> {
@@ -38,7 +39,7 @@ public class ContextAwareResolver {
         };
     }
 
-    public Model resolve(Collection<String> contexts, Map<String, Object> document) {
+    public Model resolve(Collection<?> contexts, Map<String, Object> document) {
         for (int i = 0; i < models.length; i++) {
             if (predicates[i].test(contexts)) {
                 return models[i];
@@ -47,17 +48,17 @@ public class ContextAwareResolver {
         return null;
     }
 
-    public static final Builder builder() {
+    public static final Builder newBuilder() {
         return new Builder();
     }
 
     public static class Builder {
 
-        private final Collection<Predicate<Collection<String>>> predicates = new ArrayList<>();;
+        private final Collection<Predicate<SequencedCollection<?>>> predicates = new ArrayList<>();;
         private final Collection<Model> models = new ArrayList<>();
 
         public Builder model(
-                Predicate<Collection<String>> selector,
+                Predicate<SequencedCollection<?>> selector,
                 Model... models) {
 
             if (models.length == 1) {
@@ -67,7 +68,7 @@ public class ContextAwareResolver {
             }
 
             this.predicates.add(selector);
-            this.models.add(new HybridAdapterModel(models));
+            this.models.add(new HybridModel(models));
             return this;
         }
 

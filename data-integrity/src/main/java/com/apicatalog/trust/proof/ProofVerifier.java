@@ -37,7 +37,7 @@ public class ProofVerifier {
         this.digestFactory = digestFactory;
     }
 
-    public static Builder builder() {
+    public static Builder newBuilder() {
         return new Builder();
     }
 
@@ -56,7 +56,7 @@ public class ProofVerifier {
 
         var publicKey = publicKeyResolver.getPublicKey(
                 proof.verificationMethod(),
-                proof.purpose(),
+                proof.purpose().uri(),
                 proof.signature().algorithm(),
                 Instant.now());
 

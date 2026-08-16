@@ -11,34 +11,26 @@ import java.util.HashSet;
 import java.util.Map;
 
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.trust.semantic.SemanticAdapter;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.SemanticModel;
 
 public class SDPayloadGenerator extends GraphPayloadGenerator {
 
-//    private final SemanticModel model;
-//    private final SDGraphProcessor processor;
-//
-//    private Collection<String> includedProofs;
-
     public SDPayloadGenerator(
             SemanticModel model,
-            SemanticAdapter processor) {
+            SemanticModel.Accessor processor) {
         super(model, processor);
-//        this.model = model;
-//        this.processor = processor;
     }
 
     public SDBaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
 
-        var skolemized = Skolemizer.skolemize(processor.expandedData());
+        var skolemized = Skolemizer.skolemize(adapter.expandedData());
 
-        var compacted = model.compact().apply(processor.context(), skolemized);
+        var compacted = model.compact().apply(adapter.context(), skolemized);
 
-        var canonizer = model.newCanonizer();
-
-        var consumer = canonizer.consumer();
+        if (!(model.newCanonizer() instanceof SDGraphCanonizer canonizer)) {
+            throw new IllegalStateException();
+        }
 
         model.tordf().accept(skolemized, ((subject, predicate, object, datatype, language, direction, graph) -> {
 
@@ -51,7 +43,7 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
                 o = "_:" + o.substring(Skolemizer.URN_PREFIX.length());
             }
 
-            consumer.accept(s, predicate, o, datatype, language, direction, graph);
+            canonizer.accept(s, predicate, o, datatype, language, direction, graph);
         }));
 
         var canonized = new ArrayList<String>();
@@ -140,18 +132,18 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
         base.compacted = compacted;
         base.canonized = canonized;
         base.model = model;
-        base.context = processor.context();
+        base.context = adapter.context();
 
         return base;
     }
 
     public SDDerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
 
-        var canonizer = model.newCanonizer();
+        if (!(model.newCanonizer() instanceof SDGraphCanonizer canonizer)) {
+            throw new IllegalStateException();
+        }
 
-        var consumer = canonizer.consumer();
-
-        model.tordf().accept(processor.expandedData(), consumer);
+        model.tordf().accept(adapter.expandedData(), canonizer);
 
         var canonized = new ArrayList<String[]>();
 
@@ -160,7 +152,6 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
                     new String[] {
                             subject, predicate, object, datatype, language, direction, graph
                     });
-
         }));
 
         var labelMap = canonizer.labels().values().stream()
@@ -221,6 +212,6 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
     }
 
     private Map<String, Object> compacted() {
-        return model.compact().apply(processor.context(), processor.expandedData());
+        return model.compact().apply(adapter.context(), adapter.expandedData());
     }
 }

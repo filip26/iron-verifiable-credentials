@@ -14,8 +14,6 @@ import com.apicatalog.trust.payload.PayloadGenerator;
 
 public class SemanticModel implements Model {
 
-    // "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-
     @FunctionalInterface
     public interface QuadConsumer {
         void accept(
@@ -28,29 +26,30 @@ public class SemanticModel implements Model {
                 String graph);
     }
 
-    public interface GraphCanonizer {
-        QuadConsumer consumer();
+    public interface GraphCanonizer extends QuadConsumer {
+
+//        QuadConsumer consumer();
 
         byte[] canonize();
 
-        void canonize(QuadConsumer consumer);
-
-        Map<String, String> labels();
-
-        String toNQuad(
-                String subject,
-                String predicate,
-                String object,
-                String datatype,
-                String language,
-                String direction,
-                String graph);
+//        void canonize(QuadConsumer consumer);
+//
+//        Map<String, String> labels();
+//
+//        String toNQuad(
+//                String subject,
+//                String predicate,
+//                String object,
+//                String datatype,
+//                String language,
+//                String direction,
+//                String graph);
 
         // TODO void reset();
     }
 
     public record Primitives(
-            SemanticAdapter.Factory adapter,
+            SemanticModel.Accessor.Factory adapter,
             GraphUpdater.Factory updater,
             GraphProofCursor.Factory cursor,
             GraphPayloadGenerator.Factory payload) {
@@ -70,14 +69,14 @@ public class SemanticModel implements Model {
 
     private final Supplier<GraphCanonizer> canonizeFactory;
 
-    private final Map<String, GraphProofReader> readers;
+    private final Map<String, GraphProofMapper> readers;
 
     public SemanticModel(
             Vocab vocab,
             Primitives primitives,
             JsonLdOps jsonLd,
             Supplier<GraphCanonizer> canonizeFactory,
-            Map<String, GraphProofReader> readers) {
+            Map<String, GraphProofMapper> readers) {
         this.vocab = vocab;
         this.primitives = primitives;
         this.jsonLd = jsonLd;
@@ -87,7 +86,7 @@ public class SemanticModel implements Model {
     }
 
     @Override
-    public SemanticAdapter createAdapter(Map<String, Object> document) {
+    public SemanticModel.Accessor createAccessor(Map<String, Object> document) {
         return primitives.adapter.createAdapter(
                 this,
                 ContextAwareResolver.getContexts(document),
@@ -96,19 +95,19 @@ public class SemanticModel implements Model {
 
     @Override
     public Document.Updater createUpdater(Map<String, Object> document) {
-        return primitives.updater.createUpdater(this, createAdapter(document));
+        return primitives.updater.createUpdater(this, createAccessor(document));
     }
 
-    public PayloadGenerator createPayload(SemanticAdapter adapter) {
+    public PayloadGenerator createPayload(SemanticModel.Accessor adapter) {
         return primitives.payload.createPayload(this, adapter);
     }
 
-    public GraphProofCursor createCursor(SemanticAdapter adapter) {
+    public GraphProofCursor createCursor(SemanticModel.Accessor adapter) {
         return primitives.cursor.createCursor(this, adapter);
     }
 
-    public GraphProofReader reader(String proofType) {
-        return readers.get(proofType);
+    public GraphProofMapper reader(String type) {
+        return readers.get(type);
     }
 
     public GraphCanonizer newCanonizer() {
@@ -130,5 +129,32 @@ public class SemanticModel implements Model {
     @Override
     public Vocab vocab() {
         return vocab;
+    }
+    
+    public interface Accessor extends Document.Accessor {
+
+        @FunctionalInterface
+        public interface Factory {
+            SemanticModel.Accessor createAdapter(
+                    SemanticModel model,
+                    Collection<String> context,
+                    Map<String, Object> document);
+        }
+
+        Collection<String> context();
+
+        @Override
+        Graph document();
+
+        // returns proof graph ids, might be URI or blank node identifier
+        Collection<String> proofGraphs();
+
+        Graph proofGraph(String graph);
+
+        Map<String, Object> expandedData();
+
+        Vocab vocab();
+
+        Map<String, ?> source();
     }
 }

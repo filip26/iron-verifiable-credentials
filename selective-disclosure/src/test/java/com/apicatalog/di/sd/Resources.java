@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.DataIntegrity;
+import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.proof.c14n.StaticRDFC;
 import com.apicatalog.di.suite.ECDSASD2023;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
@@ -25,26 +27,26 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.model.Model;
-import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphProofCursor;
-import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
-import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.fasterxml.jackson.core.JsonFactory;
 
 import jakarta.json.Json;
 
 class Resources {
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
-            .proof(ECDSASD2023.getInstance())
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+            .cryptosuite(ECDSASD2023.getInstance())
             .expand(Resources::expand)
             .compact(Resources::compact)
             .tordf(Resources::toRDF)
+            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
             .c14n(Resources::newRDFC)
 //TODO            .hmac()
-            .adapter(GraphAdapter::newInstance)
+            .accessor(GraphAccessor::newInstance)
             .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(SDPayloadGenerator::new)
@@ -162,7 +164,7 @@ class Resources {
         return new RdfcPrcessor(); // TODO reuse one instance across
     }
 
-    static class RdfcPrcessor implements GraphCanonizer {
+    static class RdfcPrcessor implements SDGraphCanonizer {
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         final RdfCanon canon = RdfCanon.create(SHA_256);
@@ -198,23 +200,24 @@ class Resources {
         }
 
         @Override
-        public QuadConsumer consumer() {
-            // TODO remove with rdf-api 2.0.0
-            return new SemanticModel.QuadConsumer() {
-                @Override
-                public void accept(
-                        String subject,
-                        String predicate,
-                        String object,
-                        String datatype,
-                        String language,
-                        String direction,
-                        String graph) {
+        public void accept(
+                String subject,
+                String predicate,
+                String object,
+                String datatype,
+                String language,
+                String direction,
+                String graph) {
 
-                    canon.quad(subject, predicate, object, datatype, language, direction, graph);
-                }
-            };
+            canon.quad(subject, predicate, object, datatype, language, direction, graph);
         }
+
+//        @Override
+//        public QuadConsumer consumer() {
+//            // TODO remove with rdf-api 2.0.0
+//            return new SemanticModel.QuadConsumer() {
+//            };
+//        }
 
         @Override
         public Map<String, String> labels() {

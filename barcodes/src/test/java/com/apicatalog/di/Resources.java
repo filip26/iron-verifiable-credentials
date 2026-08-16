@@ -12,35 +12,35 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.barcodes.ECDSAXI2023;
+import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.proof.c14n.StaticRDFC;
 import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
 import com.apicatalog.rdf.canon.RdfCanon;
-import com.apicatalog.rdf.nquads.NQuadsWriter;
 import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.model.Model;
-import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
-import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
-            .proof(ECDSAXI2023.getInstance())
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+            .cryptosuite(ECDSAXI2023.getInstance())
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
+            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
             .c14n(Resources::createRDFC)
-            .adapter(GraphAdapter::newInstance)
+            .accessor(GraphAccessor::newInstance)
             .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
@@ -127,11 +127,11 @@ class Resources {
         }
     }
 
-    static final RdfcPrcessor createRDFC() {
-        return new RdfcPrcessor(); // TODO reuse one instance across
+    static final RDFCProcessor createRDFC() {
+        return new RDFCProcessor(); // TODO reuse one instance across
     }
 
-    static class RdfcPrcessor implements GraphCanonizer {
+    static class RDFCProcessor implements GraphCanonizer {
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         final RdfCanon canon = RdfCanon.create(SHA_256);
@@ -152,46 +152,47 @@ class Resources {
             return bos.toByteArray();
         }
 
-        @Override
-        public void canonize(QuadConsumer consumer) {
-            try {
-                canon.provide(((subject, predicate, object, datatype, language, direction, graph) -> {
-                    consumer.accept(subject, predicate, object, datatype, language, direction, graph);
-                    return null;
-                }));
-            } catch (RdfConsumerException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
+//        @Override
+//        public void canonize(QuadConsumer consumer) {
+//            try {
+//                canon.provide(((subject, predicate, object, datatype, language, direction, graph) -> {
+//                    consumer.accept(subject, predicate, object, datatype, language, direction, graph);
+//                    return null;
+//                }));
+//            } catch (RdfConsumerException e) {
+//                throw new IllegalArgumentException(e);
+//            }
+//        }
 
         @Override
-        public QuadConsumer consumer() {
-            // TODO remove with rdf-api 2.0.0
-            return new SemanticModel.QuadConsumer() {
-                @Override
-                public void accept(
-                        String subject,
-                        String predicate,
-                        String object,
-                        String datatype,
-                        String language,
-                        String direction,
-                        String graph) {
+        public void accept(
+                String subject,
+                String predicate,
+                String object,
+                String datatype,
+                String language,
+                String direction,
+                String graph) {
 
-                    canon.quad(subject, predicate, object, datatype, language, direction, graph);
-                }
-            };
+            canon.quad(subject, predicate, object, datatype, language, direction, graph);
         }
+//        @Override
+//        public QuadConsumer consumer() {
+//            // TODO remove with rdf-api 2.0.0
+//            return new SemanticModel.QuadConsumer() {
+//
+//            };
+//        }
 
-        @Override
-        public Map<String, String> labels() {
-            return canon.mapping();
-        }
-
-        @Override
-        public String toNQuad(String subject, String predicate, String object, String datatype, String language,
-                String direction, String graph) {
-            return NQuadsWriter.nquad(subject, predicate, object, datatype, language, direction, graph);
-        }
+//        @Override
+//        public Map<String, String> labels() {
+//            return canon.mapping();
+//        }
+//
+//        @Override
+//        public String toNQuad(String subject, String predicate, String object, String datatype, String language,
+//                String direction, String graph) {
+//            return NQuadsWriter.nquad(subject, predicate, object, datatype, language, direction, graph);
+//        }
     }
 }

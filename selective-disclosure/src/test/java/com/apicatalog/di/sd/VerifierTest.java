@@ -31,7 +31,7 @@ public class VerifierTest {
             .methodResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
             .build();
 
-    static ProofVerifier PROOF_VERIFIER = ProofVerifier.builder()
+    static ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
             .publicKeyResolver(MULTIKEY_RESOLVER::getPublicKey)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)
             .verifier(ECDSA2019.P384, BCECDSAVerifier.getP384Instance()::verify)
@@ -44,7 +44,7 @@ public class VerifierTest {
 
         var signed = Resources.getMap(resource);
 
-        var processor = Resources.SEMANTIC_MODEL.createAdapter(signed);
+        var processor = Resources.SEMANTIC_MODEL.createAccessor(signed);
 
         var cursor = processor.createProofCursor();
 

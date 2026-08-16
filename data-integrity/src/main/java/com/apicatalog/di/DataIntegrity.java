@@ -13,16 +13,16 @@ import java.util.function.Supplier;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.lexical.LexicalAdapter;
+import com.apicatalog.trust.lexical.LexicalAccessor;
 import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.MapProofCursor;
-import com.apicatalog.trust.lexical.MapProofReader;
+import com.apicatalog.trust.lexical.PropertyProofCursor;
+import com.apicatalog.trust.lexical.PropertyProofMapper;
 import com.apicatalog.trust.model.Model.Vocab;
+import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
-import com.apicatalog.trust.semantic.GraphProofReader;
+import com.apicatalog.trust.semantic.GraphProofMapper;
 import com.apicatalog.trust.semantic.GraphUpdater;
-import com.apicatalog.trust.semantic.SemanticAdapter;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.SemanticModel.JsonLdOps;
@@ -31,14 +31,14 @@ import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
 public class DataIntegrity {
 
-    public static final String VOCAB_PROOF_URI = "https://w3id.org/security#proof";
-    public static final String VOCAB_PROOF_KEY = "proof";
+    public static final String PREDICATE_PROOF = "https://w3id.org/security#proof";
+    public static final String PROPERTY_PROOF = "proof";
 
-    public static SemanticModelBuilder createSematicModel(String c14n) {
+    public static SemanticModelBuilder newSematicModel(String c14n) {
         return new SemanticModelBuilder(c14n);
     }
 
-    public static LexicalModelBuilder createLexicalModel(String c14n) {
+    public static LexicalModelBuilder newLexicalModel(String c14n) {
         return new LexicalModelBuilder(c14n);
     }
 
@@ -48,9 +48,9 @@ public class DataIntegrity {
 
         private Supplier<GraphCanonizer> c14nFactory;
 
-        private String proofPredicate = DataIntegrity.VOCAB_PROOF_URI;
+        private String proofPredicate = DataIntegrity.PREDICATE_PROOF;
 
-        private SemanticAdapter.Factory adapterFactory;
+        private SemanticModel.Accessor.Factory adapterFactory;
         private GraphUpdater.Factory updaterFactory;
         private GraphProofCursor.Factory cursorFactory;
         private GraphPayloadGenerator.Factory payloadFactory;
@@ -59,8 +59,13 @@ public class DataIntegrity {
         private BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
         private Function<Map<String, Object>, Collection<Object>> expand;
 
+        private Map<String, Supplier<GraphCanonizer>> proofC14n = Map.of();
+
         private Map<String, CryptoSuite> cryptosuites;
-        private Map<String, GraphProofReader> readers;
+
+        private Map<String, GraphProofMapper> readers;
+
+        private boolean ed25519Signature2020 = false;
 
         private SemanticModelBuilder(String c14n) {
             this.c14n = c14n;
@@ -74,6 +79,14 @@ public class DataIntegrity {
 
         public SemanticModelBuilder c14n(Supplier<GraphCanonizer> c14nFactory) {
             this.c14nFactory = c14nFactory;
+            return this;
+        }
+
+        public SemanticModelBuilder c14n(String proofType, Supplier<GraphCanonizer> c14nFactory) {
+            if (this.proofC14n.isEmpty()) {
+                this.proofC14n = new HashMap<>();
+            }
+            this.proofC14n.put(proofType, c14nFactory);
             return this;
         }
 
@@ -98,7 +111,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder adapter(SemanticAdapter.Factory factory) {
+        public SemanticModelBuilder accessor(SemanticModel.Accessor.Factory factory) {
             this.adapterFactory = factory;
             return this;
         }
@@ -113,11 +126,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
-            return proof(cryptosuite.apply(c14n));
-        }
-
-        public SemanticModelBuilder proof(CryptoSuite cryptosuite) {
+        public SemanticModelBuilder cryptosuite(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
             }
@@ -128,39 +137,48 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder proof(String proofType, GraphProofReader reader) {
+        public SemanticModelBuilder proof(String proofType, GraphProofMapper reader) {
             readers.put(proofType, reader);
             return this;
         }
 
         // legacy support
         public SemanticModelBuilder Ed25519Signature2020() {
-            proof(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020.newReader());
+            this.ed25519Signature2020 = true;
             return this;
         }
 
         public SemanticModel build() {
 
+            if (c14nFactory == null) {
+                throw new IllegalStateException();
+            }
+
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_URI,
-                        new DataIntegrityProof.GraphReader(cryptosuites));
+                        new DataIntegrityProof.GraphMapper(
+                                cryptosuites,
+                                proofC14n.getOrDefault(DataIntegrityProof.TYPE_URI, c14nFactory)));
+            }
+
+            if (ed25519Signature2020) {
+                readers.put(
+                        Ed25519Signature2020.TYPE_URI,
+                        new Ed25519Signature2020.GraphMapper(
+                                proofC14n.getOrDefault(Ed25519Signature2020.TYPE_URI, c14nFactory)));
             }
 
 //            if (readers.isEmpty()) {
 //                throw new IllegalStateException();
 //            }
 
-            if (c14nFactory == null) {
-                throw new IllegalStateException();
-            }
-
             return new SemanticModel(
                     new Vocab(
                             "@context",
                             proofPredicate,
                             null,
-                            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                            Graph.PREDICATE_TYPE),
                     new Primitives(
                             adapterFactory,
                             updaterFactory,
@@ -181,13 +199,14 @@ public class DataIntegrity {
 
         private Function<Map<String, Object>, byte[]> canonize;
 
-        private LexicalAdapter.Factory processorFactory;
-        private MapProofCursor.Factory cursorFactory;
+        private LexicalAccessor.Factory processorFactory;
+        private PropertyProofCursor.Factory cursorFactory;
 
+        private Map<String, Function<Map<String, Object>, byte[]>> proofC14n = Map.of();
         private Map<String, CryptoSuite> cryptosuites;
-        private Map<String, MapProofReader> readers;
+        private Map<String, PropertyProofMapper> readers;
 
-        private String proofProperty = DataIntegrity.VOCAB_PROOF_KEY;
+        private String proofProperty = DataIntegrity.PROPERTY_PROOF;
 
         private LexicalModelBuilder(String c14n) {
             this.c14n = c14n;
@@ -205,20 +224,30 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder cursor(MapProofCursor.Factory factory) {
+        public LexicalModelBuilder c14n(String proofType, Function<Map<String, Object>, byte[]> canonize) {
+            if (this.proofC14n.isEmpty()) {
+                this.proofC14n = new HashMap<>();
+            }
+            this.proofC14n.put(proofType, canonize);
+            return this;
+        }
+
+        public LexicalModelBuilder cursor(PropertyProofCursor.Factory factory) {
             this.cursorFactory = factory;
             return this;
         }
 
-        public LexicalModelBuilder adapter(LexicalAdapter.Factory factory) {
+        public LexicalModelBuilder accessor(LexicalAccessor.Factory factory) {
             this.processorFactory = factory;
             return this;
         }
 
-        public LexicalModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
-            return proof(cryptosuite.apply(c14n));
-        }
+//        public LexicalModelBuilder proof(Function<String, CryptoSuite> cryptosuite) {
+//            return proof(cryptosuite.apply(c14n));
+//        }
 
+        // public LexicalModelBuilder proof(Predicate<Collection<?>> context,
+        // CryptoSuite cryptosuite) {
         public LexicalModelBuilder proof(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
@@ -231,19 +260,22 @@ public class DataIntegrity {
         }
 
         public LexicalModel build() {
+
+            if (canonize == null) {
+                throw new IllegalStateException();
+            }
+
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
                 readers.put(
                         DataIntegrityProof.TYPE_NAME,
-                        new DataIntegrityProof.MapReader(cryptosuites));
+                        new DataIntegrityProof.PropertyMapMapper(
+                                cryptosuites,
+                                proofC14n.getOrDefault(DataIntegrityProof.TYPE_NAME, canonize)));
             }
 
 //            if (readers.isEmpty()) {
 //                throw new IllegalStateException();
 //            }
-
-            if (canonize == null) {
-                throw new IllegalStateException();
-            }
 
             return new LexicalModel(
                     new Vocab("@context", proofProperty, "id", "type"),

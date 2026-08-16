@@ -6,9 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.apicatalog.trust.model.Model.Vocab;
-
-public class MapAdapter implements LexicalAdapter {
+public class PropertyMapAccessor implements LexicalAccessor {
 
     private final LexicalModel model;
     private final Collection<String> context;
@@ -16,7 +14,7 @@ public class MapAdapter implements LexicalAdapter {
     private final Map<String, Object> data;
     private final Map<String, Object>[] proofs;
 
-    protected MapAdapter(
+    protected PropertyMapAccessor(
             LexicalModel model,
             Collection<String> context,
             Map<String, Object> data,
@@ -27,7 +25,7 @@ public class MapAdapter implements LexicalAdapter {
         this.proofs = proofs;
     }
 
-    public static final MapAdapter newInstance(
+    public static final PropertyMapAccessor newInstance(
             LexicalModel model,
             Collection<String> context,
             Map<String, Object> document) {
@@ -39,7 +37,7 @@ public class MapAdapter implements LexicalAdapter {
         case null -> List.of();
         case Object obj -> List.of(obj);
         };
-
+        
         @SuppressWarnings("unchecked")
         Map<String, Object>[] mapProofs = new Map[proofs.size()];
 
@@ -52,6 +50,7 @@ public class MapAdapter implements LexicalAdapter {
             @SuppressWarnings("unchecked")
             var map = (Map<String, Object>) rawMap;
 
+            // inject context into a proof
             if (!map.containsKey("@context")) {
                 map = new HashMap<>(map);
                 map.put("@context", context);
@@ -60,16 +59,16 @@ public class MapAdapter implements LexicalAdapter {
             mapProofs[index++] = map;
         }
 
-        return new MapAdapter(model, context, data, mapProofs);
+        return new PropertyMapAccessor(model, context, data, mapProofs);
     }
 
     @Override
-    public MapProofCursor createProofCursor() {
+    public PropertyProofCursor createProofCursor() {
         return model.createCursor(this);
     }
 
     @Override
-    public Map<String, Object> data() {
+    public Map<String, Object> document() {
         return data;
     }
 
@@ -80,7 +79,7 @@ public class MapAdapter implements LexicalAdapter {
 
     @Override
     public int proofs() {
-        return proofs.length;
+        return proofs != null ? proofs.length : 0;
     }
 
     @Override

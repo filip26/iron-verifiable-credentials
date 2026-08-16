@@ -9,9 +9,9 @@ import com.apicatalog.trust.model.Model;
 
 public class LexicalModel implements Model {
 
-    private final LexicalAdapter.Factory processorFactory;
-    private final MapProofCursor.Factory cursorFactory;
-    private final Map<String, MapProofReader> proofReaders;
+    private final LexicalAccessor.Factory processorFactory;
+    private final PropertyProofCursor.Factory cursorFactory;
+    private final Map<String, PropertyProofMapper> proofReaders;
 
     private final Function<Map<String, Object>, byte[]> canonize;
 
@@ -19,10 +19,10 @@ public class LexicalModel implements Model {
 
     public LexicalModel(
             Vocab vocab,
-            LexicalAdapter.Factory processorFactory,
-            MapProofCursor.Factory cursorFactory,
+            LexicalAccessor.Factory processorFactory,
+            PropertyProofCursor.Factory cursorFactory,
             Function<Map<String, Object>, byte[]> canonize,
-            Map<String, MapProofReader> proofReaders) {
+            Map<String, PropertyProofMapper> proofReaders) {
         this.vocab = vocab;
         this.processorFactory = processorFactory;
         this.cursorFactory = cursorFactory;
@@ -31,8 +31,8 @@ public class LexicalModel implements Model {
     }
 
     @Override
-    public LexicalAdapter createAdapter(Map<String, Object> document) {
-        return processorFactory.createProcessor(
+    public LexicalAccessor createAccessor(Map<String, Object> document) {
+        return processorFactory.createAdapter(
                 this,
                 ContextAwareResolver.getContexts(document),
                 document);
@@ -40,26 +40,26 @@ public class LexicalModel implements Model {
 
     @Override
     public Updater createUpdater(Map<String, Object> document) {
-        return new MapUpdater(this, createAdapter(document));
+        return new LexicalUpdater(this, createAccessor(document));
     }
 
-    public MapProofCursor createCursor(LexicalAdapter processor) {
+    public PropertyProofCursor createCursor(LexicalAccessor processor) {
         return cursorFactory.newInstance(this, processor);
     }
 
-    public MapPayloadGenerator createPayload(Map<String, Object> document) {
-        return createPayload(createAdapter(document));
+    public PropertyMapPayloadGenerator createPayload(Map<String, Object> document) {
+        return createPayload(createAccessor(document));
     }
 
-    public MapPayloadGenerator createPayload(LexicalAdapter processor) {
-        return new MapPayloadGenerator(this, processor);
+    public PropertyMapPayloadGenerator createPayload(LexicalAccessor processor) {
+        return new PropertyMapPayloadGenerator(this, processor);
     }
 
     public byte[] canonize(Map<String, Object> data) {
         return canonize.apply(data);
     }
 
-    public MapProofReader reader(String proofType) {
+    public PropertyProofMapper reader(String proofType) {
         return proofReaders.get(proofType);
     }
 

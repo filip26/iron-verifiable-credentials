@@ -1,6 +1,5 @@
 package com.apicatalog.trust.semantic;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +10,7 @@ import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
-public final class GraphAdapter implements SemanticAdapter {
+public final class GraphAccessor implements SemanticModel.Accessor {
 
     private final SemanticModel model;
 
@@ -23,7 +22,7 @@ public final class GraphAdapter implements SemanticAdapter {
 
     private Dataset dataset;
 
-    protected GraphAdapter(
+    protected GraphAccessor(
             SemanticModel model,
             Collection<String> context,
             Map<String, Object> document) {
@@ -37,11 +36,11 @@ public final class GraphAdapter implements SemanticAdapter {
         this.dataset = null;
     }
 
-    public static GraphAdapter newInstance(
+    public static GraphAccessor newInstance(
             SemanticModel model,
             Collection<String> context,
             Map<String, Object> document) {
-        return new GraphAdapter(model, context, document);
+        return new GraphAccessor(model, context, document);
     }
 
     @Override
@@ -55,26 +54,20 @@ public final class GraphAdapter implements SemanticAdapter {
     }
 
     @Override
-    public Collection<String[]> data() {
+    public Graph document() {
         lazyInit();
         return dataset.graphs.get("@default");
     }
 
     @Override
-    public Collection<String[]> proof(String graph) {
+    public Graph proofGraph(String graph) {
         lazyInit();
         return dataset.graphs.get(graph);
     }
 
-    public Collection<String> proofs() {
+    public Collection<String> proofGraphs() {
         lazyInit();
         return dataset.proofGraphs;
-    }
-
-    @Override
-    public String proofType(String graph) {
-        lazyInit();
-        return dataset.proofTypes.get(graph);
     }
 
     @Override
@@ -96,14 +89,14 @@ public final class GraphAdapter implements SemanticAdapter {
             throw new IllegalArgumentException();
         }
 
-        if (expanded.iterator().next() instanceof Map map) {
+        if (expanded.iterator().next() instanceof Map map) { // TODO use getFirst()
             expandedData = new LinkedHashMap<String, Object>(map);
             if (map.containsKey(model.vocab().proof())) {
                 var proofs = expandedData.remove(model.vocab().proof());
                 if (proofs instanceof Collection<?> col) {
                     expandedProofs = col;
                 } else {
-                    throw new IllegalArgumentException();
+                    throw new IllegalStateException();
                 }
             }
 
@@ -114,7 +107,6 @@ public final class GraphAdapter implements SemanticAdapter {
 //        if (expandedProofs != null) {
         dataset = new Dataset();
         dataset.proofPredicate = model.vocab().proof();
-        dataset.typePredicate = model.vocab().type();
         model.tordf().accept(expanded, dataset);
 //        }
 //        if (dataset == null) {
@@ -129,14 +121,13 @@ public final class GraphAdapter implements SemanticAdapter {
 
     private static class Dataset implements QuadConsumer {
 
-        private final Map<String, String> proofTypes = new HashMap<>();
+//        private final Map<String, String> proofTypes = new HashMap<>();
 
-        private Map<String, Collection<String[]>> graphs = new HashMap<>();
+        private final Map<String, Graph> graphs = new HashMap<>();
 
-        private Collection<String> proofGraphs = new HashSet<>();
+        private final Collection<String> proofGraphs = new HashSet<>();
 
         private String proofPredicate;
-        private String typePredicate;
 
         @Override
         public void accept(
@@ -150,21 +141,26 @@ public final class GraphAdapter implements SemanticAdapter {
 
             var key = graph;
 
-            if (key == null) {
+            // default graph
+            if (graph == null) {
                 key = "@default";
 
                 if (proofPredicate.equals(predicate)) {
                     proofGraphs.add(object);
                 }
-
-            } else if (typePredicate.equals(predicate)) {
-                proofTypes.put(graph, object);
             }
 
-            graphs.computeIfAbsent(key, (_) -> new ArrayList<String[]>())
-                    .add(new String[] {
-                            subject, predicate, object, datatype, language, direction, graph
-                    });
+            var container = graphs.computeIfAbsent(key, _ -> new Graph(graph, new HashMap<>()));
+
+            var node = container.nodes().computeIfAbsent(
+                    subject,
+                    _ -> new Graph.Node(subject, graph));
+
+//            if (typePredicate.equals(predicate)) {
+//                node.type().add(object);
+//            }
+
+            node.addStatement(predicate, object, datatype, language, direction);
         }
     }
 

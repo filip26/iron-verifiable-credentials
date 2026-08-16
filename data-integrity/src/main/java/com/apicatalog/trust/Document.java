@@ -9,15 +9,12 @@ import com.apicatalog.trust.proof.ProofCursor;
 
 public interface Document {
 
-    interface Adapter {
+    interface Accessor {
 
-
-//TODO       
-//      <T> T adapt(Class<T> type);
-//      boolean hasProofs();
+        Object document();
 
         ProofCursor createProofCursor();
-        
+
     }
 
     interface Updater {
@@ -29,7 +26,6 @@ public interface Document {
         Map<String, ?> compacted();
 
         Vocab vocab();
-
     }
 
 }

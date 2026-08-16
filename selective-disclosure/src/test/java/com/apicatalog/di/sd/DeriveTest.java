@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,7 +14,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.jcs.Jcs;
-import com.apicatalog.tree.io.java.NativeComposer;
 
 class DeriveTest {
 
@@ -25,7 +23,7 @@ class DeriveTest {
 
         var signed = Resources.getMap(resource + ".signed.json");
 
-        var processor = Resources.SEMANTIC_MODEL.createAdapter(signed);
+        var processor = Resources.SEMANTIC_MODEL.createAccessor(signed);
 
         var cursor = processor.createProofCursor();
 
@@ -55,9 +53,7 @@ class DeriveTest {
 
         var document = new LinkedHashMap<String, Object>(derivedSignature.payload().compacted().get());
 
-        var composer = new NativeComposer<Map<String, ? extends Object>>();
-        DataIntegrityProof.compact(derivedSignature.proof(), composer);
-        document.put("proof", composer.compose());
+        document.put("proof", DataIntegrityProof.compact(derivedSignature.proof(), false));
 
         var expected = Resources.getMap(resource + ".derived.json");
 

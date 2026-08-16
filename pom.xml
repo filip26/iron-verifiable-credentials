@@ -29,6 +29,8 @@
         <module>data-integrity</module>
         <module>selective-disclosure</module>
         <module>barcodes</module>
+        <!--<module>data-model-v2</module>-->
+        <module>sdk</module>
     </modules>
 
     <build>
