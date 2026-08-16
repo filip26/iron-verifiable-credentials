@@ -1,5 +1,7 @@
 package com.apicatalog.di;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -90,6 +92,12 @@ public class VerifierTest {
             }
 
             var proof = cursor.proof();
+
+            assertTrue(proof.hasRequired());
+            assertFalse(proof.isExpired());
+            assertFalse(proof.isPostDated());
+
+            assertNotNull(proof.signature());
 
 //            if (!Relationship.ASSERTION.getName().equals(proof.purpose())) {
 //                throw new IllegalArgumentException();

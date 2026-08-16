@@ -99,6 +99,8 @@ public class IssuerTest {
             var proofDraft = cryptosuite.createProofDraft();
             proofDraft.options(options);
 
+            assertTrue(proofDraft.hasRequired());
+            
             var updater = getUpdater(cryptosuite.c14n()).apply(document);
 
             var payload = updater.createPayload();

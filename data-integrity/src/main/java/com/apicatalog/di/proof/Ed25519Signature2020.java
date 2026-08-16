@@ -263,47 +263,20 @@ public final class Ed25519Signature2020 implements Proof {
         return context;
     }
 
-//
-//    public void validate(Map<String, Object> params) throws DocumentError {
-//        if (created == null) {
-//            throw new DocumentError(ErrorType.Missing, "Created");
-//        }
-//        if (method == null) {
-//            throw new DocumentError(ErrorType.Missing, "VerificationMethod");
-//        }
-//        if (purpose == null) {
-//            throw new DocumentError(ErrorType.Missing, "ProofPurpose");
-//        }
-//        if (value == null || ((SolidProofValue) value).toByteArray().length == 0) {
-//            throw new DocumentError(ErrorType.Missing, "ProofValue");
-//        }
-//        // proof value must be 64 bytes
-//        if (((SolidProofValue) value).toByteArray().length != 64) {
-//            throw new DocumentError(ErrorType.Invalid, "ProofValue");
-//        }
-//
-//        if (params != null) {
-//            assertEquals(params, DataIntegrityVocab.PURPOSE, purpose.toString()); // TODO compare as URI, expect URI in params
-//            assertEquals(params, DataIntegrityVocab.CHALLENGE, challenge);
-//            assertEquals(params, DataIntegrityVocab.DOMAIN, domain);
-//        }
-//    }
-//
-//    protected static void assertEquals(Map<String, Object> params, Term name, String param) throws DocumentError {
-//
-//        final Object value = params.get(name.name());
-//
-//        if (value == null) {
-//            return;
-//        }
-//
-//        if (!value.equals(param)) {
-//            throw new DocumentError(ErrorType.Invalid, name);
-//        }
-//    }
-
     public static StaticRDFC newStaticRDFC() {
         return new StaticRDFC();
+    }
+
+    @Override
+    public boolean hasRequired() {
+        return created != null
+                && verificationMethod != null
+                && purpose != null;
+    }
+
+    @Override
+    public boolean isExpired() {
+        return false;
     }
 
     public static class StaticRDFC implements GraphCanonizer {
