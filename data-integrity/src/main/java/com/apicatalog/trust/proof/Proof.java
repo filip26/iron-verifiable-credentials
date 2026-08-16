@@ -72,32 +72,27 @@ public interface Proof extends CanonicalPayload {
         CAPABILITY_INVOCATION("capabilityInvocation"),
         CAPABILITY_DELEGATION("capabilityDelegation");
 
-        private final String name;
+        private final String key;
         private final String uri;
 
         private static final Map<String, Purpose> LOOKUP;
 
         static {
-            Map<String, Purpose> map = HashMap.newHashMap(Purpose.values().length);
+            Map<String, Purpose> map = HashMap.newHashMap(Purpose.values().length * 2);
             for (Purpose purpose : values()) {
-                map.put(purpose.name, purpose);
+                map.put(purpose.key, purpose);
                 map.put(purpose.uri, purpose);
             }
             LOOKUP = Map.copyOf(map);
         }
 
         Purpose(String name) {
-            this.name = name;
+            this.key = name;
             this.uri = "https://w3id.org/security#" + (name.endsWith("Method") ? name : name + "Method");
         }
 
-        Purpose(String name, String uri) {
-            this.name = name;
-            this.uri = uri;
-        }
-
         public String key() {
-            return name;
+            return key;
         }
 
         public String uri() {
@@ -112,7 +107,7 @@ public interface Proof extends CanonicalPayload {
             Purpose rel = LOOKUP.get(nameOrUri);
 
             if (rel == null) {
-                throw new IllegalArgumentException("Unknown relationship: " + nameOrUri);
+                throw new IllegalArgumentException("Unknown proof purpose: " + nameOrUri);
             }
 
             return rel;
