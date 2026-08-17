@@ -17,6 +17,27 @@ Static JSON-LD security contexts for W3C Verifiable Credentials Data Integrity s
 | `https://www.w3.org/2018/credentials/v1` | `ab4ddd9a531758807a79a5b450510d61ae8d147eab966cc9a200c07095b0cdcc` |
 | `https://w3id.org/security/data-integrity/v1` | `b5d829bd09aa7c42abc6efa0c8ed7635313b5487f37ccfce3ecd149ca9418554` |
 
+
+## Examples
+
+```javascript
+// Obtain a context resource by URI
+var resource = SecurityContexts.getContext("https://www.w3.org/ns/credentials/v2");
+
+// Verify resource content against its SHA-256 digest
+if (resource != null && resource.isValid()) {
+     // Resource integrity confirmed
+}
+ 
+// Read context as an InputStream
+try (var is = SecurityContexts.getContextAsStream("https://www.w3.org/ns/credentials/v2")) {
+    // Read or parse JSON-LD
+}
+
+// Read context directly as a byte array
+byte[] bytes = SecurityContexts.getContextAsBytes("https://www.w3.org/ns/credentials/v2");
+ ```
+
 ## 📦 Installation
 
 ```xml
