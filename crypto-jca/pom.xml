@@ -7,7 +7,7 @@
     <artifactId>iron-crypto-jca</artifactId>
     <version>1.0.0</version>
 
-    <name>Iron Data Integrity: Java Cryptography Architecture (JCA)</name>
+    <name>Data Integrity: Java Cryptography Architecture (JCA)</name>
 
     <description>
         An asymmetric cryptography implementation based on the Java Cryptography

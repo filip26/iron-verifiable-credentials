@@ -9,7 +9,7 @@
 
     <packaging>jar</packaging>
 
-    <name>Iron Data Integrity: Bouncy Castle Crypto</name>
+    <name>Data Integrity: Bouncy Castle Crypto</name>
     <description>
         Bouncy Castle based asymmetric cryptography implementation for W3C Data
         Integrity specifications.

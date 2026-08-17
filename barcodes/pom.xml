@@ -7,11 +7,11 @@
     <artifactId>iron-barcodes</artifactId>
     <version>1.0.0-M1</version>
 
-    <name>Iron Verifiable Credential Barcodes</name>
+    <name>Verifiable Credential Barcodes</name>
     <description>
         Standards-compliant, modular library for W3C Verifiable Credential
-        Barcodes,
-        enabling compact, secure Verifiable Credentials for optical barcodes.
+        Barcodes, enabling compact, secure Verifiable Credentials for optical
+        barcodes.
     </description>
 
     <url>https://github.com/filip26/iron-verifiable-credentials</url>
