@@ -1,7 +1,7 @@
 # Iron Security Contexts
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-security-contexts.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-security-contexts)
-[![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-security-contexts/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/security-contexts)
+[![javadoc](https://javadoc.io/badge2/com.apicatalog/iron-security-contexts/javadoc.svg)](https://javadoc.io/doc/com.apicatalog/iron-security-contexts)
 
 Static JSON-LD security contexts for W3C Verifiable Credentials Data Integrity specifications, providing offline resolution and integrity verification.
 
