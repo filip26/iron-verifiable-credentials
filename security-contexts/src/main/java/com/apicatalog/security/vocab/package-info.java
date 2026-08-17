@@ -6,7 +6,7 @@
  * 
  * <pre>{@code
  * // Obtain a context resource by URI
- * ContextResource resource = SecurityContexts.getContext("https://www.w3.org/ns/credentials/v2");
+ * ContextResource resource = SecurityContexts.context("https://www.w3.org/ns/credentials/v2");
  * 
  * // Verify resource content against its SHA-256 digest
  * if (resource != null && resource.isValid()) {
@@ -14,12 +14,12 @@
  * }
  * 
  * // Read context as an InputStream
- * try (InputStream in = SecurityContexts.getContextAsStream("https://www.w3.org/ns/credentials/v2")) {
+ * try (InputStream in = SecurityContexts.contextAsStream("https://www.w3.org/ns/credentials/v2")) {
  *     // Read or parse JSON-LD
  * }
  *
  * // Read context directly as a byte array
- * byte[] bytes = SecurityContexts.getContextAsBytes("https://www.w3.org/ns/credentials/v2");
+ * byte[] bytes = SecurityContexts.contextAsBytes("https://www.w3.org/ns/credentials/v2");
  *
  * }</pre>
  */
