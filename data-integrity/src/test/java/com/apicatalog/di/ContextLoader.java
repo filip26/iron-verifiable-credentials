@@ -49,5 +49,4 @@ public class ContextLoader implements DocumentLoader {
             throw new IllegalStateException(e);
         }
     }
-
 }
