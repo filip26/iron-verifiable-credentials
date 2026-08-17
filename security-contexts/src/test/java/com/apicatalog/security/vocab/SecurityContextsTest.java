@@ -12,7 +12,7 @@ class SecurityContextsTest {
     @ParameterizedTest
     @MethodSource("uris")
     void testIsValid(String uri) {
-        assertTrue(SecurityContexts.getContext(uri).isValid());
+        assertTrue(SecurityContexts.context(uri).isValid());
     }
 
     static Stream<String> uris() {

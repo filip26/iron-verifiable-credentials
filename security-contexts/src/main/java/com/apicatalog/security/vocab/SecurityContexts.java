@@ -69,7 +69,7 @@ public final class SecurityContexts {
      * @return the corresponding {@link ContextResource}, or {@code null} if not
      *         found
      */
-    public static ContextResource getContext(String uri) {
+    public static ContextResource context(String uri) {
         return INDEX.get(uri);
     }
 
@@ -80,7 +80,7 @@ public final class SecurityContexts {
      * @return an {@link InputStream} for the resource, or {@code null} if the URI
      *         is not indexed or the resource is missing
      */
-    public static InputStream getContextAsStream(String uri) {
+    public static InputStream contextAsStream(String uri) {
         var resource = INDEX.get(uri);
         return resource != null ? resource.asInputStream() : null;
     }
@@ -94,7 +94,7 @@ public final class SecurityContexts {
      * @throws UncheckedIOException if an I/O error occurs while reading the
      *                              resource
      */
-    public static byte[] getContextAsBytes(String uri) {
+    public static byte[] contextAsBytes(String uri) {
         var resource = INDEX.get(uri);
         return resource != null ? resource.asBytes() : null;
     }
@@ -188,7 +188,7 @@ public final class SecurityContexts {
          */
         public byte[] asBytes() {
             try {
-                try (var is = SecurityContexts.class.getResourceAsStream(resource)) {
+                try (var is = asInputStream()) {
                     return is != null ? is.readAllBytes() : null;
                 }
             } catch (IOException e) {
