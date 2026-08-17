@@ -27,3 +27,7 @@ Static JSON-LD security contexts for W3C Verifiable Credentials Data Integrity s
 </dependency>
 ```
 
+## 📚 Resources
+
+- [Verifiable Credentials Vocabulary v2.0](https://www.w3.org/2018/credentials//)
+- [Security Vocabulary](https://w3id.org/security)
