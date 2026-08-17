@@ -23,6 +23,7 @@
     </properties>
 
     <modules>
+        <module>security-contexts</module>
         <module>crypto-bc</module>
         <module>crypto-jca</module>
         <module>crypto-gcloud-kms</module>

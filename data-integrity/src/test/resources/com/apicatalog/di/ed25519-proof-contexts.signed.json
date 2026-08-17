@@ -1,0 +1,16 @@
+{
+    "@context":["https://www.w3.org/2018/credentials/v1","https://w3id.org/security/suites/ed25519-2020/v1"],
+    "id":"urn:uuid:763d3745-c777-4933-867a-fc89347ebc24",
+    "type":["VerifiableCredential"],
+    "issuer":"did:key:z6MksvTdeczd92YQ5W2V2gL9kXdRvD2AEiyJPoWieP95HUDo",
+    "issuanceDate":"2020-03-16T22:37:26.544Z",
+    "credentialSubject":{"id":"did:key:z6MktKwz7Ge1Yxzr4JHavN33wiwa8y81QdcMRLXQsrH9T53b"},
+    "proof":{
+        "@context":["https://www.w3.org/2018/credentials/v1","https://w3id.org/security/suites/ed25519-2020/v1"],
+        "type":"Ed25519Signature2020",
+        "created":"2026-08-16T23:41:52Z",
+        "verificationMethod":"did:key:z6MksvTdeczd92YQ5W2V2gL9kXdRvD2AEiyJPoWieP95HUDo#z6MksvTdeczd92YQ5W2V2gL9kXdRvD2AEiyJPoWieP95HUDo",
+        "proofPurpose":"assertionMethod",
+        "proofValue":"z3yG6CFDyE2vimmZKvtBRm1qVxcYNnNCnQu2KFRxqyu4FtgqDCsYcSyP1EAqiQkRpjsWKE3U7NenmzBTbQaSdh7nd"
+    }
+}
