@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Provides static access to JSON-LD security contexts related to W3C Verifiable
@@ -18,7 +19,7 @@ import java.util.Objects;
  * context URIs to local classpath resources and their corresponding SHA-256
  * integrity digests for off-line context retrieval and validation.
  */
-public class SecurityContexts {
+public final class SecurityContexts {
 
     private SecurityContexts() {
     }
@@ -85,11 +86,11 @@ public class SecurityContexts {
     }
 
     /**
-     * Returns the context as byte array.
+     * Returns the context resource contents as a byte array.
      *
      * @param uri the context URI string
-     * @return a byte array containing resource contents, or {@code null} if the URI
-     *         is not indexed
+     * @return a byte array containing the resource contents, or {@code null} if the
+     *         URI is not indexed or the resource is not found
      * @throws UncheckedIOException if an I/O error occurs while reading the
      *                              resource
      */
@@ -99,16 +100,28 @@ public class SecurityContexts {
     }
 
     /**
-     * Represents a static context resource along with its expected SHA-256 digest.
+     * Returns the URIs of all registered security contexts.
      *
-     * Example to obtain digest:
-     * 
+     * @return an immutable set containing the registered context URIs
+     */
+    public static Set<String> uris() {
+        return INDEX.keySet();
+    }
+
+    /**
+     * Represents a static context resource together with its expected SHA-256
+     * digest.
+     *
+     * <p>
+     * The digest can be obtained, for example, with:
+     *
      * <pre>{@code
-     *  curl -sL -H "Accept: application/ld+json" CONTEXT | openssl dgst -sha256
+     * curl -sL -H "Accept: application/ld+json" CONTEXT | openssl dgst -sha256
      * }</pre>
-     * 
-     * @param resource     the relative path name of the resource file
-     * @param sha256Digest the expected SHA-256 hash bytes
+     * </p>
+     *
+     * @param resource     the relative classpath resource name
+     * @param sha256Digest the expected SHA-256 digest
      */
     public static record ContextResource(
             String resource,
@@ -133,27 +146,23 @@ public class SecurityContexts {
         /**
          * Validates that the resource content matches its SHA-256 digest.
          *
-         * @return {@code true} if the computed digest matches the expected digest;
-         *         {@code false} if content does not match or resource is missing
-         * @throws IllegalStateException if SHA-256 algorithm is unavailable
-         * @throws UncheckedIOException  if an I/O error occurs during reading
+         * @return {@code true} if the resource content matches the expected digest;
+         *         {@code false} otherwise
+         * @throws NullPointerException  if the resource is not found
+         * @throws IllegalStateException if the SHA-256 algorithm is unavailable
+         * @throws UncheckedIOException  if an I/O error occurs while reading the
+         *                               resource
          */
         public boolean isValid() {
-            try {
-
-                return isValid(asInputStream().readAllBytes());
-
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            return isValid(asBytes());
         }
 
         /**
-         * Validates that the resource content matches its SHA-256 digest.
+         * Validates that the supplied resource content matches its SHA-256 digest.
          *
-         * @param resource
+         * @param resource the resource content to validate
          * @return {@code true} if the computed digest matches the expected digest;
-         *         {@code false} if content does not match or resource is missing
+         *         {@code false} otherwise
          * @throws IllegalStateException if SHA-256 algorithm is unavailable
          */
         public boolean isValid(byte[] resource) {
@@ -170,15 +179,18 @@ public class SecurityContexts {
         }
 
         /**
-         * Returns the context as a byte array.
+         * Returns the context resource contents as a byte array.
          *
-         * @return byte array containing resource content
-         * @throws IllegalStateException if resource stream cannot be opened
-         * @throws UncheckedIOException  if an I/O error occurs
+         * @return a byte array containing the resource contents, or {@code null} if the
+         *         resource is not found
+         * @throws UncheckedIOException if an I/O error occurs while reading the
+         *                              resource
          */
         public byte[] asBytes() {
             try {
-                return SecurityContexts.class.getResourceAsStream("contexts/" + resource).readAllBytes();
+                try (var is = SecurityContexts.class.getResourceAsStream(resource)) {
+                    return is != null ? is.readAllBytes() : null;
+                }
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
@@ -190,7 +202,7 @@ public class SecurityContexts {
          * @return an {@link InputStream} for the resource, or {@code null} if not found
          */
         public InputStream asInputStream() {
-            return SecurityContexts.class.getResourceAsStream("contexts/" + resource);
+            return SecurityContexts.class.getResourceAsStream(resource);
         }
     }
 }
