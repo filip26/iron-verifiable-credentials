@@ -118,7 +118,6 @@ public final class SecurityContexts {
      * <pre>{@code
      * curl -sL -H "Accept: application/ld+json" CONTEXT | openssl dgst -sha256
      * }</pre>
-     * </p>
      *
      * @param resource     the relative classpath resource name
      * @param sha256Digest the expected SHA-256 digest
