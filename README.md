@@ -40,6 +40,7 @@ The following cryptographic suites are supported out-of-the-box.
 
 | Name | Version | Description |
 | :--- | :-----: | :--- |
+| [iron-security-contexts](security-contexts/README.md) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-security-contexts.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-security-contexts) | Static JSON-LD security contexts for W3C VCs |
 | [iron-crypto-bc](crypto-bc/README.md) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-bc.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-bc) | Bouncy Castle based asymmetric cryptography implementation for W3C Data Integrity specifications | 
 | [iron-crypto-jca](crypto-jca/README.md) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-jca.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-jca) | Java Cryptography Architecture (JCA) based asymmetric cryptography implementation for W3C Data Integrity specifications |
 | [iron-crypto-gcloud-kms](crypto-gcloud-kms/README.md) | [![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/iron-crypto-gcloud-kms.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/iron-crypto-gcloud-kms) | Google Cloud KMS based asymmetric cryptography implementation for W3C Data Integrity specifications |

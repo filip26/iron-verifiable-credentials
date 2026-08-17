@@ -60,6 +60,7 @@
         <multicodec.version>4.0.0</multicodec.version>
 
         <!-- Tests -->
+        <contexts.version>1.0.0</contexts.version>
         <jcs.version>3.0.0-M4</jcs.version>
         <rdfc.version>3.0.0</rdfc.version>
         <jsonld.version>1.7.0</jsonld.version>
@@ -85,6 +86,12 @@
             <version>${multicodec.version}</version>
         </dependency>
         <!-- Tests -->
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-security-contexts</artifactId>
+            <version>${contexts.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-crypto-bc</artifactId>

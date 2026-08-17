@@ -17,6 +17,96 @@ import com.apicatalog.trust.signature.Signature;
 public interface Proof extends CanonicalPayload {
 
     /**
+     * Represents the intended purpose of the proof, indicating why it was created
+     * and for what purpose it should be verified.
+     */
+    public enum Purpose {
+
+        /**
+         * Used for authentication purposes, proving control over an identifier.
+         */
+        AUTHENTICATION("authentication"),
+
+        /**
+         * Used to assert a claim or statement.
+         */
+        ASSERTION("assertionMethod"),
+
+        /**
+         * Used for establishing a secure communication channel via key agreement.
+         */
+        KEY_AGREEMENT("keyAgreement"),
+
+        /**
+         * Used to invoke a capability.
+         */
+        CAPABILITY_INVOCATION("capabilityInvocation"),
+
+        /**
+         * Used to delegate a capability to another entity.
+         */
+        CAPABILITY_DELEGATION("capabilityDelegation");
+
+        private final String key;
+        private final String uri;
+
+        private static final Map<String, Purpose> LOOKUP;
+
+        static {
+            Map<String, Purpose> map = HashMap.newHashMap(Purpose.values().length * 2);
+            for (Purpose purpose : values()) {
+                map.put(purpose.key, purpose);
+                map.put(purpose.uri, purpose);
+            }
+            LOOKUP = Map.copyOf(map);
+        }
+
+        Purpose(String name) {
+            this.key = name;
+            this.uri = "https://w3id.org/security#" + (name.endsWith("Method") ? name : name + "Method");
+        }
+
+        /**
+         * Retrieves the short string key identifying this purpose.
+         *
+         * @return the purpose key
+         */
+        public String key() {
+            return key;
+        }
+
+        /**
+         * Retrieves the full URI identifying this purpose.
+         *
+         * @return the purpose URI
+         */
+        public String uri() {
+            return uri;
+        }
+
+        /**
+         * Resolves a {@link Purpose} from its key or URI string representation.
+         *
+         * @param nameOrUri the string key or URI to resolve
+         * @return the corresponding {@link Purpose}
+         * @throws IllegalArgumentException if the input is null, blank, or unknown
+         */
+        public static Purpose from(String nameOrUri) {
+            if (nameOrUri == null || nameOrUri.isBlank()) {
+                throw new IllegalArgumentException("Proof purpose cannot be null or blank");
+            }
+
+            Purpose rel = LOOKUP.get(nameOrUri);
+
+            if (rel == null) {
+                throw new IllegalArgumentException("Unknown proof purpose: " + nameOrUri);
+            }
+
+            return rel;
+        }
+    }
+
+    /**
      * Retrieves the specific type of the proof.
      *
      * @return a string identifying the proof type
@@ -64,53 +154,31 @@ public interface Proof extends CanonicalPayload {
      */
     Instant created();
 
-    public enum Purpose {
+    /**
+     * Checks whether all mandatory properties of the proof are present, excluding
+     * the signature itself.
+     *
+     * @return {@code true} if all required properties are present, {@code false}
+     *         otherwise
+     */
+    boolean hasRequired();
 
-        AUTHENTICATION("authentication"),
-        ASSERTION("assertionMethod"),
-        KEY_AGREEMENT("keyAgreement"),
-        CAPABILITY_INVOCATION("capabilityInvocation"),
-        CAPABILITY_DELEGATION("capabilityDelegation");
+    /**
+     * Checks whether the proof has expired according to its temporal properties and
+     * the current system time.
+     *
+     * @return {@code true} if the proof is expired, {@code false} otherwise
+     */
+    boolean isExpired();
 
-        private final String key;
-        private final String uri;
-
-        private static final Map<String, Purpose> LOOKUP;
-
-        static {
-            Map<String, Purpose> map = HashMap.newHashMap(Purpose.values().length * 2);
-            for (Purpose purpose : values()) {
-                map.put(purpose.key, purpose);
-                map.put(purpose.uri, purpose);
-            }
-            LOOKUP = Map.copyOf(map);
-        }
-
-        Purpose(String name) {
-            this.key = name;
-            this.uri = "https://w3id.org/security#" + (name.endsWith("Method") ? name : name + "Method");
-        }
-
-        public String key() {
-            return key;
-        }
-
-        public String uri() {
-            return uri;
-        }
-
-        public static Purpose from(String nameOrUri) {
-            if (nameOrUri == null || nameOrUri.isBlank()) {
-                throw new IllegalArgumentException("Proof purpose cannot be null or blank");
-            }
-
-            Purpose rel = LOOKUP.get(nameOrUri);
-
-            if (rel == null) {
-                throw new IllegalArgumentException("Unknown proof purpose: " + nameOrUri);
-            }
-
-            return rel;
-        }
+    /**
+     * Checks whether the proof is post-dated (created in the future relative to the
+     * current system time).
+     *
+     * @return {@code true} if the proof's creation time is in the future,
+     *         {@code false} otherwise
+     */
+    default boolean isPostDated() {
+        return created() != null && Instant.now().isBefore(created());
     }
 }

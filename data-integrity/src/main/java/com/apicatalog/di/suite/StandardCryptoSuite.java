@@ -30,7 +30,7 @@ public abstract class StandardCryptoSuite implements CryptoSuite {
         this.signatureGenerator = signatureGenerator;
     }
 
-    public ProofDraft createProofDraft() throws SignatureException {
+    public ProofDraft newProofDraft() {
         return new ProofDraft(this);
     }
 

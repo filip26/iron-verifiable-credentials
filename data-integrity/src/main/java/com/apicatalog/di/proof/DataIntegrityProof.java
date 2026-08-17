@@ -295,15 +295,16 @@ public final class DataIntegrityProof implements Proof {
         return context;
     }
 
-    public boolean isValid() {
+    @Override
+    public boolean hasRequired() {
         return created != null
-                && Instant.now().isAfter(created)
-                && (expires == null || Instant.now().isBefore(expires))
                 && verificationMethod != null
-                && purpose != null
-                && proofValue != null
-        // TODO && proofValue.isValid()
-        ;
+                && purpose != null;
+    }
+
+    @Override
+    public boolean isExpired() {
+        return expires != null && expires.isBefore(Instant.now());
     }
 
     public static Function<DataIntegrityProof, byte[]> getProofCanonizer(String c14n) {
@@ -353,8 +354,15 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
-        public boolean isValid() {
-            return proof.isValid();
+        /**
+         * Checks whether all mandatory properties of the proof are present, excluding
+         * the signature itself.
+         *
+         * @return {@code true} if all required properties are present, {@code false}
+         *         otherwise
+         */
+        public boolean hasRequired() {
+            return proof.hasRequired();
         }
 
         // TODO ?!?!
@@ -498,6 +506,15 @@ public final class DataIntegrityProof implements Proof {
         public Collection<String> previous() {
             return proof.previous() != null ? proof.previous() : Set.of();
         }
+
+        public Purpose purpose() {
+            return proof.purpose();
+        }
+
+        public Instant created() {
+            return proof.created();
+        }
+
     }
 
     public static class PropertyMapMapper implements PropertyProofMapper {
