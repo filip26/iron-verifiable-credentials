@@ -49,6 +49,8 @@
             <roles>
                 <role>author</role>
             </roles>
+            <organization>APICatalog</organization>
+            <organizationUrl>https://apicatalog.com</organizationUrl>
         </developer>
     </developers>
 
