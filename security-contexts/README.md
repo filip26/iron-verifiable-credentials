@@ -22,11 +22,11 @@ Static JSON-LD security contexts for W3C Verifiable Credentials Data Integrity s
 
 ```javascript
 
-// List bundled contexts
+// Retrieve the immutable set of bundled context URIs
 var uris = SecurityContexts.uris();
 
 // Obtain a context resource by URI
-var resource = SecurityContexts.context("https://www.w3.org/ns/credentials/v2");
+ContextResource resource = SecurityContexts.context("https://www.w3.org/ns/credentials/v2");
 
 // Verify resource content against its SHA-256 digest
 if (resource != null && resource.isValid()) {
@@ -40,6 +40,11 @@ try (var is = SecurityContexts.contextAsStream("https://www.w3.org/ns/credential
 
 // Read context directly as a byte array
 byte[] bytes = SecurityContexts.contextAsBytes("https://www.w3.org/ns/credentials/v2");
+
+// Check for Verifiable Credentials Data Model v2.0 context
+if (!ctx.isEmpty() && SecurityContext.VCDM_V2.equals(ctx.getFirst())) {
+    // Handle Verifiable Credentials Data Model v2.0 
+}
  ```
 
 ## 📦 Installation
