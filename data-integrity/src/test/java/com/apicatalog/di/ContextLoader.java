@@ -14,20 +14,20 @@ import com.apicatalog.security.vocab.SecurityContexts;
 public class ContextLoader implements DocumentLoader {
 
     static final Map<String, Document> CONTEXTS = Map.of(
-            "https://www.w3.org/2018/credentials/v1",
-            load(SecurityContexts.contextAsStream("https://www.w3.org/2018/credentials/v1")),
+            SecurityContexts.VCDM_V1,
+            context(SecurityContexts.VCDM_V1),
 
-            "https://www.w3.org/ns/credentials/v2",
-            load(SecurityContexts.contextAsStream("https://www.w3.org/ns/credentials/v2")),
+            SecurityContexts.VCDM_V2,
+            context(SecurityContexts.VCDM_V2),
 
-            "https://w3id.org/security/suites/ed25519-2020/v1",
-            load(SecurityContexts.contextAsStream("https://w3id.org/security/suites/ed25519-2020/v1")),
+            SecurityContexts.ED25519_2020_V1,
+            context(SecurityContexts.ED25519_2020_V1),
 
             "https://www.w3.org/ns/credentials/examples/v2",
-            load("examples-v2.json"),
+            resource("examples-v2.json"),
 
             "https://w3id.org/citizenship/v4rc1",
-            load("citizenship-v4rc1.json"));
+            resource("citizenship-v4rc1.json"));
 
     @Override
     public Document loadDocument(URI url, DocumentLoaderOptions options) throws JsonLdError {
@@ -38,11 +38,15 @@ public class ContextLoader implements DocumentLoader {
         return new ContextLoader();
     }
 
-    static Document load(String name) {
-        return load(Resources.class.getResourceAsStream("context/" + name));
+    static Document resource(String name) {
+        return document(Resources.class.getResourceAsStream("context/" + name));
     }
 
-    static Document load(InputStream is) {
+    static Document context(String uri) {
+        return document(SecurityContexts.contextAsStream(uri));
+    }
+
+    static Document document(InputStream is) {
         try {
             return JsonDocument.of(is);
         } catch (JsonLdError e) {
