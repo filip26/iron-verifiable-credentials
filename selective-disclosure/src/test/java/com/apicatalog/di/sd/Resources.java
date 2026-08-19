@@ -112,7 +112,7 @@ class Resources {
         }
     }
 
-    static final Collection<Object> expand(Map<String, Object> document) {
+    static final Collection<Object> expand(Map<String, ?> document) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();
@@ -133,7 +133,7 @@ class Resources {
         }
     }
 
-    static final Map<String, Object> compact(Collection<String> context, Map<String, Object> document) {
+    static final Map<String, Object> compact(Collection<?> context, Map<String, ?> document) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();
@@ -142,7 +142,13 @@ class Resources {
             }
 
             var ctx = Json.createArrayBuilder();
-            context.forEach(ctx::add);
+            for (var contextValue : context) {
+                if (!(contextValue instanceof String contextUri)) {
+                    throw new UnsupportedOperationException();
+                }
+                ctx.add(contextUri);
+            }
+
             var ctxx = ctx.build();
 
             var compacted = JsonLd.compact(JsonDocument.of(new ByteArrayInputStream(bos.toByteArray())),

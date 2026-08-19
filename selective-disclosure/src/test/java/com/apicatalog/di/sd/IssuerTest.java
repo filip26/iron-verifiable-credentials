@@ -24,6 +24,7 @@ import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
+import com.apicatalog.trust.model.ContextAwareResolver;
 
 public class IssuerTest {
 
@@ -83,7 +84,9 @@ public class IssuerTest {
         var proofDraft = cryptosuite.createProofDraft();
         proofDraft.options(options);
 
-        var updater = Resources.SEMANTIC_MODEL.createUpdater(sourceDocument);
+        var context = ContextAwareResolver.getContexts(sourceDocument);
+        
+        var updater = Resources.SEMANTIC_MODEL.createUpdater(context, sourceDocument);
 
         var payload = updater.createPayload();
 

@@ -24,6 +24,7 @@ import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
+import com.apicatalog.trust.model.ContextAwareResolver;
 
 public class IssuerTest {
 
@@ -73,7 +74,9 @@ public class IssuerTest {
         var proofDraft = cryptosuite.newProofDraft();
         proofDraft.options(options);
 
-        var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
+        var context = ContextAwareResolver.getContexts(document);
+        
+        var updater = Resources.SEMANTIC_MODEL.createUpdater(context, document);
 
         var payloadProvider = updater.createPayload();
 
