@@ -15,7 +15,7 @@ public class LexicalUpdater implements Document.Updater {
     private final LexicalAccessor adapter;
 
     private Collection<Map<String, ?>> newProofs;
-    private Collection<String> contexts = null;
+    private Collection<Object> contexts = null;
 
     public LexicalUpdater(LexicalModel model, LexicalAccessor adapter) {
         this.model = model;
@@ -23,7 +23,7 @@ public class LexicalUpdater implements Document.Updater {
     }
 
     @Override
-    public void addProof(Collection<String> context, Map<String, ?> compacted) {
+    public void addProof(Collection<?> context, Map<String, ?> compacted) {
         if (newProofs == null) {
             newProofs = new ArrayList<>();
         }
@@ -89,7 +89,7 @@ public class LexicalUpdater implements Document.Updater {
         return model.vocab();
     }
 
-    private static Collection<Object> merge(Collection<?> documentContext, Collection<String> proofContext) {
+    private static Collection<Object> merge(Collection<?> documentContext, Collection<?> proofContext) {
         var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
         result.addAll(documentContext);
         result.addAll(proofContext);

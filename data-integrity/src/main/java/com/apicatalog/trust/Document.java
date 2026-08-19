@@ -21,7 +21,7 @@ public interface Document {
 
         PayloadGenerator createPayload();
 
-        void addProof(Collection<String> context, Map<String, ?> compacted);
+        void addProof(Collection<?> context, Map<String, ?> compacted);
 
         Map<String, ?> compacted();
 

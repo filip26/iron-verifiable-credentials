@@ -8,8 +8,10 @@ import java.security.SignatureException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -30,7 +32,7 @@ import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.signature.Signature;
 
 public final class Ed25519Signature2020 implements Proof {
-    
+
     public static final String CONTEXT_URI = "https://w3id.org/security/suites/ed25519-2020/v1";
 
     public static final String TYPE_URI = "https://w3id.org/security#Ed25519Signature2020";
@@ -54,7 +56,7 @@ public final class Ed25519Signature2020 implements Proof {
     private static final String KEY_PURPOSE = "proofPurpose";
     private static final String KEY_PROOF_VALUE = "proofValue";
 
-    private Collection<String> context;
+    private Collection<?> context;
 
     private Instant created;
     private Purpose purpose;
@@ -119,13 +121,13 @@ public final class Ed25519Signature2020 implements Proof {
     public static Draft newDraft(Map<String, Object> map) {
 
         var proof = new Ed25519Signature2020();
-        Collection<String> context = List.of();
+        Collection<?> context = List.of();
 
         for (var entry : map.entrySet()) {
             switch (entry.getKey()) {
             case "@context":
                 if (entry.getValue() instanceof Collection<?> col) {
-                    context = col.stream().map(String.class::cast).toList();
+                    context = col;
 
                 } else if (entry.getValue() instanceof String uri) {
                     context = List.of(uri);
@@ -146,6 +148,17 @@ public final class Ed25519Signature2020 implements Proof {
             }
         }
 
+        // setup default context
+        if (context.isEmpty()) {
+            context = Set.of(Ed25519Signature2020.CONTEXT_URI);
+
+        } else if (!context.contains(Ed25519Signature2020.CONTEXT_URI)) {
+            var tmp = new LinkedHashSet<>(context.size());
+            tmp.addAll(context);
+            tmp.add(Ed25519Signature2020.CONTEXT_URI);
+            context = tmp;
+        }
+
         return new Draft(proof, context);
     }
 
@@ -153,7 +166,7 @@ public final class Ed25519Signature2020 implements Proof {
 
         private final Ed25519Signature2020 proof;
 
-        private Draft(Ed25519Signature2020 proof, Collection<String> context) {
+        private Draft(Ed25519Signature2020 proof, Collection<?> context) {
             this.proof = proof;
             this.proof.context = context;
         }
@@ -194,12 +207,12 @@ public final class Ed25519Signature2020 implements Proof {
             return this;
         }
 
-        public Draft context(Collection<String> context) {
+        public Draft context(Collection<?> context) {
             proof.context = context;
             return this;
         }
 
-        public Collection<String> context() {
+        public Collection<?> context() {
             return proof.context;
         }
 
@@ -274,7 +287,7 @@ public final class Ed25519Signature2020 implements Proof {
      * @return a collection of strings representing the JSON-LD context URIs, or
      *         {@code null} if not present
      */
-    public Collection<String> context() {
+    public Collection<?> context() {
         return context;
     }
 

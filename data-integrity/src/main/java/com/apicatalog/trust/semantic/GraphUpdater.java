@@ -18,18 +18,18 @@ public final class GraphUpdater implements Document.Updater {
     }
 
     private final SemanticModel model;
-    private final SemanticModel.Accessor adapter;
+    private final SemanticModel.Accessor accessor;
 
     private Collection<Map<String, ?>> newProofs;
-    private Collection<String> contexts = null;
+    private Collection<Object> contexts = null;
 
     public GraphUpdater(SemanticModel model, SemanticModel.Accessor adapter) {
         this.model = model;
-        this.adapter = adapter;
+        this.accessor = adapter;
     }
 
     @Override
-    public void addProof(Collection<String> context, Map<String, ?> compacted) {
+    public void addProof(Collection<?> context, Map<String, ?> compacted) {
         if (newProofs == null) {
             newProofs = new ArrayList<>();
         }
@@ -37,7 +37,7 @@ public final class GraphUpdater implements Document.Updater {
 
         if (context != null) {
             if (contexts == null) {
-                contexts = new LinkedHashSet<>(context.size() * 2);
+                contexts = new LinkedHashSet<>(context.size());
             }
             contexts.addAll(context);
         }
@@ -47,16 +47,16 @@ public final class GraphUpdater implements Document.Updater {
     public Map<String, ?> compacted() {
 
         if (newProofs == null) {
-            return adapter.source();
+            return accessor.source();
         }
 
-        var document = new LinkedHashMap<String, Object>(adapter.source());
-        var terms = adapter.vocab();
+        var document = new LinkedHashMap<String, Object>(accessor.source());
+        var terms = accessor.vocab();
 
         var proofs = document.get(terms.proof());
 
         if (contexts != null) {
-            document.put(adapter.vocab().context(), merge(adapter.context(), contexts));
+            document.put(accessor.vocab().context(), merge(accessor.context(), contexts));
         }
 
         if (proofs instanceof Collection<?> col) {
@@ -80,7 +80,7 @@ public final class GraphUpdater implements Document.Updater {
         return document;
     }
 
-    static Collection<?> merge(Collection<?> documentContext, Collection<String> proofContext) {
+    static Collection<?> merge(Collection<?> documentContext, Collection<?> proofContext) {
         var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
         result.addAll(documentContext);
         result.addAll(proofContext);
@@ -89,11 +89,11 @@ public final class GraphUpdater implements Document.Updater {
 
     @Override
     public PayloadGenerator createPayload() {
-        return model.createPayload(adapter);
+        return model.createPayload(accessor);
     }
 
     @Override
     public Vocab vocab() {
-        return adapter.vocab();
+        return accessor.vocab();
     }
 }

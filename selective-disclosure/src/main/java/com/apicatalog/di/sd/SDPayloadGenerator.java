@@ -18,15 +18,15 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
 
     public SDPayloadGenerator(
             SemanticModel model,
-            SemanticModel.Accessor processor) {
-        super(model, processor);
+            SemanticModel.Accessor accessor) {
+        super(model, accessor);
     }
 
     public SDBaseDocument redactable(Collection<String> mandatoryPointers, byte[] hmacKey) {
 
-        var skolemized = Skolemizer.skolemize(adapter.expandedData());
+        var skolemized = Skolemizer.skolemize(accessor.expandedData());
 
-        var compacted = model.compact().apply(adapter.context(), skolemized);
+        var compacted = model.compact().apply(accessor.context(), skolemized);
 
         if (!(model.newCanonizer() instanceof SDGraphCanonizer canonizer)) {
             throw new IllegalStateException();
@@ -132,7 +132,7 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
         base.compacted = compacted;
         base.canonized = canonized;
         base.model = model;
-        base.context = adapter.context();
+        base.context = accessor.context();
 
         return base;
     }
@@ -143,7 +143,7 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
             throw new IllegalStateException();
         }
 
-        model.tordf().accept(adapter.expandedData(), canonizer);
+        model.tordf().accept(accessor.expandedData(), canonizer);
 
         var canonized = new ArrayList<String[]>();
 
@@ -212,6 +212,6 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
     }
 
     private Map<String, Object> compacted() {
-        return model.compact().apply(adapter.context(), adapter.expandedData());
+        return model.compact().apply(accessor.context(), accessor.expandedData());
     }
 }
