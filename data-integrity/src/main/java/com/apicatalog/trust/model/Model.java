@@ -1,5 +1,6 @@
 package com.apicatalog.trust.model;
 
+import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.trust.Document;
@@ -13,10 +14,8 @@ public interface Model {
     record Vocab(String context, String proof, String id, String type) {
     };
 
-    //TODO add context param
-    Document.Accessor createAccessor(Map<String, Object> document);
-    //TODO add context param
-    Document.Updater createUpdater(Map<String, Object> document);
+    Document.Accessor createAccessor(Collection<?> context, Map<String, ?> document);
+    Document.Updater createUpdater(Collection<?> context, Map<String, ?> document);
 
     Vocab vocab();
 

@@ -118,7 +118,7 @@ public final class Ed25519Signature2020 implements Proof {
         return new Draft(new Ed25519Signature2020(), List.of());
     }
 
-    public static Draft newDraft(Map<String, Object> map) {
+    public static Draft newDraft(Map<String, ?> map) {
 
         var proof = new Ed25519Signature2020();
         Collection<?> context = List.of();

@@ -44,7 +44,7 @@ public class PropertyMapPayloadGenerator implements PayloadGenerator {
             }
         }
 
-        var document = new HashMap<>(accessor.document());
+        var document = new HashMap<String, Object>(accessor.document());
         document.put(model.vocab().proof(), proofs);
 
         var canonical = model.canonize(document);

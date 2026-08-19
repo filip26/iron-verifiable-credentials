@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.apicatalog.trust.Document;
-import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.PayloadGenerator;
 
@@ -56,8 +55,8 @@ public class SemanticModel implements Model {
     };
 
     public record JsonLdOps(
-            Function<Map<String, Object>, Collection<Object>> expand,
-            BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact,
+            Function<Map<String, ?>, Collection<Object>> expand,
+            BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact,
             BiConsumer<Object, QuadConsumer> tordf) {
     };
 
@@ -86,16 +85,16 @@ public class SemanticModel implements Model {
     }
 
     @Override
-    public SemanticModel.Accessor createAccessor(Map<String, Object> document) {
+    public SemanticModel.Accessor createAccessor(Collection<?> context, Map<String, ?> document) {
         return primitives.adapter.createAdapter(
                 this,
-                ContextAwareResolver.getContexts(document),
+                context,
                 document);
     }
 
     @Override
-    public Document.Updater createUpdater(Map<String, Object> document) {
-        return primitives.updater.createUpdater(this, createAccessor(document));
+    public Document.Updater createUpdater(Collection<?> context, Map<String, ?> document) {
+        return primitives.updater.createUpdater(this, createAccessor(context, document));
     }
 
     public PayloadGenerator createPayload(SemanticModel.Accessor adapter) {
@@ -118,11 +117,11 @@ public class SemanticModel implements Model {
         return jsonLd.tordf;
     }
 
-    public Function<Map<String, Object>, Collection<Object>> expand() {
+    public Function<Map<String, ?>, Collection<Object>> expand() {
         return jsonLd.expand;
     }
 
-    public BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact() {
+    public BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact() {
         return jsonLd.compact;
     }
 
@@ -137,11 +136,11 @@ public class SemanticModel implements Model {
         public interface Factory {
             SemanticModel.Accessor createAdapter(
                     SemanticModel model,
-                    Collection<String> context,
-                    Map<String, Object> document);
+                    Collection<?> context,
+                    Map<String, ?> document);
         }
 
-        Collection<String> context();
+        Collection<?> context();
 
         @Override
         Graph document();

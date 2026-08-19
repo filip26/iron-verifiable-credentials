@@ -5,8 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,6 +30,7 @@ import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.Document;
+import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.proof.Proof;
 
@@ -89,6 +91,8 @@ public class IssuerTest {
                             .formatted(privateKeyCodec.name(), privateKeyCodec.code()));
         }
 
+        final var context = ContextAwareResolver.getContexts(document);
+        
         Proof proof = null;
         Map<String, ?> issued = null;
 
@@ -101,7 +105,9 @@ public class IssuerTest {
 
             assertTrue(proofDraft.hasRequired());
 
-            var updater = getUpdater(cryptosuite.c14n()).apply(document);
+            //TODO check document level contexts for proof presence
+            
+            var updater = getUpdater(cryptosuite.c14n()).apply(context, document);
 
             var payload = updater.createPayload();
 
@@ -122,7 +128,9 @@ public class IssuerTest {
 
             var proofDraft = Ed25519Signature2020.newDraft((Map<String, Object>) options);
 
-            var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
+            //TODO check document level contexts for proof presence
+            
+            var updater = Resources.SEMANTIC_MODEL.createUpdater(context, document);
 
             var payload = updater.createPayload();
 
@@ -148,7 +156,7 @@ public class IssuerTest {
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(issued)));
     }
 
-    static Function<Map<String, Object>, Document.Updater> getUpdater(String c14n) {
+    static BiFunction<Collection<?>, Map<String, ?>, Document.Updater> getUpdater(String c14n) {
         return switch (c14n) {
         case Model.C14N_RDFC -> Resources.SEMANTIC_MODEL::createUpdater;
         case Model.C14N_JCS -> Resources.LEXICAL_MODEL::createUpdater;

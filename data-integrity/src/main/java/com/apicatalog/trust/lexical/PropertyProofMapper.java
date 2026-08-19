@@ -12,7 +12,7 @@ public interface PropertyProofMapper {
 
     // reads from tree
     Proof materialize(
-            Collection<String> contexts,
+            Collection<?> contexts,
             Map<String, Object> proof,
             LexicalModel model,
             PayloadGenerator payload);

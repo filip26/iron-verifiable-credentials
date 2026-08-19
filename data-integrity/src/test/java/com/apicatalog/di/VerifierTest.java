@@ -76,7 +76,7 @@ public class VerifierTest {
 
         var model = MODEL_RESOLVER.resolve(contexts, signed);
 
-        var accessor = model.createAccessor(signed);
+        var accessor = model.createAccessor(contexts, signed);
 
         var cursor = accessor.createProofCursor();
 

@@ -135,7 +135,7 @@ class Resources {
         }
     }
 
-    static final Collection<Object> expand(Map<String, Object> document) {
+    static final Collection<Object> expand(Map<String, ?> document) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();

@@ -11,16 +11,16 @@ public interface LexicalAccessor extends Document.Accessor {
     interface Factory {
         LexicalAccessor createAdapter(
                 LexicalModel model,
-                Collection<String> context,
-                Map<String, Object> document);
+                Collection<?> context,
+                Map<String, ?> document);
     }
 
     @Override
-    Map<String, Object> document();
+    Map<String, ?> document();
 
     int proofs();
 
     Map<String, Object> proof(int index);
 
-    Collection<String> context();
+    Collection<?> context();
 }

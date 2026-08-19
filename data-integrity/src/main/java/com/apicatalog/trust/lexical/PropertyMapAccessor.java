@@ -9,15 +9,15 @@ import java.util.Map;
 public class PropertyMapAccessor implements LexicalAccessor {
 
     private final LexicalModel model;
-    private final Collection<String> context;
+    private final Collection<?> context;
 
-    private final Map<String, Object> data;
+    private final Map<String, ?> data;
     private final Map<String, Object>[] proofs;
 
     protected PropertyMapAccessor(
             LexicalModel model,
-            Collection<String> context,
-            Map<String, Object> data,
+            Collection<?> context,
+            Map<String, ?> data,
             Map<String, Object>[] proofs) {
         this.model = model;
         this.context = context;
@@ -27,8 +27,8 @@ public class PropertyMapAccessor implements LexicalAccessor {
 
     public static final PropertyMapAccessor newInstance(
             LexicalModel model,
-            Collection<String> context,
-            Map<String, Object> document) {
+            Collection<?> context,
+            Map<String, ?> document) {
 
         var data = new LinkedHashMap<>(document);
 
@@ -68,7 +68,7 @@ public class PropertyMapAccessor implements LexicalAccessor {
     }
 
     @Override
-    public Map<String, Object> document() {
+    public Map<String, ?> document() {
         return data;
     }
 
@@ -83,7 +83,7 @@ public class PropertyMapAccessor implements LexicalAccessor {
     }
 
     @Override
-    public Collection<String> context() {
+    public Collection<?> context() {
         return context;
     }
 }

@@ -14,8 +14,8 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     private final SemanticModel model;
 
-    private final Collection<String> context;
-    private final Map<String, Object> document;
+    private final Collection<?> context;
+    private final Map<String, ?> document;
 
     private Map<String, Object> expandedData;
     private Collection<?> expandedProofs;
@@ -24,8 +24,8 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     protected GraphAccessor(
             SemanticModel model,
-            Collection<String> context,
-            Map<String, Object> document) {
+            Collection<?> context,
+            Map<String, ?> document) {
         this.model = model;
         this.context = context;
         this.document = document;
@@ -38,8 +38,8 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     public static GraphAccessor newInstance(
             SemanticModel model,
-            Collection<String> context,
-            Map<String, Object> document) {
+            Collection<?> context,
+            Map<String, ?> document) {
         return new GraphAccessor(model, context, document);
     }
 
@@ -49,7 +49,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
     }
 
     @Override
-    public Collection<String> context() {
+    public Collection<?> context() {
         return context;
     }
 

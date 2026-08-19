@@ -19,7 +19,7 @@ public class SDBaseDocument implements RedactablePayload {
 
     byte[] hmacKey;
 
-    Collection<String> context;
+    Collection<?> context;
     Map<String, Object> compacted;
     List<String> canonized;
 

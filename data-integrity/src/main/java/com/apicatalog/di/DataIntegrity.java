@@ -56,8 +56,8 @@ public class DataIntegrity {
         private GraphPayloadGenerator.Factory payloadFactory;
 
         private BiConsumer<Object, QuadConsumer> tordf;
-        private BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact;
-        private Function<Map<String, Object>, Collection<Object>> expand;
+        private BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact;
+        private Function<Map<String, ?>, Collection<Object>> expand;
 
         private Map<String, Supplier<GraphCanonizer>> proofC14n = Map.of();
 
@@ -90,13 +90,13 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder expand(Function<Map<String, Object>, Collection<Object>> expand) {
+        public SemanticModelBuilder expand(Function<Map<String, ?>, Collection<Object>> expand) {
             this.expand = expand;
             return this;
         }
 
         public SemanticModelBuilder compact(
-                BiFunction<Collection<String>, Map<String, Object>, Map<String, Object>> compact) {
+                BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact) {
             this.compact = compact;
             return this;
         }
@@ -197,12 +197,12 @@ public class DataIntegrity {
 
         final private String c14n;
 
-        private Function<Map<String, Object>, byte[]> canonize;
+        private Function<Map<String, ?>, byte[]> canonize;
 
         private LexicalAccessor.Factory processorFactory;
         private PropertyProofCursor.Factory cursorFactory;
 
-        private Map<String, Function<Map<String, Object>, byte[]>> proofC14n = Map.of();
+        private Map<String, Function<Map<String, ?>, byte[]>> proofC14n = Map.of();
         private Map<String, CryptoSuite> cryptosuites;
         private Map<String, PropertyProofMapper> readers;
 
@@ -219,12 +219,12 @@ public class DataIntegrity {
             return this;
         }
 
-        public LexicalModelBuilder c14n(Function<Map<String, Object>, byte[]> canonize) {
+        public LexicalModelBuilder c14n(Function<Map<String, ?>, byte[]> canonize) {
             this.canonize = canonize;
             return this;
         }
 
-        public LexicalModelBuilder c14n(String proofType, Function<Map<String, Object>, byte[]> canonize) {
+        public LexicalModelBuilder c14n(String proofType, Function<Map<String, ?>, byte[]> canonize) {
             if (this.proofC14n.isEmpty()) {
                 this.proofC14n = new HashMap<>();
             }

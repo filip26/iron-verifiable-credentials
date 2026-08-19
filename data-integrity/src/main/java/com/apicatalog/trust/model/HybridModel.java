@@ -25,16 +25,14 @@ public class HybridModel implements Model {
 
     @Override
     // TODO add context as parameter
-    public Document.Accessor createAccessor(Map<String, Object> document) {
-
-        var context = ContextAwareResolver.getContexts(document);
+    public Document.Accessor createAccessor(Collection<?> context, Map<String, ?> document) {
 
         var hybrid = new Adapter();
 
         var adapters = new ArrayList<Document.Accessor>(models.length);
 
         for (var model : models) {
-            var modelProcessor = model.createAccessor(document);
+            var modelProcessor = model.createAccessor(context, document);
             if (modelProcessor != null) {
                 adapters.add(modelProcessor);
             }
@@ -52,8 +50,8 @@ public class HybridModel implements Model {
     public static class Adapter implements Document.Accessor {
 
         SequencedCollection<Document.Accessor> acessors;
-        SequencedCollection<?> context;
-        Map<String, Object> document;
+        Collection<?> context;
+        Map<String, ?> document;
         Object data;
 
         @Override
@@ -155,7 +153,7 @@ public class HybridModel implements Model {
     }
 
     @Override
-    public Updater createUpdater(Map<String, Object> document) {
+    public Updater createUpdater(Collection<?> context, Map<String, ?> document) {
         throw new UnsupportedOperationException();
     }
 }

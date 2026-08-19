@@ -319,7 +319,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
     }
 
     private static Map<String, Object> recompact(
-            Collection<String> context,
+            Collection<?> context,
             Map<String, Object> document,
             SemanticModel model) {
 

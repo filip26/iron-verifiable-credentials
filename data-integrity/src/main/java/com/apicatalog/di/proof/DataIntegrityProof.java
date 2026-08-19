@@ -529,10 +529,10 @@ public final class DataIntegrityProof implements Proof {
     public static class PropertyMapMapper implements PropertyProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
-        private final Function<Map<String, Object>, byte[]> canonize;
+        private final Function<Map<String, ?>, byte[]> canonize;
 
         public PropertyMapMapper(Map<String, CryptoSuite> cryptosuites,
-                Function<Map<String, Object>, byte[]> canonize) {
+                Function<Map<String, ?>, byte[]> canonize) {
             this.cryptosuites = cryptosuites;
             this.canonize = canonize;
         }
@@ -545,7 +545,7 @@ public final class DataIntegrityProof implements Proof {
 
         @Override
         public Proof materialize(
-                Collection<String> contexts,
+                Collection<?> contexts,
                 Map<String, Object> proof,
                 LexicalModel model,
                 PayloadGenerator payload) {

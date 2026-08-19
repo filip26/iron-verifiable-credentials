@@ -17,7 +17,7 @@ public class PropertyProofCursor implements ProofCursor {
     }
 
     private final LexicalModel model;
-    private final LexicalAccessor processor;
+    private final LexicalAccessor accessor;
     private final PropertyProofMapper[] readers;
 
     private int currentIndex;
@@ -31,7 +31,7 @@ public class PropertyProofCursor implements ProofCursor {
             LexicalAccessor processor,
             PropertyProofMapper[] readers) {
         this.model = model;
-        this.processor = processor;
+        this.accessor = processor;
         this.readers = readers;
 
         this.currentProof = null;
@@ -85,7 +85,7 @@ public class PropertyProofCursor implements ProofCursor {
 
             // FIXME context!
             payloadProvider.reset();
-            currentProof = reader.materialize(processor.context(), currentEntry, model, payloadProvider);
+            currentProof = reader.materialize(accessor.context(), currentEntry, model, payloadProvider);
         }
 
         return currentProof;
@@ -98,7 +98,7 @@ public class PropertyProofCursor implements ProofCursor {
             return false;
         }
 
-        currentEntry = processor.proof(++currentIndex);
+        currentEntry = accessor.proof(++currentIndex);
         currentProof = null;
         return true;
     }
