@@ -42,6 +42,15 @@ import com.apicatalog.trust.signature.Signature;
  */
 public final class DataIntegrityProof implements Proof {
 
+    /**
+     * A collection of known JSON-LD context URIs associated with W3C Verifiable
+     * Credentials and Data Integrity specifications.
+     */
+    public static final Collection<String> KNOWN_CONTEXTS = Set.of(
+            "https://www.w3.org/ns/credentials/v2",
+            "https://w3id.org/security/data-integrity/v2",
+            "https://w3id.org/security/data-integrity/v1");
+
     public static final String TYPE_URI = "https://w3id.org/security#DataIntegrityProof";
     public static final String TYPE_NAME = "DataIntegrityProof";
 

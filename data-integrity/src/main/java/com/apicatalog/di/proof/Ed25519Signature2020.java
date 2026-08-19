@@ -30,7 +30,7 @@ import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.signature.Signature;
 
 public final class Ed25519Signature2020 implements Proof {
-
+    
     public static final String CONTEXT_URI = "https://w3id.org/security/suites/ed25519-2020/v1";
 
     public static final String TYPE_URI = "https://w3id.org/security#Ed25519Signature2020";
@@ -39,6 +39,9 @@ public final class Ed25519Signature2020 implements Proof {
     public static final String SIGNATURE_ALGORITHM = "Ed25519";
     public static final String HASH_ALGORITHM = "SHA-256";
     public static final String C14N = "RDFC";
+
+    public static final int SIGNATURE_LENGTH = 64;
+    public static final int PUBLIC_KEY_SIZE = 32;
 
     private static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
     private static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";

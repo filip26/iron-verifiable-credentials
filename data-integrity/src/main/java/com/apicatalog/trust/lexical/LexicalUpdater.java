@@ -37,7 +37,7 @@ public class LexicalUpdater implements Document.Updater {
     }
 
     @Override
-    public Map<String, ?> compacted() {
+    public Map<String, Object> compacted() {
 
         Collection<Map<String, ?>> proofs = null;
 
@@ -89,7 +89,7 @@ public class LexicalUpdater implements Document.Updater {
         return model.vocab();
     }
 
-    private static Collection<?> merge(Collection<?> documentContext, Collection<String> proofContext) {
+    private static Collection<Object> merge(Collection<?> documentContext, Collection<String> proofContext) {
         var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
         result.addAll(documentContext);
         result.addAll(proofContext);
