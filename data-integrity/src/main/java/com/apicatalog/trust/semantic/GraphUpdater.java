@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SequencedCollection;
@@ -42,22 +41,25 @@ public final class GraphUpdater implements Document.Updater {
         }
         newProofs.add(compacted);
 
-        final SequencedCollection<?> sequence;
+        if (context instanceof SequencedCollection<?> sequence) {
 
-        if (context instanceof SequencedCollection<?> col) {
-            sequence = col;
+            if (contexts == null) {
+                contexts = new LinkedHashSet<>(sequence.size() * 3);
+            }
+
+            contexts.addAll(sequence);
+
         } else if (context instanceof String uri) {
-            sequence = List.of(uri);
+
+            if (contexts == null) {
+                contexts = new LinkedHashSet<>();
+            }
+
+            contexts.add(uri);
 
         } else {
             throw new ClassCastException();
         }
-
-        if (contexts == null) {
-            contexts = new LinkedHashSet<>(sequence.size() * 3);
-        }
-
-        contexts.addAll(sequence);
     }
 
     @Override

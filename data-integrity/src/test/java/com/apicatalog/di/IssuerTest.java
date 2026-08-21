@@ -119,7 +119,7 @@ public class IssuerTest {
 IO.println("IS 1: " + new String(diProof.signature().payload().canonicalPayload()));
 IO.println("IS 2: " + new String(diProof.canonicalPayload()));
             updater.addProof(
-                    diProof.context(),
+                    proofDraft.context(),
                     diProof.compact());
 
             proof = diProof;

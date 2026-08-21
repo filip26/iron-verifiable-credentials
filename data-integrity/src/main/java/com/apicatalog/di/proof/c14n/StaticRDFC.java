@@ -90,41 +90,51 @@ public final class StaticRDFC implements GraphCanonizer {
         case DataIntegrityProof.PREDICATE_CREATED:
             created = object;
             break;
+
         case DataIntegrityProof.PREDICATE_CHALLENGE:
             challenge = object;
             break;
+
         case DataIntegrityProof.PREDICATE_CRYPTOSUITE:
             cryptosuite = object;
             break;
+
         case DataIntegrityProof.PREDICATE_DOMAIN:
             if (domains == null) {
                 domains = new ArrayList<>();
             }
             domains.add(object);
             break;
+
         case DataIntegrityProof.PREDICATE_NONCE:
             nonce = object;
             break;
+
         case DataIntegrityProof.PREDICATE_EXPIRES:
             expires = object;
             break;
+
         case DataIntegrityProof.PREDICATE_PREVIOUS_PROOF:
             if (previous == null) {
                 previous = new ArrayList<>();
             }
             previous.add(object);
             break;
+
         case DataIntegrityProof.PREDICATE_PROOF_PURPOSE:
             purpose = object;
             break;
+
         case DataIntegrityProof.PREDICATE_VERIFICATION_METHOD:
             verificationMethod = object;
             break;
+
         case Graph.PREDICATE_TYPE:
             if (!DataIntegrityProof.TYPE_URI.equals(object)) {
                 throw new IllegalArgumentException();
             }
             break;
+
         default:
             throw new IllegalArgumentException("Unsupported predicate " + predicate);
         }
@@ -158,29 +168,29 @@ public final class StaticRDFC implements GraphCanonizer {
     }
 
     /**
-     * Builds the deterministic N-Quads representation of a DataIntegrityProof for
-     * RDF Dataset Canonicalization (RDFC).
+     * Builds the deterministic N-Quads representation of a
+     * {@link DataIntegrityProof.Draft} for RDF Dataset Canonicalization (RDFC).
      *
      * <p>
      * The returned value is UTF-8 encoded and suitable for signing. The output
      * strictly follows N-Quads syntax and is deterministic for the supplied values.
      * </p>
      *
-     * @param proof
-     * @return UTF-8 encoded canonical N-Quads proof representation
+     * @param proofDraft
+     * @return UTF-8 encoded canonical N-Quads proof draft representation
      */
-    public static byte[] canonize(DataIntegrityProof proof) {
+    public static byte[] canonize(DataIntegrityProof.Draft proofDraft) {
         return canonize(
-                proof.id(),
-                proof.created() != null ? proof.created().toString() : null,
-                proof.challenge(),
-                proof.cryptosuite() != null ? proof.cryptosuite().id() : null,
-                proof.domains(),
-                proof.expires() != null ? proof.expires().toString() : null,
-                proof.nonce(),
-                proof.previous(),
-                proof.purpose() != null ? proof.purpose().uri() : null,
-                proof.verificationMethod());
+                proofDraft.id(),
+                proofDraft.created() != null ? proofDraft.created().toString() : null,
+                proofDraft.challenge(),
+                proofDraft.cryptosuite() != null ? proofDraft.cryptosuite().id() : null,
+                proofDraft.domains(),
+                proofDraft.expires() != null ? proofDraft.expires().toString() : null,
+                proofDraft.nonce(),
+                proofDraft.previous(),
+                proofDraft.purpose() != null ? proofDraft.purpose().uri() : null,
+                proofDraft.verificationMethod());
     }
 
     public static byte[] canonize(
@@ -203,68 +213,69 @@ public final class StaticRDFC implements GraphCanonizer {
             var os = new ByteArrayOutputStream();
 
             if (created != null) {
-                rdfcStatement(id, 2, created, os);
+                statement(id, 2, created, os);
             }
 
             os.write(id);
             os.write(RDFC_TEMPLATE[1]); // type
 
             if (challenge != null) {
-                rdfcStatement(id, 4, challenge, os);
+                statement(id, 4, challenge, os);
             }
             if (cryptosuite != null) {
-                rdfcStatement(id, 6, cryptosuite, os);
+                statement(id, 6, cryptosuite, os);
             }
 
             if (domains != null) {
                 if (domains.size() == 1) {
-                    rdfcStatement(id, 8, domains.getFirst(), os);
+                    statement(id, 8, domains.getFirst(), os);
 
                 } else if (domains.size() > 1) {
                     var array = domains.toArray(String[]::new);
                     Arrays.sort(array);
                     for (var el : array) {
-                        rdfcStatement(id, 8, el, os);
+                        statement(id, 8, el, os);
                     }
                 }
             }
 
             if (expires != null) {
-                rdfcStatement(id, 10, expires, os);
+                statement(id, 10, expires, os);
             }
 
             if (nonce != null) {
-                rdfcStatement(id, 12, nonce, os);
+                statement(id, 12, nonce, os);
             }
 
             if (previous != null && !previous.isEmpty()) {
                 if (previous.size() == 1) {
-                    rdfcStatement(id, 14, previous.getFirst(), os);
+                    statement(id, 14, previous.getFirst(), os);
 
                 } else if (previous.size() > 1) {
                     var array = previous.toArray(String[]::new);
                     Arrays.sort(array);
                     for (var el : array) {
-                        rdfcStatement(id, 14, el, os);
+                        statement(id, 14, el, os);
                     }
                 }
             }
 
             if (purpose != null) {
-                rdfcStatement(id, 16, purpose, os);
+                statement(id, 16, purpose, os);
             }
 
             if (vm != null) {
-                rdfcStatement(id, 18, vm, os);
+                statement(id, 18, vm, os);
             }
 
             return os.toByteArray();
+
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
-    private static <T> void rdfcStatement(byte[] id, int index, String value, OutputStream os) {
+    private static <T> void statement(byte[] id, int index, String value, OutputStream os) {
         try {
             os.write(id);
             os.write(RDFC_TEMPLATE[index]);

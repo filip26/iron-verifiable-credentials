@@ -80,7 +80,7 @@ public final class DataIntegrityProof implements Proof {
 
     private CryptoSuite cryptosuite;
 
-    private boolean isContextArray;
+//    private boolean isContextArray;
     private SequencedCollection<String> context;
 
     private String id;
@@ -253,10 +253,10 @@ public final class DataIntegrityProof implements Proof {
         return expires != null && expires.isBefore(Instant.now());
     }
 
-    public boolean isContextArray() {
-        return isContextArray;
-    }
-    
+//    public boolean isContextArray() {
+//        return isContextArray;
+//    }
+
     public Map<String, ?> compact() {
         return compact(this, false);
     }
@@ -325,7 +325,7 @@ public final class DataIntegrityProof implements Proof {
         writer.endMap();
     }
 
-    public static Function<DataIntegrityProof, byte[]> getProofCanonizer(String c14n) {
+    public static Function<DataIntegrityProof.Draft, byte[]> getProofCanonizer(String c14n) {
         return switch (c14n) {
         case Model.C14N_JCS -> StaticJCS::canonize;
         case Model.C14N_RDFC -> StaticRDFC::canonize;
@@ -335,13 +335,14 @@ public final class DataIntegrityProof implements Proof {
 
     public static class Draft {
 
+        private Object context;
         protected final DataIntegrityProof proof;
 
         // TODO public?!
         public Draft(CryptoSuite cryptosuite) {
+            this.context = List.of();
             this.proof = new DataIntegrityProof();
             this.proof.cryptosuite = cryptosuite;
-            this.proof.isContextArray = true;
             this.proof.context = List.of();
             this.proof.previousProof = List.of();
         }
@@ -350,30 +351,12 @@ public final class DataIntegrityProof implements Proof {
             return canonize(DataIntegrityProof.getProofCanonizer(c14n));
         }
 
-        protected byte[] canonize(Function<DataIntegrityProof, byte[]> canonizer) {
+        protected byte[] canonize(Function<DataIntegrityProof.Draft, byte[]> canonizer) {
 
             Objects.requireNonNull(canonizer);
 
-            proof.canonicalPayload = canonizer.apply(proof);
+            proof.canonicalPayload = canonizer.apply(this);
             return proof.canonicalPayload;
-        }
-
-        // TODO clone?
-        public Draft proof(DataIntegrityProof source) {
-            proof.canonicalPayload = source.canonicalPayload;
-            proof.challenge = source.challenge;
-            proof.context = source.context;
-            proof.isContextArray = source.isContextArray;
-            proof.created = source.created;
-            proof.cryptosuite = source.cryptosuite;
-            proof.domain = source.domain;
-            proof.expires = source.expires;
-            proof.id = source.id;
-            proof.nonce = source.nonce;
-            proof.previousProof = source.previousProof;
-            proof.purpose = source.purpose;
-            proof.verificationMethod = source.verificationMethod;
-            return this;
         }
 
         /**
@@ -394,10 +377,12 @@ public final class DataIntegrityProof implements Proof {
                 switch (entry.getKey()) {
                 case "@context":
                     if (entry.getValue() instanceof Collection<?> col) {
-                        context(col.stream().map(String.class::cast).toList());
+                        context = col;
+                        proof.context = col.stream().map(String.class::cast).toList();
 
                     } else if (entry.getValue() instanceof String uri) {
-                        context(uri);
+                        context = uri;
+                        proof.context = List.of(uri);
 
                     } else {
                         throw new IllegalArgumentException();
@@ -502,14 +487,22 @@ public final class DataIntegrityProof implements Proof {
         }
 
         public Draft context(String context) {
-            proof.isContextArray = false;
+            this.context = context;
             return context(List.of(context));
         }
 
         public Draft context(SequencedCollection<String> context) {
+            this.context = context;
             proof.context = context;
             return this;
         }
+
+//TODO         public Draft canonizer(Function<DataIntegrityProof, byte[]> canonizer) {
+//
+//            Objects.requireNonNull(canonizer);
+//
+//            return proof.canonicalPayload;
+//        }
 
         public DataIntegrityProof unsigned() {
             return proof;
@@ -524,12 +517,12 @@ public final class DataIntegrityProof implements Proof {
             return proof.cryptosuite;
         }
 
-        public Collection<String> context() {
-            return proof.context;
+        public Object context() {
+            return context;
         }
 
-        public Collection<String> previous() {
-            return proof.previous() != null ? proof.previous() : Set.of();
+        public SequencedCollection<String> previous() {
+            return proof.previous() != null ? proof.previous() : List.of();
         }
 
         public Purpose purpose() {
@@ -538,6 +531,30 @@ public final class DataIntegrityProof implements Proof {
 
         public Instant created() {
             return proof.created;
+        }
+
+        public String challenge() {
+            return proof.challenge;
+        }
+
+        public SequencedCollection<String> domains() {
+            return proof.domain;
+        }
+
+        public Instant expires() {
+            return proof.expires;
+        }
+
+        public String nonce() {
+            return proof.nonce;
+        }
+
+        public String verificationMethod() {
+            return proof.verificationMethod;
+        }
+
+        public String id() {
+            return proof.id;
         }
     }
 
@@ -575,6 +592,7 @@ public final class DataIntegrityProof implements Proof {
                     di.id = stringValue(entry.getValue());
                     break;
                 case KEY_TYPE, "@context":
+//FIXME, if context is missing set document
                     // skip, already processed
                     break;
                 case KEY_CRYPTOSUITE:

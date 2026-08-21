@@ -17,12 +17,12 @@
     "alumniOf": "The School of Examples"
   },
   "proof": {
-    "@context": "https://w3id.org/security/data-integrity/v2",
+    "@context": ["https://w3id.org/security/data-integrity/v2"],
     "type": "DataIntegrityProof",
     "cryptosuite": "eddsa-jcs-2022",
     "created": "2023-02-24T23:36:38Z",
     "verificationMethod": "did:key:z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2#z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2",
     "proofPurpose": "assertionMethod",
-    "proofValue": "z22fNUnJaYz2tnAWXJZVY3RAH6RUSLkPFwaN1rqPxTKoLm37DhcDKz1mMTdhcZDQ2g3bM47fvPKeuSRopjZgjhzHh"
+    "proofValue": "zy25bGuNs3FKauRyuKpGAqnUnNgywB9Jxto95SY7WNpKqffrGvzX4Fwob8Ak6zZotJLpaDgGwANfdYx5WDEixCfR"
   }
 }

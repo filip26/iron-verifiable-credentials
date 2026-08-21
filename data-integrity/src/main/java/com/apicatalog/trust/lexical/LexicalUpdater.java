@@ -86,17 +86,6 @@ public class LexicalUpdater implements Document.Updater {
 
         var compacted = new LinkedHashMap<String, Object>(document.size() + 2);
         compacted.putAll(document);
-//
-//        if (contexts != null && !contexts.isEmpty()) {
-//
-//            var documentContext = accessor.context();
-//
-//            // TODO check if proof contexts are equal to the document context
-//            // yes -> proof contains no contexts
-//            // no -> keep proof compacted with context
-//
-//            compacted.put(model.vocab().context(), merge(accessor.context(), contexts));
-//        }
 
         if (proofs != null && !proofs.isEmpty()) {
             compacted.put(model.vocab().proof(),
@@ -117,13 +106,6 @@ public class LexicalUpdater implements Document.Updater {
     @Override
     public Vocab vocab() {
         return model.vocab();
-    }
-
-    private static Collection<Object> merge(Collection<?> documentContext, Collection<?> proofContext) {
-        var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
-        result.addAll(documentContext);
-        result.addAll(proofContext);
-        return result;
     }
 
 //    private static boolean areCollectionsEqualUnordered(Collection<?> c1, Collection<?> c2) {

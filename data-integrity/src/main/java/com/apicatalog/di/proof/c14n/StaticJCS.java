@@ -34,44 +34,44 @@ public final class StaticJCS {
             .toArray(byte[][]::new);
 
     /**
-     * Builds the canonical {@link DataIntegrityProof} (JCS) for signing.
+     * Builds the canonical {@link DataIntegrityProof.Draft} (JCS) for signing.
      *
-     * @param proof
+     * @param proofDraft
      * @return UTF-8 encoded JSON proof bytes
      */
-    public static byte[] canonize(DataIntegrityProof proof) {
+    public static byte[] canonize(DataIntegrityProof.Draft proofDraft) {
         try {
+            // proof.isContextArray() ||
             var os = new ByteArrayOutputStream();
             os.write('{');
 
             var next = false;
 
-            if (proof.context() != null && !proof.context().isEmpty()) {
-                if (proof.isContextArray() || proof.context().size() > 1) {
-                    next = sequence(proof.context(), 11, os, next);
-                } else {
-                    next = entry(11, proof.context().getFirst(), os, next);
-                }
+            if (proofDraft.context() instanceof Collection context) {
+                next = collection(11, context, os, next);
+
+            } else if (proofDraft.context() instanceof String context) {
+                next = entry(11, context, os, next);
             }
 
-            next = entry(1, proof.challenge(), os, next);
-            next = entry(2, proof.created(), Instant::toString, os, next);
-            next = entry(3, proof.cryptosuite(), CryptoSuite::id, os, next);
+            next = entry(1, proofDraft.challenge(), os, next);
+            next = entry(2, proofDraft.created(), Instant::toString, os, next);
+            next = entry(3, proofDraft.cryptosuite(), CryptoSuite::id, os, next);
 
-            if (proof.domains() != null && !proof.domains().isEmpty()) {
-                next = sequence(proof.domains(), 4, os, next);
+            if (proofDraft.domains() != null && !proofDraft.domains().isEmpty()) {
+                next = sequence(proofDraft.domains(), 4, os, next);
             }
 
-            next = entry(5, proof.expires(), Instant::toString, os, next);
-            next = entry(6, proof.id(), os, next);
-            next = entry(7, proof.nonce(), os, next);
+            next = entry(5, proofDraft.expires(), Instant::toString, os, next);
+            next = entry(6, proofDraft.id(), os, next);
+            next = entry(7, proofDraft.nonce(), os, next);
 
-            if (proof.previous() != null && !proof.previous().isEmpty()) {
-                next = sequence(proof.previous(), 8, os, next);
+            if (proofDraft.previous() != null && !proofDraft.previous().isEmpty()) {
+                next = sequence(proofDraft.previous(), 8, os, next);
             }
 
-            if (proof.purpose() != null) {
-                next = entry(9, proof.purpose().key(), os, next);
+            if (proofDraft.purpose() != null) {
+                next = entry(9, proofDraft.purpose().key(), os, next);
             }
 
             if (next) {
@@ -80,7 +80,7 @@ public final class StaticJCS {
 
             os.write(JCS_TEMPLATE[0]); // type
 
-            entry(10, proof.verificationMethod(), os, true);
+            entry(10, proofDraft.verificationMethod(), os, true);
 
             os.write('}');
 
