@@ -331,28 +331,20 @@ public final class DataIntegrityProof implements Proof {
 
     public static class Draft {
 
-        private Object context;
         protected final DataIntegrityProof proof;
+
+        protected Object context;
+        protected Function<DataIntegrityProof.Draft, byte[]> canonizer;
 
         // TODO public?!
         public Draft(CryptoSuite cryptosuite) {
             this.context = List.of();
+            this.canonizer = DataIntegrityProof.getProofCanonizer(cryptosuite.c14n());
             this.proof = new DataIntegrityProof();
             this.proof.cryptosuite = cryptosuite;
+            this.proof.canonicalPayload = null;
             this.proof.context = List.of();
             this.proof.previousProof = List.of();
-        }
-
-        protected byte[] canonize(String c14n) {
-            return canonize(DataIntegrityProof.getProofCanonizer(c14n));
-        }
-
-        protected byte[] canonize(Function<DataIntegrityProof.Draft, byte[]> canonizer) {
-
-            Objects.requireNonNull(canonizer);
-
-            proof.canonicalPayload = canonizer.apply(this);
-            return proof.canonicalPayload;
         }
 
         /**
@@ -434,17 +426,17 @@ public final class DataIntegrityProof implements Proof {
         }
 
         public Draft proof(DataIntegrityProof source) {
-            proof.canonicalPayload = source.canonicalPayload;
             context(source.context);
-            challenge(source.challenge);
-            created(source.created);
-            domain(source.domain);
-            expires(source.expires);
-            id(source.id);
-            nonce(source.nonce);
-            previousProof(source.previousProof);
-            purpose(source.purpose);
-            verificationMethod(source.verificationMethod);
+            proof.canonicalPayload = source.canonicalPayload;
+            proof.challenge = source.challenge;
+            proof.created = source.created;
+            proof.domain = source.domain;
+            proof.expires = source.expires;
+            proof.id = source.id;
+            proof.nonce = source.nonce;
+            proof.previousProof = source.previousProof;
+            proof.purpose = source.purpose;
+            proof.verificationMethod = source.verificationMethod;
             return this;
         }
 
@@ -508,14 +500,16 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
-//TODO         public Draft canonizer(Function<DataIntegrityProof, byte[]> canonizer) {
-//
-//            Objects.requireNonNull(canonizer);
-//
-//            return proof.canonicalPayload;
-//        }
+        public Draft c14n(Function<DataIntegrityProof.Draft, byte[]> canonizer) {
+            Objects.requireNonNull(canonizer);
+            this.canonizer = canonizer;
+            return this;
+        }
 
         public DataIntegrityProof unsigned() {
+            if (proof.canonicalPayload == null) {
+                proof.canonicalPayload = canonizer.apply(this);
+            }
             return proof;
         }
 

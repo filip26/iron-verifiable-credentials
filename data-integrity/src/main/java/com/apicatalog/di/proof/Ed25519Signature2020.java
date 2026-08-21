@@ -156,7 +156,7 @@ public final class Ed25519Signature2020 implements Proof {
             context = List.of(Ed25519Signature2020.CONTEXT_URI);
 
         } else if (!context.contains(Ed25519Signature2020.CONTEXT_URI)) {
-            var tmp = new LinkedHashSet<>(context.size());
+            var tmp = new LinkedHashSet<>(context.size() + 1);
             tmp.addAll(context);
             tmp.add(Ed25519Signature2020.CONTEXT_URI);
             context = tmp;

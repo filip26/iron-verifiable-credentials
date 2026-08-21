@@ -149,12 +149,11 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
         signature.signatureAlgorithm = base.signatureAlgorithm;
         signature.signatures = signatures;
 
-        // FIXME use close function
+        var baseProof = (DataIntegrityProof) base.proof;
 
-//        var x = ((DataIntegrityProof) base.proof).clone();
-        var d = new DataIntegrityProof.Draft(((DataIntegrityProof) base.proof).cryptosuite());
-        d.proof(((DataIntegrityProof) base.proof));
-        signature.proof = d.sign(signature);
+        signature.proof = new DataIntegrityProof.Draft(baseProof.cryptosuite())
+                .proof(baseProof)
+                .sign(signature);
 
         return signature;
     }

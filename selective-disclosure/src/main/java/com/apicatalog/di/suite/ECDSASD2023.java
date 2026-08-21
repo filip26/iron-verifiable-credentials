@@ -105,7 +105,7 @@ public final class ECDSASD2023 implements CryptoSuite {
         return Model.C14N_RDFC;
     }
 
-    public static class ProofDraft extends DataIntegrityProof.Draft {
+    public static final class ProofDraft extends DataIntegrityProof.Draft {
 
         final Function<byte[], Multicodec> proofPublicKeyDecoder;
 
@@ -127,8 +127,6 @@ public final class ECDSASD2023 implements CryptoSuite {
             case P384 -> Digestor.SHA_384;
             default -> throw new IllegalArgumentException();
             };
-
-            canonize(Model.C14N_RDFC);
 
             var unsignedProof = unsigned();
 
