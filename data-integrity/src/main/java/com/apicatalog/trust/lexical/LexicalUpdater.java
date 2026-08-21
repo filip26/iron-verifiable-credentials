@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
 
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
@@ -12,71 +16,94 @@ import com.apicatalog.trust.model.Model.Vocab;
 public class LexicalUpdater implements Document.Updater {
 
     private final LexicalModel model;
-    private final LexicalAccessor adapter;
+    private final LexicalAccessor accessor;
 
-    private Collection<Map<String, ?>> newProofs;
-    private Collection<Object> contexts = null;
+    private Collection<Entry<?, Map<String, ?>>> proofsEntries;
 
     public LexicalUpdater(LexicalModel model, LexicalAccessor adapter) {
         this.model = model;
-        this.adapter = adapter;
+        this.accessor = adapter;
     }
 
     @Override
-    public void addProof(Collection<?> context, Map<String, ?> compacted) {
-        if (newProofs == null) {
-            newProofs = new ArrayList<>();
+    public void addProof(Object context, Map<String, ?> compacted) {
+
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(compacted);
+
+        if (proofsEntries == null) {
+            proofsEntries = new ArrayList<>();
         }
-        newProofs.add(compacted);
-        if (context != null && !context.isEmpty()) {
-            if (contexts == null) {
-                contexts = new LinkedHashSet<>(context.size() * 2);
-            }
-            contexts.addAll(context);
-        }
+        proofsEntries.add(Map.entry(context, compacted));
     }
 
     @Override
     public Map<String, ?> compacted() {
 
-        Collection<Map<String, ?>> proofs = null;
+        List<Map<String, ?>> proofs = null;
 
-        if (adapter.proofs() > 0) {
+        // existing proofs
+        if (accessor.proofs() > 0) {
             if (proofs == null) {
-                proofs = new ArrayList<>(adapter.proofs() + (newProofs != null ? newProofs.size() : 0));
+                proofs = new ArrayList<>(accessor.proofs() + (proofsEntries != null ? proofsEntries.size() : 0));
             }
-            for (int i = 0; i < adapter.proofs(); i++) {
-                proofs.add(adapter.proof(i));
+            for (int i = 0; i < accessor.proofs(); i++) {
+                proofs.add(accessor.proof(i));
             }
         }
-        
-        if (newProofs != null) {
+        IO.println("1 > " + accessor.context());
+        IO.println("1 > " + accessor.document());
+        // new proofs
+        if (proofsEntries != null && !proofsEntries.isEmpty()) {
+
             if (proofs == null) {
-                proofs = newProofs;
-            } else {
-                for (var proof : newProofs) {
-                    proofs.add(proof);
+                proofs = new ArrayList<>(proofsEntries.size());
+            }
+
+            for (var proofEntry : proofsEntries) {
+
+                final Map<String, Object> proof;
+
+                if (!proofEntry.getKey().equals(accessor.context())) {
+                    // add @context to the proof
+                    proof = new LinkedHashMap<>(proofEntry.getValue());
+                    
+                    proof.put(model.vocab().context(), proofEntry.getKey());
+
+                } else {
+                    proof = (Map<String, Object>) proofEntry.getValue();
                 }
+
+                proofs.add(proof);
             }
         }
 
         if (proofs == null) {
-            return adapter.document();
+            return accessor.document();
         }
 
-        var document = adapter.document();
-        
+        var document = accessor.document();
+
         var compacted = new LinkedHashMap<String, Object>(document.size() + 2);
         compacted.putAll(document);
+//
+//        if (contexts != null && !contexts.isEmpty()) {
+//
+//            var documentContext = accessor.context();
+//
+//            // TODO check if proof contexts are equal to the document context
+//            // yes -> proof contains no contexts
+//            // no -> keep proof compacted with context
+//
+//            compacted.put(model.vocab().context(), merge(accessor.context(), contexts));
+//        }
 
-        if (contexts != null) {
-            compacted.put(model.vocab().context(), merge(adapter.context(), contexts));
+        if (proofs != null && !proofs.isEmpty()) {
+            compacted.put(model.vocab().proof(),
+                    proofs.size() == 1
+                            ? proofs.iterator().next()
+                            : proofs);
         }
-
-        compacted.put(model.vocab().proof(),
-                proofs.size() == 1
-                        ? proofs.iterator().next()
-                        : proofs);
 
         return compacted;
 
@@ -84,7 +111,7 @@ public class LexicalUpdater implements Document.Updater {
 
     @Override
     public PropertyMapPayloadGenerator createPayload() {
-        return model.createPayload(adapter);
+        return model.createPayload(accessor);
     }
 
     @Override
@@ -98,4 +125,30 @@ public class LexicalUpdater implements Document.Updater {
         result.addAll(proofContext);
         return result;
     }
+
+//    private static boolean areCollectionsEqualUnordered(Collection<?> c1, Collection<?> c2) {
+//        if (c1.size() != c2.size()) {
+//            return false;
+//        }
+//
+//        Map<?, Long> map1 = c1.stream()
+//                .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+//
+//        Map<?, Long> map2 = c2.stream()
+//                .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+//
+//        return map1.equals(map2);
+//    }
+
+//    private static boolean areSortedEqual(Collection<?> l1, Collection<?> l2) {
+//        if (l1.size() != l2.size()) return false;
+//        
+//        var sorted1 = new ArrayList<Object>(l1);
+//        var sorted2 = new ArrayList<Object>(l2);
+//        Collections.sort(sorted1);
+//        Collections.sort(sorted2);
+//        
+//        return sorted1.equals(sorted2);
+//    }
+       
 }

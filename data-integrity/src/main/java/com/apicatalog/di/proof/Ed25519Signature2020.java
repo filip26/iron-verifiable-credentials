@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -69,6 +68,10 @@ public final class Ed25519Signature2020 implements Proof {
     private Ed25519Signature2020() {
     }
 
+    public Map<String, ?> compact() {
+        return compact(this);
+    }
+
     public static Map<String, ?> compact(Ed25519Signature2020 proof) {
         var composer = new NativeComposer<Map<String, ? extends Object>>();
         compact(proof, composer);
@@ -115,15 +118,15 @@ public final class Ed25519Signature2020 implements Proof {
     }
 
     public static Draft newDraft() {
-        return new Draft(new Ed25519Signature2020(), List.of());
+        return new Draft(new Ed25519Signature2020(), List.of(Ed25519Signature2020.CONTEXT_URI));
     }
 
-    public static Draft newDraft(Map<String, ?> map) {
+    public static Draft newDraft(Map<String, ?> options) {
 
         var proof = new Ed25519Signature2020();
         Collection<?> context = List.of();
 
-        for (var entry : map.entrySet()) {
+        for (var entry : options.entrySet()) {
             switch (entry.getKey()) {
             case "@context":
                 if (entry.getValue() instanceof Collection<?> col) {
@@ -150,7 +153,7 @@ public final class Ed25519Signature2020 implements Proof {
 
         // setup default context
         if (context.isEmpty()) {
-            context = Set.of(Ed25519Signature2020.CONTEXT_URI);
+            context = List.of(Ed25519Signature2020.CONTEXT_URI);
 
         } else if (!context.contains(Ed25519Signature2020.CONTEXT_URI)) {
             var tmp = new LinkedHashSet<>(context.size());

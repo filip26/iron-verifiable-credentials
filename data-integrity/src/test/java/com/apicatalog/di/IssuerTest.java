@@ -92,7 +92,7 @@ public class IssuerTest {
         }
 
         final var context = ContextAwareResolver.getContexts(document);
-        
+
         Proof proof = null;
         Map<String, ?> issued = null;
 
@@ -105,42 +105,51 @@ public class IssuerTest {
 
             assertTrue(proofDraft.hasRequired());
 
-            //TODO check document level contexts for proof presence
-            
             var updater = getUpdater(cryptosuite.c14n()).apply(context, document);
 
             var payload = updater.createPayload();
 
             payload.withProofs(proofDraft.previous());
 
-            proof = proofDraft.sign(
+            var diProof = proofDraft.sign(
                     signatureAlgorithm,
                     signer,
                     Resources.DIGEST_FACTORY,
                     payload.digestible());
+IO.println("IS 1: " + new String(diProof.signature().payload().canonicalPayload()));
+IO.println("IS 2: " + new String(diProof.canonicalPayload()));
+            updater.addProof(
+                    diProof.context(),
+                    diProof.compact());
 
-            updater.addProof(proofDraft.context(), DataIntegrityProof.compact((DataIntegrityProof) proof, false));
+            proof = diProof;
+
             issued = updater.compacted();
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 
             assertEquals(Ed25519Signature2020.SIGNATURE_ALGORITHM, signatureAlgorithm);
 
-            var proofDraft = Ed25519Signature2020.newDraft((Map<String, Object>) options);
+            // TODO check document level contexts for proof presence
 
-            //TODO check document level contexts for proof presence
-            
             var updater = Resources.SEMANTIC_MODEL.createUpdater(context, document);
 
             var payload = updater.createPayload();
 
-            proof = Ed25519Signature2020.generateProof(
+            var proofDraft = Ed25519Signature2020.newDraft((Map<String, Object>) options);
+
+            var edProof = Ed25519Signature2020.generateProof(
                     signer,
                     Resources.DIGEST_FACTORY,
                     proofDraft,
                     payload.digestible());
 
-            updater.addProof(proofDraft.context(), Ed25519Signature2020.compact((Ed25519Signature2020) proof));
+            updater.addProof(
+                    edProof.context(),
+                    edProof.compact());
+
+            proof = edProof;
+
             issued = updater.compacted();
 
         } else {

@@ -80,6 +80,7 @@ public final class DataIntegrityProof implements Proof {
 
     private CryptoSuite cryptosuite;
 
+    private boolean isContextArray;
     private SequencedCollection<String> context;
 
     private String id;
@@ -96,70 +97,6 @@ public final class DataIntegrityProof implements Proof {
     private byte[] canonicalPayload;
 
     private DataIntegrityProof() {
-    }
-
-    public static Map<String, ?> compact(DataIntegrityProof proof, boolean addContext) {
-        var composer = new NativeComposer<Map<String, ? extends Object>>();
-        compact(proof, composer, addContext);
-        return composer.compose();
-    }
-
-    public static void compact(DataIntegrityProof proof, TreeEmitter emitter, boolean addContext) {
-
-        var writer = Tree.newPropertyTree(emitter).beginMap();
-
-        if (addContext && proof.context != null && !proof.context.isEmpty()) {
-
-            writer.beginSequence("@context");
-
-            for (var ctx : proof.context) {
-                writer.element(ctx);
-            }
-
-            writer.endSequence();
-        }
-
-        writer.entry(KEY_ID, proof.id())
-                .entry(KEY_TYPE, proof.type())
-                .entry(KEY_CRYPTOSUITE, proof.cryptosuite(), CryptoSuite::id)
-                .entry(KEY_CREATED, proof.created(), Instant::toString)
-                .entry(KEY_EXPIRES, proof.expires(), Instant::toString);
-
-        if (proof.domains() != null && !proof.domains().isEmpty()) {
-            if (proof.domains().size() == 1) {
-                writer.entry(KEY_DOMAIN, proof.domains().iterator().next());
-            } else {
-                writer.beginSequence(KEY_DOMAIN);
-                for (var domain : proof.domains()) {
-                    writer.element(domain);
-                }
-                writer.endSequence();
-            }
-        }
-
-        writer.entry(KEY_CHALLENGE, proof.challenge())
-                .entry(KEY_NONCE, proof.nonce())
-                .entry(KEY_VERIFICATION_METHOD, proof.verificationMethod())
-                .entry(KEY_PURPOSE, proof.purpose() != null ? proof.purpose().key() : null);
-
-        if (proof.cryptosuite() != null) {
-            writer.entry(KEY_PROOF_VALUE, proof.signature(), proof.cryptosuite()::encode);
-        } else {
-            writer.entry(KEY_PROOF_VALUE, proof.signature(), Signature::toString);
-        }
-
-        if (proof.previous() != null && !proof.previous().isEmpty()) {
-            if (proof.previous().size() == 1) {
-                writer.entry(KEY_PREVIOUS_PROOF, proof.previous().iterator().next());
-            } else {
-                writer.beginSequence(KEY_PREVIOUS_PROOF);
-                for (var previousProof : proof.previous()) {
-                    writer.element(previousProof);
-                }
-                writer.endSequence();
-            }
-        }
-        writer.endMap();
     }
 
     /**
@@ -316,6 +253,78 @@ public final class DataIntegrityProof implements Proof {
         return expires != null && expires.isBefore(Instant.now());
     }
 
+    public boolean isContextArray() {
+        return isContextArray;
+    }
+    
+    public Map<String, ?> compact() {
+        return compact(this, false);
+    }
+
+    public static Map<String, ?> compact(DataIntegrityProof proof, boolean addContext) {
+        var composer = new NativeComposer<Map<String, ? extends Object>>();
+        compact(proof, composer, addContext);
+        return composer.compose();
+    }
+
+    public static void compact(DataIntegrityProof proof, TreeEmitter emitter, boolean addContext) {
+
+        var writer = Tree.newPropertyTree(emitter).beginMap();
+
+        if (addContext && proof.context != null && !proof.context.isEmpty()) {
+
+            writer.beginSequence("@context");
+
+            for (var ctx : proof.context) {
+                writer.element(ctx);
+            }
+
+            writer.endSequence();
+        }
+
+        writer.entry(KEY_ID, proof.id())
+                .entry(KEY_TYPE, proof.type())
+                .entry(KEY_CRYPTOSUITE, proof.cryptosuite(), CryptoSuite::id)
+                .entry(KEY_CREATED, proof.created(), Instant::toString)
+                .entry(KEY_EXPIRES, proof.expires(), Instant::toString);
+
+        if (proof.domains() != null && !proof.domains().isEmpty()) {
+            if (proof.domains().size() == 1) {
+                writer.entry(KEY_DOMAIN, proof.domains().iterator().next());
+            } else {
+                writer.beginSequence(KEY_DOMAIN);
+                for (var domain : proof.domains()) {
+                    writer.element(domain);
+                }
+                writer.endSequence();
+            }
+        }
+
+        writer.entry(KEY_CHALLENGE, proof.challenge())
+                .entry(KEY_NONCE, proof.nonce())
+                .entry(KEY_VERIFICATION_METHOD, proof.verificationMethod())
+                .entry(KEY_PURPOSE, proof.purpose() != null ? proof.purpose().key() : null);
+
+        if (proof.cryptosuite() != null) {
+            writer.entry(KEY_PROOF_VALUE, proof.signature(), proof.cryptosuite()::encode);
+        } else {
+            writer.entry(KEY_PROOF_VALUE, proof.signature(), Signature::toString);
+        }
+
+        if (proof.previous() != null && !proof.previous().isEmpty()) {
+            if (proof.previous().size() == 1) {
+                writer.entry(KEY_PREVIOUS_PROOF, proof.previous().iterator().next());
+            } else {
+                writer.beginSequence(KEY_PREVIOUS_PROOF);
+                for (var previousProof : proof.previous()) {
+                    writer.element(previousProof);
+                }
+                writer.endSequence();
+            }
+        }
+        writer.endMap();
+    }
+
     public static Function<DataIntegrityProof, byte[]> getProofCanonizer(String c14n) {
         return switch (c14n) {
         case Model.C14N_JCS -> StaticJCS::canonize;
@@ -332,6 +341,9 @@ public final class DataIntegrityProof implements Proof {
         public Draft(CryptoSuite cryptosuite) {
             this.proof = new DataIntegrityProof();
             this.proof.cryptosuite = cryptosuite;
+            this.proof.isContextArray = true;
+            this.proof.context = List.of();
+            this.proof.previousProof = List.of();
         }
 
         protected byte[] canonize(String c14n) {
@@ -351,6 +363,7 @@ public final class DataIntegrityProof implements Proof {
             proof.canonicalPayload = source.canonicalPayload;
             proof.challenge = source.challenge;
             proof.context = source.context;
+            proof.isContextArray = source.isContextArray;
             proof.created = source.created;
             proof.cryptosuite = source.cryptosuite;
             proof.domain = source.domain;
@@ -377,8 +390,6 @@ public final class DataIntegrityProof implements Proof {
         // TODO ?!?!
         public Draft options(Map<String, Object> options) {
 
-            previousProof(List.of());
-
             for (var entry : options.entrySet()) {
                 switch (entry.getKey()) {
                 case "@context":
@@ -386,7 +397,7 @@ public final class DataIntegrityProof implements Proof {
                         context(col.stream().map(String.class::cast).toList());
 
                     } else if (entry.getValue() instanceof String uri) {
-                        context(List.of(uri));
+                        context(uri);
 
                     } else {
                         throw new IllegalArgumentException();
@@ -490,6 +501,16 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
+        public Draft context(String context) {
+            proof.isContextArray = false;
+            return context(List.of(context));
+        }
+
+        public Draft context(SequencedCollection<String> context) {
+            proof.context = context;
+            return this;
+        }
+
         public DataIntegrityProof unsigned() {
             return proof;
         }
@@ -499,17 +520,12 @@ public final class DataIntegrityProof implements Proof {
             return proof;
         }
 
-        public Draft context(SequencedCollection<String> context) {
-            proof.context = context;
-            return this;
-        }
-
         public CryptoSuite cryptosuite() {
             return proof.cryptosuite;
         }
 
         public Collection<String> context() {
-            return proof.context();
+            return proof.context;
         }
 
         public Collection<String> previous() {
@@ -521,9 +537,8 @@ public final class DataIntegrityProof implements Proof {
         }
 
         public Instant created() {
-            return proof.created();
+            return proof.created;
         }
-
     }
 
     public static class PropertyMapMapper implements PropertyProofMapper {

@@ -1,6 +1,8 @@
 package com.apicatalog.di.suite;
 
 import java.security.SignatureException;
+import java.util.Map;
+import java.util.SequencedCollection;
 
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.multibase.Multibase;

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.SequencedCollection;
 
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
@@ -29,18 +32,32 @@ public final class GraphUpdater implements Document.Updater {
     }
 
     @Override
-    public void addProof(Collection<?> context, Map<String, ?> compacted) {
+    public void addProof(Object context, Map<String, ?> compacted) {
+
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(compacted);
+
         if (newProofs == null) {
             newProofs = new ArrayList<>();
         }
         newProofs.add(compacted);
 
-        if (context != null) {
-            if (contexts == null) {
-                contexts = new LinkedHashSet<>(context.size());
-            }
-            contexts.addAll(context);
+        final SequencedCollection<?> sequence;
+
+        if (context instanceof SequencedCollection<?> col) {
+            sequence = col;
+        } else if (context instanceof String uri) {
+            sequence = List.of(uri);
+
+        } else {
+            throw new ClassCastException();
         }
+
+        if (contexts == null) {
+            contexts = new LinkedHashSet<>(sequence.size() * 3);
+        }
+
+        contexts.addAll(sequence);
     }
 
     @Override

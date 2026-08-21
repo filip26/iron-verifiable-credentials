@@ -47,7 +47,11 @@ public final class StaticJCS {
             var next = false;
 
             if (proof.context() != null && !proof.context().isEmpty()) {
-                next = sequence(proof.context(), 11, os, next);
+                if (proof.isContextArray() || proof.context().size() > 1) {
+                    next = sequence(proof.context(), 11, os, next);
+                } else {
+                    next = entry(11, proof.context().getFirst(), os, next);
+                }
             }
 
             next = entry(1, proof.challenge(), os, next);

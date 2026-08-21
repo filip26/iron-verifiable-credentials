@@ -1,6 +1,5 @@
 package com.apicatalog.trust;
 
-import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.trust.model.Model.Vocab;
@@ -21,7 +20,7 @@ public interface Document {
 
         PayloadGenerator createPayload();
 
-        void addProof(Collection<?> context, Map<String, ?> compacted);
+        void addProof(Object context, Map<String, ?> compacted);
 
         Map<String, ?> compacted();
 

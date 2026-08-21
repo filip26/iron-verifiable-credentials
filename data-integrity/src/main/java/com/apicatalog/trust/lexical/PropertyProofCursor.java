@@ -74,7 +74,9 @@ public class PropertyProofCursor implements ProofCursor {
 
     @Override
     public boolean isAccepted() {
-        return currentEntry != null && readers[currentIndex].accepts(currentEntry);
+        return currentEntry != null
+                && readers[currentIndex] != null
+                && readers[currentIndex].accepts(currentEntry);
     }
 
     @Override

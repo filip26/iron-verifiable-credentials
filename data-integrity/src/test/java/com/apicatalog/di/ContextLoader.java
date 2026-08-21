@@ -23,6 +23,9 @@ public class ContextLoader implements DocumentLoader {
             SecurityContexts.ED25519_2020_V1,
             context(SecurityContexts.ED25519_2020_V1),
 
+            SecurityContexts.VCDI_V2,
+            context(SecurityContexts.VCDI_V2),
+
             "https://www.w3.org/ns/credentials/examples/v2",
             resource("examples-v2.json"),
 
