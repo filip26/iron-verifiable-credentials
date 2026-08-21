@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.trust.model.ContextAwareResolver;
 
@@ -25,7 +24,7 @@ class DeriveTest {
         var signed = Resources.getMap(resource + ".signed.json");
 
         var context = ContextAwareResolver.getContexts(signed);
-        
+
         var processor = Resources.SEMANTIC_MODEL.createAccessor(context, signed);
 
         var cursor = processor.createProofCursor();
@@ -56,7 +55,7 @@ class DeriveTest {
 
         var document = new LinkedHashMap<String, Object>(derivedSignature.payload().compacted().get());
 
-        document.put("proof", DataIntegrityProof.compact(derivedSignature.proof(), false));
+        document.put("proof", derivedSignature.proof().compact());
 
         var expected = Resources.getMap(resource + ".derived.json");
 

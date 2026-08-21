@@ -150,32 +150,14 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
         signature.signatures = signatures;
 
         // FIXME use close function
+
+//        var x = ((DataIntegrityProof) base.proof).clone();
         var d = new DataIntegrityProof.Draft(((DataIntegrityProof) base.proof).cryptosuite());
         d.proof(((DataIntegrityProof) base.proof));
-        signature.proof = d.signed(signature);
+        signature.proof = d.sign(signature);
 
         return signature;
     }
-    
-//  // TODO clone?
-//  public Draft proof(DataIntegrityProof source) {
-//      context = source.context;
-//      proof.canonicalPayload = source.canonicalPayload;
-//      proof.challenge = source.challenge;
-//      proof.context = source.context;
-////      proof.isContextArray = source.isContextArray;
-//      proof.created = source.created;
-//      proof.cryptosuite = source.cryptosuite;
-//      proof.domain = source.domain;
-//      proof.expires = source.expires;
-//      proof.id = source.id;
-//      proof.nonce = source.nonce;
-//      proof.previousProof = source.previousProof;
-//      proof.purpose = source.purpose;
-//      proof.verificationMethod = source.verificationMethod;
-//      return this;
-//  }
-
 
     @Override
     public byte[] toByteArray() {

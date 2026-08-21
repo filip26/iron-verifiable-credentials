@@ -116,8 +116,7 @@ public class IssuerTest {
                     signer,
                     Resources.DIGEST_FACTORY,
                     payload.digestible());
-IO.println("IS 1: " + new String(diProof.signature().payload().canonicalPayload()));
-IO.println("IS 2: " + new String(diProof.canonicalPayload()));
+
             updater.addProof(
                     proofDraft.context(),
                     diProof.compact());

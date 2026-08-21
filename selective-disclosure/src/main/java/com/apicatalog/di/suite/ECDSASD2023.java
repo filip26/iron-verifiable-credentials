@@ -143,7 +143,7 @@ public final class ECDSASD2023 implements CryptoSuite {
                     unsignedProof,
                     payload);
 
-            return signed(signature);
+            return sign(signature);
         }
     }
 

@@ -253,21 +253,17 @@ public final class DataIntegrityProof implements Proof {
         return expires != null && expires.isBefore(Instant.now());
     }
 
-//    public boolean isContextArray() {
-//        return isContextArray;
-//    }
-
     public Map<String, ?> compact() {
-        return compact(this, false);
+        return compact(false);
     }
 
-    public static Map<String, ?> compact(DataIntegrityProof proof, boolean addContext) {
+    public Map<String, ?> compact(boolean addContext) {
         var composer = new NativeComposer<Map<String, ? extends Object>>();
-        compact(proof, composer, addContext);
+        compact(this, composer, addContext);
         return composer.compose();
     }
 
-    public static void compact(DataIntegrityProof proof, TreeEmitter emitter, boolean addContext) {
+    private static void compact(DataIntegrityProof proof, TreeEmitter emitter, boolean addContext) {
 
         var writer = Tree.newPropertyTree(emitter).beginMap();
 
@@ -437,6 +433,21 @@ public final class DataIntegrityProof implements Proof {
             return this;
         }
 
+        public Draft proof(DataIntegrityProof source) {
+            proof.canonicalPayload = source.canonicalPayload;
+            context(source.context);
+            challenge(source.challenge);
+            created(source.created);
+            domain(source.domain);
+            expires(source.expires);
+            id(source.id);
+            nonce(source.nonce);
+            previousProof(source.previousProof);
+            purpose(source.purpose);
+            verificationMethod(source.verificationMethod);
+            return this;
+        }
+
         public Draft created(Instant created) {
             proof.created = created != null
                     ? created.truncatedTo(ChronoUnit.SECONDS)
@@ -508,7 +519,7 @@ public final class DataIntegrityProof implements Proof {
             return proof;
         }
 
-        public DataIntegrityProof signed(Signature signature) {
+        public DataIntegrityProof sign(Signature signature) {
             proof.proofValue = signature;
             return proof;
         }

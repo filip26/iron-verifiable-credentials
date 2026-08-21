@@ -83,7 +83,7 @@ public abstract class StandardCryptoSuite implements CryptoSuite {
                     unsigned,
                     payload);
 
-            return signed(signature);
+            return sign(signature);
         }
     }
 }

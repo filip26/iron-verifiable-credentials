@@ -75,7 +75,7 @@ public class IssuerTest {
         proofDraft.options(options);
 
         var context = ContextAwareResolver.getContexts(document);
-        
+
         var updater = Resources.SEMANTIC_MODEL.createUpdater(context, document);
 
         var payloadProvider = updater.createPayload();
@@ -98,7 +98,7 @@ public class IssuerTest {
 
         updater.addProof(
                 proof.context(),
-                DataIntegrityProof.compact(proof, false));
+                proof.compact());
 
         var issued = updater.compacted();
 

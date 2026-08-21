@@ -37,7 +37,7 @@ public class PropertyMapAccessor implements LexicalAccessor {
         case null -> List.of();
         case Object obj -> List.of(obj);
         };
-        
+
         @SuppressWarnings("unchecked")
         Map<String, Object>[] mapProofs = new Map[proofs.size()];
 
@@ -49,8 +49,7 @@ public class PropertyMapAccessor implements LexicalAccessor {
 
             @SuppressWarnings("unchecked")
             var map = (Map<String, Object>) rawMap;
-IO.println("!1" + map);
-IO.println("!2" + context);
+
             // inject context into a proof
             if (!map.containsKey("@context")) {
                 map = new HashMap<>(map);

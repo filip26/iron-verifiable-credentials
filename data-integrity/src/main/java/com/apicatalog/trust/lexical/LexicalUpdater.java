@@ -3,12 +3,10 @@ package com.apicatalog.trust.lexical;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Set;
 
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
@@ -51,8 +49,7 @@ public class LexicalUpdater implements Document.Updater {
                 proofs.add(accessor.proof(i));
             }
         }
-        IO.println("1 > " + accessor.context());
-        IO.println("1 > " + accessor.document());
+
         // new proofs
         if (proofsEntries != null && !proofsEntries.isEmpty()) {
 
@@ -67,7 +64,6 @@ public class LexicalUpdater implements Document.Updater {
                 if (!proofEntry.getKey().equals(accessor.context())) {
                     // add @context to the proof
                     proof = new LinkedHashMap<>(proofEntry.getValue());
-                    
                     proof.put(model.vocab().context(), proofEntry.getKey());
 
                 } else {
@@ -78,24 +74,20 @@ public class LexicalUpdater implements Document.Updater {
             }
         }
 
+        final var document = accessor.document();
+
         if (proofs == null) {
-            return accessor.document();
+            return document;
         }
 
-        var document = accessor.document();
-
-        var compacted = new LinkedHashMap<String, Object>(document.size() + 2);
+        final var compacted = new LinkedHashMap<String, Object>(document.size() + 1);
         compacted.putAll(document);
-
-        if (proofs != null && !proofs.isEmpty()) {
-            compacted.put(model.vocab().proof(),
-                    proofs.size() == 1
-                            ? proofs.iterator().next()
-                            : proofs);
-        }
+        compacted.put(model.vocab().proof(),
+                proofs.size() == 1
+                        ? proofs.getFirst()
+                        : proofs);
 
         return compacted;
-
     }
 
     @Override
@@ -107,30 +99,4 @@ public class LexicalUpdater implements Document.Updater {
     public Vocab vocab() {
         return model.vocab();
     }
-
-//    private static boolean areCollectionsEqualUnordered(Collection<?> c1, Collection<?> c2) {
-//        if (c1.size() != c2.size()) {
-//            return false;
-//        }
-//
-//        Map<?, Long> map1 = c1.stream()
-//                .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
-//
-//        Map<?, Long> map2 = c2.stream()
-//                .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
-//
-//        return map1.equals(map2);
-//    }
-
-//    private static boolean areSortedEqual(Collection<?> l1, Collection<?> l2) {
-//        if (l1.size() != l2.size()) return false;
-//        
-//        var sorted1 = new ArrayList<Object>(l1);
-//        var sorted2 = new ArrayList<Object>(l2);
-//        Collections.sort(sorted1);
-//        Collections.sort(sorted2);
-//        
-//        return sorted1.equals(sorted2);
-//    }
-       
 }
