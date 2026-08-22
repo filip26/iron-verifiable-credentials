@@ -109,7 +109,7 @@ public class IssuerTest {
 
         updater.addProof(proof.compact());
 
-        var issuedDocument = updater.compacted();
+        var issuedDocument = updater.compact();
 
         var expected = Resources.getMap(resource + ".signed.json");
 

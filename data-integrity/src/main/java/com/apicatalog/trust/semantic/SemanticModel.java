@@ -2,6 +2,7 @@ package com.apicatalog.trust.semantic;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -55,7 +56,7 @@ public class SemanticModel implements Model {
     };
 
     public record JsonLdOps(
-            Function<Map<String, ?>, Collection<Object>> expand,
+            Function<Map<String, ?>, SequencedCollection<?>> expand,
             BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact,
             BiConsumer<Object, QuadConsumer> tordf) {
     };
@@ -117,7 +118,7 @@ public class SemanticModel implements Model {
         return jsonLd.tordf;
     }
 
-    public Function<Map<String, ?>, Collection<Object>> expand() {
+    public Function<Map<String, ?>, SequencedCollection<?>> expand() {
         return jsonLd.expand;
     }
 
@@ -129,7 +130,7 @@ public class SemanticModel implements Model {
     public Vocab vocab() {
         return vocab;
     }
-    
+
     public interface Accessor extends Document.Accessor {
 
         @FunctionalInterface

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SequencedCollection;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -57,7 +58,7 @@ public class DataIntegrity {
 
         private BiConsumer<Object, QuadConsumer> tordf;
         private BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact;
-        private Function<Map<String, ?>, Collection<Object>> expand;
+        private Function<Map<String, ?>, SequencedCollection<?>> expand;
 
         private Map<String, Supplier<GraphCanonizer>> proofC14n = Map.of();
 
@@ -90,7 +91,7 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder expand(Function<Map<String, ?>, Collection<Object>> expand) {
+        public SemanticModelBuilder expand(Function<Map<String, ?>, SequencedCollection<?>> expand) {
             this.expand = expand;
             return this;
         }

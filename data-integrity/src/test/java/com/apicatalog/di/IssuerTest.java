@@ -121,7 +121,7 @@ public class IssuerTest {
 
             proof = diProof;
 
-            issued = updater.compacted();
+            issued = updater.compact();
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 
@@ -145,7 +145,7 @@ public class IssuerTest {
 
             proof = edProof;
 
-            issued = updater.compacted();
+            issued = updater.compact();
 
         } else {
             fail("An unsupported proof type " + options.get("type"));

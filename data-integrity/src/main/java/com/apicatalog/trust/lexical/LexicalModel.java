@@ -34,7 +34,6 @@ public class LexicalModel implements Model {
     public LexicalAccessor createAccessor(Collection<?> context, Map<String, ?> document) {
         return processorFactory.createAdapter(
                 this,
-                context,
                 document);
     }
 

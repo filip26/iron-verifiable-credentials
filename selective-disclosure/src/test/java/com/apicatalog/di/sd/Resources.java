@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Collection;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.DataIntegrity;
@@ -29,9 +30,9 @@ import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
-import com.apicatalog.trust.semantic.GraphUpdater;
 import com.fasterxml.jackson.core.JsonFactory;
 
 import jakarta.json.Json;
@@ -112,7 +113,7 @@ class Resources {
         }
     }
 
-    static final Collection<Object> expand(Map<String, ?> document) {
+    static final SequencedCollection<?> expand(Map<String, ?> document) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();

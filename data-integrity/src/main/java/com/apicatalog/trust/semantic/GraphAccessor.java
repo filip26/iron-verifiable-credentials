@@ -59,6 +59,11 @@ public final class GraphAccessor implements SemanticModel.Accessor {
     }
 
     @Override
+    public Map<String, ?> source() {
+        return document;
+    }
+    
+    @Override
     public Graph document() {
         lazyInit();
         return dataset.graphs.get("@default");
@@ -94,7 +99,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
             throw new IllegalArgumentException();
         }
 
-        if (expanded.iterator().next() instanceof Map map) { // TODO use getFirst()
+        if (expanded.getFirst() instanceof Map map) {
             expandedData = new LinkedHashMap<String, Object>(map);
             if (map.containsKey(model.vocab().proof())) {
                 var proofs = expandedData.remove(model.vocab().proof());
@@ -109,19 +114,9 @@ public final class GraphAccessor implements SemanticModel.Accessor {
             throw new IllegalArgumentException();
         }
 
-//        if (expandedProofs != null) {
         dataset = new Dataset();
         dataset.proofPredicate = model.vocab().proof();
         model.tordf().accept(expanded, dataset);
-//        }
-//        if (dataset == null) {
-//
-//            dataset = new Dataset();
-//            dataset.proofPredicate = model.vocab().proof();
-//            dataset.typePredicate = model.vocab().type();
-//
-//            model.tordf().accept(document, dataset);
-//        }
     }
 
     private static class Dataset implements QuadConsumer {
@@ -173,10 +168,5 @@ public final class GraphAccessor implements SemanticModel.Accessor {
     public Vocab vocab() {
         // FIXME read from JSON-LD term map after expansion
         return new Vocab("@context", "proof", "id", "type");
-    }
-
-    @Override
-    public Map<String, ?> source() {
-        return document;
     }
 }

@@ -23,7 +23,7 @@ public final class PropertyProofCursor implements ProofCursor {
     private int currentIndex;
 
     private Proof currentProof;
-    private Map<String, Object> currentEntry;
+    private Map<String, ?> currentEntry;
     private PayloadGenerator payloadProvider;
 
     private PropertyProofCursor(

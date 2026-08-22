@@ -98,7 +98,7 @@ public class IssuerTest {
 
         updater.addProof(proof.compact());
 
-        var issued = updater.compacted();
+        var issued = updater.compact();
 
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);

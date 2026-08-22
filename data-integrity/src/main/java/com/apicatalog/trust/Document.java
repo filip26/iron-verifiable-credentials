@@ -22,7 +22,7 @@ public interface Document {
 
         void addProof(Map<String, ?> compacted);
 
-        Map<String, ?> compacted();
+        Map<String, ?> compact();
 
         Vocab vocab();
     }

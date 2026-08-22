@@ -35,7 +35,7 @@ public class LexicalUpdater implements Document.Updater {
     }
 
     @Override
-    public Map<String, ?> compacted() {
+    public Map<String, ?> compact() {
 
         List<Map<String, ?>> proofs = null;
 
@@ -78,7 +78,7 @@ public class LexicalUpdater implements Document.Updater {
             return document;
         }
 
-        final var compacted = new LinkedHashMap<String, Object>(document.size() + 1);
+        final var compacted = LinkedHashMap.<String, Object>newLinkedHashMap(document.size() + 1);
         compacted.putAll(document);
         compacted.put(model.vocab().proof(), proofs.size() == 1 ? proofs.getFirst() : proofs);
 

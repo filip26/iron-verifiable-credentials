@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SequencedCollection;
 
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model.Vocab;
@@ -21,7 +22,7 @@ public final class GraphUpdater implements Document.Updater {
     private final SemanticModel model;
     private final SemanticModel.Accessor accessor;
 
-    private Collection<Map<String, ?>> newProofs;
+    private SequencedCollection<Map<String, ?>> newProofs;
     private Collection<Object> contexts = null;
 
     public GraphUpdater(SemanticModel model, SemanticModel.Accessor adapter) {
@@ -32,7 +33,6 @@ public final class GraphUpdater implements Document.Updater {
     @Override
     public void addProof(Map<String, ?> compacted) {
 
-//        Objects.requireNonNull(context);
         Objects.requireNonNull(compacted);
 
         if (newProofs == null) {
@@ -65,18 +65,20 @@ public final class GraphUpdater implements Document.Updater {
     }
 
     @Override
-    public Map<String, ?> compacted() {
+    public Map<String, ?> compact() {
 
         if (newProofs == null) {
             return accessor.source();
         }
 
-        var document = new LinkedHashMap<String, Object>(accessor.source());
+        var document = LinkedHashMap.<String, Object>newLinkedHashMap(accessor.source().size() + 2);
+        document.putAll(accessor.source());
+
         var terms = accessor.vocab();
 
         var proofs = document.get(terms.proof());
 
-        if (contexts != null) {
+        if (contexts != null && !contexts.isEmpty()) {
             document.put(accessor.vocab().context(), merge(accessor.context(), contexts));
         }
 
@@ -87,7 +89,7 @@ public final class GraphUpdater implements Document.Updater {
             proofs = clone;
 
         } else if (proofs == null) {
-            proofs = newProofs.size() == 1 ? newProofs.iterator().next() : newProofs;
+            proofs = newProofs.size() == 1 ? newProofs.getFirst() : newProofs;
 
         } else {
             var col = new ArrayList<>(newProofs.size() + 1);

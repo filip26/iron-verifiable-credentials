@@ -372,7 +372,7 @@ public final class DataIntegrityProof implements Proof {
             return proof.hasRequired();
         }
 
-        public void options(Collection<?> documentContext, Map<String, ?> options) {
+        public void options(SequencedCollection<?> documentContext, Map<String, ?> options) {
 
             Objects.requireNonNull(documentContext);
             Objects.requireNonNull(options);
@@ -442,6 +442,8 @@ public final class DataIntegrityProof implements Proof {
             if (proof.context.isEmpty()) {
                 for (var ctx : KNOWN_CONTEXTS) {
                     if (documentContext.contains(ctx)) {
+                        proof.isCompactContext = false;
+                        proof.context = documentContext.stream().map(String.class::cast).toList();  //TODO
                         return;
                     }
                 }
@@ -594,23 +596,24 @@ public final class DataIntegrityProof implements Proof {
     public static class PropertyMapMapper implements PropertyProofMapper {
 
         private final Map<String, CryptoSuite> cryptosuites;
-        private final Function<Map<String, ?>, byte[]> canonize;
+        private final Function<Map<String, ?>, byte[]> canonizer;
 
-        public PropertyMapMapper(Map<String, CryptoSuite> cryptosuites,
-                Function<Map<String, ?>, byte[]> canonize) {
+        public PropertyMapMapper(
+                Map<String, CryptoSuite> cryptosuites,
+                Function<Map<String, ?>, byte[]> canonizer) {
             this.cryptosuites = cryptosuites;
-            this.canonize = canonize;
+            this.canonizer = canonizer;
         }
 
         @Override
-        public boolean accepts(Map<String, Object> proof) {
+        public boolean accepts(Map<String, ?> proof) {
             return TYPE_NAME.equals(proof.get(KEY_TYPE))
                     && cryptosuites.containsKey(proof.get(KEY_CRYPTOSUITE));
         }
 
         @Override
         public Proof materialize(
-                Map<String, Object> proof,
+                Map<String, ?> proof,
                 LexicalModel model,
                 PayloadGenerator payload) {
 
@@ -702,7 +705,7 @@ public final class DataIntegrityProof implements Proof {
 
             var unsignedProof = new HashMap<>(proof);
             unsignedProof.remove("proofValue");
-            di.canonicalPayload = canonize.apply(unsignedProof);
+            di.canonicalPayload = canonizer.apply(unsignedProof);
 
             if (proofValue != null) {
                 di.proofValue = di.cryptosuite

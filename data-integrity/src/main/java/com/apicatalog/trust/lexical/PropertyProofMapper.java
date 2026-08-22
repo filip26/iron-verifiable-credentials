@@ -7,11 +7,11 @@ import com.apicatalog.trust.proof.Proof;
 
 public interface PropertyProofMapper {
     
-    boolean accepts(Map<String, Object> proof);
+    boolean accepts(Map<String, ?> proof);
 
     // reads from tree
     Proof materialize(
-            Map<String, Object> proof,
+            Map<String, ?> proof,
             LexicalModel model,
             PayloadGenerator payload);
 

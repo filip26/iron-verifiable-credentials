@@ -35,7 +35,7 @@ public class PropertyMapPayloadGenerator implements PayloadGenerator {
             return payloadFactory.apply(canonical);
         }
 
-        var proofs = new ArrayList<Map<String, Object>>(includedProofs.size());
+        var proofs = new ArrayList<Map<String, ?>>(includedProofs.size());
 
         for (int i = 0; i < accessor.proofs(); i++) {
             var proof = accessor.proof(i);
