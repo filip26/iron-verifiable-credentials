@@ -20,6 +20,8 @@ import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.lexical.PropertyProofMapper;
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.Graph;
+import com.apicatalog.trust.semantic.Graph.NodeMapper;
+import com.apicatalog.trust.semantic.Graph.TypeMapping;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphProofMapper;
@@ -64,13 +66,15 @@ public class DataIntegrity {
 
         private Map<String, CryptoSuite> cryptosuites;
 
-        private Map<String, GraphProofMapper> readers;
+        private Function<Collection<String>, NodeMapper<?>> documentMapper;
 
+        private Map<String, GraphProofMapper> proofMappers;
+        
         private boolean ed25519Signature2020 = false;
 
         private SemanticModelBuilder(String c14n) {
             this.c14n = c14n;
-            this.readers = new LinkedHashMap<>();
+            this.proofMappers = new LinkedHashMap<>();
         }
 
         public SemanticModelBuilder proofPredicate(String uri) {
@@ -138,8 +142,13 @@ public class DataIntegrity {
             return this;
         }
 
+        public SemanticModelBuilder document(Function<Collection<String>, NodeMapper<?>> mapper) {
+            this.documentMapper = mapper;
+            return this;
+        }
+
         public SemanticModelBuilder proof(String proofType, GraphProofMapper reader) {
-            readers.put(proofType, reader);
+            proofMappers.put(proofType, reader);
             return this;
         }
 
@@ -156,7 +165,7 @@ public class DataIntegrity {
             }
 
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
-                readers.put(
+                proofMappers.put(
                         DataIntegrityProof.TYPE_URI,
                         new DataIntegrityProof.GraphMapper(
                                 cryptosuites,
@@ -164,7 +173,7 @@ public class DataIntegrity {
             }
 
             if (ed25519Signature2020) {
-                readers.put(
+                proofMappers.put(
                         Ed25519Signature2020.TYPE_URI,
                         new Ed25519Signature2020.GraphMapper(
                                 proofC14n.getOrDefault(Ed25519Signature2020.TYPE_URI, c14nFactory)));
@@ -190,7 +199,8 @@ public class DataIntegrity {
                             compact,
                             tordf),
                     c14nFactory,
-                    readers);
+                    documentMapper,
+                    proofMappers);
         }
     }
 
@@ -287,4 +297,22 @@ public class DataIntegrity {
         }
     }
 
+
+    private static class DefaultTypeMapper implements TypeMapping {
+
+        Map<Class<?>, Function<Collection<String>, NodeMapper<?>>> mappers;
+
+        @Override
+        public <T> NodeMapper<T> mapper(Class<T> baseclass, Collection<String> types) {
+
+            var provider = mappers.get(baseclass);
+
+            if (provider != null) {
+                return (NodeMapper<T>)provider.apply(types);
+            }
+
+            return null;
+        }
+
+    }
 }

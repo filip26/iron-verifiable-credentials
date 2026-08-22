@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.semantic.Graph.NodeMapper;
 
 public class SemanticModel implements Model {
 
@@ -69,20 +70,24 @@ public class SemanticModel implements Model {
 
     private final Supplier<GraphCanonizer> canonizeFactory;
 
-    private final Map<String, GraphProofMapper> readers;
+    private final Function<Collection<String>, NodeMapper<?>> documentMapper;
+    private final Map<String, GraphProofMapper> proofMappers;
 
     public SemanticModel(
             Vocab vocab,
             Primitives primitives,
             JsonLdOps jsonLd,
             Supplier<GraphCanonizer> canonizeFactory,
-            Map<String, GraphProofMapper> readers) {
+            Function<Collection<String>, NodeMapper<?>> documentMapper, 
+            Map<String, GraphProofMapper> proofMappers) {
         this.vocab = vocab;
         this.primitives = primitives;
         this.jsonLd = jsonLd;
 
         this.canonizeFactory = canonizeFactory;
-        this.readers = readers;
+        
+        this.documentMapper = documentMapper;
+        this.proofMappers = proofMappers;
     }
 
     @Override
@@ -106,8 +111,12 @@ public class SemanticModel implements Model {
         return primitives.cursor.createCursor(this, adapter);
     }
 
-    public GraphProofMapper reader(String type) {
-        return readers.get(type);
+    public NodeMapper<?> documentMapper(Collection<String> types) {
+        return documentMapper.apply(types);
+    }
+    
+    public GraphProofMapper proofMapper(String type) {
+        return proofMappers.get(type);
     }
 
     public GraphCanonizer newCanonizer() {

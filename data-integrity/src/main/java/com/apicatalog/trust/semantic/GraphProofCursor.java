@@ -69,7 +69,7 @@ public class GraphProofCursor implements ProofCursor {
 
                 var proofType = node.type().getFirst();
 
-                var reader = model.reader(proofType);
+                var reader = model.proofMapper(proofType);
 
                 if (reader != null && reader.accepts(node)) {
                     proofReaders.put(proofGraphId, Map.entry(node.id(), reader));

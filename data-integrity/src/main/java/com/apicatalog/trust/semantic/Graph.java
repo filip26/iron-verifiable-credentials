@@ -143,7 +143,6 @@ public record Graph(
 
         if (value == null) {
             return Map.of(langString.tag(), langString.object());
-
         }
 
         var mutable = value;
@@ -168,20 +167,44 @@ public record Graph(
 
         return Instant.parse(literal.object());
     }
-    
-    public static final Object resource(
-            Graph.Statement statement, 
+
+    public static final Collection<?> resources(
+            Graph.Statement statement,
+            Collection<?> value,
             Graph graph,
             SemanticModel model,
-            Class<?> baseclazz, 
+            Class<?> baseclazz,
             TypeMapping typeMapping) {
+
+        if (value == null) {
+            return List.of(resource(statement, graph, model, baseclazz, typeMapping));
+        }
+
+        @SuppressWarnings("unchecked")
+        var mutable = (Collection<Object>) value;
+
+        if (value.size() == 1) {
+            mutable = new ArrayList<>(value);
+        }
+
+        mutable.add(resource(statement, graph, model, baseclazz, typeMapping));
+        return mutable;
+    }
+
+    public static final Object resource(
+            Graph.Statement statement,
+            Graph graph,
+            SemanticModel model,
+            Class<?> baseclazz,
+            TypeMapping typeMapping) {
+
         if (!(statement instanceof ResourceStatement resource)) {
             throw new IllegalArgumentException();
         }
-        
-        if (graph.nodes().containsKey(resource.object())) {
 
-            var node = graph.nodes().get(resource.object());
+        var node = graph.nodes().get(resource.object());
+
+        if (node != null) {
 
             if (typeMapping != null) {
 

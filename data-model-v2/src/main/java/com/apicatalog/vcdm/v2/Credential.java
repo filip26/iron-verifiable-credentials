@@ -96,9 +96,18 @@ public class Credential {
 
     }
 
-    public class GraphMapper implements Graph.NodeMapper<Credential> {
+//
+//    public static GraphMapper newGraphMapper(TypeMapping typeMapping) {
+//        return new GraphMapper(typeMapping);
+//    }
+//    
+    public static class GraphMapper implements Graph.NodeMapper<Credential> {
 
         private final TypeMapping typeMapping;
+
+        public GraphMapper() {
+            this(null);
+        }
 
         public GraphMapper(TypeMapping typeMapping) {
             this.typeMapping = typeMapping;
@@ -149,6 +158,14 @@ public class Credential {
                         throw new IllegalArgumentException();
                     }
                     credential.validUntil = Graph.xsdDateTime(statement);
+                    break;
+
+                case "https://www.w3.org/2018/credentials#credentialSubject":
+                    if (credential.validUntil != null) {
+                        throw new IllegalArgumentException();
+                    }
+                    credential.subject = Graph.resources(statement, credential.subject, graph, model, Issuer.class,
+                            typeMapping);
                     break;
 
                 default:
