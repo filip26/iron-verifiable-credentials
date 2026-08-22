@@ -44,7 +44,7 @@ public class PropertyMapAccessor implements LexicalAccessor {
         int index = 0;
         for (var proof : proofs) {
             if (!(proof instanceof Map<?, ?> rawMap)) {
-                throw new IllegalArgumentException("Proof must be a Map");
+                throw new IllegalArgumentException("Proof must be a Map, but was " + proof);
             }
 
             @SuppressWarnings("unchecked")
@@ -53,7 +53,7 @@ public class PropertyMapAccessor implements LexicalAccessor {
             // inject context into a proof
             if (!map.containsKey("@context")) {
                 map = new HashMap<>(map);
-                map.put("@context", context);
+                map.put("@context", document.get("@context"));
             }
 
             mapProofs[index++] = map;

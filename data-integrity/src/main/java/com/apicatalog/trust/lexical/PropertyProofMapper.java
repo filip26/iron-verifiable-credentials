@@ -1,6 +1,5 @@
 package com.apicatalog.trust.lexical;
 
-import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.trust.payload.PayloadGenerator;
@@ -12,7 +11,6 @@ public interface PropertyProofMapper {
 
     // reads from tree
     Proof materialize(
-            Collection<?> contexts,
             Map<String, Object> proof,
             LexicalModel model,
             PayloadGenerator payload);

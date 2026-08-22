@@ -116,7 +116,7 @@ public class IssuerTest {
                     signer,
                     Resources.DIGEST_FACTORY,
                     payload.digestible());
-            
+
             updater.addProof(diProof.compact());
 
             proof = diProof;
@@ -151,13 +151,12 @@ public class IssuerTest {
             fail("An unsupported proof type " + options.get("type"));
         }
 
-        // verify the newly issued proof just for testing
-        var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
-        assertTrue(verified);
-
         var expected = Resources.getMap(resource + ".signed.json");
 
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(issued)));
+
+        // try to verify the newly issued proof instance
+        assertTrue(VerifierTest.PROOF_VERIFIER.verify(proof));
     }
 
     static BiFunction<Collection<?>, Map<String, ?>, Document.Updater> getUpdater(String c14n) {

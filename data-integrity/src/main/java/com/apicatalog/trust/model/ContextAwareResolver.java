@@ -21,7 +21,7 @@ public class ContextAwareResolver {
 
     // TODO must not be static, the resolver should have been configured with
     // "@context" key, or context extractos? -> getJsonLdContext(...)
-    public static SequencedCollection<String> getContexts(Map<String, Object> document) {
+    public static SequencedCollection<?> getContexts(Map<String, ?> document) {
         return switch (document.get("@context")) {
         case Collection<?> col -> col.stream()
                 .map(item -> {
@@ -32,14 +32,14 @@ public class ContextAwareResolver {
                             "The @context collection contains one or more non-string elements");
                 })
                 .toList();
-        case String context -> List.of(context);
+        case Object context -> List.of(context);
         case null -> List.of();
-        default ->
-            throw new IllegalArgumentException("Invalid @context type: expected a string or a collection of strings");
+//        default ->
+//            throw new IllegalArgumentException("Invalid @context type: expected a string or a collection of strings");
         };
     }
 
-    public Model resolve(Collection<?> contexts, Map<String, Object> document) {
+    public Model resolve(Collection<?> contexts, Map<String, ?> document) {
         for (int i = 0; i < models.length; i++) {
             if (predicates[i].test(contexts)) {
                 return models[i];

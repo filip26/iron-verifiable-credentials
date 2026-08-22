@@ -75,7 +75,7 @@ public final class PropertyProofCursor implements ProofCursor {
             var reader = readers[currentIndex];
 
             payloadProvider.reset();
-            currentProof = reader.materialize(signedDocument.context(), currentEntry, model, payloadProvider);
+            currentProof = reader.materialize(currentEntry, model, payloadProvider);
         }
 
         return currentProof;
