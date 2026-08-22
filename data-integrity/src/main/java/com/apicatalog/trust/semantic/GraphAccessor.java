@@ -40,6 +40,11 @@ public final class GraphAccessor implements SemanticModel.Accessor {
             SemanticModel model,
             Collection<?> context,
             Map<String, ?> document) {
+
+        if (context == null || context.isEmpty()) {
+            return null;
+        }
+
         return new GraphAccessor(model, context, document);
     }
 

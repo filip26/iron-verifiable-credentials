@@ -1,11 +1,13 @@
 package com.apicatalog.di.sd;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import com.apicatalog.trust.model.Model;
 
 public record SDDerivedDocument(
+        Collection<?> documentContext,
         Supplier<Map<String, Object>> compacted,
         byte[] canonicalPayload,
         byte[][] redactablePayload,

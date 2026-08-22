@@ -20,7 +20,7 @@ public interface Document {
 
         PayloadGenerator createPayload();
 
-        void addProof(Object context, Map<String, ?> compacted);
+        void addProof(Map<String, ?> compacted);
 
         Map<String, ?> compacted();
 

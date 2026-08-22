@@ -309,6 +309,7 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
         }
 
         var derivedDocument = new SDDerivedDocument(
+                payload.context,
                 () -> SDBaseProofValue.recompact(payload.context, selection, payload.model),
                 payload.base,
                 disclosedPayload,

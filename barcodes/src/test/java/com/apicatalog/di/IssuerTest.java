@@ -67,14 +67,14 @@ public class IssuerTest {
                             .formatted(privateKeyCodec.name(), privateKeyCodec.code()));
         }
 
+        var context = ContextAwareResolver.getContexts(document);
+
         DataIntegrityProof proof = null;
 
         var cryptosuite = ECDSAXI2023.getInstance();
 
         var proofDraft = cryptosuite.newProofDraft();
-        proofDraft.options(options);
-
-        var context = ContextAwareResolver.getContexts(document);
+        proofDraft.options(context, options);
 
         var updater = Resources.SEMANTIC_MODEL.createUpdater(context, document);
 
@@ -96,9 +96,7 @@ public class IssuerTest {
                 Resources.DIGEST_FACTORY,
                 payload);
 
-        updater.addProof(
-                proof.context(),
-                proof.compact());
+        updater.addProof(proof.compact());
 
         var issued = updater.compacted();
 

@@ -81,10 +81,10 @@ public class IssuerTest {
             fail();
         }
 
-        var proofDraft = cryptosuite.createProofDraft();
-        proofDraft.options(options);
-
         var context = ContextAwareResolver.getContexts(sourceDocument);
+
+        var proofDraft = cryptosuite.createProofDraft();
+        proofDraft.options(context, options);
 
         var updater = Resources.SEMANTIC_MODEL.createUpdater(context, sourceDocument);
 
@@ -107,7 +107,7 @@ public class IssuerTest {
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);
 
-        updater.addProof(proof.context(), proof.compact());
+        updater.addProof(proof.compact());
 
         var issuedDocument = updater.compacted();
 

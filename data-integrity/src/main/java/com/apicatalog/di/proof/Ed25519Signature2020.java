@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -55,7 +56,7 @@ public final class Ed25519Signature2020 implements Proof {
     private static final String KEY_PURPOSE = "proofPurpose";
     private static final String KEY_PROOF_VALUE = "proofValue";
 
-    private Collection<?> context;
+    private SequencedCollection<?> context;
 
     private Instant created;
     private Purpose purpose;
@@ -80,8 +81,24 @@ public final class Ed25519Signature2020 implements Proof {
 
     public static void compact(Ed25519Signature2020 proof, TreeEmitter emitter) {
         var writer = Tree.newPropertyTree(emitter)
-                .beginMap()
-                .entry(KEY_TYPE, proof.type())
+                .beginMap();
+
+        if (proof.context != null && !proof.context.isEmpty()) {
+
+            if (proof.context.size() > 1) {
+                writer.beginSequence("@context");
+
+                for (var ctx : proof.context) {
+                    writer.element((String) ctx);
+                }
+
+                writer.endSequence();
+
+            } else {
+                writer.entry("@context", (String) proof.context.getFirst());
+            }
+        }
+        writer.entry(KEY_TYPE, proof.type())
                 .entry(KEY_CREATED, proof.created, Instant::toString)
                 .entry(KEY_VERIFICATION_METHOD, proof.verificationMethod)
                 .entry(KEY_PURPOSE, proof.purpose != null ? proof.purpose.key() : null);
@@ -118,22 +135,23 @@ public final class Ed25519Signature2020 implements Proof {
     }
 
     public static Draft newDraft() {
-        return new Draft(new Ed25519Signature2020(), List.of(Ed25519Signature2020.CONTEXT_URI));
+        var proof = new Ed25519Signature2020();
+        proof.context = List.of(Ed25519Signature2020.CONTEXT_URI);
+        return new Draft(proof);
     }
 
     public static Draft newDraft(Map<String, ?> options) {
 
         var proof = new Ed25519Signature2020();
-        Collection<?> context = List.of();
 
         for (var entry : options.entrySet()) {
             switch (entry.getKey()) {
             case "@context":
-                if (entry.getValue() instanceof Collection<?> col) {
-                    context = col;
+                if (entry.getValue() instanceof SequencedCollection<?> col) {
+                    proof.context = col;
 
                 } else if (entry.getValue() instanceof String uri) {
-                    context = List.of(uri);
+                    proof.context = List.of(uri);
 
                 } else {
                     throw new IllegalArgumentException();
@@ -152,26 +170,25 @@ public final class Ed25519Signature2020 implements Proof {
         }
 
         // setup default context
-        if (context.isEmpty()) {
-            context = List.of(Ed25519Signature2020.CONTEXT_URI);
+        if (proof.context == null || proof.context.isEmpty()) {
+            proof.context = List.of(Ed25519Signature2020.CONTEXT_URI);
 
-        } else if (!context.contains(Ed25519Signature2020.CONTEXT_URI)) {
-            var tmp = new LinkedHashSet<>(context.size() + 1);
-            tmp.addAll(context);
+        } else if (!proof.context.contains(Ed25519Signature2020.CONTEXT_URI)) {
+            var tmp = new LinkedHashSet<>(proof.context.size() + 1);
+            tmp.addAll(proof.context);
             tmp.add(Ed25519Signature2020.CONTEXT_URI);
-            context = tmp;
+            proof.context = tmp;
         }
 
-        return new Draft(proof, context);
+        return new Draft(proof);
     }
 
     public static final class Draft {
 
         private final Ed25519Signature2020 proof;
 
-        private Draft(Ed25519Signature2020 proof, Collection<?> context) {
+        private Draft(Ed25519Signature2020 proof) {
             this.proof = proof;
-            this.proof.context = context;
         }
 
         public byte[] canonize() {
@@ -210,8 +227,8 @@ public final class Ed25519Signature2020 implements Proof {
             return this;
         }
 
-        public Draft context(Collection<?> context) {
-            proof.context = context;
+        public Draft context(SequencedCollection<?> context) {
+            this.proof.context = context;
             return this;
         }
 
@@ -284,15 +301,15 @@ public final class Ed25519Signature2020 implements Proof {
         return purpose;
     }
 
-    /**
-     * The JSON-LD context used to process the proof. Optional.
-     * 
-     * @return a collection of strings representing the JSON-LD context URIs, or
-     *         {@code null} if not present
-     */
-    public Collection<?> context() {
-        return context;
-    }
+//    /**
+//     * The JSON-LD context used to process the proof. Optional.
+//     * 
+//     * @return a collection of strings representing the JSON-LD context URIs, or
+//     *         {@code null} if not present
+//     */
+//    public Collection<?> context() {
+//        return context;
+//    }
 
     public static StaticRDFC newStaticRDFC() {
         return new StaticRDFC();

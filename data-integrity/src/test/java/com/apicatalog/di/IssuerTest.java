@@ -101,7 +101,7 @@ public class IssuerTest {
             var cryptosuite = getCryptosuite((String) options.get("cryptosuite"));
 
             var proofDraft = cryptosuite.newProofDraft();
-            proofDraft.options(options);
+            proofDraft.options(context, options);
 
             assertTrue(proofDraft.hasRequired());
 
@@ -116,10 +116,8 @@ public class IssuerTest {
                     signer,
                     Resources.DIGEST_FACTORY,
                     payload.digestible());
-
-            updater.addProof(
-                    proofDraft.context(),
-                    diProof.compact());
+            
+            updater.addProof(diProof.compact());
 
             proof = diProof;
 
@@ -143,9 +141,7 @@ public class IssuerTest {
                     proofDraft,
                     payload.digestible());
 
-            updater.addProof(
-                    edProof.context(),
-                    edProof.compact());
+            updater.addProof(edProof.compact());
 
             proof = edProof;
 

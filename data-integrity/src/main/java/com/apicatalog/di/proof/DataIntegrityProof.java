@@ -46,7 +46,7 @@ public final class DataIntegrityProof implements Proof {
      * A collection of known JSON-LD context URIs associated with W3C Verifiable
      * Credentials and Data Integrity specifications.
      */
-    public static final Collection<String> KNOWN_CONTEXTS = Set.of(
+    public static final Set<String> KNOWN_CONTEXTS = Set.of(
             "https://www.w3.org/ns/credentials/v2",
             "https://w3id.org/security/data-integrity/v2",
             "https://w3id.org/security/data-integrity/v1");
@@ -80,7 +80,7 @@ public final class DataIntegrityProof implements Proof {
 
     private CryptoSuite cryptosuite;
 
-//    private boolean isContextArray;
+    private boolean isCompactContext;
     private SequencedCollection<String> context;
 
     private String id;
@@ -232,10 +232,10 @@ public final class DataIntegrityProof implements Proof {
     }
 
     /**
-     * The JSON-LD context used to process the proof. Optional.
+     * The JSON-LD context used to process the proof.
      * 
      * @return a collection of strings representing the JSON-LD context URIs, or
-     *         {@code null} if not present
+     *         {@code null} if document level context is used to process this proof.
      */
     public SequencedCollection<String> context() {
         return context;
@@ -253,29 +253,34 @@ public final class DataIntegrityProof implements Proof {
         return expires != null && expires.isBefore(Instant.now());
     }
 
-    public Map<String, ?> compact() {
-        return compact(false);
+    public boolean isCompactContext() {
+        return isCompactContext;
     }
 
-    public Map<String, ?> compact(boolean addContext) {
+    public Map<String, ?> compact() {
         var composer = new NativeComposer<Map<String, ? extends Object>>();
-        compact(this, composer, addContext);
+        compact(this, composer, isCompactContext);
         return composer.compose();
     }
 
-    private static void compact(DataIntegrityProof proof, TreeEmitter emitter, boolean addContext) {
+    private static void compact(DataIntegrityProof proof, TreeEmitter emitter, boolean isCompactContext) {
 
         var writer = Tree.newPropertyTree(emitter).beginMap();
 
-        if (addContext && proof.context != null && !proof.context.isEmpty()) {
+        if (proof.context != null && !proof.context.isEmpty()) {
 
-            writer.beginSequence("@context");
+            if (!isCompactContext || proof.context.size() > 1) {
+                writer.beginSequence("@context");
 
-            for (var ctx : proof.context) {
-                writer.element(ctx);
+                for (var ctx : proof.context) {
+                    writer.element(ctx);
+                }
+
+                writer.endSequence();
+
+            } else {
+                writer.entry("@context", proof.context.getFirst());
             }
-
-            writer.endSequence();
         }
 
         writer.entry(KEY_ID, proof.id())
@@ -321,7 +326,7 @@ public final class DataIntegrityProof implements Proof {
         writer.endMap();
     }
 
-    public static Function<DataIntegrityProof.Draft, byte[]> getProofCanonizer(String c14n) {
+    public static Function<DataIntegrityProof, byte[]> getProofCanonizer(String c14n) {
         return switch (c14n) {
         case Model.C14N_JCS -> StaticJCS::canonize;
         case Model.C14N_RDFC -> StaticRDFC::canonize;
@@ -333,18 +338,15 @@ public final class DataIntegrityProof implements Proof {
 
         protected final DataIntegrityProof proof;
 
-        protected Object context;
-        protected Function<DataIntegrityProof.Draft, byte[]> canonizer;
+        protected Function<DataIntegrityProof, byte[]> canonizer;
 
         // TODO public?!
         public Draft(CryptoSuite cryptosuite) {
-            this.context = List.of();
             this.canonizer = DataIntegrityProof.getProofCanonizer(cryptosuite.c14n());
             this.proof = new DataIntegrityProof();
+            this.proof.isCompactContext = true;
             this.proof.cryptosuite = cryptosuite;
             this.proof.canonicalPayload = null;
-            this.proof.context = List.of();
-            this.proof.previousProof = List.of();
         }
 
         /**
@@ -359,17 +361,17 @@ public final class DataIntegrityProof implements Proof {
         }
 
         // TODO ?!?!
-        public Draft options(Map<String, Object> options) {
+        public Draft options(Collection<?> documentContext, Map<String, Object> options) {
 
             for (var entry : options.entrySet()) {
                 switch (entry.getKey()) {
                 case "@context":
                     if (entry.getValue() instanceof Collection<?> col) {
-                        context = col;
+                        proof.isCompactContext = false;
                         proof.context = col.stream().map(String.class::cast).toList();
 
                     } else if (entry.getValue() instanceof String uri) {
-                        context = uri;
+                        proof.isCompactContext = true;
                         proof.context = List.of(uri);
 
                     } else {
@@ -422,6 +424,19 @@ public final class DataIntegrityProof implements Proof {
                     break;
                 }
             }
+
+            if (proof.context == null) {
+                for (var ctx : KNOWN_CONTEXTS) {
+                    if (documentContext.contains(ctx)) {
+                        return this;
+                    }
+                }
+                // set default context
+                proof.isCompactContext = true;
+                proof.context = List.of("https://w3id.org/security/data-integrity/v2");
+                return this;
+            }
+
             return this;
         }
 
@@ -441,9 +456,8 @@ public final class DataIntegrityProof implements Proof {
         }
 
         public Draft created(Instant created) {
-            proof.created = created != null
-                    ? created.truncatedTo(ChronoUnit.SECONDS)
-                    : null;
+            Objects.requireNonNull(created);
+            proof.created = created.truncatedTo(ChronoUnit.SECONDS);
             return this;
         }
 
@@ -455,11 +469,13 @@ public final class DataIntegrityProof implements Proof {
         }
 
         public Draft purpose(Purpose purpose) {
+            Objects.requireNonNull(purpose);
             proof.purpose = purpose;
             return this;
         }
 
         public Draft verificationMethod(String verificationMethod) {
+            Objects.requireNonNull(verificationMethod);
             proof.verificationMethod = verificationMethod;
             return this;
         }
@@ -490,17 +506,20 @@ public final class DataIntegrityProof implements Proof {
         }
 
         public Draft context(String context) {
-            this.context = context;
-            return context(List.of(context));
+            Objects.nonNull(context);
+            proof.isCompactContext = true;
+            proof.context = List.of(context);
+            return this;
         }
 
         public Draft context(SequencedCollection<String> context) {
-            this.context = context;
+            Objects.nonNull(context);
+            proof.isCompactContext = false;
             proof.context = context;
             return this;
         }
 
-        public Draft c14n(Function<DataIntegrityProof.Draft, byte[]> canonizer) {
+        public Draft c14n(Function<DataIntegrityProof, byte[]> canonizer) {
             Objects.requireNonNull(canonizer);
             this.canonizer = canonizer;
             return this;
@@ -508,7 +527,7 @@ public final class DataIntegrityProof implements Proof {
 
         public DataIntegrityProof unsigned() {
             if (proof.canonicalPayload == null) {
-                proof.canonicalPayload = canonizer.apply(this);
+                proof.canonicalPayload = canonizer.apply(proof);
             }
             return proof;
         }
@@ -520,10 +539,6 @@ public final class DataIntegrityProof implements Proof {
 
         public CryptoSuite cryptosuite() {
             return proof.cryptosuite;
-        }
-
-        public Object context() {
-            return context;
         }
 
         public SequencedCollection<String> previous() {

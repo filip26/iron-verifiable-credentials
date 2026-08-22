@@ -153,6 +153,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
 
         signature.proof = new DataIntegrityProof.Draft(baseProof.cryptosuite())
                 .proof(baseProof)
+//                .context(document.documentContext())
                 .sign(signature);
 
         return signature;

@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.Collection;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,7 +31,7 @@ public class VerifierTest {
 
     static final ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.newBuilder()
             // accept any context - for test purposes only
-            .model(Predicate.not(Collection::isEmpty),
+            .model(_ -> true,
                     // in processing preferences order
                     Resources.SEMANTIC_MODEL,
                     Resources.LEXICAL_MODEL)
@@ -102,7 +100,7 @@ public class VerifierTest {
 //            if (!Relationship.ASSERTION.getName().equals(proof.purpose())) {
 //                throw new IllegalArgumentException();
 //            }
-
+            
             var verified = PROOF_VERIFIER.verify(proof);
 
             assertTrue(verified);

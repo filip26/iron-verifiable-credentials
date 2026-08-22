@@ -169,28 +169,28 @@ public final class StaticRDFC implements GraphCanonizer {
 
     /**
      * Builds the deterministic N-Quads representation of a
-     * {@link DataIntegrityProof.Draft} for RDF Dataset Canonicalization (RDFC).
+     * {@link DataIntegrityProof} for RDF Dataset Canonicalization (RDFC).
      *
      * <p>
      * The returned value is UTF-8 encoded and suitable for signing. The output
      * strictly follows N-Quads syntax and is deterministic for the supplied values.
      * </p>
      *
-     * @param proofDraft
+     * @param proof
      * @return UTF-8 encoded canonical N-Quads proof draft representation
      */
-    public static byte[] canonize(DataIntegrityProof.Draft proofDraft) {
+    public static byte[] canonize(DataIntegrityProof proof) {
         return canonize(
-                proofDraft.id(),
-                proofDraft.created() != null ? proofDraft.created().toString() : null,
-                proofDraft.challenge(),
-                proofDraft.cryptosuite() != null ? proofDraft.cryptosuite().id() : null,
-                proofDraft.domains(),
-                proofDraft.expires() != null ? proofDraft.expires().toString() : null,
-                proofDraft.nonce(),
-                proofDraft.previous(),
-                proofDraft.purpose() != null ? proofDraft.purpose().uri() : null,
-                proofDraft.verificationMethod());
+                proof.id(),
+                proof.created() != null ? proof.created().toString() : null,
+                proof.challenge(),
+                proof.cryptosuite() != null ? proof.cryptosuite().id() : null,
+                proof.domains(),
+                proof.expires() != null ? proof.expires().toString() : null,
+                proof.nonce(),
+                proof.previous(),
+                proof.purpose() != null ? proof.purpose().uri() : null,
+                proof.verificationMethod());
     }
 
     public static byte[] canonize(

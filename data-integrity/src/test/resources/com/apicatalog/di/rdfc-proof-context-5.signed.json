@@ -1,0 +1,16 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/examples/v2",
+    "https://w3id.org/security/data-integrity/v2"
+  ],
+  "uuid": "urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33",
+  "digest": "yuKpGAqnUnNgywB9Jxto95SY7WNpKqffrGvzX4Fwob8Ak6zZotJLpaD",
+  "proof": {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "eddsa-rdfc-2022",
+    "created": "2023-02-24T23:36:38Z",
+    "verificationMethod": "did:key:z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2#z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "z2R4gdt2K6YDGCtPKMPb8tWmmRqZt47QAaKRmFfzY8ctpiX8H9JvfcWfHbo3aMHo4mrP9fpP18Qd3VopbcpyaHYg8"
+  }
+}

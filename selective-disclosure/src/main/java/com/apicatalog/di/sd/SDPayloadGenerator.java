@@ -204,6 +204,7 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
         }
 
         return new SDDerivedDocument(
+                accessor.context(),
                 this::compacted,
                 mandatory.toString().getBytes(StandardCharsets.UTF_8),
                 disclosed,

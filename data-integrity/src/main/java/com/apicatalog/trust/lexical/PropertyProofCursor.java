@@ -7,7 +7,7 @@ import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
 
-public class PropertyProofCursor implements ProofCursor {
+public final class PropertyProofCursor implements ProofCursor {
 
     @FunctionalInterface
     public interface Factory {
@@ -17,7 +17,7 @@ public class PropertyProofCursor implements ProofCursor {
     }
 
     private final LexicalModel model;
-    private final LexicalAccessor accessor;
+    private final LexicalAccessor signedDocument;
     private final PropertyProofMapper[] readers;
 
     private int currentIndex;
@@ -26,12 +26,12 @@ public class PropertyProofCursor implements ProofCursor {
     private Map<String, Object> currentEntry;
     private PayloadGenerator payloadProvider;
 
-    protected PropertyProofCursor(
+    private PropertyProofCursor(
             LexicalModel model,
             LexicalAccessor processor,
             PropertyProofMapper[] readers) {
         this.model = model;
-        this.accessor = processor;
+        this.signedDocument = processor;
         this.readers = readers;
 
         this.currentProof = null;
@@ -61,17 +61,6 @@ public class PropertyProofCursor implements ProofCursor {
         return new PropertyProofCursor(model, processor, mapping.toArray(PropertyProofMapper[]::new));
     }
 
-//    public Data data() {
-//
-//        if (document == null) {
-//
-//            // TODO add custom document reader
-    //// FIXME document = new MapData(payload, model.c14n());
-//        }
-//
-//        return document;
-//    }
-
     @Override
     public boolean isAccepted() {
         return currentEntry != null
@@ -85,9 +74,8 @@ public class PropertyProofCursor implements ProofCursor {
 
             var reader = readers[currentIndex];
 
-            // FIXME context!
             payloadProvider.reset();
-            currentProof = reader.materialize(accessor.context(), currentEntry, model, payloadProvider);
+            currentProof = reader.materialize(signedDocument.context(), currentEntry, model, payloadProvider);
         }
 
         return currentProof;
@@ -100,7 +88,7 @@ public class PropertyProofCursor implements ProofCursor {
             return false;
         }
 
-        currentEntry = accessor.proof(++currentIndex);
+        currentEntry = signedDocument.proof(++currentIndex);
         currentProof = null;
         return true;
     }

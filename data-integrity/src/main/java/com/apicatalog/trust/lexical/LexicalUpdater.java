@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 
 import com.apicatalog.trust.Document;
@@ -16,7 +15,7 @@ public class LexicalUpdater implements Document.Updater {
     private final LexicalModel model;
     private final LexicalAccessor accessor;
 
-    private Collection<Entry<?, Map<String, ?>>> proofsEntries;
+    private Collection<Map<String, ?>> proofsEntries;
 
     public LexicalUpdater(LexicalModel model, LexicalAccessor adapter) {
         this.model = model;
@@ -24,15 +23,15 @@ public class LexicalUpdater implements Document.Updater {
     }
 
     @Override
-    public void addProof(Object context, Map<String, ?> compacted) {
+    public void addProof(Map<String, ?> compacted) {
 
-        Objects.requireNonNull(context);
+//        Objects.requireNonNull(context);
         Objects.requireNonNull(compacted);
 
         if (proofsEntries == null) {
             proofsEntries = new ArrayList<>();
         }
-        proofsEntries.add(Map.entry(context, compacted));
+        proofsEntries.add(compacted);
     }
 
     @Override
@@ -50,6 +49,8 @@ public class LexicalUpdater implements Document.Updater {
             }
         }
 
+        final var document = accessor.document();
+
         // new proofs
         if (proofsEntries != null && !proofsEntries.isEmpty()) {
 
@@ -57,24 +58,21 @@ public class LexicalUpdater implements Document.Updater {
                 proofs = new ArrayList<>(proofsEntries.size());
             }
 
+            final var documentContext = document.get("@context");
+
             for (var proofEntry : proofsEntries) {
 
-                final Map<String, Object> proof;
-
-                if (!proofEntry.getKey().equals(accessor.context())) {
-                    // add @context to the proof
-                    proof = new LinkedHashMap<>(proofEntry.getValue());
-                    proof.put(model.vocab().context(), proofEntry.getKey());
+                if (documentContext != null && documentContext.equals(proofEntry.get("@context"))) {
+                    var proof = new LinkedHashMap<>(proofEntry);
+                    proof.remove(model.vocab().context());
+                    proofs.add(proof);
 
                 } else {
-                    proof = (Map<String, Object>) proofEntry.getValue();
-                }
+                    proofs.add(proofEntry);
 
-                proofs.add(proof);
+                }
             }
         }
-
-        final var document = accessor.document();
 
         if (proofs == null) {
             return document;
@@ -82,10 +80,7 @@ public class LexicalUpdater implements Document.Updater {
 
         final var compacted = new LinkedHashMap<String, Object>(document.size() + 1);
         compacted.putAll(document);
-        compacted.put(model.vocab().proof(),
-                proofs.size() == 1
-                        ? proofs.getFirst()
-                        : proofs);
+        compacted.put(model.vocab().proof(), proofs.size() == 1 ? proofs.getFirst() : proofs);
 
         return compacted;
     }
