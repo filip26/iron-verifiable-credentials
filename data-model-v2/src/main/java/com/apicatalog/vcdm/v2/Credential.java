@@ -169,22 +169,22 @@ public class Credential {
 
                 switch (statement.predicate()) {
                 case Graph.PREDICATE_TYPE:
-                    credential.type = Graph.ids(statement, credential.type);
+                    credential.type = Graph.resources(statement, credential.type);
                     break;
 
                 case PREDICATE_NAME:
-                    credential.name = Graph.langMap(statement, credential.name, false);
+                    credential.name = Graph.langString(statement, credential.name, false);
                     break;
 
                 case PREDICATE_DESCRIPTION:
-                    credential.description = Graph.langMap(statement, credential.description, false);
+                    credential.description = Graph.langString(statement, credential.description, false);
                     break;
 
                 case PREDICATE_ISSUER:
                     if (credential.issuer != null) {
                         throw new IllegalArgumentException();
                     }
-                    credential.issuer = Graph.resource(context, statement, node.graph(), model, typeMapping);
+                    credential.issuer = Graph.node(context, statement, node.graph(), model, typeMapping);
                     break;
 
                 case PREDICATE_VALID_FROM:
@@ -202,7 +202,7 @@ public class Credential {
                     break;
 
                 case PREDICATE_SUBJECT:
-                    credential.subject = Graph.resources(
+                    credential.subject = Graph.nodes(
                             context,
                             statement,
                             credential.subject,
@@ -212,7 +212,7 @@ public class Credential {
                     break;
 
                 case PREDICATE_STATUS:
-                    credential.status = Graph.resources(
+                    credential.status = Graph.nodes(
                             context,
                             statement,
                             credential.status,
@@ -222,7 +222,7 @@ public class Credential {
                     break;
 
                 case PREDICATE_SCHEMA:
-                    credential.schema = Graph.resources(
+                    credential.schema = Graph.nodes(
                             context,
                             statement,
                             credential.schema,
@@ -232,7 +232,7 @@ public class Credential {
                     break;
 
                 case PREDICATE_TERMS_OF_USE:
-                    credential.termsOfUse = Graph.resources(
+                    credential.termsOfUse = Graph.nodes(
                             context,
                             statement,
                             credential.termsOfUse,
@@ -242,7 +242,7 @@ public class Credential {
                     break;
 
                 case PREDICATE_EVIDENCE:
-                    credential.evidence = Graph.resources(
+                    credential.evidence = Graph.nodes(
                             context,
                             statement,
                             credential.evidence,

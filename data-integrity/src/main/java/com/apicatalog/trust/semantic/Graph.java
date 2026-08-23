@@ -138,7 +138,7 @@ public record Graph(
         }
     };
 
-    public static final SequencedCollection<LangString> langMap(
+    public static final SequencedCollection<LangString> langString(
             Graph.Statement statement,
             SequencedCollection<LangString> value,
             boolean allowAlts) {
@@ -186,7 +186,7 @@ public record Graph(
         return Instant.parse(literal.object());
     }
 
-    public static final Collection<?> resources(
+    public static final Collection<?> nodes(
             SequencedCollection<?> context,
             Graph.Statement statement,
             Collection<?> value,
@@ -195,7 +195,7 @@ public record Graph(
             TypeMapping typeMapping) {
 
         if (value == null) {
-            return List.of(resource(context, statement, graph, model, typeMapping));
+            return List.of(node(context, statement, graph, model, typeMapping));
         }
 
         @SuppressWarnings("unchecked")
@@ -205,11 +205,11 @@ public record Graph(
             mutable = new ArrayList<>(value);
         }
 
-        mutable.add(resource(context, statement, graph, model, typeMapping));
+        mutable.add(node(context, statement, graph, model, typeMapping));
         return mutable;
     }
 
-    public static final Object resource(
+    public static final Object node(
             SequencedCollection<?> context,
             Graph.Statement statement,
             Graph graph,
@@ -237,7 +237,7 @@ public record Graph(
         return resource.object();
     }
 
-    public static final Set<String> ids(
+    public static final Set<String> resources(
             Graph.Statement statement,
             Set<String> value) {
 

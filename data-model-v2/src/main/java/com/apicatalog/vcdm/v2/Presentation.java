@@ -28,7 +28,7 @@ public class Presentation {
     }
 
     private SequencedCollection<?> context;
-    
+
     private URI id;
     private Set<String> type;
     private Object holder;
@@ -39,12 +39,12 @@ public class Presentation {
      * excluding the {@code verifiableCredential predicate.
      *
      * @return {@code true} if all required properties are present, {@code false}
-     *         otherwise
+     * otherwise
      */
     public boolean hasRequired() {
         return type != null && type.contains(TYPE_URI);
     }
-    
+
     /**
      * The JSON-LD context used to process the presentation.
      * 
@@ -103,14 +103,28 @@ public class Presentation {
 
                 switch (statement.predicate()) {
                 case Graph.PREDICATE_TYPE:
-                    presentation.type = Graph.ids(statement, presentation.type);
+                    presentation.type = Graph.resources(statement, presentation.type);
                     break;
-                    
+
                 case PREDICATE_HOLDER:
                     if (presentation.holder != null) {
                         throw new IllegalArgumentException();
                     }
-                    presentation.holder = Graph.resource(context, statement, node.graph(), model, typeMapping);
+                    presentation.holder = Graph.node(context, statement, node.graph(), model, typeMapping);
+                    break;
+
+                case PREDICATE_CREDENTIAL:
+                    // TODO
+                    break;
+
+                case PREDICATE_TERMS_OF_USE:
+                    presentation.termsOfUse = Graph.nodes(
+                            context,
+                            statement,
+                            presentation.termsOfUse,
+                            node.graph(),
+                            model,
+                            typeMapping);
                     break;
 
                 default:
