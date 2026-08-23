@@ -56,23 +56,29 @@ class Resources {
             .build();
 
     static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+            // proof predicate
             .proofPredicate(DataIntegrity.PREDICATE_PROOF)
+            // enable selected DataIntegrityProof cryptosuites
             .cryptosuite(EdDSA2022.withRDFC())
             .cryptosuite(ECDSA2019.withRDFC())
             .cryptosuite(MLDSA2024.get44withRDFC())
             .cryptosuite(SLHDSA2024.get128withRDFC())
+            // enable legacy Ed25519Signature2020 suite
             .Ed25519Signature2020()
-            .expand(Resources::expand)
-            .tordf(Resources::toRDF)
             // proof type specific c14n provider
             .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
             .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
-            // document and proof c14n provider
+            // document and proof default c14n provider
             .c14n(Resources::createRDFC)
+            // JSON-LD processing
+            .expand(Resources::expand)
+            .tordf(Resources::toRDF)
+            // document processing, optional customizations
             .accessor(GraphAccessor::newInstance)
             .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
+            // the model assembly
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;

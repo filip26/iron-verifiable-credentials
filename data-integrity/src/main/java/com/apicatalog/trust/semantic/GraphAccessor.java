@@ -82,6 +82,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     @Override
     public Graph documentGraph() {
+        lazyInit();
         return dataset.graphs.get("@default");
     }
 

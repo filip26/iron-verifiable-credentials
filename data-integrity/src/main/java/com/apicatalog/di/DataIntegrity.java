@@ -20,6 +20,7 @@ import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.lexical.PropertyProofMapper;
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.Graph;
+import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.Graph.NodeMapper;
 import com.apicatalog.trust.semantic.Graph.TypeMapping;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
@@ -53,7 +54,7 @@ public class DataIntegrity {
 
         private String proofPredicate = DataIntegrity.PREDICATE_PROOF;
 
-        private SemanticModel.Accessor.Factory adapterFactory;
+        private SemanticModel.Accessor.Factory accessorFactory;
         private GraphUpdater.Factory updaterFactory;
         private GraphProofCursor.Factory cursorFactory;
         private GraphPayloadGenerator.Factory payloadFactory;
@@ -69,12 +70,17 @@ public class DataIntegrity {
         private Function<Collection<String>, NodeMapper<?>> documentMapper;
 
         private Map<String, GraphProofMapper> proofMappers;
-        
+
         private boolean ed25519Signature2020 = false;
 
         private SemanticModelBuilder(String c14n) {
             this.c14n = c14n;
             this.proofMappers = new LinkedHashMap<>();
+            // default processors
+            this.accessorFactory = GraphAccessor::newInstance;
+            this.updaterFactory = GraphUpdater::new;
+            this.cursorFactory = GraphProofCursor::newInstance;
+            this.payloadFactory = GraphPayloadGenerator::new;
         }
 
         public SemanticModelBuilder proofPredicate(String uri) {
@@ -117,7 +123,7 @@ public class DataIntegrity {
         }
 
         public SemanticModelBuilder accessor(SemanticModel.Accessor.Factory factory) {
-            this.adapterFactory = factory;
+            this.accessorFactory = factory;
             return this;
         }
 
@@ -190,7 +196,7 @@ public class DataIntegrity {
                             null,
                             Graph.PREDICATE_TYPE),
                     new Primitives(
-                            adapterFactory,
+                            accessorFactory,
                             updaterFactory,
                             cursorFactory,
                             payloadFactory),
@@ -297,7 +303,6 @@ public class DataIntegrity {
         }
     }
 
-
     private static class DefaultTypeMapper implements TypeMapping {
 
         Map<Class<?>, Function<Collection<String>, NodeMapper<?>>> mappers;
@@ -308,7 +313,7 @@ public class DataIntegrity {
             var provider = mappers.get(baseclass);
 
             if (provider != null) {
-                return (NodeMapper<T>)provider.apply(types);
+                return (NodeMapper<T>) provider.apply(types);
             }
 
             return null;

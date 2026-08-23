@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.stream.Stream;
@@ -29,10 +30,6 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.model.Model;
-import com.apicatalog.trust.semantic.GraphAccessor;
-import com.apicatalog.trust.semantic.GraphPayloadGenerator;
-import com.apicatalog.trust.semantic.GraphProofCursor;
-import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -51,34 +48,27 @@ class Resources {
 //            .cursor(PropertyProofCursor::newInstance)
 //             .build();
 
-    static Credential.GraphMapper CREDENTIAL_GRAPH_MAPPER = new Credential.GraphMapper();
-
     static SemanticModel VCDM20_SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
             .document(
                     types -> types.contains(Credential.TYPE_URI)
-                            ? CREDENTIAL_GRAPH_MAPPER
+                            ? new Credential.GraphMapper()
                             : null)
-            .proofPredicate(DataIntegrity.PREDICATE_PROOF)
-            // enable DataIntegrityProof cryptosuites
+            .proofPredicate(Credential.PREDICATE_PROOF)
+            // enable selected DataIntegrityProof cryptosuites
             .cryptosuite(EdDSA2022.withRDFC())
             .cryptosuite(ECDSA2019.withRDFC())
             .cryptosuite(MLDSA2024.get44withRDFC())
             .cryptosuite(SLHDSA2024.get128withRDFC())
             // enable legacy Ed25519Signature2020 suite
             .Ed25519Signature2020()
-            // JSON-LD processing
-            .expand(Resources::expand)
-            .tordf(Resources::toRDF)
             // proof type specific c14n provider
             .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
             .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
             // document and default proof c14n provider
-            .c14n(Resources::createRDFC)
-            // document processing
-            .accessor(GraphAccessor::newInstance)
-            .updater(GraphUpdater::new)
-            .cursor(GraphProofCursor::newInstance)
-            .payload(GraphPayloadGenerator::new)
+            .c14n(Resources::newRDFC)
+            // JSON-LD processing
+            .expand(Resources::expand)
+            .tordf(Resources::toRDF)            
             // the model assembly
             .build();
 
@@ -94,7 +84,7 @@ class Resources {
                     Digestor.SHA_256, SHA_256::digest,
                     Digestor.SHA_384, MessageDigest.getInstance("SHA-384")::digest))::get;
 
-        } catch (java.security.NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -163,7 +153,7 @@ class Resources {
         }
     }
 
-    static final RDFCProcessor createRDFC() {
+    static final RDFCProcessor newRDFC() {
         return new RDFCProcessor(); // TODO reuse one instance across
     }
 

@@ -180,7 +180,7 @@ public class Credential {
                     break;
 
                 case PREDICATE_SUBJECT:
-                    if (credential.validUntil != null) {
+                    if (credential.subject != null) {
                         throw new IllegalArgumentException();
                     }
                     credential.subject = Graph.resources(
@@ -192,11 +192,28 @@ public class Credential {
                             typeMapping);
                     break;
 
+                case PREDICATE_STATUS:
+                    if (credential.status != null) {
+                        throw new IllegalArgumentException();
+                    }
+                    credential.status = Graph.resources(
+                            statement,
+                            credential.status,
+                            graph,
+                            model,
+                            Status.class,
+                            typeMapping);
+                    break;
+                
+                case PREDICATE_PROOF:
+                    IO.println("TODO: " + statement);
+                    break;
+                    
                 default:
-//                    throw new IllegalArgumentException(
-//                            """
-//                            Unrecognized predicate has been found %s.
-//                            """.formatted(statement.predicate()));
+                    throw new IllegalArgumentException(
+                            """
+                            Unrecognized predicate has been found %s.
+                            """.formatted(statement.predicate()));
                 }
             }
 

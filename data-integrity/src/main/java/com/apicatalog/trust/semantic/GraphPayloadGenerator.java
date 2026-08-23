@@ -47,7 +47,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
 
         var canonizer = model.newCanonizer();
 
-        Set<String> selectedGraph = Set.of();
+        var selectedGraph = Set.<String>of();
 
         if (!includedProofs.isEmpty()) {
             selectedGraph = HashSet.<String>newHashSet(includedProofs.size());
