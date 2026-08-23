@@ -212,7 +212,7 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
                 labels);
     }
 
-    private Map<String, Object> compacted() {
+    private Map<String, ?> compacted() {
         return model.compact().apply(accessor.context(), accessor.expandedData());
     }
 }

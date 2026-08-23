@@ -1,13 +1,17 @@
 package com.apicatalog.di;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.SequencedCollection;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -20,9 +24,10 @@ import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.lexical.PropertyProofMapper;
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.Graph;
-import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.Graph.NodeMapper;
+import com.apicatalog.trust.semantic.Graph.NodeMapping;
 import com.apicatalog.trust.semantic.Graph.TypeMapping;
+import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphProofMapper;
@@ -60,14 +65,17 @@ public class DataIntegrity {
         private GraphPayloadGenerator.Factory payloadFactory;
 
         private BiConsumer<Object, QuadConsumer> tordf;
-        private BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact;
+        private BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact;
         private Function<Map<String, ?>, SequencedCollection<?>> expand;
 
         private Map<String, Supplier<GraphCanonizer>> proofC14n = Map.of();
 
         private Map<String, CryptoSuite> cryptosuites;
 
+        @Deprecated
         private Function<Collection<String>, NodeMapper<?>> documentMapper;
+
+        private Collection<TypeMapping> typeMapping;
 
         private Map<String, GraphProofMapper> proofMappers;
 
@@ -107,7 +115,7 @@ public class DataIntegrity {
         }
 
         public SemanticModelBuilder compact(
-                BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact) {
+                BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact) {
             this.compact = compact;
             return this;
         }
@@ -148,8 +156,25 @@ public class DataIntegrity {
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder document(Function<Collection<String>, NodeMapper<?>> mapper) {
             this.documentMapper = mapper;
+            return this;
+        }
+
+        public SemanticModelBuilder document(String type, NodeMapper<?> mapper) {
+            if (this.typeMapping == null) {
+                typeMapping = new ArrayList<>();
+            }
+            typeMapping.add(new TypeMapping(new String[] { type }, mapper));
+            return this;
+        }
+
+        public SemanticModelBuilder document(Set<String> types, NodeMapper<?> mapper) {
+            if (this.typeMapping == null) {
+                typeMapping = new ArrayList<>();
+            }
+            typeMapping.add(new TypeMapping(types.toArray(String[]::new), mapper));
             return this;
         }
 
@@ -205,6 +230,9 @@ public class DataIntegrity {
                             compact,
                             tordf),
                     c14nFactory,
+                    typeMapping != null && !typeMapping.isEmpty()
+                            ? new Graph.TypeMappingMatcher(typeMapping)
+                            : null,
                     documentMapper,
                     proofMappers);
         }
@@ -303,7 +331,7 @@ public class DataIntegrity {
         }
     }
 
-    private static class DefaultTypeMapper implements TypeMapping {
+    private static class DefaultTypeMapper implements NodeMapping {
 
         Map<String, Function<Collection<String>, NodeMapper<?>>> mappers;
 

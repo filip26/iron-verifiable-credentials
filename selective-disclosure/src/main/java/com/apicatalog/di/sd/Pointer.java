@@ -52,7 +52,7 @@ class Pointer {
         return tokens.toArray(String[]::new);
     }
 
-    public static Map<String, Object> select(Map<String, Object> source, Collection<String> pointers) {
+    public static Map<String, ?> select(Map<String, ?> source, Collection<String> pointers) {
 
         var target = cloneWithContext(source);
 

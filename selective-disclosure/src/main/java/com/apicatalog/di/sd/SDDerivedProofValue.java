@@ -29,7 +29,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
     protected static final byte[] BYTE_PREFIX = new byte[] { (byte) 0xd9, 0x5d, 0x01 };
 
     private SDDerivedProofValue() {
-//        // TODO Auto-generated constructor stub
+        // protected
     }
 
     public static boolean isAccepted(byte[] signature) {
@@ -153,8 +153,7 @@ public final class SDDerivedProofValue extends SDProofValue<SDDerivedDocument> i
 
         var draft = new DataIntegrityProof.Draft(baseProof.cryptosuite());
         draft.copyOf(baseProof);
-        draft.sign(signature);
-
+        signature.proof = draft.sign(signature);
         return signature;
     }
 

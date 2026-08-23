@@ -53,6 +53,32 @@ public class MaterializeTest {
             assertTrue(credential.hasRequired());
             assertFalse(credential.isExpired());
             assertFalse(credential.isPostDated());
+
+        } else if (document instanceof Presentation presentation) {
+            IO.println(presentation.context());
+            IO.println(presentation.id());
+            IO.println(presentation.type());
+            IO.println(presentation.holder());
+
+            var credentials = presentation.newCredentialCursor();
+
+            while (credentials.next()) {
+
+                var credential = credentials.newAccessor();
+
+                IO.println(credential.document());
+
+                var proofs = credential.createProofCursor();
+                if (proofs != null) {
+                    while (proofs.next()) {
+                        
+                        IO.println("proof > " + proofs.isAccepted());
+                        IO.println("      > " + proofs.proof());
+                        
+                    }
+                }
+            }
+
         }
 
 //        IO.println(document.);

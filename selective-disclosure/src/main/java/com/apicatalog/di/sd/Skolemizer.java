@@ -19,14 +19,14 @@ class Skolemizer {
         this.prefix = urnScheme + "s" + randomValue + "c";
     }
 
-    public static Map<String, Object> skolemize(Map<String, Object> expanded) {
+    public static Map<String, ?> skolemize(Map<String, ?> expanded) {
         return new Skolemizer(
                 URN_PREFIX,
                 Long.toHexString((long) (Math.random() * 10000000)))
                 .skolemizeExpanded(expanded);
     }
 
-    private Collection<Object> skolemizeExpanded(final Collection<?> collection) {
+    private Collection<?> skolemizeExpanded(final Collection<?> collection) {
 
         var skolemized = new ArrayList<>(collection.size());
 
@@ -42,7 +42,7 @@ class Skolemizer {
         return skolemized;
     }
 
-    private Map<String, Object> skolemizeExpanded(final Map<String, Object> document) {
+    private Map<String, ?> skolemizeExpanded(final Map<String, ?> document) {
 
         if (document.containsKey("@value")) {
             return document;

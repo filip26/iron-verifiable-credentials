@@ -3,12 +3,13 @@ package com.apicatalog.vcdm.v2;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
 
 import com.apicatalog.trust.LangString;
 import com.apicatalog.trust.semantic.Graph;
-import com.apicatalog.trust.semantic.Graph.TypeMapping;
+import com.apicatalog.trust.semantic.Graph.NodeMapping;
 import com.apicatalog.trust.semantic.SemanticModel;
 
 public class Credential {
@@ -142,13 +143,13 @@ public class Credential {
 
     public static class GraphMapper implements Graph.NodeMapper<Credential> {
 
-        private final TypeMapping typeMapping;
+        private final NodeMapping typeMapping;
 
         public GraphMapper() {
             this(null);
         }
 
-        public GraphMapper(TypeMapping typeMapping) {
+        public GraphMapper(NodeMapping typeMapping) {
             this.typeMapping = typeMapping;
         }
 
@@ -156,6 +157,7 @@ public class Credential {
         public Credential materialize(
                 SequencedCollection<?> context,
                 Graph.Node node,
+                Map<String, Graph> dataset,
                 SemanticModel model) {
 
             var credential = new Credential();
@@ -184,7 +186,7 @@ public class Credential {
                     if (credential.issuer != null) {
                         throw new IllegalArgumentException();
                     }
-                    credential.issuer = Graph.node(context, statement, node.graph(), model, typeMapping);
+                    credential.issuer = Graph.node(context, statement, node.graph(), dataset, model, typeMapping);
                     break;
 
                 case PREDICATE_VALID_FROM:
@@ -207,6 +209,7 @@ public class Credential {
                             statement,
                             credential.subject,
                             node.graph(),
+                            dataset,
                             model,
                             typeMapping);
                     break;
@@ -217,6 +220,7 @@ public class Credential {
                             statement,
                             credential.status,
                             node.graph(),
+                            dataset,
                             model,
                             typeMapping);
                     break;
@@ -227,6 +231,7 @@ public class Credential {
                             statement,
                             credential.schema,
                             node.graph(),
+                            dataset,
                             model,
                             typeMapping);
                     break;
@@ -237,6 +242,7 @@ public class Credential {
                             statement,
                             credential.termsOfUse,
                             node.graph(),
+                            dataset,
                             model,
                             typeMapping);
                     break;
@@ -247,6 +253,7 @@ public class Credential {
                             statement,
                             credential.evidence,
                             node.graph(),
+                            dataset,
                             model,
                             typeMapping);
                     break;

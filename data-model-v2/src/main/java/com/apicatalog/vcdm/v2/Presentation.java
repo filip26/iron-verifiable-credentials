@@ -1,13 +1,19 @@
 package com.apicatalog.vcdm.v2;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
 
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.semantic.Graph;
-import com.apicatalog.trust.semantic.Graph.TypeMapping;
+import com.apicatalog.trust.semantic.Graph.ResourceStatement;
+import com.apicatalog.trust.semantic.Graph.NodeMapping;
+import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.SemanticModel;
 
 public class Presentation {
@@ -19,12 +25,13 @@ public class Presentation {
     public static final String PREDICATE_HOLDER = "https://www.w3.org/2018/credentials#holder";
     public static final String PREDICATE_TERMS_OF_USE = "https://www.w3.org/2018/credentials#termsOfUse";
 
+    public static final String PREDICATE_PROOF = "https://w3id.org/security#proof";
+    
     public interface CredentialCursor {
 
         boolean next();
 
         Document.Accessor newAccessor();
-
     }
 
     private SequencedCollection<?> context;
@@ -33,6 +40,9 @@ public class Presentation {
     private Set<String> type;
     private Object holder;
     private Collection<?> termsOfUse;
+
+    private SemanticModel model;    //TODO use resolver to get model
+    private Collection<Map<String, Graph>> credential;
 
     /**
      * Checks whether all mandatory properties of the presentation are present,
@@ -71,18 +81,36 @@ public class Presentation {
     }
 
     public CredentialCursor newCredentialCursor() {
-        return null;
+        return new CredentialCursor() {
+
+            Iterator<Map<String, Graph>> datasets = credential.iterator();
+            Map<String, Graph> currentDataset = null;
+
+            @Override
+            public boolean next() {
+                if (datasets.hasNext()) {
+                    this.currentDataset = datasets.next();
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public GraphAccessor newAccessor() {
+                return GraphAccessor.newInstance(model, currentDataset);
+            }
+        };
     }
 
     public static class GraphMapper implements Graph.NodeMapper<Presentation> {
 
-        private final TypeMapping typeMapping;
+        private final NodeMapping typeMapping;
 
         public GraphMapper() {
             this(null);
         }
 
-        public GraphMapper(TypeMapping typeMapping) {
+        public GraphMapper(NodeMapping typeMapping) {
             this.typeMapping = typeMapping;
         }
 
@@ -90,10 +118,12 @@ public class Presentation {
         public Presentation materialize(
                 SequencedCollection<?> context,
                 Graph.Node node,
+                Map<String, Graph> dataset,
                 SemanticModel model) {
 
             var presentation = new Presentation();
             presentation.context = context;
+            presentation.model = model;
 
             if (!node.id().startsWith("_:")) {
                 presentation.id = URI.create(node.id());
@@ -110,11 +140,21 @@ public class Presentation {
                     if (presentation.holder != null) {
                         throw new IllegalArgumentException();
                     }
-                    presentation.holder = Graph.node(context, statement, node.graph(), model, typeMapping);
+                    presentation.holder = Graph.node(context, statement, node.graph(), dataset, model, typeMapping);
                     break;
 
                 case PREDICATE_CREDENTIAL:
-                    // TODO
+                    if (!(statement instanceof ResourceStatement)) {
+                        throw new IllegalArgumentException();
+                    }
+                    if (presentation.credential == null) {
+                        presentation.credential = new ArrayList<>();
+                    }
+
+                    var credential = new HashMap<>(dataset);
+                    credential.put("@default", credential.remove(statement.object()));
+                    
+                    presentation.credential.add(credential);
                     break;
 
                 case PREDICATE_TERMS_OF_USE:
@@ -123,10 +163,15 @@ public class Presentation {
                             statement,
                             presentation.termsOfUse,
                             node.graph(),
+                            dataset,
                             model,
                             typeMapping);
                     break;
 
+                case PREDICATE_PROOF:
+                    // ignored, not mapped directly
+                    break;                    
+                    
                 default:
                     throw new IllegalArgumentException(
                             """

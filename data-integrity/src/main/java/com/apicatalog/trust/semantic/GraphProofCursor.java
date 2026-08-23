@@ -78,9 +78,9 @@ public class GraphProofCursor implements ProofCursor {
             }
         }
 
-        if (proofReaders.isEmpty()) {
-            return null;
-        }
+//        if (proofReaders.isEmpty()) {
+////            return null;
+//        }
 
         return new GraphProofCursor(model, adapter, proofReaders);
     }

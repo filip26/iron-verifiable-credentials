@@ -49,7 +49,9 @@ class Resources {
 
                         return null;
                     })
-            .proofPredicate(Credential.PREDICATE_PROOF)
+            .document(Credential.TYPE_URI, new Credential.GraphMapper())
+            .document(Presentation.TYPE_URI, new Presentation.GraphMapper())
+//            .proofPredicate(Credential.PREDICATE_PROOF)
             // enable selected DataIntegrityProof cryptosuites
             .cryptosuite(EdDSA2022.withRDFC())
             .cryptosuite(ECDSA2019.withRDFC())

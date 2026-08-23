@@ -319,9 +319,9 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
         return SDDerivedProofValue.newInstance(this, derivedDocument, selectedSignatures);
     }
 
-    private static Map<String, Object> recompact(
+    private static Map<String, ?> recompact(
             Collection<?> context,
-            Map<String, Object> document,
+            Map<String, ?> document,
             SemanticModel model) {
 
         var expanded = model.expand().apply(document);

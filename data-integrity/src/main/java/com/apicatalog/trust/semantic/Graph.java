@@ -2,18 +2,23 @@ package com.apicatalog.trust.semantic;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
+import java.util.SequencedMap;
+import java.util.SequencedSet;
 import java.util.Set;
 
 import com.apicatalog.trust.LangString;
 
 public record Graph(
         String id,
-        Map<String, Node> nodes) {
+        SequencedMap<String, Node> nodes) {
 
     public static final String PREDICATE_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
@@ -22,7 +27,7 @@ public record Graph(
         final String id;
         final Graph graph;
 
-        SequencedCollection<String> type;
+        final SequencedSet<String> type;
         Collection<Statement> statements;
 
         public Node(
@@ -30,23 +35,14 @@ public record Graph(
                 Graph graph) {
             this.id = id;
             this.graph = graph;
-            this.type = List.of();
+            this.type = new LinkedHashSet<String>(4);
             this.statements = List.of();
         }
 
         public void addStatement(String predicate, String object, String datatype, String language, String direction) {
 
             if (PREDICATE_TYPE.equals(predicate)) {
-                if (type.isEmpty()) {
-                    type = List.of(object);
-
-                } else if (type.size() == 1) {
-                    type = List.of(type.getFirst(), object);
-
-                } else {
-                    type = new ArrayList<>(type);
-                    type.add(object);
-                }
+                type.add(object);
             }
 
             if (statements.isEmpty()) {
@@ -76,7 +72,7 @@ public record Graph(
             return graph;
         }
 
-        public SequencedCollection<String> type() {
+        public SequencedSet<String> type() {
             return type;
         }
 
@@ -191,11 +187,12 @@ public record Graph(
             Graph.Statement statement,
             Collection<?> value,
             Graph graph,
+            Map<String, Graph> dataset,
             SemanticModel model,
-            TypeMapping typeMapping) {
+            NodeMapping typeMapping) {
 
         if (value == null) {
-            return List.of(node(context, statement, graph, model, typeMapping));
+            return List.of(node(context, statement, graph, dataset, model, typeMapping));
         }
 
         @SuppressWarnings("unchecked")
@@ -205,7 +202,7 @@ public record Graph(
             mutable = new ArrayList<>(value);
         }
 
-        mutable.add(node(context, statement, graph, model, typeMapping));
+        mutable.add(node(context, statement, graph, dataset, model, typeMapping));
         return mutable;
     }
 
@@ -213,8 +210,9 @@ public record Graph(
             SequencedCollection<?> context,
             Graph.Statement statement,
             Graph graph,
+            Map<String, Graph> dataset,
             SemanticModel model,
-            TypeMapping typeMapping) {
+            NodeMapping typeMapping) {
 
         if (!(statement instanceof ResourceStatement resource)) {
             throw new IllegalArgumentException();
@@ -229,7 +227,7 @@ public record Graph(
                 var mapper = typeMapping.mapper(statement.predicate(), node.type());
 
                 if (mapper != null) {
-                    return mapper.materialize(context, node, model);
+                    return mapper.materialize(context, node, dataset, model);
                 }
             }
             return node;
@@ -269,13 +267,85 @@ public record Graph(
         T materialize(
                 SequencedCollection<?> context,
                 Graph.Node node,
+                Map<String, Graph> dataset,
                 SemanticModel model);
     }
 
     @FunctionalInterface
-    public interface TypeMapping {
+    public interface NodeMapping {
 
         <T> NodeMapper<T> mapper(String predicate, Collection<String> types);
 
+    }
+
+    public record TypeMapping(String[] types, NodeMapper<?> mapper) {
+    }
+
+    public static final class TypeMappingMatcher {
+
+        private static final Comparator<TypeMapping> BY_SIZE_DESC = Comparator
+                .comparingInt((TypeMapping mapping) -> mapping.types().length)
+                .reversed();
+
+        private final TypeMapping[] mappings;
+
+        public TypeMappingMatcher(Collection<TypeMapping> mappings) {
+            this.mappings = mappings.toArray(TypeMapping[]::new);
+
+            for (var mapping : this.mappings) {
+                Arrays.sort(mapping.types());
+            }
+
+            Arrays.sort(this.mappings, BY_SIZE_DESC);
+        }
+
+        TypeMapping findBest(Set<String> types) {
+            var query = types.toArray(String[]::new);
+            Arrays.sort(query);
+
+            TypeMapping best = null;
+            int bestMatches = 0;
+
+            for (var mapping : mappings) {
+                if (mapping.types().length <= bestMatches) {
+                    break;
+                }
+
+                int matches = intersectionSize(query, mapping.types());
+
+                if (matches > bestMatches) {
+                    bestMatches = matches;
+                    best = mapping;
+
+                    if (bestMatches == query.length) {
+                        break;
+                    }
+                }
+            }
+
+            return best;
+        }
+
+        static int intersectionSize(String[] a, String[] b) {
+            int ai = 0;
+            int bi = 0;
+            int matches = 0;
+
+            while (ai < a.length && bi < b.length) {
+                int cmp = a[ai].compareTo(b[bi]);
+
+                if (cmp < 0) {
+                    ai++;
+                } else if (cmp > 0) {
+                    bi++;
+                } else {
+                    matches++;
+                    ai++;
+                    bi++;
+                }
+            }
+
+            return matches;
+        }
     }
 }

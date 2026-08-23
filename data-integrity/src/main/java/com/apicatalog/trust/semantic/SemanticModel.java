@@ -3,15 +3,18 @@ package com.apicatalog.trust.semantic;
 import java.util.Collection;
 import java.util.Map;
 import java.util.SequencedCollection;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.apicatalog.trust.Document;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.semantic.Graph.NodeMapper;
+import com.apicatalog.trust.semantic.Graph.TypeMapping;
 
 public class SemanticModel implements Model {
 
@@ -58,7 +61,7 @@ public class SemanticModel implements Model {
 
     public record JsonLdOps(
             Function<Map<String, ?>, SequencedCollection<?>> expand,
-            BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact,
+            BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact,
             BiConsumer<Object, QuadConsumer> tordf) {
     };
 
@@ -70,6 +73,8 @@ public class SemanticModel implements Model {
 
     private final Supplier<GraphCanonizer> canonizeFactory;
 
+    private final Graph.TypeMappingMatcher typeMatcher;
+    @Deprecated
     private final Function<Collection<String>, NodeMapper<?>> documentMapper;
     private final Map<String, GraphProofMapper> proofMappers;
 
@@ -78,6 +83,7 @@ public class SemanticModel implements Model {
             Primitives primitives,
             JsonLdOps jsonLd,
             Supplier<GraphCanonizer> canonizeFactory,
+            Graph.TypeMappingMatcher typeMatcher,
             Function<Collection<String>, NodeMapper<?>> documentMapper, 
             Map<String, GraphProofMapper> proofMappers) {
         this.vocab = vocab;
@@ -85,7 +91,7 @@ public class SemanticModel implements Model {
         this.jsonLd = jsonLd;
 
         this.canonizeFactory = canonizeFactory;
-        
+        this.typeMatcher = typeMatcher;
         this.documentMapper = documentMapper;
         this.proofMappers = proofMappers;
     }
@@ -111,8 +117,13 @@ public class SemanticModel implements Model {
         return primitives.cursor.createCursor(this, adapter);
     }
 
-    public NodeMapper<?> documentMapper(Collection<String> types) {
-        return documentMapper.apply(types);
+    public NodeMapper<?> documentMapper(Set<String> types) {
+        var mapping = typeMatcher.findBest(types);
+        if (mapping != null) {
+            return mapping.mapper();
+        }
+        return null;
+//        return documentMapper.apply(types);
     }
     
     public GraphProofMapper proofMapper(String type) {
@@ -131,7 +142,7 @@ public class SemanticModel implements Model {
         return jsonLd.expand;
     }
 
-    public BiFunction<Collection<?>, Map<String, ?>, Map<String, Object>> compact() {
+    public BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact() {
         return jsonLd.compact;
     }
 
@@ -162,10 +173,23 @@ public class SemanticModel implements Model {
 
         Graph proofGraph(String graph);
 
-        Map<String, Object> expandedData();
+        //TODO move to specialized SDGraphAccessor
+        Map<String, ?> expandedData();
 
         Vocab vocab();
 
         Map<String, ?> source();
+    }
+    
+    public static class DocumentMapping {
+        
+        Predicate<Collection<?>> context;
+        
+        TypeMapping typeMapping;
+        //TODO Map<String, NodeMapper<?>> propertyMapping
+
+        Map<String, GraphProofMapper> proofMappers;
+
+        String proofPredicate;        
     }
 }

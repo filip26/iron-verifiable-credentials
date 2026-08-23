@@ -8,7 +8,7 @@ import com.apicatalog.trust.model.Model;
 
 public record SDDerivedDocument(
         Collection<?> documentContext,
-        Supplier<Map<String, Object>> compacted,
+        Supplier<Map<String, ?>> compacted,
         byte[] canonicalPayload,
         byte[][] redactablePayload,
         int[] indices,

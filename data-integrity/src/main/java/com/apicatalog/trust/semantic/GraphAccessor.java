@@ -1,9 +1,11 @@
 package com.apicatalog.trust.semantic;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
 
@@ -18,23 +20,28 @@ public final class GraphAccessor implements SemanticModel.Accessor {
     private final SequencedCollection<?> context;
     private final Map<String, ?> document;
 
-    private Map<String, Object> expandedData;
-    private Collection<?> expandedProofs;
+    private final Map<String, ?> expandedData;
 
-    private Dataset dataset;
+    private String resource;
+    private final Collection<String> proofGraphs;
+    private final Map<String, Graph> dataset;
 
     protected GraphAccessor(
             SemanticModel model,
             SequencedCollection<?> context,
-            Map<String, ?> document) {
+            Map<String, ?> document,
+            Map<String, Object> expandedData,
+            String resource,
+            Collection<String> proofGraphs,
+            Map<String, Graph> dataset) {
         this.model = model;
         this.context = context;
         this.document = document;
+        this.expandedData = expandedData;
 
-        this.expandedData = null;
-        this.expandedProofs = null;
-
-        this.dataset = null;
+        this.resource = resource;
+        this.proofGraphs = proofGraphs;
+        this.dataset = dataset;
     }
 
     public static GraphAccessor newInstance(
@@ -46,7 +53,93 @@ public final class GraphAccessor implements SemanticModel.Accessor {
             return null;
         }
 
-        return new GraphAccessor(model, context, document);
+        // TODO get term map
+        var expanded = model.expand().apply(document);
+
+        if (expanded.size() != 1) {
+            throw new IllegalArgumentException();
+        }
+
+        Map<String, Object> expandedData = null;
+
+        if (expanded.getFirst() instanceof Map map) {
+            expandedData = new LinkedHashMap<String, Object>(map);
+            if (map.containsKey(model.vocab().proof())) {
+                var proofs = expandedData.remove(model.vocab().proof());
+                if (proofs != null && !(proofs instanceof Collection)) {
+                    throw new IllegalStateException();
+                }
+            }
+
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+        var dataset = new DatasetBuilder();
+        dataset.proofPredicate = model.vocab().proof();
+
+        model.tordf().accept(expanded, dataset);
+
+        return new GraphAccessor(
+                model,
+                context,
+                document,
+                expandedData,
+                dataset.resource,
+                dataset.proofGraphs,
+                dataset.graphs);
+    }
+
+    public static GraphAccessor newInstance(
+            SemanticModel model,
+            Map<String, Graph> dataset) {
+
+        var graph = dataset.get("@default");
+
+        String resource = null;
+        var proofGraphs = List.<String>of();
+
+        if (graph.nodes().size() == 1) {
+            var node = graph.nodes().firstEntry().getValue();
+            resource = node.id;
+            proofGraphs = new ArrayList<String>();
+
+            for (var statement : node.statements()) {
+                if (model.vocab().proof().equals(statement.predicate())) {
+                    proofGraphs.add(statement.object());
+                }
+            }
+
+        } else {
+            proofGraphs = new ArrayList<String>();
+
+            for (var node : graph.nodes().values()) {
+
+                resource = node.id;
+                proofGraphs.clear();
+
+                for (var statement : node.statements()) {
+                    if (model.vocab().proof().equals(statement.predicate())) {
+                        proofGraphs.add(statement.object());
+                    }
+                }
+
+                if (!proofGraphs.isEmpty()) {
+                    break;
+                }
+                
+                resource = null;
+            }
+        }
+IO.println(">>> # " + resource + ", " + proofGraphs);
+        return new GraphAccessor(
+                model,
+                null, // TODO
+                null, // TODO
+                null, // TODO
+                resource,
+                proofGraphs,
+                dataset);
     }
 
     @Override
@@ -68,11 +161,23 @@ public final class GraphAccessor implements SemanticModel.Accessor {
     public Object document() {
         var graph = documentGraph();
 
-        // TODO cache
-        for (var node : graph.nodes().values()) {
-            var mapper = model.documentMapper(node.type());
-            if (mapper != null) {
-                return mapper.materialize(context, node, model);
+        if (model != null) {
+            // TODO cache
+
+            if (resource != null) {
+                var node = graph.nodes().get(resource);
+                var mapper = model.documentMapper(node.type());
+                if (mapper != null) {
+                    return mapper.materialize(context, node, dataset, model);
+                }
+            }
+
+            for (var node : graph.nodes().values()) {
+                var mapper = model.documentMapper(node.type());
+                if (mapper != null) {
+                    resource = node.id();
+                    return mapper.materialize(context, node, dataset, model);
+                }
             }
         }
 
@@ -81,67 +186,30 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     @Override
     public Graph documentGraph() {
-        lazyInit();
-        return dataset.graphs.get("@default");
+        return dataset.get("@default");
     }
 
     @Override
     public Graph proofGraph(String graph) {
-        lazyInit();
-        return dataset.graphs.get(graph);
+        return dataset.get(graph);
     }
 
     public Collection<String> proofGraphs() {
-        lazyInit();
-        return dataset.proofGraphs;
+        return proofGraphs;
     }
 
     @Override
-    public Map<String, Object> expandedData() {
-        lazyInit();
+    public Map<String, ?> expandedData() {
         return expandedData;
     }
 
-    private void lazyInit() {
-
-        if (expandedData != null || dataset != null) {
-            return;
-        }
-
-        // TODO get term map
-        var expanded = model.expand().apply(document);
-
-        if (expanded.size() != 1) {
-            throw new IllegalArgumentException();
-        }
-
-        if (expanded.getFirst() instanceof Map map) {
-            expandedData = new LinkedHashMap<String, Object>(map);
-            if (map.containsKey(model.vocab().proof())) {
-                var proofs = expandedData.remove(model.vocab().proof());
-                if (proofs instanceof Collection<?> col) {
-                    expandedProofs = col;
-                } else {
-                    throw new IllegalStateException();
-                }
-            }
-
-        } else {
-            throw new IllegalArgumentException();
-        }
-
-        dataset = new Dataset();
-        dataset.proofPredicate = model.vocab().proof();
-        model.tordf().accept(expanded, dataset);
-    }
-
-    private static class Dataset implements QuadConsumer {
-
-//        private final Map<String, String> proofTypes = new HashMap<>();
+    private static class DatasetBuilder implements QuadConsumer {
 
         private final Map<String, Graph> graphs = new HashMap<>();
 
         private final Collection<String> proofGraphs = new HashSet<>();
+
+        private String resource = null;
 
         private String proofPredicate;
 
@@ -162,19 +230,21 @@ public final class GraphAccessor implements SemanticModel.Accessor {
                 key = "@default";
 
                 if (proofPredicate.equals(predicate)) {
+                    if (resource == null) {
+                        resource = subject;
+
+                    } else if (!resource.equals(subject)) {
+                        throw new IllegalArgumentException("Multiple nodes with proof predicates ...");
+                    }
                     proofGraphs.add(object);
                 }
             }
 
-            var container = graphs.computeIfAbsent(key, _ -> new Graph(graph, new HashMap<>()));
+            var container = graphs.computeIfAbsent(key, _ -> new Graph(graph, new LinkedHashMap<>()));
 
             var node = container.nodes().computeIfAbsent(
                     subject,
                     _ -> new Graph.Node(subject, container));
-
-//            if (typePredicate.equals(predicate)) {
-//                node.type().add(object);
-//            }
 
             node.addStatement(predicate, object, datatype, language, direction);
         }
