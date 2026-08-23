@@ -25,7 +25,7 @@ public class Credential {
     public static final String PREDICATE_STATUS = "https://www.w3.org/2018/credentials#credentialStatus";
     public static final String PREDICATE_SCHEMA = "https://www.w3.org/2018/credentials#credentialSchema";
     public static final String PREDICATE_CONFIDENCE_METHOD = "https://www.w3.org/2018/credentials#credentialSchema";
-    
+
     public static final String PREDICATE_EVIDENCE = "https://www.w3.org/2018/credentials#evidence";
     public static final String PREDICATE_REFRESH_SERVICE = "https://www.w3.org/2018/credentials#refreshService";
     public static final String PREDICATE_RELATED_RESOURCES = "https://www.w3.org/2018/credentials#relatedResource";
@@ -58,30 +58,50 @@ public class Credential {
     Collection<?> schema;
     Collection<?> evidence;
 
-//        default Collection<Object> status() {
-//            return List.of();
-//        }
-//
-//        /**
-//         * Checks if the credential is expired.
-//         *
-//         * @return <code>true</code> if the credential is expired
-//         */
-//        default boolean isExpired() {
-//            return validUntil() != null && Instant.now().isAfter(validUntil());
-//        }
-//
-//        /**
-//         * Checks if the credential is active, i.e. does not define validFrom property
-//         * or the property datetime is before now.
-//         * 
-//         * @since 0.90.0
-//         * 
-//         * @return <code>true</code> if the credential is active
-//         */
-//        default boolean isNotValidYet() {
-//            return validFrom() != null && validFrom().isAfter(Instant.now());
-//        }
+    /**
+     * Checks whether all mandatory properties of the credential are present,
+     * excluding the proofs itself.
+     *
+     * @return {@code true} if all required properties are present, {@code false}
+     *         otherwise
+     */
+    public boolean hasRequired() {
+        return context != null && VCDM2.isDefined(context)
+                && type != null && !type.isEmpty()
+                && issuer != null
+        // TODO
+        ;
+
+    }
+
+    /**
+     * Checks whether the credential has expired according to its temporal
+     * properties and the current system time.
+     *
+     * @return {@code true} if the credential is expired, {@code false} otherwise
+     */
+    public boolean isExpired() {
+        return validUntil != null && validUntil.isBefore(Instant.now());
+    }
+
+    /**
+     * Checks whether the credential is post-dated ({@link Credential#validFrom()}
+     * in the future relative to the current system time).
+     *
+     * @return {@code true} if the credential's validFrom time is in the future,
+     *         {@code false} otherwise
+     */
+    public boolean isPostDated() {
+        return validFrom != null && Instant.now().isBefore(validFrom);
+    }
+
+    public Instant validFrom() {
+        return validFrom;
+    }
+
+    public Instant validUntil() {
+        return validUntil;
+    }
 
     public interface Issuer {
 
@@ -115,11 +135,6 @@ public class Credential {
 
     }
 
-//
-//    public static GraphMapper newGraphMapper(TypeMapping typeMapping) {
-//        return new GraphMapper(typeMapping);
-//    }
-//    
     public static class GraphMapper implements Graph.NodeMapper<Credential> {
 
         private final TypeMapping typeMapping;
@@ -204,11 +219,11 @@ public class Credential {
                             Status.class,
                             typeMapping);
                     break;
-                
+
                 case PREDICATE_PROOF:
                     IO.println("TODO: " + statement);
                     break;
-                    
+
                 default:
                     throw new IllegalArgumentException(
                             """
@@ -217,9 +232,7 @@ public class Credential {
                 }
             }
 
-            // TODO Auto-generated method stub
             return credential;
         }
-
     }
 }
