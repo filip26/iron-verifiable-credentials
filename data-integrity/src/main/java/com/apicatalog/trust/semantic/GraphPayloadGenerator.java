@@ -79,7 +79,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
                                     statement.datatype(),
                                     statement.language(),
                                     statement.direction(),
-                                    proofNode.graph());
+                                    proofNode.graph().id());
                         }
                     }
                 }
@@ -98,7 +98,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
                             statement.datatype(),
                             statement.language(),
                             statement.direction(),
-                            node.graph());
+                            node.graph().id());
                 }
             }
         }

@@ -305,12 +305,12 @@ public class DataIntegrity {
 
     private static class DefaultTypeMapper implements TypeMapping {
 
-        Map<Class<?>, Function<Collection<String>, NodeMapper<?>>> mappers;
+        Map<String, Function<Collection<String>, NodeMapper<?>>> mappers;
 
         @Override
-        public <T> NodeMapper<T> mapper(Class<T> baseclass, Collection<String> types) {
+        public <T> NodeMapper<T> mapper(String predicate, Collection<String> types) {
 
-            var provider = mappers.get(baseclass);
+            var provider = mappers.get(predicate);
 
             if (provider != null) {
                 return (NodeMapper<T>) provider.apply(types);

@@ -25,7 +25,7 @@ public class HybridModel implements Model {
 
     @Override
     // TODO add context as parameter
-    public Document.Accessor createAccessor(Collection<?> context, Map<String, ?> document) {
+    public Document.Accessor createAccessor(SequencedCollection<?> context, Map<String, ?> document) {
 
         var hybrid = new Adapter();
 
@@ -153,7 +153,7 @@ public class HybridModel implements Model {
     }
 
     @Override
-    public Updater createUpdater(Collection<?> context, Map<String, ?> document) {
+    public Updater createUpdater(SequencedCollection<?> context, Map<String, ?> document) {
         throw new UnsupportedOperationException();
     }
 }

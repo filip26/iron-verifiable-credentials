@@ -1,7 +1,7 @@
 package com.apicatalog.trust.model;
 
-import java.util.Collection;
 import java.util.Map;
+import java.util.SequencedCollection;
 
 import com.apicatalog.trust.Document;
 
@@ -14,8 +14,8 @@ public interface Model {
     record Vocab(String context, String proof, String id, String type) {
     };
 
-    Document.Accessor createAccessor(Collection<?> context, Map<String, ?> document);
-    Document.Updater createUpdater(Collection<?> context, Map<String, ?> document);
+    Document.Accessor createAccessor(SequencedCollection<?> context, Map<String, ?> document);
+    Document.Updater createUpdater(SequencedCollection<?> context, Map<String, ?> document);
 
     Vocab vocab();
 

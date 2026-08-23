@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
@@ -159,7 +159,7 @@ public class IssuerTest {
         assertTrue(VerifierTest.PROOF_VERIFIER.verify(proof));
     }
 
-    static BiFunction<Collection<?>, Map<String, ?>, Document.Updater> getUpdater(String c14n) {
+    static BiFunction<SequencedCollection<?>, Map<String, ?>, Document.Updater> getUpdater(String c14n) {
         return switch (c14n) {
         case Model.C14N_RDFC -> Resources.SEMANTIC_MODEL::createUpdater;
         case Model.C14N_JCS -> Resources.LEXICAL_MODEL::createUpdater;

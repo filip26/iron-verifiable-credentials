@@ -1,5 +1,8 @@
 package com.apicatalog.vcdm.v2;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,7 +38,7 @@ public class MaterializeTest {
         var document = accessor.document();
 
         IO.println(document);
-        
+
         if (document instanceof Credential credential) {
             IO.println(credential.context);
             IO.println(credential.id);
@@ -47,15 +50,18 @@ public class MaterializeTest {
             IO.println(credential.issuer);
             IO.println(credential.subject);
 
+            assertTrue(credential.hasRequired());
+            assertFalse(credential.isExpired());
+            assertFalse(credential.isPostDated());
         }
-        
+
 //        IO.println(document.);
     }
 
     static final Stream<String> resources() {
         return Resources
                 .stream()
-                .filter(name -> name.endsWith(".signed.json"))
+                .filter(name -> name.endsWith(".json"))
                 .sorted();
     }
 }

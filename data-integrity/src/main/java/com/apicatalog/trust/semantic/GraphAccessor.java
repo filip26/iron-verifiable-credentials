@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SequencedCollection;
 
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.proof.ProofCursor;
@@ -14,7 +15,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     private final SemanticModel model;
 
-    private final Collection<?> context;
+    private final SequencedCollection<?> context;
     private final Map<String, ?> document;
 
     private Map<String, Object> expandedData;
@@ -24,7 +25,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     protected GraphAccessor(
             SemanticModel model,
-            Collection<?> context,
+            SequencedCollection<?> context,
             Map<String, ?> document) {
         this.model = model;
         this.context = context;
@@ -38,7 +39,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     public static GraphAccessor newInstance(
             SemanticModel model,
-            Collection<?> context,
+            SequencedCollection<?> context,
             Map<String, ?> document) {
 
         if (context == null || context.isEmpty()) {
@@ -54,7 +55,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
     }
 
     @Override
-    public Collection<?> context() {
+    public SequencedCollection<?> context() {
         return context;
     }
 
@@ -65,15 +66,13 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     @Override
     public Object document() {
-        lazyInit();
-
-        var graph = dataset.graphs.get("@default");
+        var graph = documentGraph();
 
         // TODO cache
         for (var node : graph.nodes().values()) {
             var mapper = model.documentMapper(node.type());
             if (mapper != null) {
-                return mapper.materialize(node, graph, model);
+                return mapper.materialize(context, node, model);
             }
         }
 
@@ -171,7 +170,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
             var node = container.nodes().computeIfAbsent(
                     subject,
-                    _ -> new Graph.Node(subject, graph));
+                    _ -> new Graph.Node(subject, container));
 
 //            if (typePredicate.equals(predicate)) {
 //                node.type().add(object);

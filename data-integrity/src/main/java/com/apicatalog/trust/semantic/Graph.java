@@ -3,10 +3,13 @@ package com.apicatalog.trust.semantic;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
+import java.util.Set;
+
+import com.apicatalog.trust.LangString;
 
 public record Graph(
         String id,
@@ -17,14 +20,14 @@ public record Graph(
     public static final class Node {
 
         final String id;
-        final String graph;
+        final Graph graph;
 
         SequencedCollection<String> type;
         Collection<Statement> statements;
 
         public Node(
                 String id,
-                String graph) {
+                Graph graph) {
             this.id = id;
             this.graph = graph;
             this.type = List.of();
@@ -69,7 +72,7 @@ public record Graph(
             return id;
         }
 
-        public String graph() {
+        public Graph graph() {
             return graph;
         }
 
@@ -135,40 +138,38 @@ public record Graph(
         }
     };
 
-    public static final Map<String, String> langMap(Graph.Statement statement, Map<String, String> value, boolean allowAlts) {
+    public static final SequencedCollection<LangString> langMap(
+            Graph.Statement statement,
+            SequencedCollection<LangString> value,
+            boolean allowAlts) {
 
-        String language = null;
-        String text = null;
+        final LangString langString;
 
-        if (statement instanceof LangStringStatement langString) {
+        if (statement instanceof LangStringStatement ls) {
 
-            language = langString.tag();
-            text = langString.object();
-            // FIXME, check if string
+            langString = new LangString(ls.object, ls.language, ls.direction);
+
         } else if (statement instanceof LiteralStatement literal) {
 
-            if (!allowAlts && value != null && value.containsKey("@default")) {
-                throw new IllegalArgumentException();
-            }
-            
-            language = (value == null || !value.containsKey("@default")) ? "@default" : "@alt-" + value.size();
-            text = literal.object;
+            // FIXME, check if string
+            langString = new LangString(literal.object, null, null);
 
         } else {
             throw new IllegalArgumentException(" ..., but was " + statement);
         }
 
         if (value == null) {
-            return Map.of(language, text);
+            return List.of(langString);
         }
 
         var mutable = value;
 
         if (value.size() == 1) {
-            mutable = new HashMap<String, String>(value);
+            mutable = new ArrayList<>(48);
+            mutable.add(value.getFirst());
         }
 
-        mutable.put(language, text);
+        mutable.add(langString);
         return mutable;
     }
 
@@ -186,15 +187,15 @@ public record Graph(
     }
 
     public static final Collection<?> resources(
+            SequencedCollection<?> context,
             Graph.Statement statement,
             Collection<?> value,
             Graph graph,
             SemanticModel model,
-            Class<?> baseclazz,
             TypeMapping typeMapping) {
 
         if (value == null) {
-            return List.of(resource(statement, graph, model, baseclazz, typeMapping));
+            return List.of(resource(context, statement, graph, model, typeMapping));
         }
 
         @SuppressWarnings("unchecked")
@@ -204,15 +205,15 @@ public record Graph(
             mutable = new ArrayList<>(value);
         }
 
-        mutable.add(resource(statement, graph, model, baseclazz, typeMapping));
+        mutable.add(resource(context, statement, graph, model, typeMapping));
         return mutable;
     }
 
     public static final Object resource(
+            SequencedCollection<?> context,
             Graph.Statement statement,
             Graph graph,
             SemanticModel model,
-            Class<?> baseclazz,
             TypeMapping typeMapping) {
 
         if (!(statement instanceof ResourceStatement resource)) {
@@ -225,10 +226,10 @@ public record Graph(
 
             if (typeMapping != null) {
 
-                var mapper = typeMapping.mapper(baseclazz, node.type());
+                var mapper = typeMapping.mapper(statement.predicate(), node.type());
 
                 if (mapper != null) {
-                    return mapper.materialize(node, graph, model);
+                    return mapper.materialize(context, node, model);
                 }
             }
             return node;
@@ -236,20 +237,45 @@ public record Graph(
         return resource.object();
     }
 
+    public static final Set<String> ids(
+            Graph.Statement statement,
+            Set<String> value) {
+
+        if (!(statement instanceof ResourceStatement)) {
+            throw new IllegalArgumentException(" ..., but was " + statement);
+
+        }
+
+        var string = statement.object();
+
+        if (value == null) {
+            return Set.of(string);
+        }
+
+        var mutable = value;
+
+        if (value.size() == 1) {
+            mutable = new HashSet<>(value);
+        }
+
+        mutable.add(string);
+        return mutable;
+    }
+
     @FunctionalInterface
     public interface NodeMapper<T> {
 
         // reads from n-quads
         T materialize(
+                SequencedCollection<?> context,
                 Graph.Node node,
-                Graph graph,
                 SemanticModel model);
     }
 
     @FunctionalInterface
     public interface TypeMapping {
 
-        <T> NodeMapper<T> mapper(Class<T> baseclass, Collection<String> types);
+        <T> NodeMapper<T> mapper(String predicate, Collection<String> types);
 
     }
 }

@@ -36,23 +36,19 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-//    static LexicalModel VCDM20_LEXICAL_MODEL = DataIntegrity.newLexicalModel(Model.C14N_JCS)
-//            .proofProperty(DataIntegrity.PROPERTY_PROOF)
-//            .proof(EdDSA2022.withJCS())
-//            .proof(ECDSA2019.withJCS())
-//            .proof(MLDSA2024.get44withJCS())
-//            .proof(SLHDSA2024.get128withJCS())
-//            .c14n(DataIntegrityProof.TYPE_NAME, StaticJCS::canonize) // proof type specific c14n provider
-    ////            .c14n(Jcs::canonize)
-//            .accessor(PropertyMapAccessor::newInstance)
-//            .cursor(PropertyProofCursor::newInstance)
-//             .build();
-
     static SemanticModel VCDM20_SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
             .document(
-                    types -> types.contains(Credential.TYPE_URI)
-                            ? new Credential.GraphMapper()
-                            : null)
+                    types -> {
+
+                        if (types.contains(Credential.TYPE_URI)) {
+                            return new Credential.GraphMapper();
+
+                        } else if (types.contains(Presentation.TYPE_URI)) {
+                            return new Presentation.GraphMapper();
+                        }
+
+                        return null;
+                    })
             .proofPredicate(Credential.PREDICATE_PROOF)
             // enable selected DataIntegrityProof cryptosuites
             .cryptosuite(EdDSA2022.withRDFC())
@@ -68,7 +64,7 @@ class Resources {
             .c14n(Resources::newRDFC)
             // JSON-LD processing
             .expand(Resources::expand)
-            .tordf(Resources::toRDF)            
+            .tordf(Resources::toRDF)
             // the model assembly
             .build();
 

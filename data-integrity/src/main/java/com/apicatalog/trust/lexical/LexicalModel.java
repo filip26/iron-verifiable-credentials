@@ -1,7 +1,7 @@
 package com.apicatalog.trust.lexical;
 
-import java.util.Collection;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.function.Function;
 
 import com.apicatalog.trust.Document.Updater;
@@ -31,14 +31,14 @@ public class LexicalModel implements Model {
     }
 
     @Override
-    public LexicalAccessor createAccessor(Collection<?> context, Map<String, ?> document) {
+    public LexicalAccessor createAccessor(SequencedCollection<?> context, Map<String, ?> document) {
         return processorFactory.createAdapter(
                 this,
                 document);
     }
 
     @Override
-    public Updater createUpdater(Collection<?> context, Map<String, ?> document) {
+    public Updater createUpdater(SequencedCollection<?> context, Map<String, ?> document) {
         return new LexicalUpdater(this, createAccessor(context, document));
     }
 
@@ -46,7 +46,7 @@ public class LexicalModel implements Model {
         return cursorFactory.newInstance(this, processor);
     }
 
-    public PropertyMapPayloadGenerator createPayload(Collection<?> context, Map<String, ?> document) {
+    public PropertyMapPayloadGenerator createPayload(SequencedCollection<?> context, Map<String, ?> document) {
         return createPayload(createAccessor(context, document));
     }
 

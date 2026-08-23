@@ -3,9 +3,10 @@ package com.apicatalog.vcdm.v2;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Map;
 import java.util.SequencedCollection;
+import java.util.Set;
 
+import com.apicatalog.trust.LangString;
 import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.Graph.TypeMapping;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -38,13 +39,11 @@ public class Credential {
 
     URI id;
 
-    Collection<String> type;
+    Set<String> type;
 
-    // returns lang-map
-    Map<String, String> name;
+    SequencedCollection<LangString> name;
 
-    // returns lang-map
-    Map<String, String> description;
+    SequencedCollection<LangString> description;
 
     Object issuer;
 
@@ -57,6 +56,7 @@ public class Credential {
     Collection<?> status;
     Collection<?> schema;
     Collection<?> evidence;
+    Collection<?> termsOfUse;
 
     /**
      * Checks whether all mandatory properties of the credential are present,
@@ -67,11 +67,11 @@ public class Credential {
      */
     public boolean hasRequired() {
         return context != null && VCDM2.isDefined(context)
-                && type != null && !type.isEmpty()
+                && type != null && type.contains(TYPE_URI)
                 && issuer != null
+                && subject != null && !subject.isEmpty()
         // TODO
         ;
-
     }
 
     /**
@@ -95,6 +95,31 @@ public class Credential {
         return validFrom != null && Instant.now().isBefore(validFrom);
     }
 
+    /**
+     * The JSON-LD context used to process the credentials.
+     * 
+     * @return a collection of strings representing the JSON-LD context URIs
+     */
+    public SequencedCollection<?> context() {
+        return context;
+    }
+
+    public URI id() {
+        return id;
+    }
+
+    public Set<String> type() {
+        return type;
+    }
+
+    public Collection<LangString> name() {
+        return name;
+    }
+
+    public Collection<LangString> description() {
+        return description;
+    }
+
     public Instant validFrom() {
         return validFrom;
     }
@@ -103,36 +128,16 @@ public class Credential {
         return validUntil;
     }
 
-    public interface Issuer {
-
+    public Object issuer() {
+        return issuer;
     }
 
-    public interface Evidence {
-
+    public Collection<?> subject() {
+        return subject;
     }
 
-    public interface Schema {
-
-    }
-
-    public interface Status {
-
-    }
-
-    public interface ConfidenceMethod {
-
-    }
-
-    public interface RefreshService {
-
-    }
-
-    public interface RenderMethod {
-
-    }
-
-    public interface TermsOfUse {
-
+    public Collection<?> status() {
+        return status;
     }
 
     public static class GraphMapper implements Graph.NodeMapper<Credential> {
@@ -149,20 +154,22 @@ public class Credential {
 
         @Override
         public Credential materialize(
-                Graph.Node root,
-                Graph graph,
+                SequencedCollection<?> context,
+                Graph.Node node,
                 SemanticModel model) {
 
             var credential = new Credential();
+            credential.context = context;
 
-            if (!root.id().startsWith("_:")) {
-                credential.id = URI.create(root.id());
+            if (!node.id().startsWith("_:")) {
+                credential.id = URI.create(node.id());
             }
 
-            for (var statement : root.statements()) {
+            for (var statement : node.statements()) {
 
                 switch (statement.predicate()) {
                 case Graph.PREDICATE_TYPE:
+                    credential.type = Graph.ids(statement, credential.type);
                     break;
 
                 case PREDICATE_NAME:
@@ -177,7 +184,7 @@ public class Credential {
                     if (credential.issuer != null) {
                         throw new IllegalArgumentException();
                     }
-                    credential.issuer = Graph.resource(statement, graph, model, Issuer.class, typeMapping);
+                    credential.issuer = Graph.resource(context, statement, node.graph(), model, typeMapping);
                     break;
 
                 case PREDICATE_VALID_FROM:
@@ -195,33 +202,57 @@ public class Credential {
                     break;
 
                 case PREDICATE_SUBJECT:
-                    if (credential.subject != null) {
-                        throw new IllegalArgumentException();
-                    }
                     credential.subject = Graph.resources(
+                            context,
                             statement,
                             credential.subject,
-                            graph,
+                            node.graph(),
                             model,
-                            Issuer.class, // FIXME
                             typeMapping);
                     break;
 
                 case PREDICATE_STATUS:
-                    if (credential.status != null) {
-                        throw new IllegalArgumentException();
-                    }
                     credential.status = Graph.resources(
+                            context,
                             statement,
                             credential.status,
-                            graph,
+                            node.graph(),
                             model,
-                            Status.class,
+                            typeMapping);
+                    break;
+
+                case PREDICATE_SCHEMA:
+                    credential.schema = Graph.resources(
+                            context,
+                            statement,
+                            credential.schema,
+                            node.graph(),
+                            model,
+                            typeMapping);
+                    break;
+
+                case PREDICATE_TERMS_OF_USE:
+                    credential.termsOfUse = Graph.resources(
+                            context,
+                            statement,
+                            credential.termsOfUse,
+                            node.graph(),
+                            model,
+                            typeMapping);
+                    break;
+
+                case PREDICATE_EVIDENCE:
+                    credential.evidence = Graph.resources(
+                            context,
+                            statement,
+                            credential.evidence,
+                            node.graph(),
+                            model,
                             typeMapping);
                     break;
 
                 case PREDICATE_PROOF:
-                    IO.println("TODO: " + statement);
+                    // ignored, not mapped directly
                     break;
 
                 default:
@@ -235,4 +266,37 @@ public class Credential {
             return credential;
         }
     }
+
+//  public interface Issuer {
+//
+//  }
+//
+//  public interface Evidence {
+//
+//  }
+//
+//  public interface Schema {
+//
+//  }
+//
+//  public interface Status {
+//
+//  }
+//
+//  public interface ConfidenceMethod {
+//
+//  }
+//
+//  public interface RefreshService {
+//
+//  }
+//
+//  public interface RenderMethod {
+//
+//  }
+//
+//  public interface TermsOfUse {
+//
+//  }
+
 }

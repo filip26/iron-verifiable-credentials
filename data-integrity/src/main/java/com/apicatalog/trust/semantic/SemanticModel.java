@@ -91,7 +91,7 @@ public class SemanticModel implements Model {
     }
 
     @Override
-    public SemanticModel.Accessor createAccessor(Collection<?> context, Map<String, ?> document) {
+    public SemanticModel.Accessor createAccessor(SequencedCollection<?> context, Map<String, ?> document) {
         return primitives.adapter.createAdapter(
                 this,
                 context,
@@ -99,7 +99,7 @@ public class SemanticModel implements Model {
     }
 
     @Override
-    public Document.Updater createUpdater(Collection<?> context, Map<String, ?> document) {
+    public Document.Updater createUpdater(SequencedCollection<?> context, Map<String, ?> document) {
         return primitives.updater.createUpdater(this, createAccessor(context, document));
     }
 
@@ -146,11 +146,11 @@ public class SemanticModel implements Model {
         public interface Factory {
             SemanticModel.Accessor createAdapter(
                     SemanticModel model,
-                    Collection<?> context,
+                    SequencedCollection<?> context,
                     Map<String, ?> document);
         }
 
-        Collection<?> context();
+        SequencedCollection<?> context();
 
         @Override
         Object document();
