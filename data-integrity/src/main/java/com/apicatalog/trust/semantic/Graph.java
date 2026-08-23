@@ -135,14 +135,31 @@ public record Graph(
         }
     };
 
-    public static final Map<String, String> langMap(Graph.Statement statement, Map<String, String> value) {
+    public static final Map<String, String> langMap(Graph.Statement statement, Map<String, String> value, boolean allowAlts) {
 
-        if (!(statement instanceof LangStringStatement langString)) {
-            throw new IllegalArgumentException();
+        String language = null;
+        String text = null;
+
+        if (statement instanceof LangStringStatement langString) {
+
+            language = langString.tag();
+            text = langString.object();
+            // FIXME, check if string
+        } else if (statement instanceof LiteralStatement literal) {
+
+            if (!allowAlts && value != null && value.containsKey("@default")) {
+                throw new IllegalArgumentException();
+            }
+            
+            language = (value == null || !value.containsKey("@default")) ? "@default" : "@alt-" + value.size();
+            text = literal.object;
+
+        } else {
+            throw new IllegalArgumentException(" ..., but was " + statement);
         }
 
         if (value == null) {
-            return Map.of(langString.tag(), langString.object());
+            return Map.of(language, text);
         }
 
         var mutable = value;
@@ -151,7 +168,7 @@ public record Graph(
             mutable = new HashMap<String, String>(value);
         }
 
-        mutable.put(langString.tag(), langString.object());
+        mutable.put(language, text);
         return mutable;
     }
 

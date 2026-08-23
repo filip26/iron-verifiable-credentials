@@ -35,6 +35,21 @@ public class MaterializeTest {
         var document = accessor.document();
 
         IO.println(document);
+        
+        if (document instanceof Credential credential) {
+            IO.println(credential.context);
+            IO.println(credential.id);
+            IO.println(credential.type);
+            IO.println(credential.name);
+            IO.println(credential.description);
+            IO.println(credential.validFrom);
+            IO.println(credential.validUntil);
+            IO.println(credential.issuer);
+            IO.println(credential.subject);
+
+        }
+        
+//        IO.println(document.);
     }
 
     static final Stream<String> resources() {

@@ -15,6 +15,25 @@ public class Credential {
     public static final String TYPE_URI = "https://www.w3.org/2018/credentials#VerifiableCredential";
     public static final String TYPE_NAME = "VerifiableCredential";
 
+    public static final String PREDICATE_NAME = "https://schema.org/name";
+    public static final String PREDICATE_DESCRIPTION = "https://schema.org/description";
+    public static final String PREDICATE_ISSUER = "https://www.w3.org/2018/credentials#issuer";
+    public static final String PREDICATE_VALID_FROM = "https://www.w3.org/2018/credentials#validFrom";
+    public static final String PREDICATE_VALID_UNTIL = "https://www.w3.org/2018/credentials#validUntil";
+
+    public static final String PREDICATE_SUBJECT = "https://www.w3.org/2018/credentials#credentialSubject";
+    public static final String PREDICATE_STATUS = "https://www.w3.org/2018/credentials#credentialStatus";
+    public static final String PREDICATE_SCHEMA = "https://www.w3.org/2018/credentials#credentialSchema";
+    public static final String PREDICATE_CONFIDENCE_METHOD = "https://www.w3.org/2018/credentials#credentialSchema";
+    
+    public static final String PREDICATE_EVIDENCE = "https://www.w3.org/2018/credentials#evidence";
+    public static final String PREDICATE_REFRESH_SERVICE = "https://www.w3.org/2018/credentials#refreshService";
+    public static final String PREDICATE_RELATED_RESOURCES = "https://www.w3.org/2018/credentials#relatedResource";
+    public static final String PREDICATE_RENDER_METHOD = "https://www.w3.org/2018/credentials#renderMethod";
+    public static final String PREDICATE_TERMS_OF_USE = "https://www.w3.org/2018/credentials#termsOfUse";
+
+    public static final String PREDICATE_PROOF = "https://w3id.org/security#proof";
+
     SequencedCollection<?> context;
 
     URI id;
@@ -131,48 +150,53 @@ public class Credential {
                 case Graph.PREDICATE_TYPE:
                     break;
 
-                case "https://schema.org/name":
-                    credential.name = Graph.langMap(statement, credential.name);
+                case PREDICATE_NAME:
+                    credential.name = Graph.langMap(statement, credential.name, false);
                     break;
 
-                case "https://schema.org/description":
-                    credential.description = Graph.langMap(statement, credential.description);
+                case PREDICATE_DESCRIPTION:
+                    credential.description = Graph.langMap(statement, credential.description, false);
                     break;
 
-                case "https://www.w3.org/2018/credentials#issuer":
+                case PREDICATE_ISSUER:
                     if (credential.issuer != null) {
                         throw new IllegalArgumentException();
                     }
                     credential.issuer = Graph.resource(statement, graph, model, Issuer.class, typeMapping);
                     break;
 
-                case "https://www.w3.org/2018/credentials#validFrom":
+                case PREDICATE_VALID_FROM:
                     if (credential.validFrom != null) {
                         throw new IllegalArgumentException();
                     }
                     credential.validFrom = Graph.xsdDateTime(statement);
                     break;
 
-                case "https://www.w3.org/2018/credentials#validUntil":
+                case PREDICATE_VALID_UNTIL:
                     if (credential.validUntil != null) {
                         throw new IllegalArgumentException();
                     }
                     credential.validUntil = Graph.xsdDateTime(statement);
                     break;
 
-                case "https://www.w3.org/2018/credentials#credentialSubject":
+                case PREDICATE_SUBJECT:
                     if (credential.validUntil != null) {
                         throw new IllegalArgumentException();
                     }
-                    credential.subject = Graph.resources(statement, credential.subject, graph, model, Issuer.class,
+                    credential.subject = Graph.resources(
+                            statement,
+                            credential.subject,
+                            graph,
+                            model,
+                            Issuer.class, // FIXME
                             typeMapping);
                     break;
 
                 default:
-                    throw new IllegalArgumentException(
-                            """
-                            Unrecognized predicate has been found %s.
-                            """.formatted(statement.predicate()));
+//                    throw new IllegalArgumentException(
+//                            """
+//                            Unrecognized predicate has been found %s.
+//                            """.formatted(statement.predicate()));
                 }
             }
 

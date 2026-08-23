@@ -153,7 +153,9 @@ public class SemanticModel implements Model {
         Collection<?> context();
 
         @Override
-        Graph document();
+        Object document();
+
+        Graph documentGraph();
 
         // returns proof graph ids, might be URI or blank node identifier
         Collection<String> proofGraphs();

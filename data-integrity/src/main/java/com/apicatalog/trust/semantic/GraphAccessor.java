@@ -62,10 +62,26 @@ public final class GraphAccessor implements SemanticModel.Accessor {
     public Map<String, ?> source() {
         return document;
     }
-    
+
     @Override
-    public Graph document() {
+    public Object document() {
         lazyInit();
+
+        var graph = dataset.graphs.get("@default");
+
+        // TODO cache
+        for (var node : graph.nodes().values()) {
+            var mapper = model.documentMapper(node.type());
+            if (mapper != null) {
+                return mapper.materialize(node, graph, model);
+            }
+        }
+
+        return graph;
+    }
+
+    @Override
+    public Graph documentGraph() {
         return dataset.graphs.get("@default");
     }
 

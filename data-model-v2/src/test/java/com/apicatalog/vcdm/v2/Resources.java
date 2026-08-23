@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.stream.Stream;
@@ -60,22 +59,27 @@ class Resources {
                             ? CREDENTIAL_GRAPH_MAPPER
                             : null)
             .proofPredicate(DataIntegrity.PREDICATE_PROOF)
+            // enable DataIntegrityProof cryptosuites
             .cryptosuite(EdDSA2022.withRDFC())
             .cryptosuite(ECDSA2019.withRDFC())
             .cryptosuite(MLDSA2024.get44withRDFC())
             .cryptosuite(SLHDSA2024.get128withRDFC())
+            // enable legacy Ed25519Signature2020 suite
             .Ed25519Signature2020()
+            // JSON-LD processing
             .expand(Resources::expand)
             .tordf(Resources::toRDF)
             // proof type specific c14n provider
             .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
             .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
-            // document and proof c14n provider
+            // document and default proof c14n provider
             .c14n(Resources::createRDFC)
+            // document processing
             .accessor(GraphAccessor::newInstance)
             .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
+            // the model assembly
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;
