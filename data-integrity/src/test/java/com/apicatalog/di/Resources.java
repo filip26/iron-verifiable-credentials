@@ -46,10 +46,10 @@ class Resources {
 
     static LexicalModel LEXICAL_MODEL = DataIntegrity.newLexicalModel(Model.C14N_JCS)
             .proofProperty(DataIntegrity.PROPERTY_PROOF)
-            .proof(EdDSA2022.withJCS())
-            .proof(ECDSA2019.withJCS())
-            .proof(MLDSA2024.get44withJCS())
-            .proof(SLHDSA2024.get128withJCS())
+            .cryptosuite(EdDSA2022.withJCS())
+            .cryptosuite(ECDSA2019.withJCS())
+            .cryptosuite(MLDSA2024.get44withJCS())
+            .cryptosuite(SLHDSA2024.get128withJCS())
             .c14n(DataIntegrityProof.TYPE_NAME, StaticJCS::canonize) // proof type specific c14n provider
             .c14n(Jcs::canonize)
             .accessor(PropertyMapAccessor::newInstance)
@@ -73,7 +73,7 @@ class Resources {
             // the processor assembly
             .build();
     
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newModelBuilder()
             // proof predicate
             .proofPredicate(DataIntegrity.PREDICATE_PROOF)
             // enable selected DataIntegrityProof cryptosuites

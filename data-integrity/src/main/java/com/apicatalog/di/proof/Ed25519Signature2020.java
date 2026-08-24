@@ -301,15 +301,15 @@ public final class Ed25519Signature2020 implements Proof {
         return purpose;
     }
 
-//    /**
-//     * The JSON-LD context used to process the proof. Optional.
-//     * 
-//     * @return a collection of strings representing the JSON-LD context URIs, or
-//     *         {@code null} if not present
-//     */
-//    public Collection<?> context() {
-//        return context;
-//    }
+    /**
+     * The JSON-LD context used to process the proof. Optional.
+     * 
+     * @return a collection of strings representing the JSON-LD context URIs, or
+     *         {@code null} if not present
+     */
+    public Collection<?> context() {
+        return context;
+    }
 
     public static StaticRDFC newStaticRDFC() {
         return new StaticRDFC();

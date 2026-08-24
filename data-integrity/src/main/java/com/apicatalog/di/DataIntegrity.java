@@ -6,10 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SequencedCollection;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -24,85 +21,42 @@ import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.Graph.NodeMapper;
 import com.apicatalog.trust.semantic.Graph.TypeMapping;
-import com.apicatalog.trust.semantic.GraphAccessor;
-import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProcessor;
-import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphProofMapper;
-import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
 public class DataIntegrity {
 
     public static final String PREDICATE_PROOF = "https://w3id.org/security#proof";
     public static final String PROPERTY_PROOF = "proof";
 
-    public static SemanticModelBuilder newSematicModel(String c14n) {
-        return new SemanticModelBuilder(c14n);
+    public static ModelBuilder newModelBuilder() {
+        return new ModelBuilder();
     }
 
     @Deprecated
-    public static SemanticMappingBuilder newSematicModel2() {
-        return new SemanticMappingBuilder();
-    }
-
     public static LexicalModelBuilder newLexicalModel(String c14n) {
         return new LexicalModelBuilder(c14n);
     }
 
-    public static class SemanticMappingBuilder {
+    public static class ModelBuilder {
 
-        public SemanticMappingBuilder proofPredicate(String uri) {
-//            this.proofPredicate = uri;
-            return this;
-        }
+//        private final String c14n;
 
-        public SemanticMappingBuilder cryptosuite(CryptoSuite cryptosuite) {
-//            if (!c14n.equals(cryptosuite.c14n())) {
-//                throw new IllegalArgumentException();
-//            }
-//            if (cryptosuites == null) {
-//                cryptosuites = new HashMap<>();
-//            }
-//            cryptosuites.put(cryptosuite.id(), cryptosuite);
-            return this;
-        }
-
-        public SemanticMappingBuilder proof(String proofType, GraphProofMapper reader) {
-//            proofMappers.put(proofType, reader);
-            return this;
-        }
-
-        // legacy support
-        public SemanticMappingBuilder Ed25519Signature2020() {
-//            this.ed25519Signature2020 = true;
-            return this;
-        }
-
-        public SemanticModel.Mapping build() {
-            return null;
-        }
-
-    }
-
-    public static class SemanticModelBuilder {
-
-        private final String c14n;
-
-        private Supplier<GraphCanonizer> c14nFactory;
+//        private Supplier<GraphCanonizer> c14nFactory;
 
         private String proofPredicate = DataIntegrity.PREDICATE_PROOF;
 
-        private SemanticModel.Accessor.Factory accessorFactory;
-        private GraphUpdater.Factory updaterFactory;
-        private GraphProofCursor.Factory cursorFactory;
-        private GraphPayloadGenerator.Factory payloadFactory;
+        private GraphProcessor processor;
+//        private SemanticModel.Accessor.Factory accessorFactory;
+//        private GraphUpdater.Factory updaterFactory;
+//        private GraphProofCursor.Factory cursorFactory;
+//        private GraphPayloadGenerator.Factory payloadFactory;
 
-        private BiConsumer<Object, QuadConsumer> tordf;
-        private BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact;
-        private Function<Map<String, ?>, SequencedCollection<?>> expand;
+//        private BiConsumer<Object, QuadConsumer> tordf;
+//        private BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact;
+//        private Function<Map<String, ?>, SequencedCollection<?>> expand;
 
         private Map<String, Supplier<GraphCanonizer>> proofC14n = Map.of();
 
@@ -113,106 +67,109 @@ public class DataIntegrity {
 
         private Collection<TypeMapping> typeMapping;
 
-        private Map<String, GraphProofMapper> proofMappers;
+        private Map<String, PropertyProofMapper> mapProofMappers;
+        private Map<String, GraphProofMapper> graphProofMappers;
 
         private boolean ed25519Signature2020 = false;
 
-        private SemanticModelBuilder(String c14n) {
-            this.c14n = c14n;
-            this.proofMappers = new LinkedHashMap<>();
+
+        private String proofProperty = DataIntegrity.PROPERTY_PROOF;
+
+        private ModelBuilder() {
+//            this.c14n = c14n;
             // default processors
-            this.accessorFactory = GraphAccessor::newInstance;
-            this.updaterFactory = GraphUpdater::new;
-            this.cursorFactory = GraphProofCursor::newInstance;
-            this.payloadFactory = GraphPayloadGenerator::new;
+//            this.accessorFactory = GraphAccessor::newInstance;
+//            this.updaterFactory = GraphUpdater::new;
+//            this.cursorFactory = GraphProofCursor::newInstance;
+//            this.payloadFactory = GraphPayloadGenerator::new;
         }
 
-        public SemanticModelBuilder proofPredicate(String uri) {
+        public ModelBuilder proofPredicate(String uri) {
             this.proofPredicate = uri;
             return this;
         }
-
-        @Deprecated
-        public SemanticModelBuilder c14n(Supplier<GraphCanonizer> c14nFactory) {
-            this.c14nFactory = c14nFactory;
-            return this;
-        }
-
-        @Deprecated
-        public SemanticModelBuilder c14n(String proofType, Supplier<GraphCanonizer> c14nFactory) {
-            if (this.proofC14n.isEmpty()) {
-                this.proofC14n = new HashMap<>();
-            }
-            this.proofC14n.put(proofType, c14nFactory);
-            return this;
-        }
-
-        @Deprecated
-        public SemanticModelBuilder expand(Function<Map<String, ?>, SequencedCollection<?>> expand) {
-            this.expand = expand;
-            return this;
-        }
-
-        @Deprecated
-        public SemanticModelBuilder compact(
-                BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact) {
-            this.compact = compact;
-            return this;
-        }
-
-        @Deprecated
-        public SemanticModelBuilder tordf(BiConsumer<Object, QuadConsumer> tordf) {
-            this.tordf = tordf;
-            return this;
-        }
-
-        @Deprecated
-        public SemanticModelBuilder cursor(GraphProofCursor.Factory factory) {
-            this.cursorFactory = factory;
-            return this;
-        }
-
-        @Deprecated
-        public SemanticModelBuilder accessor(SemanticModel.Accessor.Factory factory) {
-            this.accessorFactory = factory;
-            return this;
-        }
-
-        @Deprecated
-        public SemanticModelBuilder updater(GraphUpdater.Factory factory) {
-            this.updaterFactory = factory;
-            return this;
-        }
-
-        @Deprecated
-        public SemanticModelBuilder payload(GraphPayloadGenerator.Factory factory) {
-            this.payloadFactory = factory;
-            return this;
-        }
         
-
-        public SemanticModelBuilder processor(GraphProcessor processor) {
-//FIXME
+        public ModelBuilder proofProperty(String name) {
+            this.proofProperty = name;
             return this;
         }
-        
 
-        @Deprecated
-        public SemanticModelBuilder document(Function<Collection<String>, NodeMapper<?>> mapper) {
+//        @Deprecated
+//        public SemanticModelBuilder c14n(Supplier<GraphCanonizer> c14nFactory) {
+//            this.c14nFactory = c14nFactory;
+//            return this;
+//        }
+//
+//        @Deprecated
+//        public SemanticModelBuilder c14n(String proofType, Supplier<GraphCanonizer> c14nFactory) {
+//            if (this.proofC14n.isEmpty()) {
+//                this.proofC14n = new HashMap<>();
+//            }
+//            this.proofC14n.put(proofType, c14nFactory);
+//            return this;
+//        }
+//
+//        @Deprecated
+//        public SemanticModelBuilder expand(Function<Map<String, ?>, SequencedCollection<?>> expand) {
+//            this.expand = expand;
+//            return this;
+//        }
+//
+//        @Deprecated
+//        public SemanticModelBuilder compact(
+//                BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact) {
+//            this.compact = compact;
+//            return this;
+//        }
+//
+//        @Deprecated
+//        public SemanticModelBuilder tordf(BiConsumer<Object, QuadConsumer> tordf) {
+//            this.tordf = tordf;
+//            return this;
+//        }
+//
+//        @Deprecated
+//        public SemanticModelBuilder cursor(GraphProofCursor.Factory factory) {
+//            this.cursorFactory = factory;
+//            return this;
+//        }
+//
+//        @Deprecated
+//        public SemanticModelBuilder accessor(SemanticModel.Accessor.Factory factory) {
+//            this.accessorFactory = factory;
+//            return this;
+//        }
+//
+//        @Deprecated
+//        public SemanticModelBuilder updater(GraphUpdater.Factory factory) {
+//            this.updaterFactory = factory;
+//            return this;
+//        }
+//
+//        @Deprecated
+//        public SemanticModelBuilder payload(GraphPayloadGenerator.Factory factory) {
+//            this.payloadFactory = factory;
+//            return this;
+//        }
+//        
+
+                @Deprecated
+        public ModelBuilder document(Function<Collection<String>, NodeMapper<?>> mapper) {
             this.documentMapper = mapper;
             return this;
         }
 
-        @Deprecated
-        public SemanticModelBuilder document(String type, NodeMapper<?> mapper) {
+       
+        public ModelBuilder document(String type, NodeMapper<?> mapper) {
             if (this.typeMapping == null) {
                 typeMapping = new ArrayList<>();
             }
             typeMapping.add(new TypeMapping(new String[] { type }, mapper));
             return this;
         }
+
         @Deprecated
-        public SemanticModelBuilder document(Set<String> types, NodeMapper<?> mapper) {
+        public ModelBuilder document(Set<String> types, NodeMapper<?> mapper) {
             if (this.typeMapping == null) {
                 typeMapping = new ArrayList<>();
             }
@@ -220,11 +177,10 @@ public class DataIntegrity {
             return this;
         }
 
-
-        public SemanticModelBuilder cryptosuite(CryptoSuite cryptosuite) {
-            if (!c14n.equals(cryptosuite.c14n())) {
-                throw new IllegalArgumentException();
-            }
+        public ModelBuilder cryptosuite(CryptoSuite cryptosuite) {
+//            if (!c14n.equals(cryptosuite.c14n())) {
+//                throw new IllegalArgumentException();
+//            }
             if (cryptosuites == null) {
                 cryptosuites = new HashMap<>();
             }
@@ -232,43 +188,52 @@ public class DataIntegrity {
             return this;
         }
 
-        public SemanticModelBuilder proof(String proofType, GraphProofMapper reader) {
-            proofMappers.put(proofType, reader);
+        public ModelBuilder proof(String proofType, GraphProofMapper reader) {
+            if (graphProofMappers == null) {
+                graphProofMappers = new LinkedHashMap<>();
+            }
+            graphProofMappers.put(proofType, reader);
             return this;
         }
 
         // legacy support
-        public SemanticModelBuilder Ed25519Signature2020() {
+        public ModelBuilder Ed25519Signature2020() {
             this.ed25519Signature2020 = true;
+            return this;
+        }
+
+        public ModelBuilder processor(GraphProcessor processor) {
+            Objects.requireNonNull(processor);
+            this.processor = processor;
             return this;
         }
 
         public SemanticModel build() {
 
-            if (c14nFactory == null) {
+            if (processor == null) {
                 throw new IllegalStateException();
             }
 
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
-                proofMappers.put(
+                graphProofMappers.put(
                         DataIntegrityProof.TYPE_URI,
                         new DataIntegrityProof.GraphMapper(
                                 cryptosuites,
-                                proofC14n.getOrDefault(DataIntegrityProof.TYPE_URI, c14nFactory)));
+                                proofC14n.getOrDefault(DataIntegrityProof.TYPE_URI, processor::newCanonizer)));
             }
 
             if (ed25519Signature2020) {
-                proofMappers.put(
+                graphProofMappers.put(
                         Ed25519Signature2020.TYPE_URI,
                         new Ed25519Signature2020.GraphMapper(
-                                proofC14n.getOrDefault(Ed25519Signature2020.TYPE_URI, c14nFactory)));
+                                proofC14n.getOrDefault(Ed25519Signature2020.TYPE_URI, processor::newCanonizer)));
             }
 
 //            if (readers.isEmpty()) {
 //                throw new IllegalStateException();
 //            }
 
-            //FIXME
+            // FIXME
 //            var processor = new GraphProcessor(
 //                    accessorFactory,
 //                    updaterFactory,
@@ -286,15 +251,16 @@ public class DataIntegrity {
                             proofPredicate,
                             null,
                             Graph.PREDICATE_TYPE),
-                    null,
+                    processor,
                     typeMapping != null && !typeMapping.isEmpty()
                             ? new Graph.TypeMappingMatcher(typeMapping)
                             : null,
                     documentMapper,
-                    proofMappers);
+                    graphProofMappers);
         }
     }
 
+    @Deprecated
     public static class LexicalModelBuilder {
 
         final private String c14n;
@@ -350,7 +316,7 @@ public class DataIntegrity {
 
         // public LexicalModelBuilder proof(Predicate<Collection<?>> context,
         // CryptoSuite cryptosuite) {
-        public LexicalModelBuilder proof(CryptoSuite cryptosuite) {
+        public LexicalModelBuilder cryptosuite(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
                 throw new IllegalArgumentException();
             }

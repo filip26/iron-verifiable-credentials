@@ -39,18 +39,18 @@ import jakarta.json.Json;
 
 class Resources {
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newModelBuilder()
             .cryptosuite(ECDSASD2023.getInstance())
-            .expand(Resources::expand)
-            .compact(Resources::compact)
-            .tordf(Resources::toRDF)
-            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
-            .c14n(Resources::newRDFC)
-//TODO            .hmac()
-            .accessor(GraphAccessor::newInstance)
-            .updater(GraphUpdater::new)
-            .cursor(GraphProofCursor::newInstance)
-            .payload(SDPayloadGenerator::new)
+//            .expand(Resources::expand)
+//            .compact(Resources::compact)
+//            .tordf(Resources::toRDF)
+//            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
+//            .c14n(Resources::newRDFC)
+////TODO            .hmac()
+//            .accessor(GraphAccessor::newInstance)
+//            .updater(GraphUpdater::new)
+//            .cursor(GraphProofCursor::newInstance)
+//            .payload(SDPayloadGenerator::new)
 
             .build();
 

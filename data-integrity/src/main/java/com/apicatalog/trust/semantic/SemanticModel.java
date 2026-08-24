@@ -87,21 +87,25 @@ public class SemanticModel implements Model {
 
     @Override
     public Document.Updater createUpdater(SequencedCollection<?> context, Map<String, ?> document) {
-        return processor.updater.createUpdater(this, createAccessor(context, document));
+        return processor.updater(this, createAccessor(context, document));
     }
 
+    @Deprecated
     public PayloadGenerator createPayload(SemanticModel.Accessor adapter) {
-        return processor.payload.createPayload(this, adapter);
+        return processor.createPayload(this, adapter);
     }
 
+    @Deprecated
     public GraphProofCursor createCursor(SemanticModel.Accessor adapter) {
-        return processor.cursor.createCursor(this, adapter);
+        return processor.createCursor(this, adapter);
     }
 
     public NodeMapper<?> documentMapper(Set<String> types) {
-        var mapping = typeMatcher.findBest(types);
-        if (mapping != null) {
-            return mapping.mapper();
+        if (typeMatcher != null) {
+            var mapping = typeMatcher.findBest(types);
+            if (mapping != null) {
+                return mapping.mapper();
+            }
         }
         return null;
 //        return documentMapper.apply(types);

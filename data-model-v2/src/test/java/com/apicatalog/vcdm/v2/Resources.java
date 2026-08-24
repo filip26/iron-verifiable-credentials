@@ -58,16 +58,14 @@ class Resources {
             // the processor assembly
             .build();
 
-    static SemanticModel VCDM20_CREDENTIAL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+    static SemanticModel VCDM20_CREDENTIAL = DataIntegrity.newModelBuilder()
             // TODO .context(predicate, VCDM20::isDefined)
-//          .types(Credential.TYPE_URI)
             .proofPredicate(Credential.PREDICATE_PROOF)
             // document mapper
-//          .document(new Credential.GraphMapper()
+            .document(Credential.TYPE_URI, new Credential.GraphMapper())
             // custom node mapping
 //          .mapping(Credential.PREDICATE_ISSUER, types, mapper) or typeMapping?
 
-//            .proofPredicate(Credential.PREDICATE_PROOF)
             // enable selected DataIntegrityProof cryptosuites
             .cryptosuite(EdDSA2022.withRDFC())
             .cryptosuite(ECDSA2019.withRDFC())
@@ -76,16 +74,16 @@ class Resources {
 
             // model processor
             .processor(GRAPH_PROCESSOR)
-            
+
             // the model assembly
             .build();
 
-    static SemanticModel VCDM20_PRESENTATION = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+    static SemanticModel VCDM20_PRESENTATION = DataIntegrity.newModelBuilder()
     // TODO .context(predicate, VCDM20::isDefined)
 //          .types(Credential.TYPE_URI)
             .proofPredicate(Credential.PREDICATE_PROOF)
             // document mapper
-//          .document(new Presentation.GraphMapper(VCDM20_CREDENTIAL)
+            .document(Presentation.TYPE_URI, new Presentation.GraphMapper())
             // custom node mapping
 //          .mapping(Credential.PREDICATE_ISSUER, types, mapper) or typeMapping?
 
@@ -95,7 +93,7 @@ class Resources {
 
             // model processor
             .processor(GRAPH_PROCESSOR)
-            
+
             // the model assembly
             .build();
 

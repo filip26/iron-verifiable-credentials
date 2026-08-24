@@ -34,16 +34,16 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newModelBuilder()
             .cryptosuite(ECDSAXI2023.getInstance())
-            .expand(Resources::expand)
-            .tordf(Resources::toRDF)
-            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
-            .c14n(Resources::createRDFC)
-            .accessor(GraphAccessor::newInstance)
-            .updater(GraphUpdater::new)
-            .cursor(GraphProofCursor::newInstance)
-            .payload(GraphPayloadGenerator::new)
+//            .expand(Resources::expand)
+//            .tordf(Resources::toRDF)
+//            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
+//            .c14n(Resources::createRDFC)
+//            .accessor(GraphAccessor::newInstance)
+//            .updater(GraphUpdater::new)
+//            .cursor(GraphProofCursor::newInstance)
+//            .payload(GraphPayloadGenerator::new)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;

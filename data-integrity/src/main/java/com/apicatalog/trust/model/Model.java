@@ -18,9 +18,8 @@ public interface Model {
     };
 
     //FIXME mode to Document.Processor
-    @Deprecated
     Document.Accessor createAccessor(SequencedCollection<?> context, Map<String, ?> document);
-    @Deprecated
+
     Document.Updater createUpdater(SequencedCollection<?> context, Map<String, ?> document);
 
 }

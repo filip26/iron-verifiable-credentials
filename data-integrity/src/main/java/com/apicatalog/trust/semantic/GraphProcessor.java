@@ -1,40 +1,54 @@
 package com.apicatalog.trust.semantic;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SequencedCollection;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.apicatalog.di.DataIntegrity;
-import com.apicatalog.di.DataIntegrity.SemanticModelBuilder;
-import com.apicatalog.di.proof.DataIntegrityProof;
-import com.apicatalog.di.proof.Ed25519Signature2020;
-import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.model.Model.Vocab;
-import com.apicatalog.trust.semantic.Graph.NodeMapper;
-import com.apicatalog.trust.semantic.Graph.TypeMapping;
+import com.apicatalog.trust.Document;
+import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
 public class GraphProcessor {
 
-    SemanticModel.Accessor.Factory adapter;
-    GraphUpdater.Factory updater;
-    GraphProofCursor.Factory cursor;
-    GraphPayloadGenerator.Factory payload;
+    private final SemanticModel.Accessor.Factory adapter;
+    private final GraphUpdater.Factory updater;
+    private final GraphProofCursor.Factory cursor;
+    private final GraphPayloadGenerator.Factory payload;
 
-    Function<Map<String, ?>, SequencedCollection<?>> expand;
-    BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact;
-    BiConsumer<Object, QuadConsumer> tordf;
+    private final Function<Map<String, ?>, SequencedCollection<?>> expand;
+    private final BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact;
+    private final BiConsumer<Object, QuadConsumer> tordf;
+    
+    private final Supplier<GraphCanonizer> canonizerFactory;
 
-    private Supplier<GraphCanonizer> canonizeFactory;
+    private GraphProcessor(
+            SemanticModel.Accessor.Factory adapter,
+            GraphUpdater.Factory updater,
+            GraphProofCursor.Factory cursor,
+            GraphPayloadGenerator.Factory payload,
+
+            Function<Map<String, ?>, SequencedCollection<?>> expand,
+            BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact,
+            BiConsumer<Object, QuadConsumer> tordf,
+            
+            Supplier<GraphCanonizer> canonizerFactory) {
+        this.adapter = adapter;
+        this.updater = updater;
+        this.cursor = cursor;
+        this.payload = payload;
+        
+        this.expand = expand;
+        this.compact = compact;
+        this.tordf = tordf;
+        
+        this.canonizerFactory = canonizerFactory;
+    }
 
     public SemanticModel.Accessor accessor(
             SemanticModel model,
@@ -46,21 +60,27 @@ public class GraphProcessor {
                 document);
     }
 
-//
-//    public Document.Updater createUpdater(SequencedCollection<?> context, Map<String, ?> document) {
-//        return updater.createUpdater(this, createAccessor(context, document));
-//    }
-//
-//    public PayloadGenerator createPayload(SemanticModel.Accessor adapter) {
-//        return payload.createPayload(this, adapter);
-//    }
-//
-//    public GraphProofCursor createCursor(SemanticModel.Accessor adapter) {
-//        return cursor.createCursor(this, adapter);
-//    }
+
+    public Document.Updater updater(
+            SemanticModel model,
+            SemanticModel.Accessor adapter) {
+        return updater.createUpdater(model, adapter);
+    }
+
+    public PayloadGenerator createPayload(
+            SemanticModel model,
+            SemanticModel.Accessor adapter) {
+        return payload.createPayload(model, adapter);
+    }
+
+    public GraphProofCursor createCursor(
+            SemanticModel model,
+            SemanticModel.Accessor adapter) {
+        return cursor.createCursor(model, adapter);
+    }
 
     public GraphCanonizer newCanonizer() {
-        return canonizeFactory.get();
+        return canonizerFactory.get();
     }
 
     public void tordf(Object document, QuadConsumer consumer) {
@@ -161,31 +181,15 @@ public class GraphProcessor {
                 throw new IllegalStateException();
             }
 
-            // FIXME
-            return null;
-//            var processor = new GraphProcessor(
-//                    accessorFactory,
-//                    updaterFactory,
-//                    cursorFactory,
-//                    payloadFactory,
-//                    expand,
-//                    compact,
-//                    tordf,
-//                    c14nFactory
-//                    );
-
-//            return new SemanticModel(
-//                    new Vocab(
-//                            "@context",
-//                            proofPredicate,
-//                            null,
-//                            Graph.PREDICATE_TYPE),
-//                    processor,
-//                    typeMapping != null && !typeMapping.isEmpty()
-//                            ? new Graph.TypeMappingMatcher(typeMapping)
-//                            : null,
-//                    documentMapper,
-//                    proofMappers);
+            return new GraphProcessor(
+                    accessorFactory,
+                    updaterFactory,
+                    cursorFactory,
+                    payloadFactory,
+                    expand,
+                    compact,
+                    tordf,
+                    c14nFactory);
         }
     }
 }
