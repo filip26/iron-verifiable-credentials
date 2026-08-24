@@ -26,13 +26,13 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
 
         var skolemized = Skolemizer.skolemize(accessor.expandedData());
 
-        var compacted = model.compact().apply(accessor.context(), skolemized);
+        var compacted = model.processor().compact(accessor.context(), skolemized);
 
-        if (!(model.newCanonizer() instanceof SDGraphCanonizer canonizer)) {
+        if (!(model.processor().newCanonizer() instanceof SDGraphCanonizer canonizer)) {
             throw new IllegalStateException();
         }
 
-        model.tordf().accept(skolemized, ((subject, predicate, object, datatype, language, direction, graph) -> {
+        model.processor().tordf(skolemized, ((subject, predicate, object, datatype, language, direction, graph) -> {
 
             var s = subject;
             if (s.startsWith(Skolemizer.URN_PREFIX)) {
@@ -71,7 +71,7 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
 
         var mandatoryNQuads = new HashSet<String>(selection.size());
 
-        model.tordf().accept(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {
+        model.processor().tordf(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {
 
             var s = subject;
             if (s.startsWith(Skolemizer.URN_PREFIX)) {
@@ -139,11 +139,11 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
 
     public SDDerivedDocument derived(Map<Integer, byte[]> labels, int[] indices) {
 
-        if (!(model.newCanonizer() instanceof SDGraphCanonizer canonizer)) {
+        if (!(model.processor().newCanonizer() instanceof SDGraphCanonizer canonizer)) {
             throw new IllegalStateException();
         }
 
-        model.tordf().accept(accessor.expandedData(), canonizer);
+        model.processor().tordf(accessor.expandedData(), canonizer);
 
         var canonized = new ArrayList<String[]>();
 
@@ -213,6 +213,6 @@ public class SDPayloadGenerator extends GraphPayloadGenerator {
     }
 
     private Map<String, ?> compacted() {
-        return model.compact().apply(accessor.context(), accessor.expandedData());
+        return model.processor().compact(accessor.context(), accessor.expandedData());
     }
 }

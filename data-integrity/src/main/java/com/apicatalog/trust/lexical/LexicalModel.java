@@ -62,7 +62,6 @@ public class LexicalModel implements Model {
         return proofReaders.get(proofType);
     }
 
-    @Override
     public Vocab vocab() {
         return vocab;
     }

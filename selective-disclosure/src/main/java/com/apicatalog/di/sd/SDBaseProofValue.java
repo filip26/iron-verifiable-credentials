@@ -238,13 +238,13 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
 
         var selectedNQuads = new HashSet<String>();
 
-        if (!(payload.model.newCanonizer() instanceof SDGraphCanonizer c14n)) {
+        if (!(payload.model.processor().newCanonizer() instanceof SDGraphCanonizer c14n)) {
             throw new IllegalStateException();
         }
 
 //        var consumer = c14n.consumer();
 
-        payload.model.tordf().accept(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {
+        payload.model.processor().tordf(selection, ((subject, predicate, object, datatype, language, direction, graph) -> {
 
             var s = subject;
             if (s.startsWith(Skolemizer.URN_PREFIX)) {
@@ -324,11 +324,11 @@ public final class SDBaseProofValue extends SDProofValue<SDBaseDocument> impleme
             Map<String, ?> document,
             SemanticModel model) {
 
-        var expanded = model.expand().apply(document);
+        var expanded = model.processor().expand(document);
 
         var deskolemized = Skolemizer.deskolemizeExpanded(expanded);
 
-        return model.compact().apply(context, (Map<String, Object>) deskolemized.iterator().next());
+        return model.processor().compact(context, (Map<String, Object>) deskolemized.iterator().next());
     }
 
     private static int[] relativeIndices(int[] combined, int[] mandatory) {

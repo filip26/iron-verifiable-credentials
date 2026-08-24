@@ -148,11 +148,6 @@ public class HybridModel implements Model {
     }
 
     @Override
-    public Vocab vocab() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Updater createUpdater(SequencedCollection<?> context, Map<String, ?> document) {
         throw new UnsupportedOperationException();
     }

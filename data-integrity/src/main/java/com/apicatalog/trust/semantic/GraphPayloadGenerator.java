@@ -45,7 +45,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
             return payloadFactory.apply(genericPayload);
         }
 
-        var canonizer = model.newCanonizer();
+        var canonizer = model.processor().newCanonizer();
 
         var selectedGraph = Set.<String>of();
 

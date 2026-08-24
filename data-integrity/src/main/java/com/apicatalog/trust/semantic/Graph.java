@@ -272,6 +272,7 @@ public record Graph(
     }
 
     @FunctionalInterface
+    @Deprecated
     public interface NodeMapping {
 
         <T> NodeMapper<T> mapper(String predicate, Collection<String> types);

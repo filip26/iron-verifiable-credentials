@@ -35,6 +35,7 @@ import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
+import com.apicatalog.trust.semantic.GraphProcessor;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -55,16 +56,7 @@ class Resources {
             .cursor(PropertyProofCursor::newInstance)
             .build();
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
-            // proof predicate
-            .proofPredicate(DataIntegrity.PREDICATE_PROOF)
-            // enable selected DataIntegrityProof cryptosuites
-            .cryptosuite(EdDSA2022.withRDFC())
-            .cryptosuite(ECDSA2019.withRDFC())
-            .cryptosuite(MLDSA2024.get44withRDFC())
-            .cryptosuite(SLHDSA2024.get128withRDFC())
-            // enable legacy Ed25519Signature2020 suite
-            .Ed25519Signature2020()
+    static GraphProcessor GRAPH_PROCESSOR = GraphProcessor.newBuilder(Model.C14N_RDFC)
             // proof type specific c14n provider
             .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
             .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
@@ -78,6 +70,20 @@ class Resources {
             .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)
+            // the processor assembly
+            .build();
+    
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+            // proof predicate
+            .proofPredicate(DataIntegrity.PREDICATE_PROOF)
+            // enable selected DataIntegrityProof cryptosuites
+            .cryptosuite(EdDSA2022.withRDFC())
+            .cryptosuite(ECDSA2019.withRDFC())
+            .cryptosuite(MLDSA2024.get44withRDFC())
+            .cryptosuite(SLHDSA2024.get128withRDFC())
+            // enable legacy Ed25519Signature2020 suite
+            .Ed25519Signature2020()
+            .processor(GRAPH_PROCESSOR)
             // the model assembly
             .build();
 

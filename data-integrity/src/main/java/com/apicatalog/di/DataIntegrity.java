@@ -5,13 +5,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -25,17 +23,15 @@ import com.apicatalog.trust.lexical.PropertyProofMapper;
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.Graph.NodeMapper;
-import com.apicatalog.trust.semantic.Graph.NodeMapping;
 import com.apicatalog.trust.semantic.Graph.TypeMapping;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
+import com.apicatalog.trust.semantic.GraphProcessor;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphProofMapper;
 import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.semantic.SemanticModel.JsonLdOps;
-import com.apicatalog.trust.semantic.SemanticModel.Primitives;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 
 public class DataIntegrity {
@@ -47,8 +43,48 @@ public class DataIntegrity {
         return new SemanticModelBuilder(c14n);
     }
 
+    @Deprecated
+    public static SemanticMappingBuilder newSematicModel2() {
+        return new SemanticMappingBuilder();
+    }
+
     public static LexicalModelBuilder newLexicalModel(String c14n) {
         return new LexicalModelBuilder(c14n);
+    }
+
+    public static class SemanticMappingBuilder {
+
+        public SemanticMappingBuilder proofPredicate(String uri) {
+//            this.proofPredicate = uri;
+            return this;
+        }
+
+        public SemanticMappingBuilder cryptosuite(CryptoSuite cryptosuite) {
+//            if (!c14n.equals(cryptosuite.c14n())) {
+//                throw new IllegalArgumentException();
+//            }
+//            if (cryptosuites == null) {
+//                cryptosuites = new HashMap<>();
+//            }
+//            cryptosuites.put(cryptosuite.id(), cryptosuite);
+            return this;
+        }
+
+        public SemanticMappingBuilder proof(String proofType, GraphProofMapper reader) {
+//            proofMappers.put(proofType, reader);
+            return this;
+        }
+
+        // legacy support
+        public SemanticMappingBuilder Ed25519Signature2020() {
+//            this.ed25519Signature2020 = true;
+            return this;
+        }
+
+        public SemanticModel.Mapping build() {
+            return null;
+        }
+
     }
 
     public static class SemanticModelBuilder {
@@ -96,11 +132,13 @@ public class DataIntegrity {
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder c14n(Supplier<GraphCanonizer> c14nFactory) {
             this.c14nFactory = c14nFactory;
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder c14n(String proofType, Supplier<GraphCanonizer> c14nFactory) {
             if (this.proofC14n.isEmpty()) {
                 this.proofC14n = new HashMap<>();
@@ -109,41 +147,79 @@ public class DataIntegrity {
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder expand(Function<Map<String, ?>, SequencedCollection<?>> expand) {
             this.expand = expand;
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder compact(
                 BiFunction<Collection<?>, Map<String, ?>, Map<String, ?>> compact) {
             this.compact = compact;
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder tordf(BiConsumer<Object, QuadConsumer> tordf) {
             this.tordf = tordf;
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder cursor(GraphProofCursor.Factory factory) {
             this.cursorFactory = factory;
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder accessor(SemanticModel.Accessor.Factory factory) {
             this.accessorFactory = factory;
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder updater(GraphUpdater.Factory factory) {
             this.updaterFactory = factory;
             return this;
         }
 
+        @Deprecated
         public SemanticModelBuilder payload(GraphPayloadGenerator.Factory factory) {
             this.payloadFactory = factory;
             return this;
         }
+        
+
+        public SemanticModelBuilder processor(GraphProcessor processor) {
+//FIXME
+            return this;
+        }
+        
+
+        @Deprecated
+        public SemanticModelBuilder document(Function<Collection<String>, NodeMapper<?>> mapper) {
+            this.documentMapper = mapper;
+            return this;
+        }
+
+        @Deprecated
+        public SemanticModelBuilder document(String type, NodeMapper<?> mapper) {
+            if (this.typeMapping == null) {
+                typeMapping = new ArrayList<>();
+            }
+            typeMapping.add(new TypeMapping(new String[] { type }, mapper));
+            return this;
+        }
+        @Deprecated
+        public SemanticModelBuilder document(Set<String> types, NodeMapper<?> mapper) {
+            if (this.typeMapping == null) {
+                typeMapping = new ArrayList<>();
+            }
+            typeMapping.add(new TypeMapping(types.toArray(String[]::new), mapper));
+            return this;
+        }
+
 
         public SemanticModelBuilder cryptosuite(CryptoSuite cryptosuite) {
             if (!c14n.equals(cryptosuite.c14n())) {
@@ -153,28 +229,6 @@ public class DataIntegrity {
                 cryptosuites = new HashMap<>();
             }
             cryptosuites.put(cryptosuite.id(), cryptosuite);
-            return this;
-        }
-
-        @Deprecated
-        public SemanticModelBuilder document(Function<Collection<String>, NodeMapper<?>> mapper) {
-            this.documentMapper = mapper;
-            return this;
-        }
-
-        public SemanticModelBuilder document(String type, NodeMapper<?> mapper) {
-            if (this.typeMapping == null) {
-                typeMapping = new ArrayList<>();
-            }
-            typeMapping.add(new TypeMapping(new String[] { type }, mapper));
-            return this;
-        }
-
-        public SemanticModelBuilder document(Set<String> types, NodeMapper<?> mapper) {
-            if (this.typeMapping == null) {
-                typeMapping = new ArrayList<>();
-            }
-            typeMapping.add(new TypeMapping(types.toArray(String[]::new), mapper));
             return this;
         }
 
@@ -214,22 +268,25 @@ public class DataIntegrity {
 //                throw new IllegalStateException();
 //            }
 
+            //FIXME
+//            var processor = new GraphProcessor(
+//                    accessorFactory,
+//                    updaterFactory,
+//                    cursorFactory,
+//                    payloadFactory,
+//                    expand,
+//                    compact,
+//                    tordf,
+//                    c14nFactory
+//                    );
+
             return new SemanticModel(
                     new Vocab(
                             "@context",
                             proofPredicate,
                             null,
                             Graph.PREDICATE_TYPE),
-                    new Primitives(
-                            accessorFactory,
-                            updaterFactory,
-                            cursorFactory,
-                            payloadFactory),
-                    new JsonLdOps(
-                            expand,
-                            compact,
-                            tordf),
-                    c14nFactory,
+                    null,
                     typeMapping != null && !typeMapping.isEmpty()
                             ? new Graph.TypeMappingMatcher(typeMapping)
                             : null,
@@ -329,23 +386,5 @@ public class DataIntegrity {
                     canonize,
                     readers);
         }
-    }
-
-    private static class DefaultTypeMapper implements NodeMapping {
-
-        Map<String, Function<Collection<String>, NodeMapper<?>>> mappers;
-
-        @Override
-        public <T> NodeMapper<T> mapper(String predicate, Collection<String> types) {
-
-            var provider = mappers.get(predicate);
-
-            if (provider != null) {
-                return (NodeMapper<T>) provider.apply(types);
-            }
-
-            return null;
-        }
-
     }
 }

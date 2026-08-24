@@ -16,7 +16,7 @@ public class MaterializeTest {
             // accepts VCDM v2.0
             .model(VCDM2::isDefined,
                     // in processing preferences order
-                    Resources.VCDM20_SEMANTIC_MODEL
+                    Resources.GRAPH_PROCESSOR
 //                    Resources.VCDM20_LEXICAL_MODEL
             )
             .build();

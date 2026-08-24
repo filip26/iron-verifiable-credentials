@@ -1,13 +1,12 @@
 package com.apicatalog.trust.semantic;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
+import java.util.Set;
 
 import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.proof.ProofCursor;
@@ -23,7 +22,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
     private final Map<String, ?> expandedData;
 
     private String resource;
-    private final Collection<String> proofGraphs;
+    private final Set<String> proofGraphs;
     private final Map<String, Graph> dataset;
 
     protected GraphAccessor(
@@ -32,7 +31,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
             Map<String, ?> document,
             Map<String, Object> expandedData,
             String resource,
-            Collection<String> proofGraphs,
+            Set<String> proofGraphs,
             Map<String, Graph> dataset) {
         this.model = model;
         this.context = context;
@@ -54,7 +53,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
         }
 
         // TODO get term map
-        var expanded = model.expand().apply(document);
+        var expanded = model.processor().expand(document);
 
         if (expanded.size() != 1) {
             throw new IllegalArgumentException();
@@ -78,7 +77,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
         var dataset = new DatasetBuilder();
         dataset.proofPredicate = model.vocab().proof();
 
-        model.tordf().accept(expanded, dataset);
+        model.processor().tordf(expanded, dataset);
 
         return new GraphAccessor(
                 model,
@@ -97,12 +96,12 @@ public final class GraphAccessor implements SemanticModel.Accessor {
         var graph = dataset.get("@default");
 
         String resource = null;
-        var proofGraphs = List.<String>of();
+        var proofGraphs = Set.<String>of();
 
         if (graph.nodes().size() == 1) {
             var node = graph.nodes().firstEntry().getValue();
             resource = node.id;
-            proofGraphs = new ArrayList<String>();
+            proofGraphs = new HashSet<String>();
 
             for (var statement : node.statements()) {
                 if (model.vocab().proof().equals(statement.predicate())) {
@@ -111,12 +110,9 @@ public final class GraphAccessor implements SemanticModel.Accessor {
             }
 
         } else {
-            proofGraphs = new ArrayList<String>();
+            proofGraphs = new HashSet<String>();
 
             for (var node : graph.nodes().values()) {
-
-                resource = node.id;
-                proofGraphs.clear();
 
                 for (var statement : node.statements()) {
                     if (model.vocab().proof().equals(statement.predicate())) {
@@ -124,14 +120,14 @@ public final class GraphAccessor implements SemanticModel.Accessor {
                     }
                 }
 
+                // find first node with proofs
                 if (!proofGraphs.isEmpty()) {
+                    resource = node.id;
                     break;
                 }
-                
-                resource = null;
             }
         }
-IO.println(">>> # " + resource + ", " + proofGraphs);
+
         return new GraphAccessor(
                 model,
                 null, // TODO
@@ -194,7 +190,7 @@ IO.println(">>> # " + resource + ", " + proofGraphs);
         return dataset.get(graph);
     }
 
-    public Collection<String> proofGraphs() {
+    public Set<String> proofGraphs() {
         return proofGraphs;
     }
 
@@ -207,7 +203,7 @@ IO.println(">>> # " + resource + ", " + proofGraphs);
 
         private final Map<String, Graph> graphs = new HashMap<>();
 
-        private final Collection<String> proofGraphs = new HashSet<>();
+        private final Set<String> proofGraphs = new HashSet<>();
 
         private String resource = null;
 

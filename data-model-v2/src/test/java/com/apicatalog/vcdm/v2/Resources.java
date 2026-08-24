@@ -30,43 +30,72 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.semantic.GraphAccessor;
+import com.apicatalog.trust.semantic.GraphPayloadGenerator;
+import com.apicatalog.trust.semantic.GraphProcessor;
+import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static SemanticModel VCDM20_SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
-            .document(
-                    types -> {
+    static GraphProcessor GRAPH_PROCESSOR = GraphProcessor.newBuilder(Model.C14N_RDFC)
+            // proof type specific c14n provider
+            .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
+            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
+            // document and proof default c14n provider
+            .c14n(Resources::newRDFC)
+            // JSON-LD processing
+            .expand(Resources::expand)
+            .tordf(Resources::toRDF)
+            // document processing, optional customizations
+            .accessor(GraphAccessor::newInstance)
+            .updater(GraphUpdater::new)
+            .cursor(GraphProofCursor::newInstance)
+            .payload(GraphPayloadGenerator::new)
+            // the processor assembly
+            .build();
 
-                        if (types.contains(Credential.TYPE_URI)) {
-                            return new Credential.GraphMapper();
+    static SemanticModel VCDM20_CREDENTIAL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+            // TODO .context(predicate, VCDM20::isDefined)
+//          .types(Credential.TYPE_URI)
+            .proofPredicate(Credential.PREDICATE_PROOF)
+            // document mapper
+//          .document(new Credential.GraphMapper()
+            // custom node mapping
+//          .mapping(Credential.PREDICATE_ISSUER, types, mapper) or typeMapping?
 
-                        } else if (types.contains(Presentation.TYPE_URI)) {
-                            return new Presentation.GraphMapper();
-                        }
-
-                        return null;
-                    })
-            .document(Credential.TYPE_URI, new Credential.GraphMapper())
-            .document(Presentation.TYPE_URI, new Presentation.GraphMapper())
 //            .proofPredicate(Credential.PREDICATE_PROOF)
             // enable selected DataIntegrityProof cryptosuites
             .cryptosuite(EdDSA2022.withRDFC())
             .cryptosuite(ECDSA2019.withRDFC())
             .cryptosuite(MLDSA2024.get44withRDFC())
             .cryptosuite(SLHDSA2024.get128withRDFC())
-            // enable legacy Ed25519Signature2020 suite
-            .Ed25519Signature2020()
-            // proof type specific c14n provider
-            .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
-            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
-            // document and default proof c14n provider
-            .c14n(Resources::newRDFC)
-            // JSON-LD processing
-            .expand(Resources::expand)
-            .tordf(Resources::toRDF)
+
+            // model processor
+            .processor(GRAPH_PROCESSOR)
+            
+            // the model assembly
+            .build();
+
+    static SemanticModel VCDM20_PRESENTATION = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+    // TODO .context(predicate, VCDM20::isDefined)
+//          .types(Credential.TYPE_URI)
+            .proofPredicate(Credential.PREDICATE_PROOF)
+            // document mapper
+//          .document(new Presentation.GraphMapper(VCDM20_CREDENTIAL)
+            // custom node mapping
+//          .mapping(Credential.PREDICATE_ISSUER, types, mapper) or typeMapping?
+
+            // enable selected DataIntegrityProof cryptosuites
+            .cryptosuite(EdDSA2022.withRDFC())
+            .cryptosuite(ECDSA2019.withRDFC())
+
+            // model processor
+            .processor(GRAPH_PROCESSOR)
+            
             // the model assembly
             .build();
 
