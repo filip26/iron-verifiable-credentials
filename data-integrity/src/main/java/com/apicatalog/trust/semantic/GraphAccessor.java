@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
 
-import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
+import com.apicatalog.trust.semantic.SemanticModel.Vocab;
 
 public final class GraphAccessor implements SemanticModel.Accessor {
 

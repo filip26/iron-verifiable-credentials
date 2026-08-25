@@ -7,9 +7,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.apicatalog.di.DataIntegrity;
-import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.CryptoSuite;
-import com.apicatalog.trust.model.Model.Vocab;
 
 public class PropertyMapProcessor {
 
@@ -23,7 +21,7 @@ public class PropertyMapProcessor {
 
         private Function<Map<String, ?>, byte[]> canonize;
 
-        private LexicalAccessor.Factory processorFactory;
+        private LexicalAccessor.Factory accessorFactory;
         private PropertyProofCursor.Factory cursorFactory;
 
         private Map<String, Function<Map<String, ?>, byte[]>> proofC14n = Map.of();
@@ -62,7 +60,7 @@ public class PropertyMapProcessor {
         }
 
         public Builder accessor(LexicalAccessor.Factory factory) {
-            this.processorFactory = factory;
+            this.accessorFactory = factory;
             return this;
         }
 
@@ -84,8 +82,8 @@ public class PropertyMapProcessor {
         }
 
         public PropertyMapProcessor build() {
-
-            return null;
+//FIXME
+            return new PropertyMapProcessor();
 //            if (canonize == null) {
 //                throw new IllegalStateException();
 //            }

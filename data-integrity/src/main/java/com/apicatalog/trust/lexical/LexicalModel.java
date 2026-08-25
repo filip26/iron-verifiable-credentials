@@ -9,6 +9,9 @@ import com.apicatalog.trust.model.Model;
 
 public class LexicalModel implements Model {
 
+    public record Vocab(String context, String proof, String id, String type) {
+    };
+
     private final LexicalAccessor.Factory processorFactory;
     private final PropertyProofCursor.Factory cursorFactory;
     private final Map<String, PropertyProofMapper> proofReaders;

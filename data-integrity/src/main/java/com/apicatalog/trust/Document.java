@@ -5,7 +5,6 @@ import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.ProofCursor;
 
@@ -20,9 +19,7 @@ public interface Document {
 
         String c14n();
 
-        Predicate<SequencedCollection<?>> contextMatcher();
-
-        Set<String> types();
+        boolean isAccepted(SequencedCollection<?> context, Map<String, ?> document);
 
     }
 
@@ -34,6 +31,7 @@ public interface Document {
 
     interface Accessor {
 
+        //TODO move to mapper
         Object document();
 
         ProofCursor createProofCursor();
@@ -48,7 +46,6 @@ public interface Document {
 
         Map<String, ?> compact();
 
-        Vocab vocab();
+//        Vocab vocab();
     }
-
 }

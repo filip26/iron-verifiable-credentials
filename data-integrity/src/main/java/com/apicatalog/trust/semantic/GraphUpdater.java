@@ -9,8 +9,8 @@ import java.util.Objects;
 import java.util.SequencedCollection;
 
 import com.apicatalog.trust.Document;
-import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.semantic.SemanticModel.Vocab;
 
 public final class GraphUpdater implements Document.Updater {
 
@@ -115,7 +115,6 @@ public final class GraphUpdater implements Document.Updater {
         return model.createPayload(accessor);
     }
 
-    @Override
     public Vocab vocab() {
         return accessor.vocab();
     }

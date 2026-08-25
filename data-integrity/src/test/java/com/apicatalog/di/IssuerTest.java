@@ -129,7 +129,7 @@ public class IssuerTest {
 
             // TODO check document level contexts for proof presence
 
-            var updater = Resources.SEMANTIC_MODEL.createUpdater(context, document);
+            var updater = Resources.DI_HYBRID_MODEL.createUpdater(context, document);
 
             var payload = updater.createPayload();
 
@@ -161,8 +161,8 @@ public class IssuerTest {
 
     static BiFunction<SequencedCollection<?>, Map<String, ?>, Document.Updater> getUpdater(String c14n) {
         return switch (c14n) {
-        case Model.C14N_RDFC -> Resources.SEMANTIC_MODEL::createUpdater;
-        case Model.C14N_JCS -> Resources.LEXICAL_MODEL::createUpdater;
+        case Model.C14N_RDFC -> Resources.DI_HYBRID_MODEL::createUpdater;
+        case Model.C14N_JCS -> Resources.DI_LEXICAL_MODEL::createUpdater;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.

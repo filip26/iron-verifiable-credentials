@@ -29,13 +29,13 @@ import com.apicatalog.security.Digestor;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
-import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.PropertyMapAccessor;
+import com.apicatalog.trust.lexical.PropertyMapProcessor;
 import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
-import com.apicatalog.trust.semantic.GraphProcessor;
+import com.apicatalog.trust.semantic.GraphProcessorResources;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -44,19 +44,14 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static LexicalModel LEXICAL_MODEL = DataIntegrity.newLexicalModel(Model.C14N_JCS)
-            .proofProperty(DataIntegrity.PROPERTY_PROOF)
-            .cryptosuite(EdDSA2022.withJCS())
-            .cryptosuite(ECDSA2019.withJCS())
-            .cryptosuite(MLDSA2024.get44withJCS())
-            .cryptosuite(SLHDSA2024.get128withJCS())
+    static PropertyMapProcessor MAP_PROCESSOR = PropertyMapProcessor.newBuilder(Model.C14N_JCS)
             .c14n(DataIntegrityProof.TYPE_NAME, StaticJCS::canonize) // proof type specific c14n provider
             .c14n(Jcs::canonize)
             .accessor(PropertyMapAccessor::newInstance)
             .cursor(PropertyProofCursor::newInstance)
             .build();
 
-    static GraphProcessor GRAPH_PROCESSOR = GraphProcessor.newBuilder(Model.C14N_RDFC)
+    static GraphProcessorResources GRAPH_PROCESSOR = GraphProcessorResources.newBuilder(Model.C14N_RDFC)
             // proof type specific c14n provider
             .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
             .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
@@ -72,18 +67,50 @@ class Resources {
             .payload(GraphPayloadGenerator::new)
             // the processor assembly
             .build();
-    
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newModelBuilder()
-            // proof predicate
+
+    static Model DI_LEXICAL_MODEL = DataIntegrity.newModelBuilder()
+            .proofProperty(DataIntegrity.PROPERTY_PROOF)
+            .cryptosuite(EdDSA2022.withJCS())
+            .cryptosuite(ECDSA2019.withJCS())
+            .cryptosuite(MLDSA2024.get44withJCS())
+            .cryptosuite(SLHDSA2024.get128withJCS())
+            .processor(MAP_PROCESSOR)
+            .build();
+
+    static Model DI_HYBRID_MODEL = DataIntegrity.newModelBuilder()
+            // proof predicate - semantic processing
             .proofPredicate(DataIntegrity.PREDICATE_PROOF)
+            // proof property key - lexical processing
+            .proofProperty(DataIntegrity.PROPERTY_PROOF)
+
             // enable selected DataIntegrityProof cryptosuites
             .cryptosuite(EdDSA2022.withRDFC())
             .cryptosuite(ECDSA2019.withRDFC())
             .cryptosuite(MLDSA2024.get44withRDFC())
             .cryptosuite(SLHDSA2024.get128withRDFC())
+
+            .cryptosuite(EdDSA2022.withJCS())
+            .cryptosuite(ECDSA2019.withJCS())
+            .cryptosuite(MLDSA2024.get44withJCS())
+            .cryptosuite(SLHDSA2024.get128withJCS())
+
+            // processors
+            .processor(GRAPH_PROCESSOR)
+            .processor(MAP_PROCESSOR)
+
+            // the model assembly
+            .build();
+
+    static Model DI_LEGACY_MODEL = DataIntegrity.newModelBuilder()
+            // proof predicate - semantic processing
+            .proofPredicate(DataIntegrity.PREDICATE_PROOF)
+
             // enable legacy Ed25519Signature2020 suite
             .Ed25519Signature2020()
+
+            // processors
             .processor(GRAPH_PROCESSOR)
+
             // the model assembly
             .build();
 

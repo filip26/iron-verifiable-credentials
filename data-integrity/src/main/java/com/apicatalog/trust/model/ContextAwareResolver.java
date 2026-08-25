@@ -54,20 +54,20 @@ public class ContextAwareResolver {
 
     public static class Builder {
 
-        private final Collection<Predicate<SequencedCollection<?>>> predicates = new ArrayList<>();;
+        private final Collection<Predicate<SequencedCollection<?>>> contextPredicates = new ArrayList<>();;
         private final Collection<Model> models = new ArrayList<>();
 
         public Builder model(
-                Predicate<SequencedCollection<?>> selector,
+                Predicate<SequencedCollection<?>> contextPredicate,
                 Model... models) {
 
             if (models.length == 1) {
-                this.predicates.add(selector);
+                this.contextPredicates.add(contextPredicate);
                 this.models.add(models[0]);
                 return this;
             }
 
-            this.predicates.add(selector);
+            this.contextPredicates.add(contextPredicate);
             this.models.add(new HybridModel(models));
             return this;
         }
@@ -75,7 +75,7 @@ public class ContextAwareResolver {
         @SuppressWarnings("unchecked")
         public ContextAwareResolver build() {
             return new ContextAwareResolver(
-                    predicates.toArray(Predicate[]::new),
+                    contextPredicates.toArray(Predicate[]::new),
                     models.toArray(Model[]::new));
         }
     }

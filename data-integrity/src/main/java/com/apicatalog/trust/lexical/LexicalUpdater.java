@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.apicatalog.trust.Document;
-import com.apicatalog.trust.model.Model.Vocab;
+import com.apicatalog.trust.lexical.LexicalModel.Vocab;
 
 public class LexicalUpdater implements Document.Updater {
 
@@ -90,7 +90,6 @@ public class LexicalUpdater implements Document.Updater {
         return model.createPayload(accessor);
     }
 
-    @Override
     public Vocab vocab() {
         return model.vocab();
     }

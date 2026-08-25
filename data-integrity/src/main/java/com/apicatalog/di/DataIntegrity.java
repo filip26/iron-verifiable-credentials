@@ -15,13 +15,13 @@ import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.CryptoSuite;
 import com.apicatalog.trust.lexical.LexicalAccessor;
 import com.apicatalog.trust.lexical.LexicalModel;
+import com.apicatalog.trust.lexical.PropertyMapProcessor;
 import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.lexical.PropertyProofMapper;
-import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.semantic.Graph;
 import com.apicatalog.trust.semantic.Graph.NodeMapper;
 import com.apicatalog.trust.semantic.Graph.TypeMapping;
-import com.apicatalog.trust.semantic.GraphProcessor;
+import com.apicatalog.trust.semantic.GraphProcessorResources;
 import com.apicatalog.trust.semantic.GraphProofMapper;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
@@ -48,7 +48,8 @@ public class DataIntegrity {
 
         private String proofPredicate = DataIntegrity.PREDICATE_PROOF;
 
-        private GraphProcessor processor;
+        private GraphProcessorResources graphProcessor;
+        private PropertyMapProcessor mapProcessor;
 //        private SemanticModel.Accessor.Factory accessorFactory;
 //        private GraphUpdater.Factory updaterFactory;
 //        private GraphProofCursor.Factory cursorFactory;
@@ -62,8 +63,7 @@ public class DataIntegrity {
 
         private Map<String, CryptoSuite> cryptosuites;
 
-        @Deprecated
-        private Function<Collection<String>, NodeMapper<?>> documentMapper;
+        private NodeMapper<?> documentMapper;
 
         private Collection<TypeMapping> typeMapping;
 
@@ -71,7 +71,6 @@ public class DataIntegrity {
         private Map<String, GraphProofMapper> graphProofMappers;
 
         private boolean ed25519Signature2020 = false;
-
 
         private String proofProperty = DataIntegrity.PROPERTY_PROOF;
 
@@ -88,7 +87,7 @@ public class DataIntegrity {
             this.proofPredicate = uri;
             return this;
         }
-        
+
         public ModelBuilder proofProperty(String name) {
             this.proofProperty = name;
             return this;
@@ -153,13 +152,11 @@ public class DataIntegrity {
 //        }
 //        
 
-                @Deprecated
-        public ModelBuilder document(Function<Collection<String>, NodeMapper<?>> mapper) {
+        public ModelBuilder document(NodeMapper<?> mapper) {
             this.documentMapper = mapper;
             return this;
         }
 
-       
         public ModelBuilder document(String type, NodeMapper<?> mapper) {
             if (this.typeMapping == null) {
                 typeMapping = new ArrayList<>();
@@ -168,7 +165,6 @@ public class DataIntegrity {
             return this;
         }
 
-        @Deprecated
         public ModelBuilder document(Set<String> types, NodeMapper<?> mapper) {
             if (this.typeMapping == null) {
                 typeMapping = new ArrayList<>();
@@ -202,31 +198,43 @@ public class DataIntegrity {
             return this;
         }
 
-        public ModelBuilder processor(GraphProcessor processor) {
+        public ModelBuilder processor(GraphProcessorResources processor) {
             Objects.requireNonNull(processor);
-            this.processor = processor;
+            this.graphProcessor = processor;
+            return this;
+        }
+
+        public ModelBuilder processor(PropertyMapProcessor processor) {
+            Objects.requireNonNull(processor);
+            this.mapProcessor = processor;
             return this;
         }
 
         public SemanticModel build() {
 
-            if (processor == null) {
-                throw new IllegalStateException();
-            }
-
             if (cryptosuites != null && !cryptosuites.isEmpty()) {
+
+//                if (Model.C14N_JCS.equals(cryptosuites))
+
                 graphProofMappers.put(
                         DataIntegrityProof.TYPE_URI,
                         new DataIntegrityProof.GraphMapper(
                                 cryptosuites,
-                                proofC14n.getOrDefault(DataIntegrityProof.TYPE_URI, processor::newCanonizer)));
+                                graphProcessor::newCanonizer
+//                                proofC14n.getOrDefault(DataIntegrityProof.TYPE_URI, graphProcessor::newCanonizer))
+                        ));
             }
 
             if (ed25519Signature2020) {
+
+                if (graphProcessor == null) {
+                    throw new IllegalStateException();
+                }
+
                 graphProofMappers.put(
                         Ed25519Signature2020.TYPE_URI,
-                        new Ed25519Signature2020.GraphMapper(
-                                proofC14n.getOrDefault(Ed25519Signature2020.TYPE_URI, processor::newCanonizer)));
+                        new Ed25519Signature2020.GraphMapper(graphProcessor::newCanonizer));
+//                                proofC14n.getOrDefault(Ed25519Signature2020.TYPE_URI, graphProcessor::newCanonizer)));
             }
 
 //            if (readers.isEmpty()) {
@@ -246,16 +254,17 @@ public class DataIntegrity {
 //                    );
 
             return new SemanticModel(
-                    new Vocab(
+                    new SemanticModel.Vocab(
                             "@context",
                             proofPredicate,
                             null,
                             Graph.PREDICATE_TYPE),
-                    processor,
+                    graphProcessor,
                     typeMapping != null && !typeMapping.isEmpty()
                             ? new Graph.TypeMappingMatcher(typeMapping)
                             : null,
-                    documentMapper,
+// FIXME documentMapper,
+                    null,
                     graphProofMappers);
         }
     }
@@ -346,7 +355,7 @@ public class DataIntegrity {
 //            }
 
             return new LexicalModel(
-                    new Vocab("@context", proofProperty, "id", "type"),
+                    new LexicalModel.Vocab("@context", proofProperty, "id", "type"),
                     processorFactory,
                     cursorFactory,
                     canonize,

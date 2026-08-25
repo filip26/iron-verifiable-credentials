@@ -10,6 +10,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.SequencedCollection;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.DataIntegrity;
@@ -32,7 +33,7 @@ import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
-import com.apicatalog.trust.semantic.GraphProcessor;
+import com.apicatalog.trust.semantic.GraphProcessorResources;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
@@ -41,7 +42,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static GraphProcessor GRAPH_PROCESSOR = GraphProcessor.newBuilder(Model.C14N_RDFC)
+    static GraphProcessorResources GRAPH_PROCESSOR = GraphProcessorResources.newBuilder(Model.C14N_RDFC)
             // proof type specific c14n provider
             .c14n(Ed25519Signature2020.TYPE_URI, Ed25519Signature2020::newStaticRDFC)
             .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
@@ -58,11 +59,11 @@ class Resources {
             // the processor assembly
             .build();
 
-    static SemanticModel VCDM20_CREDENTIAL = DataIntegrity.newModelBuilder()
-            // TODO .context(predicate, VCDM20::isDefined)
+    static Model VCDM20_CREDENTIAL = DataIntegrity.newModelBuilder()
             .proofPredicate(Credential.PREDICATE_PROOF)
-            // document mapper
-            .document(Credential.TYPE_URI, new Credential.GraphMapper())
+            // generic document mapper
+            .document(new Credential.GraphMapper())
+
             // custom node mapping
 //          .mapping(Credential.PREDICATE_ISSUER, types, mapper) or typeMapping?
 
@@ -78,14 +79,20 @@ class Resources {
             // the model assembly
             .build();
 
-    static SemanticModel VCDM20_PRESENTATION = DataIntegrity.newModelBuilder()
-    // TODO .context(predicate, VCDM20::isDefined)
-//          .types(Credential.TYPE_URI)
+    static Model VCDM20_PRESENTATION = DataIntegrity.newModelBuilder()
             .proofPredicate(Credential.PREDICATE_PROOF)
-            // document mapper
-            .document(Presentation.TYPE_URI, new Presentation.GraphMapper())
-            // custom node mapping
-//          .mapping(Credential.PREDICATE_ISSUER, types, mapper) or typeMapping?
+            
+            // document must include this type
+//          .type(types -> types.contains(Presentation.TYPE_URI)) TODO predicate
+            
+            // generic document mapper
+            .document(new Presentation.GraphMapper())
+            
+            // custom document mapper - must match types
+            .document(Set.of(
+                    Presentation.TYPE_URI,
+                    "https://www.w3.org/ns/credentials/examples#ExamplePresentation"),
+                    new Presentation.GraphMapper())
 
             // enable selected DataIntegrityProof cryptosuites
             .cryptosuite(EdDSA2022.withRDFC())

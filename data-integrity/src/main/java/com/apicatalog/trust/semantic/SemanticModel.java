@@ -54,9 +54,12 @@ public class SemanticModel implements Model {
         // TODO void reset();
     }
 
+    public record Vocab(String context, String proof, String id, String type) {
+    };
+
     private final Vocab vocab;
 
-    private final GraphProcessor processor;
+    private final GraphProcessorResources processor;
 
     private final Graph.TypeMappingMatcher typeMatcher;
     @Deprecated
@@ -65,7 +68,7 @@ public class SemanticModel implements Model {
 
     public SemanticModel(
             Vocab vocab,
-            GraphProcessor processor,
+            GraphProcessorResources processor,
             Graph.TypeMappingMatcher typeMatcher,
             Function<Collection<String>, NodeMapper<?>> documentMapper,
             Map<String, GraphProofMapper> proofMappers) {
@@ -115,7 +118,7 @@ public class SemanticModel implements Model {
         return proofMappers.get(type);
     }
 
-    public GraphProcessor processor() {
+    public GraphProcessorResources processor() {
         return processor;
     }
 

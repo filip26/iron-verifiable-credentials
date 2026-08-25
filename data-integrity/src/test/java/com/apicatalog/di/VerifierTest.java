@@ -18,6 +18,7 @@ import com.apicatalog.crypto.bc.BCEd25519Verifier;
 import com.apicatalog.crypto.bc.BCMLDSAVerifier;
 import com.apicatalog.crypto.bc.BCSLHDSAVerifier;
 import com.apicatalog.di.proof.DataIntegrityProof;
+import com.apicatalog.di.proof.Ed25519Signature2020;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.MLDSA2024;
@@ -36,14 +37,16 @@ import com.apicatalog.trust.proof.ProofVerifier;
 public class VerifierTest {
 
     static final ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.newBuilder()
+
+            // legacy model support
+            .model(ctx -> ctx.contains(Ed25519Signature2020.CONTEXT_URI), Resources.DI_LEGACY_MODEL)
+
             // accept without context
-            .model(Collection::isEmpty, Resources.LEXICAL_MODEL)
+            .model(Collection::isEmpty, Resources.DI_LEXICAL_MODEL)
 
             // accept any existing context - for test purposes only
-            .model(Predicate.not(Collection::isEmpty),
-                    // in processing preferences order
-                    Resources.SEMANTIC_MODEL,
-                    Resources.LEXICAL_MODEL)
+            .model(Predicate.not(Collection::isEmpty), Resources.DI_HYBRID_MODEL)
+
             .build();
 
     static final DidKeyResolver DID_KEY_RESOLVER = DidKeyResolver.newBuilder()
