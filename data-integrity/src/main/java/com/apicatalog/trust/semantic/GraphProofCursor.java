@@ -53,7 +53,7 @@ public class GraphProofCursor implements ProofCursor {
             return null;
         }
 
-        var proofReaders = HashMap.<String, Entry<String, GraphProofMapper>>newHashMap(proofGraphs.size());
+        var proofMappers = HashMap.<String, Entry<String, GraphProofMapper>>newHashMap(proofGraphs.size());
 
         for (var proofGraphId : proofGraphs) {
 
@@ -69,20 +69,20 @@ public class GraphProofCursor implements ProofCursor {
 
                 var proofType = node.type().getFirst();
 
-                var reader = model.proofMapper(proofType);
+                var mapper = model.proofMapper(proofType);
 
-                if (reader != null && reader.accepts(node)) {
-                    proofReaders.put(proofGraphId, Map.entry(node.id(), reader));
+                if (mapper != null && mapper.accepts(node)) {
+                    proofMappers.put(proofGraphId, Map.entry(node.id(), mapper));
                     break;
                 }
             }
         }
 
 //        if (proofReaders.isEmpty()) {
-////            return null;
+        //// return null;
 //        }
 
-        return new GraphProofCursor(model, adapter, proofReaders);
+        return new GraphProofCursor(model, adapter, proofMappers);
     }
 
     @Override
@@ -117,5 +117,12 @@ public class GraphProofCursor implements ProofCursor {
 
     public Graph proofGraph() {
         return currentProofGraph;
+    }
+
+    @Override
+    public String proofType() {
+        return currentReader != null && currentProofGraph != null
+                ? currentProofGraph.nodes().get(currentReader.getKey()).type().getFirst()
+                : null;
     }
 }

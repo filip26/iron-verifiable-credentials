@@ -142,6 +142,8 @@ public class SemanticModel implements Model {
         Object document();
 
         Graph documentGraph();
+        
+        String documentNode();
 
         // returns proof graph ids, might be URI or blank node identifier
         Set<String> proofGraphs();

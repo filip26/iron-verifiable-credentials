@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
 
+import com.apicatalog.trust.Document.Mapper;
 import com.apicatalog.trust.proof.ProofCursor;
 import com.apicatalog.trust.semantic.SemanticModel.QuadConsumer;
 import com.apicatalog.trust.semantic.SemanticModel.Vocab;
@@ -21,7 +22,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
 
     private final Map<String, ?> expandedData;
 
-    private String resource;
+    private String documentNode;
     private final Set<String> proofGraphs;
     private final Map<String, Graph> dataset;
 
@@ -38,7 +39,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
         this.document = document;
         this.expandedData = expandedData;
 
-        this.resource = resource;
+        this.documentNode = resource;
         this.proofGraphs = proofGraphs;
         this.dataset = dataset;
     }
@@ -160,8 +161,8 @@ public final class GraphAccessor implements SemanticModel.Accessor {
         if (model != null) {
             // TODO cache
 
-            if (resource != null) {
-                var node = graph.nodes().get(resource);
+            if (documentNode != null) {
+                var node = graph.nodes().get(documentNode);
                 var mapper = model.documentMapper(node.type());
                 if (mapper != null) {
                     return mapper.materialize(context, node, dataset, model);
@@ -171,7 +172,7 @@ public final class GraphAccessor implements SemanticModel.Accessor {
             for (var node : graph.nodes().values()) {
                 var mapper = model.documentMapper(node.type());
                 if (mapper != null) {
-                    resource = node.id();
+                    documentNode = node.id();
                     return mapper.materialize(context, node, dataset, model);
                 }
             }
@@ -180,9 +181,20 @@ public final class GraphAccessor implements SemanticModel.Accessor {
         return graph;
     }
 
+
+    @Override
+    public Mapper createDocumentMapper() {
+        // TODO Auto-generated method stub
+        return null;
+    }
     @Override
     public Graph documentGraph() {
         return dataset.get("@default");
+    }
+    
+    @Override
+    public String documentNode() {
+        return documentNode;
     }
 
     @Override
@@ -251,4 +263,5 @@ public final class GraphAccessor implements SemanticModel.Accessor {
         // FIXME read from JSON-LD term map after expansion
         return new Vocab("@context", "proof", "id", "type");
     }
+
 }

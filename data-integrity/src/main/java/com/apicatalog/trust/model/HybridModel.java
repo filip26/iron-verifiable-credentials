@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.SequencedCollection;
 
 import com.apicatalog.trust.Document;
+import com.apicatalog.trust.Document.Mapper;
 import com.apicatalog.trust.Document.Updater;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
@@ -89,6 +90,11 @@ public class HybridModel implements Model {
             }
             return data;
         }
+
+        @Override
+        public Mapper createDocumentMapper() {
+            return acessors.getFirst().createDocumentMapper();
+        }
     }
 
     private static class Cursor implements ProofCursor {
@@ -144,6 +150,12 @@ public class HybridModel implements Model {
         public Proof proof() {
             return isAccepted() ? accepted.proof() : null;
         }
+
+        @Override
+        public String proofType() {
+            return isAccepted() ? accepted.proofType() : null;
+        }
+
     }
 
     @Override

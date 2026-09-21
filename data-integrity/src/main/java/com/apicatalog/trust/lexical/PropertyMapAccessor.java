@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.apicatalog.trust.Document.Mapper;
+
 public class PropertyMapAccessor implements LexicalAccessor {
 
     private final LexicalModel model;
@@ -76,5 +78,11 @@ public class PropertyMapAccessor implements LexicalAccessor {
     @Override
     public int proofs() {
         return proofs != null ? proofs.length : 0;
+    }
+
+    @Override
+    public Mapper createDocumentMapper() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -2,13 +2,16 @@ package com.apicatalog.trust;
 
 import java.util.Map;
 import java.util.SequencedCollection;
-import java.util.Set;
-import java.util.function.Predicate;
 
 import com.apicatalog.trust.payload.PayloadGenerator;
 import com.apicatalog.trust.proof.ProofCursor;
 
 public interface Document {
+
+    @FunctionalInterface
+    public interface ContextExtractor {
+        SequencedCollection<?> extract(Map<String, ?> document);
+    }
 
     public interface Model {
 
@@ -24,15 +27,20 @@ public interface Document {
     }
 
     interface Processor {
+
         Accessor createAccessor(Model model, SequencedCollection<?> context, Map<String, ?> document);
 
         Updater createUpdater(Model model, SequencedCollection<?> context, Map<String, ?> document);
+
     }
 
     interface Accessor {
 
-        //TODO move to mapper
+        // FIXME use mapper
+        @Deprecated
         Object document();
+
+        Mapper createDocumentMapper();
 
         ProofCursor createProofCursor();
 
@@ -47,5 +55,9 @@ public interface Document {
         Map<String, ?> compact();
 
 //        Vocab vocab();
+    }
+
+    interface Mapper {
+
     }
 }

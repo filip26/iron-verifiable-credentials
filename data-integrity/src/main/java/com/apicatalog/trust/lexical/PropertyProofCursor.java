@@ -92,4 +92,9 @@ public final class PropertyProofCursor implements ProofCursor {
         currentProof = null;
         return true;
     }
+
+    @Override
+    public String proofType() {
+        return (String) currentEntry.get("type");
+    }
 }

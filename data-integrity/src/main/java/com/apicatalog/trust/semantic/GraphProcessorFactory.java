@@ -21,8 +21,6 @@ public class GraphProcessorFactory {
 
     public GraphProcessor newInstance(SequencedCollection<?> context, Map<String, ?> document) {
 
-        
-        
         return null;
     }
 
