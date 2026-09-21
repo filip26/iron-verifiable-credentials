@@ -6,16 +6,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.apicatalog</groupId>
-    <artifactId>iron-sd-sic</artifactId>
+    <artifactId>iron-sd-smt</artifactId>
     <version>1.0.0-M1</version>
 
     <packaging>jar</packaging>
 
-    <name>Signed Individual Claims (SIC) Selective Disclosure (SD) Proofs</name>
+    <name>Signed Merkle Tree (SMT) Selective Disclosure (SD) Proofs</name>
 
     <description>
         A modular, high-performance implementation of W3C VC Data Integrity
-        Selective Disclosure (SD) Proofs using Signed Individual Claims (SIC) algorithm.
+        Selective Disclosure (SD) Proofs using path-flattened Signed Merkle Tree (SMT) algorithm.
         Built-in support for ecdsa-sd-2023 cryptographical suite.
     </description>
 
