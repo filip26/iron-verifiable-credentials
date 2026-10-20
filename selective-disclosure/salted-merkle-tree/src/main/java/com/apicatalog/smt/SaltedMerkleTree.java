@@ -13,8 +13,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Set;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -268,16 +270,17 @@ public class SaltedMerkleTree {
     /**
      * Returns a Graphviz DOT representation
      */
-    public void writeDot(Writer writer, int claims, int leaves, Integer[] mapping, int[] selection) {
+    public void writeDot(Writer writer, int claims, int leaves, Integer[] mapping, int[] selection, int[] indices) {
         try (var print = new PrintWriter(writer)) {
-            writeDot(print, claims, leaves, mapping, selection);
+            writeDot(print, claims, leaves, mapping, selection, indices);
         }
     }
 
     /**
      * Returns a Graphviz DOT representation
      */
-    public void writeDot(PrintWriter writer, int claims, int leaves, Integer[] mapping, int[] selection) {
+    public void writeDot(PrintWriter writer, int claims, int leaves, Integer[] mapping, int[] selection,
+            int[] indices) {
 
         final int paddedSize = (leaves == 1)
                 ? 1
@@ -292,6 +295,8 @@ public class SaltedMerkleTree {
 
         final var depth = 32 - Integer.numberOfLeadingZeros(leaves - 1);
 
+        var path = generatePathIndices(leaves, indices);
+        IO.println(path);
         int levelSize = leaves;
         int paddedLevelSize = paddedSize;
 
@@ -326,8 +331,8 @@ public class SaltedMerkleTree {
                 if (level == depth) {
                     writer.print(", style=filled, fillcolor=lightgoldenrod1");
 
-//                } else if (authPath.contains(level * paddedSize + index)) {
-//                    dot.append(", style=filled, fillcolor=lightsalmon");
+                } else if (path.contains(level * leaves + index)) {
+                    writer.print(", style=filled, fillcolor=lightsalmon");
                 }
 
                 writer.println("];");
@@ -360,9 +365,9 @@ public class SaltedMerkleTree {
                 writer.print(depth - level);
                 writer.print("</sub> >");
 
-//                if (authPath.contains(level * paddedSize + levelSize)) {
-//                    dotwriter.print(", style=filled, fillcolor=lightsalmon");
-//                }
+                if (path.contains(level * leaves + levelSize)) {
+                    writer.print(", style=filled, fillcolor=lightsalmon");
+                }
                 writer.println("];");
             }
 
@@ -384,7 +389,7 @@ public class SaltedMerkleTree {
             writer.print("</sub>>");
 
             if (i < claims) {
-                if (selectionIndex < selection.length && mapping[i] == selection[selectionIndex]) {
+                if (selectionIndex < indices.length && mapping[i] == indices[selectionIndex]) {
                     writer.print(", style=filled, fillcolor=palegreen");
                 } else {
                     writer.print(", style=filled, fillcolor=lightyellow");
@@ -403,7 +408,7 @@ public class SaltedMerkleTree {
                 writer.printf("%d", i + 1);
                 writer.print("</sub>>");
 
-                if (selectionIndex < selection.length && mapping[i] == selection[selectionIndex]) {
+                if (selectionIndex < indices.length && mapping[i] == indices[selectionIndex]) {
                     writer.print(", style=filled, fillcolor=palegreen");
                     selectionIndex++;
 
@@ -429,6 +434,50 @@ public class SaltedMerkleTree {
         }
 
         writer.println('}');
+    }
+
+    public Set<Integer> generatePathIndices(int leaves, int[] indices) {
+
+        final var path = new HashSet<Integer>();
+
+        final var depth = 32 - Integer.numberOfLeadingZeros(leaves - 1);
+
+        final var buffer = new boolean[leaves];
+
+        for (var i = 0; i < indices.length; i++) {
+            buffer[indices[i]] = true;
+        }
+
+        var levelSize = leaves;
+
+        for (int level = 0; level < depth; level++) {
+
+            for (int index = 0; index < levelSize; index += 2) {
+
+                if ((index + 1) == levelSize) {
+                    buffer[levelSize] = false;
+                    levelSize++;
+                }
+
+                if (buffer[index]) {
+                    if (!buffer[index + 1]) {
+                        path.add(level * leaves + index + 1);
+                    }
+                    buffer[index >>> 1] = true;
+
+                } else if (buffer[index + 1]) {
+                    path.add(level * leaves + index);
+                    buffer[index >>> 1] = true;
+
+                } else {
+                    buffer[index >>> 1] = false;
+                }
+            }
+
+            levelSize = levelSize >>> 1;
+        }
+
+        return path;
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
@@ -500,7 +549,7 @@ public class SaltedMerkleTree {
 
         Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
         try (var writer = new StringWriter()) {
-            tree.writeDot(writer, claims.length, leaves.length, mapping, selectedIndices);
+            tree.writeDot(writer, claims.length, leaves.length, mapping, selection, selectedIndices);
             Files.writeString(file, writer.toString());
             IO.println("DOT file written to: " + file);
         }
