@@ -10,13 +10,14 @@ import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -270,16 +271,16 @@ public class SaltedMerkleTree {
     /**
      * Returns a Graphviz DOT representation
      */
-    public void writeDot(Writer writer, int claims, int leaves, Integer[] mapping, int[] selection, int[] indices) {
+    public void writeDot(Writer writer, int claims, int leaves, Integer[] mapping, int[] indices) {
         try (var print = new PrintWriter(writer)) {
-            writeDot(print, claims, leaves, mapping, selection, indices);
+            writeDot(print, claims, leaves, mapping, indices);
         }
     }
 
     /**
      * Returns a Graphviz DOT representation
      */
-    public void writeDot(PrintWriter writer, int claims, int leaves, Integer[] mapping, int[] selection,
+    public void writeDot(PrintWriter writer, int claims, int leaves, Integer[] mapping,
             int[] indices) {
 
         final int paddedSize = (leaves == 1)
@@ -362,7 +363,7 @@ public class SaltedMerkleTree {
                 writer.print(levelSize);
                 writer.print(" [label=<");
                 writer.print("Node P<sub>");
-                writer.print(depth - level);
+                writer.print(level);
                 writer.print("</sub> >");
 
                 if (path.contains(level * leaves + levelSize)) {
@@ -423,7 +424,7 @@ public class SaltedMerkleTree {
             writer.println("];");
 
             writer.print("  N");
-            writer.print(0);
+            writer.print(0);    // level 0
             writer.print('_');
             writer.print(mapping[i]);
             writer.print(" -> C");
@@ -438,7 +439,7 @@ public class SaltedMerkleTree {
 
     public Set<Integer> generatePathIndices(int leaves, int[] indices) {
 
-        final var path = new HashSet<Integer>();
+        final var path = new TreeSet<Integer>();
 
         final var depth = 32 - Integer.numberOfLeadingZeros(leaves - 1);
 
@@ -482,7 +483,7 @@ public class SaltedMerkleTree {
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
 
-        var claims = new byte[11][];
+        var claims = new byte[20][];
 
         for (var i = 0; i < claims.length; i++) {
             claims[i] = ("Leaf #" + (i + 1)).getBytes(StandardCharsets.UTF_8);
@@ -490,15 +491,17 @@ public class SaltedMerkleTree {
 
         var digest = MessageDigest.getInstance("SHA-256");
 
-//        var hmacKey = new byte[32];
-//
-//        var random = new SecureRandom();
-//        random.nextBytes(hmacKey);
-//
-//        IO.println(HexFormat.of().formatHex(hmacKey));
+        var hmacKey = new byte[32];
 
-        var hmacKey = HexFormat.of().parseHex("fd212eaefbae1f5a5bb9285525b62d5c167375cc0e21aa17ad61c679de53a84f");
+        var random = new SecureRandom();
+        random.nextBytes(hmacKey);
 
+        IO.println(HexFormat.of().formatHex(hmacKey));
+
+//        var hmacKey = HexFormat.of().parseHex("fd212eaefbae1f5a5bb9285525b62d5c167375cc0e21aa17ad61c679de53a84f");
+
+        hmacKey = HexFormat.of().parseHex("a61b763c687c28a4064bb2d7b06e2e5fb25d4f1ea226b611d11d846768058630");
+        
         final String type = "HmacSHA256";
         final SecretKeySpec key = new SecretKeySpec(hmacKey, type);
 
@@ -518,7 +521,7 @@ public class SaltedMerkleTree {
         IO.println("root     \t= " + HexFormat.of().formatHex(root));
         IO.println("mapping  \t= " + Arrays.toString(mapping));
 
-        var selection = new int[] { 1, 2, 3, 4, 5 };
+        var selection = new int[] { 0, 1, 7, 10 };
 
         IO.println("selection\t= " + Arrays.toString(selection));
 
@@ -549,7 +552,7 @@ public class SaltedMerkleTree {
 
         Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
         try (var writer = new StringWriter()) {
-            tree.writeDot(writer, claims.length, leaves.length, mapping, selection, selectedIndices);
+            tree.writeDot(writer, claims.length, leaves.length, mapping, selectedIndices);
             Files.writeString(file, writer.toString());
             IO.println("DOT file written to: " + file);
         }

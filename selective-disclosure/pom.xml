@@ -24,7 +24,7 @@
 
     <modules>
         <module>sic</module>
-        <module>smt</module>
+        <module>salted-merkle-tree</module>
     </modules>
 
     <build>
