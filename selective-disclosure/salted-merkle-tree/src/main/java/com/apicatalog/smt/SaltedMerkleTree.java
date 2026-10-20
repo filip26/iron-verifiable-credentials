@@ -1,9 +1,6 @@
 package com.apicatalog.smt;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,8 +13,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -261,229 +256,12 @@ public class SaltedMerkleTree {
 
     protected byte[] levelPadding(Mac hmac, int level) {
         hmac.update(PREFIX_LEVEL_PADDING);
-        hmac.update((byte) level);  //FIXME
+        hmac.update((byte) level); // FIXME
         var salt = hmac.doFinal();
 
         digest.update(PREFIX_PADDING);
         digest.update(salt);
         return digest.digest();
-    }
-
-    /**
-     * Returns a Graphviz DOT representation
-     */
-    public static final void writeDot(Writer writer, int claims, Integer[] mapping, int[] indices) {
-        try (var print = new PrintWriter(writer)) {
-            writeDot(print, claims, mapping, indices);
-        }
-    }
-
-    /**
-     * Returns a Graphviz DOT representation
-     */
-    public static final void writeDot(
-            PrintWriter writer,
-            int claims,
-            Integer[] mapping,
-            int[] indices) {
-
-        final int leaves = claims + (claims & 1);
-        final int paddedSize = (leaves == 1)
-                ? 1
-                : Integer.highestOneBit(leaves - 1) << 1;
-
-        writer.println("""
-                       digraph MerkleTree {
-                         rankdir=TB;
-                         node [shape=box, fontname=\"monospace\"];
-                         edge [color=gray50];
-                       """);
-
-        final var depth = 32 - Integer.numberOfLeadingZeros(leaves - 1);
-
-        var path = generatePathIndices(leaves, indices);
-
-        int levelSize = leaves;
-        int paddedLevelSize = paddedSize;
-
-        for (int level = 0; level <= depth; level++) {
-
-            for (int index = 0; index < levelSize; index++) {
-                writer.print("  N");
-                writer.print(level);
-                writer.print('_');
-                writer.print(index);
-                writer.print(" [label=");
-
-                if (level == 0) {
-                    writer.print("<Leaf<sub>");
-                    writer.printf("%d", index + 1);
-                    writer.print("</sub>>");
-
-                } else if (level == depth) {
-                    writer.print("<Root 1:");
-                    writer.print(leaves);
-                    writer.print('>');
-
-                } else {
-                    var step = paddedSize / paddedLevelSize;
-                    writer.print("\"Node ");
-                    writer.print(step * index + 1);
-                    writer.print(":");
-                    writer.print(step * (index + 1));
-                    writer.print('"');
-                }
-
-                if (level == depth) {
-                    writer.print(", style=filled, fillcolor=lightgoldenrod1");
-
-                } else if (path.contains(level * leaves + index)) {
-                    writer.print(", style=filled, fillcolor=lightsalmon");
-                }
-
-                writer.println("];");
-
-                if (level > 0) {
-                    writer.print("  N");
-                    writer.print(level);
-                    writer.print('_');
-                    writer.print(index);
-                    writer.print(" -> N");
-                    writer.print(level - 1);
-                    writer.print('_');
-                    writer.print(index * 2);
-                    writer.print(',');
-                    writer.print(" N");
-                    writer.print(level - 1);
-                    writer.print('_');
-                    writer.print(index * 2 + 1);
-                    writer.println(';');
-                }
-            }
-
-            if (levelSize > 1 && levelSize % 2 == 1) {
-                writer.print("  N");
-                writer.print(level);
-                writer.print('_');
-                writer.print(levelSize);
-                writer.print(" [label=<");
-                writer.print("Node P<sub>");
-                writer.print(level);
-                writer.print("</sub> >");
-
-                if (path.contains(level * leaves + levelSize)) {
-                    writer.print(", style=filled, fillcolor=lightsalmon");
-                }
-                writer.println("];");
-            }
-
-            levelSize = (levelSize + 1) >>> 1;
-            paddedLevelSize = (levelSize == 1)
-                    ? 1
-                    : Integer.highestOneBit(levelSize - 1) << 1;
-        }
-
-        int selectionIndex = 0;
-
-        for (var i = 0; i < leaves; i++) {
-
-            writer.print("  S");
-            writer.print(mapping[i]);
-            writer.print(" [label=");
-            writer.print("<Salt<sub>");
-            writer.printf("%d", i + 1);
-            writer.print("</sub>>");
-
-            if (i < claims) {
-                if (selectionIndex < indices.length && mapping[i] == indices[selectionIndex]) {
-                    writer.print(", style=filled, fillcolor=palegreen");
-                } else {
-                    writer.print(", style=filled, fillcolor=lightyellow");
-                }
-            } else {
-                writer.print(", style=filled, fillcolor=grey80");
-
-            }
-            writer.println("];");
-
-            writer.print("  C");
-            writer.print(mapping[i]);
-            writer.print(" [label=");
-            if (i < claims) {
-                writer.print("<Claim<sub>");
-                writer.printf("%d", i + 1);
-                writer.print("</sub>>");
-
-                if (selectionIndex < indices.length && mapping[i] == indices[selectionIndex]) {
-                    writer.print(", style=filled, fillcolor=palegreen");
-                    selectionIndex++;
-
-                } else {
-                    writer.print(", style=filled, fillcolor=lightyellow");
-                }
-
-            } else {
-                writer.print("\"Empty\"");
-                writer.print(", style=filled, fillcolor=grey80");
-            }
-            writer.println("];");
-
-            writer.print("  N");
-            writer.print(0); // level 0
-            writer.print('_');
-            writer.print(mapping[i]);
-            writer.print(" -> C");
-            writer.print(mapping[i]);
-            writer.print(", S");
-            writer.print(mapping[i]);
-            writer.println(';');
-        }
-
-        writer.println('}');
-    }
-
-    public static final Set<Integer> generatePathIndices(int leaves, int[] indices) {
-
-        final var path = new TreeSet<Integer>();
-
-        final var depth = 32 - Integer.numberOfLeadingZeros(leaves - 1);
-
-        final var buffer = new boolean[leaves];
-
-        for (var i = 0; i < indices.length; i++) {
-            buffer[indices[i]] = true;
-        }
-
-        var levelSize = leaves;
-
-        for (int level = 0; level < depth; level++) {
-
-            for (int index = 0; index < levelSize; index += 2) {
-
-                if ((index + 1) == levelSize) {
-                    buffer[levelSize] = false;
-                    levelSize++;
-                }
-
-                if (buffer[index]) {
-                    if (!buffer[index + 1]) {
-                        path.add(level * leaves + index + 1);
-                    }
-                    buffer[index >>> 1] = true;
-
-                } else if (buffer[index + 1]) {
-                    path.add(level * leaves + index);
-                    buffer[index >>> 1] = true;
-
-                } else {
-                    buffer[index >>> 1] = false;
-                }
-            }
-
-            levelSize = levelSize >>> 1;
-        }
-
-        return path;
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
@@ -526,7 +304,7 @@ public class SaltedMerkleTree {
         IO.println("root     \t= " + HexFormat.of().formatHex(root));
         IO.println("mapping  \t= " + Arrays.toString(mapping));
 
-        var selection = new int[] { 0,2 };
+        var selection = new int[] { 0, 2 };
 
         IO.println("selection\t= " + Arrays.toString(selection));
 
@@ -557,7 +335,7 @@ public class SaltedMerkleTree {
 
         Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
         try (var writer = Files.newBufferedWriter(file)) {
-            SaltedMerkleTree.writeDot(writer, claims.length, mapping, selectedIndices);
+            TopologyDotWriter.write(writer, claims.length, mapping, selectedIndices);
             IO.println("DOT file written to: " + file);
         }
     }
