@@ -254,13 +254,14 @@ public class SaltedMerkleTree {
             digest.update(data);
         } else {
             digest.update((byte) 0);
+            digest.update((byte) 0);
         }
         return digest.digest();
     }
 
     protected byte[] levelPadding(Mac hmac, int level) {
         hmac.update(PREFIX_LEVEL_PADDING);
-        hmac.update((byte) level);
+        hmac.update((byte) level);  //FIXME
         var salt = hmac.doFinal();
 
         digest.update(PREFIX_PADDING);
@@ -271,18 +272,22 @@ public class SaltedMerkleTree {
     /**
      * Returns a Graphviz DOT representation
      */
-    public void writeDot(Writer writer, int claims, int leaves, Integer[] mapping, int[] indices) {
+    public static final void writeDot(Writer writer, int claims, Integer[] mapping, int[] indices) {
         try (var print = new PrintWriter(writer)) {
-            writeDot(print, claims, leaves, mapping, indices);
+            writeDot(print, claims, mapping, indices);
         }
     }
 
     /**
      * Returns a Graphviz DOT representation
      */
-    public void writeDot(PrintWriter writer, int claims, int leaves, Integer[] mapping,
+    public static final void writeDot(
+            PrintWriter writer,
+            int claims,
+            Integer[] mapping,
             int[] indices) {
 
+        final int leaves = claims + (claims & 1);
         final int paddedSize = (leaves == 1)
                 ? 1
                 : Integer.highestOneBit(leaves - 1) << 1;
@@ -297,7 +302,7 @@ public class SaltedMerkleTree {
         final var depth = 32 - Integer.numberOfLeadingZeros(leaves - 1);
 
         var path = generatePathIndices(leaves, indices);
-        IO.println(path);
+
         int levelSize = leaves;
         int paddedLevelSize = paddedSize;
 
@@ -424,7 +429,7 @@ public class SaltedMerkleTree {
             writer.println("];");
 
             writer.print("  N");
-            writer.print(0);    // level 0
+            writer.print(0); // level 0
             writer.print('_');
             writer.print(mapping[i]);
             writer.print(" -> C");
@@ -437,7 +442,7 @@ public class SaltedMerkleTree {
         writer.println('}');
     }
 
-    public Set<Integer> generatePathIndices(int leaves, int[] indices) {
+    public static final Set<Integer> generatePathIndices(int leaves, int[] indices) {
 
         final var path = new TreeSet<Integer>();
 
@@ -483,7 +488,7 @@ public class SaltedMerkleTree {
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
 
-        var claims = new byte[20][];
+        var claims = new byte[9][];
 
         for (var i = 0; i < claims.length; i++) {
             claims[i] = ("Leaf #" + (i + 1)).getBytes(StandardCharsets.UTF_8);
@@ -500,8 +505,8 @@ public class SaltedMerkleTree {
 
 //        var hmacKey = HexFormat.of().parseHex("fd212eaefbae1f5a5bb9285525b62d5c167375cc0e21aa17ad61c679de53a84f");
 
-        hmacKey = HexFormat.of().parseHex("a61b763c687c28a4064bb2d7b06e2e5fb25d4f1ea226b611d11d846768058630");
-        
+//        hmacKey = HexFormat.of().parseHex("a61b763c687c28a4064bb2d7b06e2e5fb25d4f1ea226b611d11d846768058630");
+
         final String type = "HmacSHA256";
         final SecretKeySpec key = new SecretKeySpec(hmacKey, type);
 
@@ -521,7 +526,7 @@ public class SaltedMerkleTree {
         IO.println("root     \t= " + HexFormat.of().formatHex(root));
         IO.println("mapping  \t= " + Arrays.toString(mapping));
 
-        var selection = new int[] { 0, 1, 7, 10 };
+        var selection = new int[] { 0,2 };
 
         IO.println("selection\t= " + Arrays.toString(selection));
 
@@ -551,11 +556,9 @@ public class SaltedMerkleTree {
         IO.println("ref      \t= " + HexFormat.of().formatHex(ref));
 
         Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
-        try (var writer = new StringWriter()) {
-            tree.writeDot(writer, claims.length, leaves.length, mapping, selectedIndices);
-            Files.writeString(file, writer.toString());
+        try (var writer = Files.newBufferedWriter(file)) {
+            SaltedMerkleTree.writeDot(writer, claims.length, mapping, selectedIndices);
             IO.println("DOT file written to: " + file);
         }
-
     }
 }
