@@ -27,7 +27,7 @@ public class SaltedMerkleTree {
     static final byte PREFIX_INDEX_PADDING = 0x10;
     static final byte PREFIX_LEVEL_PADDING = 0x11;
 
-    private final MessageDigest digest;
+    final MessageDigest digest;
 
     /**
      * Creates a salted Merkle tree helper using the specified digest.
@@ -60,25 +60,20 @@ public class SaltedMerkleTree {
 
         for (int level = 0; level < depth; level++) {
 
+            // if the current level size is odd number, never true for level 0
+            if ((levelSize & 1) == 1) {
+                buffer[levelSize] = levelPadding(hmac, level);
+                levelSize++;
+            }
+
             for (int index = 0; index < levelSize; index += 2) {
 
                 var left = buffer[index];
-
-                byte[] right = null;
-
-                // if the current level size is even number
-                if ((index + 1) < levelSize) {
-                    right = buffer[index + 1];
-
-                } else {
-                    // or use depth-based padding
-                    right = levelPadding(hmac, level);
-                    levelSize++;
-                }
+                var right = buffer[index + 1];
 
                 buffer[index >>> 1] = hashNode(left, right);
-
             }
+
             levelSize >>>= 1;
         }
 
@@ -116,28 +111,35 @@ public class SaltedMerkleTree {
 
             for (int index = 0; index < levelSize; index += 2) {
 
+                final var left = buffer[index];
+
+                final byte[] right;
+
                 if ((index + 1) == levelSize) {
-                    buffer[levelSize] = levelPadding(hmac, level);
+                    right = levelPadding(hmac, level);
                     levelSize++;
+
+                } else {
+                    right = buffer[index + 1];
                 }
 
-                final var left = buffer[index];
-                final var right = buffer[index + 1];
-                final var parentIndex = index >>> 1;
+                final byte[] parent;
 
                 if (left == null) {
                     if (right != null) {
                         path.add(right);
                     }
-                    buffer[parentIndex] = null;
+                    parent = null;
 
                 } else if (right == null) {
                     path.add(left);
-                    buffer[parentIndex] = null;
+                    parent = null;
 
                 } else {
-                    buffer[parentIndex] = hashNode(left, right);
+                    parent = hashNode(left, right);
                 }
+
+                buffer[index >>> 1] = parent;
             }
 
             levelSize >>>= 1;
@@ -237,7 +239,7 @@ public class SaltedMerkleTree {
         var salts = new byte[size + (size & 1)][];
 
         for (var i = 0; i < salts.length; i++) {
-            hmac.update((byte) PREFIX_INDEX_PADDING);
+            hmac.update(PREFIX_INDEX_PADDING);
             hmac.update((byte) (i >>> 24));
             hmac.update((byte) (i >>> 16));
             hmac.update((byte) (i >>> 8));
@@ -273,7 +275,7 @@ public class SaltedMerkleTree {
     }
 
     /**
-     * Computes salted leaf hashes for all claims. H(PREFIX_LEAF || SALT || DATA).
+     * Computes salted leaf hashes for all claims.
      *
      * <p>
      * The resulting hashes are leaves used as the initial level of a tree.
@@ -337,7 +339,11 @@ public class SaltedMerkleTree {
 
     /**
      * Computes the hash of an internal node.
-     *
+     * 
+     * <p>
+     * {@code H(PREFIX_NODE || left || right)}.
+     * </p>
+     * 
      * <p>
      * The left and right child hashes are ordered inputs; their positions are
      * significant.
@@ -377,8 +383,12 @@ public class SaltedMerkleTree {
 
     /**
      * Derives the padding hash used for a missing sibling at a specified tree
-     * level. H(PREFIX_PADDING || HMAC(key, PREFIX_LEVEL_PADDING ||
-     * uint32_be(level))).
+     * level.
+     * 
+     * <p>
+     * {@code H(PREFIX_PADDING || HMAC(K, PREFIX_LEVEL_PADDING ||
+     * uint32_be(level)))}.
+     * </p>
      *
      * <p>
      * Level-specific padding allows incomplete levels to be handled without
@@ -395,10 +405,10 @@ public class SaltedMerkleTree {
         hmac.update((byte) (level >>> 16));
         hmac.update((byte) (level >>> 8));
         hmac.update((byte) level);
-        var salt = hmac.doFinal();
+        var padding = hmac.doFinal();
 
         digest.update(PREFIX_PADDING);
-        digest.update(salt);
+        digest.update(padding);
         return digest.digest();
     }
 }
