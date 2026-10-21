@@ -1,25 +1,19 @@
 package com.apicatalog.smt;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HexFormat;
 import java.util.List;
 
 import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Provides methods to generate a balanced binary salted Merkle tree root from
- * leaves, as well verification paths generation and the root reconstruction.
+ * Provides operations for generating salted Merkle tree roots, generating
+ * verification paths, and reconstructing roots to verify disclosed claims.
+ *
+ * @see <a href="https://github.com/filip26/salted-merkle-tree">Salted Merkle
+ *      Tree</a>
  */
 public class SaltedMerkleTree {
 
@@ -27,19 +21,34 @@ public class SaltedMerkleTree {
     static final byte PREFIX_NODE = 0x01;
     static final byte PREFIX_PADDING = 0x02;
 
-    static final byte PREFIX_INDEX = 0x10;
+    static final byte PREFIX_INDEX_PADDING = 0x10;
     static final byte PREFIX_LEVEL_PADDING = 0x11;
 
     private final MessageDigest digest;
 
-    SaltedMerkleTree(MessageDigest digest) {
+    /**
+     * Creates a salted Merkle tree helper using the specified digest.
+     *
+     * @param digest the digest algorithm used for tree hashes
+     *
+     */
+    public SaltedMerkleTree(MessageDigest digest) {
         this.digest = digest;
     }
 
-    public static SaltedMerkleTree newInstance(MessageDigest digest) {
-        return new SaltedMerkleTree(digest);
-    }
-
+    /**
+     * Computes the root representing the integrity commitment to a collection of
+     * leaf hashes.
+     *
+     * <p>
+     * The input buffer is modified in place. The initial number of leaves must be
+     * even and greater than one.
+     * </p>
+     *
+     * @param hmac   the HMAC instance used for depth-based padding
+     * @param buffer the array of leaf hashes (overridden during computation)
+     * @return the root byte array of the salted Merkle tree
+     */
     public byte[] generateRoot(Mac hmac, byte[][] buffer) {
 
         final var depth = 32 - Integer.numberOfLeadingZeros(buffer.length - 1);
@@ -64,15 +73,34 @@ public class SaltedMerkleTree {
                     levelSize++;
                 }
 
-                buffer[index >>> 1] = nodeHash(left, right);
+                buffer[index >>> 1] = hashNode(left, right);
 
             }
-            levelSize = levelSize >>> 1;
+            levelSize >>>= 1;
         }
 
         return buffer[0];
     }
 
+    /**
+     * Generates the verification path required to authenticate selected leaves
+     * against a root.
+     *
+     * <p>
+     * Selected leaves are represented by {@code null} entries in the input buffer.
+     * The resulting path contains the hashes needed to reconstruct the root.
+     * </p>
+     *
+     * <p>
+     * The input buffer is modified in place. The initial number of leaves must be
+     * even and greater than one.
+     * </p>
+     *
+     * @param hmac   the HMAC instance used for depth-based padding
+     * @param buffer the array of leaf hashes, with selected leaves represented by
+     *               {@code null} (overridden during computation)
+     * @return the verification path hashes in verification order
+     */
     public List<byte[]> generatePath(Mac hmac, byte[][] buffer) {
 
         final var path = new ArrayList<byte[]>();
@@ -90,29 +118,46 @@ public class SaltedMerkleTree {
                     levelSize++;
                 }
 
-                if (buffer[index] == null) {
+                final var left = buffer[index];
+                final var right = buffer[index + 1];
+                final var parentIndex = index >>> 1;
 
-                    if (buffer[index + 1] != null) {
-                        path.add(buffer[index + 1]);
+                if (left == null) {
+                    if (right != null) {
+                        path.add(right);
                     }
+                    buffer[parentIndex] = null;
 
-                    buffer[index >>> 1] = null;
-
-                } else if (buffer[index + 1] == null) {
-                    path.add(buffer[index]);
-                    buffer[index >>> 1] = null;
+                } else if (right == null) {
+                    path.add(left);
+                    buffer[parentIndex] = null;
 
                 } else {
-                    buffer[index >>> 1] = nodeHash(buffer[index], buffer[index + 1]);
+                    buffer[parentIndex] = hashNode(left, right);
                 }
             }
 
-            levelSize = levelSize >>> 1;
+            levelSize >>>= 1;
         }
 
         return path;
     }
 
+    /**
+     * Reconstructs a root from disclosed claims, their salts and original indices,
+     * and a verification path.
+     *
+     * <p>
+     * The reconstructed root can be compared with a trusted root to verify the
+     * integrity and positions of the disclosed claims.
+     * </p>
+     *
+     * @param claims  the disclosed claim data
+     * @param salts   the salts associated with the disclosed claims
+     * @param indices the original leaf indices of the disclosed claims
+     * @param path    the verification path in the verification order
+     * @return the reconstructed root hash
+     */
     public byte[] recreateRoot(byte[][] claims, byte[][] salts, int[] indices, byte[][] path) {
 
         var mapping = new Integer[indices.length];
@@ -128,7 +173,7 @@ public class SaltedMerkleTree {
 
         // reconstruct leaves
         for (int i = 0; i < levelSize; i++) {
-            buffer[i] = leafHash(salts[mapping[i]], claims[mapping[i]]);
+            buffer[i] = hashLeaf(salts[mapping[i]], claims[mapping[i]]);
             mapping[i] = indices[mapping[i]];
         }
 
@@ -147,12 +192,12 @@ public class SaltedMerkleTree {
                     var left = path[pathIndex++];
                     var right = buffer[i];
 
-                    buffer[nextLevelSize] = nodeHash(left, right);
+                    buffer[nextLevelSize] = hashNode(left, right);
 
                     mapping[nextLevelSize] = nodeIndex >>> 1;
 
                 } else if (i + 1 < levelSize && ((nodeIndex + 1) == mapping[i + 1])) {
-                    buffer[nextLevelSize] = nodeHash(buffer[i], buffer[i + 1]);
+                    buffer[nextLevelSize] = hashNode(buffer[i], buffer[i + 1]);
                     mapping[nextLevelSize] = nodeIndex >>> 1;
                     i++;
 
@@ -160,7 +205,7 @@ public class SaltedMerkleTree {
                     var left = buffer[i];
                     var right = path[pathIndex++];
 
-                    buffer[nextLevelSize] = nodeHash(left, right);
+                    buffer[nextLevelSize] = hashNode(left, right);
                     mapping[nextLevelSize] = nodeIndex >>> 1;
                 }
                 nextLevelSize++;
@@ -172,19 +217,46 @@ public class SaltedMerkleTree {
         return buffer[0];
     }
 
+    /**
+     * Generates salts for leaf entries, including an additional salt when required
+     * to accommodate an odd number of entries.
+     *
+     * <p>
+     * Salts are derived using the supplied HMAC and an index-dependent input.
+     * </p>
+     *
+     * @param hmac the HMAC used to derive salts
+     * @param size the number of leaf entries
+     * @return the generated salts
+     */
     public byte[][] salts(Mac hmac, int size) {
 
         // size must be even number
         var salts = new byte[size + (size & 1)][];
 
         for (var i = 0; i < salts.length; i++) {
-            hmac.update((byte) PREFIX_INDEX);
-            hmac.update((byte) i); // FIXME
+            hmac.update((byte) PREFIX_INDEX_PADDING);
+            hmac.update((byte) (i >>> 24));
+            hmac.update((byte) (i >>> 16));
+            hmac.update((byte) (i >>> 8));
+            hmac.update((byte) i);
             salts[i] = hmac.doFinal();
         }
         return salts;
     }
 
+    /**
+     * Determines the slot assigned to each original leaf index using its salt and
+     * the salt ordering.
+     *
+     * <p>
+     * The mapping represents the secret-keyed HMAC slot distribution and associates
+     * each original index with its position in the sorted order.
+     * </p>
+     *
+     * @param salts the salts associated with the leaf entries
+     * @return the slot assigned to each original index
+     */
     public Integer[] mapping(byte[][] salts) {
 
         var mapping = new Integer[salts.length];
@@ -198,14 +270,40 @@ public class SaltedMerkleTree {
         return mapping;
     }
 
-    // Computes an array of H(PREFIX_LEAF || SALT || DATA) leaves. Initializes the
-    // instance.
+    /**
+     * Computes salted leaf hashes for all claims. H(PREFIX_LEAF || SALT || DATA).
+     *
+     * <p>
+     * The resulting hashes are leaves used as the initial level of a tree.
+     * </p>
+     *
+     * @param claims  the claim data
+     * @param salts   the salts associated with the claims
+     * @param mapping the mapping from claim positions to leaf positions
+     * @return the leaves, including any required padding leaf
+     */
     public byte[][] leaves(byte[][] claims, byte[][] salts, Integer[] mapping) {
         return leaves(claims, salts, mapping, null);
     }
 
-    // Computes an array of H(PREFIX_LEAF || SALT || DATA) for undisclosed leaves.
-    // Initializes the instance.
+    /**
+     * Computes salted leaf hashes while omitting selected claims. H(PREFIX_LEAF ||
+     * SALT || DATA).
+     *
+     * <p>
+     * The resulting leaves are intended for verification-path generation. Selected
+     * entries remain {@code null}, allowing the corresponding claims to be withheld
+     * while constructing a proof.
+     * </p>
+     *
+     * @param claims   the claim data
+     * @param salts    the salts associated with the claims, including a padding
+     *                 salt if required
+     * @param mapping  the mapping from claim positions to leaf positions
+     * @param selected the sorted indices of claims to omit, or {@code null} to
+     *                 include all claims
+     * @return the leaves for root construction or verification path generation
+     */
     public byte[][] leaves(byte[][] claims, byte[][] salts, Integer[] mapping, int[] selected) {
 
         var remainder = claims.length & 1;
@@ -220,7 +318,7 @@ public class SaltedMerkleTree {
                     || selectedIndex >= selected.length
                     || selected[selectedIndex] != i) {
 
-                buffer[mapping[i]] = leafHash(salts[i], claims[i]);
+                buffer[mapping[i]] = hashLeaf(salts[i], claims[i]);
 
             } else {
                 selectedIndex++;
@@ -229,114 +327,76 @@ public class SaltedMerkleTree {
 
         if (remainder > 0) {
             // add padding leaf
-            buffer[mapping[claims.length]] = leafHash(salts[claims.length], null);
+            buffer[mapping[claims.length]] = hashLeaf(salts[claims.length], null);
         }
 
         return buffer;
     }
 
-    protected byte[] nodeHash(byte[] left, byte[] right) {
+    /**
+     * Computes the hash of an internal node.
+     *
+     * <p>
+     * The left and right child hashes are ordered inputs; their positions are
+     * significant.
+     * </p>
+     *
+     * @param left  the left child hash
+     * @param right the right child hash
+     * @return the parent hash
+     */
+    public byte[] hashNode(byte[] left, byte[] right) {
         digest.update(PREFIX_NODE);
         digest.update(left);
         digest.update(right);
         return digest.digest();
     }
 
-    protected byte[] leafHash(byte[] salt, byte[] data) {
+    /**
+     * Computes the hash representing a salted leaf claim.
+     *
+     * <p>
+     * Including a salt helps protect low-entropy claim data against offline
+     * dictionary attacks.
+     * </p>
+     *
+     * @param salt the salt associated with the claim
+     * @param data the claim data, or {@code null} for an empty claim
+     * @return the leaf hash
+     */
+    public byte[] hashLeaf(byte[] salt, byte[] data) {
         digest.update(PREFIX_LEAF);
         digest.update(salt);
         if (data != null) {
             digest.update(data);
-        } else {
-            digest.update((byte) 0);
-            digest.update((byte) 0);
         }
         return digest.digest();
     }
 
-    protected byte[] levelPadding(Mac hmac, int level) {
+    /**
+     * Derives the padding hash used for a missing sibling at a specified tree
+     * level. H(PREFIX_PADDING || HMAC(key, PREFIX_LEVEL_PADDING ||
+     * uint32_be(level))).
+     *
+     * <p>
+     * Level-specific padding allows incomplete levels to be handled without
+     * explicitly materializing all padding nodes.
+     * </p>
+     *
+     * @param hmac  the HMAC used to derive the padding value
+     * @param level the zero-based tree level
+     * @return the padding hash for the specified level
+     */
+    public byte[] levelPadding(Mac hmac, int level) {
         hmac.update(PREFIX_LEVEL_PADDING);
-        hmac.update((byte) level); // FIXME
+        hmac.update((byte) (level >>> 24));
+        hmac.update((byte) (level >>> 16));
+        hmac.update((byte) (level >>> 8));
+        hmac.update((byte) level);
         var salt = hmac.doFinal();
 
         digest.update(PREFIX_PADDING);
         digest.update(salt);
         return digest.digest();
-    }
-
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-
-        var claims = new byte[9][];
-
-        for (var i = 0; i < claims.length; i++) {
-            claims[i] = ("Leaf #" + (i + 1)).getBytes(StandardCharsets.UTF_8);
-        }
-
-        var digest = MessageDigest.getInstance("SHA-256");
-
-        var hmacKey = new byte[32];
-
-        var random = new SecureRandom();
-        random.nextBytes(hmacKey);
-
-        IO.println(HexFormat.of().formatHex(hmacKey));
-
-//        var hmacKey = HexFormat.of().parseHex("fd212eaefbae1f5a5bb9285525b62d5c167375cc0e21aa17ad61c679de53a84f");
-
-//        hmacKey = HexFormat.of().parseHex("a61b763c687c28a4064bb2d7b06e2e5fb25d4f1ea226b611d11d846768058630");
-
-        final String type = "HmacSHA256";
-        final SecretKeySpec key = new SecretKeySpec(hmacKey, type);
-
-        final Mac hmac = Mac.getInstance(type);
-        hmac.init(key);
-
-        var tree = SaltedMerkleTree.newInstance(digest);
-
-        var salts = tree.salts(hmac, claims.length);
-
-        var mapping = tree.mapping(salts);
-
-        var leaves = tree.leaves(claims, salts, mapping);
-
-        var root = tree.generateRoot(hmac, leaves);
-
-        IO.println("root     \t= " + HexFormat.of().formatHex(root));
-        IO.println("mapping  \t= " + Arrays.toString(mapping));
-
-        var selection = new int[] { 0, 2 };
-
-        IO.println("selection\t= " + Arrays.toString(selection));
-
-        leaves = tree.leaves(claims, salts, mapping, selection);
-
-        var path = tree.generatePath(hmac, leaves);
-        IO.println("path     \t= (" + path.size() + ")");
-
-        var selectedClaims = new byte[selection.length][];
-        var selectedSalts = new byte[selection.length][];
-        var selectedIndices = new int[selection.length];
-
-        for (var i = 0; i < selection.length; i++) {
-            selectedClaims[i] = claims[selection[i]];
-            selectedSalts[i] = salts[selection[i]];
-            selectedIndices[i] = mapping[selection[i]];
-        }
-
-        IO.println("indices  \t= " + Arrays.toString(selectedIndices));
-
-        var ref = tree.recreateRoot(
-                selectedClaims,
-                selectedSalts,
-                selectedIndices,
-                path.stream().toArray(byte[][]::new));
-
-        IO.println("ref      \t= " + HexFormat.of().formatHex(ref));
-
-        Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
-        try (var writer = Files.newBufferedWriter(file)) {
-            TopologyDotWriter.write(writer, claims.length, mapping, selectedIndices);
-            IO.println("DOT file written to: " + file);
-        }
     }
 }

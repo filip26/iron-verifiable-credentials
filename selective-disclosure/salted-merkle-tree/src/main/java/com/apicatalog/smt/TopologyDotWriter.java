@@ -1,42 +1,22 @@
 package com.apicatalog.smt;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HexFormat;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+public class TopologyDotWriter implements AutoCloseable {
 
-public class TopologyDotWriter {
+    final PrintWriter writer;
 
-    /**
-     * Returns a Graphviz DOT representation
-     */
-    public static final void write(Writer writer, int claims, Integer[] mapping, int[] indices) {
-        try (var print = new PrintWriter(writer)) {
-            write(print, claims, mapping, indices);
-        }
+    public TopologyDotWriter(Writer writer) {
+        this.writer = new PrintWriter(writer);
     }
 
     /**
-     * Returns a Graphviz DOT representation
+     * Writes a Graphviz DOT representation
      */
-    public static final void write(
-            PrintWriter writer,
+    public final void write(
             int claims,
             Integer[] mapping,
             int[] indices) {
@@ -47,7 +27,7 @@ public class TopologyDotWriter {
                 : Integer.highestOneBit(leaves - 1) << 1;
 
         writer.println("""
-                       digraph MerkleTree {
+                       digraph SaltedMerkleTree {
                          rankdir=TB;
                          node [shape=box, fontname=\"monospace\"];
                          edge [color=gray50];
@@ -64,9 +44,7 @@ public class TopologyDotWriter {
 
             for (int index = 0; index < levelSize; index++) {
                 writer.print("  N");
-                writer.print(level);
-                writer.print('_');
-                writer.print(index);
+                writer.print(level * leaves + index);
                 writer.print(" [label=");
 
                 if (level == 0) {
@@ -99,27 +77,19 @@ public class TopologyDotWriter {
 
                 if (level > 0) {
                     writer.print("  N");
-                    writer.print(level);
-                    writer.print('_');
-                    writer.print(index);
+                    writer.print(level * leaves + index);
                     writer.print(" -> N");
-                    writer.print(level - 1);
-                    writer.print('_');
-                    writer.print(index * 2);
+                    writer.print((level - 1) * leaves + index * 2);
                     writer.print(',');
                     writer.print(" N");
-                    writer.print(level - 1);
-                    writer.print('_');
-                    writer.print(index * 2 + 1);
+                    writer.print((level - 1) * leaves + index * 2 + 1);
                     writer.println(';');
                 }
             }
 
             if (levelSize > 1 && levelSize % 2 == 1) {
                 writer.print("  N");
-                writer.print(level);
-                writer.print('_');
-                writer.print(levelSize);
+                writer.print(level * leaves + levelSize);
                 writer.print(" [label=<");
                 writer.print("Node P<sub>");
                 writer.print(level);
@@ -183,9 +153,7 @@ public class TopologyDotWriter {
             writer.println("];");
 
             writer.print("  N");
-            writer.print(0); // level 0
-            writer.print('_');
-            writer.print(mapping[i]);
+            writer.print(i); // level 0
             writer.print(" -> C");
             writer.print(mapping[i]);
             writer.print(", S");
@@ -238,5 +206,10 @@ public class TopologyDotWriter {
         }
 
         return path;
+    }
+
+    @Override
+    public void close() {
+        writer.close();
     }
 }
