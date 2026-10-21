@@ -12,8 +12,11 @@ import javax.crypto.Mac;
  * Provides operations for generating salted Merkle tree roots, generating
  * verification paths, and reconstructing roots to verify disclosed claims.
  *
+ * @author Filip Kolařík {@literal <filip26@gmail.com>}
+ * 
  * @see <a href="https://github.com/filip26/salted-merkle-tree">Salted Merkle
  *      Tree</a>
+ * 
  */
 public class SaltedMerkleTree {
 
@@ -188,26 +191,25 @@ public class SaltedMerkleTree {
 
                 var nodeIndex = mapping[i];
 
+                final byte[] left;
+                final byte[] right;
+
                 if ((nodeIndex & 1) == 1) {
-                    var left = path[pathIndex++];
-                    var right = buffer[i];
-
-                    buffer[nextLevelSize] = hashNode(left, right);
-
-                    mapping[nextLevelSize] = nodeIndex >>> 1;
+                    left = path[pathIndex++];
+                    right = buffer[i];
 
                 } else if (i + 1 < levelSize && ((nodeIndex + 1) == mapping[i + 1])) {
-                    buffer[nextLevelSize] = hashNode(buffer[i], buffer[i + 1]);
-                    mapping[nextLevelSize] = nodeIndex >>> 1;
+                    left = buffer[i];
+                    right = buffer[i + 1];
                     i++;
 
                 } else {
-                    var left = buffer[i];
-                    var right = path[pathIndex++];
-
-                    buffer[nextLevelSize] = hashNode(left, right);
-                    mapping[nextLevelSize] = nodeIndex >>> 1;
+                    left = buffer[i];
+                    right = path[pathIndex++];
                 }
+
+                buffer[nextLevelSize] = hashNode(left, right);
+                mapping[nextLevelSize] = nodeIndex >>> 1;
                 nextLevelSize++;
 
             }
