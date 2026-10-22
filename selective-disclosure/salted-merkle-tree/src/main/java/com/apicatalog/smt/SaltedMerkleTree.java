@@ -62,6 +62,7 @@ public class SaltedMerkleTree {
 
             // if the current level size is odd number, never true for level 0
             if ((levelSize & 1) == 1) {
+                // add depth-based padding
                 buffer[levelSize] = levelPadding(hmac, level);
                 levelSize++;
             }

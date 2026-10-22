@@ -153,7 +153,7 @@ public class TopologyDotWriter implements AutoCloseable {
             writer.println("];");
 
             writer.print("  N");
-            writer.print(i); // level 0
+            writer.print(mapping[i]); // level 0
             writer.print(" -> C");
             writer.print(mapping[i]);
             writer.print(", S");
