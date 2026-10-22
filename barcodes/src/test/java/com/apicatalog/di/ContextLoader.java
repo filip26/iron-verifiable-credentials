@@ -1,5 +1,6 @@
 package com.apicatalog.di;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
@@ -8,13 +9,14 @@ import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.DocumentLoaderOptions;
+import com.apicatalog.security.vocab.SecurityContexts;
 
 public class ContextLoader implements DocumentLoader {
 
     static final Map<String, Document> CONTEXTS = Map.of(
-            "https://www.w3.org/ns/credentials/v2", load("credentials-v2.json"),
-            "https://w3id.org/vc-barcodes/v1", load("barcodes-v1.json"),
-            "https://w3id.org/utopia/v2", load("utopia-v2.json"));
+            SecurityContexts.VCDM_V2, context(SecurityContexts.VCDM_V2),
+            "https://w3id.org/vc-barcodes/v1", resource("barcodes-v1.json"),
+            "https://w3id.org/utopia/v2", resource("utopia-v2.json"));
 
     @Override
     public Document loadDocument(URI url, DocumentLoaderOptions options) throws JsonLdError {
@@ -25,12 +27,19 @@ public class ContextLoader implements DocumentLoader {
         return new ContextLoader();
     }
 
-    static Document load(String name) {
+    static Document resource(String name) {
+        return document(Resources.class.getResourceAsStream("context/" + name));
+    }
+
+    static Document context(String uri) {
+        return document(SecurityContexts.contextAsStream(uri));
+    }
+
+    static Document document(InputStream is) {
         try {
-            return JsonDocument.of(Resources.class.getResourceAsStream("context/" + name));
+            return JsonDocument.of(is);
         } catch (JsonLdError e) {
             throw new IllegalStateException(e);
         }
     }
-
 }

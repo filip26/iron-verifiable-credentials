@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.Collection;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.stream.Stream;
 
 import com.apicatalog.di.barcodes.ECDSAXI2023;
@@ -27,23 +27,23 @@ import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
+import com.apicatalog.trust.semantic.GraphUpdater;
 import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
-import com.apicatalog.trust.semantic.GraphUpdater;
 import com.fasterxml.jackson.core.JsonFactory;
 
 class Resources {
 
-    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+    static SemanticModel SEMANTIC_MODEL = DataIntegrity.newModelBuilder()
             .cryptosuite(ECDSAXI2023.getInstance())
-            .expand(Resources::expand)
-            .tordf(Resources::toRDF)
-            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
-            .c14n(Resources::createRDFC)
-            .accessor(GraphAccessor::newInstance)
-            .updater(GraphUpdater::new)
-            .cursor(GraphProofCursor::newInstance)
-            .payload(GraphPayloadGenerator::new)
+//            .expand(Resources::expand)
+//            .tordf(Resources::toRDF)
+//            .c14n(DataIntegrityProof.TYPE_URI, StaticRDFC::newInstance)
+//            .c14n(Resources::createRDFC)
+//            .accessor(GraphAccessor::newInstance)
+//            .updater(GraphUpdater::new)
+//            .cursor(GraphProofCursor::newInstance)
+//            .payload(GraphPayloadGenerator::new)
             .build();
 
     static final Digestor.Factory DIGEST_FACTORY;
@@ -106,7 +106,7 @@ class Resources {
         }
     }
 
-    static final Collection<Object> expand(Map<String, Object> document) {
+    static final SequencedCollection<?> expand(Map<String, ?> document) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();

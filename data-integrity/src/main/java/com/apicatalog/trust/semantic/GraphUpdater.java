@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.SequencedCollection;
 
 import com.apicatalog.trust.Document;
-import com.apicatalog.trust.model.Model.Vocab;
 import com.apicatalog.trust.payload.PayloadGenerator;
+import com.apicatalog.trust.semantic.SemanticModel.Vocab;
 
 public final class GraphUpdater implements Document.Updater {
 
@@ -18,45 +20,66 @@ public final class GraphUpdater implements Document.Updater {
     }
 
     private final SemanticModel model;
-    private final SemanticModel.Accessor adapter;
+    private final SemanticModel.Accessor accessor;
 
-    private Collection<Map<String, ?>> newProofs;
-    private Collection<String> contexts = null;
+    private SequencedCollection<Map<String, ?>> newProofs;
+    private Collection<Object> contexts = null;
 
     public GraphUpdater(SemanticModel model, SemanticModel.Accessor adapter) {
         this.model = model;
-        this.adapter = adapter;
+        this.accessor = adapter;
     }
 
     @Override
-    public void addProof(Collection<String> context, Map<String, ?> compacted) {
+    public void addProof(Map<String, ?> compacted) {
+
+        Objects.requireNonNull(compacted);
+
         if (newProofs == null) {
             newProofs = new ArrayList<>();
         }
+
+        var context = compacted.remove("@context");
+
         newProofs.add(compacted);
 
-        if (context != null) {
+        if (context instanceof Collection<?> sequence) {
+
             if (contexts == null) {
-                contexts = new LinkedHashSet<>(context.size() * 2);
+                contexts = new LinkedHashSet<>(sequence.size() * 3);
             }
-            contexts.addAll(context);
+
+            contexts.addAll(sequence);
+
+        } else if (context instanceof String uri) {
+
+            if (contexts == null) {
+                contexts = new LinkedHashSet<>();
+            }
+
+            contexts.add(uri);
+
+        } else if (context != null) {
+            throw new ClassCastException();
         }
     }
 
     @Override
-    public Map<String, ?> compacted() {
+    public Map<String, ?> compact() {
 
         if (newProofs == null) {
-            return adapter.source();
+            return accessor.source();
         }
 
-        var document = new LinkedHashMap<String, Object>(adapter.source());
-        var terms = adapter.vocab();
+        var document = LinkedHashMap.<String, Object>newLinkedHashMap(accessor.source().size() + 2);
+        document.putAll(accessor.source());
+
+        var terms = accessor.vocab();
 
         var proofs = document.get(terms.proof());
 
-        if (contexts != null) {
-            document.put(adapter.vocab().context(), merge(adapter.context(), contexts));
+        if (contexts != null && !contexts.isEmpty()) {
+            document.put(accessor.vocab().context(), merge(accessor.context(), contexts));
         }
 
         if (proofs instanceof Collection<?> col) {
@@ -66,7 +89,7 @@ public final class GraphUpdater implements Document.Updater {
             proofs = clone;
 
         } else if (proofs == null) {
-            proofs = newProofs.size() == 1 ? newProofs.iterator().next() : newProofs;
+            proofs = newProofs.size() == 1 ? newProofs.getFirst() : newProofs;
 
         } else {
             var col = new ArrayList<>(newProofs.size() + 1);
@@ -80,7 +103,7 @@ public final class GraphUpdater implements Document.Updater {
         return document;
     }
 
-    static Collection<?> merge(Collection<?> documentContext, Collection<String> proofContext) {
+    static Collection<?> merge(Collection<?> documentContext, Collection<?> proofContext) {
         var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
         result.addAll(documentContext);
         result.addAll(proofContext);
@@ -89,11 +112,10 @@ public final class GraphUpdater implements Document.Updater {
 
     @Override
     public PayloadGenerator createPayload() {
-        return model.createPayload(adapter);
+        return model.createPayload(accessor);
     }
 
-    @Override
     public Vocab vocab() {
-        return adapter.vocab();
+        return accessor.vocab();
     }
 }

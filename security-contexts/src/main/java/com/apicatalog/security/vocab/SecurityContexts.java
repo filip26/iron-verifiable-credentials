@@ -24,41 +24,55 @@ public final class SecurityContexts {
     private SecurityContexts() {
     }
 
+    public static final String VCDM_V2 = "https://www.w3.org/ns/credentials/v2";
+    public static final String VCDI_V2 = "https://w3id.org/security/data-integrity/v2";
+
+    public static final String DID_V1 = "https://www.w3.org/ns/did/v1";
+    public static final String CID_V1 = "https://www.w3.org/ns/cid/v1";
+
+    public static final String ED25519_2020_V1 = "https://w3id.org/security/suites/ed25519-2020/v1";
+
+    public static final String MULTIKEY_V1 = "https://w3id.org/security/multikey/v1";
+    public static final String JWK_V1 = "https://w3id.org/security/jwk/v1";
+
+    public static final String VCDM_V1 = "https://www.w3.org/2018/credentials/v1";
+    public static final String VCDI_V1 = "https://w3id.org/security/data-integrity/v1";
+
     private static final Map<String, ContextResource> INDEX = Map.of(
 
-            "https://www.w3.org/ns/credentials/v2", new ContextResource(
+            VCDM_V2, new ContextResource(
                     "credentials-v2.json",
                     "59955ced6697d61e03f2b2556febe5308ab16842846f5b586d7f1f7adec92734"),
 
-            "https://w3id.org/security/data-integrity/v2", new ContextResource(
+            VCDI_V2, new ContextResource(
                     "vcdi-v2.json",
                     "67f21e6e33a6c14e5ccfd2fc7865f7474fb71a04af7e94136cb399dfac8ae8f4"),
 
-            "https://www.w3.org/ns/did/v1", new ContextResource(
+            DID_V1, new ContextResource(
                     "did-v1.json",
                     "4f3eae5568c9c5f036a082088f9e192019ee06faa78973c87ff91d5421b88dad"),
 
-            "https://w3id.org/security/suites/ed25519-2020/v1", new ContextResource(
+            ED25519_2020_V1, new ContextResource(
                     "ed25519-2020-v1.json",
                     "b9e1ab971fd8bf2c7553e0c4a9438e0b9450afde1ea1ca5b2492368b9f549588"),
 
-            "https://w3id.org/security/multikey/v1", new ContextResource(
+            MULTIKEY_V1, new ContextResource(
                     "multikey-v1.json",
                     "ba2c182de2d92f7e47184bcca8fcf0beaee6d3986c527bf664c195bbc7c58597"),
 
-            "https://w3id.org/security/jwk/v1", new ContextResource(
+            JWK_V1, new ContextResource(
                     "jwk-v1.json",
                     "0f14b62f6071aafe00df265770ea0c7508e118247d79b7d861a406d2aa00bece"),
 
-            "https://www.w3.org/ns/cid/v1", new ContextResource(
+            CID_V1, new ContextResource(
                     "cid-v1.json",
                     "ea216ecc1cb02cd39b693dba2250141e270ba0bf95890be107dd9a9e8e43de85"),
 
-            "https://www.w3.org/2018/credentials/v1", new ContextResource(
+            VCDM_V1, new ContextResource(
                     "credentials-v1.json",
                     "ab4ddd9a531758807a79a5b450510d61ae8d147eab966cc9a200c07095b0cdcc"),
 
-            "https://w3id.org/security/data-integrity/v1", new ContextResource(
+            VCDI_V1, new ContextResource(
                     "vcdi-v1.json",
                     "b5d829bd09aa7c42abc6efa0c8ed7635313b5487f37ccfce3ecd149ca9418554"));
 

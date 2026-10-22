@@ -6,7 +6,7 @@ public interface ProofCursor {
 
     boolean isAccepted();
     
-// ???   String proofType();
+    String proofType();
 
     Proof proof();
 }

@@ -43,7 +43,7 @@ public class ProofVerifier {
 
     public boolean verify(Proof proof) throws InvalidKeyException, SignatureException {
 
-        assert (proof != null);
+        Objects.requireNonNull(proof);
 
         if (proof.signature() == null) {
             return false;

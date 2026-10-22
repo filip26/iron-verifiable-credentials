@@ -35,7 +35,7 @@ public class PropertyMapPayloadGenerator implements PayloadGenerator {
             return payloadFactory.apply(canonical);
         }
 
-        var proofs = new ArrayList<Map<String, Object>>(includedProofs.size());
+        var proofs = new ArrayList<Map<String, ?>>(includedProofs.size());
 
         for (int i = 0; i < accessor.proofs(); i++) {
             var proof = accessor.proof(i);
@@ -44,7 +44,8 @@ public class PropertyMapPayloadGenerator implements PayloadGenerator {
             }
         }
 
-        var document = new HashMap<>(accessor.document());
+        var document = HashMap.<String, Object>newHashMap(accessor.document().size() + 1);
+        document.putAll(accessor.document());
         document.put(model.vocab().proof(), proofs);
 
         var canonical = model.canonize(document);

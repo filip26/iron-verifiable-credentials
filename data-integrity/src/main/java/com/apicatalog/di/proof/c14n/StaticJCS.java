@@ -41,13 +41,18 @@ public final class StaticJCS {
      */
     public static byte[] canonize(DataIntegrityProof proof) {
         try {
+            // proof.isContextArray() ||
             var os = new ByteArrayOutputStream();
             os.write('{');
 
             var next = false;
 
             if (proof.context() != null && !proof.context().isEmpty()) {
-                next = sequence(proof.context(), 11, os, next);
+                if (!proof.isCompactContext() || proof.context().size() > 1) {
+                    next = collection(11, proof.context(), os, next);    
+                } else {
+                    next = entry(11, proof.context().getFirst() , os, next);
+                }
             }
 
             next = entry(1, proof.challenge(), os, next);

@@ -6,29 +6,27 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.apicatalog.trust.Document.Mapper;
+
 public class PropertyMapAccessor implements LexicalAccessor {
 
     private final LexicalModel model;
-    private final Collection<String> context;
 
-    private final Map<String, Object> data;
+    private final Map<String, ?> data;
     private final Map<String, Object>[] proofs;
 
     protected PropertyMapAccessor(
             LexicalModel model,
-            Collection<String> context,
-            Map<String, Object> data,
+            Map<String, ?> data,
             Map<String, Object>[] proofs) {
         this.model = model;
-        this.context = context;
         this.data = data;
         this.proofs = proofs;
     }
 
     public static final PropertyMapAccessor newInstance(
             LexicalModel model,
-            Collection<String> context,
-            Map<String, Object> document) {
+            Map<String, ?> document) {
 
         var data = new LinkedHashMap<>(document);
 
@@ -37,14 +35,14 @@ public class PropertyMapAccessor implements LexicalAccessor {
         case null -> List.of();
         case Object obj -> List.of(obj);
         };
-        
+
         @SuppressWarnings("unchecked")
         Map<String, Object>[] mapProofs = new Map[proofs.size()];
 
         int index = 0;
         for (var proof : proofs) {
             if (!(proof instanceof Map<?, ?> rawMap)) {
-                throw new IllegalArgumentException("Proof must be a Map");
+                throw new IllegalArgumentException("Proof must be a Map, but was " + proof);
             }
 
             @SuppressWarnings("unchecked")
@@ -53,13 +51,13 @@ public class PropertyMapAccessor implements LexicalAccessor {
             // inject context into a proof
             if (!map.containsKey("@context")) {
                 map = new HashMap<>(map);
-                map.put("@context", context);
+                map.put("@context", document.get("@context"));
             }
 
             mapProofs[index++] = map;
         }
 
-        return new PropertyMapAccessor(model, context, data, mapProofs);
+        return new PropertyMapAccessor(model, data, mapProofs);
     }
 
     @Override
@@ -68,12 +66,12 @@ public class PropertyMapAccessor implements LexicalAccessor {
     }
 
     @Override
-    public Map<String, Object> document() {
+    public Map<String, ?> document() {
         return data;
     }
 
     @Override
-    public Map<String, Object> proof(int index) {
+    public Map<String, ?> proof(int index) {
         return proofs[index];
     }
 
@@ -83,7 +81,8 @@ public class PropertyMapAccessor implements LexicalAccessor {
     }
 
     @Override
-    public Collection<String> context() {
-        return context;
+    public Mapper createDocumentMapper() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

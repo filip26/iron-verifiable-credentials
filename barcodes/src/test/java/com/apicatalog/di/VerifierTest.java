@@ -22,6 +22,7 @@ import com.apicatalog.did.resolver.MultiKeyResolver;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
+import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.proof.ProofVerifier;
 
 public class VerifierTest {
@@ -51,7 +52,9 @@ public class VerifierTest {
         Map<String, Object> options = Resources.getMap(resource + ".options.json");
         Map<String, Object> signed = Resources.getMap(resource + ".signed.json");
 
-        var processor = Resources.SEMANTIC_MODEL.createAccessor(signed);
+        var context = ContextAwareResolver.getContexts(signed);
+        
+        var processor = Resources.SEMANTIC_MODEL.createAccessor(context, signed);
 
         var cursor = processor.createProofCursor();
 

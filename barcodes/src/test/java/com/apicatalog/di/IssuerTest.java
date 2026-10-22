@@ -24,6 +24,7 @@ import com.apicatalog.multibase.MultibaseDecoder;
 import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
+import com.apicatalog.trust.model.ContextAwareResolver;
 
 public class IssuerTest {
 
@@ -66,14 +67,16 @@ public class IssuerTest {
                             .formatted(privateKeyCodec.name(), privateKeyCodec.code()));
         }
 
+        var context = ContextAwareResolver.getContexts(document);
+
         DataIntegrityProof proof = null;
 
         var cryptosuite = ECDSAXI2023.getInstance();
 
         var proofDraft = cryptosuite.newProofDraft();
-        proofDraft.options(options);
+        proofDraft.options(context, options);
 
-        var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
+        var updater = Resources.SEMANTIC_MODEL.createUpdater(context, document);
 
         var payloadProvider = updater.createPayload();
 
@@ -93,11 +96,9 @@ public class IssuerTest {
                 Resources.DIGEST_FACTORY,
                 payload);
 
-        updater.addProof(
-                proof.context(),
-                DataIntegrityProof.compact(proof, false));
+        updater.addProof(proof.compact());
 
-        var issued = updater.compacted();
+        var issued = updater.compact();
 
         var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
         assertTrue(verified);

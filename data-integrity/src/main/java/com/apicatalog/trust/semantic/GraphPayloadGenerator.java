@@ -19,7 +19,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
     }
 
     protected final SemanticModel model;
-    protected final SemanticModel.Accessor adapter;
+    protected final SemanticModel.Accessor accessor;
 
     protected Collection<String> includedProofs;
     protected byte[] genericPayload;
@@ -28,7 +28,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
             SemanticModel model,
             SemanticModel.Accessor adapter) {
         this.model = model;
-        this.adapter = adapter;
+        this.accessor = adapter;
         this.includedProofs = List.of();
         this.genericPayload = null;
     }
@@ -45,17 +45,17 @@ public class GraphPayloadGenerator implements PayloadGenerator {
             return payloadFactory.apply(genericPayload);
         }
 
-        var canonizer = model.newCanonizer();
+        var canonizer = model.processor().newCanonizer();
 
-        Set<String> selectedGraph = Set.of();
+        var selectedGraph = Set.<String>of();
 
         if (!includedProofs.isEmpty()) {
             selectedGraph = HashSet.<String>newHashSet(includedProofs.size());
 
             // select proofs
-            for (var proofGraphId : adapter.proofGraphs()) {
+            for (var proofGraphId : accessor.proofGraphs()) {
 
-                var proofGraph = adapter.proofGraph(proofGraphId);
+                var proofGraph = accessor.proofGraph(proofGraphId);
 
                 var selected = false;
 
@@ -79,14 +79,14 @@ public class GraphPayloadGenerator implements PayloadGenerator {
                                     statement.datatype(),
                                     statement.language(),
                                     statement.direction(),
-                                    proofNode.graph());
+                                    proofNode.graph().id());
                         }
                     }
                 }
             }
         }
 
-        for (var node : adapter.document().nodes().values()) {
+        for (var node : accessor.documentGraph().nodes().values()) {
             for (var statement : node.statements()) {
                 // do not include proof predicates if not selected
                 if (!model.vocab().proof().equals(statement.predicate())
@@ -98,7 +98,7 @@ public class GraphPayloadGenerator implements PayloadGenerator {
                             statement.datatype(),
                             statement.language(),
                             statement.direction(),
-                            node.graph());
+                            node.graph().id());
                 }
             }
         }

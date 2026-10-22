@@ -3,96 +3,94 @@ package com.apicatalog.trust.lexical;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.apicatalog.trust.Document;
-import com.apicatalog.trust.model.Model.Vocab;
+import com.apicatalog.trust.lexical.LexicalModel.Vocab;
 
 public class LexicalUpdater implements Document.Updater {
 
     private final LexicalModel model;
-    private final LexicalAccessor adapter;
+    private final LexicalAccessor accessor;
 
-    private Collection<Map<String, ?>> newProofs;
-    private Collection<String> contexts = null;
+    private Collection<Map<String, ?>> proofsEntries;
 
     public LexicalUpdater(LexicalModel model, LexicalAccessor adapter) {
         this.model = model;
-        this.adapter = adapter;
+        this.accessor = adapter;
     }
 
     @Override
-    public void addProof(Collection<String> context, Map<String, ?> compacted) {
-        if (newProofs == null) {
-            newProofs = new ArrayList<>();
+    public void addProof(Map<String, ?> compacted) {
+
+//        Objects.requireNonNull(context);
+        Objects.requireNonNull(compacted);
+
+        if (proofsEntries == null) {
+            proofsEntries = new ArrayList<>();
         }
-        newProofs.add(compacted);
-        if (context != null && !context.isEmpty()) {
-            if (contexts == null) {
-                contexts = new LinkedHashSet<>(context.size() * 2);
-            }
-            contexts.addAll(context);
-        }
+        proofsEntries.add(compacted);
     }
 
     @Override
-    public Map<String, ?> compacted() {
+    public Map<String, ?> compact() {
 
-        Collection<Map<String, ?>> proofs = null;
+        List<Map<String, ?>> proofs = null;
 
-        if (adapter.proofs() > 0) {
+        // existing proofs
+        if (accessor.proofs() > 0) {
             if (proofs == null) {
-                proofs = new ArrayList<>(adapter.proofs() + (newProofs != null ? newProofs.size() : 0));
+                proofs = new ArrayList<>(accessor.proofs() + (proofsEntries != null ? proofsEntries.size() : 0));
             }
-            for (int i = 0; i < adapter.proofs(); i++) {
-                proofs.add(adapter.proof(i));
+            for (int i = 0; i < accessor.proofs(); i++) {
+                proofs.add(accessor.proof(i));
             }
         }
-        
-        if (newProofs != null) {
+
+        final var document = accessor.document();
+
+        // new proofs
+        if (proofsEntries != null && !proofsEntries.isEmpty()) {
+
             if (proofs == null) {
-                proofs = newProofs;
-            } else {
-                for (var proof : newProofs) {
+                proofs = new ArrayList<>(proofsEntries.size());
+            }
+
+            final var documentContext = document.get("@context");
+
+            for (var proofEntry : proofsEntries) {
+
+                if (documentContext != null && documentContext.equals(proofEntry.get("@context"))) {
+                    var proof = new LinkedHashMap<>(proofEntry);
+                    proof.remove(model.vocab().context());
                     proofs.add(proof);
+
+                } else {
+                    proofs.add(proofEntry);
+
                 }
             }
         }
 
         if (proofs == null) {
-            return adapter.document();
+            return document;
         }
 
-        var compacted = new LinkedHashMap<>(adapter.document());
-
-        if (contexts != null) {
-            compacted.put(model.vocab().context(), merge(adapter.context(), contexts));
-        }
-
-        compacted.put(model.vocab().proof(),
-                proofs.size() == 1
-                        ? proofs.iterator().next()
-                        : proofs);
+        final var compacted = LinkedHashMap.<String, Object>newLinkedHashMap(document.size() + 1);
+        compacted.putAll(document);
+        compacted.put(model.vocab().proof(), proofs.size() == 1 ? proofs.getFirst() : proofs);
 
         return compacted;
-
     }
 
     @Override
     public PropertyMapPayloadGenerator createPayload() {
-        return model.createPayload(adapter);
+        return model.createPayload(accessor);
     }
 
-    @Override
     public Vocab vocab() {
         return model.vocab();
-    }
-
-    private static Collection<?> merge(Collection<?> documentContext, Collection<String> proofContext) {
-        var result = LinkedHashSet.<Object>newLinkedHashSet(documentContext.size() + proofContext.size());
-        result.addAll(documentContext);
-        result.addAll(proofContext);
-        return result;
     }
 }

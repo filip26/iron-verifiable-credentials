@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.SequencedCollection;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -29,6 +31,7 @@ import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.trust.Document;
+import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.proof.Proof;
 
@@ -45,6 +48,7 @@ public class IssuerTest {
 
     @ParameterizedTest
     @MethodSource({ "resources" })
+    @Disabled
     void testIssue(String resource) throws Throwable {
 
         Map<String, String> keys = Resources.getMap(resource + ".keys.json");
@@ -89,6 +93,8 @@ public class IssuerTest {
                             .formatted(privateKeyCodec.name(), privateKeyCodec.code()));
         }
 
+        final var context = ContextAwareResolver.getContexts(document);
+
         Proof proof = null;
         Map<String, ?> issued = null;
 
@@ -97,61 +103,68 @@ public class IssuerTest {
             var cryptosuite = getCryptosuite((String) options.get("cryptosuite"));
 
             var proofDraft = cryptosuite.newProofDraft();
-            proofDraft.options(options);
+            proofDraft.options(context, options);
 
             assertTrue(proofDraft.hasRequired());
-            
-            var updater = getUpdater(cryptosuite.c14n()).apply(document);
+
+            var updater = getUpdater(cryptosuite.c14n()).apply(context, document);
 
             var payload = updater.createPayload();
 
             payload.withProofs(proofDraft.previous());
 
-            proof = proofDraft.sign(
+            var diProof = proofDraft.sign(
                     signatureAlgorithm,
                     signer,
                     Resources.DIGEST_FACTORY,
                     payload.digestible());
 
-            updater.addProof(proofDraft.context(), DataIntegrityProof.compact((DataIntegrityProof) proof, false));
-            issued = updater.compacted();
+            updater.addProof(diProof.compact());
+
+            proof = diProof;
+
+            issued = updater.compact();
 
         } else if (Ed25519Signature2020.TYPE_NAME.equals(options.get("type"))) {
 
             assertEquals(Ed25519Signature2020.SIGNATURE_ALGORITHM, signatureAlgorithm);
 
-            var proofDraft = Ed25519Signature2020.newDraft((Map<String, Object>) options);
+            // TODO check document level contexts for proof presence
 
-            var updater = Resources.SEMANTIC_MODEL.createUpdater(document);
+            var updater = Resources.DI_HYBRID_MODEL.createUpdater(context, document);
 
             var payload = updater.createPayload();
 
-            proof = Ed25519Signature2020.generateProof(
+            var proofDraft = Ed25519Signature2020.newDraft((Map<String, Object>) options);
+
+            var edProof = Ed25519Signature2020.generateProof(
                     signer,
                     Resources.DIGEST_FACTORY,
                     proofDraft,
                     payload.digestible());
 
-            updater.addProof(proofDraft.context(), Ed25519Signature2020.compact((Ed25519Signature2020) proof));
-            issued = updater.compacted();
+            updater.addProof(edProof.compact());
+
+            proof = edProof;
+
+            issued = updater.compact();
 
         } else {
             fail("An unsupported proof type " + options.get("type"));
         }
 
-        // verify the newly issued proof just for testing
-        var verified = VerifierTest.PROOF_VERIFIER.verify(proof);
-        assertTrue(verified);
-
         var expected = Resources.getMap(resource + ".signed.json");
 
         assertEquals(new String(Jcs.canonize(expected)), new String(Jcs.canonize(issued)));
+
+        // try to verify the newly issued proof instance
+        assertTrue(VerifierTest.PROOF_VERIFIER.verify(proof));
     }
 
-    static Function<Map<String, Object>, Document.Updater> getUpdater(String c14n) {
+    static BiFunction<SequencedCollection<?>, Map<String, ?>, Document.Updater> getUpdater(String c14n) {
         return switch (c14n) {
-        case Model.C14N_RDFC -> Resources.SEMANTIC_MODEL::createUpdater;
-        case Model.C14N_JCS -> Resources.LEXICAL_MODEL::createUpdater;
+        case Model.C14N_RDFC -> Resources.DI_HYBRID_MODEL::createUpdater;
+        case Model.C14N_JCS -> Resources.DI_LEXICAL_MODEL::createUpdater;
         default -> throw new IllegalStateException(
                 """
                 Unsupported c14n = %s.

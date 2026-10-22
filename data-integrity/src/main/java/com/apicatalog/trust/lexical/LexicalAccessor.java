@@ -1,6 +1,5 @@
 package com.apicatalog.trust.lexical;
 
-import java.util.Collection;
 import java.util.Map;
 
 import com.apicatalog.trust.Document;
@@ -11,16 +10,15 @@ public interface LexicalAccessor extends Document.Accessor {
     interface Factory {
         LexicalAccessor createAdapter(
                 LexicalModel model,
-                Collection<String> context,
-                Map<String, Object> document);
+                Map<String, ?> document);
     }
 
     @Override
-    Map<String, Object> document();
+    Map<String, ?> document();
 
     int proofs();
 
-    Map<String, Object> proof(int index);
+    Map<String, ?> proof(int index);
 
-    Collection<String> context();
+//    Collection<?> context();
 }

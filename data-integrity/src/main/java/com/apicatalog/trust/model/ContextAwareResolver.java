@@ -21,7 +21,7 @@ public class ContextAwareResolver {
 
     // TODO must not be static, the resolver should have been configured with
     // "@context" key, or context extractos? -> getJsonLdContext(...)
-    public static SequencedCollection<String> getContexts(Map<String, Object> document) {
+    public static SequencedCollection<?> getContexts(Map<String, ?> document) {
         return switch (document.get("@context")) {
         case Collection<?> col -> col.stream()
                 .map(item -> {
@@ -32,14 +32,14 @@ public class ContextAwareResolver {
                             "The @context collection contains one or more non-string elements");
                 })
                 .toList();
-        case String context -> List.of(context);
+        case Object context -> List.of(context);
         case null -> List.of();
-        default ->
-            throw new IllegalArgumentException("Invalid @context type: expected a string or a collection of strings");
+//        default ->
+//            throw new IllegalArgumentException("Invalid @context type: expected a string or a collection of strings");
         };
     }
 
-    public Model resolve(Collection<?> contexts, Map<String, Object> document) {
+    public Model resolve(Collection<?> contexts, Map<String, ?> document) {
         for (int i = 0; i < models.length; i++) {
             if (predicates[i].test(contexts)) {
                 return models[i];
@@ -54,20 +54,20 @@ public class ContextAwareResolver {
 
     public static class Builder {
 
-        private final Collection<Predicate<SequencedCollection<?>>> predicates = new ArrayList<>();;
+        private final Collection<Predicate<SequencedCollection<?>>> contextPredicates = new ArrayList<>();;
         private final Collection<Model> models = new ArrayList<>();
 
         public Builder model(
-                Predicate<SequencedCollection<?>> selector,
+                Predicate<SequencedCollection<?>> contextPredicate,
                 Model... models) {
 
             if (models.length == 1) {
-                this.predicates.add(selector);
+                this.contextPredicates.add(contextPredicate);
                 this.models.add(models[0]);
                 return this;
             }
 
-            this.predicates.add(selector);
+            this.contextPredicates.add(contextPredicate);
             this.models.add(new HybridModel(models));
             return this;
         }
@@ -75,7 +75,7 @@ public class ContextAwareResolver {
         @SuppressWarnings("unchecked")
         public ContextAwareResolver build() {
             return new ContextAwareResolver(
-                    predicates.toArray(Predicate[]::new),
+                    contextPredicates.toArray(Predicate[]::new),
                     models.toArray(Model[]::new));
         }
     }

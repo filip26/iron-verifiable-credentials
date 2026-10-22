@@ -2,48 +2,47 @@ package com.apicatalog.trust.semantic;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
+import java.util.SequencedMap;
+import java.util.SequencedSet;
+import java.util.Set;
+
+import com.apicatalog.trust.LangString;
 
 public record Graph(
         String id,
-        Map<String, Node> nodes) {
+        SequencedMap<String, Node> nodes) {
 
     public static final String PREDICATE_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
     public static final class Node {
 
         final String id;
-        final String graph;
+        final Graph graph;
 
-        SequencedCollection<String> type;
+        final SequencedSet<String> type;
         Collection<Statement> statements;
 
         public Node(
                 String id,
-                String graph) {
+                Graph graph) {
             this.id = id;
             this.graph = graph;
-            this.type = List.of();
+            this.type = new LinkedHashSet<String>(4);
             this.statements = List.of();
         }
 
         public void addStatement(String predicate, String object, String datatype, String language, String direction) {
 
             if (PREDICATE_TYPE.equals(predicate)) {
-                if (type.isEmpty()) {
-                    type = List.of(object);
-
-                } else if (type.size() == 1) {
-                    type = List.of(type.getFirst(), object);
-
-                } else {
-                    type = new ArrayList<>(type);
-                    type.add(object);
-                }
+                type.add(object);
             }
 
             if (statements.isEmpty()) {
@@ -69,11 +68,11 @@ public record Graph(
             return id;
         }
 
-        public String graph() {
+        public Graph graph() {
             return graph;
         }
 
-        public SequencedCollection<String> type() {
+        public SequencedSet<String> type() {
             return type;
         }
 
@@ -135,24 +134,38 @@ public record Graph(
         }
     };
 
-    public static final Map<String, String> langMap(Graph.Statement statement, Map<String, String> value) {
+    public static final SequencedCollection<LangString> langString(
+            Graph.Statement statement,
+            SequencedCollection<LangString> value,
+            boolean allowAlts) {
 
-        if (!(statement instanceof LangStringStatement langString)) {
-            throw new IllegalArgumentException();
+        final LangString langString;
+
+        if (statement instanceof LangStringStatement ls) {
+
+            langString = new LangString(ls.object, ls.language, ls.direction);
+
+        } else if (statement instanceof LiteralStatement literal) {
+
+            // FIXME, check if string
+            langString = new LangString(literal.object, null, null);
+
+        } else {
+            throw new IllegalArgumentException(" ..., but was " + statement);
         }
 
         if (value == null) {
-            return Map.of(langString.tag(), langString.object());
-
+            return List.of(langString);
         }
 
         var mutable = value;
 
         if (value.size() == 1) {
-            mutable = new HashMap<String, String>(value);
+            mutable = new ArrayList<>(48);
+            mutable.add(value.getFirst());
         }
 
-        mutable.put(langString.tag(), langString.object());
+        mutable.add(langString);
         return mutable;
     }
 
@@ -168,27 +181,53 @@ public record Graph(
 
         return Instant.parse(literal.object());
     }
-    
-    public static final Object resource(
-            Graph.Statement statement, 
+
+    public static final Collection<?> nodes(
+            SequencedCollection<?> context,
+            Graph.Statement statement,
+            Collection<?> value,
             Graph graph,
+            Map<String, Graph> dataset,
             SemanticModel model,
-            Class<?> baseclazz, 
-            TypeMapping typeMapping) {
+            NodeMapping typeMapping) {
+
+        if (value == null) {
+            return List.of(node(context, statement, graph, dataset, model, typeMapping));
+        }
+
+        @SuppressWarnings("unchecked")
+        var mutable = (Collection<Object>) value;
+
+        if (value.size() == 1) {
+            mutable = new ArrayList<>(value);
+        }
+
+        mutable.add(node(context, statement, graph, dataset, model, typeMapping));
+        return mutable;
+    }
+
+    public static final Object node(
+            SequencedCollection<?> context,
+            Graph.Statement statement,
+            Graph graph,
+            Map<String, Graph> dataset,
+            SemanticModel model,
+            NodeMapping typeMapping) {
+
         if (!(statement instanceof ResourceStatement resource)) {
             throw new IllegalArgumentException();
         }
-        
-        if (graph.nodes().containsKey(resource.object())) {
 
-            var node = graph.nodes().get(resource.object());
+        var node = graph.nodes().get(resource.object());
+
+        if (node != null) {
 
             if (typeMapping != null) {
 
-                var mapper = typeMapping.mapper(baseclazz, node.type());
+                var mapper = typeMapping.mapper(statement.predicate(), node.type());
 
                 if (mapper != null) {
-                    return mapper.materialize(node, graph, model);
+                    return mapper.materialize(context, node, dataset, model);
                 }
             }
             return node;
@@ -196,20 +235,118 @@ public record Graph(
         return resource.object();
     }
 
+    public static final Set<String> resources(
+            Graph.Statement statement,
+            Set<String> value) {
+
+        if (!(statement instanceof ResourceStatement)) {
+            throw new IllegalArgumentException(" ..., but was " + statement);
+
+        }
+
+        var string = statement.object();
+
+        if (value == null) {
+            return Set.of(string);
+        }
+
+        var mutable = value;
+
+        if (value.size() == 1) {
+            mutable = new HashSet<>(value);
+        }
+
+        mutable.add(string);
+        return mutable;
+    }
+
     @FunctionalInterface
     public interface NodeMapper<T> {
 
         // reads from n-quads
         T materialize(
+                SequencedCollection<?> context,
                 Graph.Node node,
-                Graph graph,
+                Map<String, Graph> dataset,
                 SemanticModel model);
     }
 
     @FunctionalInterface
-    public interface TypeMapping {
+    @Deprecated
+    public interface NodeMapping {
 
-        <T> NodeMapper<T> mapper(Class<T> baseclass, Collection<String> types);
+        <T> NodeMapper<T> mapper(String predicate, Collection<String> types);
 
+    }
+
+    public record TypeMapping(String[] types, NodeMapper<?> mapper) {
+    }
+
+    public static final class TypeMappingMatcher {
+
+        private static final Comparator<TypeMapping> BY_SIZE_DESC = Comparator
+                .comparingInt((TypeMapping mapping) -> mapping.types().length)
+                .reversed();
+
+        private final TypeMapping[] mappings;
+
+        public TypeMappingMatcher(Collection<TypeMapping> mappings) {
+            this.mappings = mappings.toArray(TypeMapping[]::new);
+
+            for (var mapping : this.mappings) {
+                Arrays.sort(mapping.types());
+            }
+
+            Arrays.sort(this.mappings, BY_SIZE_DESC);
+        }
+
+        TypeMapping findBest(Set<String> types) {
+            var query = types.toArray(String[]::new);
+            Arrays.sort(query);
+
+            TypeMapping best = null;
+            int bestMatches = 0;
+
+            for (var mapping : mappings) {
+                if (mapping.types().length <= bestMatches) {
+                    break;
+                }
+
+                int matches = intersectionSize(query, mapping.types());
+
+                if (matches > bestMatches) {
+                    bestMatches = matches;
+                    best = mapping;
+
+                    if (bestMatches == query.length) {
+                        break;
+                    }
+                }
+            }
+
+            return best;
+        }
+
+        static int intersectionSize(String[] a, String[] b) {
+            int ai = 0;
+            int bi = 0;
+            int matches = 0;
+
+            while (ai < a.length && bi < b.length) {
+                int cmp = a[ai].compareTo(b[bi]);
+
+                if (cmp < 0) {
+                    ai++;
+                } else if (cmp > 0) {
+                    bi++;
+                } else {
+                    matches++;
+                    ai++;
+                    bi++;
+                }
+            }
+
+            return matches;
+        }
     }
 }

@@ -70,8 +70,6 @@ public abstract class StandardCryptoSuite implements CryptoSuite {
                 Digestor.Factory digestFactory,
                 DigestiblePayload payload) throws SignatureException {
 
-            canonize(proof.cryptosuite().c14n());
-
             var unsigned = unsigned();
 
             var signature = signatureGenerator.generate(
@@ -81,7 +79,7 @@ public abstract class StandardCryptoSuite implements CryptoSuite {
                     unsigned,
                     payload);
 
-            return signed(signature);
+            return sign(signature);
         }
     }
 }

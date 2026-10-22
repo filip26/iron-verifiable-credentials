@@ -8,8 +8,10 @@ import java.security.SignatureException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -40,6 +42,9 @@ public final class Ed25519Signature2020 implements Proof {
     public static final String HASH_ALGORITHM = "SHA-256";
     public static final String C14N = "RDFC";
 
+    public static final int SIGNATURE_LENGTH = 64;
+    public static final int PUBLIC_KEY_SIZE = 32;
+
     private static final String PREDICATE_CREATED = "http://purl.org/dc/terms/created";
     private static final String PREDICATE_VERIFICATION_METHOD = "https://w3id.org/security#verificationMethod";
     private static final String PREDICATE_PROOF_PURPOSE = "https://w3id.org/security#proofPurpose";
@@ -51,7 +56,7 @@ public final class Ed25519Signature2020 implements Proof {
     private static final String KEY_PURPOSE = "proofPurpose";
     private static final String KEY_PROOF_VALUE = "proofValue";
 
-    private Collection<String> context;
+    private SequencedCollection<?> context;
 
     private Instant created;
     private Purpose purpose;
@@ -64,6 +69,10 @@ public final class Ed25519Signature2020 implements Proof {
     private Ed25519Signature2020() {
     }
 
+    public Map<String, ?> compact() {
+        return compact(this);
+    }
+
     public static Map<String, ?> compact(Ed25519Signature2020 proof) {
         var composer = new NativeComposer<Map<String, ? extends Object>>();
         compact(proof, composer);
@@ -72,8 +81,24 @@ public final class Ed25519Signature2020 implements Proof {
 
     public static void compact(Ed25519Signature2020 proof, TreeEmitter emitter) {
         var writer = Tree.newPropertyTree(emitter)
-                .beginMap()
-                .entry(KEY_TYPE, proof.type())
+                .beginMap();
+
+        if (proof.context != null && !proof.context.isEmpty()) {
+
+            if (proof.context.size() > 1) {
+                writer.beginSequence("@context");
+
+                for (var ctx : proof.context) {
+                    writer.element((String) ctx);
+                }
+
+                writer.endSequence();
+
+            } else {
+                writer.entry("@context", (String) proof.context.getFirst());
+            }
+        }
+        writer.entry(KEY_TYPE, proof.type())
                 .entry(KEY_CREATED, proof.created, Instant::toString)
                 .entry(KEY_VERIFICATION_METHOD, proof.verificationMethod)
                 .entry(KEY_PURPOSE, proof.purpose != null ? proof.purpose.key() : null);
@@ -110,22 +135,23 @@ public final class Ed25519Signature2020 implements Proof {
     }
 
     public static Draft newDraft() {
-        return new Draft(new Ed25519Signature2020(), List.of());
+        var proof = new Ed25519Signature2020();
+        proof.context = List.of(Ed25519Signature2020.CONTEXT_URI);
+        return new Draft(proof);
     }
 
-    public static Draft newDraft(Map<String, Object> map) {
+    public static Draft newDraft(Map<String, ?> options) {
 
         var proof = new Ed25519Signature2020();
-        Collection<String> context = List.of();
 
-        for (var entry : map.entrySet()) {
+        for (var entry : options.entrySet()) {
             switch (entry.getKey()) {
             case "@context":
-                if (entry.getValue() instanceof Collection<?> col) {
-                    context = col.stream().map(String.class::cast).toList();
+                if (entry.getValue() instanceof SequencedCollection<?> col) {
+                    proof.context = col;
 
                 } else if (entry.getValue() instanceof String uri) {
-                    context = List.of(uri);
+                    proof.context = List.of(uri);
 
                 } else {
                     throw new IllegalArgumentException();
@@ -143,16 +169,26 @@ public final class Ed25519Signature2020 implements Proof {
             }
         }
 
-        return new Draft(proof, context);
+        // setup default context
+        if (proof.context == null || proof.context.isEmpty()) {
+            proof.context = List.of(Ed25519Signature2020.CONTEXT_URI);
+
+        } else if (!proof.context.contains(Ed25519Signature2020.CONTEXT_URI)) {
+            var tmp = new LinkedHashSet<>(proof.context.size() + 1);
+            tmp.addAll(proof.context);
+            tmp.add(Ed25519Signature2020.CONTEXT_URI);
+            proof.context = tmp;
+        }
+
+        return new Draft(proof);
     }
 
     public static final class Draft {
 
         private final Ed25519Signature2020 proof;
 
-        private Draft(Ed25519Signature2020 proof, Collection<String> context) {
+        private Draft(Ed25519Signature2020 proof) {
             this.proof = proof;
-            this.proof.context = context;
         }
 
         public byte[] canonize() {
@@ -191,12 +227,12 @@ public final class Ed25519Signature2020 implements Proof {
             return this;
         }
 
-        public Draft context(Collection<String> context) {
-            proof.context = context;
+        public Draft context(SequencedCollection<?> context) {
+            this.proof.context = context;
             return this;
         }
 
-        public Collection<String> context() {
+        public Collection<?> context() {
             return proof.context;
         }
 
@@ -271,7 +307,7 @@ public final class Ed25519Signature2020 implements Proof {
      * @return a collection of strings representing the JSON-LD context URIs, or
      *         {@code null} if not present
      */
-    public Collection<String> context() {
+    public Collection<?> context() {
         return context;
     }
 

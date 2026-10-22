@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.SequencedCollection;
 
 import com.apicatalog.trust.Document;
+import com.apicatalog.trust.Document.Mapper;
 import com.apicatalog.trust.Document.Updater;
 import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.proof.ProofCursor;
@@ -24,17 +25,14 @@ public class HybridModel implements Model {
     }
 
     @Override
-    // TODO add context as parameter
-    public Document.Accessor createAccessor(Map<String, Object> document) {
-
-        var context = ContextAwareResolver.getContexts(document);
+    public Document.Accessor createAccessor(SequencedCollection<?> context, Map<String, ?> document) {
 
         var hybrid = new Adapter();
 
         var adapters = new ArrayList<Document.Accessor>(models.length);
 
         for (var model : models) {
-            var modelProcessor = model.createAccessor(document);
+            var modelProcessor = model.createAccessor(context, document);
             if (modelProcessor != null) {
                 adapters.add(modelProcessor);
             }
@@ -52,8 +50,8 @@ public class HybridModel implements Model {
     public static class Adapter implements Document.Accessor {
 
         SequencedCollection<Document.Accessor> acessors;
-        SequencedCollection<?> context;
-        Map<String, Object> document;
+        Collection<?> context;
+        Map<String, ?> document;
         Object data;
 
         @Override
@@ -91,6 +89,11 @@ public class HybridModel implements Model {
                 data = acessors.getFirst().document();
             }
             return data;
+        }
+
+        @Override
+        public Mapper createDocumentMapper() {
+            return acessors.getFirst().createDocumentMapper();
         }
     }
 
@@ -147,15 +150,26 @@ public class HybridModel implements Model {
         public Proof proof() {
             return isAccepted() ? accepted.proof() : null;
         }
+
+        @Override
+        public String proofType() {
+            return isAccepted() ? accepted.proofType() : null;
+        }
+
     }
 
     @Override
-    public Vocab vocab() {
+    public Updater createUpdater(SequencedCollection<?> context, Map<String, ?> document) {
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public Updater createUpdater(Map<String, Object> document) {
-        throw new UnsupportedOperationException();
-    }
+//
+//    @Override
+//    public boolean isAccepted(SequencedCollection<?> context, Map<String, ?> document) {
+//        for (var model : models) {
+//            if (!model.isAccepted(context, document)) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 }
