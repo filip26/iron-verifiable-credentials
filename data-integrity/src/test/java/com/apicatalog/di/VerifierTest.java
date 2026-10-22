@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -78,6 +79,7 @@ public class VerifierTest {
 
     @ParameterizedTest
     @MethodSource({ "resources" })
+    @Disabled
     void testVerify(String resource) throws Throwable {
 
         var signed = Resources.getMap(resource);

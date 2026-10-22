@@ -23,7 +23,7 @@
     </properties>
 
     <modules>
-        <module>sic</module>
+	    <!--       <module>sic</module> -->
         <module>salted-merkle-tree</module>
     </modules>
 

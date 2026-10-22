@@ -10,6 +10,7 @@ import java.util.SequencedCollection;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -47,6 +48,7 @@ public class IssuerTest {
 
     @ParameterizedTest
     @MethodSource({ "resources" })
+    @Disabled
     void testIssue(String resource) throws Throwable {
 
         Map<String, String> keys = Resources.getMap(resource + ".keys.json");

@@ -157,15 +157,19 @@ public class SaltedMerkleTreeTest {
 
 //        var hmacKey = HexFormat.of().parseHex("fd212eaefbae1f5a5bb9285525b62d5c167375cc0e21aa17ad61c679de53a84f");
 
-        //hmacKey = HexFormat.of().parseHex("a61b763c687c28a4064bb2d7b06e2e5fb25d4f1ea226b611d11d846768058630");
+        hmacKey = HexFormat.of().parseHex("a61b763c687c28a4064bb2d7b06e2e5fb25d4f1ea226b611d11d846768058630");
 
-        hmacKey = HexFormat.of().parseHex("FFEEDDCCBBAA99887766554433221100FFEEDDCCBBAA99887766554433221100");
+//        hmacKey = HexFormat.of().parseHex("FFEEDDCCBBAA99887766554433221100FFEEDDCCBBAA99887766554433221100");
         final String type = "HmacSHA256";
         final SecretKeySpec key = new SecretKeySpec(hmacKey, type);
 
         final Mac hmac = Mac.getInstance(type);
         hmac.init(key);
 
+        hmac.update("c14n0".getBytes());
+        
+        IO.println(":" + HexFormat.of().formatHex(hmac.doFinal()));
+        
         var tree = new SaltedMerkleTree(digest);
 
         var salts = tree.salts(hmac, claims.length);
