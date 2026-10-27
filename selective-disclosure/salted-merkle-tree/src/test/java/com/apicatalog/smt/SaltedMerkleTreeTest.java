@@ -61,7 +61,7 @@ public class SaltedMerkleTreeTest {
         final Mac hmac = Mac.getInstance("HmacSHA256");
         hmac.init(hmacSecretKey);
 
-        var tree = new SaltedMerkleTree(digest);
+        var tree = new SaltedMerkleTree(digest, 8);
 
         var salts = tree.salts(hmac, claims.size());
 
@@ -140,7 +140,7 @@ public class SaltedMerkleTreeTest {
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
 
-        var claims = new byte[5][];
+        var claims = new byte[11][];
 
         for (var i = 0; i < claims.length; i++) {
             claims[i] = ("Leaf #" + (i + 1)).getBytes(StandardCharsets.UTF_8);
@@ -155,7 +155,7 @@ public class SaltedMerkleTreeTest {
 
         IO.println(HexFormat.of().formatHex(hmacKey));
 
-//        var hmacKey = HexFormat.of().parseHex("fd212eaefbae1f5a5bb9285525b62d5c167375cc0e21aa17ad61c679de53a84f");
+//        hmacKey = HexFormat.of().parseHex("fd212eaefbae1f5a5bb9285525b62d5c167375cc0e21aa17ad61c679de53a84f");
 
         hmacKey = HexFormat.of().parseHex("a61b763c687c28a4064bb2d7b06e2e5fb25d4f1ea226b611d11d846768058630");
 
@@ -170,9 +170,9 @@ public class SaltedMerkleTreeTest {
         
         IO.println(":" + HexFormat.of().formatHex(hmac.doFinal()));
         
-        var tree = new SaltedMerkleTree(digest);
+        var tree = new SaltedMerkleTree(digest, 8);
 
-        var salts = tree.salts(hmac, claims.length);
+        var salts = tree.salts(hmac, claims.length + 4);
 
         var mapping = tree.mapping(salts);
 
@@ -183,7 +183,8 @@ public class SaltedMerkleTreeTest {
         IO.println("root     \t= " + HexFormat.of().formatHex(root));
         IO.println("mapping  \t= " + Arrays.toString(mapping));
 
-        var selection = new int[] { 2, 3 };
+//        var selection = new int[] { 2, 3 };
+        var selection = new int[] { 0, 1, 5, 9 };
 
         IO.println("selection\t= " + Arrays.toString(selection));
 
@@ -214,7 +215,7 @@ public class SaltedMerkleTreeTest {
 
         Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
         try (var writer = new TopologyDotWriter(Files.newBufferedWriter(file))) {
-            writer.write(claims.length, mapping, selectedIndices);
+            writer.write(salts.length, mapping, selectedIndices);
             IO.println("DOT file written to: " + file);
         }
     }

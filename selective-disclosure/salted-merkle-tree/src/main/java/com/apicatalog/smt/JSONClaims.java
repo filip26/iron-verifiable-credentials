@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class SdJsonDocument {
+public class JSONClaims {
 
     public static List<byte[]> flatten(Map<String, Object> document) {
 

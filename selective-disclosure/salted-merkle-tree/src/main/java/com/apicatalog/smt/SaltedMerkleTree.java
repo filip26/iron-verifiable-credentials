@@ -28,6 +28,8 @@ public class SaltedMerkleTree {
     static final byte PREFIX_LEVEL_PADDING = 0x11;
 
     final MessageDigest digest;
+    final int maxDepth;
+    final int maxLeaves;
 
     /**
      * Creates a salted Merkle tree helper using the specified digest.
@@ -35,8 +37,10 @@ public class SaltedMerkleTree {
      * @param digest the digest algorithm used for tree hashes
      *
      */
-    public SaltedMerkleTree(MessageDigest digest) {
+    public SaltedMerkleTree(MessageDigest digest, int maxDepth) {
         this.digest = digest;
+        this.maxDepth = maxDepth;
+        this.maxLeaves = 1 << maxDepth;
     }
 
     /**
@@ -53,6 +57,10 @@ public class SaltedMerkleTree {
      * @return the root byte array of the salted Merkle tree
      */
     public byte[] generateRoot(Mac hmac, byte[][] buffer) {
+
+        if (buffer.length > maxLeaves) {
+            throw new IllegalArgumentException();
+        }
 
         final var depth = 32 - Integer.numberOfLeadingZeros(buffer.length - 1);
 
@@ -102,9 +110,13 @@ public class SaltedMerkleTree {
      */
     public List<byte[]> generatePath(Mac hmac, byte[][] buffer) {
 
-        final var path = new ArrayList<byte[]>();
+        if (buffer.length > maxLeaves) {
+            throw new IllegalArgumentException();
+        }
 
         final var depth = 32 - Integer.numberOfLeadingZeros(buffer.length - 1);
+
+        final var path = new ArrayList<byte[]>();
 
         var levelSize = buffer.length;
 
@@ -166,7 +178,12 @@ public class SaltedMerkleTree {
      */
     public byte[] recreateRoot(byte[][] claims, byte[][] salts, int[] indices, byte[][] path) {
 
+        if (claims.length > maxLeaves) {
+            throw new IllegalArgumentException();
+        }
+
         var mapping = new Integer[indices.length];
+
         for (int i = 0; i < mapping.length; i++) {
             mapping[i] = i;
         }
@@ -183,10 +200,11 @@ public class SaltedMerkleTree {
             mapping[i] = indices[mapping[i]];
         }
 
+        int depth = 0;
         int pathIndex = 0;
 
         // reconstruct root
-        while (levelSize > 1 || pathIndex < path.length) {
+        while ((depth <= maxDepth) && (levelSize > 1 || pathIndex < path.length)) {
 
             int nextLevelSize = 0;
 
@@ -217,6 +235,7 @@ public class SaltedMerkleTree {
 
             }
             levelSize = nextLevelSize;
+            depth++;
         }
 
         return buffer[0];
@@ -311,19 +330,23 @@ public class SaltedMerkleTree {
      */
     public byte[][] leaves(byte[][] claims, byte[][] salts, Integer[] mapping, int[] selected) {
 
-        var remainder = claims.length & 1;
+        if (claims.length > maxLeaves) {
+            throw new IllegalArgumentException();
+        }
 
-        var buffer = new byte[claims.length + remainder][];
+        var remainder = salts.length & 1;
+
+        var buffer = new byte[salts.length + remainder][];
 
         var selectedIndex = 0;
 
-        for (int i = 0; i < claims.length; i++) {
+        for (int i = 0; i < salts.length; i++) {
 
             if (selected == null
                     || selectedIndex >= selected.length
                     || selected[selectedIndex] != i) {
 
-                buffer[mapping[i]] = hashLeaf(salts[i], claims[i]);
+                buffer[mapping[i]] = hashLeaf(salts[i], i < claims.length ? claims[i] : null);
 
             } else {
                 selectedIndex++;
