@@ -1,5 +1,5 @@
 package com.apicatalog.smt;
 
-public class RDFClaims {
+public class RdfClaims {
 
 }

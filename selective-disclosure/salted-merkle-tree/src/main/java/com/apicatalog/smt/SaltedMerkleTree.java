@@ -3,6 +3,7 @@ package com.apicatalog.smt;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -306,7 +307,7 @@ public class SaltedMerkleTree {
      * @param mapping the mapping from claim positions to leaf positions
      * @return the leaves, including any required padding leaf
      */
-    public byte[][] leaves(byte[][] claims, byte[][] salts, Integer[] mapping) {
+    public byte[][] leaves(Collection<byte[]> claims, byte[][] salts, Integer[] mapping) {
         return leaves(claims, salts, mapping, null);
     }
 
@@ -328,9 +329,17 @@ public class SaltedMerkleTree {
      *                 include all claims
      * @return the leaves for root construction or verification path generation
      */
-    public byte[][] leaves(byte[][] claims, byte[][] salts, Integer[] mapping, int[] selected) {
+    public byte[][] leaves(Collection<byte[]> claims, byte[][] salts, Integer[] mapping, int[] selected) {
 
-        if (claims.length > maxLeaves) {
+        if (claims.size() > maxLeaves) {
+            throw new IllegalArgumentException();
+        }
+
+        if (claims.size() > salts.length) {
+            throw new IllegalArgumentException();
+        }
+
+        if (salts.length != mapping.length) {
             throw new IllegalArgumentException();
         }
 
@@ -340,13 +349,15 @@ public class SaltedMerkleTree {
 
         var selectedIndex = 0;
 
+        var claimsIt = claims.iterator();
+
         for (int i = 0; i < salts.length; i++) {
 
             if (selected == null
                     || selectedIndex >= selected.length
                     || selected[selectedIndex] != i) {
 
-                buffer[mapping[i]] = hashLeaf(salts[i], i < claims.length ? claims[i] : null);
+                buffer[mapping[i]] = hashLeaf(salts[i], claimsIt.hasNext() ? claimsIt.next() : null);
 
             } else {
                 selectedIndex++;
@@ -355,7 +366,7 @@ public class SaltedMerkleTree {
 
         if (remainder > 0) {
             // add padding leaf
-            buffer[mapping[claims.length]] = hashLeaf(salts[claims.length], null);
+            buffer[mapping[claims.size()]] = hashLeaf(salts[claims.size()], null);
         }
 
         return buffer;

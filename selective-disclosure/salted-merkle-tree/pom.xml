@@ -60,7 +60,7 @@
         <cbor-java.version>0.9</cbor-java.version>
 
         <!-- test resources -->
-        <jcs.version>3.0.0-M4</jcs.version>
+<!--        <jcs.version>3.0.0-M4</jcs.version>-->
         <rdfc.version>3.0.0</rdfc.version>
         <jsonld.version>1.7.0</jsonld.version>
         <crypto.version>1.0.0</crypto.version>        
@@ -75,12 +75,12 @@
             <version>${crypto.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>titanium-jcs</artifactId>
             <version>${jcs.version}</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>titanium-json-ld</artifactId>
