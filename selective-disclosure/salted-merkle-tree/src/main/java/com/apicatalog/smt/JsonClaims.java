@@ -8,7 +8,6 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -32,7 +31,7 @@ public class JsonClaims {
         return new JsonClaims(claims);
     }
 
-    public static JsonClaims from(Map<String, ?> document, Collection<String> selected) {
+    public static JsonClaims from(Map<String, ?> document, Set<String> selected) {
         var claims = new TreeMap<String, byte[][]>();
 
         flatten("", document, claims, selected);
@@ -40,12 +39,7 @@ public class JsonClaims {
         return new JsonClaims(claims);
     }
 
-    static void flatten(String path, Object node, Map<String, byte[][]> claims, Collection<String> selected) {
-
-        if (selected.contains(path)) {
-            claims.put(path, null);
-            return;
-        }
+    static void flatten(String path, Object node, Map<String, byte[][]> claims, Set<String> selected) {
 
         switch (node) {
         case Collection<?> col -> {
@@ -55,16 +49,27 @@ public class JsonClaims {
                 flatten(path + "/" + i, it.next(), claims, selected);
                 i++;
             }
+            return;
         }
         case Map<?, ?> map -> {
             for (var entry : map.entrySet()) {
                 flatten(path + "/" + jsonPointer((String) entry.getKey()), entry.getValue(), claims, selected);
             }
+            return;
         }
+        default -> {
+            if (selected.contains(path)) {
+                claims.put(path, new byte[0][]);
+                return;
+            }
+        }
+        }
+
+        switch (node) {
         case Number number -> add(path, canonizeNumber(number), claims);
         case String string -> add(path, canonizeString(string), claims);
-        case null -> add(path, JCS_NULL, claims);
         case Boolean bool -> add(path, bool ? JCS_TRUE : JCS_FALSE, claims);
+        case null -> add(path, JCS_NULL, claims);
         default -> {
             throw new IllegalArgumentException();
         }
@@ -305,28 +310,20 @@ public class JsonClaims {
     }
 
     public List<byte[][]> values() {
-        return List.copyOf(claims.values());
+        return List.copyOf(claims.values()); // FIXME
     }
 
     public static String toString(byte[][] claim) {
 
-        if (claim == null) {
-            return Objects.toString(claim);
+        if (claim == null || claim.length < 2) {
+            return "Claim[null]";
         }
 
-        return "Claim(UTF8("
+        return "Claim["
                 + new String(claim[0], StandardCharsets.UTF_8)
-                + ") || 0x00 || JCS("
-                + new String(claim[1], StandardCharsets.UTF_8)
-                + "))";
-
-//        var index = separator(claim);
-
-//        return "Claim(UTF8("
-//                + new String(claim, 0, index, StandardCharsets.UTF_8)
-//                + ") || 0x00 || JCS("
-//                + new String(claim, index + 1, claim.length - index - 1, StandardCharsets.UTF_8)
-//                + "))";
+                + " || 0x00 || "
+                + new String(claim[2], StandardCharsets.UTF_8)
+                + "]";
     }
 
     public static int separator(byte[] claim) {

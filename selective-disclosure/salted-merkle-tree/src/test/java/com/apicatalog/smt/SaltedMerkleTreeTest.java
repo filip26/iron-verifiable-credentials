@@ -1,10 +1,9 @@
 package com.apicatalog.smt;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -74,11 +73,11 @@ public class SaltedMerkleTreeTest {
 //            IO.println("DOT file written to: " + file);
 //        }
 
-//        claims = JsonClaims.from(json, Set.of("/city", "/country"));
-//        IO.println("C2> " + claims.size());
-//        for (var claim : claims.values()) {
-//            IO.println("C2> " + JsonClaims.toString(claim));
-//        }
+        claims = JsonClaims.from(json, Set.of("/city", "/country"));
+        IO.println("C2> " + claims.size());
+        for (var claim : claims.values()) {
+            IO.println("C2> " + JsonClaims.toString(claim));
+        }
 
         leaves = tree.leaves(
                 claims.values(),
@@ -91,23 +90,20 @@ public class SaltedMerkleTreeTest {
         }
 
         var path = tree.generatePath(hmac, leaves);
+        assertFalse(path.isEmpty());
 
-        for (var x : path) {
-            IO.println("path > " + HexFormat.of().formatHex(x));
-        }
+//        for (var x : path) {
+//            IO.println("path > " + HexFormat.of().formatHex(x));
+//        }
 
         var ref = tree.recreateRoot(
                 List.of(
                         JsonClaims.claim("/city", "\"Prague\"".getBytes()),
                         JsonClaims.claim("/country", "\"Czech Republic\"".getBytes())),
-                new byte[][] {
+                List.of(
                         salts[0],
-                        salts[1]
-                },
-                new int[] {
-                        mapping[0],
-                        mapping[1]
-                },
+                        salts[1]),
+                List.of(mapping[0], mapping[1]),
                 path);
 
         IO.println("ref> " + HexFormat.of().formatHex(ref));

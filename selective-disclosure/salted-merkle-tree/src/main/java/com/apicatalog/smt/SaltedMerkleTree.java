@@ -180,19 +180,19 @@ public class SaltedMerkleTree {
      * @param path    the verification path in the verification order
      * @return the reconstructed root hash
      */
-    public byte[] recreateRoot(List<byte[][]> claims, byte[][] salts, int[] indices, List<byte[]> path) {
+    public byte[] recreateRoot(List<byte[][]> claims, List<byte[]> salts, List<Integer> indices, List<byte[]> path) {
 
         if (claims.size() > maxLeaves) {
             throw new IllegalArgumentException();
         }
 
-        var mapping = new Integer[indices.length];
+        var mapping = new Integer[indices.size()];
 
         for (int i = 0; i < mapping.length; i++) {
             mapping[i] = i;
         }
 
-        Arrays.parallelSort(mapping, Comparator.comparing(i -> indices[i]));
+        Arrays.parallelSort(mapping, Comparator.comparing(i -> indices.get(i)));
 
         var buffer = new byte[claims.size()][];
 
@@ -200,8 +200,8 @@ public class SaltedMerkleTree {
 
         // reconstruct leaves
         for (int i = 0; i < levelSize; i++) {
-            buffer[i] = hashLeaf(salts[mapping[i]], claims.get(mapping[i]));
-            mapping[i] = indices[mapping[i]];
+            buffer[i] = hashLeaf(salts.get(mapping[i]), claims.get(mapping[i]));
+            mapping[i] = indices.get(mapping[i]);
         }
 
         int depth = 0;
@@ -324,15 +324,15 @@ public class SaltedMerkleTree {
      * while constructing a proof.
      * </p>
      *
-     * @param claims   the claim data
-     * @param salts    the salts associated with the claims, including a padding
-     *                 salt if required
-     * @param mapping  the mapping from claim positions to leaf positions
-     * @param selected the sorted indices of claims to omit, or {@code null} to
-     *                 include all claims
+     * @param claims  the claim data
+     * @param salts   the salts associated with the claims, including a padding salt
+     *                if required
+     * @param mapping the mapping from claim positions to leaf positions
+     * @param filter  the sorted indices of claims to omit, or {@code null} to
+     *                include all claims
      * @return the leaves for root construction or verification path generation
      */
-    public byte[][] leaves(List<byte[][]> claims, byte[][] salts, Integer[] mapping, List<Integer> selected) {
+    public byte[][] leaves(List<byte[][]> claims, byte[][] salts, Integer[] mapping, List<Integer> filter) {
 
         if (claims.size() > maxLeaves) {
             throw new IllegalArgumentException();
@@ -352,13 +352,14 @@ public class SaltedMerkleTree {
 
         for (int i = 0; i < salts.length; i++) {
 
-            if (selected == null
-                    || selectedIndex >= selected.size()
-                    || selected.get(selectedIndex) != i) {
+            if (filter == null 
+                    || selectedIndex >= filter.size()
+                    || filter.get(selectedIndex) != i) {
 
                 buffer[mapping[i]] = hashLeaf(salts[i], i < claims.size() ? claims.get(i) : null);
 
             } else {
+                buffer[mapping[i]] = null;
                 selectedIndex++;
             }
         }
