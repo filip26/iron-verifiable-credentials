@@ -18,22 +18,22 @@ import javax.crypto.Mac;
  *      Tree</a>
  * 
  */
-public class SaltedMerkleTree {
+public final class SaltedMerkleTree {
 
-    public static record Leaf(byte[] salt, byte[][] data) {
-
+    /*** Disclosure data associated with the disclosed claims */
+    public static record Disclosure(List<byte[]> salts, List<Integer> indices, List<byte[]> path) {
     }
 
-    static final byte PREFIX_LEAF = 0x00;
-    static final byte PREFIX_NODE = 0x01;
-    static final byte PREFIX_PADDING = 0x02;
+    private static final byte PREFIX_LEAF = 0x00;
+    private static final byte PREFIX_NODE = 0x01;
+    private static final byte PREFIX_PADDING = 0x02;
 
-    static final byte PREFIX_INDEX_PADDING = 0x10;
-    static final byte PREFIX_LEVEL_PADDING = 0x11;
+    private static final byte PREFIX_INDEX_PADDING = 0x10;
+    private static final byte PREFIX_LEVEL_PADDING = 0x11;
 
-    final MessageDigest digest;
-    final int maxDepth;
-    final int maxLeaves;
+    private final MessageDigest digest;
+    private final int maxDepth;
+    private final int maxLeaves;
 
     /**
      * Creates a salted Merkle tree helper using the specified digest.
@@ -45,6 +45,40 @@ public class SaltedMerkleTree {
         this.digest = digest;
         this.maxDepth = maxDepth;
         this.maxLeaves = 1 << maxDepth;
+    }
+
+    /**
+     * Computes the root representing the integrity commitment to a collection of
+     * claims.
+     *
+     * @param hmac   the HMAC instance used for depth-based padding
+     * @param claims the array of claims
+     * @return the root byte array of the salted Merkle tree
+     */
+    public byte[] generateRoot(Mac hmac, List<byte[][]> claims) {
+
+        var salts = salts(hmac, claims.size());
+
+        var mapping = mapping(salts);
+
+        var leaves = leaves(
+                claims,
+                salts,
+                mapping);
+
+//        for (var x : leaves) {
+//            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
+//        }
+//
+        var root = generateRoot(hmac, leaves);
+//        IO.println("mapping  \t= " + Arrays.toString(mapping));
+//        IO.println("root     \t= " + HexFormat.of().formatHex(root));
+//
+//        for (var salt : salts) {
+//            IO.println("salt> " + HexFormat.of().formatHex(salt));
+//        }
+
+        return root;
     }
 
     /**
@@ -91,6 +125,44 @@ public class SaltedMerkleTree {
         }
 
         return buffer[0];
+    }
+
+    /**
+     * Generates the verification path required to authenticate selected claims
+     * against a root.
+     *
+     * @param hmac     the HMAC instance used for depth-based padding
+     * @param claims   the list of claims
+     * @param dislosed the list of ordered claim indices to disclose
+     * @return the disclosure associated with the disclosed claims
+     */
+    public Disclosure generatePath(Mac hmac, List<byte[][]> claims, List<Integer> dislosed) {
+
+        var salts = salts(hmac, claims.size());
+
+        var mapping = mapping(salts);
+
+        var leaves = leaves(
+                claims,
+                salts,
+                mapping,
+                dislosed);
+
+//        for (var x : leaves) {
+//            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
+//        }
+
+        var path = generatePath(hmac, leaves);
+
+        var selectedSalts = new ArrayList<byte[]>(dislosed.size());
+        var indices = new ArrayList<Integer>(dislosed.size());
+
+        for (int i = 0; i < dislosed.size(); i++) {
+            indices.add(mapping[dislosed.get(i)]);
+            selectedSalts.add(salts[i]);
+        }
+
+        return new Disclosure(selectedSalts, indices, path);
     }
 
     /**
@@ -246,6 +318,22 @@ public class SaltedMerkleTree {
     }
 
     /**
+     * Reconstructs a root from disclosed claims, their disclosure.
+     *
+     * <p>
+     * The reconstructed root can be compared with a trusted root to verify the
+     * integrity and positions of the disclosed claims.
+     * </p>
+     *
+     * @param claims     the disclosed claim data
+     * @param disclosure the disclosure associated with the disclosed claims
+     * @return the reconstructed root hash
+     */
+    public byte[] recreateRoot(List<byte[][]> claims, Disclosure disclosure) {
+        return recreateRoot(claims, disclosure.salts, disclosure.indices, disclosure.path);
+    }
+
+    /**
      * Generates salts for leaf entries, including an additional salt when required
      * to accommodate an odd number of entries.
      *
@@ -352,7 +440,7 @@ public class SaltedMerkleTree {
 
         for (int i = 0; i < salts.length; i++) {
 
-            if (filter == null 
+            if (filter == null
                     || selectedIndex >= filter.size()
                     || filter.get(selectedIndex) != i) {
 

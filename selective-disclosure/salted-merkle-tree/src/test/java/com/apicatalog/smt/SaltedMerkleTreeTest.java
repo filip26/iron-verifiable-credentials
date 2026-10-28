@@ -41,32 +41,7 @@ public class SaltedMerkleTreeTest {
 
         var tree = new SaltedMerkleTree(digest, 8);
 
-        var sd = new Sd(tree);
-
-        var root = sd.commitment(hmac, claims.values());
-        
-//        tree.generateRoot(hmac, claims.values());
-        
-//        var salts = tree.salts(hmac, claims.size());
-//
-//        var mapping = tree.mapping(salts);
-//
-//        var leaves = tree.leaves(
-//                claims.values(),
-//                salts,
-//                mapping);
-//
-//        for (var x : leaves) {
-//            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
-//        }
-//
-//        var root = tree.generateRoot(hmac, leaves);
-//        IO.println("mapping  \t= " + Arrays.toString(mapping));
-//        IO.println("root     \t= " + HexFormat.of().formatHex(root));
-//
-//        for (var salt : salts) {
-//            IO.println("salt> " + HexFormat.of().formatHex(salt));
-//        }
+        var root = tree.generateRoot(hmac, claims.values());
 
 //        Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
 //        try (var writer = new TopologyDotWriter(Files.newBufferedWriter(file))) {
@@ -75,46 +50,25 @@ public class SaltedMerkleTreeTest {
 //        }
 
         claims = JsonClaims.from(json, Set.of("/city", "/country"));
-        IO.println("C2> " + claims.size() + ", indices " + claims.selected());
-        for (var claim : claims.values()) {
-            IO.println("C2> " + JsonClaims.toString(claim));
-        }
-
-        var disclosure = sd.disclose(hmac, claims.values(), claims.selected());
-        
-//        leaves = tree.leaves(
-//                claims.values(),
-//                salts,
-//                mapping,
-//                claims.selected());
-//
-//        for (var x : leaves) {
-//            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
+//        IO.println("C2> " + claims.size() + ", indices " + claims.selected());
+//        for (var claim : claims.values()) {
+//            IO.println("C2> " + JsonClaims.toString(claim));
 //        }
-//
-//        var path = tree.generatePath(hmac, leaves);
+
+        var disclosure = tree.generatePath(hmac, claims.values(), claims.selected());
+        
         assertNotNull(disclosure);
 
         for (var x : disclosure.path()) {
             IO.println("path > " + HexFormat.of().formatHex(x));
         }
         
-        var ref = sd.commitment(
+        var ref = tree.recreateRoot(
                 List.of(
                       JsonClaims.claim("/city", "\"Prague\"".getBytes()),
                       JsonClaims.claim("/country", "\"Czech Republic\"".getBytes())),
                 disclosure);
-//
-//        var ref = tree.recreateRoot(
-//                List.of(
-//                        JsonClaims.claim("/city", "\"Prague\"".getBytes()),
-//                        JsonClaims.claim("/country", "\"Czech Republic\"".getBytes())),
-//                List.of(
-//                        salts[0],
-//                        salts[1]),
-//                List.of(mapping[0], mapping[1]),
-//                path);
-//
+
         IO.println("ref> " + HexFormat.of().formatHex(ref));
 
         assertArrayEquals(root, ref);
