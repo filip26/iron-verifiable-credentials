@@ -1,13 +1,12 @@
 package com.apicatalog.smt;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
@@ -17,10 +16,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.junit.jupiter.api.Test;
-
-import jakarta.json.JsonArray;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 public class SaltedMerkleTreeTest {
 
@@ -46,28 +41,32 @@ public class SaltedMerkleTreeTest {
 
         var tree = new SaltedMerkleTree(digest, 8);
 
+        var sd = new Sd(tree);
+
+        var root = sd.commitment(hmac, claims.values());
+        
 //        tree.generateRoot(hmac, claims.values());
         
-        var salts = tree.salts(hmac, claims.size());
-
-        var mapping = tree.mapping(salts);
-
-        var leaves = tree.leaves(
-                claims.values(),
-                salts,
-                mapping);
-
-        for (var x : leaves) {
-            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
-        }
-
-        var root = tree.generateRoot(hmac, leaves);
-        IO.println("mapping  \t= " + Arrays.toString(mapping));
-        IO.println("root     \t= " + HexFormat.of().formatHex(root));
-
-        for (var salt : salts) {
-            IO.println("salt> " + HexFormat.of().formatHex(salt));
-        }
+//        var salts = tree.salts(hmac, claims.size());
+//
+//        var mapping = tree.mapping(salts);
+//
+//        var leaves = tree.leaves(
+//                claims.values(),
+//                salts,
+//                mapping);
+//
+//        for (var x : leaves) {
+//            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
+//        }
+//
+//        var root = tree.generateRoot(hmac, leaves);
+//        IO.println("mapping  \t= " + Arrays.toString(mapping));
+//        IO.println("root     \t= " + HexFormat.of().formatHex(root));
+//
+//        for (var salt : salts) {
+//            IO.println("salt> " + HexFormat.of().formatHex(salt));
+//        }
 
 //        Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
 //        try (var writer = new TopologyDotWriter(Files.newBufferedWriter(file))) {
@@ -81,57 +80,45 @@ public class SaltedMerkleTreeTest {
             IO.println("C2> " + JsonClaims.toString(claim));
         }
 
-        leaves = tree.leaves(
-                claims.values(),
-                salts,
-                mapping,
-                claims.selected());
-
-        for (var x : leaves) {
-            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
-        }
-
-        var path = tree.generatePath(hmac, leaves);
-        assertFalse(path.isEmpty());
-
-//        for (var x : path) {
-//            IO.println("path > " + HexFormat.of().formatHex(x));
+        var disclosure = sd.disclose(hmac, claims.values(), claims.selected());
+        
+//        leaves = tree.leaves(
+//                claims.values(),
+//                salts,
+//                mapping,
+//                claims.selected());
+//
+//        for (var x : leaves) {
+//            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
 //        }
+//
+//        var path = tree.generatePath(hmac, leaves);
+        assertNotNull(disclosure);
 
-        var ref = tree.recreateRoot(
+        for (var x : disclosure.path()) {
+            IO.println("path > " + HexFormat.of().formatHex(x));
+        }
+        
+        var ref = sd.commitment(
                 List.of(
-                        JsonClaims.claim("/city", "\"Prague\"".getBytes()),
-                        JsonClaims.claim("/country", "\"Czech Republic\"".getBytes())),
-                List.of(
-                        salts[0],
-                        salts[1]),
-                List.of(mapping[0], mapping[1]),
-                path);
-
+                      JsonClaims.claim("/city", "\"Prague\"".getBytes()),
+                      JsonClaims.claim("/country", "\"Czech Republic\"".getBytes())),
+                disclosure);
+//
+//        var ref = tree.recreateRoot(
+//                List.of(
+//                        JsonClaims.claim("/city", "\"Prague\"".getBytes()),
+//                        JsonClaims.claim("/country", "\"Czech Republic\"".getBytes())),
+//                List.of(
+//                        salts[0],
+//                        salts[1]),
+//                List.of(mapping[0], mapping[1]),
+//                path);
+//
         IO.println("ref> " + HexFormat.of().formatHex(ref));
 
         assertArrayEquals(root, ref);
 
-    }
-
-    private static void flatten(String path, JsonValue node, List<String> result) {
-        switch (node.getValueType()) {
-        case OBJECT -> {
-            JsonObject obj = node.asJsonObject();
-            obj.forEach((key, value) -> flatten(path + "/" + escape(key), value, result));
-        }
-        case ARRAY -> {
-            JsonArray arr = node.asJsonArray();
-            for (int i = 0; i < arr.size(); i++) {
-                flatten(path + "/" + i, arr.get(i), result);
-            }
-        }
-        default -> result.add(path + "=" + node);
-        }
-    }
-
-    private static String escape(String token) {
-        return token.replace("~", "~0").replace("/", "~1");
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
