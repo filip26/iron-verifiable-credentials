@@ -2,14 +2,15 @@ package com.apicatalog.smt;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 public class JsonClaims {
 
@@ -17,49 +18,53 @@ public class JsonClaims {
     static byte[] JCS_TRUE = "true".getBytes(StandardCharsets.UTF_8);
     static byte[] JCS_FALSE = "false".getBytes(StandardCharsets.UTF_8);
 
-    final Map<String, byte[][]> claims;
+    final List<byte[][]> claims;
+    final List<Integer> indices;
 
-    protected JsonClaims(Map<String, byte[][]> claims) {
+    protected JsonClaims(List<byte[][]> claims, List<Integer> indices) {
         this.claims = claims;
+        this.indices = indices;
     }
 
     public static JsonClaims from(Map<String, ?> document) {
-        var claims = new TreeMap<String, byte[][]>();
-
-        flatten("", document, claims, Set.of());
-
-        return new JsonClaims(claims);
+        return from(document, Set.of());
     }
 
     public static JsonClaims from(Map<String, ?> document, Set<String> selected) {
-        var claims = new TreeMap<String, byte[][]>();
+        var claims = new ArrayList<byte[][]>();
+        List<Integer> indices = selected.isEmpty() ? List.of() : new ArrayList<>(selected.size());
 
-        flatten("", document, claims, selected);
+        flatten("", document, claims, selected, indices);
 
-        return new JsonClaims(claims);
+        return new JsonClaims(claims, indices);
     }
 
-    static void flatten(String path, Object node, Map<String, byte[][]> claims, Set<String> selected) {
+    static void flatten(String path, Object node, List<byte[][]> claims, Set<String> selected, List<Integer> indices) {
 
         switch (node) {
         case Collection<?> col -> {
             var it = col.iterator();
             int i = 0;
             while (it.hasNext()) {
-                flatten(path + "/" + i, it.next(), claims, selected);
+                flatten(path + "/" + i, it.next(), claims, selected, indices);
                 i++;
             }
             return;
         }
-        case Map<?, ?> map -> {
-            for (var entry : map.entrySet()) {
-                flatten(path + "/" + jsonPointer((String) entry.getKey()), entry.getValue(), claims, selected);
+        case Map map -> {
+            var entries = new ArrayList<Entry<String, Object>>(map.entrySet());
+            Collections.sort(entries, Entry.comparingByKey());
+
+            for (var entry : entries) {
+                flatten(path + "/" + escapeJsonPointerSegment(entry.getKey()), entry.getValue(), claims, selected,
+                        indices);
             }
             return;
         }
         default -> {
             if (selected.contains(path)) {
-                claims.put(path, new byte[0][]);
+                indices.add(claims.size());
+                claims.add(null);
                 return;
             }
         }
@@ -76,12 +81,12 @@ public class JsonClaims {
         }
     }
 
-    static void add(String path, byte[] value, Map<String, byte[][]> claims) {
-        claims.put(path, claim(path, value));
+    static void add(String path, byte[] value, List<byte[][]> claims) {
+        claims.add(claim(path, value));
     }
 
     public void add(String path, byte[] value) {
-        claims.put(path, claim(path, value));
+        claims.add(claim(path, value));
     }
 
     public static byte[][] claim(String path, byte[] value) {
@@ -92,7 +97,7 @@ public class JsonClaims {
         };
     }
 
-    public static String jsonPointer(String token) {
+    public static String escapeJsonPointerSegment(String token) {
         return token.replace("~", "~0").replace("/", "~1");
     }
 
@@ -305,12 +310,12 @@ public class JsonClaims {
         return claims.size();
     }
 
-    public Collection<Entry<String, byte[][]>> entries() {
-        return claims.entrySet();
+    public List<Integer> selected() {
+        return indices;
     }
 
     public List<byte[][]> values() {
-        return List.copyOf(claims.values()); // FIXME
+        return claims;
     }
 
     public static String toString(byte[][] claim) {
@@ -336,5 +341,4 @@ public class JsonClaims {
         }
         return index;
     }
-
 }

@@ -46,6 +46,8 @@ public class SaltedMerkleTreeTest {
 
         var tree = new SaltedMerkleTree(digest, 8);
 
+//        tree.generateRoot(hmac, claims.values());
+        
         var salts = tree.salts(hmac, claims.size());
 
         var mapping = tree.mapping(salts);
@@ -74,7 +76,7 @@ public class SaltedMerkleTreeTest {
 //        }
 
         claims = JsonClaims.from(json, Set.of("/city", "/country"));
-        IO.println("C2> " + claims.size());
+        IO.println("C2> " + claims.size() + ", indices " + claims.selected());
         for (var claim : claims.values()) {
             IO.println("C2> " + JsonClaims.toString(claim));
         }
@@ -83,7 +85,7 @@ public class SaltedMerkleTreeTest {
                 claims.values(),
                 salts,
                 mapping,
-                List.of(0, 1));
+                claims.selected());
 
         for (var x : leaves) {
             IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
