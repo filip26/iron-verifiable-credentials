@@ -3,7 +3,6 @@ package com.apicatalog.smt;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -20,6 +19,10 @@ import javax.crypto.Mac;
  * 
  */
 public class SaltedMerkleTree {
+
+    public static record Leaf(byte[] salt, byte[][] data) {
+
+    }
 
     static final byte PREFIX_LEAF = 0x00;
     static final byte PREFIX_NODE = 0x01;
@@ -177,9 +180,9 @@ public class SaltedMerkleTree {
      * @param path    the verification path in the verification order
      * @return the reconstructed root hash
      */
-    public byte[] recreateRoot(byte[][] claims, byte[][] salts, int[] indices, byte[][] path) {
+    public byte[] recreateRoot(List<byte[][]> claims, byte[][] salts, int[] indices, List<byte[]> path) {
 
-        if (claims.length > maxLeaves) {
+        if (claims.size() > maxLeaves) {
             throw new IllegalArgumentException();
         }
 
@@ -191,13 +194,13 @@ public class SaltedMerkleTree {
 
         Arrays.parallelSort(mapping, Comparator.comparing(i -> indices[i]));
 
-        var buffer = new byte[claims.length][];
+        var buffer = new byte[claims.size()][];
 
         int levelSize = buffer.length;
 
         // reconstruct leaves
         for (int i = 0; i < levelSize; i++) {
-            buffer[i] = hashLeaf(salts[mapping[i]], claims[mapping[i]]);
+            buffer[i] = hashLeaf(salts[mapping[i]], claims.get(mapping[i]));
             mapping[i] = indices[mapping[i]];
         }
 
@@ -205,7 +208,7 @@ public class SaltedMerkleTree {
         int pathIndex = 0;
 
         // reconstruct root
-        while ((depth <= maxDepth) && (levelSize > 1 || pathIndex < path.length)) {
+        while ((depth <= maxDepth) && (levelSize > 1 || pathIndex < path.size())) {
 
             int nextLevelSize = 0;
 
@@ -217,7 +220,7 @@ public class SaltedMerkleTree {
                 final byte[] right;
 
                 if ((nodeIndex & 1) == 1) {
-                    left = path[pathIndex++];
+                    left = path.get(pathIndex++);
                     right = buffer[i];
 
                 } else if (i + 1 < levelSize && ((nodeIndex + 1) == mapping[i + 1])) {
@@ -227,7 +230,7 @@ public class SaltedMerkleTree {
 
                 } else {
                     left = buffer[i];
-                    right = path[pathIndex++];
+                    right = path.get(pathIndex++);
                 }
 
                 buffer[nextLevelSize] = hashNode(left, right);
@@ -307,7 +310,7 @@ public class SaltedMerkleTree {
      * @param mapping the mapping from claim positions to leaf positions
      * @return the leaves, including any required padding leaf
      */
-    public byte[][] leaves(Collection<byte[]> claims, byte[][] salts, Integer[] mapping) {
+    public byte[][] leaves(List<byte[][]> claims, byte[][] salts, Integer[] mapping) {
         return leaves(claims, salts, mapping, null);
     }
 
@@ -329,7 +332,7 @@ public class SaltedMerkleTree {
      *                 include all claims
      * @return the leaves for root construction or verification path generation
      */
-    public byte[][] leaves(Collection<byte[]> claims, byte[][] salts, Integer[] mapping, int[] selected) {
+    public byte[][] leaves(List<byte[][]> claims, byte[][] salts, Integer[] mapping, List<Integer> selected) {
 
         if (claims.size() > maxLeaves) {
             throw new IllegalArgumentException();
@@ -343,30 +346,21 @@ public class SaltedMerkleTree {
             throw new IllegalArgumentException();
         }
 
-        var remainder = salts.length & 1;
-
-        var buffer = new byte[salts.length + remainder][];
+        var buffer = new byte[salts.length][];
 
         var selectedIndex = 0;
-
-        var claimsIt = claims.iterator();
 
         for (int i = 0; i < salts.length; i++) {
 
             if (selected == null
-                    || selectedIndex >= selected.length
-                    || selected[selectedIndex] != i) {
+                    || selectedIndex >= selected.size()
+                    || selected.get(selectedIndex) != i) {
 
-                buffer[mapping[i]] = hashLeaf(salts[i], claimsIt.hasNext() ? claimsIt.next() : null);
+                buffer[mapping[i]] = hashLeaf(salts[i], i < claims.size() ? claims.get(i) : null);
 
             } else {
                 selectedIndex++;
             }
-        }
-
-        if (remainder > 0) {
-            // add padding leaf
-            buffer[mapping[claims.size()]] = hashLeaf(salts[claims.size()], null);
         }
 
         return buffer;
@@ -407,11 +401,13 @@ public class SaltedMerkleTree {
      * @param data the claim data, or {@code null} for an empty claim
      * @return the leaf hash
      */
-    public byte[] hashLeaf(byte[] salt, byte[] data) {
+    public byte[] hashLeaf(byte[] salt, byte[][] data) {
         digest.update(PREFIX_LEAF);
         digest.update(salt);
         if (data != null) {
-            digest.update(data);
+            for (var i = 0; i < data.length; i++) {
+                digest.update(data[i]);
+            }
         }
         return digest.digest();
     }

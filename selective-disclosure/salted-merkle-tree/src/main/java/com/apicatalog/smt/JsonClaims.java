@@ -2,12 +2,15 @@ package com.apicatalog.smt;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class JsonClaims {
 
@@ -15,68 +18,73 @@ public class JsonClaims {
     static byte[] JCS_TRUE = "true".getBytes(StandardCharsets.UTF_8);
     static byte[] JCS_FALSE = "false".getBytes(StandardCharsets.UTF_8);
 
-    final Collection<byte[]> claims;
+    final Map<String, byte[][]> claims;
 
-    protected JsonClaims(Collection<byte[]> claims) {
+    protected JsonClaims(Map<String, byte[][]> claims) {
         this.claims = claims;
     }
 
     public static JsonClaims from(Map<String, ?> document) {
-        var claims = new ArrayList<byte[]>();
+        var claims = new TreeMap<String, byte[][]>();
 
-        flatten("", document, claims);
+        flatten("", document, claims, Set.of());
 
         return new JsonClaims(claims);
     }
 
-    static void flatten(String path, Object node, Collection<byte[]> result) {
+    public static JsonClaims from(Map<String, ?> document, Collection<String> selected) {
+        var claims = new TreeMap<String, byte[][]>();
+
+        flatten("", document, claims, selected);
+
+        return new JsonClaims(claims);
+    }
+
+    static void flatten(String path, Object node, Map<String, byte[][]> claims, Collection<String> selected) {
+
+        if (selected.contains(path)) {
+            claims.put(path, null);
+            return;
+        }
+
         switch (node) {
         case Collection<?> col -> {
             var it = col.iterator();
             int i = 0;
             while (it.hasNext()) {
-                flatten(path + "/" + i, it.next(), result);
+                flatten(path + "/" + i, it.next(), claims, selected);
                 i++;
             }
         }
         case Map<?, ?> map -> {
-            var entries = new ArrayList<Entry<String, Object>>(((Map<String, Object>) map).entrySet());
-            entries.sort(Map.Entry.comparingByKey());
-
-            for (var entry : entries) {
-                flatten(path + "/" + jsonPointer(entry.getKey()), entry.getValue(), result);
+            for (var entry : map.entrySet()) {
+                flatten(path + "/" + jsonPointer((String) entry.getKey()), entry.getValue(), claims, selected);
             }
-
         }
-        case Number number -> add(path, canonizeNumber(number), result);
-        case String string -> add(path, canonizeString(string), result);
-        case null -> add(path, JCS_NULL, result);
-        case Boolean bool -> add(path, bool ? JCS_TRUE : JCS_FALSE, result);
+        case Number number -> add(path, canonizeNumber(number), claims);
+        case String string -> add(path, canonizeString(string), claims);
+        case null -> add(path, JCS_NULL, claims);
+        case Boolean bool -> add(path, bool ? JCS_TRUE : JCS_FALSE, claims);
         default -> {
             throw new IllegalArgumentException();
         }
         }
     }
 
-    static void add(String path, byte[] value, Collection<byte[]> claims) {
-        claims.add(claim(path, value));
+    static void add(String path, byte[] value, Map<String, byte[][]> claims) {
+        claims.put(path, claim(path, value));
     }
 
     public void add(String path, byte[] value) {
-        claims.add(claim(path, value));
+        claims.put(path, claim(path, value));
     }
 
-    public static byte[] claim(String path, byte[] value) {
-
-        var pathAsBytes = path.getBytes(StandardCharsets.UTF_8);
-
-        var claim = new byte[pathAsBytes.length + value.length + 1];
-
-        System.arraycopy(pathAsBytes, 0, claim, 0, pathAsBytes.length);
-        System.arraycopy(new byte[] { 0x00 }, 0, claim, pathAsBytes.length, 1);
-        System.arraycopy(value, 0, claim, pathAsBytes.length + 1, value.length);
-
-        return claim;
+    public static byte[][] claim(String path, byte[] value) {
+        return new byte[][] {
+                path.getBytes(StandardCharsets.UTF_8),
+                new byte[] { 0x00 },
+                value
+        };
     }
 
     public static String jsonPointer(String token) {
@@ -218,7 +226,7 @@ public class JsonClaims {
         final HexFormat hexFormat = HexFormat.of();
 
         out.write('"');
-        
+
         for (int i = 0; i < length;) {
             int ch = value.codePointAt(i);
             switch (ch) {
@@ -292,18 +300,33 @@ public class JsonClaims {
         return claims.size();
     }
 
-    public Collection<byte[]> values() {
-        return claims;
+    public Collection<Entry<String, byte[][]>> entries() {
+        return claims.entrySet();
     }
 
-    public static String toString(byte[] claim) {
-        var index = separator(claim);
+    public List<byte[][]> values() {
+        return List.copyOf(claims.values());
+    }
+
+    public static String toString(byte[][] claim) {
+
+        if (claim == null) {
+            return Objects.toString(claim);
+        }
 
         return "Claim(UTF8("
-                + new String(claim, 0, index, StandardCharsets.UTF_8)
+                + new String(claim[0], StandardCharsets.UTF_8)
                 + ") || 0x00 || JCS("
-                + new String(claim, index + 1, claim.length - index - 1, StandardCharsets.UTF_8)
+                + new String(claim[1], StandardCharsets.UTF_8)
                 + "))";
+
+//        var index = separator(claim);
+
+//        return "Claim(UTF8("
+//                + new String(claim, 0, index, StandardCharsets.UTF_8)
+//                + ") || 0x00 || JCS("
+//                + new String(claim, index + 1, claim.length - index - 1, StandardCharsets.UTF_8)
+//                + "))";
     }
 
     public static int separator(byte[] claim) {

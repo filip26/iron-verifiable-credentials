@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -30,7 +31,7 @@ public class SaltedMerkleTreeTest {
         var json = Map.of("name", "Filip", "city", "Prague", "country", "Czech Republic");
 
         var claims = JsonClaims.from(json);
-        
+
         for (var claim : claims.values()) {
             IO.println(JsonClaims.toString(claim));
         }
@@ -55,38 +56,50 @@ public class SaltedMerkleTreeTest {
                 salts,
                 mapping);
 
+        for (var x : leaves) {
+            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
+        }
+
         var root = tree.generateRoot(hmac, leaves);
         IO.println("mapping  \t= " + Arrays.toString(mapping));
         IO.println("root     \t= " + HexFormat.of().formatHex(root));
 
-        for (var salt: salts) {
-            IO.println(HexFormat.of().formatHex(salt));
+        for (var salt : salts) {
+            IO.println("salt> " + HexFormat.of().formatHex(salt));
         }
 
-        Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
-        try (var writer = new TopologyDotWriter(Files.newBufferedWriter(file))) {
-            writer.write(claims.size(), mapping, new int[] { 0, 2 });
-            IO.println("DOT file written to: " + file);
-        }
+//        Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
+//        try (var writer = new TopologyDotWriter(Files.newBufferedWriter(file))) {
+//            writer.write(claims.size(), mapping, new int[] { 0, 2 });
+//            IO.println("DOT file written to: " + file);
+//        }
 
-        
+//        claims = JsonClaims.from(json, Set.of("/city", "/country"));
+//        IO.println("C2> " + claims.size());
+//        for (var claim : claims.values()) {
+//            IO.println("C2> " + JsonClaims.toString(claim));
+//        }
+
         leaves = tree.leaves(
                 claims.values(),
                 salts,
                 mapping,
-                new int[] { 0, 1 });
+                List.of(0, 1));
+
+        for (var x : leaves) {
+            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
+        }
 
         var path = tree.generatePath(hmac, leaves);
 
         for (var x : path) {
-            IO.println(HexFormat.of().formatHex(x));
+            IO.println("path > " + HexFormat.of().formatHex(x));
         }
-        
+
         var ref = tree.recreateRoot(
-                new byte[][] {
-                        "/city=\"Prague\"".getBytes(),
-                        "/country=\"Czech Republic\"".getBytes()
-                },
+                List.of(
+                        JsonClaims.claim("/city", "\"Prague\"".getBytes()),
+                        JsonClaims.claim("/country", "\"Czech Republic\"".getBytes())),
                 new byte[][] {
                         salts[0],
                         salts[1]
@@ -95,10 +108,12 @@ public class SaltedMerkleTreeTest {
                         mapping[0],
                         mapping[1]
                 },
-                path.stream().toArray(byte[][]::new));
+                path);
+
+        IO.println("ref> " + HexFormat.of().formatHex(ref));
 
         assertArrayEquals(root, ref);
-        
+
     }
 
     private static void flatten(String path, JsonValue node, List<String> result) {
@@ -138,11 +153,13 @@ public class SaltedMerkleTreeTest {
 //
 //        IO.println(HexFormat.of().formatHex(hmacKey));
 //
-////        hmacKey = HexFormat.of().parseHex("fd212eaefbae1f5a5bb9285525b62d5c167375cc0e21aa17ad61c679de53a84f");
+        //// hmacKey
+        /// = HexFormat.of().parseHex("fd212eaefbae1f5a5bb9285525b62d5c167375cc0e21aa17ad61c679de53a84f");
 //
 //        hmacKey = HexFormat.of().parseHex("a61b763c687c28a4064bb2d7b06e2e5fb25d4f1ea226b611d11d846768058630");
 //
-////        hmacKey = HexFormat.of().parseHex("FFEEDDCCBBAA99887766554433221100FFEEDDCCBBAA99887766554433221100");
+        //// hmacKey
+        /// = HexFormat.of().parseHex("FFEEDDCCBBAA99887766554433221100FFEEDDCCBBAA99887766554433221100");
 //        final String type = "HmacSHA256";
 //        final SecretKeySpec key = new SecretKeySpec(hmacKey, type);
 //
@@ -166,7 +183,7 @@ public class SaltedMerkleTreeTest {
 //        IO.println("root     \t= " + HexFormat.of().formatHex(root));
 //        IO.println("mapping  \t= " + Arrays.toString(mapping));
 //
-////        var selection = new int[] { 2, 3 };
+        //// var selection = new int[] { 2, 3 };
 //        var selection = new int[] { 0, 1, 5, 9 };
 //
 //        IO.println("selection\t= " + Arrays.toString(selection));
