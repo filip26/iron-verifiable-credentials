@@ -49,20 +49,20 @@ public class TopologyDotWriter implements AutoCloseable {
 
                 if (level == 0) {
                     writer.print("<Leaf<sub>");
-                    writer.printf("%d", index + 1);
+                    writer.printf("%d", index);
                     writer.print("</sub>>");
 
                 } else if (level == depth) {
-                    writer.print("<Root 1:");
-                    writer.print(leaves);
+                    writer.print("<Root 0:");
+                    writer.print(paddedSize - 1);
                     writer.print('>');
 
                 } else {
                     var step = paddedSize / paddedLevelSize;
                     writer.print("\"Node ");
-                    writer.print(step * index + 1);
+                    writer.print(step * index );
                     writer.print(":");
-                    writer.print(step * (index + 1));
+                    writer.print(step * (index +1) - 1);
                     writer.print('"');
                 }
 
@@ -115,7 +115,7 @@ public class TopologyDotWriter implements AutoCloseable {
             writer.print(mapping[i]);
             writer.print(" [label=");
             writer.print("<Salt<sub>");
-            writer.printf("%d", i + 1);
+            writer.printf("%d", i);
             writer.print("</sub>>");
 
             if (i < claims) {
@@ -135,7 +135,7 @@ public class TopologyDotWriter implements AutoCloseable {
             writer.print(" [label=");
             if (i < claims) {
                 writer.print("<Claim<sub>");
-                writer.printf("%d", i + 1);
+                writer.printf("%d", i);
                 writer.print("</sub>>");
 
                 if (selectionIndex < indices.length && mapping[i] == indices[selectionIndex]) {

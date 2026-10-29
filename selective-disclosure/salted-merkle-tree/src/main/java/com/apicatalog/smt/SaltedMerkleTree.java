@@ -13,30 +13,65 @@ import javax.crypto.Mac;
  * verification paths, and reconstructing roots to verify disclosed claims.
  *
  * @author Filip Kolařík {@literal <filip26@gmail.com>}
- * 
+ *
  * @see <a href="https://github.com/filip26/salted-merkle-tree">Salted Merkle
  *      Tree</a>
- * 
  */
-public class SaltedMerkleTree {
-
-    static final byte PREFIX_LEAF = 0x00;
-    static final byte PREFIX_NODE = 0x01;
-    static final byte PREFIX_PADDING = 0x02;
-
-    static final byte PREFIX_INDEX_PADDING = 0x10;
-    static final byte PREFIX_LEVEL_PADDING = 0x11;
-
-    final MessageDigest digest;
+public final class SaltedMerkleTree {
 
     /**
-     * Creates a salted Merkle tree helper using the specified digest.
+     * Disclosure data associated with the disclosed claims.
      *
-     * @param digest the digest algorithm used for tree hashes
-     *
+     * @param salts   the salts associated with the disclosed claims
+     * @param indices the original leaf indices of the disclosed claims
+     * @param path    the verification path hashes
      */
-    public SaltedMerkleTree(MessageDigest digest) {
+    public static record Disclosure(List<byte[]> salts, List<Integer> indices, List<byte[]> path) {
+    }
+
+    private static final byte PREFIX_LEAF = 0x00;
+    private static final byte PREFIX_NODE = 0x01;
+    private static final byte PREFIX_PADDING = 0x02;
+
+    private static final byte PREFIX_INDEX_PADDING = 0x10;
+    private static final byte PREFIX_LEVEL_PADDING = 0x11;
+
+    private final MessageDigest digest;
+    private final int maxDepth;
+    private final int maxLeaves;
+
+    /**
+     * Creates a salted Merkle tree using the specified digest and maximum depth.
+     *
+     * @param digest   the digest algorithm used for tree hashes
+     * @param maxDepth the maximum depth of the tree
+     */
+    public SaltedMerkleTree(MessageDigest digest, int maxDepth) {
         this.digest = digest;
+        this.maxDepth = maxDepth;
+        this.maxLeaves = 1 << maxDepth;
+    }
+
+    /**
+     * Computes the root representing the integrity commitment to a collection of
+     * claims.
+     *
+     * @param hmac   the HMAC instance used for depth-based padding
+     * @param claims the list of claims
+     * @return the root byte array of the salted Merkle tree
+     */
+    public byte[] generateRoot(Mac hmac, List<byte[][]> claims) {
+
+        var salts = salts(hmac, claims.size());
+
+        var mapping = mapping(salts);
+
+        var leaves = leaves(
+                claims,
+                salts,
+                mapping);
+
+        return generateRoot(hmac, leaves);
     }
 
     /**
@@ -53,6 +88,10 @@ public class SaltedMerkleTree {
      * @return the root byte array of the salted Merkle tree
      */
     public byte[] generateRoot(Mac hmac, byte[][] buffer) {
+
+        if (buffer.length > maxLeaves) {
+            throw new IllegalArgumentException();
+        }
 
         final var depth = 32 - Integer.numberOfLeadingZeros(buffer.length - 1);
 
@@ -82,6 +121,40 @@ public class SaltedMerkleTree {
     }
 
     /**
+     * Generates the verification path required to authenticate selected claims
+     * against a root.
+     *
+     * @param hmac     the HMAC instance used for depth-based padding
+     * @param claims   the list of claims
+     * @param dislosed the list of ordered claim indices to disclose
+     * @return the disclosure associated with the disclosed claims
+     */
+    public Disclosure generatePath(Mac hmac, List<byte[][]> claims, List<Integer> dislosed) {
+
+        var salts = salts(hmac, claims.size());
+
+        var mapping = mapping(salts);
+
+        var leaves = leaves(
+                claims,
+                salts,
+                mapping,
+                dislosed);
+
+        var path = generatePath(hmac, leaves);
+
+        var selectedSalts = new ArrayList<byte[]>(dislosed.size());
+        var indices = new ArrayList<Integer>(dislosed.size());
+
+        for (int i = 0; i < dislosed.size(); i++) {
+            indices.add(mapping[dislosed.get(i)]);
+            selectedSalts.add(salts[i]);
+        }
+
+        return new Disclosure(selectedSalts, indices, path);
+    }
+
+    /**
      * Generates the verification path required to authenticate selected leaves
      * against a root.
      *
@@ -102,9 +175,13 @@ public class SaltedMerkleTree {
      */
     public List<byte[]> generatePath(Mac hmac, byte[][] buffer) {
 
-        final var path = new ArrayList<byte[]>();
+        if (buffer.length > maxLeaves) {
+            throw new IllegalArgumentException();
+        }
 
         final var depth = 32 - Integer.numberOfLeadingZeros(buffer.length - 1);
+
+        final var path = new ArrayList<byte[]>();
 
         var levelSize = buffer.length;
 
@@ -164,29 +241,35 @@ public class SaltedMerkleTree {
      * @param path    the verification path in the verification order
      * @return the reconstructed root hash
      */
-    public byte[] recreateRoot(byte[][] claims, byte[][] salts, int[] indices, byte[][] path) {
+    public byte[] recreateRoot(List<byte[][]> claims, List<byte[]> salts, List<Integer> indices, List<byte[]> path) {
 
-        var mapping = new Integer[indices.length];
+        if (claims.size() > maxLeaves) {
+            throw new IllegalArgumentException();
+        }
+
+        var mapping = new Integer[indices.size()];
+
         for (int i = 0; i < mapping.length; i++) {
             mapping[i] = i;
         }
 
-        Arrays.parallelSort(mapping, Comparator.comparing(i -> indices[i]));
+        Arrays.parallelSort(mapping, Comparator.comparing(i -> indices.get(i)));
 
-        var buffer = new byte[claims.length][];
+        var buffer = new byte[claims.size()][];
 
         int levelSize = buffer.length;
 
         // reconstruct leaves
         for (int i = 0; i < levelSize; i++) {
-            buffer[i] = hashLeaf(salts[mapping[i]], claims[mapping[i]]);
-            mapping[i] = indices[mapping[i]];
+            buffer[i] = hashLeaf(salts.get(mapping[i]), claims.get(mapping[i]));
+            mapping[i] = indices.get(mapping[i]);
         }
 
+        int depth = 0;
         int pathIndex = 0;
 
         // reconstruct root
-        while (levelSize > 1 || pathIndex < path.length) {
+        while ((depth <= maxDepth) && (levelSize > 1 || pathIndex < path.size())) {
 
             int nextLevelSize = 0;
 
@@ -198,7 +281,7 @@ public class SaltedMerkleTree {
                 final byte[] right;
 
                 if ((nodeIndex & 1) == 1) {
-                    left = path[pathIndex++];
+                    left = path.get(pathIndex++);
                     right = buffer[i];
 
                 } else if (i + 1 < levelSize && ((nodeIndex + 1) == mapping[i + 1])) {
@@ -208,7 +291,7 @@ public class SaltedMerkleTree {
 
                 } else {
                     left = buffer[i];
-                    right = path[pathIndex++];
+                    right = path.get(pathIndex++);
                 }
 
                 buffer[nextLevelSize] = hashNode(left, right);
@@ -217,9 +300,26 @@ public class SaltedMerkleTree {
 
             }
             levelSize = nextLevelSize;
+            depth++;
         }
 
         return buffer[0];
+    }
+
+    /**
+     * Reconstructs a root from disclosed claims and their disclosure.
+     *
+     * <p>
+     * The reconstructed root can be compared with a trusted root to verify the
+     * integrity and positions of the disclosed claims.
+     * </p>
+     *
+     * @param claims     the disclosed claim data
+     * @param disclosure the disclosure associated with the disclosed claims
+     * @return the reconstructed root hash
+     */
+    public byte[] recreateRoot(List<byte[][]> claims, Disclosure disclosure) {
+        return recreateRoot(claims, disclosure.salts, disclosure.indices, disclosure.path);
     }
 
     /**
@@ -287,7 +387,7 @@ public class SaltedMerkleTree {
      * @param mapping the mapping from claim positions to leaf positions
      * @return the leaves, including any required padding leaf
      */
-    public byte[][] leaves(byte[][] claims, byte[][] salts, Integer[] mapping) {
+    public byte[][] leaves(List<byte[][]> claims, byte[][] salts, Integer[] mapping) {
         return leaves(claims, salts, mapping, null);
     }
 
@@ -301,38 +401,44 @@ public class SaltedMerkleTree {
      * while constructing a proof.
      * </p>
      *
-     * @param claims   the claim data
-     * @param salts    the salts associated with the claims, including a padding
-     *                 salt if required
-     * @param mapping  the mapping from claim positions to leaf positions
-     * @param selected the sorted indices of claims to omit, or {@code null} to
-     *                 include all claims
+     * @param claims  the claim data
+     * @param salts   the salts associated with the claims, including a padding salt
+     *                if required
+     * @param mapping the mapping from claim positions to leaf positions
+     * @param filter  the sorted indices of claims to omit, or {@code null} to
+     *                include all claims
      * @return the leaves for root construction or verification path generation
      */
-    public byte[][] leaves(byte[][] claims, byte[][] salts, Integer[] mapping, int[] selected) {
+    public byte[][] leaves(List<byte[][]> claims, byte[][] salts, Integer[] mapping, List<Integer> filter) {
 
-        var remainder = claims.length & 1;
+        if (claims.size() > maxLeaves) {
+            throw new IllegalArgumentException();
+        }
 
-        var buffer = new byte[claims.length + remainder][];
+        if (claims.size() > salts.length) {
+            throw new IllegalArgumentException();
+        }
+
+        if (salts.length != mapping.length) {
+            throw new IllegalArgumentException();
+        }
+
+        var buffer = new byte[salts.length][];
 
         var selectedIndex = 0;
 
-        for (int i = 0; i < claims.length; i++) {
+        for (int i = 0; i < salts.length; i++) {
 
-            if (selected == null
-                    || selectedIndex >= selected.length
-                    || selected[selectedIndex] != i) {
+            if (filter == null
+                    || selectedIndex >= filter.size()
+                    || filter.get(selectedIndex) != i) {
 
-                buffer[mapping[i]] = hashLeaf(salts[i], claims[i]);
+                buffer[mapping[i]] = hashLeaf(salts[i], i < claims.size() ? claims.get(i) : null);
 
             } else {
+                buffer[mapping[i]] = null;
                 selectedIndex++;
             }
-        }
-
-        if (remainder > 0) {
-            // add padding leaf
-            buffer[mapping[claims.length]] = hashLeaf(salts[claims.length], null);
         }
 
         return buffer;
@@ -373,11 +479,13 @@ public class SaltedMerkleTree {
      * @param data the claim data, or {@code null} for an empty claim
      * @return the leaf hash
      */
-    public byte[] hashLeaf(byte[] salt, byte[] data) {
+    public byte[] hashLeaf(byte[] salt, byte[][] data) {
         digest.update(PREFIX_LEAF);
         digest.update(salt);
         if (data != null) {
-            digest.update(data);
+            for (var i = 0; i < data.length; i++) {
+                digest.update(data[i]);
+            }
         }
         return digest.digest();
     }
@@ -411,5 +519,23 @@ public class SaltedMerkleTree {
         digest.update(PREFIX_PADDING);
         digest.update(padding);
         return digest.digest();
+    }
+
+    /**
+     * Returns the maximum depth of the tree.
+     *
+     * @return the maximum depth
+     */
+    public int maxDepth() {
+        return maxDepth;
+    }
+
+    /**
+     * Returns the maximum number of leaves supported by the tree.
+     *
+     * @return the maximum number of leaves
+     */
+    public int maxLeaves() {
+        return maxLeaves;
     }
 }
