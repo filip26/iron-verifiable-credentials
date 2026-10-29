@@ -13,10 +13,9 @@ import javax.crypto.Mac;
  * verification paths, and reconstructing roots to verify disclosed claims.
  *
  * @author Filip Kolařík {@literal <filip26@gmail.com>}
- * 
+ *
  * @see <a href="https://github.com/filip26/salted-merkle-tree">Salted Merkle
  *      Tree</a>
- * 
  */
 public final class SaltedMerkleTree {
 
@@ -66,19 +65,7 @@ public final class SaltedMerkleTree {
                 salts,
                 mapping);
 
-//        for (var x : leaves) {
-//            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
-//        }
-//
-        var root = generateRoot(hmac, leaves);
-//        IO.println("mapping  \t= " + Arrays.toString(mapping));
-//        IO.println("root     \t= " + HexFormat.of().formatHex(root));
-//
-//        for (var salt : salts) {
-//            IO.println("salt> " + HexFormat.of().formatHex(salt));
-//        }
-
-        return root;
+        return generateRoot(hmac, leaves);
     }
 
     /**
@@ -147,10 +134,6 @@ public final class SaltedMerkleTree {
                 salts,
                 mapping,
                 dislosed);
-
-//        for (var x : leaves) {
-//            IO.println("leaf > " + (x != null ? HexFormat.of().formatHex(x) : null));
-//        }
 
         var path = generatePath(hmac, leaves);
 
@@ -318,7 +301,7 @@ public final class SaltedMerkleTree {
     }
 
     /**
-     * Reconstructs a root from disclosed claims, their disclosure.
+     * Reconstructs a root from disclosed claims and their disclosure.
      *
      * <p>
      * The reconstructed root can be compared with a trusted root to verify the
@@ -530,5 +513,13 @@ public final class SaltedMerkleTree {
         digest.update(PREFIX_PADDING);
         digest.update(padding);
         return digest.digest();
+    }
+
+    public int maxDepth() {
+        return maxDepth;
+    }
+
+    public int maxLeaves() {
+        return maxLeaves;
     }
 }

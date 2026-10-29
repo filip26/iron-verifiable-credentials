@@ -12,19 +12,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class JsonClaims {
+public record JsonClaims(List<byte[][]> values, List<Integer> selected) {
 
     static byte[] JCS_NULL = "null".getBytes(StandardCharsets.UTF_8);
     static byte[] JCS_TRUE = "true".getBytes(StandardCharsets.UTF_8);
     static byte[] JCS_FALSE = "false".getBytes(StandardCharsets.UTF_8);
-
-    final List<byte[][]> claims;
-    final List<Integer> indices;
-
-    protected JsonClaims(List<byte[][]> claims, List<Integer> indices) {
-        this.claims = claims;
-        this.indices = indices;
-    }
 
     public static JsonClaims from(Map<String, ?> document) {
         return from(document, Set.of());
@@ -39,7 +31,12 @@ public class JsonClaims {
         return new JsonClaims(claims, indices);
     }
 
-    static void flatten(String path, Object node, List<byte[][]> claims, Set<String> selected, List<Integer> indices) {
+    public int size() {
+        return values.size();
+    }
+
+    private static void flatten(String path, Object node, List<byte[][]> claims, Set<String> selected,
+            List<Integer> indices) {
 
         switch (node) {
         case Collection<?> col -> {
@@ -51,8 +48,9 @@ public class JsonClaims {
             }
             return;
         }
-        case Map map -> {
-            var entries = new ArrayList<Entry<String, Object>>(map.entrySet());
+        case Map<?, ?> map -> {
+            @SuppressWarnings("unchecked")
+            var entries = new ArrayList<>((Set<? extends Entry<String, Object>>) map.entrySet());
             Collections.sort(entries, Entry.comparingByKey());
 
             for (var entry : entries) {
@@ -81,11 +79,7 @@ public class JsonClaims {
         }
     }
 
-    static void add(String path, byte[] value, List<byte[][]> claims) {
-        claims.add(claim(path, value));
-    }
-
-    public void add(String path, byte[] value) {
+    private static void add(String path, byte[] value, List<byte[][]> claims) {
         claims.add(claim(path, value));
     }
 
@@ -304,18 +298,6 @@ public class JsonClaims {
         }
         out.write('"');
         return out.toByteArray();
-    }
-
-    public int size() {
-        return claims.size();
-    }
-
-    public List<Integer> selected() {
-        return indices;
-    }
-
-    public List<byte[][]> values() {
-        return claims;
     }
 
     public static String toString(byte[][] claim) {

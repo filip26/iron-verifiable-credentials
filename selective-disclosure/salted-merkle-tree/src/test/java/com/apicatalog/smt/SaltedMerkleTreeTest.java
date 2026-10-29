@@ -8,7 +8,6 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,9 +21,9 @@ public class SaltedMerkleTreeTest {
     @Test
     void testJson() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
 
-        var json = Map.of("name", "Filip", "city", "Prague", "country", "Czech Republic");
+        var dataset = Map.of("name", "Filip", "city", "Prague", "country", "Czech Republic");
 
-        var claims = JsonClaims.from(json);
+        var claims = JsonClaims.from(dataset);
 
         for (var claim : claims.values()) {
             IO.println(JsonClaims.toString(claim));
@@ -39,40 +38,31 @@ public class SaltedMerkleTreeTest {
         final Mac hmac = Mac.getInstance("HmacSHA256");
         hmac.init(hmacSecretKey);
 
+        // limit the tree depth to 8 levels, i.e. max 2^8 leaves
         var tree = new SaltedMerkleTree(digest, 8);
 
-        var root = tree.generateRoot(hmac, claims.values());
+        // claim list commitment
+        var commitment = tree.generateRoot(hmac, claims.values());
 
-//        Path file = Path.of(System.getProperty("user.home"), "merkle-tree.dot");
-//        try (var writer = new TopologyDotWriter(Files.newBufferedWriter(file))) {
-//            writer.write(claims.size(), mapping, new int[] { 0, 2 });
-//            IO.println("DOT file written to: " + file);
-//        }
+        // claims to be disclosed
+        claims = JsonClaims.from(dataset, Set.of("/city", "/country"));
 
-        claims = JsonClaims.from(json, Set.of("/city", "/country"));
-//        IO.println("C2> " + claims.size() + ", indices " + claims.selected());
-//        for (var claim : claims.values()) {
-//            IO.println("C2> " + JsonClaims.toString(claim));
-//        }
-
+        // disclosure associated with the disclosed claims
         var disclosure = tree.generatePath(hmac, claims.values(), claims.selected());
-        
+
         assertNotNull(disclosure);
 
-        for (var x : disclosure.path()) {
-            IO.println("path > " + HexFormat.of().formatHex(x));
-        }
-        
+        // disclosed claims
+        claims = JsonClaims.from(Map.of("country", "Czech Republic", "city", "Prague"));
+
+        // reconstruct the claim list commitment from disclosed claims and associated
+        // disclosure
         var ref = tree.recreateRoot(
-                List.of(
-                      JsonClaims.claim("/city", "\"Prague\"".getBytes()),
-                      JsonClaims.claim("/country", "\"Czech Republic\"".getBytes())),
+                claims.values(),
                 disclosure);
 
-        IO.println("ref> " + HexFormat.of().formatHex(ref));
-
-        assertArrayEquals(root, ref);
-
+        // original commitment and reconstructed commitment must match
+        assertArrayEquals(commitment, ref);
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
