@@ -19,7 +19,7 @@ import java.util.function.Predicate;
  * Represents structured JSON claims extracted and flattened from a JSON
  * document, along with selected claim indices for cryptographic processing.
  *
- * @param dataset  the normalized data representation of the JSON document
+ * @param dataset  the data representation of the resulting JSON document
  * @param claims   the list of extracted claim structures
  * @param selected the indices of claims that are selected for disclosure
  */
