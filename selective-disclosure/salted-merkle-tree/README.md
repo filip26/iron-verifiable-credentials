@@ -1,6 +1,6 @@
 # SD Salted Merkle Tree
 
-An implementation of the [Salted Merkle Tree for Selective Disclosure](https://github.com/filip26/salted-merkle-tree).
+Privacy-preserving selective disclosure of JSON claims using [Salted Merkle Tree](https://github.com/filip26/salted-merkle-tree).
 
 ### Examples
 
