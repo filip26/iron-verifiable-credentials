@@ -25,10 +25,6 @@ public class SaltedMerkleTreeTest {
 
         var claims = JsonClaims.from(dataset);
 
-        for (var claim : claims.claims()) {
-            IO.println(JsonClaims.toString(claim));
-        }
-
         var digest = MessageDigest.getInstance("SHA-256");
 
         var hmacSecretKey = new SecretKeySpec(

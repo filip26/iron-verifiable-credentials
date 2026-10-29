@@ -19,7 +19,13 @@ import javax.crypto.Mac;
  */
 public final class SaltedMerkleTree {
 
-    /*** Disclosure data associated with the disclosed claims */
+    /**
+     * Disclosure data associated with the disclosed claims.
+     *
+     * @param salts   the salts associated with the disclosed claims
+     * @param indices the original leaf indices of the disclosed claims
+     * @param path    the verification path hashes
+     */
     public static record Disclosure(List<byte[]> salts, List<Integer> indices, List<byte[]> path) {
     }
 
@@ -35,10 +41,10 @@ public final class SaltedMerkleTree {
     private final int maxLeaves;
 
     /**
-     * Creates a salted Merkle tree helper using the specified digest.
+     * Creates a salted Merkle tree using the specified digest and maximum depth.
      *
-     * @param digest the digest algorithm used for tree hashes
-     *
+     * @param digest   the digest algorithm used for tree hashes
+     * @param maxDepth the maximum depth of the tree
      */
     public SaltedMerkleTree(MessageDigest digest, int maxDepth) {
         this.digest = digest;
@@ -51,7 +57,7 @@ public final class SaltedMerkleTree {
      * claims.
      *
      * @param hmac   the HMAC instance used for depth-based padding
-     * @param claims the array of claims
+     * @param claims the list of claims
      * @return the root byte array of the salted Merkle tree
      */
     public byte[] generateRoot(Mac hmac, List<byte[][]> claims) {
@@ -515,10 +521,20 @@ public final class SaltedMerkleTree {
         return digest.digest();
     }
 
+    /**
+     * Returns the maximum depth of the tree.
+     *
+     * @return the maximum depth
+     */
     public int maxDepth() {
         return maxDepth;
     }
 
+    /**
+     * Returns the maximum number of leaves supported by the tree.
+     *
+     * @return the maximum number of leaves
+     */
     public int maxLeaves() {
         return maxLeaves;
     }

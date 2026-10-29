@@ -8,27 +8,53 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HexFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Predicate;
 
+/**
+ * Represents structured JSON claims extracted and flattened from a JSON
+ * document, along with selected claim indices for cryptographic processing.
+ *
+ * @param dataset  the normalized data representation of the JSON document
+ * @param claims   the list of extracted claim structures
+ * @param selected the indices of claims that are selected for disclosure
+ */
 public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Integer> selected) {
 
     private static byte[] JCS_NULL = "null".getBytes(StandardCharsets.UTF_8);
     private static byte[] JCS_TRUE = "true".getBytes(StandardCharsets.UTF_8);
     private static byte[] JCS_FALSE = "false".getBytes(StandardCharsets.UTF_8);
 
+    /**
+     * Extracts all available claims from a document map.
+     *
+     * @param document the document represented as a map
+     * @return the claims
+     */
     public static JsonClaims from(Map<String, ?> document) {
         return from(document, Set.of());
     }
 
+    /**
+     * Extracts claims from a document map, designating the specified JSONPointers
+     * as selected.
+     *
+     * @param document the document represented as a map
+     * @param selected the set of JSONPointers
+     * @return the claims with selected indices
+     */
     @SuppressWarnings("unchecked")
     public static JsonClaims from(Map<String, ?> document, Set<String> selected) {
+
         var claims = new ArrayList<byte[][]>();
+
         List<Integer> indices = selected.isEmpty() ? List.of() : new ArrayList<>(selected.size());
 
-        var dataset = flatten("", document, claims, selected, indices);
+        var dataset = flatten("", document, claims, selected::contains, indices);
 
         return new JsonClaims(dataset != null ? (Map<String, Object>) dataset : document, claims, indices);
     }
@@ -37,7 +63,7 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
         return claims.size();
     }
 
-    private static Object flatten(String path, Object node, List<byte[][]> claims, Set<String> selected,
+    private static Object flatten(String path, Object node, List<byte[][]> claims, Predicate<String> selected,
             List<Integer> indices) {
 
         switch (node) {
@@ -45,15 +71,21 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
             var it = col.iterator();
             int i = 0;
 
-            List<Object> data = null;
+            Map<Integer, Object> data = null;
 
             while (it.hasNext()) {
-                var element = flatten(path + "/" + i, it.next(), claims, selected, indices);
+                var element = flatten(
+                        path + "/" + i,
+                        it.next(),
+                        claims,
+                        selected.test(path) ? _ -> true : selected,
+                        indices);
+
                 if (element != null) {
                     if (data == null) {
-                        data = new ArrayList<>();
+                        data = new LinkedHashMap<>();
                     }
-                    data.add(element);
+                    data.put(i, element);
                 }
                 i++;
             }
@@ -71,7 +103,7 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
                         path + "/" + escapeJsonPointerSegment(entry.getKey()),
                         entry.getValue(),
                         claims,
-                        selected,
+                        selected.test(path) ? _ -> true : selected,
                         indices);
 
                 if (value != null) {
@@ -84,7 +116,7 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
             return data;
         }
         default -> {
-            if (selected.contains(path)) {
+            if (selected.test(path)) {
                 indices.add(claims.size());
                 claims.add(null);
                 return node;
