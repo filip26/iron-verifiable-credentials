@@ -6,64 +6,88 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public record JsonClaims(List<byte[][]> values, List<Integer> selected) {
+public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Integer> selected) {
 
-    static byte[] JCS_NULL = "null".getBytes(StandardCharsets.UTF_8);
-    static byte[] JCS_TRUE = "true".getBytes(StandardCharsets.UTF_8);
-    static byte[] JCS_FALSE = "false".getBytes(StandardCharsets.UTF_8);
+    private static byte[] JCS_NULL = "null".getBytes(StandardCharsets.UTF_8);
+    private static byte[] JCS_TRUE = "true".getBytes(StandardCharsets.UTF_8);
+    private static byte[] JCS_FALSE = "false".getBytes(StandardCharsets.UTF_8);
 
     public static JsonClaims from(Map<String, ?> document) {
         return from(document, Set.of());
     }
 
+    @SuppressWarnings("unchecked")
     public static JsonClaims from(Map<String, ?> document, Set<String> selected) {
         var claims = new ArrayList<byte[][]>();
         List<Integer> indices = selected.isEmpty() ? List.of() : new ArrayList<>(selected.size());
 
-        flatten("", document, claims, selected, indices);
+        var dataset = flatten("", document, claims, selected, indices);
 
-        return new JsonClaims(claims, indices);
+        return new JsonClaims(dataset != null ? (Map<String, Object>) dataset : document, claims, indices);
     }
 
     public int size() {
-        return values.size();
+        return claims.size();
     }
 
-    private static void flatten(String path, Object node, List<byte[][]> claims, Set<String> selected,
+    private static Object flatten(String path, Object node, List<byte[][]> claims, Set<String> selected,
             List<Integer> indices) {
 
         switch (node) {
         case Collection<?> col -> {
             var it = col.iterator();
             int i = 0;
+
+            List<Object> data = null;
+
             while (it.hasNext()) {
-                flatten(path + "/" + i, it.next(), claims, selected, indices);
+                var element = flatten(path + "/" + i, it.next(), claims, selected, indices);
+                if (element != null) {
+                    if (data == null) {
+                        data = new ArrayList<>();
+                    }
+                    data.add(element);
+                }
                 i++;
             }
-            return;
+            return data;
         }
         case Map<?, ?> map -> {
             @SuppressWarnings("unchecked")
             var entries = new ArrayList<>((Set<? extends Entry<String, Object>>) map.entrySet());
             Collections.sort(entries, Entry.comparingByKey());
 
+            Map<String, Object> data = null;
+
             for (var entry : entries) {
-                flatten(path + "/" + escapeJsonPointerSegment(entry.getKey()), entry.getValue(), claims, selected,
+                var value = flatten(
+                        path + "/" + escapeJsonPointerSegment(entry.getKey()),
+                        entry.getValue(),
+                        claims,
+                        selected,
                         indices);
+
+                if (value != null) {
+                    if (data == null) {
+                        data = new HashMap<>();
+                    }
+                    data.put(entry.getKey(), value);
+                }
             }
-            return;
+            return data;
         }
         default -> {
             if (selected.contains(path)) {
                 indices.add(claims.size());
                 claims.add(null);
-                return;
+                return node;
             }
         }
         }
@@ -77,6 +101,7 @@ public record JsonClaims(List<byte[][]> values, List<Integer> selected) {
             throw new IllegalArgumentException();
         }
         }
+        return null;
     }
 
     private static void add(String path, byte[] value, List<byte[][]> claims) {
@@ -311,16 +336,5 @@ public record JsonClaims(List<byte[][]> values, List<Integer> selected) {
                 + " || 0x00 || "
                 + new String(claim[2], StandardCharsets.UTF_8)
                 + "]";
-    }
-
-    public static int separator(byte[] claim) {
-        int index = -1;
-        for (int i = 0; i < claim.length; i++) {
-            if (claim[i] == 0) {
-                index = i;
-                break;
-            }
-        }
-        return index;
     }
 }

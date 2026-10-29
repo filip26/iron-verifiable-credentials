@@ -25,7 +25,7 @@ public class SaltedMerkleTreeTest {
 
         var claims = JsonClaims.from(dataset);
 
-        for (var claim : claims.values()) {
+        for (var claim : claims.claims()) {
             IO.println(JsonClaims.toString(claim));
         }
 
@@ -42,23 +42,23 @@ public class SaltedMerkleTreeTest {
         var tree = new SaltedMerkleTree(digest, 8);
 
         // claim list commitment
-        var commitment = tree.generateRoot(hmac, claims.values());
+        var commitment = tree.generateRoot(hmac, claims.claims());
 
         // claims to be disclosed
         claims = JsonClaims.from(dataset, Set.of("/city", "/country"));
 
         // disclosure associated with the disclosed claims
-        var disclosure = tree.generatePath(hmac, claims.values(), claims.selected());
+        var disclosure = tree.generatePath(hmac, claims.claims(), claims.selected());
 
         assertNotNull(disclosure);
 
         // disclosed claims
-        claims = JsonClaims.from(Map.of("country", "Czech Republic", "city", "Prague"));
+        claims = JsonClaims.from(claims.dataset());
 
         // reconstruct the claim list commitment from disclosed claims and associated
         // disclosure
         var ref = tree.recreateRoot(
-                claims.values(),
+                claims.claims(),
                 disclosure);
 
         // original commitment and reconstructed commitment must match
