@@ -93,7 +93,7 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
         }
         case Map<?, ?> map -> {
             @SuppressWarnings("unchecked")
-            var entries = new ArrayList<>((Set<? extends Entry<String, Object>>) map.entrySet());
+            var entries = new ArrayList<>((Collection<? extends Entry<String, Object>>) map.entrySet());
             Collections.sort(entries, Entry.comparingByKey());
 
             Map<String, Object> data = null;
