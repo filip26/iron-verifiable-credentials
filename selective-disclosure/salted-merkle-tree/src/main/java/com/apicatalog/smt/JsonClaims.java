@@ -25,7 +25,6 @@ import java.util.function.Predicate;
  */
 public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Integer> selected) {
 
-    private static byte[] JCS_NULL = "null".getBytes(StandardCharsets.UTF_8);
     private static byte[] JCS_TRUE = "true".getBytes(StandardCharsets.UTF_8);
     private static byte[] JCS_FALSE = "false".getBytes(StandardCharsets.UTF_8);
 
@@ -70,32 +69,68 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
             Predicate<String> selected,
             List<Integer> indices) {
 
+        if (node == null) {
+            throw new IllegalArgumentException(
+                    "Null or undefined values are not allowed as a JSON claim value at path %s, got %s."
+                            .formatted(path, node));
+        }
+
         switch (node) {
         case Collection<?> col -> {
+
+            if (col.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Empty JSON arrays are not allowed as a JSON claim value at path %s, got %s."
+                                .formatted(path, node));
+            }
+
             var it = col.iterator();
             int i = 0;
 
-            Map<Integer, Object> data = null;
+            final var isSelected = selected.test(path);
+
+            if (isSelected) {
+                var result = new ArrayList<>();
+                while (it.hasNext()) {
+                    result.add(flatten(
+                            path + "/" + i,
+                            it.next(),
+                            claims,
+                            isSelected ? _ -> true : selected,
+                            indices));
+                }
+                return result;
+            }
+
+            Map<Integer, Object> result = null;
 
             while (it.hasNext()) {
                 var element = flatten(
                         path + "/" + i,
                         it.next(),
                         claims,
-                        selected.test(path) ? _ -> true : selected,
+                        isSelected ? _ -> true : selected,
                         indices);
 
                 if (element != null) {
-                    if (data == null) {
-                        data = new LinkedHashMap<>();
+                    if (result == null) {
+                        result = new LinkedHashMap<>();
                     }
-                    data.put(i, element);
+                    result.put(i, element);
                 }
                 i++;
             }
-            return data;
+
+            return result;
         }
         case Map<?, ?> map -> {
+
+            if (map.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Empty JSON objects are not allowed as a JSON claim value at path %s, got %s."
+                                .formatted(path, node));
+            }
+
             @SuppressWarnings("unchecked")
             var entries = new ArrayList<>(((Map<String, Object>) map).entrySet());
             Collections.sort(entries, Entry.comparingByKey());
@@ -132,7 +167,6 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
         case Number number -> add(path, canonizeNumber(number), claims);
         case String string -> add(path, canonizeString(string), claims);
         case Boolean bool -> add(path, bool ? JCS_TRUE : JCS_FALSE, claims);
-        case null -> add(path, JCS_NULL, claims);
         default -> {
             throw new IllegalArgumentException();
         }
