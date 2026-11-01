@@ -86,9 +86,7 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
 
             var it = col.iterator();
 
-            final var isSelected = selected.test(path);
-
-            if (isSelected) {
+            if (selected.test(path)) {
                 var result = new ArrayList<>();
                 while (it.hasNext()) {
                     result.add(flatten(
@@ -110,7 +108,7 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
                         path + "/" + elementIndex,
                         it.next(),
                         claims,
-                        isSelected ? _ -> true : selected,
+                        selected,
                         indices);
 
                 if (element != null) {
