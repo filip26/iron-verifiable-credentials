@@ -64,7 +64,8 @@ public final class SaltedMerkleTree {
 
         if (claims.size() > this.maxLeaves) {
             throw new IllegalArgumentException(
-                    "Claims size " + claims.size() + " exceed the maximum allowed number of leaves " + maxLeaves);
+                    "Claims size %d exceed the maximum allowed number of leaves %d."
+                            .formatted(claims.size(), maxLeaves));
         }
 
         var salts = salts(hmac, claims.size());
@@ -96,7 +97,8 @@ public final class SaltedMerkleTree {
 
         if (buffer.length > maxLeaves) {
             throw new IllegalArgumentException(
-                    "Leaves size " + buffer.length + ", exceed the maximum allowed number " + maxLeaves + ".");
+                    "Leaves size %d exceed the maximum allowed number %d."
+                            .formatted(buffer.length, maxLeaves));
         }
 
         final var depth = 32 - Integer.numberOfLeadingZeros(buffer.length - 1);
@@ -139,7 +141,8 @@ public final class SaltedMerkleTree {
 
         if (claims.size() > this.maxLeaves) {
             throw new IllegalArgumentException(
-                    "Claims size " + claims.size() + " exceed the maximum allowed number of leaves " + maxLeaves);
+                    "Claims size %d exceed the maximum allowed number of leaves %d."
+                            .formatted(claims.size(), maxLeaves));
         }
 
         var salts = salts(hmac, claims.size());
@@ -188,7 +191,8 @@ public final class SaltedMerkleTree {
 
         if (buffer.length > maxLeaves) {
             throw new IllegalArgumentException(
-                    "Leaves size " + buffer.length + " exceed the maximum allowed number of leaves " + maxLeaves);
+                    "Leaves size %d exceed the maximum allowed number of leaves %d."
+                            .formatted(buffer.length, maxLeaves));
         }
 
         final var depth = 32 - Integer.numberOfLeadingZeros(buffer.length - 1);
@@ -257,17 +261,20 @@ public final class SaltedMerkleTree {
 
         if (claims.size() > maxLeaves) {
             throw new IllegalArgumentException(
-                    "Claims size " + claims.size() + " exceed the maximum allowed number of leaves " + maxLeaves);
+                    "Claims size %d exceed the maximum allowed number of leaves %d."
+                            .formatted(claims.size(), maxLeaves));
         }
 
         if (claims.size() != salts.size()) {
             throw new IllegalArgumentException(
-                    "Claims length " + claims.size() + " must match salts length " + salts.size());
+                    "Claims length %d must match salts length %d."
+                            .formatted(claims.size(), salts.size()));
         }
 
         if (claims.size() != indices.size()) {
             throw new IllegalArgumentException(
-                    "Claims length " + claims.size() + " must match indices length " + indices.size());
+                    "Claims length %d must match indices length %d."
+                            .formatted(claims.size(), indices.size()));
         }
 
         var mapping = new Integer[indices.size()];
@@ -286,8 +293,9 @@ public final class SaltedMerkleTree {
         for (int i = 0; i < levelSize; i++) {
 
             if (indices.get(mapping[i]) > this.maxLeaves) {
-                throw new IllegalArgumentException("Leaf index " + indices.get(mapping[i])
-                        + " exceeds maximum allowed index " + (this.maxLeaves - 1));
+                throw new IllegalArgumentException(
+                        "Leaf index %d exceeds maximum allowed index %d."
+                                .formatted(indices.get(mapping[i]), this.maxLeaves - 1));
             }
 
             buffer[i] = hashLeaf(salts.get(mapping[i]), claims.get(mapping[i]));
@@ -302,7 +310,8 @@ public final class SaltedMerkleTree {
 
             if (level > this.maxDepth) {
                 throw new IllegalArgumentException(
-                        "Maximum tree depth " + this.maxDepth + " exceeded during root reconstruction.");
+                        "Maximum tree depth %d exceeded during root reconstruction."
+                                .formatted(this.maxDepth));
             }
 
             int nextLevelSize = 0;
@@ -322,8 +331,8 @@ public final class SaltedMerkleTree {
 
                     } else {
                         throw new IllegalArgumentException(
-                                "The path is truncated, expected left hash at index "
-                                        + pathIndex + " but the path length is " + path.size());
+                                "The path is truncated, expected left hash at index %d but the path length is %d."
+                                        .formatted(pathIndex, path.size()));
                     }
 
                 } else if (i + 1 < levelSize && ((nodeIndex + 1) == mapping[i + 1])) {
@@ -337,8 +346,8 @@ public final class SaltedMerkleTree {
 
                 } else {
                     throw new IllegalArgumentException(
-                            "The path is truncated, expected right hash at index "
-                                    + pathIndex + " but the path length is " + path.size());
+                            "The path is truncated, expected right hash at index %d but the path length is %d."
+                                    .formatted(pathIndex, path.size()));
                 }
 
                 buffer[nextLevelSize] = hashNode(left, right);
