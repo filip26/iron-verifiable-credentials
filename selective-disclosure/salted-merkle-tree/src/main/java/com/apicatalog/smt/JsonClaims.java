@@ -63,7 +63,11 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
         return claims.size();
     }
 
-    private static Object flatten(String path, Object node, List<byte[][]> claims, Predicate<String> selected,
+    private static Object flatten(
+            String path,
+            Object node,
+            List<byte[][]> claims,
+            Predicate<String> selected,
             List<Integer> indices) {
 
         switch (node) {
