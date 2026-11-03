@@ -85,18 +85,15 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
             }
 
             var it = col.iterator();
-            int i = 0;
 
-            final var isSelected = selected.test(path);
-
-            if (isSelected) {
+            if (selected.test(path)) {
                 var result = new ArrayList<>();
                 while (it.hasNext()) {
                     result.add(flatten(
-                            path + "/" + i,
+                            path + "/" + result.size(),
                             it.next(),
                             claims,
-                            isSelected ? _ -> true : selected,
+                            _ -> true,
                             indices));
                 }
                 return result;
@@ -104,21 +101,23 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
 
             Map<Integer, Object> result = null;
 
+            int elementIndex = 0;
+
             while (it.hasNext()) {
                 var element = flatten(
-                        path + "/" + i,
+                        path + "/" + elementIndex,
                         it.next(),
                         claims,
-                        isSelected ? _ -> true : selected,
+                        selected,
                         indices);
 
                 if (element != null) {
                     if (result == null) {
                         result = new LinkedHashMap<>();
                     }
-                    result.put(i, element);
+                    result.put(elementIndex, element);
                 }
-                i++;
+                elementIndex++;
             }
 
             return result;
@@ -167,9 +166,7 @@ public record JsonClaims(Map<String, ?> dataset, List<byte[][]> claims, List<Int
         case Number number -> add(path, canonizeNumber(number), claims);
         case String string -> add(path, canonizeString(string), claims);
         case Boolean bool -> add(path, bool ? JCS_TRUE : JCS_FALSE, claims);
-        default -> {
-            throw new IllegalArgumentException();
-        }
+        default -> throw new IllegalArgumentException();
         }
         return null;
     }
