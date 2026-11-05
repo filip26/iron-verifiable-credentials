@@ -3,7 +3,8 @@
 
 # SD JSON Claims
 
-[![Maven](https://badges.mvnrepository.com/badge/com.apicatalog/sd-json-claims/badge.svg?label=Maven)](https://mvnrepository.com/artifact/com.apicatalog/sd-json-claims)
+[![Maven Central](https://img.shields.io/maven-central/v/com.apicatalog/sd-json-claims.svg?label=Central)](https://mvnrepository.com/artifact/com.apicatalog/sd-json-claims)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Privacy-preserving selective disclosure of JSON documents using [Salted Merkle Tree](https://github.com/filip26/salted-merkle-tree). 
 
