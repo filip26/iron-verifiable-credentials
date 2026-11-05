@@ -3,6 +3,8 @@
 
 # SD JSON Claims
 
+[![Maven](https://badges.mvnrepository.com/badge/com.apicatalog/sd-json-claims/badge.svg?label=Maven)](https://mvnrepository.com/artifact/com.apicatalog/sd-json-claims)
+
 Privacy-preserving selective disclosure of JSON documents using [Salted Merkle Tree](https://github.com/filip26/salted-merkle-tree). 
 
 A JSON document is transformed into an ordered sequence of claims that are signed by an issuer. The signature tethered with the origin document is passed to a holder, which is a disclosing party having the ability to select a particular set of claims to be disclosed and shared as a JSON document with a verifier. The verifier does not receive all the claims included in the origin document, only the disclosed claims, and can verify the disclosed document fragment is the one signed by the issuer while undisclosed claims stay secret.
@@ -19,3 +21,13 @@ Selective disclosure is used in a three-party trust model allowing a verifier to
 ## Interoperability
 
 * [SD JSON Claims.js](https://github.com/filip26/sd-json-claims.js)
+
+## Installation
+
+```xml
+<dependency>
+    <groupId>com.apicatalog</groupId>
+    <artifactId>sd-json-claims</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
